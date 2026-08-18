@@ -37,12 +37,22 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.partner != null ? '${widget.character.partner!['age']} tahun' : 'Tidak diketahui';
     }
 
+    if (role == 'Mertua') {
+      if (name.startsWith('Ayah Mertua')) {
+        return widget.character.fatherInLawAge != null ? '${widget.character.fatherInLawAge} tahun' : 'Tidak diketahui';
+      } else {
+        return widget.character.motherInLawAge != null ? '${widget.character.motherInLawAge} tahun' : 'Tidak diketahui';
+      }
+    }
+
     if (role == 'Kandung' && name.startsWith('Ayah')) {
       return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Kandung' && name.startsWith('Ibu')) {
       return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       return widget.character.stepFatherAge != null ? '${widget.character.stepFatherAge} tahun' : 'Tidak diketahui';
+    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+      return widget.character.stepMotherAge != null ? '${widget.character.stepMotherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -55,6 +65,13 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     } else {
+      // Cek di extended family
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == name) {
+          int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
+          return extAge < 0 ? 'Belum Lahir (Dalam Kandungan)' : '$extAge tahun';
+        }
+      }
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
         if (expectedLabel == name) {
@@ -75,12 +92,22 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return int.tryParse(widget.character.partner?['relationship'] ?? '50') ?? 50;
     }
 
+    if (role == 'Mertua') {
+      if (name.startsWith('Ayah Mertua')) {
+        return widget.character.fatherInLawRelationship ?? 50;
+      } else {
+        return widget.character.motherInLawRelationship ?? 50;
+      }
+    }
+
     if (role == 'Kandung' && name.startsWith('Ayah')) {
       return widget.character.fatherRelationship ?? 50;
     } else if (role == 'Kandung' && name.startsWith('Ibu')) {
       return widget.character.motherRelationship ?? 50;
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       return widget.character.stepFatherRelationship ?? 50;
+    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+      return widget.character.stepMotherRelationship ?? 50;
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -91,6 +118,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     } else {
+      // Cek di extended family
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == name) {
+          return int.tryParse(ext['relationship'] ?? '50') ?? 50;
+        }
+      }
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
         if (expectedLabel == name) {
@@ -114,12 +147,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return;
     }
 
+    if (role == 'Mertua') {
+      if (name.startsWith('Ayah Mertua')) {
+        widget.character.fatherInLawRelationship = ((widget.character.fatherInLawRelationship ?? 50) + changeAmount).clamp(0, 100);
+      } else {
+        widget.character.motherInLawRelationship = ((widget.character.motherInLawRelationship ?? 50) + changeAmount).clamp(0, 100);
+      }
+      return;
+    }
+
     if (role == 'Kandung' && name.startsWith('Ayah')) {
       widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Kandung' && name.startsWith('Ibu')) {
       widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) + changeAmount).clamp(0, 100);
+    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+      widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -132,6 +176,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     } else {
+      // Cek di extended family
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == name) {
+          int currentRel = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+          ext['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
+          return;
+        }
+      }
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
         if (expectedLabel == name) {

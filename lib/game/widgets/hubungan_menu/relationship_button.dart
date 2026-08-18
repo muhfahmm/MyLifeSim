@@ -27,7 +27,7 @@ class RelationshipButton extends StatelessWidget {
           return;
         }
 
-        // --- CONSTRUCT UNIFIED LIST OF CHILDREN (SIBLINGS + PLAYER) ---
+        // --- BUAT DAFTAR SAUDARA & DIRI SENDIRI ---
         final List<Map<String, dynamic>> childrenList = [];
 
         // 1. Masukkan semua saudara kandung yang SUDAH LAHIR (age >= 0)
@@ -35,7 +35,8 @@ class RelationshipButton extends StatelessWidget {
           final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
           final bool isDeceased = sib['isDeceased'] == 'true';
           final String expectedLabel = '${sib['name']} (${sib['relation']})';
-          
+
+          // Hindari duplikasi jika saudara adalah pasangan
           if (character.partner != null && character.partner!['name'] == expectedLabel) {
             continue;
           }
@@ -64,8 +65,25 @@ class RelationshipButton extends StatelessWidget {
           'isDeceased': false,
         });
 
-        // 3. Urutkan dari yang tertua ke termuda (descending) berdasarkan umur
+        // 3. Urutkan dari yang tertua ke termuda (descending)
         childrenList.sort((a, b) => b['age'].compareTo(a['age']));
+
+        // --- FILTER KELUARGA BESAR BERDASARKAN SISI KELUARGA ---
+        // Asumsi: `relation` di extendedFamily sudah mencakup "(dari Ayah)" atau "(dari Ibu)".
+        final List<Map<String, dynamic>> fatherSide = [];
+        final List<Map<String, dynamic>> motherSide = [];
+
+        for (var member in character.extendedFamily) {
+          final String relation = member['relation'] ?? '';
+          if (relation.contains('Ayah')) {
+            fatherSide.add(member);
+          } else if (relation.contains('Ibu')) {
+            motherSide.add(member);
+          } else {
+            // Fallback: masukkan ke ibu jika tidak terdeteksi
+            motherSide.add(member);
+          }
+        }
 
         DialogHelper.show(
           context: context,
@@ -112,6 +130,17 @@ class RelationshipButton extends StatelessWidget {
                   ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isStepFatherDeceased,
                 ),
+              if (character.stepMotherName != null)
+                _buildFamilyItem(
+                  context,
+                  icon: Icons.person_add,
+                  label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
+                  status: 'Tiri',
+                  color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
+                  relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                  ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
+                  isDeceased: character.isStepMotherDeceased,
+                ),
 
               // ============================================
               // 2. BAGIAN PACAR / TUNANGAN / SUAMI / ISTRI
@@ -143,10 +172,41 @@ class RelationshipButton extends StatelessWidget {
                 ),
               ],
 
+              // ============================================
+              // 2b. BAGIAN MERTUA (AYAH & IBU MERTUA)
+              // ============================================
+              if (character.fatherInLawName != null || character.motherInLawName != null) ...[
+                const Divider(height: 32),
+                const Text('👵👴 Mertua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                const SizedBox(height: 8),
+                if (character.fatherInLawName != null)
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person,
+                    label: character.isFatherInLawDeceased ? 'Ayah Mertua (${character.fatherInLawName}) (Wafat)' : 'Ayah Mertua (${character.fatherInLawName})',
+                    status: 'Mertua',
+                    color: character.isFatherInLawDeceased ? Colors.grey : Colors.blueGrey,
+                    relationshipValue: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
+                    ageText: character.fatherInLawAge != null ? '${character.fatherInLawAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isFatherInLawDeceased,
+                  ),
+                if (character.motherInLawName != null)
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person_outline,
+                    label: character.isMotherInLawDeceased ? 'Ibu Mertua (${character.motherInLawName}) (Wafat)' : 'Ibu Mertua (${character.motherInLawName})',
+                    status: 'Mertua',
+                    color: character.isMotherInLawDeceased ? Colors.grey : Colors.brown,
+                    relationshipValue: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
+                    ageText: character.motherInLawAge != null ? '${character.motherInLawAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isMotherInLawDeceased,
+                  ),
+              ],
+
               const Divider(height: 32),
 
               // ============================================
-              // 3. BAGIAN SAUDARA & DIRI SENDIRI (URUTAN UMUR)
+              // 3. BAGIAN SAUDARA & DIRI SENDIRI
               // ============================================
               const Text('👫 Saudara & Diri Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
               const SizedBox(height: 8),
@@ -160,7 +220,6 @@ class RelationshipButton extends StatelessWidget {
                 final bool isMale = gender == 'Laki-laki';
 
                 if (isPlayer) {
-                  // Card Khusus Player (Diri Sendiri, tidak bisa diklik)
                   return Container(
                     margin: const EdgeInsets.only(bottom: 6),
                     padding: const EdgeInsets.all(12),
@@ -177,18 +236,24 @@ class RelationshipButton extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                name,
-                                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal),
-                              ),
+                              Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal)),
                               const SizedBox(height: 2),
-                              Text(
-                                'Umur: $age tahun',
-                                style: const TextStyle(fontSize: 11, color: Colors.black54),
-                              ),
+                              Text('Umur: $age tahun', style: const TextStyle(fontSize: 11, color: Colors.black54)),
                             ],
                           ),
                         ),
+                        if (character.gender.trim().toLowerCase() == 'perempuan' && character.isPregnant) ...[
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            margin: const EdgeInsets.only(right: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: Colors.pink.withOpacity(0.3)),
+                            ),
+                            child: const Text('Hamil 🍼', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.pink)),
+                          ),
+                        ],
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
@@ -196,16 +261,12 @@ class RelationshipButton extends StatelessWidget {
                             borderRadius: BorderRadius.circular(8),
                             border: Border.all(color: Colors.teal.withOpacity(0.3)),
                           ),
-                          child: const Text(
-                            'Anda',
-                            style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal),
-                          ),
+                          child: const Text('Anda', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal)),
                         ),
                       ],
                     ),
                   );
                 } else {
-                  // Card Saudara Kandung (Bisa diklik menuju Aksi jika hidup)
                   return _buildFamilyItem(
                     context,
                     icon: isMale ? Icons.male : Icons.female,
@@ -220,7 +281,69 @@ class RelationshipButton extends StatelessWidget {
               }).toList(),
 
               // ============================================
-              // 4. BAGIAN ANAK (JIKA ADA) - SEKARANG BERPERILAKU SAMA SEPERTI KELUARGA LAIN
+              // 4. BAGIAN KELUARGA BESAR (EXTENDED FAMILY)
+              // ============================================
+              if (character.extendedFamily.isNotEmpty) ...[
+                const Divider(height: 32),
+
+                // --- KELUARGA DARI AYAH ---
+                if (fatherSide.isNotEmpty) ...[
+                  const Text('👨 Keluarga dari Ayah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  ...fatherSide.map((ext) {
+                    final String name = ext['name'] ?? 'Keluarga';
+                    final String relation = ext['relation'] ?? 'Keluarga';
+                    final int relVal = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+                    final int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
+                    final bool isDeceased = ext['isDeceased'] == 'true';
+                    final bool isMale = (ext['gender'] ?? 'Laki-laki') == 'Laki-laki';
+
+                    if (extAge < 0 && !isDeceased) return const SizedBox.shrink();
+
+                    return _buildFamilyItem(
+                      context,
+                      icon: isMale ? Icons.face : Icons.face_3,
+                      label: isDeceased ? '$name (Wafat)' : name,
+                      status: relation, // Badge akan menampilkan "Nenek (dari Ayah)", dst.
+                      color: isDeceased ? Colors.grey : (isMale ? Colors.blueGrey : Colors.brown),
+                      relationshipValue: relVal,
+                      ageText: '$extAge tahun',
+                      isDeceased: isDeceased,
+                    );
+                  }).toList(),
+                  const SizedBox(height: 12),
+                ],
+
+                // --- KELUARGA DARI IBU ---
+                if (motherSide.isNotEmpty) ...[
+                  const Text('👩 Keluarga dari Ibu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  ...motherSide.map((ext) {
+                    final String name = ext['name'] ?? 'Keluarga';
+                    final String relation = ext['relation'] ?? 'Keluarga';
+                    final int relVal = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+                    final int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
+                    final bool isDeceased = ext['isDeceased'] == 'true';
+                    final bool isMale = (ext['gender'] ?? 'Laki-laki') == 'Laki-laki';
+
+                    if (extAge < 0 && !isDeceased) return const SizedBox.shrink();
+
+                    return _buildFamilyItem(
+                      context,
+                      icon: isMale ? Icons.face : Icons.face_3,
+                      label: isDeceased ? '$name (Wafat)' : name,
+                      status: relation, // Badge akan menampilkan "Kakek (dari Ibu)", dst.
+                      color: isDeceased ? Colors.grey : (isMale ? Colors.blueGrey : Colors.brown),
+                      relationshipValue: relVal,
+                      ageText: '$extAge tahun',
+                      isDeceased: isDeceased,
+                    );
+                  }).toList(),
+                ],
+              ],
+
+              // ============================================
+              // 5. BAGIAN ANAK (JIKA ADA)
               // ============================================
               if (character.children.isNotEmpty) ...[
                 const Divider(height: 32),
@@ -281,7 +404,7 @@ class RelationshipButton extends StatelessWidget {
     );
   }
 
-  // --- WIDGET HELPER: Menampilkan Kartu Anggota Keluarga / Relasi ---
+  // --- WIDGET HELPER: Kartu Anggota Keluarga / Relasi (Navigasi ke ActionMenu) ---
   Widget _buildFamilyItem(
     BuildContext context, {
     required IconData icon,
@@ -294,9 +417,7 @@ class RelationshipButton extends StatelessWidget {
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
-        // 1. Tutup menu dialog Hubungan & Keluarga
-        Navigator.pop(context); 
-        // 2. Pindah ke Halaman Aksi
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -307,7 +428,6 @@ class RelationshipButton extends StatelessWidget {
             ),
           ),
         ).then((_) {
-          // Panggil onRefresh setelah menutup Halaman Aksi agar Dashboard & status uang/kepuasan ter-refresh
           onRefresh();
         });
       },
@@ -333,17 +453,14 @@ class RelationshipButton extends StatelessWidget {
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w600, 
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                           color: isDeceased ? Colors.grey.shade600 : Colors.black87,
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'Umur: $ageText',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54),
-                      ),
+                      Text('Umur: $ageText', style: const TextStyle(fontSize: 11, color: Colors.black54)),
                     ],
                   ),
                 ),
@@ -367,7 +484,6 @@ class RelationshipButton extends StatelessWidget {
             ),
             if (!isDeceased) ...[
               const SizedBox(height: 8),
-              // Progress Bar Tingkat Kepuasan / Hubungan
               Row(
                 children: [
                   const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),
@@ -410,7 +526,7 @@ class RelationshipButton extends StatelessWidget {
     );
   }
 
-  // --- WIDGET HELPER: Menampilkan Kartu Anak (Klik Memunculkan Orangtua Asal Usul) ---
+  // --- WIDGET HELPER: Kartu Anak ---
   Widget _buildChildItem(
     BuildContext context, {
     required IconData icon,
@@ -421,7 +537,6 @@ class RelationshipButton extends StatelessWidget {
     required String ageText,
     bool isDeceased = false,
   }) {
-    // SEKARANG LOGIKANYA SAMA SEPERTI KELUARGA LAIN: NAVIGASI KE ACTION MENU
     return InkWell(
       onTap: isDeceased ? null : () {
         Navigator.pop(context);
@@ -431,7 +546,7 @@ class RelationshipButton extends StatelessWidget {
             builder: (context) => ActionMenuScreen(
               character: character,
               targetName: label,
-              targetRole: status, // bisa 'Laki-laki' / 'Perempuan' atau 'Anak'
+              targetRole: status,
             ),
           ),
         ).then((_) {
@@ -460,17 +575,14 @@ class RelationshipButton extends StatelessWidget {
                       Text(
                         label,
                         style: TextStyle(
-                          fontSize: 14, 
-                          fontWeight: FontWeight.w600, 
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
                           color: isDeceased ? Colors.grey.shade600 : Colors.black87,
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text(
-                        'Umur: $ageText',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54),
-                      ),
+                      Text('Umur: $ageText', style: const TextStyle(fontSize: 11, color: Colors.black54)),
                     ],
                   ),
                 ),
@@ -494,7 +606,6 @@ class RelationshipButton extends StatelessWidget {
             ),
             if (!isDeceased) ...[
               const SizedBox(height: 8),
-              // Progress Bar Tingkat Kepuasan / Hubungan
               Row(
                 children: [
                   const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),

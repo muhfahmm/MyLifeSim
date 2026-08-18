@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/bercinta.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
 import 'age_base.dart';
 
 String _getPartnerGender(String targetName) {
@@ -285,6 +286,30 @@ List<ActionItem> getAge12PlusActions(
         }
 
         if (accepted) {
+          // Cari usia asli target dari daftar keluarga
+          int actualTargetAge = 18; // fallback
+          if (targetName.startsWith('Ayah')) {
+            actualTargetAge = character.fatherAge ?? 40;
+          } else if (targetName.startsWith('Ibu')) {
+            actualTargetAge = character.motherAge ?? 38;
+          } else {
+            // Cek di siblings
+            for (var sib in character.siblings) {
+              final String expectedLabel = '${sib['name']} (${sib['relation']})';
+              if (expectedLabel == targetName) {
+                actualTargetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
+                break;
+              }
+            }
+            // Cek di extendedFamily
+            for (var ext in character.extendedFamily) {
+              if (ext['name'] == targetName) {
+                actualTargetAge = int.tryParse(ext['age'] ?? '18') ?? 18;
+                break;
+              }
+            }
+          }
+
           showDialog(
             'Cinta Diterima! 💖',
             '$targetName menerima ajakanmu untuk berpacaran! Sekarang kalian resmi berpacaran.',
@@ -292,7 +317,7 @@ List<ActionItem> getAge12PlusActions(
               character.partner = {
                 'name': targetName,
                 'gender': partnerGender,
-                'age': '0',
+                'age': '$actualTargetAge',
                 'relationship': currentRel.toString(),
                 'relation': 'Pacar',
               };
@@ -317,7 +342,7 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 3. Lamar
-  if (isPartnerRole && targetRole == 'Pacar' && age >= 18) {
+  if (isPartnerRole && character.partner != null && character.partner!['relation'] == 'Pacar' && age >= 18) {
     actions.add(ActionItem(
       label: 'Lamar',
       icon: Icons.diamond,
@@ -336,6 +361,17 @@ List<ActionItem> getAge12PlusActions(
               }
               character.happiness = (character.happiness + 30).clamp(0, 100);
               updateState();
+
+              // Tampilkan dialog pilihan beritahu ortu atau tidak
+              BeritahuLamaranHelper.showTellOrNotDialog(
+                context: context,
+                character: character,
+                partnerName: targetName,
+                partnerRole: targetRole,
+                onComplete: () {
+                  updateState();
+                },
+              );
             }
           );
         } else {
@@ -355,7 +391,7 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 4. Rencanakan Pernikahan
-  if (isPartnerRole && targetRole == 'Tunangan' && age >= 18) {
+  if (isPartnerRole && character.partner != null && character.partner!['relation'] == 'Tunangan' && age >= 18) {
     actions.add(ActionItem(
       label: 'Rencanakan Pernikahan',
       icon: Icons.wc,
@@ -377,13 +413,30 @@ List<ActionItem> getAge12PlusActions(
             String spouseRelation = partnerGender == 'Laki-laki' ? 'Suami' : 'Istri';
             showDialog(
               'Pernikahan Sukses! 🎉💒',
-              'Selamat! Pernikahan kalian berjalan sangat lancar dan meriah. Sekarang kalian resmi menjadi sepasang Suami-Istri!',
+              'Selamat! Pernikahan kalian berjalan sangat lancar dan meriah. Sekarang kalian resmi menjadi sepasang Suami-Istri! (Sekarang kamu juga memiliki keluarga mertua baru!)',
               Icons.wc, Colors.green, () {
                 character.money -= 100;
                 if (character.partner != null) {
                   character.partner!['relation'] = spouseRelation;
                 }
                 character.happiness = (character.happiness + 40).clamp(0, 100);
+
+                // Generate Mertua
+                final int partnerAge = int.tryParse(character.partner?['age'] ?? '20') ?? 20;
+                final List<String> fallbackMale = ['Bambang', 'Wahyudi', 'Herman', 'Tirto', 'Suryo'];
+                final List<String> fallbackFemale = ['Suryani', 'Hartati', 'Endang', 'Ratna', 'Wati'];
+                final List<String> fallbackLast = ['Kusuma', 'Prabowo', 'Susilo', 'Subianto', 'Harahap'];
+
+                character.fatherInLawName = '${fallbackMale[random.nextInt(fallbackMale.length)]} ${fallbackLast[random.nextInt(fallbackLast.length)]}';
+                character.fatherInLawAge = partnerAge + 22 + random.nextInt(10);
+                character.fatherInLawRelationship = 50;
+                character.isFatherInLawDeceased = false;
+
+                character.motherInLawName = '${fallbackFemale[random.nextInt(fallbackFemale.length)]} ${fallbackLast[random.nextInt(fallbackLast.length)]}';
+                character.motherInLawAge = partnerAge + 20 + random.nextInt(8);
+                character.motherInLawRelationship = 50;
+                character.isMotherInLawDeceased = false;
+
                 updateState();
               }
             );
@@ -434,6 +487,100 @@ List<ActionItem> getAge12PlusActions(
           }
         );
       }
+    },
+  ));
+
+  // 6. Pujian
+  actions.add(ActionItem(
+    label: 'Pujian',
+    icon: Icons.thumb_up,
+    color: Colors.blueAccent,
+    onTap: () {
+      int relBonus = random.nextInt(5) + 8;
+      showDialog(
+        'Berikan Pujian',
+        'Kamu memberikan pujian yang tulus kepada $relation. Dia terlihat sangat senang! (+$relBonus% hubungan)',
+        Icons.thumb_up, Colors.blueAccent, () {
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
+    },
+  ));
+
+  // 7. Percakapan
+  actions.add(ActionItem(
+    label: 'Percakapan',
+    icon: Icons.chat,
+    color: Colors.teal,
+    onTap: () {
+      int relBonus = random.nextInt(4) + 2;
+      showDialog(
+        'Bercakap-cakap',
+        'Kamu mengobrol santai dengan $relation tentang hobi dan kesehariannya. (+$relBonus% hubungan)',
+        Icons.chat, Colors.teal, () {
+          character.happiness = (character.happiness + 5).clamp(0, 100);
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
+    },
+  ));
+
+  // 8. Menyinggung
+  actions.add(ActionItem(
+    label: 'Menyinggung',
+    icon: Icons.sentiment_very_dissatisfied,
+    color: Colors.red,
+    onTap: () {
+      int relPenalty = random.nextInt(11) + 5;
+      showDialog(
+        'Menyinggung Perasaan',
+        'Kamu melontarkan lelucon kasar yang menyinggung perasaan $relation. Hubungan menjadi canggung (-$relPenalty% hubungan).',
+        Icons.sentiment_very_dissatisfied, Colors.red, () {
+          character.happiness = (character.happiness - 15).clamp(0, 100);
+          updateRelationship(-relPenalty);
+          updateState();
+        }
+      );
+    },
+  ));
+
+  // 9. Pergi ke Bioskop Bersama
+  actions.add(ActionItem(
+    label: 'Pergi ke Bioskop Bersama',
+    icon: Icons.movie,
+    color: Colors.deepPurple,
+    onTap: () {
+      int relBonus = random.nextInt(6) + 10;
+      showDialog(
+        'Menonton Bioskop',
+        'Kamu mengajak $relation pergi menonton film di bioskop terdekat. (+$relBonus% hubungan)',
+        Icons.movie, Colors.deepPurple, () {
+          character.happiness = (character.happiness + 15).clamp(0, 100);
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
+    },
+  ));
+
+  // 10. Habiskan Waktu Bersama
+  actions.add(ActionItem(
+    label: 'Habiskan Waktu Bersama',
+    icon: Icons.people,
+    color: Colors.indigo,
+    onTap: () {
+      int relBonus = random.nextInt(5) + 8;
+      showDialog(
+        'Habiskan Waktu',
+        'Kamu menghabiskan sore yang santai bersama $relation untuk mengobrol dan berjalan-jalan. (+$relBonus% hubungan)',
+        Icons.people, Colors.indigo, () {
+          character.happiness = (character.happiness + 10).clamp(0, 100);
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
     },
   ));
 

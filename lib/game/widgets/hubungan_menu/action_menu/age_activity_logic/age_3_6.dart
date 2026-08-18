@@ -86,17 +86,55 @@ List<ActionItem> getAge3to6Actions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(6) + 5;
+          int relPenalty = random.nextInt(5) + 1; // 1-5%
           showDialog(
             'Pelukan Ditolak',
             '$relation sedang sibuk dan menolak pelukanmu. Kamu merasa sedikit sedih (-$relPenalty%).',
             Icons.sentiment_dissatisfied, Colors.grey, () {
-              character.happiness = (character.happiness - 5).clamp(0, 100);
+              character.happiness = (character.happiness - 2).clamp(0, 100);
               updateRelationship(-relPenalty);
               updateState();
             }
           );
         }
+      },
+    ),
+
+    // 3. Pergi ke Bioskop Bersama
+    ActionItem(
+      label: 'Pergi ke Bioskop Bersama',
+      icon: Icons.movie,
+      color: Colors.deepPurple,
+      onTap: () {
+        int relBonus = random.nextInt(6) + 10;
+        showDialog(
+          'Pergi ke Bioskop',
+          'Kamu pergi ke bioskop menonton film anak-anak bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan)',
+          Icons.movie, Colors.deepPurple, () {
+            character.happiness = (character.happiness + 15).clamp(0, 100);
+            updateRelationship(relBonus);
+            updateState();
+          }
+        );
+      },
+    ),
+
+    // 4. Habiskan Waktu Bersama
+    ActionItem(
+      label: 'Habiskan Waktu Bersama',
+      icon: Icons.people,
+      color: Colors.blueAccent,
+      onTap: () {
+        int relBonus = random.nextInt(5) + 8;
+        showDialog(
+          'Habiskan Waktu',
+          'Kamu menghabiskan waktu bermain bersama $relation sepanjang hari! (+$relBonus% hubungan)',
+          Icons.people, Colors.blueAccent, () {
+            character.happiness = (character.happiness + 12).clamp(0, 100);
+            updateRelationship(relBonus);
+            updateState();
+          }
+        );
       },
     ),
   ];

@@ -18,18 +18,22 @@ class Character {
   String? fatherName;        // Nama Ayah Kandung
   String? motherName;        // Nama Ibu Kandung
   String? stepFatherName;    // Nama Ayah Tiri (jika ada)
+  String? stepMotherName;    // Nama Ibu Tiri (jika ada)
   int birthOrder;            // Urutan kelahiran (1 = anak pertama, 2 = kedua, dst)
   List<Map<String, String>> siblings; // Daftar saudara [{name: '...', gender: 'Laki-laki', relation: '...', relationship: '50', age: '2', isDeceased: 'false'}]
+  List<Map<String, String>> extendedFamily = []; // Daftar kakek, nenek, paman, bibi, sepupu [{name: '...', gender: 'Laki-laki', relation: 'Kakek (dari Ayah)', relationship: '50', age: '70', isDeceased: 'false'}]
 
   // --- HUBUNGAN (RELATIONSHIP BARS) ---
   int? fatherRelationship;
   int? motherRelationship;
   int? stepFatherRelationship;
+  int? stepMotherRelationship;
 
   // --- UMUR KELUARGA ---
   int? fatherAge;
   int? motherAge;
   int? stepFatherAge;
+  int? stepMotherAge;
 
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
@@ -54,6 +58,17 @@ class Character {
   bool isFatherDeceased = false;
   bool isMotherDeceased = false;
   bool isStepFatherDeceased = false;
+  bool isStepMotherDeceased = false;
+
+  // --- DATA MERTUA ---
+  String? fatherInLawName;
+  String? motherInLawName;
+  int? fatherInLawAge;
+  int? motherInLawAge;
+  int? fatherInLawRelationship;
+  int? motherInLawRelationship;
+  bool isFatherInLawDeceased = false;
+  bool isMotherInLawDeceased = false;
 
   // --- STATUS PENYAKIT SEKSUAL ---
   bool hasHIV = false;
@@ -78,14 +93,24 @@ class Character {
     this.fatherName,
     this.motherName,
     this.stepFatherName,
+    this.stepMotherName,
     this.birthOrder = 1,
     this.siblings = const [],
+    this.extendedFamily = const [],
     this.fatherRelationship = 50,
     this.motherRelationship = 50,
     this.stepFatherRelationship = 50,
+    this.stepMotherRelationship = 50,
     this.fatherAge,
     this.motherAge,
     this.stepFatherAge,
+    this.stepMotherAge,
+    this.fatherInLawName,
+    this.motherInLawName,
+    this.fatherInLawAge,
+    this.motherInLawAge,
+    this.fatherInLawRelationship = 50,
+    this.motherInLawRelationship = 50,
     this.partner,
   }) : inbox = [];
 
@@ -148,6 +173,68 @@ class Character {
       }
     }
 
+    if (stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null) {
+      stepMotherAge = stepMotherAge! + 1;
+      if (stepMotherAge! > 60) {
+        int deathChance = (stepMotherAge! - 60) ~/ 2 + 1;
+        if (random.nextInt(100) < deathChance) {
+          isStepMotherDeceased = true;
+          stepMotherRelationship = 0;
+          events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun.');
+        }
+      }
+    }
+
+    if (fatherInLawName != null && !isFatherInLawDeceased && fatherInLawAge != null) {
+      fatherInLawAge = fatherInLawAge! + 1;
+      if (fatherInLawAge! > 60) {
+        int deathChance = (fatherInLawAge! - 60) ~/ 2 + 1;
+        if (random.nextInt(100) < deathChance) {
+          isFatherInLawDeceased = true;
+          fatherInLawRelationship = 0;
+          events.add('👴 Kabar Duka: Ayah mertuamu, $fatherInLawName, meninggal dunia pada usia $fatherInLawAge tahun.');
+        }
+      }
+    }
+
+    if (motherInLawName != null && !isMotherInLawDeceased && motherInLawAge != null) {
+      motherInLawAge = motherInLawAge! + 1;
+      if (motherInLawAge! > 60) {
+        int deathChance = (motherInLawAge! - 60) ~/ 2 + 1;
+        if (random.nextInt(100) < deathChance) {
+          isMotherInLawDeceased = true;
+          motherInLawRelationship = 0;
+          events.add('👵 Kabar Duka: Ibu mertuamu, $motherInLawName, meninggal dunia pada usia $motherInLawAge tahun.');
+        }
+      }
+    }
+
+    // --- LOGIKA REMARRY: PENDAPATAN AYAH/IBU TIRI SETELAH LAHIR (35% CHANCE) ---
+    // Kasus 1: Ibu kandung hidup, tetapi tidak ada ayah kandung (atau wafat) dan belum punya ayah tiri
+    if (motherName != null && !isMotherDeceased && (fatherName == null || isFatherDeceased) && stepFatherName == null) {
+      if (random.nextInt(100) < 35) {
+        stepFatherName = 'Fajar Pratama'; // Default fallback name
+        stepFatherAge = motherAge! + random.nextInt(5) - 2;
+        stepFatherRelationship = 50;
+        isStepFatherDeceased = false;
+        final String notice = '💍 Kabar Keluarga: Ibumu menikah lagi! Sekarang kamu memiliki Ayah Tiri bernama $stepFatherName.';
+        events.add(notice);
+        inbox.add(notice);
+      }
+    }
+    // Kasus 2: Ayah kandung hidup, tetapi tidak ada ibu kandung (atau wafat) dan belum punya ibu tiri
+    else if (fatherName != null && !isFatherDeceased && (motherName == null || isMotherDeceased) && stepMotherName == null) {
+      if (random.nextInt(100) < 35) {
+        stepMotherName = 'Dian Lestari'; // Default fallback name
+        stepMotherAge = fatherAge! + random.nextInt(5) - 2;
+        stepMotherRelationship = 50;
+        isStepMotherDeceased = false;
+        final String notice = '💍 Kabar Keluarga: Ayahmu menikah lagi! Sekarang kamu memiliki Ibu Tiri bernama $stepMotherName.';
+        events.add(notice);
+        inbox.add(notice);
+      }
+    }
+
     // 2. Sibling Aging & Birth & Death
     for (var sib in siblings) {
       bool isDeceased = sib['isDeceased'] == 'true';
@@ -165,6 +252,29 @@ class Character {
             sib['isDeceased'] = 'true';
             sib['relationship'] = '0';
             events.add('💀 Kabar Duka: Saudaramu, ${sib['name']} (${sib['relation']}), meninggal dunia pada usia $nextAge tahun.');
+          }
+        }
+      }
+    }
+
+    // 2b. Extended Family Aging & Death
+    for (var ext in extendedFamily) {
+      bool isDeceased = ext['isDeceased'] == 'true';
+      if (!isDeceased) {
+        int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
+        int nextAge = extAge + 1;
+        ext['age'] = nextAge.toString();
+
+        if (extAge < 0 && nextAge == 0) {
+          // Sepupu baru lahir
+          events.add('👶 Sepupu Baru Lahir! Paman/Bibimu dikaruniai anak bernama ${ext['name']}.');
+        } else if (nextAge > 65) {
+          // Risiko kematian lansia kakek/nenek/paman/bibi
+          int deathChance = (nextAge - 65) ~/ 2 + 1;
+          if (random.nextInt(100) < deathChance) {
+            ext['isDeceased'] = 'true';
+            ext['relationship'] = '0';
+            events.add('💀 Kabar Duka: Keluargamu, ${ext['name']} (${ext['relation']}), meninggal dunia pada usia $nextAge tahun.');
           }
         }
       }

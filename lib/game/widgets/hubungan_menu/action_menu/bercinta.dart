@@ -4,6 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/pilih_tempat.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -464,7 +465,20 @@ class _BercintaScreenState extends State<BercintaScreen> {
             onPressed: () {
               Navigator.of(context).pop();
               stateUpdate();
-              Navigator.of(context).pop();
+              if (isPregnant || isPartnerPregnant) {
+                // Tampilkan dialog pilihan beritahu ortu atau tidak
+                BeritahuKehamilanHelper.showTellOrNotDialog(
+                  context: context,
+                  character: widget.character,
+                  partnerName: widget.targetName,
+                  partnerRole: widget.targetRole,
+                  onComplete: () {
+                    Navigator.of(context).pop();
+                  },
+                );
+              } else {
+                Navigator.of(context).pop();
+              }
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
