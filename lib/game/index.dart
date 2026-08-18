@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/paused_menu/pausedMenu.dart';
+import 'dart:math';
 
 // Import widget-widget UI
 import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
@@ -10,6 +11,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/relationship_button.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
+import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -154,8 +156,8 @@ class _GameScreenState extends State<GameScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                if (type == 'Ajak Pacaran') {
+              if (type == 'Ajak Pacaran') {
+                setState(() {
                   _character.partner = {
                     'name': partnerName,
                     'gender': proposal['gender'],
@@ -171,24 +173,19 @@ class _GameScreenState extends State<GameScreen> {
                   _character.inbox.add(
                     '💖 Hubungan Baru: Kamu menerima ajakan pacaran dari keluargamu, $partnerName. Sekarang kalian resmi berpacaran diam-diam.'
                   );
-                } else {
-                  // Bercinta diterima
-                  _character.happiness = (_character.happiness + 20).clamp(0, 100);
-                  _updateFamilyRelationship(partnerName, 15);
-
-                  _character.inbox.add(
-                    '💋 Aktivitas Mesra: Kamu menerima ajakan bercinta dari $partnerName. Kalian menghabiskan waktu intim bersama.'
-                  );
-                }
-                _character.activeProposal = null;
-              });
-              
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('💖 Kamu menerima ajakan dari $partnerName!'),
-                  backgroundColor: Colors.pink,
-                ),
-              );
+                  _character.activeProposal = null;
+                });
+                
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('💖 Kamu menerima ajakan dari $partnerName!'),
+                    backgroundColor: Colors.pink,
+                  ),
+                );
+              } else {
+                // Bercinta diterima -> Tampilkan dialog pengaman (kondom)
+                _showIncomingCondomDialog(proposal);
+              }
             },
             child: const Text('Terima', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
           ),
@@ -218,6 +215,182 @@ class _GameScreenState extends State<GameScreen> {
         ],
       ),
     );
+  }
+
+  void _showIncomingCondomDialog(Map<String, dynamic> proposal) {
+    final String partnerName = proposal['name'];
+    final String relation = proposal['relation'];
+    final String myGender = _character.gender.trim().toLowerCase();
+    final String partnerGender = (proposal['gender'] ?? 'Laki-laki').trim().toLowerCase();
+    final bool isHetero = myGender != partnerGender;
+
+    String riskInfo = '';
+    String whoGetsPregnant = '';
+    int ageMin = 0, ageMax = 0;
+
+    if (isHetero) {
+      if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
+        whoGetsPregnant = 'Kamu hamil';
+        ageMin = 8; ageMax = 45;
+      } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
+        whoGetsPregnant = 'Pasanganmu hamil';
+        ageMin = 9; ageMax = 65;
+      }
+
+      bool isAgeValid = _character.age >= ageMin && _character.age <= ageMax;
+      if (isAgeValid) {
+        double fertility = _getIncomingFertilityRate(_character.age, myGender);
+        riskInfo = 'Jika TIDAK memakai pengaman: Ada ${(fertility * 100).toInt()}% risiko $whoGetsPregnant! (Usia saat ini ${_character.age} tahun, kesuburan ${(fertility * 100).toInt()}%)';
+      } else {
+        riskInfo = 'Jika TIDAK memakai pengaman: Risiko 0% karena usia saat ini (${_character.age} tahun) berada di luar masa subur. (Syarat: Minimal $ageMin - Maksimal $ageMax tahun)';
+      }
+    } else {
+      riskInfo = 'Kombinasi gender: Kamu ($myGender) & Pasangan ($partnerGender) -> Risiko hamil 0% (Tidak memungkinkan secara biologis).';
+    }
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.health_and_safety, color: Colors.blue, size: 28),
+            SizedBox(width: 8),
+            Text('Gunakan Pengaman?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Apa kamu ingin menggunakan kondom untuk mencegah kehamilan?',
+              style: TextStyle(fontSize: 14),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Gender: Kamu ($_character.gender) & $relation ($partnerGender)',
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+            ),
+            const SizedBox(height: 8),
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.blue.shade200),
+              ),
+              child: Text(
+                riskInfo,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.blue),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _executeIncomingBercinta(proposal, true);
+            },
+            child: const Text('Ya, pakai', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _executeIncomingBercinta(proposal, false);
+            },
+            child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  double _getIncomingFertilityRate(int age, String gender) {
+    final String g = gender.trim().toLowerCase();
+    if (g == 'perempuan') {
+      if (age < 8 || age > 45) return 0.0;
+      if (age >= 8 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.65;
+      if (age >= 40 && age <= 45) return 0.30;
+    } else {
+      if (age < 9 || age > 65) return 0.0;
+      if (age >= 9 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.75;
+      if (age >= 40 && age <= 49) return 0.55;
+      if (age >= 50 && age <= 65) return 0.35;
+    }
+    return 0.0;
+  }
+
+  void _executeIncomingBercinta(Map<String, dynamic> proposal, bool useCondom) {
+    final String partnerName = proposal['name'];
+    final String relation = proposal['relation'];
+    final String myGender = _character.gender.trim().toLowerCase();
+    final String partnerGender = (proposal['gender'] ?? 'Laki-laki').trim().toLowerCase();
+    final Random random = Random();
+
+    setState(() {
+      _character.happiness = (_character.happiness + 20).clamp(0, 100);
+      _updateFamilyRelationship(partnerName, 15);
+
+      String additionalMsg = '';
+      if (!useCondom && myGender != partnerGender) {
+        double myFertility = _getIncomingFertilityRate(_character.age, myGender);
+        if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
+          if (!_character.isPregnant && myFertility > 0 && random.nextDouble() < myFertility) {
+            _character.isPregnant = true;
+            _character.pregnantByPartnerName = partnerName;
+            _character.pregnantByPartnerRole = proposal['role'] ?? relation;
+            _character.inbox.add(
+              '🍼 Kabar Kehamilan: Kamu hamil dari hasil hubungan intim dengan $partnerName!'
+            );
+          }
+        } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
+          if (!_character.partnerIsPregnant && myFertility > 0 && random.nextDouble() < myFertility) {
+            _character.partnerIsPregnant = true;
+            _character.pregnantByPartnerName = partnerName;
+            _character.pregnantByPartnerRole = proposal['role'] ?? relation;
+            _character.inbox.add(
+              '👶 Kabar Kehamilan: Pasangan/keluargamu, $partnerName, hamil dari hasil hubungan intim denganmu!'
+            );
+          }
+        }
+      }
+
+      // Jalankan logika penularan penyakit seksual (STD) jika tidak pakai pengaman
+      if (!useCondom) {
+        // Panggil std_logic.dart helper
+        importPenyakitSTDCheck(proposal);
+      }
+
+      _character.inbox.add(
+        '💋 Aktivitas Mesra: Kamu menerima ajakan bercinta dari $partnerName. Kalian menghabiskan waktu intim bersama.'
+      );
+      _character.activeProposal = null;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('💋 Kamu menerima ajakan bercinta dari $partnerName!'),
+        backgroundColor: Colors.pink,
+      ),
+    );
+  }
+
+  void importPenyakitSTDCheck(Map<String, dynamic> proposal) {
+    // Memanggil handleSTDCheck di std_logic.dart
+    final String partnerName = proposal['name'];
+    final String relation = proposal['relation'];
+    final String role = proposal['role'] ?? relation;
+    final Random random = Random();
+    
+    handleSTDCheck(_character, role, partnerName, random);
   }
 
   void _updateFamilyRelationship(String targetName, int changeAmount) {

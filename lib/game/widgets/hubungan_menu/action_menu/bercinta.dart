@@ -196,25 +196,31 @@ class _BercintaScreenState extends State<BercintaScreen> {
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
     final String partnerGender = _getPartnerGender().trim().toLowerCase();
 
+    // Bonus 15% jika target tersebut sudah berstatus resmi sebagai pacar aktif
+    int partnerBonus = 0;
+    if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
+      partnerBonus = 15;
+    }
+
     // 1. Logika Orang Tua (User) Mengajak Anak Kandung/Tiri (Target)
     if (isChild) {
       if (myGender == 'laki-laki') {
         // Sebagai Ayah
         if (partnerGender == 'laki-laki') {
           // Mengajak anak laki-laki: 20%
-          success = _random.nextInt(100) < 20;
+          success = _random.nextInt(100) < (20 + partnerBonus);
         } else {
           // Mengajak anak perempuan: 35%
-          success = _random.nextInt(100) < 35;
+          success = _random.nextInt(100) < (35 + partnerBonus);
         }
       } else {
         // Sebagai Ibu
         if (partnerGender == 'laki-laki') {
           // Mengajak anak laki-laki: 20%
-          success = _random.nextInt(100) < 20;
+          success = _random.nextInt(100) < (20 + partnerBonus);
         } else {
           // Mengajak anak perempuan: 20%
-          success = _random.nextInt(100) < 20;
+          success = _random.nextInt(100) < (20 + partnerBonus);
         }
       }
     } 
@@ -222,18 +228,18 @@ class _BercintaScreenState extends State<BercintaScreen> {
     else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah')) {
       if (myGender == 'laki-laki') {
         // Anak laki mengajak ayahnya: 10%
-        success = _random.nextInt(100) < 10;
+        success = _random.nextInt(100) < (10 + partnerBonus);
       } else {
         // Anak perempuan mengajak ayahnya: 30%
-        success = _random.nextInt(100) < 30;
+        success = _random.nextInt(100) < (30 + partnerBonus);
       }
     } else if (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
       if (myGender == 'laki-laki') {
         // Anak laki mengajak ibunya: 10%
-        success = _random.nextInt(100) < 10;
+        success = _random.nextInt(100) < (10 + partnerBonus);
       } else {
         // Anak perempuan mengajak ibunya: 30%
-        success = _random.nextInt(100) < 30;
+        success = _random.nextInt(100) < (30 + partnerBonus);
       }
     }
     // 3. Logika Saudara Kandung / Incest Sibling (User dengan Target Kakak/Adik)
@@ -242,27 +248,27 @@ class _BercintaScreenState extends State<BercintaScreen> {
       
       if (myGender == 'perempuan' && partnerGender == 'perempuan') {
         // Anak perempuan dengan anak perempuan: 20%
-        success = _random.nextInt(100) < 20;
+        success = _random.nextInt(100) < (20 + partnerBonus);
       } else if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
         // Anak laki dengan anak laki: 10%
-        success = _random.nextInt(100) < 10;
+        success = _random.nextInt(100) < (10 + partnerBonus);
       } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
         // Kakak laki adik perempuan ATAU adik laki kakak perempuan
         if (isTargetOlder) {
           // Target adalah Kakak Perempuan -> User adalah Adik Laki -> Adik laki kakak perempuan: 30%
-          success = _random.nextInt(100) < 30;
+          success = _random.nextInt(100) < (30 + partnerBonus);
         } else {
           // Target adalah Adik Perempuan -> User adalah Kakak Laki -> Kakak laki adik perempuan: 30%
-          success = _random.nextInt(100) < 30;
+          success = _random.nextInt(100) < (30 + partnerBonus);
         }
       } else if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
         // Kakak perempuan adik laki ATAU adik perempuan kakak laki
         if (isTargetOlder) {
           // Target adalah Kakak Laki -> User adalah Adik Perempuan -> Kakak laki adik perempuan: 30%
-          success = _random.nextInt(100) < 30;
+          success = _random.nextInt(100) < (30 + partnerBonus);
         } else {
           // Target adalah Adik Laki -> User adalah Kakak Perempuan -> Adik laki kakak perempuan: 30%
-          success = _random.nextInt(100) < 30;
+          success = _random.nextInt(100) < (30 + partnerBonus);
         }
       } else {
         success = _random.nextInt(100) < 30; // Persentase default saudara/i 30%
