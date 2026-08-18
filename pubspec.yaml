@@ -1,0 +1,28 @@
+name: bitlife
+description: A new Flutter project.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Jika ada package lain yang kamu tambahkan (misal path_provider), taruh di sini
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+
+  assets:
+    - json/bendera_negara/countries.json
+    - json/firstname_lastname/asia/indonesia/male/firstname.json
+    - json/firstname_lastname/asia/indonesia/male/lastname.json
+    - json/firstname_lastname/asia/indonesia/female/firstname.json
+    - json/firstname_lastname/asia/indonesia/female/lastname.json
