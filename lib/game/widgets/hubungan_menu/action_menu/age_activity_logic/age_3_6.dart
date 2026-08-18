@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/age/age_3_6.dart
+// lib/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_3_6.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
@@ -25,11 +25,11 @@ List<ActionItem> getAge3to6Actions(
         // Tentukan persentase keberhasilan berdasarkan target
         int successRate;
         if (relation == 'Ayah') {
-          successRate = 40;
+          successRate = 70;
         } else if (relation == 'Ibu') {
           successRate = 70;
         } else {
-          successRate = 55; // default untuk target lain (kakak, nenek, dll)
+          successRate = 50; // default untuk target lain (kakak, nenek, dll)
         }
 
         if (random.nextInt(100) < successRate) {
@@ -64,12 +64,14 @@ List<ActionItem> getAge3to6Actions(
       icon: Icons.face,
       color: Colors.pinkAccent,
       onTap: () {
-        // Untuk Ayah atau Ibu, peluang berhasil 70%
+        // Tentukan persentase keberhasilan berdasarkan target
         int successRate;
         if (relation == 'Ayah' || relation == 'Ibu') {
           successRate = 70;
+        } else if (relation == 'Kakek' || relation == 'Nenek') {
+          successRate = 60;
         } else {
-          successRate = 50; // default untuk target lain
+          successRate = 50; // Paman, Bibi, atau target lainnya
         }
 
         if (random.nextInt(100) < successRate) {
