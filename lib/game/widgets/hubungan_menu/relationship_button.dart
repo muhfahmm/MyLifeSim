@@ -173,8 +173,43 @@ class RelationshipButton extends StatelessWidget {
               ],
 
               // ============================================
+              // 2a. BAGIAN PACAR KEDUA (SELINGKUHAN)
+              // ============================================
+              if (character.secondPartner != null) ...[
+                const Divider(height: 32),
+                Row(
+                  children: [
+                    const Text('💔 Hubungan Rahasia', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepOrange)),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.deepOrange,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text('Selingkuhan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                _buildFamilyItem(
+                  context,
+                  icon: Icons.heart_broken,
+                  label: character.secondPartner!['isDeceased'] == 'true'
+                      ? '${character.secondPartner!['name']!} (Wafat)'
+                      : character.secondPartner!['name']!,
+                  status: 'Pacar (Rahasia)',
+                  color: character.secondPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.deepOrange,
+                  relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
+                  ageText: '${character.secondPartner!['age']} tahun',
+                  isDeceased: character.secondPartner!['isDeceased'] == 'true',
+                ),
+              ],
+
+              // ============================================
               // 2b. BAGIAN MERTUA (AYAH & IBU MERTUA)
               // ============================================
+
               if (character.fatherInLawName != null || character.motherInLawName != null) ...[
                 const Divider(height: 32),
                 const Text('👵👴 Mertua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),

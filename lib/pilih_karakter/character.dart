@@ -54,6 +54,10 @@ class Character {
   // --- DATA PACAR / PASANGAN ---
   Map<String, String>? partner; // {'name': '...', 'relationship': '70', 'gender': '...', 'age': '20', 'relation': 'Pacar', 'isDeceased': 'false'}
 
+  // --- DATA PACAR KEDUA (SELINGKUHAN) ---
+  Map<String, String>? secondPartner; // sama dengan struktur partner
+  bool isHavingAffair = false; // true jika user sedang selingkuh
+
   // --- STATUS KEMATIAN KELUARGA KANDUNG ---
   bool isFatherDeceased = false;
   bool isMotherDeceased = false;

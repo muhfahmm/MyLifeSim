@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
 import 'age_base.dart';
 
 String _getPartnerGender(String targetName) {
@@ -35,6 +36,8 @@ List<ActionItem> getAge12PlusActions(
   final String partnerGender = _getPartnerGender(targetName).toLowerCase();
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
   final bool isAlreadyPartner = character.partner != null && character.partner!['name'] == targetName;
+  final bool isAlreadySecondPartner = character.secondPartner != null && character.secondPartner!['name'] == targetName;
+  final bool hasExistingPartner = character.partner != null;
   final bool isChild = targetRole == 'Laki-laki' || targetRole == 'Perempuan';
 
   // Helper untuk mendapatkan nilai hubungan saat ini
@@ -223,12 +226,12 @@ List<ActionItem> getAge12PlusActions(
     },
   ));
 
-  // 2. Ajak Pacaran
-  if (!isAlreadyPartner && !isPartnerRole) {
+  // 2. Ajak Pacaran - tampil jika belum jadi pacar target ini, bukan pasangan resmi, dan belum jadi selingkuhan
+  if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
     actions.add(ActionItem(
-      label: 'Ajak Pacaran',
-      icon: Icons.favorite_border,
-      color: Colors.redAccent,
+      label: hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+      icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite_border,
+      color: hasExistingPartner ? Colors.deepOrange : Colors.redAccent,
       onTap: () {
         int currentRel = _getCurrentRelationshipValue();
         bool accepted = false;
@@ -241,18 +244,16 @@ List<ActionItem> getAge12PlusActions(
 
         // --- LOGIKA BARU: AYAH & IBU ---
         if (targetNameLower.startsWith('ayah')) {
-          // Jika target adalah Ayah (atau Ayah Tiri)
           if (myGender == 'perempuan') {
-            accepted = random.nextInt(100) < 30; // Anak perempuan ajak ayah: 30%
+            accepted = random.nextInt(100) < 30;
           } else {
-            accepted = random.nextInt(100) < 10; // Anak laki-laki ajak ayah: 10%
+            accepted = random.nextInt(100) < 10;
           }
         } else if (targetNameLower.startsWith('ibu')) {
-          // Jika target adalah Ibu
           if (myGender == 'perempuan') {
-            accepted = random.nextInt(100) < 5; // Anak perempuan ajak ibu: 5%
+            accepted = random.nextInt(100) < 5;
           } else {
-            accepted = random.nextInt(100) < 10; // Anak laki-laki ajak ibu: 10%
+            accepted = random.nextInt(100) < 10;
           }
         } 
         // --- LOGIKA SAUDARA ---
@@ -286,14 +287,13 @@ List<ActionItem> getAge12PlusActions(
         }
 
         if (accepted) {
-          // Cari usia asli target dari daftar keluarga
-          int actualTargetAge = 18; // fallback
+          // Cari usia asli target
+          int actualTargetAge = 18;
           if (targetName.startsWith('Ayah')) {
             actualTargetAge = character.fatherAge ?? 40;
           } else if (targetName.startsWith('Ibu')) {
             actualTargetAge = character.motherAge ?? 38;
           } else {
-            // Cek di siblings
             for (var sib in character.siblings) {
               final String expectedLabel = '${sib['name']} (${sib['relation']})';
               if (expectedLabel == targetName) {
@@ -301,7 +301,6 @@ List<ActionItem> getAge12PlusActions(
                 break;
               }
             }
-            // Cek di extendedFamily
             for (var ext in character.extendedFamily) {
               if (ext['name'] == targetName) {
                 actualTargetAge = int.tryParse(ext['age'] ?? '18') ?? 18;
@@ -310,21 +309,69 @@ List<ActionItem> getAge12PlusActions(
             }
           }
 
-          showDialog(
-            'Cinta Diterima! 💖',
-            '$targetName menerima ajakanmu untuk berpacaran! Sekarang kalian resmi berpacaran.',
-            Icons.favorite, Colors.pink, () {
-              character.partner = {
-                'name': targetName,
-                'gender': partnerGender,
-                'age': '$actualTargetAge',
-                'relationship': currentRel.toString(),
-                'relation': 'Pacar',
-              };
-              character.happiness = (character.happiness + 25).clamp(0, 100);
-              updateState();
+          final newPartnerData = {
+            'name': targetName,
+            'gender': partnerGender,
+            'age': '$actualTargetAge',
+            'relationship': currentRel.toString(),
+            'relation': 'Pacar',
+          };
+
+          // --- KASUS: SUDAH PUNYA PACAR (AFFAIR / SELINGKUH) ---
+          if (hasExistingPartner) {
+            // 50% berhasil menjalin selingkuhan, 50% gagal dan pacar pertama tahu
+            bool affairSuccess = random.nextInt(100) < 50;
+
+            if (affairSuccess) {
+              showDialog(
+                'Selingkuh Berhasil! 💘',
+                '$targetName menerima ajakanmu meskipun kamu sudah punya pacar. Kamu kini memiliki 2 pacar!',
+                Icons.favorite, Colors.deepOrange, () {
+                  character.secondPartner = newPartnerData;
+                  character.isHavingAffair = true;
+                  character.happiness = (character.happiness + 10).clamp(0, 100);
+                  updateState();
+
+                  // Tawarkan untuk beritahu pacar pertama
+                  BeritahuPacarHelper.showTellFirstPartnerDialog(
+                    context: context,
+                    character: character,
+                    secondPartnerName: targetName,
+                    onComplete: () {
+                      updateState();
+                    },
+                  );
+                }
+              );
+            } else {
+              // Gagal - pacar pertama entah bagaimana mengetahui niat ini
+              int relPenalty = random.nextInt(15) + 10; // -10 sampai -25%
+              showDialog(
+                'Ketahuan! 😡',
+                '$targetName menolak ajakanmu dan langsung memberitahu pacarmu! ${character.partner!['name']} sangat marah dan kecewa (-$relPenalty% hubungan dengan ${character.partner!['name']}).',
+                Icons.heart_broken, Colors.red, () {
+                  if (character.partner != null) {
+                    int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
+                    character.partner!['relationship'] = (rel - relPenalty).clamp(0, 100).toString();
+                  }
+                  character.happiness = (character.happiness - 15).clamp(0, 100);
+                  character.inbox.add('😡 Ketahuan: ${character.partner!['name']} mengetahui kamu mencoba merayu $targetName sebagai selingkuhan!');
+                  updateState();
+                }
+              );
             }
-          );
+          } else {
+            // --- KASUS NORMAL: BELUM PUNYA PACAR ---
+            showDialog(
+              'Cinta Diterima! 💖',
+              '$targetName menerima ajakanmu untuk berpacaran! Sekarang kalian resmi berpacaran.',
+              Icons.favorite, Colors.pink, () {
+                character.partner = newPartnerData;
+                character.happiness = (character.happiness + 25).clamp(0, 100);
+                updateState();
+              }
+            );
+          }
         } else {
           int relPenalty = random.nextInt(5) + 1; // 1-5% saja
           showDialog(

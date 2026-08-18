@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/pilih_tempat.dart
+// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart
 import 'package:flutter/material.dart';
 
 class LocationOption {
@@ -56,7 +56,22 @@ class TempatBercintaHelper {
   ];
 
   // Menampilkan dialog pemilihan lokasi bercinta secara bertingkat
-  static Future<String?> showLocationChooser(BuildContext context, String partnerName) async {
+  // Menyembunyikan opsi mobil jika usia user adalah 12 dan target (pasangan) kurang dari 18 tahun (belum bisa menyetir mobil)
+  static Future<String?> showLocationChooser({
+    required BuildContext context,
+    required String partnerName,
+    required int userAge,
+    required int targetAge,
+  }) async {
+    // Saring lokasi berdasarkan aturan: jika user berusia 12 tahun dan target kurang dari 18 tahun, sembunyikan Mobil.
+    final bool hideCar = (userAge == 12 && targetAge < 18);
+    final List<LocationOption> filteredLocations = mainLocations.where((loc) {
+      if (loc.name == 'Di Mobil' && hideCar) {
+        return false;
+      }
+      return true;
+    }).toList();
+
     // Langkah 1: Pilih Lokasi Utama (Rumah, Mobil, Hotel)
     LocationOption? selectedMain = await showDialog<LocationOption>(
       context: context,
@@ -78,9 +93,9 @@ class TempatBercintaHelper {
           width: double.maxFinite,
           child: ListView.builder(
             shrinkWrap: true,
-            itemCount: mainLocations.length,
+            itemCount: filteredLocations.length,
             itemBuilder: (context, index) {
-              final loc = mainLocations[index];
+              final loc = filteredLocations[index];
               return Card(
                 elevation: 0,
                 color: Colors.grey.shade50,
@@ -165,7 +180,12 @@ class TempatBercintaHelper {
 
       if (selectedRoom == null) {
         // Ulangi/kembali ke pemilihan utama jika ditekan kembali
-        return showLocationChooser(context, partnerName);
+        return showLocationChooser(
+          context: context,
+          partnerName: partnerName,
+          userAge: userAge,
+          targetAge: targetAge,
+        );
       }
       return 'Rumah (${selectedRoom.name})';
     }

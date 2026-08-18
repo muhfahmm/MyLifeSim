@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/pilih_tempat.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
 
 class BercintaScreen extends StatefulWidget {
@@ -294,24 +295,24 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
     if (success) {
       title = 'Momen Mesra';
-      message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan malam yang sangat intim $_chosenLocation! (+${relationChange.abs()}% hubungan)';
+      message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan waktu yang sangat intim $_chosenLocation pada waktu $_chosenTime! (+${relationChange.abs()}% hubungan)';
       icon = Icons.favorite;
       color = Colors.pink;
       
       // Jika berhasil berhubungan seksual dan target adalah anak (Incest dari sisi Orang Tua mengajak Anak)
       if (isChild) {
         widget.character.inbox.add(
-          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName} $_chosenLocation.'
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName} $_chosenLocation pada waktu $_chosenTime.'
         );
       }
       // Jika target adalah orang tua (Incest dari sisi Anak mengajak Orang Tua)
       else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah') || targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
         widget.character.inbox.add(
-          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation $_chosenLocation.'
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation $_chosenLocation pada waktu $_chosenTime.'
         );
       } else {
         widget.character.inbox.add(
-          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan $relation $_chosenLocation.'
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan $relation $_chosenLocation pada waktu $_chosenTime.'
         );
       }
 
@@ -321,7 +322,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       };
     } else {
       title = 'Momen Canggung';
-      message = '$relation menolak ajakanmu dengan halus ketika diajak bercinta $_chosenLocation. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
+      message = '$relation menolak ajakanmu dengan halus ketika diajak bercinta $_chosenLocation pada waktu $_chosenTime. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
       icon = Icons.sentiment_dissatisfied;
       color = Colors.orange;
       stateUpdate = () {
@@ -488,15 +489,53 @@ class _BercintaScreenState extends State<BercintaScreen> {
   }
 
   String _chosenLocation = 'Rumah';
+  String _chosenTime = 'Siang';
 
   void _checkCondomNeeded() async {
-    final String? loc = await TempatBercintaHelper.showLocationChooser(context, widget.targetName);
+    // Cari usia target
+    int targetAge = 18;
+    if (widget.targetName.startsWith('Ayah')) {
+      targetAge = widget.character.fatherAge ?? 40;
+    } else if (widget.targetName.startsWith('Ibu')) {
+      targetAge = widget.character.motherAge ?? 38;
+    } else {
+      for (var sib in widget.character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})';
+        if (expectedLabel == widget.targetName) {
+          targetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
+          break;
+        }
+      }
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == widget.targetName) {
+          targetAge = int.tryParse(ext['age'] ?? '18') ?? 18;
+          break;
+        }
+      }
+    }
+
+    final String? loc = await TempatBercintaHelper.showLocationChooser(
+      context: context,
+      partnerName: widget.targetName,
+      userAge: widget.character.age,
+      targetAge: targetAge,
+    );
+
     if (loc == null) {
       // Batal memilih tempat -> kembali
       Navigator.of(context).pop();
       return;
     }
+
+    final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
+    if (time == null) {
+      // Batal memilih waktu -> kembali
+      Navigator.of(context).pop();
+      return;
+    }
+
     _chosenLocation = loc;
+    _chosenTime = time;
 
     if (_isCondomNeeded()) {
       _showCondomDialog();
