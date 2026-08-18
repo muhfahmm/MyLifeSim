@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 // Import logic per usia
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age/age_base.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age/age_3_6.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age/age_6_11.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age/age_12_plus.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_base.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_3_6.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_6_11.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
