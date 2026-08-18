@@ -296,6 +296,7 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(height: 12),
             _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true),
 
+            // --- STATUS KEHAMILAN (PERBAIKAN) ---
             if (_character.isPregnant || _character.partnerIsPregnant) ...[
               const SizedBox(height: 16),
               Container(
@@ -315,7 +316,9 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      _character.isPregnant ? 'Status: Hamil 🍼' : 'Status: Pasangan Hamil 👶',
+                      _character.isPregnant 
+                        ? 'Status: Hamil 🍼' 
+                        : 'Status: ${_character.partner?['name'] ?? 'Pasangan'} Hamil 👶',
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

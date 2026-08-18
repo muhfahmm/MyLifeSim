@@ -35,7 +35,7 @@ List<ActionItem> getAge12PlusActions(
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
   final bool isAlreadyPartner = character.partner != null && character.partner!['name'] == targetName;
 
-  // Helper untuk mendapatkan nilai hubungan saat ini (dinamai ulang agar tidak bentrok)
+  // Helper untuk mendapatkan nilai hubungan saat ini
   int _getCurrentRelationshipValue() {
     return int.tryParse(character.partner?['relationship'] ?? '50') ?? 50;
   }
@@ -75,21 +75,54 @@ List<ActionItem> getAge12PlusActions(
         bool accepted = false;
         String targetNameLower = targetName.toLowerCase();
 
-        if (myGender == 'laki-laki' && targetNameLower.contains('kakak perempuan')) {
-          accepted = random.nextInt(100) < 30;
-        } else if (myGender == 'laki-laki' && targetNameLower.contains('adik perempuan')) {
-          accepted = random.nextInt(100) < 40;
-        } else if (myGender == 'perempuan' && (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah'))) {
-          accepted = random.nextInt(100) < 40;
-        } else if (myGender == 'perempuan' && (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu'))) {
-          accepted = random.nextInt(100) < 30;
-        } else if (myGender == 'laki-laki' && (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah'))) {
-          accepted = random.nextInt(100) < 10;
-        } else if (myGender == 'laki-laki' && (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu'))) {
-          accepted = random.nextInt(100) < 10;
-        } else if (targetRole == 'Kandung' || targetRole == 'Tiri' || targetRole.contains('Saudara') || targetNameLower.contains('kakak') || targetNameLower.contains('adik')) {
-          accepted = random.nextInt(100) < 20;
-        } else {
+        // Cek apakah target adalah saudara (Kakak/Adik)
+        bool isSibling = targetRole.contains('Saudara') || 
+                         targetNameLower.contains('kakak') || 
+                         targetNameLower.contains('adik');
+
+        // --- LOGIKA BARU: AYAH & IBU ---
+        if (targetNameLower.startsWith('ayah')) {
+          // Jika target adalah Ayah (atau Ayah Tiri)
+          if (myGender == 'perempuan') {
+            accepted = random.nextInt(100) < 30; // Anak perempuan ajak ayah: 30%
+          } else {
+            accepted = random.nextInt(100) < 10; // Anak laki-laki ajak ayah: 10%
+          }
+        } else if (targetNameLower.startsWith('ibu')) {
+          // Jika target adalah Ibu
+          if (myGender == 'perempuan') {
+            accepted = random.nextInt(100) < 5; // Anak perempuan ajak ibu: 5%
+          } else {
+            accepted = random.nextInt(100) < 10; // Anak laki-laki ajak ibu: 10%
+          }
+        } 
+        // --- LOGIKA SAUDARA ---
+        else if (isSibling) {
+          bool isTargetOlder = targetNameLower.contains('kakak');
+          bool isTargetMale = partnerGender == 'laki-laki';
+
+          if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 50;
+          } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 40;
+          } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 20;
+          } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 20;
+          } else {
+            accepted = random.nextInt(100) < 20;
+          }
+        } 
+        // --- BUKAN SAUDARA DAN BUKAN ORANG TUA ---
+        else {
           accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
         }
 

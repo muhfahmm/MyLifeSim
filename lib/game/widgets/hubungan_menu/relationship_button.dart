@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart'; // IMPORT HALAMAN AKTION
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 
 class RelationshipButton extends StatelessWidget {
   final Character character;
@@ -214,7 +214,7 @@ class RelationshipButton extends StatelessWidget {
               }).toList(),
 
               // ============================================
-              // 4. BAGIAN ANAK (JIKA ADA)
+              // 4. BAGIAN ANAK (JIKA ADA) - SEKARANG BERPERILAKU SAMA SEPERTI KELUARGA LAIN
               // ============================================
               if (character.children.isNotEmpty) ...[
                 const Divider(height: 32),
@@ -236,8 +236,6 @@ class RelationshipButton extends StatelessWidget {
                     color: isDeceased ? Colors.grey : Colors.teal,
                     relationshipValue: relVal,
                     ageText: '$childAge tahun',
-                    father: child['father'] ?? 'Tidak diketahui',
-                    mother: child['mother'] ?? 'Tidak diketahui',
                     isDeceased: isDeceased,
                   );
                 }).toList(),
@@ -415,58 +413,24 @@ class RelationshipButton extends StatelessWidget {
     required Color color,
     required int relationshipValue,
     required String ageText,
-    required String father,
-    required String mother,
     bool isDeceased = false,
   }) {
+    // SEKARANG LOGIKANYA SAMA SEPERTI KELUARGA LAIN: NAVIGASI KE ACTION MENU
     return InkWell(
-      onTap: () {
-        // Tampilkan dialog silsilah anak
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Row(
-              children: [
-                Icon(icon, color: color, size: 28),
-                const SizedBox(width: 8),
-                Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              ],
+      onTap: isDeceased ? null : () {
+        Navigator.pop(context);
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ActionMenuScreen(
+              character: character,
+              targetName: label,
+              targetRole: status, // bisa 'Laki-laki' / 'Perempuan' atau 'Anak'
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Umur: $ageText', style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 4),
-                Text('Gender: $status', style: const TextStyle(fontSize: 14)),
-                if (isDeceased) ...[
-                  const SizedBox(height: 8),
-                  const Text('Status: Meninggal Dunia 🥀', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                ],
-                const SizedBox(height: 12),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDeceased ? Colors.grey.shade100 : Colors.teal.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: isDeceased ? Colors.grey.shade300 : Colors.teal.shade200),
-                  ),
-                  child: Text(
-                    'Anak hasil hubungan dari:\n👨 Ayah: $father\n👩 Ibu: $mother',
-                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isDeceased ? Colors.grey.shade700 : Colors.teal),
-                  ),
-                ),
-              ],
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ],
           ),
-        );
+        ).then((_) {
+          onRefresh();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -516,8 +480,10 @@ class RelationshipButton extends StatelessWidget {
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                   ),
                 ),
-                const SizedBox(width: 8),
-                const Icon(Icons.info_outline, size: 14, color: Colors.grey),
+                if (!isDeceased) ...[
+                  const SizedBox(width: 8),
+                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                ],
               ],
             ),
             if (!isDeceased) ...[
