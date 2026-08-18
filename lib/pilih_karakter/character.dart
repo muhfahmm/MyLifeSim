@@ -213,10 +213,11 @@ class Character {
       }
     }
 
-    // --- LOGIKA REMARRY: PENDAPATAN AYAH/IBU TIRI SETELAH LAHIR (35% CHANCE) ---
+    // --- LOGIKA REMARRY: PENDAPATAN AYAH/IBU TIRI SETELAH LAHIR (35% CHANCE, 20% JIKA IBU 60+ TAHUN) ---
     // Kasus 1: Ibu kandung hidup, tetapi tidak ada ayah kandung (atau wafat) dan belum punya ayah tiri
     if (motherName != null && !isMotherDeceased && (fatherName == null || isFatherDeceased) && stepFatherName == null) {
-      if (random.nextInt(100) < 35) {
+      final int remarryChance = (motherAge != null && motherAge! >= 60) ? 20 : 35;
+      if (random.nextInt(100) < remarryChance) {
         stepFatherName = 'Fajar Pratama'; // Default fallback name
         stepFatherAge = motherAge! + random.nextInt(5) - 2;
         stepFatherRelationship = 50;

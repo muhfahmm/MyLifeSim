@@ -231,6 +231,66 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     );
   }
 
+  String _getTargetGender() {
+    final String role = widget.targetRole;
+    final String name = widget.targetName;
+
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+      return widget.character.partner != null ? widget.character.partner!['gender'] ?? 'Perempuan' : 'Perempuan';
+    }
+
+    if (role == 'Mertua') {
+      if (name.startsWith('Ayah Mertua')) return 'Laki-laki';
+      return 'Perempuan';
+    }
+
+    if (name.startsWith('Ayah')) return 'Laki-laki';
+    if (name.startsWith('Ibu')) return 'Perempuan';
+
+    if (role == 'Laki-laki' || role == 'Perempuan') {
+      return role;
+    }
+
+    // Cek di siblings
+    for (var sib in widget.character.siblings) {
+      final String expectedLabel = '${sib['name']} (${sib['relation']})';
+      if (expectedLabel == name) {
+        return sib['gender'] ?? 'Laki-laki';
+      }
+    }
+
+    // Cek di extended family
+    for (var ext in widget.character.extendedFamily) {
+      if (ext['name'] == name) {
+        return ext['gender'] ?? 'Laki-laki';
+      }
+    }
+
+    return 'Laki-laki'; // fallback
+  }
+
+  int _getFertilityRate(int age, String gender) {
+    final String g = gender.trim().toLowerCase();
+    double rate = 0.0;
+    if (g == 'perempuan') {
+      if (age < 8 || age > 45) rate = 0.0;
+      else if (age >= 8 && age <= 13) rate = 0.35;
+      else if (age >= 14 && age <= 19) rate = 0.55;
+      else if (age >= 20 && age <= 29) rate = 0.85;
+      else if (age >= 30 && age <= 39) rate = 0.65;
+      else if (age >= 40 && age <= 45) rate = 0.30;
+    } else { // laki-laki
+      if (age < 9 || age > 65) rate = 0.0;
+      else if (age >= 9 && age <= 13) rate = 0.35;
+      else if (age >= 14 && age <= 19) rate = 0.55;
+      else if (age >= 20 && age <= 29) rate = 0.85;
+      else if (age >= 30 && age <= 39) rate = 0.75;
+      else if (age >= 40 && age <= 49) rate = 0.55;
+      else if (age >= 50 && age <= 65) rate = 0.35;
+    }
+    return (rate * 100).toInt();
+  }
+
   // Fungsi update state yang dikirim ke file usia
   void _updateState() {
     setState(() {});
@@ -512,6 +572,40 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           ),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 12),
+                    Builder(
+                      builder: (context) {
+                        final String targetGender = _getTargetGender();
+                        final int fertilityVal = _getFertilityRate(targetAge, targetGender);
+                        return Row(
+                          children: [
+                            const Text('Tingkat Kesuburan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: fertilityVal / 100,
+                                  backgroundColor: Colors.grey.shade200,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    fertilityVal > 60 ? Colors.pink : fertilityVal > 30 ? Colors.purple : Colors.grey,
+                                  ),
+                                  minHeight: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Text(
+                              '$fertilityVal%',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                color: fertilityVal > 60 ? Colors.pink : fertilityVal > 30 ? Colors.purple : Colors.grey,
+                              ),
+                            ),
+                          ],
+                        );
+                      }
                     ),
                   ],
                 ),
