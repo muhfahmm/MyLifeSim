@@ -1,5 +1,6 @@
 // lib/pilih_karakter/character.dart
 import 'dart:math';
+import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
 class Character {
   String name;
@@ -54,6 +55,11 @@ class Character {
   bool isMotherDeceased = false;
   bool isStepFatherDeceased = false;
 
+  // --- STATUS PENYAKIT SEKSUAL ---
+  bool hasHIV = false;
+  bool hasSifilis = false;
+  bool hasHPV = false;
+
   Character({
     required this.name,
     required this.gender,
@@ -78,13 +84,24 @@ class Character {
     this.motherAge,
     this.stepFatherAge,
     this.partner,
-  });
+  }) : inbox = [];
+
+  // --- KOTAK MASUK / INBOX NOTIFIKASI ---
+  List<String> inbox;
 
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
     List<String> events = [];
     age++;
     health -= 2;
+    
+    // Logika HIV mengurangi kesehatan secara perlahan setiap tahun
+    if (hasHIV) {
+      health -= 10;
+      events.add('🚨 Kesehatan Menurun: Virus HIV/AIDS yang bersarang di tubuhmu aktif dan menurunkan sistem kekebalan tubuh (-10% kesehatan).');
+      inbox.add('🚨 Penyakit Kronis: Virus HIV/AIDS mengurangi kesehatanmu sebesar 10% tahun ini.');
+    }
+
     if (health <= 0 || age > 100) {
       isAlive = false;
     }
@@ -150,13 +167,32 @@ class Character {
       }
     }
 
-    // 3. Child Aging & Death
+    // 3. Child Aging & Death & Romance Activity
     for (var child in children) {
       bool isDeceased = child['isDeceased'] == 'true';
       if (!isDeceased) {
         int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
         int nextAge = childAge + 1;
         child['age'] = nextAge.toString();
+
+        // Cek kejadian anak pacaran/bercinta saat bertambah usia (untuk anak usia 12 ke atas)
+        if (nextAge >= 12) {
+          if (random.nextInt(100) < 15) {
+            // Tentukan tipe aktivitas anak secara acak
+            final List<String> activities = [
+              'sedang berpacaran dengan teman sekolahnya secara diam-diam.',
+              'ketahuan sedang bercinta (Make Love) dengan pasangannya.',
+              'menghabiskan malam bersama kekasihnya di kamar.',
+              'mengaku sudah melakukan hubungan intim (Make Love) pertama kalinya.'
+            ];
+            final String chosenActivity = activities[random.nextInt(activities.length)];
+            final String notification = '📢 Aktivitas Anak: Anakmu, ${child['name']} (Usia $nextAge tahun), $chosenActivity';
+            
+            // Masukkan ke log events (Popup Age Up) dan Inbox
+            events.add(notification);
+            inbox.add(notification);
+          }
+        }
 
         if (random.nextInt(150) == 42) {
           child['isDeceased'] = 'true';
@@ -199,34 +235,68 @@ class Character {
       final String childLastName = playerParts.length > 1 ? playerParts.last : '';
       final String childName = childLastName.isNotEmpty ? '$childFirstName $childLastName' : childFirstName;
 
-      String father = 'Tidak diketahui';
-      String mother = 'Tidak diketahui';
-      final String partnerNameClean = pregnantByPartnerName ?? (partner != null ? (partner!['name'] ?? 'Pasangan') : 'Pasangan');
-
-      if (gender == 'Laki-laki' || gender == 'laki-laki') {
-        father = name;
-        mother = partnerNameClean;
-      } else {
-        father = partnerNameClean;
-        mother = name;
+      // --- LOGIKA PENYAKIT & PENGAMATAN PENGAMAN ---
+      // Tampilkan notifikasi di inbox jika user atau pasangan mengidap penyakit menular seksual aktif
+      if (hasHIV || hasSifilis || hasHPV) {
+        String diseases = [
+          if (hasHIV) 'HIV/AIDS',
+          if (hasSifilis) 'Sifilis & Gonore',
+          if (hasHPV) 'HPV'
+        ].join(', ');
+        inbox.add('🚨 Kondisi Medis: Kamu saat ini mengidap penyakit $diseases. Segera lakukan pengobatan jika memungkinkan!');
       }
 
-      children.add({
-        'name': childName,
-        'gender': childGender,
-        'relationship': '80',
-        'age': '0',
-        'father': father,
-        'mother': mother,
-        'isDeceased': 'false',
-      });
+      final String partnerNameClean = pregnantByPartnerName ?? (partner != null ? (partner!['name'] ?? 'Pasangan') : 'Pasangan');
+      
+      // Jalankan logika konsekuensi kehamilan inses
+      final incestRes = handleIncestPregnancyEffect(this, random);
 
-      events.add('👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia.');
+      if (incestRes['keguguran'] == true) {
+        events.add(incestRes['pesan']);
+        isPregnant = false;
+        partnerIsPregnant = false;
+        pregnantByPartnerName = null;
+        pregnantByPartnerRole = null;
+      } else {
+        final bool hasGeneticDefect = incestRes['kelainanGenetik'] == true;
+        if (hasGeneticDefect) {
+          events.add(incestRes['pesan']);
+        }
 
-      isPregnant = false;
-      partnerIsPregnant = false;
-      pregnantByPartnerName = null;
-      pregnantByPartnerRole = null;
+        String father = 'Tidak diketahui';
+        String mother = 'Tidak diketahui';
+
+        if (gender == 'Laki-laki' || gender == 'laki-laki') {
+          father = name;
+          mother = partnerNameClean;
+        } else {
+          father = partnerNameClean;
+          mother = name;
+        }
+
+        children.add({
+          'name': childName,
+          'gender': childGender,
+          'relationship': '80',
+          'age': '0',
+          'father': father,
+          'mother': mother,
+          'isDeceased': 'false',
+          'trait': hasGeneticDefect ? 'Mengidap Kelainan Genetik' : 'Sehat',
+        });
+
+        String birthMsg = '👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia.';
+        if (hasGeneticDefect) {
+          birthMsg += ' (⚠️ Anak lahir cacat akibat kelainan genetik dari hubungan sedarah)';
+        }
+        events.add(birthMsg);
+        inbox.add(birthMsg);
+
+        isPregnant = false;
+        partnerIsPregnant = false;
+        pregnantByPartnerName = null;
+        pregnantByPartnerRole = null;
+      }
     }
 
     // --- LOGIKA AJAKAN INCEST DARI KELUARGA ---
@@ -317,6 +387,18 @@ class Character {
             'role': candidate['role'],
           };
         }
+      }
+    } else if (age >= 12 && partner != null && partner!['isDeceased'] != 'true') {
+      // Logika: Jika user sudah memiliki pacar aktif, ada persentase mengajak berhubungan intim sebanyak 60% saat pertambahan umur
+      if (random.nextInt(100) < 60) {
+        activeProposal = {
+          'name': partner!['name'],
+          'relation': partner!['relation'] ?? 'Pacar',
+          'type': 'Bercinta',
+          'gender': partner!['gender'] ?? 'Perempuan',
+          'age': partner!['age'] ?? '18',
+          'role': 'Partner',
+        };
       }
     }
 

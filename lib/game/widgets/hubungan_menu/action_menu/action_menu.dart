@@ -187,7 +187,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     // --- LOGIKA PEMANGGILAN BERDASARKAN USIA TARGET ---
     List<ActionItem> actions = [];
 
-    // Jika targetnya adalah Anak (atau targetRole Laki-laki / Perempuan)
+    // Gunakan usia terkecil antara usia player dengan usia target untuk menentukan kategori interaksi.
+    // Hal ini agar anak kecil (misal 5 tahun) tidak bisa mengajak pacaran atau bercinta dengan orang dewasa (misal kakaknya yang berumur 19 tahun).
+    final int minAge = age < targetAge ? age : targetAge;
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
 
     if (isChild && targetAge < 12) {
@@ -333,10 +335,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         ),
       ];
     } else {
-      // Gunakan logika standar berdasarkan usia target
-      if (targetAge < 3) {
+      // Gunakan logika standar berdasarkan usia terkecil (minAge)
+      if (minAge < 3) {
         // Belum ada menu, menampilkan pesan "Terlalu muda"
-      } else if (targetAge >= 3 && targetAge <= 6) {
+      } else if (minAge >= 3 && minAge <= 6) {
         actions = getAge3to6Actions(
           widget.character,
           widget.targetName,
@@ -346,7 +348,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _updateRelationship,
           _updateState,
         );
-      } else if (targetAge >= 6 && targetAge < 12) {
+      } else if (minAge >= 6 && minAge < 12) {
         actions = getAge6to11Actions(
           widget.character,
           widget.targetName,
@@ -362,7 +364,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           widget.character,
           widget.targetName,
           widget.targetRole,
-          targetAge,
+          minAge,
           _random,
           _showResultDialog,
           _updateRelationship,

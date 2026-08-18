@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/assets_menu/assets_button.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
+import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -47,6 +48,8 @@ class _GameScreenState extends State<GameScreen> {
     List<String> events = [];
     setState(() {
       events = _character.ageUp();
+      // Masukkan semua kejadian penting / peristiwa pertambahan umur ke inbox agar tidak kosong
+      _character.inbox.addAll(events);
     });
     if (!_character.isAlive) {
       showDialog(
@@ -109,6 +112,28 @@ class _GameScreenState extends State<GameScreen> {
     final String partnerName = proposal['name'];
     final String type = proposal['type']; // 'Ajak Pacaran' atau 'Bercinta'
     final String relation = proposal['relation'];
+    final String myGender = _character.gender.trim().toLowerCase();
+    final String partnerGender = (proposal['gender'] ?? 'Laki-laki').trim().toLowerCase();
+
+    String dialogTitle = '';
+    String dialogBody = '';
+
+    if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
+      dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Gay (Pacaran)!' : 'Ajakan Gay (Bercinta)!';
+      dialogBody = type == 'Ajak Pacaran'
+          ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan sesama jenis (Gay) secara diam-diam. Apakah kamu mau menerimanya?'
+          : '$partnerName (Gay) mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+    } else if (myGender == 'perempuan' && partnerGender == 'perempuan') {
+      dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Lesbian (Pacaran)!' : 'Ajakan Lesbian (Bercinta)!';
+      dialogBody = type == 'Ajak Pacaran'
+          ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerimanya?'
+          : '$partnerName (Lesbian) mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+    } else {
+      dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Mesra!';
+      dialogBody = type == 'Ajak Pacaran'
+          ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerimanya?'
+          : '$partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+    }
     
     showDialog(
       context: context,
@@ -118,13 +143,11 @@ class _GameScreenState extends State<GameScreen> {
           children: [
             Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 28),
             const SizedBox(width: 8),
-            Text(type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Mesra!', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(dialogTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
         ),
         content: Text(
-          type == 'Ajak Pacaran'
-              ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerimanya?'
-              : '$partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?',
+          dialogBody,
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -144,10 +167,18 @@ class _GameScreenState extends State<GameScreen> {
                   
                   // Update relationship di siblings/parents
                   _updateFamilyRelationship(partnerName, 20);
+
+                  _character.inbox.add(
+                    '💖 Hubungan Baru: Kamu menerima ajakan pacaran dari keluargamu, $partnerName. Sekarang kalian resmi berpacaran diam-diam.'
+                  );
                 } else {
                   // Bercinta diterima
                   _character.happiness = (_character.happiness + 20).clamp(0, 100);
                   _updateFamilyRelationship(partnerName, 15);
+
+                  _character.inbox.add(
+                    '💋 Aktivitas Mesra: Kamu menerima ajakan bercinta dari $partnerName. Kalian menghabiskan waktu intim bersama.'
+                  );
                 }
                 _character.activeProposal = null;
               });
@@ -167,6 +198,11 @@ class _GameScreenState extends State<GameScreen> {
               setState(() {
                 _character.happiness = (_character.happiness - 10).clamp(0, 100);
                 _updateFamilyRelationship(partnerName, -15);
+                
+                _character.inbox.add(
+                  '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName.'
+                );
+
                 _character.activeProposal = null;
               });
               
@@ -361,6 +397,14 @@ class _GameScreenState extends State<GameScreen> {
                 RelationshipButton(
                   character: _character,
                   isAlive: _character.isAlive,
+                  onRefresh: () {
+                    setState(() {});
+                  },
+                ),
+                
+                // INBOX NOTIFIKASI
+                InboxButton(
+                  character: _character,
                   onRefresh: () {
                     setState(() {});
                   },

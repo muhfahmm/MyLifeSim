@@ -1,7 +1,8 @@
-// lib/game/widgets/hubungan_menu/action_menu/bercinta.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
+import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -81,21 +82,21 @@ class _BercintaScreenState extends State<BercintaScreen> {
     int ageMin = 0, ageMax = 0;
 
     if (isHetero) {
-      // Siapkan informasi yang akan ditampilkan di dialog
       if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
         whoGetsPregnant = 'Kamu hamil';
-        ageMin = 9; ageMax = 50;
+        ageMin = 8; ageMax = 45;
       } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
         whoGetsPregnant = 'Pasanganmu hamil';
-        ageMin = 9; ageMax = 50;
+        ageMin = 9; ageMax = 65;
       }
 
-      // Cek usia untuk menentukan persentase
+      // Cek usia untuk menentukan persentase (hanya info, logika detail ada di eksekusi)
       bool isAgeValid = widget.character.age >= ageMin && widget.character.age <= ageMax;
       if (isAgeValid) {
-        riskInfo = 'Jika TIDAK memakai pengaman: Ada 70% risiko $whoGetsPregnant! (Usia valid)';
+        double fertility = _getFertilityRate(widget.character.age, myGender);
+        riskInfo = 'Jika TIDAK memakai pengaman: Ada ${(fertility * 100).toInt()}% risiko $whoGetsPregnant! (Usia saat ini ${widget.character.age} tahun, kesuburan ${(fertility * 100).toInt()}%)';
       } else {
-        riskInfo = 'Jika TIDAK memakai pengaman: Risiko 0% karena usia saat ini (${widget.character.age} tahun) belum memenuhi syarat. (Syarat: Minimal $ageMin tahun)';
+        riskInfo = 'Jika TIDAK memakai pengaman: Risiko 0% karena usia saat ini (${widget.character.age} tahun) berada di luar masa subur. (Syarat: Minimal $ageMin - Maksimal $ageMax tahun)';
       }
     } else {
       riskInfo = 'Kombinasi gender: Kamu ($myGender) dan Pasangan ($partnerGender) -> Risiko hamil 0% (Tidak memungkinkan secara biologis).';
@@ -162,6 +163,28 @@ class _BercintaScreenState extends State<BercintaScreen> {
     );
   }
 
+  // --- FUNGSI LOGIKA KESUBURAN DINAMIS ---
+  double _getFertilityRate(int age, String gender) {
+    final String g = gender.trim().toLowerCase();
+    if (g == 'perempuan') {
+      if (age < 8 || age > 45) return 0.0;
+      if (age >= 8 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.65;
+      if (age >= 40 && age <= 45) return 0.30;
+    } else { // laki-laki
+      if (age < 9 || age > 65) return 0.0;
+      if (age >= 9 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.75;
+      if (age >= 40 && age <= 49) return 0.55;
+      if (age >= 50 && age <= 65) return 0.35;
+    }
+    return 0.0;
+  }
+
   void _executeMakeLove() {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
@@ -169,31 +192,84 @@ class _BercintaScreenState extends State<BercintaScreen> {
     bool success = false;
     final String myGender = widget.character.gender.trim().toLowerCase();
     final String targetNameLower = widget.targetName.toLowerCase();
+    final String targetRoleLower = widget.targetRole.toLowerCase();
+    final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
+    final String partnerGender = _getPartnerGender().trim().toLowerCase();
 
-    if (myGender == 'laki-laki' && targetNameLower.contains('kakak perempuan')) {
-      // Adik laki-laki ke kakak perempuan -> 30%
-      success = _random.nextInt(100) < 30;
-    } else if (myGender == 'laki-laki' && targetNameLower.contains('adik perempuan')) {
-      // Kakak laki-laki ke adik perempuan -> 40%
-      success = _random.nextInt(100) < 40;
-    } else if (myGender == 'perempuan' && (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah'))) {
-      // Anak perempuan dengan ayah -> 40%
-      success = _random.nextInt(100) < 40;
-    } else if (myGender == 'perempuan' && (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu'))) {
-      // Anak perempuan dengan ibu -> 30%
-      success = _random.nextInt(100) < 30;
-    } else if (myGender == 'laki-laki' && (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah'))) {
-      // Anak laki-laki dengan ayah -> 10%
-      success = _random.nextInt(100) < 10;
-    } else if (myGender == 'laki-laki' && (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu'))) {
-      // Anak laki-laki dengan ibu -> 10%
-      success = _random.nextInt(100) < 10;
-    } else if (widget.targetRole == 'Kandung' || widget.targetRole == 'Tiri' || widget.targetRole.contains('Saudara') || targetNameLower.contains('kakak') || targetNameLower.contains('adik')) {
-      // Hubungan bercinta dengan keluarga lainnya (misal Kakak laki-laki, Adik laki-laki, dll)
-      // Default incest rate keluarga lainnya diatur ke 20%
-      success = _random.nextInt(100) < 20;
-    } else {
-      // Hubungan normal (Bukan keluarga)
+    // 1. Logika Orang Tua (User) Mengajak Anak Kandung/Tiri (Target)
+    if (isChild) {
+      if (myGender == 'laki-laki') {
+        // Sebagai Ayah
+        if (partnerGender == 'laki-laki') {
+          // Mengajak anak laki-laki: 20%
+          success = _random.nextInt(100) < 20;
+        } else {
+          // Mengajak anak perempuan: 35%
+          success = _random.nextInt(100) < 35;
+        }
+      } else {
+        // Sebagai Ibu
+        if (partnerGender == 'laki-laki') {
+          // Mengajak anak laki-laki: 20%
+          success = _random.nextInt(100) < 20;
+        } else {
+          // Mengajak anak perempuan: 20%
+          success = _random.nextInt(100) < 20;
+        }
+      }
+    } 
+    // 2. Logika Anak (User) Mengajak Orang Tua (Target)
+    else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah')) {
+      if (myGender == 'laki-laki') {
+        // Anak laki mengajak ayahnya: 10%
+        success = _random.nextInt(100) < 10;
+      } else {
+        // Anak perempuan mengajak ayahnya: 30%
+        success = _random.nextInt(100) < 30;
+      }
+    } else if (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
+      if (myGender == 'laki-laki') {
+        // Anak laki mengajak ibunya: 10%
+        success = _random.nextInt(100) < 10;
+      } else {
+        // Anak perempuan mengajak ibunya: 30%
+        success = _random.nextInt(100) < 30;
+      }
+    }
+    // 3. Logika Saudara Kandung / Incest Sibling (User dengan Target Kakak/Adik)
+    else if (targetRoleLower.contains('saudara') || targetNameLower.contains('kakak') || targetNameLower.contains('adik')) {
+      final bool isTargetOlder = targetNameLower.contains('kakak');
+      
+      if (myGender == 'perempuan' && partnerGender == 'perempuan') {
+        // Anak perempuan dengan anak perempuan: 20%
+        success = _random.nextInt(100) < 20;
+      } else if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
+        // Anak laki dengan anak laki: 10%
+        success = _random.nextInt(100) < 10;
+      } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
+        // Kakak laki adik perempuan ATAU adik laki kakak perempuan
+        if (isTargetOlder) {
+          // Target adalah Kakak Perempuan -> User adalah Adik Laki -> Adik laki kakak perempuan: 30%
+          success = _random.nextInt(100) < 30;
+        } else {
+          // Target adalah Adik Perempuan -> User adalah Kakak Laki -> Kakak laki adik perempuan: 30%
+          success = _random.nextInt(100) < 30;
+        }
+      } else if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
+        // Kakak perempuan adik laki ATAU adik perempuan kakak laki
+        if (isTargetOlder) {
+          // Target adalah Kakak Laki -> User adalah Adik Perempuan -> Kakak laki adik perempuan: 30%
+          success = _random.nextInt(100) < 30;
+        } else {
+          // Target adalah Adik Laki -> User adalah Kakak Perempuan -> Adik laki kakak perempuan: 30%
+          success = _random.nextInt(100) < 30;
+        }
+      } else {
+        success = _random.nextInt(100) < 30; // Persentase default saudara/i 30%
+      }
+    }
+    // 4. Hubungan Normal / Bukan Incest
+    else {
       success = _random.nextInt(100) < 65;
     }
 
@@ -213,6 +289,20 @@ class _BercintaScreenState extends State<BercintaScreen> {
       message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan malam yang sangat intim! (+${relationChange.abs()}% hubungan)';
       icon = Icons.favorite;
       color = Colors.pink;
+      
+      // Jika berhasil berhubungan seksual dan target adalah anak (Incest dari sisi Orang Tua mengajak Anak)
+      if (isChild) {
+        widget.character.inbox.add(
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName}.'
+        );
+      }
+      // Jika target adalah orang tua (Incest dari sisi Anak mengajak Orang Tua)
+      else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah') || targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
+        widget.character.inbox.add(
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation.'
+        );
+      }
+
       stateUpdate = () {
         widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
         widget.onActionComplete.call();
@@ -228,26 +318,35 @@ class _BercintaScreenState extends State<BercintaScreen> {
       };
     }
 
-    // --- LOGIKA KEHAMILAN ---
+    // --- LOGIKA KEHAMILAN DINAMIS ---
     bool isPregnant = false;
     bool isPartnerPregnant = false;
     String additionalMessage = '';
 
-    final String partnerGender = _getPartnerGender().trim().toLowerCase();
-
-    if (_useCondom == false && myGender != partnerGender) {
+    if (success && _useCondom == false && myGender != partnerGender) {
+      
+      // Ambil kesuburan berdasarkan usia dan gender
+      double myFertility = _getFertilityRate(widget.character.age, myGender);
       
       if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
         if (widget.character.isPregnant) {
           additionalMessage = 'Kamu sudah dalam kondisi hamil.';
         } else {
-          if (widget.character.age >= 9 && widget.character.age <= 50) {
-            if (_random.nextInt(100) < 70) {
+          if (myFertility > 0) {
+            if (_random.nextDouble() < myFertility) {
               isPregnant = true;
               widget.character.isPregnant = true;
               widget.character.pregnantByPartnerName = widget.targetName;
               widget.character.pregnantByPartnerRole = widget.targetRole;
+              
+              widget.character.inbox.add(
+                '🍼 Kabar Kehamilan: Kamu hamil dari hasil hubungan intim dengan $relation!'
+              );
+            } else {
+              additionalMessage = 'Kali ini belum berhasil hamil. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
             }
+          } else {
+            additionalMessage = 'Usia kamu ${widget.character.age} tahun. Kamu sudah melewati masa subur (8-45 tahun).';
           }
         }
       } 
@@ -255,16 +354,29 @@ class _BercintaScreenState extends State<BercintaScreen> {
         if (widget.character.partnerIsPregnant) {
           additionalMessage = 'Pasanganmu sudah dalam kondisi hamil.';
         } else {
-          if (widget.character.age >= 9 && widget.character.age <= 50) {
-            if (_random.nextInt(100) < 70) {
+          if (myFertility > 0) {
+            if (_random.nextDouble() < myFertility) {
               isPartnerPregnant = true;
               widget.character.partnerIsPregnant = true;
               widget.character.pregnantByPartnerName = widget.targetName;
               widget.character.pregnantByPartnerRole = widget.targetRole;
+              
+              widget.character.inbox.add(
+                '👶 Kabar Kehamilan: Pasangan/keluargamu, $relation, hamil dari hasil hubungan intim denganmu!'
+              );
+            } else {
+              additionalMessage = 'Kali ini belum berhasil menghamili. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
             }
+          } else {
+            additionalMessage = 'Usia kamu ${widget.character.age} tahun. Kamu sudah melewati masa subur (9-65 tahun).';
           }
         }
       }
+    }
+
+    // Pemicu pengecekan penyakit menular seksual (STD) jika tidak pakai pengaman
+    if (success && _useCondom == false) {
+      handleSTDCheck(widget.character, widget.targetRole, widget.targetName, _random);
     }
 
     showDialog(
