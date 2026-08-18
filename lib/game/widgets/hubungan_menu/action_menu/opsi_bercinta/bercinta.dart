@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pil
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -57,18 +58,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
   }
 
   String _getPartnerGender() {
-    final String name = widget.targetName;
-    if (name.startsWith('Ayah')) return 'Laki-laki';
-    if (name.startsWith('Ibu')) return 'Perempuan';
-
-    final int startIndex = name.indexOf('(');
-    final int endIndex = name.indexOf(')');
-    if (startIndex != -1 && endIndex != -1) {
-      final String relationText = name.substring(startIndex + 1, endIndex).toLowerCase();
-      if (relationText.contains('perempuan')) return 'Perempuan';
-      if (relationText.contains('laki-laki')) return 'Laki-laki';
-    }
-    return 'Laki-laki';
+    return HubunganIntimLogic.getPartnerGender(widget.targetName);
   }
 
   bool _isCondomNeeded() {
@@ -168,26 +158,8 @@ class _BercintaScreenState extends State<BercintaScreen> {
     );
   }
 
-  // --- FUNGSI LOGIKA KESUBURAN DINAMIS ---
   double _getFertilityRate(int age, String gender) {
-    final String g = gender.trim().toLowerCase();
-    if (g == 'perempuan') {
-      if (age < 8 || age > 45) return 0.0;
-      if (age >= 8 && age <= 13) return 0.35;
-      if (age >= 14 && age <= 19) return 0.55;
-      if (age >= 20 && age <= 29) return 0.85;
-      if (age >= 30 && age <= 39) return 0.65;
-      if (age >= 40 && age <= 45) return 0.30;
-    } else { // laki-laki
-      if (age < 9 || age > 65) return 0.0;
-      if (age >= 9 && age <= 13) return 0.35;
-      if (age >= 14 && age <= 19) return 0.55;
-      if (age >= 20 && age <= 29) return 0.85;
-      if (age >= 30 && age <= 39) return 0.75;
-      if (age >= 40 && age <= 49) return 0.55;
-      if (age >= 50 && age <= 65) return 0.35;
-    }
-    return 0.0;
+    return HubunganIntimLogic.getFertilityRate(age, gender);
   }
 
   void _executeMakeLove() {
@@ -207,82 +179,15 @@ class _BercintaScreenState extends State<BercintaScreen> {
       partnerBonus = 15;
     }
 
-    // 1. Logika Orang Tua (User) Mengajak Anak Kandung/Tiri (Target)
-    if (isChild) {
-      if (myGender == 'laki-laki') {
-        // Sebagai Ayah
-        if (partnerGender == 'laki-laki') {
-          // Mengajak anak laki-laki: 20%
-          success = _random.nextInt(100) < (20 + partnerBonus);
-        } else {
-          // Mengajak anak perempuan: 35%
-          success = _random.nextInt(100) < (35 + partnerBonus);
-        }
-      } else {
-        // Sebagai Ibu
-        if (partnerGender == 'laki-laki') {
-          // Mengajak anak laki-laki: 20%
-          success = _random.nextInt(100) < (20 + partnerBonus);
-        } else {
-          // Mengajak anak perempuan: 20%
-          success = _random.nextInt(100) < (20 + partnerBonus);
-        }
-      }
-    } 
-    // 2. Logika Anak (User) Mengajak Orang Tua (Target)
-    else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah')) {
-      if (myGender == 'laki-laki') {
-        // Anak laki mengajak ayahnya: 10%
-        success = _random.nextInt(100) < (10 + partnerBonus);
-      } else {
-        // Anak perempuan mengajak ayahnya: 30%
-        success = _random.nextInt(100) < (30 + partnerBonus);
-      }
-    } else if (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
-      if (myGender == 'laki-laki') {
-        // Anak laki mengajak ibunya: 10%
-        success = _random.nextInt(100) < (10 + partnerBonus);
-      } else {
-        // Anak perempuan mengajak ibunya: 30%
-        success = _random.nextInt(100) < (30 + partnerBonus);
-      }
-    }
-    // 3. Logika Saudara Kandung / Incest Sibling (User dengan Target Kakak/Adik)
-    else if (targetRoleLower.contains('saudara') || targetNameLower.contains('kakak') || targetNameLower.contains('adik')) {
-      final bool isTargetOlder = targetNameLower.contains('kakak');
-      
-      if (myGender == 'perempuan' && partnerGender == 'perempuan') {
-        // Anak perempuan dengan anak perempuan: 20%
-        success = _random.nextInt(100) < (20 + partnerBonus);
-      } else if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
-        // Anak laki dengan anak laki: 10%
-        success = _random.nextInt(100) < (10 + partnerBonus);
-      } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
-        // Kakak laki adik perempuan ATAU adik laki kakak perempuan
-        if (isTargetOlder) {
-          // Target adalah Kakak Perempuan -> User adalah Adik Laki -> Adik laki kakak perempuan: 30%
-          success = _random.nextInt(100) < (30 + partnerBonus);
-        } else {
-          // Target adalah Adik Perempuan -> User adalah Kakak Laki -> Kakak laki adik perempuan: 30%
-          success = _random.nextInt(100) < (30 + partnerBonus);
-        }
-      } else if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
-        // Kakak perempuan adik laki ATAU adik perempuan kakak laki
-        if (isTargetOlder) {
-          // Target adalah Kakak Laki -> User adalah Adik Perempuan -> Kakak laki adik perempuan: 30%
-          success = _random.nextInt(100) < (30 + partnerBonus);
-        } else {
-          // Target adalah Adik Laki -> User adalah Kakak Perempuan -> Adik laki kakak perempuan: 30%
-          success = _random.nextInt(100) < (30 + partnerBonus);
-        }
-      } else {
-        success = _random.nextInt(100) < 30; // Persentase default saudara/i 30%
-      }
-    }
-    // 4. Hubungan Normal / Bukan Incest
-    else {
-      success = _random.nextInt(100) < 65;
-    }
+    // Gunakan logika persentase sukses terpusat
+    success = HubunganIntimLogic.calculateMakeLoveSuccess(
+      myGender: myGender,
+      partnerGender: partnerGender,
+      targetName: widget.targetName,
+      targetRole: widget.targetRole,
+      partnerBonus: partnerBonus,
+      random: _random,
+    );
 
     int relationChange = 0;
 

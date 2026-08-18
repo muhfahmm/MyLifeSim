@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 
 class KepuasanBercintaHelper {
   /// Mengecek apakah pasangan bersedia bercinta berdasarkan tingkat kepuasan hubungan (0-100).
@@ -15,46 +16,17 @@ class KepuasanBercintaHelper {
   }) {
     final String myGender = character.gender.trim().toLowerCase();
     final String partnerGender = targetGender.trim().toLowerCase();
-    final bool isHetero = myGender != partnerGender;
+    final Random random = Random();
 
-    bool isWilling = true;
-    String rejectReason = '';
+    final Map<String, dynamic> result = HubunganIntimLogic.checkInitialWillingness(
+      myGender: myGender,
+      partnerGender: partnerGender,
+      satisfaction: satisfaction,
+      random: random,
+    );
 
-    if (isHetero) {
-      // --- LOGIKA HETEROSEXUAL (LAKI DENGAN PEREMPUAN) ---
-      final Random random = Random();
-      final int roll = random.nextInt(100);
-
-      if (satisfaction >= 60) {
-        // 70% Peluang mau
-        if (roll < 70) {
-          isWilling = true;
-        } else {
-          isWilling = false;
-          rejectReason = 'sedang tidak dalam mood yang baik meskipun hubungan kalian cukup dekat ($satisfaction%).';
-        }
-      } else if (satisfaction >= 50) {
-        // 50% Peluang mau
-        if (roll < 50) {
-          isWilling = true;
-        } else {
-          isWilling = false;
-          rejectReason = 'merasa hubungan kalian kurang hangat untuk melakukan itu ($satisfaction%).';
-        }
-      } else {
-        // Di bawah 50% selalu menolak
-        isWilling = false;
-        rejectReason = 'menolak mentah-mentah karena tingkat kepuasan hubungannya terlalu rendah ($satisfaction%).';
-      }
-    } else {
-      // --- LOGIKA NORMAL / SESAMA GENDER ---
-      if (satisfaction <= 40) {
-        isWilling = false;
-        rejectReason = 'menolak ajakanmu untuk berhubungan intim karena tingkat kepuasan hubungannya saat ini terlalu rendah ($satisfaction%).';
-      } else {
-        isWilling = true;
-      }
-    }
+    final bool isWilling = result['isWilling'] as bool;
+    final String rejectReason = result['rejectReason'] as String;
 
     if (!isWilling) {
       showDialog(

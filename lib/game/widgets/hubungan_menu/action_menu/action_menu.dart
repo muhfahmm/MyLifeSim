@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logi
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_3_6.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_6_11.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -270,25 +271,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   }
 
   int _getFertilityRate(int age, String gender) {
-    final String g = gender.trim().toLowerCase();
-    double rate = 0.0;
-    if (g == 'perempuan') {
-      if (age < 8 || age > 45) rate = 0.0;
-      else if (age >= 8 && age <= 13) rate = 0.35;
-      else if (age >= 14 && age <= 19) rate = 0.55;
-      else if (age >= 20 && age <= 29) rate = 0.85;
-      else if (age >= 30 && age <= 39) rate = 0.65;
-      else if (age >= 40 && age <= 45) rate = 0.30;
-    } else { // laki-laki
-      if (age < 9 || age > 65) rate = 0.0;
-      else if (age >= 9 && age <= 13) rate = 0.35;
-      else if (age >= 14 && age <= 19) rate = 0.55;
-      else if (age >= 20 && age <= 29) rate = 0.85;
-      else if (age >= 30 && age <= 39) rate = 0.75;
-      else if (age >= 40 && age <= 49) rate = 0.55;
-      else if (age >= 50 && age <= 65) rate = 0.35;
-    }
-    return (rate * 100).toInt();
+    return (HubunganIntimLogic.getFertilityRate(age, gender) * 100).toInt();
   }
 
   // Fungsi update state yang dikirim ke file usia
