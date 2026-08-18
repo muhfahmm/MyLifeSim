@@ -7,7 +7,7 @@ import 'dart:math';
 // Import widget-widget UI
 import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
 import 'package:bitlife/game/widgets/assets_menu/assets_button.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/relationship_button.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/relationship_button.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';

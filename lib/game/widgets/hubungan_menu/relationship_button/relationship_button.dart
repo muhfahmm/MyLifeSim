@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/relationship_button.dart
+// lib/game/widgets/hubungan_menu/relationship_button/relationship_button.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
@@ -95,7 +95,7 @@ class RelationshipButton extends StatelessWidget {
               // ============================================
               // 1. BAGIAN ORANGTUA
               // ============================================
-              const Text('👨‍👩‍👧 Orangtua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+              const Text('👨👩👧 Orangtua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
               const SizedBox(height: 8),
               if (character.fatherName != null)
                 _buildFamilyItem(
@@ -152,7 +152,7 @@ class RelationshipButton extends StatelessWidget {
                       ? '💖 Pacar'
                       : character.partner!['relation'] == 'Tunangan'
                           ? '💍 Tunangan'
-                          : '👩‍❤️‍👨 Pasangan Hidup',
+                          : '👩❤️👨 Pasangan Hidup',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
                 ),
                 const SizedBox(height: 8),

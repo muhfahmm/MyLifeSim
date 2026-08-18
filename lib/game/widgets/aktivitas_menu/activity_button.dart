@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/masturbasi.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/masturbate.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
