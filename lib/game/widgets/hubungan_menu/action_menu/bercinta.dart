@@ -6,6 +6,7 @@ import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -282,7 +283,76 @@ class _BercintaScreenState extends State<BercintaScreen> {
       success = _random.nextInt(100) < 65;
     }
 
-    int relationChange = success
+    int relationChange = 0;
+
+    // --- LOGIKA KETAHUAN BERCINTA (SUPER KETAT) ---
+    // Di Rumah: Pagi (50%), Siang (55%), Malam (20%)
+    // Di Hotel: 20%
+    if (success) {
+      int caughtChance = 0;
+      if (_chosenLocation.contains('Rumah')) {
+        final String t = _chosenTime.toLowerCase();
+        if (t.contains('pagi')) {
+          caughtChance = 50;
+        } else if (t.contains('siang') || t.contains('sore')) {
+          caughtChance = 55;
+        } else if (t.contains('malam')) {
+          caughtChance = 20;
+        }
+      } else if (_chosenLocation.contains('Hotel')) {
+        caughtChance = 20;
+      }
+
+      if (_random.nextInt(100) < caughtChance) {
+        // Gagal karena ketahuan!
+        success = false;
+        // Pinalti hubungan dengan target
+        relationChange = -(_random.nextInt(15) + 15); // -15% s/d -30%
+        // Buat detail penolakan khusus
+        final String firstPartnerName = widget.character.partner?['name'] ?? 'pasanganmu';
+        final String informantDesc = _chosenLocation.contains('Rumah') ? 'keluarga/tetangga' : 'petugas hotel';
+        
+        // Pinalti hubungan dengan pacar utama jika ada
+        if (widget.character.partner != null) {
+          int rel = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
+          widget.character.partner!['relationship'] = (rel - 25).clamp(0, 100).toString();
+        }
+        widget.character.happiness = (widget.character.happiness - 20).clamp(0, 100);
+        widget.character.inbox.add('😡 Ketahuan Basah: Aksi bercintamu dengan ${widget.targetName} ketahuan oleh $informantDesc! Hubunganmu dengan $firstPartnerName memburuk drastis.');
+
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (context) => AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                SizedBox(width: 8),
+                Text('Ketahuan Basah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: Text(
+              'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc! '
+              'Kabar buruk ini menyebar cepat dan pacar utamamu ($firstPartnerName) mengetahuinya!',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context); // Tutup layar bercinta
+                  widget.onActionComplete.call();
+                },
+                child: const Text('Lanjutkan', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+        return; // Hentikan eksekusi make love lebih lanjut
+      }
+    }
+
+    relationChange = success
         ? _random.nextInt(11) + 10
         : -(_random.nextInt(5) + 1);
 
@@ -514,35 +584,72 @@ class _BercintaScreenState extends State<BercintaScreen> {
       }
     }
 
-    final String? loc = await TempatBercintaHelper.showLocationChooser(
-      context: context,
-      partnerName: widget.targetName,
-      userAge: widget.character.age,
-      targetAge: targetAge,
-    );
-
-    if (loc == null) {
-      // Batal memilih tempat -> kembali
-      Navigator.of(context).pop();
-      return;
-    }
-
-    final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
-    if (time == null) {
-      // Batal memilih waktu -> kembali
-      Navigator.of(context).pop();
-      return;
-    }
-
-    _chosenLocation = loc;
-    _chosenTime = time;
-
-    if (_isCondomNeeded()) {
-      _showCondomDialog();
+    // --- INTEGRASI KEPUASAN BERCINTA ---
+    // Cari tingkat kepuasan hubungan dengan target ini
+    int currentSatisfaction = 50; // default fallback
+    final String cleanTargetName = widget.targetName;
+    if (widget.character.partner != null && widget.character.partner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
     } else {
-      _useCondom = null;
-      _executeMakeLove();
+      // Cari di siblings
+      for (var sib in widget.character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})';
+        if (expectedLabel == cleanTargetName) {
+          currentSatisfaction = int.tryParse(sib['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
+      // Cari di extendedFamily
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == cleanTargetName) {
+          currentSatisfaction = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
     }
+
+    KepuasanBercintaHelper.checkWillingness(
+      context: context,
+      character: widget.character,
+      targetName: widget.targetName,
+      targetGender: _getPartnerGender(),
+      satisfaction: currentSatisfaction,
+      onRejected: () {
+        Navigator.of(context).pop();
+      },
+      onAccepted: () async {
+        final String? loc = await TempatBercintaHelper.showLocationChooser(
+          context: context,
+          character: widget.character,
+          partnerName: widget.targetName,
+          userAge: widget.character.age,
+          targetAge: targetAge,
+        );
+
+        if (loc == null) {
+          Navigator.of(context).pop();
+          return;
+        }
+
+        final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
+        if (time == null) {
+          Navigator.of(context).pop();
+          return;
+        }
+
+        _chosenLocation = loc;
+        _chosenTime = time;
+
+        if (_isCondomNeeded()) {
+          _showCondomDialog();
+        } else {
+          _useCondom = null;
+          _executeMakeLove();
+        }
+      },
+    );
   }
 
   @override

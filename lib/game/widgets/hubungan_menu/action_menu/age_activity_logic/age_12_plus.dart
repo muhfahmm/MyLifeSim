@@ -5,6 +5,8 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
 
 String _getPartnerGender(String targetName) {
@@ -226,6 +228,28 @@ List<ActionItem> getAge12PlusActions(
     },
   ));
 
+  // --- LOGIKA BARU: AJAK 3SOME ---
+  // Ditampilkan jika target yang dipilih adalah salah satu pacar aktif (partner atau secondPartner)
+  // dan user sedang memiliki 2 pacar sekaligus.
+  final bool targetIsEitherPartner = (character.partner != null && character.partner!['name'] == targetName) ||
+                                     (character.secondPartner != null && character.secondPartner!['name'] == targetName);
+  final bool hasTwoPartners = character.partner != null && character.secondPartner != null;
+
+  if (targetIsEitherPartner && hasTwoPartners) {
+    actions.add(ActionItem(
+      label: 'Ajak 3some? 🔥',
+      icon: Icons.people,
+      color: Colors.purple,
+      onTap: () {
+        ThreesomeHelper.processThreesome(
+          context: context,
+          character: character,
+          updateState: updateState,
+        );
+      },
+    ));
+  }
+
   // 2. Ajak Pacaran - tampil jika belum jadi pacar target ini, bukan pasangan resmi, dan belum jadi selingkuhan
   if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
     actions.add(ActionItem(
@@ -346,17 +370,29 @@ List<ActionItem> getAge12PlusActions(
             } else {
               // Gagal - pacar pertama entah bagaimana mengetahui niat ini
               int relPenalty = random.nextInt(15) + 10; // -10 sampai -25%
+              final String firstPartnerName = character.partner!['name']!;
               showDialog(
                 'Ketahuan! 😡',
-                '$targetName menolak ajakanmu dan langsung memberitahu pacarmu! ${character.partner!['name']} sangat marah dan kecewa (-$relPenalty% hubungan dengan ${character.partner!['name']}).',
+                '$targetName menolak ajakanmu dan langsung memberitahu pacarmu!',
                 Icons.heart_broken, Colors.red, () {
                   if (character.partner != null) {
                     int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
                     character.partner!['relationship'] = (rel - relPenalty).clamp(0, 100).toString();
                   }
                   character.happiness = (character.happiness - 15).clamp(0, 100);
-                  character.inbox.add('😡 Ketahuan: ${character.partner!['name']} mengetahui kamu mencoba merayu $targetName sebagai selingkuhan!');
+                  character.inbox.add('😡 Ketahuan: $firstPartnerName mengetahui kamu mencoba merayu $targetName sebagai selingkuhan!');
                   updateState();
+
+                  // Panggil dialog interograsi
+                  InterograsiPacarHelper.showInterograsiDialog(
+                    context: context,
+                    character: character,
+                    partnerName: firstPartnerName,
+                    informantName: targetName,
+                    onComplete: () {
+                      updateState();
+                    },
+                  );
                 }
               );
             }

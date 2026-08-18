@@ -88,7 +88,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) {
+      // PERBAIKAN: Tambahkan widget. di depan character
+      if (widget.character.partner != null && widget.character.partner!['name'] == name) {
+        return int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
+      }
+      if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
+        return int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
+      }
       return int.tryParse(widget.character.partner?['relationship'] ?? '50') ?? 50;
     }
 
@@ -139,10 +146,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
-      if (widget.character.partner != null) {
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) {
+      // PERBAIKAN: Tambahkan widget. di depan character
+      if (widget.character.partner != null && widget.character.partner!['name'] == name) {
         int currentRel = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
         widget.character.partner!['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
+      } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
+        int currentRel = int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
+        widget.character.secondPartner!['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
       }
       return;
     }

@@ -1,5 +1,6 @@
 // lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 
 class LocationOption {
   final String name;
@@ -59,6 +60,7 @@ class TempatBercintaHelper {
   // Menyembunyikan opsi mobil jika usia user adalah 12 dan target (pasangan) kurang dari 18 tahun (belum bisa menyetir mobil)
   static Future<String?> showLocationChooser({
     required BuildContext context,
+    required Character character,
     required String partnerName,
     required int userAge,
     required int targetAge,
@@ -128,8 +130,97 @@ class TempatBercintaHelper {
 
     if (selectedMain == null) return null;
 
-    // Langkah 2: Jika memilih "Di Rumah", tawarkan pilihan ruangan detail
+    // Langkah 2: Jika memilih "Di Rumah", tawarkan pilihan rumah siapa (Rumah Orang Tua, Rumah Pacar Utama, Rumah Pacar Rahasia)
     if (selectedMain.name == 'Di Rumah') {
+      final String? selectedHouseOwner = await showDialog<String>(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          final String firstPartnerName = character.partner?['name'] ?? 'Pacar';
+          final String secondPartnerName = character.secondPartner?['name'] ?? 'Pacar Rahasia';
+          final String parentName = character.motherName != null ? 'Ibu (${character.motherName})' : 'Orang Tua';
+
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.home, color: Colors.redAccent),
+                SizedBox(width: 8),
+                Text('Pilih Rumah Siapa?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (character.motherName != null || character.fatherName != null)
+                  Card(
+                    elevation: 0,
+                    color: Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.people, color: Colors.blue),
+                      title: Text('Rumah $parentName'),
+                      subtitle: const Text('Rumah orang tuamu sendiri.'),
+                      onTap: () => Navigator.pop(context, 'Orang Tua'),
+                    ),
+                  ),
+                if (character.partner != null)
+                  Card(
+                    elevation: 0,
+                    color: Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite, color: Colors.pink),
+                      title: Text('Rumah $firstPartnerName'),
+                      subtitle: const Text('Rumah pacar utamamu.'),
+                      onTap: () => Navigator.pop(context, 'Pacar Pertama'),
+                    ),
+                  ),
+                if (character.secondPartner != null)
+                  Card(
+                    elevation: 0,
+                    color: Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.heart_broken, color: Colors.deepOrange),
+                      title: Text('Rumah $secondPartnerName'),
+                      subtitle: const Text('Rumah pacar rahasiamu (selingkuhan).'),
+                      onTap: () => Navigator.pop(context, 'Pacar Rahasia'),
+                    ),
+                  ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, null),
+                child: const Text('Kembali', style: TextStyle(fontWeight: FontWeight.bold)),
+              )
+            ],
+          );
+        },
+      );
+
+      if (selectedHouseOwner == null) {
+        return showLocationChooser(
+          context: context,
+          character: character,
+          partnerName: partnerName,
+          userAge: userAge,
+          targetAge: targetAge,
+        );
+      }
+
       LocationOption? selectedRoom = await showDialog<LocationOption>(
         context: context,
         barrierDismissible: false,
@@ -137,7 +228,7 @@ class TempatBercintaHelper {
           title: const Row(
             children: [
               Icon(Icons.meeting_room, color: Colors.redAccent),
-              const SizedBox(width: 8),
+              SizedBox(width: 8),
               Text('Pilih Ruangan di Rumah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
@@ -179,15 +270,15 @@ class TempatBercintaHelper {
       );
 
       if (selectedRoom == null) {
-        // Ulangi/kembali ke pemilihan utama jika ditekan kembali
         return showLocationChooser(
           context: context,
+          character: character,
           partnerName: partnerName,
           userAge: userAge,
           targetAge: targetAge,
         );
       }
-      return 'Rumah (${selectedRoom.name})';
+      return 'Rumah (Pemilik: $selectedHouseOwner | Ruangan: ${selectedRoom.name})';
     }
 
     return selectedMain.name;
