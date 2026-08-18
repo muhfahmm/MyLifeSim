@@ -1,19 +1,25 @@
 // lib/game/widgets/activity_button.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/masturbasi.dart';
 
 class ActivityButton extends StatelessWidget {
+  final Character character;
   final bool isAlive;
   final VoidCallback onWork;
   final VoidCallback onStudy;
   final VoidCallback onExercise;
+  final VoidCallback onRefresh;
 
   const ActivityButton({
     super.key,
+    required this.character,
     required this.isAlive,
     required this.onWork,
     required this.onStudy,
     required this.onExercise,
+    required this.onRefresh,
   });
 
   @override
@@ -54,6 +60,14 @@ class ActivityButton extends StatelessWidget {
                 onTap: () {
                   Navigator.pop(context);
                   onExercise();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
+                title: const Text('Masturbasi (Fantasi)'),
+                onTap: () {
+                  Navigator.pop(context);
+                  MasturbasiHelper.showMasturbationMenu(context, character, onRefresh);
                 },
               ),
             ],

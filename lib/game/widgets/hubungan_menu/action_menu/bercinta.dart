@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/pilih_tempat.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -292,20 +293,24 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
     if (success) {
       title = 'Momen Mesra';
-      message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan malam yang sangat intim! (+${relationChange.abs()}% hubungan)';
+      message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan malam yang sangat intim $_chosenLocation! (+${relationChange.abs()}% hubungan)';
       icon = Icons.favorite;
       color = Colors.pink;
       
       // Jika berhasil berhubungan seksual dan target adalah anak (Incest dari sisi Orang Tua mengajak Anak)
       if (isChild) {
         widget.character.inbox.add(
-          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName}.'
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName} $_chosenLocation.'
         );
       }
       // Jika target adalah orang tua (Incest dari sisi Anak mengajak Orang Tua)
       else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah') || targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
         widget.character.inbox.add(
-          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation.'
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation $_chosenLocation.'
+        );
+      } else {
+        widget.character.inbox.add(
+          '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan $relation $_chosenLocation.'
         );
       }
 
@@ -315,7 +320,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       };
     } else {
       title = 'Momen Canggung';
-      message = '$relation menolak ajakanmu dengan halus. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
+      message = '$relation menolak ajakanmu dengan halus ketika diajak bercinta $_chosenLocation. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
       icon = Icons.sentiment_dissatisfied;
       color = Colors.orange;
       stateUpdate = () {
@@ -468,7 +473,17 @@ class _BercintaScreenState extends State<BercintaScreen> {
     );
   }
 
-  void _checkCondomNeeded() {
+  String _chosenLocation = 'Rumah';
+
+  void _checkCondomNeeded() async {
+    final String? loc = await TempatBercintaHelper.showLocationChooser(context, widget.targetName);
+    if (loc == null) {
+      // Batal memilih tempat -> kembali
+      Navigator.of(context).pop();
+      return;
+    }
+    _chosenLocation = loc;
+
     if (_isCondomNeeded()) {
       _showCondomDialog();
     } else {

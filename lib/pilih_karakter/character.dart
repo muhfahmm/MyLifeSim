@@ -60,6 +60,9 @@ class Character {
   bool hasSifilis = false;
   bool hasHPV = false;
 
+  // --- LOGIKA MASTURBASI ---
+  int lastMasturbationAge = -5;
+
   Character({
     required this.name,
     required this.gender,

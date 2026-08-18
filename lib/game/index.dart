@@ -585,7 +585,11 @@ class _GameScreenState extends State<GameScreen> {
                 
                 // 4. AKTIVITAS
                 ActivityButton(
+                  character: _character,
                   isAlive: _character.isAlive,
+                  onRefresh: () {
+                    setState(() {});
+                  },
                   onWork: () {
                     setState(() => _character.money += 100);
                     ScaffoldMessenger.of(context).showSnackBar(
