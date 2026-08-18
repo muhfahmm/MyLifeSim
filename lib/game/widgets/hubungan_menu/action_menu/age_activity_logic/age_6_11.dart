@@ -36,12 +36,12 @@ List<ActionItem> getAge6to11Actions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(4) + 2;
+          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
           showDialog(
             'Uang Saku Ditolak',
             '$relation tidak memberimu uang saku kali ini. Hubunganmu merenggang (-$relPenalty%).',
             Icons.money_off, Colors.red, () {
-              character.happiness = (character.happiness - 5).clamp(0, 100);
+              character.happiness = (character.happiness - 2).clamp(0, 100);
               updateRelationship(-relPenalty);
               updateState();
             }

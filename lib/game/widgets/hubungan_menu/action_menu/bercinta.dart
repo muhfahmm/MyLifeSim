@@ -282,7 +282,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
     int relationChange = success
         ? _random.nextInt(11) + 10
-        : -(_random.nextInt(6) + 2);
+        : -(_random.nextInt(5) + 1);
 
     String title, message;
     IconData icon;

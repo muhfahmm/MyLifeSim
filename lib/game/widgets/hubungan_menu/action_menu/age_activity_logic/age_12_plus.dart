@@ -301,12 +301,12 @@ List<ActionItem> getAge12PlusActions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(6) + 10;
+          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
           showDialog(
             'Ajakan Ditolak 💔',
             '$targetName menolak ajakanmu untuk berpacaran. Hubungan kalian menjadi canggung (-$relPenalty%).',
             Icons.heart_broken, Colors.red, () {
-              character.happiness = (character.happiness - 15).clamp(0, 100);
+              character.happiness = (character.happiness - 5).clamp(0, 100);
               updateRelationship(-relPenalty);
               updateState();
             }
@@ -339,12 +339,12 @@ List<ActionItem> getAge12PlusActions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(6) + 15;
+          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
           showDialog(
             'Lamaran Ditolak 💔',
             '$targetName menolak lamaranmu karena merasa hubungan kalian belum cukup matang (-$relPenalty%).',
             Icons.heart_broken, Colors.red, () {
-              character.happiness = (character.happiness - 20).clamp(0, 100);
+              character.happiness = (character.happiness - 5).clamp(0, 100);
               updateRelationship(-relPenalty);
               updateState();
             }
@@ -423,12 +423,12 @@ List<ActionItem> getAge12PlusActions(
           }
         );
       } else {
-        int relPenalty = random.nextInt(4) + 2;
+        int relPenalty = random.nextInt(5) + 1; // 1-5% saja
         showDialog(
           'Minta Uang Gagal',
           '$relation menggelengkan kepala. Hubunganmu merenggang (-$relPenalty%).',
           Icons.money_off, Colors.red, () {
-            character.happiness = (character.happiness - 5).clamp(0, 100);
+            character.happiness = (character.happiness - 2).clamp(0, 100);
             updateRelationship(-relPenalty);
             updateState();
           }
