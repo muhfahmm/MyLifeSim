@@ -34,6 +34,12 @@ class RelationshipButton extends StatelessWidget {
         for (var sib in character.siblings) {
           final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
           final bool isDeceased = sib['isDeceased'] == 'true';
+          final String expectedLabel = '${sib['name']} (${sib['relation']})';
+          
+          if (character.partner != null && character.partner!['name'] == expectedLabel) {
+            continue;
+          }
+
           if (sibAge >= 0) {
             childrenList.add({
               'isPlayer': false,

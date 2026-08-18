@@ -43,6 +43,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       return widget.character.stepFatherAge != null ? '${widget.character.stepFatherAge} tahun' : 'Tidak diketahui';
+    } else if (role == 'Laki-laki' || role == 'Perempuan') {
+      // Ini adalah anak
+      for (var child in widget.character.children) {
+        final String childName = child['name'] ?? '';
+        // Bersihkan nama dari '(Wafat)' jika ada
+        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
+        if (childName == cleanName) {
+          int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+          return '$childAge tahun';
+        }
+      }
     } else {
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
@@ -70,6 +81,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.motherRelationship ?? 50;
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       return widget.character.stepFatherRelationship ?? 50;
+    } else if (role == 'Laki-laki' || role == 'Perempuan') {
+      // Ini adalah anak
+      for (var child in widget.character.children) {
+        final String childName = child['name'] ?? '';
+        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
+        if (childName == cleanName) {
+          return int.tryParse(child['relationship'] ?? '50') ?? 50;
+        }
+      }
     } else {
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
@@ -100,6 +120,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Tiri' && name.startsWith('Ayah')) {
       widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) + changeAmount).clamp(0, 100);
+    } else if (role == 'Laki-laki' || role == 'Perempuan') {
+      // Ini adalah anak
+      for (var child in widget.character.children) {
+        final String childName = child['name'] ?? '';
+        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
+        if (childName == cleanName) {
+          int currentRel = int.tryParse(child['relationship'] ?? '50') ?? 50;
+          child['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
+          break;
+        }
+      }
     } else {
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
@@ -145,44 +176,199 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   @override
   Widget build(BuildContext context) {
     final int age = widget.character.age;
+    // Tentukan umur target. Jika target memiliki umur spesifik (misal anak), gunakan itu.
+    // Jika tidak diketahui atau belum lahir, fallback ke 0.
+    final String ageString = _getCurrentAgeValue();
+    int targetAge = 0;
+    if (ageString.contains('tahun')) {
+      targetAge = int.tryParse(ageString.replaceAll(' tahun', '').trim()) ?? 0;
+    }
 
-    // --- LOGIKA PEMANGGILAN BERDASARKAN USIA ---
+    // --- LOGIKA PEMANGGILAN BERDASARKAN USIA TARGET ---
     List<ActionItem> actions = [];
 
-    if (age < 3) {
-      // Belum ada menu, akan menampilkan pesan "Terlalu muda"
-    } else if (age >= 3 && age <= 6) {
-      actions = getAge3to6Actions(
-        widget.character,
-        widget.targetName,
-        widget.targetRole,
-        _random,
-        _showResultDialog,
-        _updateRelationship,
-        _updateState,
-      );
-    } else if (age >= 6 && age < 12) {
-      actions = getAge6to11Actions(
-        widget.character,
-        widget.targetName,
-        widget.targetRole,
-        _random,
-        _showResultDialog,
-        _updateRelationship,
-        _updateState,
-      );
+    // Jika targetnya adalah Anak (atau targetRole Laki-laki / Perempuan)
+    final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
+
+    if (isChild && targetAge < 12) {
+      // Jika target anak kita di bawah 12 tahun, tampilkan menu khusus orang tua mengasuh anak:
+      // - Beri Uang Jajan (Minta uang dari sisi anak, di sini orang tua yang memberi uang)
+      // - Beri Hadiah
+      // - Ajak Bicara / Mengobrol
+      // - Beri Pelukan
+      // - Ajak Jalan-jalan / Bermain
+      // - Disiplinkan (jika nakal)
+      actions = [
+        ActionItem(
+          label: 'Beri Pelukan',
+          icon: Icons.face,
+          color: Colors.pinkAccent,
+          onTap: () {
+            int relBonus = _random.nextInt(6) + 10;
+            _showResultDialog(
+              'Pelukan Hangat',
+              'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
+              Icons.face,
+              Colors.pinkAccent,
+              () {
+                widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+                _updateRelationship(relBonus);
+                _updateState();
+              },
+            );
+          },
+        ),
+        ActionItem(
+          label: 'Bercakap-cakap',
+          icon: Icons.chat,
+          color: Colors.teal,
+          onTap: () {
+            int relBonus = _random.nextInt(5) + 5;
+            _showResultDialog(
+              'Mengobrol dengan Anak',
+              'Kamu menghabiskan waktu mengobrol dan mendengarkan cerita ${widget.targetName}. (+$relBonus% hubungan)',
+              Icons.chat,
+              Colors.teal,
+              () {
+                _updateRelationship(relBonus);
+                _updateState();
+              },
+            );
+          },
+        ),
+        ActionItem(
+          label: 'Beri Uang Jajan',
+          icon: Icons.monetization_on,
+          color: Colors.green,
+          onTap: () {
+            if (widget.character.money < 10) {
+              _showResultDialog(
+                'Uang Tidak Cukup',
+                'Kamu tidak memiliki cukup uang untuk memberikan uang jajan (\$10).',
+                Icons.money_off,
+                Colors.red,
+                () {},
+              );
+            } else {
+              int relBonus = _random.nextInt(6) + 10;
+              _showResultDialog(
+                'Beri Uang Jajan',
+                'Kamu memberikan uang jajan sebesar \$10 kepada ${widget.targetName}. Dia sangat gembira! (+$relBonus% hubungan)',
+                Icons.monetization_on,
+                Colors.green,
+                () {
+                  widget.character.money -= 10;
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            }
+          },
+        ),
+        ActionItem(
+          label: 'Beri Hadiah Mainan',
+          icon: Icons.toys,
+          color: Colors.orange,
+          onTap: () {
+            if (widget.character.money < 30) {
+              _showResultDialog(
+                'Uang Tidak Cukup',
+                'Kamu tidak memiliki cukup uang untuk membelikan mainan (\$30).',
+                Icons.money_off,
+                Colors.red,
+                () {},
+              );
+            } else {
+              int relBonus = _random.nextInt(11) + 15;
+              _showResultDialog(
+                'Hadiah Mainan',
+                'Kamu membelikan mainan baru seharga \$30 untuk ${widget.targetName}. Anakmu langsung melompat kegirangan! (+$relBonus% hubungan)',
+                Icons.toys,
+                Colors.orange,
+                () {
+                  widget.character.money -= 30;
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            }
+          },
+        ),
+        ActionItem(
+          label: 'Ajak Bermain ke Taman',
+          icon: Icons.park,
+          color: Colors.deepOrange,
+          onTap: () {
+            int relBonus = _random.nextInt(6) + 12;
+            _showResultDialog(
+              'Bermain di Taman',
+              'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
+              Icons.park,
+              Colors.green,
+              () {
+                widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+                _updateRelationship(relBonus);
+                _updateState();
+              },
+            );
+          },
+        ),
+        ActionItem(
+          label: 'Puji Anak',
+          icon: Icons.thumb_up,
+          color: Colors.blue,
+          onTap: () {
+            int relBonus = _random.nextInt(5) + 8;
+            _showResultDialog(
+              'Pujian Orang Tua',
+              'Kamu memuji kepintaran dan tingkah laku baik ${widget.targetName}. (+$relBonus% hubungan)',
+              Icons.thumb_up,
+              Colors.blue,
+              () {
+                _updateRelationship(relBonus);
+                _updateState();
+              },
+            );
+          },
+        ),
+      ];
     } else {
-      actions = getAge12PlusActions(
-        context,
-        widget.character,
-        widget.targetName,
-        widget.targetRole,
-        age,
-        _random,
-        _showResultDialog,
-        _updateRelationship,
-        _updateState,
-      );
+      // Gunakan logika standar berdasarkan usia target
+      if (targetAge < 3) {
+        // Belum ada menu, menampilkan pesan "Terlalu muda"
+      } else if (targetAge >= 3 && targetAge <= 6) {
+        actions = getAge3to6Actions(
+          widget.character,
+          widget.targetName,
+          widget.targetRole,
+          _random,
+          _showResultDialog,
+          _updateRelationship,
+          _updateState,
+        );
+      } else if (targetAge >= 6 && targetAge < 12) {
+        actions = getAge6to11Actions(
+          widget.character,
+          widget.targetName,
+          widget.targetRole,
+          _random,
+          _showResultDialog,
+          _updateRelationship,
+          _updateState,
+        );
+      } else {
+        actions = getAge12PlusActions(
+          context,
+          widget.character,
+          widget.targetName,
+          widget.targetRole,
+          targetAge,
+          _random,
+          _showResultDialog,
+          _updateRelationship,
+          _updateState,
+        );
+      }
     }
 
     final int relationshipVal = _getCurrentRelationshipValue();

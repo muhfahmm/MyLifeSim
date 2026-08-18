@@ -34,6 +34,7 @@ List<ActionItem> getAge12PlusActions(
   final String partnerGender = _getPartnerGender(targetName).toLowerCase();
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
   final bool isAlreadyPartner = character.partner != null && character.partner!['name'] == targetName;
+  final bool isChild = targetRole == 'Laki-laki' || targetRole == 'Perempuan';
 
   // Helper untuk mendapatkan nilai hubungan saat ini
   int _getCurrentRelationshipValue() {
@@ -41,6 +42,163 @@ List<ActionItem> getAge12PlusActions(
   }
 
   List<ActionItem> actions = [];
+
+  if (isChild) {
+    // Jika target adalah anak kita (usia 12 ke atas):
+    // Jika sudah usia 12 maka berikan pelukannya akan hilang (tidak ditambahkan).
+    // Dan buat ketika anak sudah usia yang sama seperti yang lain (12 tahun ke atas) maka juga akan ada make love juga.
+    actions.add(ActionItem(
+      label: 'Bercinta / Make Love',
+      icon: Icons.favorite,
+      color: Colors.pink,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BercintaScreen(
+              character: character,
+              targetName: targetName,
+              targetRole: targetRole,
+              onActionComplete: () {
+                updateState();
+              },
+            ),
+          ),
+        );
+      },
+    ));
+
+    actions.add(ActionItem(
+      label: 'Bercakap-cakap',
+      icon: Icons.chat,
+      color: Colors.teal,
+      onTap: () {
+        int relBonus = random.nextInt(5) + 5;
+        showDialog(
+          'Berbincang dengan Anak',
+          'Kamu duduk bersama $targetName dan mengobrol tentang kesehariannya serta impian masa depannya. (+$relBonus% hubungan)',
+          Icons.chat,
+          Colors.teal,
+          () {
+            updateRelationship(relBonus);
+            updateState();
+          },
+        );
+      },
+    ));
+
+    actions.add(ActionItem(
+      label: 'Beri Uang Jajan',
+      icon: Icons.monetization_on,
+      color: Colors.green,
+      onTap: () {
+        if (character.money < 20) {
+          showDialog(
+            'Uang Tidak Cukup',
+            'Kamu tidak memiliki cukup uang untuk memberikan uang jajan (\$20).',
+            Icons.money_off,
+            Colors.red,
+            () {},
+          );
+        } else {
+          int relBonus = random.nextInt(6) + 8;
+          showDialog(
+            'Beri Uang Jajan',
+            'Kamu memberikan uang jajan sebesar \$20 kepada $targetName. Dia sangat berterima kasih! (+$relBonus% hubungan)',
+            Icons.monetization_on,
+            Colors.green,
+            () {
+              character.money -= 20;
+              updateRelationship(relBonus);
+              updateState();
+            },
+          );
+        }
+      },
+    ));
+
+    actions.add(ActionItem(
+      label: 'Beri Hadiah Spesial',
+      icon: Icons.card_giftcard,
+      color: Colors.purple,
+      onTap: () {
+        if (character.money < 100) {
+          showDialog(
+            'Uang Tidak Cukup',
+            'Kamu tidak memiliki cukup uang untuk membelikan hadiah (\$100).',
+            Icons.money_off,
+            Colors.red,
+            () {},
+          );
+        } else {
+          int relBonus = random.nextInt(11) + 12;
+          showDialog(
+            'Beri Hadiah',
+            'Kamu membelikan hadiah spesial seharga \$100 untuk $targetName. Anakmu sangat senang! (+$relBonus% hubungan)',
+            Icons.card_giftcard,
+            Colors.purple,
+            () {
+              character.money -= 100;
+              updateRelationship(relBonus);
+              updateState();
+            },
+          );
+        }
+      },
+    ));
+
+    actions.add(ActionItem(
+      label: 'Ajak Liburan Bersama',
+      icon: Icons.flight,
+      color: Colors.blue,
+      onTap: () {
+        if (character.money < 250) {
+          showDialog(
+            'Uang Tidak Cukup',
+            'Kamu tidak memiliki cukup uang untuk mengajak liburan (\$250).',
+            Icons.money_off,
+            Colors.red,
+            () {},
+          );
+        } else {
+          int relBonus = random.nextInt(16) + 15;
+          showDialog(
+            'Liburan Bersama',
+            'Kamu mengajak $targetName pergi berlibur bersama akhir pekan ini. Momen ini mempererat keakraban kalian! (+$relBonus% hubungan)',
+            Icons.flight,
+            Colors.blue,
+            () {
+              character.money -= 250;
+              character.happiness = (character.happiness + 20).clamp(0, 100);
+              updateRelationship(relBonus);
+              updateState();
+            },
+          );
+        }
+      },
+    ));
+
+    actions.add(ActionItem(
+      label: 'Puji Anak',
+      icon: Icons.thumb_up,
+      color: Colors.blueAccent,
+      onTap: () {
+        int relBonus = random.nextInt(5) + 8;
+        showDialog(
+          'Pujian Orang Tua',
+          'Kamu memuji pencapaian dan kedewasaan $targetName. (+$relBonus% hubungan)',
+          Icons.thumb_up,
+          Colors.blueAccent,
+          () {
+            updateRelationship(relBonus);
+            updateState();
+          },
+        );
+      },
+    ));
+
+    return actions;
+  }
 
   // 1. Bercinta / Make Love
   actions.add(ActionItem(
