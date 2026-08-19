@@ -83,6 +83,13 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return sibAge < 0 ? 'Belum Lahir (Dalam Kandungan)' : '$sibAge tahun';
         }
       }
+      for (var cm in widget.character.classmates) {
+        final String expectedLabel = '${cm['name']} (Teman Sekelas)';
+        if (expectedLabel == name || cm['name'] == name) {
+          int cmAge = int.tryParse(cm['age'] ?? '0') ?? 0;
+          return '$cmAge tahun';
+        }
+      }
     }
     return 'Tidak diketahui';
   }
@@ -198,6 +205,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return int.tryParse(sib['relationship'] ?? '50') ?? 50;
         }
       }
+      for (var cm in widget.character.classmates) {
+        final String expectedLabel = '${cm['name']} (Teman Sekelas)';
+        if (expectedLabel == name || cm['name'] == name) {
+          return int.tryParse(cm['relationship'] ?? '50') ?? 50;
+        }
+      }
     }
     return 50;
   }
@@ -261,6 +274,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         if (expectedLabel == name) {
           int currentRel = int.tryParse(sib['relationship'] ?? '50') ?? 50;
           sib['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
+          break;
+        }
+      }
+      for (var cm in widget.character.classmates) {
+        final String expectedLabel = '${cm['name']} (Teman Sekelas)';
+        if (expectedLabel == name || cm['name'] == name) {
+          int currentRel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+          cm['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
           break;
         }
       }

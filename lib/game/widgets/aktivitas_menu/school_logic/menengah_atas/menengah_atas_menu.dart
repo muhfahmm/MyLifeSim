@@ -14,15 +14,66 @@ import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/menengah_atas/m
 
 class MenengahAtasMenu {
   static void showMenu(BuildContext context, Character character, VoidCallback onRefresh) {
+    if (character.smaMajor == null) {
+      DialogHelper.show(
+        context: context,
+        title: 'Pilih Jurusan SMA 🎓',
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text('Selamat datang di SMA! Silakan pilih jurusan peminatanmu:'),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Text('🧪', style: TextStyle(fontSize: 24)),
+              title: const Text('IPA (Sains)', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Matematika Peminatan, Fisika, Kimia, Biologi'),
+              onTap: () {
+                character.smaMajor = 'IPA';
+                Navigator.pop(context);
+                showMenu(context, character, onRefresh);
+              },
+            ),
+            ListTile(
+              leading: const Text('📈', style: TextStyle(fontSize: 24)),
+              title: const Text('IPS (Sosial)', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Geografi, Sejarah, Sosiologi, Ekonomi'),
+              onTap: () {
+                character.smaMajor = 'IPS';
+                Navigator.pop(context);
+                showMenu(context, character, onRefresh);
+              },
+            ),
+            ListTile(
+              leading: const Text('🗣️', style: TextStyle(fontSize: 24)),
+              title: const Text('Bahasa', style: TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: const Text('Sastra Indonesia, Antropologi, Bahasa Asing'),
+              onTap: () {
+                character.smaMajor = 'Bahasa';
+                Navigator.pop(context);
+                showMenu(context, character, onRefresh);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Kembali'),
+          ),
+        ],
+      );
+      return;
+    }
+
     DialogHelper.show(
       context: context,
-      title: 'Menengah Atas (SMA) 🏫',
+      title: 'Menengah Atas (SMA) - ${character.smaMajor} 🏫',
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Text(
-            'Kamu adalah murid Sekolah Menengah Atas. Pilih aktivitas sekolahmu:',
-            style: TextStyle(fontSize: 14, color: Colors.black54),
+          Text(
+            'Kamu adalah murid Sekolah Menengah Atas jurusan ${character.smaMajor}. Pilih aktivitas sekolahmu:',
+            style: const TextStyle(fontSize: 14, color: Colors.black54),
           ),
           const SizedBox(height: 16),
 

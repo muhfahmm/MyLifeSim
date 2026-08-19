@@ -40,6 +40,11 @@ class Character {
   int birthOrder;            // Urutan kelahiran (1 = anak pertama, 2 = kedua, dst)
   List<Map<String, String>> siblings; // Daftar saudara [{name: '...', gender: 'Laki-laki', relation: '...', relationship: '50', age: '2', isDeceased: 'false'}]
   List<Map<String, String>> extendedFamily = []; // Daftar kakek, nenek, paman, bibi, sepupu [{name: '...', gender: 'Laki-laki', relation: 'Kakek (dari Ayah)', relationship: '50', age: '70', isDeceased: 'false'}]
+  List<Map<String, String>> classmates = []; // Daftar teman sekelas [{name: '...', gender: 'Laki-laki', relationship: '50', age: '12', isDeceased: 'false'}]
+  String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
+  List<Map<String, String>> sdTeachers = []; // Daftar guru SD
+  List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
+  List<Map<String, String>> smaTeachers = []; // Daftar guru SMA
 
   // --- HUBUNGAN (RELATIONSHIP BARS) ---
   int? fatherRelationship;
@@ -428,6 +433,16 @@ class Character {
             events.add('💀 Kabar Duka: Keluargamu, ${ext['name']} (${ext['relation']}), meninggal dunia pada usia $nextAge tahun.');
           }
         }
+      }
+    }
+
+    // 2c. Classmate Aging
+    for (var cm in classmates) {
+      bool isDeceased = cm['isDeceased'] == 'true';
+      if (!isDeceased) {
+        int cmAge = int.tryParse(cm['age'] ?? '0') ?? 0;
+        int nextAge = cmAge + 1;
+        cm['age'] = nextAge.toString();
       }
     }
 

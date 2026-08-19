@@ -4,47 +4,319 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 class GuruMenu {
+  static void _generateTeachersIfNeeded(Character character) {
+    if (character.smaTeachers.isNotEmpty) return;
+
+    final Random random = Random();
+    final List<String> mFirsts = character.maleFirstNames ?? [];
+    final List<String> fFirsts = character.femaleFirstNames ?? [];
+    final List<String> lasts = character.lastNames ?? [];
+
+    String _genName(String gender) {
+      final List<String> firsts = gender == 'Laki-laki' ? mFirsts : fFirsts;
+      if (firsts.isEmpty) return gender == 'Laki-laki' ? 'Budi' : 'Siti';
+      final String first = firsts[random.nextInt(firsts.length)];
+      final String last = lasts.isNotEmpty ? lasts[random.nextInt(lasts.length)] : '';
+      return last.isNotEmpty ? '$first $last' : first;
+    }
+
+    String _genAge() => (30 + random.nextInt(25)).toString();
+
+    final List<Map<String, String>> temp = [];
+    for (int i = 0; i < 20; i++) {
+      final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      final String prefix = gender == 'Laki-laki' ? 'Pak ' : 'Bu ';
+      temp.add({
+        'name': prefix + _genName(gender),
+        'gender': gender,
+        'age': _genAge(),
+      });
+    }
+    character.smaTeachers = temp;
+  }
+
   static void showMenu(BuildContext context, Character character, VoidCallback onRefresh) {
     final Random random = Random();
+    _generateTeachersIfNeeded(character);
 
-    final List<Map<String, String>> teachers = [
-      {'name': 'Pak Hartono', 'subject': 'Fisika'},
-      {'name': 'Bu Kartini', 'subject': 'Sejarah Indonesia'},
-      {'name': 'Pak Herman', 'subject': 'Kimia'},
+    // 1. Mata Pelajaran Wajib (Semua Jurusan)
+    final List<Map<String, dynamic>> subjectTemplates = [
+      {
+        'subject': 'Matematika Wajib',
+        'statistic': 'Kecerdasan',
+        'desc': 'Melatih kemampuan analitis dasar.',
+        'apply': () {
+          int gain = random.nextInt(5) + 3;
+          character.intelligence = (character.intelligence + gain).clamp(0, 100);
+          return 'Kecerdasan +$gain%';
+        }
+      },
+      {
+        'subject': 'Bahasa Indonesia',
+        'statistic': 'Kecerdasan & Karma',
+        'desc': 'Membuat esai dan presentasi.',
+        'apply': () {
+          int intGain = random.nextInt(3) + 2;
+          int karmaGain = random.nextInt(3) + 2;
+          character.intelligence = (character.intelligence + intGain).clamp(0, 100);
+          character.karma = (character.karma + karmaGain).clamp(0, 100);
+          return 'Kecerdasan +$intGain%, Karma +$karmaGain%';
+        }
+      },
+      {
+        'subject': 'Bahasa Inggris',
+        'statistic': 'Kecerdasan',
+        'desc': 'Meningkatkan kemampuan bahasa global.',
+        'apply': () {
+          int gain = random.nextInt(4) + 3;
+          character.intelligence = (character.intelligence + gain).clamp(0, 100);
+          return 'Kecerdasan +$gain%';
+        }
+      },
+      {
+        'subject': 'Pendidikan Agama',
+        'statistic': 'Karma',
+        'desc': 'Memperdalam moralitas dan spiritualitas.',
+        'apply': () {
+          int gain = random.nextInt(5) + 3;
+          character.karma = (character.karma + gain).clamp(0, 100);
+          return 'Karma +$gain%';
+        }
+      },
+      {
+        'subject': 'PJOK (Olahraga)',
+        'statistic': 'Kesehatan',
+        'desc': 'Menjaga stamina dan kesehatan tubuh.',
+        'apply': () {
+          int gain = random.nextInt(6) + 3;
+          character.health = (character.health + gain).clamp(0, 100);
+          return 'Kesehatan +$gain%';
+        }
+      },
+      {
+        'subject': 'Sejarah Indonesia',
+        'statistic': 'Kecerdasan',
+        'desc': 'Memahami perjuangan bangsa.',
+        'apply': () {
+          int gain = random.nextInt(4) + 3;
+          character.intelligence = (character.intelligence + gain).clamp(0, 100);
+          return 'Kecerdasan +$gain%';
+        }
+      },
+      {
+        'subject': 'PPKn',
+        'statistic': 'Karma',
+        'desc': 'Mempelajari kewarganegaraan dan hukum.',
+        'apply': () {
+          int gain = random.nextInt(4) + 2;
+          character.karma = (character.karma + gain).clamp(0, 100);
+          return 'Karma +$gain%';
+        }
+      },
     ];
+
+    // 2. Mata Pelajaran Peminatan Berdasarkan Jurusan
+    final String major = character.smaMajor ?? 'IPA';
+    final List<Map<String, dynamic>> peminatanTemplates = [];
+
+    if (major == 'IPA') {
+      peminatanTemplates.addAll([
+        {
+          'subject': 'Matematika Peminatan',
+          'statistic': 'Kecerdasan',
+          'desc': 'Mempelajari kalkulus tingkat lanjut.',
+          'apply': () {
+            int gain = random.nextInt(6) + 4;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Fisika',
+          'statistic': 'Kecerdasan',
+          'desc': 'Memahami mekanika dan termodinamika.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Kimia',
+          'statistic': 'Kecerdasan',
+          'desc': 'Eksperimen reaksi dan senyawa unsur kimia.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Biologi',
+          'statistic': 'Kecerdasan',
+          'desc': 'Mempelajari genetika dan evolusi makhluk hidup.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+      ]);
+    } else if (major == 'IPS') {
+      peminatanTemplates.addAll([
+        {
+          'subject': 'Geografi',
+          'statistic': 'Kecerdasan',
+          'desc': 'Mempelajari peta dan tata surya.',
+          'apply': () {
+            int gain = random.nextInt(4) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Sejarah Peminatan',
+          'statistic': 'Kecerdasan',
+          'desc': 'Mempelajari sejarah peradaban dunia.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Sosiologi',
+          'statistic': 'Kecerdasan',
+          'desc': 'Menganalisis interaksi sosial masyarakat.',
+          'apply': () {
+            int gain = random.nextInt(4) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Ekonomi',
+          'statistic': 'Kecerdasan',
+          'desc': 'Dasar akuntansi dan kebijakan moneter.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+      ]);
+    } else if (major == 'Bahasa') {
+      peminatanTemplates.addAll([
+        {
+          'subject': 'Sastra Indonesia',
+          'statistic': 'Kecerdasan & Kebahagiaan',
+          'desc': 'Menelaah puisi, prosa, dan novel sastra klasik.',
+          'apply': () {
+            int intGain = random.nextInt(3) + 2;
+            int happyGain = random.nextInt(3) + 2;
+            character.intelligence = (character.intelligence + intGain).clamp(0, 100);
+            character.happiness = (character.happiness + happyGain).clamp(0, 100);
+            return 'Kecerdasan +$intGain%, Kebahagiaan +$happyGain%';
+          }
+        },
+        {
+          'subject': 'Antropologi',
+          'statistic': 'Kecerdasan',
+          'desc': 'Mempelajari kebudayaan dan evolusi budaya manusia.',
+          'apply': () {
+            int gain = random.nextInt(4) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+        {
+          'subject': 'Bahasa Asing (Jepang)',
+          'statistic': 'Kecerdasan',
+          'desc': 'Dasar komunikasi dan tata bahasa asing pilihan.',
+          'apply': () {
+            int gain = random.nextInt(5) + 3;
+            character.intelligence = (character.intelligence + gain).clamp(0, 100);
+            return 'Kecerdasan +$gain%';
+          }
+        },
+      ]);
+    }
+
+    final List<Map<String, dynamic>> allSubjects = [...subjectTemplates, ...peminatanTemplates];
+    final List<Map<String, dynamic>> teachers = [];
+
+    for (int i = 0; i < allSubjects.length; i++) {
+      if (i < character.smaTeachers.length) {
+        teachers.add({
+          'name': character.smaTeachers[i]['name'],
+          'gender': character.smaTeachers[i]['gender'],
+          'age': character.smaTeachers[i]['age'],
+          'subject': allSubjects[i]['subject'],
+          'statistic': allSubjects[i]['statistic'],
+          'desc': allSubjects[i]['desc'],
+          'apply': allSubjects[i]['apply'],
+        });
+      }
+    }
 
     DialogHelper.show(
       context: context,
-      title: '🧑‍🏫 Daftar Guru (SMA)',
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const Text(
-            'Pilih guru yang ingin kamu ajak interaksi:',
-            style: TextStyle(fontSize: 14, color: Colors.black54),
-          ),
-          const SizedBox(height: 16),
-          ...teachers.map((teacher) => Card(
-            margin: const EdgeInsets.only(bottom: 8),
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.shade200),
+      title: '🧑‍🏫 Daftar Guru (SMA) - $major',
+      content: Container(
+        width: double.maxFinite,
+        constraints: const BoxConstraints(maxHeight: 400),
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            Text(
+              'Pilih guru jurusan $major yang ingin kamu ajak interaksi:',
+              style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
-            child: ListTile(
-              leading: const Text('🧑‍🏫', style: TextStyle(fontSize: 24)),
-              title: Text(teacher['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('Guru Pelajaran: ${teacher['subject']}'),
-              trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-              onTap: () {
-                Navigator.pop(context);
-                _showTeacherInteraction(context, character, teacher['name']!, onRefresh);
-              },
-            ),
-          )),
-        ],
+            const SizedBox(height: 16),
+            ...teachers.map((teacher) => Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: teacher['gender'] == 'Laki-laki' ? Colors.blue.shade50 : Colors.purple.shade50,
+                  radius: 20,
+                  child: Image.network(
+                    AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: teacher['name']!,
+                      gender: teacher['gender'] ?? 'Perempuan',
+                      age: int.tryParse(teacher['age'] ?? '40') ?? 40,
+                    ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(teacher['gender'] == 'Laki-laki' ? Icons.male : Icons.female, color: Colors.blueGrey),
+                  ),
+                ),
+                title: Text(teacher['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text('Mata Pelajaran: ${teacher['subject']}\nEfek: ${teacher['statistic']}'),
+                isThreeLine: true,
+                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showTeacherInteraction(
+                    context,
+                    character,
+                    teacher['name']!,
+                    teacher['subject']!,
+                    teacher['desc']!,
+                    teacher['apply'] as String Function(),
+                    onRefresh,
+                  );
+                },
+              ),
+            )),
+          ],
+        ),
       ),
       actions: [
         TextButton(
@@ -55,7 +327,15 @@ class GuruMenu {
     );
   }
 
-  static void _showTeacherInteraction(BuildContext context, Character character, String teacherName, VoidCallback onRefresh) {
+  static void _showTeacherInteraction(
+    BuildContext context,
+    Character character,
+    String teacherName,
+    String subject,
+    String subjectDesc,
+    String Function() applyEffects,
+    VoidCallback onRefresh,
+  ) {
     final Random random = Random();
 
     DialogHelper.show(
@@ -67,17 +347,17 @@ class GuruMenu {
           ListTile(
             leading: const Text('🙇‍♂️', style: TextStyle(fontSize: 24)),
             title: const Text('Cari Muka', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('Menjadi ketua kelas atau asisten guru.'),
+            subtitle: const Text('Membantu membersihkan ruangan kelas/kantor.'),
             onTap: () {
               Navigator.pop(context);
-              int karmaGain = random.nextInt(4) + 3;
+              int karmaGain = random.nextInt(4) + 2;
               character.karma = (character.karma + karmaGain).clamp(0, 100);
               onRefresh();
 
               DialogHelper.show(
                 context: context,
                 title: 'Cari Muka',
-                content: Text('Kamu menawarkan diri untuk membagikan lembar lembar ujian ke kelas. Guru sangat menghargaimu. Karma +$karmaGain%!'),
+                content: Text('Kamu menawarkan bantuan merapikan buku pelajaran milik $teacherName. Guru merasa dihargai. Karma +$karmaGain%!'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -88,19 +368,18 @@ class GuruMenu {
             },
           ),
           ListTile(
-            leading: const Text('🙋‍♂️', style: TextStyle(fontSize: 24)),
-            title: const Text('Tanya Pelajaran', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('Konsultasi persiapan UTBK / kuliah.'),
+            leading: const Text('📚', style: TextStyle(fontSize: 24)),
+            title: Text('Belajar $subject', style: const TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: Text(subjectDesc),
             onTap: () {
               Navigator.pop(context);
-              int smartGain = random.nextInt(5) + 5;
-              character.intelligence = (character.intelligence + smartGain).clamp(0, 100);
+              String effectText = applyEffects();
               onRefresh();
 
               DialogHelper.show(
                 context: context,
-                title: 'Tanya Pelajaran',
-                content: Text('Kamu berkonsultasi tentang soal persiapan masuk perguruan tinggi. Kecerdasanmu meningkat +$smartGain%!'),
+                title: 'Belajar Pelajaran $subject',
+                content: Text('Kamu fokus belajar materi $subject bersama $teacherName. $subjectDesc\n\nEfek: $effectText'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
@@ -112,20 +391,20 @@ class GuruMenu {
           ),
           ListTile(
             leading: const Text('😜', style: TextStyle(fontSize: 24)),
-            title: const Text('Debat Guru / Mengacau', style: TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: const Text('Berdebat tidak sopan atau membuat keributan.'),
+            title: const Text('Iseng / Mengacau', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Membuat aksi jahil saat kelas berlangsung.'),
             onTap: () {
               Navigator.pop(context);
-              int karmaLoss = random.nextInt(6) + 5;
-              int happyGain = random.nextInt(5) + 4;
+              int karmaLoss = random.nextInt(5) + 4;
+              int happyGain = random.nextInt(5) + 3;
               character.karma = (character.karma - karmaLoss).clamp(0, 100);
               character.happiness = (character.happiness + happyGain).clamp(0, 100);
               onRefresh();
 
               DialogHelper.show(
                 context: context,
-                title: 'Mengacau',
-                content: Text('Kamu membantah argumen guru dengan nada tidak sopan di kelas. Teman sekelas menyorakimu, tapi guru memberi hukuman. Kebahagiaan +$happyGain%, Karma -$karmaLoss%!'),
+                title: 'Mengacau di Kelas',
+                content: Text('Kamu meniru suara lucu saat $teacherName menghadap ke papan tulis. Teman-teman tertawa lebar, namun guru memberikan hukuman berdiri! Kebahagiaan +$happyGain%, Karma -$karmaLoss%!'),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(context),
