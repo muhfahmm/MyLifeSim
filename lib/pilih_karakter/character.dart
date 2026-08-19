@@ -45,6 +45,12 @@ class Character {
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
   List<Map<String, String>> smaTeachers = []; // Daftar guru SMA
+  Map<String, String>? headmaster; // Kepala Sekolah SMA
+  Map<String, String>? bkTeacher; // Guru BK SMA
+  Map<String, String>? sdHeadmaster; // Kepala Sekolah SD
+  Map<String, String>? sdBkTeacher; // Guru BK SD
+  Map<String, String>? smpHeadmaster; // Kepala Sekolah SMP
+  Map<String, String>? smpBkTeacher; // Guru BK SMP
 
   // --- HUBUNGAN (RELATIONSHIP BARS) ---
   int? fatherRelationship;
@@ -444,6 +450,32 @@ class Character {
         int nextAge = cmAge + 1;
         cm['age'] = nextAge.toString();
       }
+    }
+
+    // 2d. Headmaster and BK Teacher Aging
+    if (headmaster != null) {
+      int headAge = int.tryParse(headmaster!['age'] ?? '0') ?? 0;
+      headmaster!['age'] = (headAge + 1).toString();
+    }
+    if (bkTeacher != null) {
+      int bkAge = int.tryParse(bkTeacher!['age'] ?? '0') ?? 0;
+      bkTeacher!['age'] = (bkAge + 1).toString();
+    }
+    if (sdHeadmaster != null) {
+      int headAge = int.tryParse(sdHeadmaster!['age'] ?? '0') ?? 0;
+      sdHeadmaster!['age'] = (headAge + 1).toString();
+    }
+    if (sdBkTeacher != null) {
+      int bkAge = int.tryParse(sdBkTeacher!['age'] ?? '0') ?? 0;
+      sdBkTeacher!['age'] = (bkAge + 1).toString();
+    }
+    if (smpHeadmaster != null) {
+      int headAge = int.tryParse(smpHeadmaster!['age'] ?? '0') ?? 0;
+      smpHeadmaster!['age'] = (headAge + 1).toString();
+    }
+    if (smpBkTeacher != null) {
+      int bkAge = int.tryParse(smpBkTeacher!['age'] ?? '0') ?? 0;
+      smpBkTeacher!['age'] = (bkAge + 1).toString();
     }
 
     // 3. Child Aging & Death & Romance Activity

@@ -8,7 +8,8 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 class GuruMenu {
   static void _generateTeachersIfNeeded(Character character) {
-    if (character.smaTeachers.isNotEmpty) return;
+    // Jika sudah ada, jangan generate ulang
+    if (character.smaTeachers.isNotEmpty && character.headmaster != null && character.bkTeacher != null) return;
 
     final Random random = Random();
     final List<String> mFirsts = character.maleFirstNames ?? [];
@@ -23,8 +24,31 @@ class GuruMenu {
       return last.isNotEmpty ? '$first $last' : first;
     }
 
-    String _genAge() => (30 + random.nextInt(25)).toString();
+    String _genAge() => (35 + random.nextInt(25)).toString();
 
+    // --- 1. Generate Kepala Sekolah (30% wanita, 70% pria) ---
+    final bool isHeadmasterMale = random.nextInt(100) < 70; // 70% pria
+    final String headmasterGender = isHeadmasterMale ? 'Laki-laki' : 'Perempuan';
+    final String headmasterPrefix = isHeadmasterMale ? 'Pak ' : 'Bu ';
+    character.headmaster = {
+      'name': headmasterPrefix + _genName(headmasterGender),
+      'gender': headmasterGender,
+      'age': _genAge(),
+      'role': 'Kepala Sekolah',
+    };
+
+    // --- 2. Generate Guru BK (40% wanita, 60% pria) ---
+    final bool isBkMale = random.nextInt(100) < 60; // 60% pria
+    final String bkGender = isBkMale ? 'Laki-laki' : 'Perempuan';
+    final String bkPrefix = isBkMale ? 'Pak ' : 'Bu ';
+    character.bkTeacher = {
+      'name': bkPrefix + _genName(bkGender),
+      'gender': bkGender,
+      'age': _genAge(),
+      'role': 'Guru BK',
+    };
+
+    // --- 3. Generate 20 guru mata pelajaran (seperti sebelumnya) ---
     final List<Map<String, String>> temp = [];
     for (int i = 0; i < 20; i++) {
       final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
@@ -262,6 +286,29 @@ class GuruMenu {
       }
     }
 
+    // --- KARTU KHUSUS: KEPALA SEKOLAH & GURU BK (di bagian paling atas) ---
+    final List<Map<String, dynamic>> specialTeachers = [];
+    if (character.headmaster != null) {
+      specialTeachers.add({
+        'name': character.headmaster!['name'],
+        'gender': character.headmaster!['gender'],
+        'age': character.headmaster!['age'],
+        'role': character.headmaster!['role'],
+        'isSpecial': true,
+        'type': 'headmaster',
+      });
+    }
+    if (character.bkTeacher != null) {
+      specialTeachers.add({
+        'name': character.bkTeacher!['name'],
+        'gender': character.bkTeacher!['gender'],
+        'age': character.bkTeacher!['age'],
+        'role': character.bkTeacher!['role'],
+        'isSpecial': true,
+        'type': 'bk',
+      });
+    }
+
     DialogHelper.show(
       context: context,
       title: '🧑‍🏫 Daftar Guru (SMA) - $major',
@@ -276,6 +323,44 @@ class GuruMenu {
               style: const TextStyle(fontSize: 14, color: Colors.black54),
             ),
             const SizedBox(height: 16),
+
+            // --- TAMPILKAN KEPALA SEKOLAH & GURU BK ---
+            ...specialTeachers.map((teacher) => Card(
+              margin: const EdgeInsets.only(bottom: 8),
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: teacher['gender'] == 'Laki-laki' ? Colors.blue.shade50 : Colors.purple.shade50,
+                  radius: 20,
+                  child: Image.network(
+                    AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: teacher['name']!,
+                      gender: teacher['gender'] ?? 'Perempuan',
+                      age: int.tryParse(teacher['age'] ?? '40') ?? 40,
+                    ),
+                    errorBuilder: (context, error, stackTrace) =>
+                        Icon(teacher['gender'] == 'Laki-laki' ? Icons.male : Icons.female, color: Colors.blueGrey),
+                  ),
+                ),
+                title: Text(teacher['name']!, style: const TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: Text(teacher['role']!),
+                trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+                onTap: () {
+                  Navigator.pop(context);
+                  if (teacher['type'] == 'headmaster') {
+                    _showHeadmasterInteraction(context, character, teacher['name']!, onRefresh);
+                  } else if (teacher['type'] == 'bk') {
+                    _showBkInteraction(context, character, teacher['name']!, onRefresh);
+                  }
+                },
+              ),
+            )),
+
+            // --- TAMPILKAN DAFTAR GURU MATA PELAJARAN (SISANYA) ---
             ...teachers.map((teacher) => Card(
               margin: const EdgeInsets.only(bottom: 8),
               elevation: 0,
@@ -327,6 +412,196 @@ class GuruMenu {
     );
   }
 
+  // --- INTERAKSI KHUSUS: KEPALA SEKOLAH ---
+  static void _showHeadmasterInteraction(
+    BuildContext context,
+    Character character,
+    String headmasterName,
+    VoidCallback onRefresh,
+  ) {
+    final Random random = Random();
+    DialogHelper.show(
+      context: context,
+      title: 'Interaksi dengan Kepala Sekolah $headmasterName',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Text('🗣️', style: TextStyle(fontSize: 24)),
+            title: const Text('Konsultasi Akademik', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Mendapatkan saran tentang masa depan pendidikan.'),
+            onTap: () {
+              Navigator.pop(context);
+              int intGain = random.nextInt(4) + 3;
+              character.intelligence = (character.intelligence + intGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Konsultasi dengan Kepsek',
+                content: Text('$headmasterName memberikan arahan tentang jurusan kuliah yang sesuai dengan bakatmu. Kecerdasan +$intGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+          ListTile(
+            leading: const Text('📋', style: TextStyle(fontSize: 24)),
+            title: const Text('Bantuan Administrasi', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Membantu mengurus surat izin / dokumen sekolah.'),
+            onTap: () {
+              Navigator.pop(context);
+              int karmaGain = random.nextInt(4) + 3;
+              character.karma = (character.karma + karmaGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Bantuan Administrasi',
+                content: Text('Kamu membantu $headmasterName merapikan berkas-berkas sekolah. Karma +$karmaGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+          ListTile(
+            leading: const Text('🧹', style: TextStyle(fontSize: 24)),
+            title: const Text('Cari Muka (Bersih-bersih Ruang Guru)', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Membantu membersihkan ruang kepala sekolah.'),
+            onTap: () {
+              Navigator.pop(context);
+              int karmaGain = random.nextInt(4) + 2;
+              character.karma = (character.karma + karmaGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Cari Muka',
+                content: Text('Kamu menyapu dan merapikan ruangan $headmasterName. Beliau tersenyum dan mengangguk setuju. Karma +$karmaGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => showMenu(context, character, onRefresh),
+          child: const Text('Kembali'),
+        ),
+      ],
+    );
+  }
+
+  // --- INTERAKSI KHUSUS: GURU BK ---
+  static void _showBkInteraction(
+    BuildContext context,
+    Character character,
+    String bkName,
+    VoidCallback onRefresh,
+  ) {
+    final Random random = Random();
+    DialogHelper.show(
+      context: context,
+      title: 'Interaksi dengan Guru BK $bkName',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Text('🧠', style: TextStyle(fontSize: 24)),
+            title: const Text('Konsultasi Pribadi', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Bicara tentang masalah pribadi atau tekanan belajar.'),
+            onTap: () {
+              Navigator.pop(context);
+              int happyGain = random.nextInt(5) + 4;
+              character.happiness = (character.happiness + happyGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Konsultasi BK',
+                content: Text('Kamu bercerita tentang rasa cemas menghadapi ujian. $bkName memberimu semangat dan tips rileks. Kebahagiaan +$happyGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+          ListTile(
+            leading: const Text('👥', style: TextStyle(fontSize: 24)),
+            title: const Text('Diskusi Kelompok', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Mengikuti sesi konseling bersama teman sekelas.'),
+            onTap: () {
+              Navigator.pop(context);
+              int socialGain = random.nextInt(4) + 3;
+              character.karma = (character.karma + socialGain).clamp(0, 100);
+              character.happiness = (character.happiness + socialGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Diskusi Kelompok BK',
+                content: Text('Kamu berbagi cerita dan saling mendukung dengan teman-teman. Karma +$socialGain%, Kebahagiaan +$socialGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+          ListTile(
+            leading: const Text('📝', style: TextStyle(fontSize: 24)),
+            title: const Text('Tes Minat Bakat', style: TextStyle(fontWeight: FontWeight.bold)),
+            subtitle: const Text('Mengikuti tes untuk mengetahui potensi diri.'),
+            onTap: () {
+              Navigator.pop(context);
+              int intGain = random.nextInt(4) + 2;
+              character.intelligence = (character.intelligence + intGain).clamp(0, 100);
+              onRefresh();
+
+              DialogHelper.show(
+                context: context,
+                title: 'Tes Minat Bakat',
+                content: Text('$bkName memberikan lembaran tes minat bakat. Kamu mengisinya dengan serius. Kecerdasan +$intGain%!'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti'),
+                  ),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => showMenu(context, character, onRefresh),
+          child: const Text('Kembali'),
+        ),
+      ],
+    );
+  }
+
+  // --- INTERAKSI BIASA: GURU MATA PELAJARAN (SEPERTI SEBELUMNYA) ---
   static void _showTeacherInteraction(
     BuildContext context,
     Character character,
