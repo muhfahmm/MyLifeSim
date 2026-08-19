@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/thr
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
 
+/// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {
   if (targetName.startsWith('Ayah')) return 'Laki-laki';
   if (targetName.startsWith('Ibu')) return 'Perempuan';
@@ -22,6 +23,7 @@ String _getPartnerGender(String targetName) {
   return 'Laki-laki';
 }
 
+/// Menghasilkan daftar ActionItem untuk karakter berusia 12 tahun ke atas.
 List<ActionItem> getAge12PlusActions(
   BuildContext context,
   Character character,
@@ -76,8 +78,8 @@ List<ActionItem> getAge12PlusActions(
 
   List<ActionItem> actions = [];
 
+  // Jika target adalah anak (dengan status Laki-laki atau Perempuan)
   if (isChild) {
-    // Jika target adalah anak kita (usia 12 ke atas)
     actions.add(ActionItem(
       label: 'Bercinta / Make Love',
       icon: Icons.favorite,
@@ -228,10 +230,11 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
-    return actions;
+    return actions; // Kembali lebih awal karena target adalah anak.
   }
 
-  // 1. Bercinta / Make Love
+  // Menu untuk target umum (bukan anak)
+  // 1. Bercinta / Make Love (logika kondom sudah ada di dalam BercintaScreen)
   actions.add(ActionItem(
     label: 'Bercinta / Make Love',
     icon: Icons.favorite,
@@ -253,7 +256,7 @@ List<ActionItem> getAge12PlusActions(
     },
   ));
 
-  // --- LOGIKA BARU: AJAK 3SOME ---
+  // --- AJAK 3SOME (jika memiliki dua pasangan) ---
   final bool targetIsEitherPartner = (character.partner != null && character.partner!['name'] == targetName) ||
                                      (character.secondPartner != null && character.secondPartner!['name'] == targetName);
   final bool hasTwoPartners = character.partner != null && character.secondPartner != null;
@@ -273,7 +276,7 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 2. Ajak Pacaran (Dengan Logika Khusus Mantan Pacar)
+  // 2. Ajak Pacaran / Ajak Balikan (dengan logika khusus mantan pacar)
   if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
     final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
     final String actionLabel = isExPartner 
@@ -291,7 +294,6 @@ List<ActionItem> getAge12PlusActions(
 
         // --- LOGIKA PERSENTASE AJAK BALIKAN (jika mantan) ---
         if (isExPartner) {
-          // Cari data mantan pacar
           Map<String, String>? exData;
           for (var ex in character.exPartners) {
             if (ex['name'] == targetName) {
@@ -300,23 +302,17 @@ List<ActionItem> getAge12PlusActions(
             }
           }
 
-          // Ambil data penyebab putus
-          String? breakInitiator = exData?['breakInitiator']; // 'Laki-laki' atau 'Perempuan'
-          String? breakReason = exData?['breakReason']; // 'putus biasa', 'selingkuh', 'threesome'
+          String? breakInitiator = exData?['breakInitiator'];
+          String? breakReason = exData?['breakReason'];
 
           if (breakReason == 'selingkuh' || breakReason == 'threesome') {
-            // Jika putus karena selingkuh/3some, peluang sangat kecil
             accepted = random.nextInt(100) < 10; // 10%
           } else {
-            // Putus biasa, cek siapa yang memutuskan
             if (breakInitiator == 'Laki-laki') {
-              // Pria yang memutuskan, maka wanita (target) menerima 30%
               accepted = random.nextInt(100) < 30;
             } else if (breakInitiator == 'Perempuan') {
-              // Wanita yang memutuskan, maka pria (target) menerima 25%
               accepted = random.nextInt(100) < 25;
             } else {
-              // Jika tidak ada data, default 50%
               accepted = random.nextInt(100) < 50;
             }
           }
@@ -371,7 +367,6 @@ List<ActionItem> getAge12PlusActions(
           if (isExPartner) {
             character.exPartners.removeWhere((ex) => ex['name'] == targetName);
           }
-          // --------------------------------------------------
 
           int actualTargetAge = 18;
           if (targetName.startsWith('Ayah')) {
@@ -476,7 +471,7 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 3. Lamar
+  // 3. Lamar (hanya jika sudah pacar)
   if (isPartnerRole && character.partner != null && character.partner!['relation'] == 'Pacar' && age >= 18) {
     actions.add(ActionItem(
       label: 'Lamar',
@@ -523,7 +518,7 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 4. Rencanakan Pernikahan
+  // 4. Rencanakan Pernikahan (hanya jika sudah tunangan)
   if (isPartnerRole && character.partner != null && character.partner!['relation'] == 'Tunangan' && age >= 18) {
     actions.add(ActionItem(
       label: 'Rencanakan Pernikahan',
@@ -701,7 +696,7 @@ List<ActionItem> getAge12PlusActions(
     },
   ));
 
-  // ★ MENU BARU: Minta Barang (hanya untuk usia 12+)
+  // ★ MENU BARU: Minta Barang
   actions.add(ActionItem(
     label: 'Minta Barang',
     icon: Icons.shopping_bag,
