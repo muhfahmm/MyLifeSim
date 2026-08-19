@@ -14,6 +14,14 @@ class Character {
   int appearance;
   bool isAlive;
 
+  // --- KUSTOMISASI ATRIBUT & TALENTA BARU ---
+  int discipline;
+  int fertility;
+  int karma;
+  String sexuality;
+  int willpower;
+  String specialTalent;
+
   // --- PARAMETER AVATAR DARI KUSTOMISASI ---
   String? avatarTopType;
   String? avatarAccessoriesType;
@@ -108,6 +116,12 @@ class Character {
     this.money = 0,
     this.appearance = 50,
     this.isAlive = true,
+    this.discipline = 50,
+    this.fertility = 50,
+    this.karma = 50,
+    this.sexuality = 'Straight',
+    this.willpower = 50,
+    this.specialTalent = 'None',
     // Default keluarga
     this.fatherName,
     this.motherName,

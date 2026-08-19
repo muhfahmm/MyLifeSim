@@ -8,6 +8,9 @@ import 'package:bitlife/pilih_karakter/character.dart'; // Model utama
 import 'package:bitlife/game/index.dart'; // Halaman game
 import 'package:bitlife/pilih_karakter/logic/family_generator.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/pilih_karakter/customization/appearance_customization.dart';
+import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
+import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
 
 class KarakterScreen extends StatefulWidget {
   final String gender;
@@ -39,6 +42,18 @@ class _KarakterScreenState extends State<KarakterScreen> {
   late String _selectedClotheType;
   late String _selectedClotheColor;
   late String _selectedSkinColor;
+
+  // --- STATE PARAMETER KUSTOMISASI LAINNYA ---
+  int _discipline = 50;
+  int _fertility = 50;
+  int _happiness = 50;
+  int _health = 100;
+  int _karma = 50;
+  int _looks = 50;
+  String _sexuality = 'Heteroseksual';
+  int _smarts = 50;
+  int _willpower = 50;
+  String _specialTalent = 'Tidak Ada';
 
   String _countryCodeToEmoji(String countryCode) {
     if (countryCode.length != 2) return '🌍';
@@ -210,6 +225,32 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
     final randomAvatar = AvatarGenerator.generateRandomAvatar(widget.gender);
 
+    final int discipline = random.nextInt(101);
+    final int fertility = random.nextInt(101);
+    final int happiness = random.nextInt(101);
+    final int health = 50 + random.nextInt(51); // 50-100
+    final int karma = random.nextInt(101);
+    final int looks = random.nextInt(101);
+    
+    final int sexRoll = random.nextInt(100);
+    String sexuality = 'Heteroseksual';
+    if (sexRoll < 85) {
+      sexuality = 'Heteroseksual';
+    } else if (sexRoll < 92) {
+      sexuality = 'Biseksual';
+    } else {
+      sexuality = 'Homoseksual';
+    }
+    
+    final int smarts = random.nextInt(101);
+    final int willpower = random.nextInt(101);
+    
+    final List<String> talentList = ['Tidak Ada', 'Akting', 'Kriminalitas', 'Pengedar', 'Modeling', 'Musik', 'Olahraga'];
+    String specialTalent = 'Tidak Ada';
+    if (random.nextInt(100) < 40) {
+      specialTalent = talentList[1 + random.nextInt(talentList.length - 1)];
+    }
+
     setState(() {
       _firstNameController.text = firstName;
       _lastNameController.text = lastName;
@@ -219,6 +260,17 @@ class _KarakterScreenState extends State<KarakterScreen> {
       _selectedClotheType = randomAvatar['clotheType']!;
       _selectedClotheColor = randomAvatar['clotheColor']!;
       _selectedSkinColor = randomAvatar['skinColor']!;
+      
+      _discipline = discipline;
+      _fertility = fertility;
+      _happiness = happiness;
+      _health = health;
+      _karma = karma;
+      _looks = looks;
+      _sexuality = sexuality;
+      _smarts = smarts;
+      _willpower = willpower;
+      _specialTalent = specialTalent;
     });
   }
 
@@ -235,11 +287,17 @@ class _KarakterScreenState extends State<KarakterScreen> {
       gender: (widget.gender == 'male' || widget.gender == 'laki-laki') ? 'Laki-laki' : 'Perempuan',
       location: _currentCountry,
       age: 0,
-      health: 100,
-      happiness: 50,
-      intelligence: 50,
+      health: _health,
+      happiness: _happiness,
+      intelligence: _smarts,
       money: 0,
-      appearance: 50,
+      appearance: _looks,
+      discipline: _discipline,
+      fertility: _fertility,
+      karma: _karma,
+      sexuality: _sexuality,
+      willpower: _willpower,
+      specialTalent: _specialTalent,
       maleFirstNames: _maleFirstNames,
       femaleFirstNames: _femaleFirstNames,
       lastNames: _allLastNames,
@@ -591,58 +649,132 @@ class _KarakterScreenState extends State<KarakterScreen> {
                   ),
 
                   const SizedBox(height: 16),
-                  ExpansionTile(
-                    title: const Row(
-                      children: [
-                        Icon(Icons.palette, color: Colors.blue),
-                        SizedBox(width: 8),
-                        Text('🎨 Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                      ],
+                  // --- TIGA TOMBOL KUSTOMISASI BARU (Penampilan, Atribut, Talenta) ---
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade300),
                     ),
-                    childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    children: [
-                      _buildCustomizerDropdown(
-                        label: 'Gaya Rambut',
-                        value: _selectedTopType,
-                        items: (widget.gender == 'male' || widget.gender == 'laki-laki')
-                            ? AvatarGenerator.topsMale
-                            : AvatarGenerator.topsFemale,
-                        onChanged: (val) => setState(() => _selectedTopType = val!),
+                    child: ListTile(
+                      leading: const Icon(Icons.palette, color: Colors.blue),
+                      title: const Text('🎨 Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold)),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      onTap: () async {
+                        final res = await Navigator.push<Map<String, String>>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AppearanceCustomizationScreen(
+                              gender: widget.gender,
+                              initialAppearance: {
+                                'topType': _selectedTopType,
+                                'accessoriesType': _selectedAccessoriesType,
+                                'hairColor': _selectedHairColor,
+                                'clotheType': _selectedClotheType,
+                                'clotheColor': _selectedClotheColor,
+                                'skinColor': _selectedSkinColor,
+                              },
+                            ),
+                          ),
+                        );
+                        if (res != null) {
+                          setState(() {
+                            _selectedTopType = res['topType']!;
+                            _selectedAccessoriesType = res['accessoriesType']!;
+                            _selectedHairColor = res['hairColor']!;
+                            _selectedClotheType = res['clotheType']!;
+                            _selectedClotheColor = res['clotheColor']!;
+                            _selectedSkinColor = res['skinColor']!;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+                  
+                  const SizedBox(height: 8),
+                  
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.flash_on, color: Colors.amber),
+                      title: const Text('⚡ Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                        'Penampilan: $_looks% | Kecerdasan: $_smarts% | Kesehatan: $_health%',
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
                       ),
-                      _buildCustomizerDropdown(
-                        label: 'Warna Rambut',
-                        value: _selectedHairColor,
-                        items: AvatarGenerator.hairColors,
-                        onChanged: (val) => setState(() => _selectedHairColor = val!),
-                        isColorDropdown: true,
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      onTap: () async {
+                        final res = await Navigator.push<Map<String, dynamic>>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AttributesCustomizationScreen(
+                              initialAttributes: {
+                                'discipline': _discipline,
+                                'fertility': _fertility,
+                                'happiness': _happiness,
+                                'health': _health,
+                                'karma': _karma,
+                                'looks': _looks,
+                                'sexuality': _sexuality,
+                                'smarts': _smarts,
+                                'willpower': _willpower,
+                              },
+                            ),
+                          ),
+                        );
+                        if (res != null) {
+                          setState(() {
+                            _discipline = res['discipline'] as int;
+                            _fertility = res['fertility'] as int;
+                            _happiness = res['happiness'] as int;
+                            _health = res['health'] as int;
+                            _karma = res['karma'] as int;
+                            _looks = res['looks'] as int;
+                            _sexuality = res['sexuality'] as String;
+                            _smarts = res['smarts'] as int;
+                            _willpower = res['willpower'] as int;
+                          });
+                        }
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+                  
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.star, color: Colors.orange),
+                      title: const Text('⭐ Talenta Spesial', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                        'Talenta: $_specialTalent',
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
                       ),
-                      _buildCustomizerDropdown(
-                        label: 'Warna Kulit',
-                        value: _selectedSkinColor,
-                        items: AvatarGenerator.skinColors,
-                        onChanged: (val) => setState(() => _selectedSkinColor = val!),
-                        isColorDropdown: true,
-                      ),
-                      _buildCustomizerDropdown(
-                        label: 'Aksesoris / Kacamata',
-                        value: _selectedAccessoriesType,
-                        items: AvatarGenerator.accessories,
-                        onChanged: (val) => setState(() => _selectedAccessoriesType = val!),
-                      ),
-                      _buildCustomizerDropdown(
-                        label: 'Pakaian',
-                        value: _selectedClotheType,
-                        items: AvatarGenerator.clothes,
-                        onChanged: (val) => setState(() => _selectedClotheType = val!),
-                      ),
-                      _buildCustomizerDropdown(
-                        label: 'Warna Pakaian',
-                        value: _selectedClotheColor,
-                        items: AvatarGenerator.clotheColors,
-                        onChanged: (val) => setState(() => _selectedClotheColor = val!),
-                        isColorDropdown: true,
-                      ),
-                    ],
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      onTap: () async {
+                        final res = await Navigator.push<String>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SpecialTalentCustomizationScreen(
+                              initialTalent: _specialTalent,
+                            ),
+                          ),
+                        );
+                        if (res != null) {
+                          setState(() {
+                            _specialTalent = res;
+                          });
+                        }
+                      },
+                    ),
                   ),
 
                   const SizedBox(height: 24),
