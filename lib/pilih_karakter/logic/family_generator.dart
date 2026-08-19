@@ -23,6 +23,13 @@ class FamilyGenerator {
 
     // 4. Generate Extended Family (Kakek-Nenek dari Ayah/Ibu, Paman/Bibi, Sepupu)
     _generateExtendedFamily(character, maleFirstNames, femaleFirstNames, lastNames);
+
+    // 5. Tambahkan log kelahiran ke inbox karakter
+    final birthLabel = character.birthOrderLabel;
+    String orderSuffix = character.birthOrder == 1 ? 'pertama' : 'ke-${character.birthOrder}';
+    character.inbox.add(
+      '👶 Kelahiran: Kamu lahir di ${character.location} sebagai anak $orderSuffix ($birthLabel).'
+    );
   }
 
   static int _generateAgeGap() {

@@ -82,6 +82,11 @@ class Character {
   // --- LOGIKA MASTURBASI ---
   int lastMasturbationAge = -5;
 
+  // --- DATABASE NAMA DARI JSON ---
+  List<String>? maleFirstNames;
+  List<String>? femaleFirstNames;
+  List<String>? lastNames;
+
   Character({
     required this.name,
     required this.gender,
@@ -116,10 +121,29 @@ class Character {
     this.fatherInLawRelationship = 50,
     this.motherInLawRelationship = 50,
     this.partner,
+    this.maleFirstNames,
+    this.femaleFirstNames,
+    this.lastNames,
   }) : inbox = [];
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
   List<String> inbox;
+
+  // --- LABEL URUTAN KELAHIRAN (ANAK PERTAMA/TENGAH/TERAKHIR/TUNGGAL) ---
+  String get birthOrderLabel {
+    final hasKakak = birthOrder > 1;
+    final hasAdik = siblings.any((sib) => sib['relation']?.startsWith('Adik') == true);
+
+    if (hasKakak && hasAdik) {
+      return 'Anak Tengah';
+    } else if (hasKakak && !hasAdik) {
+      return 'Anak Terakhir';
+    } else if (!hasKakak && hasAdik) {
+      return 'Anak Pertama';
+    } else {
+      return 'Anak Tunggal';
+    }
+  }
 
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
@@ -240,6 +264,97 @@ class Character {
       }
     }
 
+    // Pastikan list siblings mutable agar bisa ditambahkan adik baru
+    siblings = List<Map<String, String>>.from(siblings);
+
+    // --- LOGIKA KELAHIRAN ADIK BARU DARI IBU / IBU TIRI YANG SUBUR ---
+    final List<String> sibBoys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
+    final List<String> sibGirls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
+
+    // Kelahiran dari Ibu Kandung
+    if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 18 && motherAge! <= 45) {
+      // Peluang 6% per tahun untuk melahirkan anak baru
+      if (random.nextInt(100) < 6) {
+        final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+        final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+        
+        // Ambil nama belakang dari ayah kandung atau ayah tiri, jika tidak ada pakai nama belakang player/ibu
+        String lastName = '';
+        if (fatherName != null && !isFatherDeceased) {
+          final parts = fatherName!.split(' ');
+          if (parts.length > 1) lastName = parts.last;
+        } else if (stepFatherName != null && !isStepFatherDeceased) {
+          final parts = stepFatherName!.split(' ');
+          if (parts.length > 1) lastName = parts.last;
+        }
+        
+        if (lastName.isEmpty) {
+          final parts = name.split(' ');
+          if (parts.length > 1) lastName = parts.last;
+        }
+        
+        final String babyName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
+        
+        // Tentukan apakah saudara tiri atau kandung
+        // Jika tidak ada ayah kandung atau ayah kandung sudah meninggal, tapi ada ayah tiri -> adik tiri
+        final bool isStepSibling = (fatherName == null || isFatherDeceased);
+        final String relType = isStepSibling
+            ? (gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan')
+            : (gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan');
+            
+        final String notice = '👶 Adik Baru Lahir! Ibumu melahirkan seorang $relType bernama $babyName.';
+        events.add(notice);
+        inbox.add(notice);
+        
+        siblings.add({
+          'name': babyName,
+          'gender': gender,
+          'relation': relType,
+          'relationship': '80',
+          'age': '0',
+          'isDeceased': 'false',
+        });
+      }
+    }
+
+    // Kelahiran dari Ibu Tiri
+    if (stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null && stepMotherAge! >= 18 && stepMotherAge! <= 45) {
+      // Peluang 6% per tahun untuk melahirkan anak baru
+      if (random.nextInt(100) < 6) {
+        final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+        final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+        
+        // Ibu tiri melahirkan anak dari ayah kandung kita
+        String lastName = '';
+        if (fatherName != null && !isFatherDeceased) {
+          final parts = fatherName!.split(' ');
+          if (parts.length > 1) lastName = parts.last;
+        }
+        if (lastName.isEmpty) {
+          final parts = name.split(' ');
+          if (parts.length > 1) lastName = parts.last;
+        }
+        
+        final String babyName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
+        
+        // Anak dari Ibu Tiri selalu Adik Tiri bagi player
+        final String relType = gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan';
+        
+        final String notice = '👶 Adik Baru Lahir! Ibu Tirimu ($stepMotherName) melahirkan seorang $relType bernama $babyName.';
+        events.add(notice);
+        inbox.add(notice);
+        
+        siblings.add({
+          'name': babyName,
+          'gender': gender,
+          'relation': relType,
+          'relationship': '80',
+          'age': '0',
+          'isDeceased': 'false',
+        });
+      }
+    }
+
     // 2. Sibling Aging & Birth & Death
     for (var sib in siblings) {
       bool isDeceased = sib['isDeceased'] == 'true';
@@ -342,8 +457,8 @@ class Character {
     if (isPregnant || partnerIsPregnant) {
       final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
       
-      final List<String> boys = ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
-      final List<String> girls = ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
+      final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
+      final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
       
       final String childFirstName = childGender == 'Laki-laki' 
           ? boys[random.nextInt(boys.length)] 

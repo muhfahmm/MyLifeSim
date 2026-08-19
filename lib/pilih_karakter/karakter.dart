@@ -214,6 +214,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
       intelligence: 50,
       money: 0,
       appearance: 50,
+      maleFirstNames: _maleFirstNames,
+      femaleFirstNames: _femaleFirstNames,
+      lastNames: _allLastNames,
     );
 
     // --- 2. GENERATE KELUARGA (PENTING!) ---

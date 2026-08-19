@@ -488,7 +488,7 @@ class _GameScreenState extends State<GameScreen> {
                     const Icon(Icons.person, size: 64, color: Colors.blue),
                     const SizedBox(height: 8),
                     Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                    Text('Gender: ${_character.gender}', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+                    Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
                     Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 16, color: Colors.grey)),
                   ],
                 ),
