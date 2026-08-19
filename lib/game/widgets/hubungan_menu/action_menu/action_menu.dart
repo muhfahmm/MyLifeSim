@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logi
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_6_11.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
@@ -536,6 +537,128 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _updateRelationship,
           _updateState,
         );
+      }
+    }
+
+    // --- TAMBAHAN LOGIKA KHUSUS USIA >= 7 TAHUN UNTUK ADIK/KAKAK DENGAN LAWAN JENIS ---
+    if (age >= 7) {
+      final String myGender = widget.character.gender.trim().toLowerCase();
+      final String cleanName = widget.targetName.toLowerCase();
+      final String cleanRole = widget.targetRole.toLowerCase();
+
+      bool isSibling = cleanRole.contains('saudara') ||
+                       cleanRole.contains('kandung') ||
+                       cleanName.contains('kakak') ||
+                       cleanName.contains('adik');
+
+      bool existsInSiblings = widget.character.siblings.any((sib) =>
+          '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName);
+
+      if (isSibling && existsInSiblings) {
+        String targetGender = 'laki-laki';
+        for (var sib in widget.character.siblings) {
+          final String expectedLabel = '${sib['name']} (${sib['relation']})'.toLowerCase();
+          if (expectedLabel == cleanName) {
+            targetGender = (sib['gender'] ?? 'Laki-laki').toLowerCase();
+            break;
+          }
+        }
+
+        bool genderMatch = (myGender == 'laki-laki' && targetGender == 'perempuan') ||
+                            (myGender == 'perempuan' && targetGender == 'laki-laki');
+
+        if (genderMatch) {
+          bool hasBercinta = actions.any((act) => act.label.contains('Bercinta') || act.label.contains('Make Love'));
+          if (!hasBercinta) {
+            actions.add(ActionItem(
+              label: 'Bercinta / Make Love',
+              icon: Icons.favorite,
+              color: Colors.pink,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BercintaScreen(
+                      character: widget.character,
+                      targetName: widget.targetName,
+                      targetRole: widget.targetRole,
+                      onActionComplete: () {
+                        _updateState();
+                      },
+                    ),
+                  ),
+                );
+              },
+            ));
+          }
+
+          bool isAlreadyPartner = widget.character.partner != null && widget.character.partner!['name'] == widget.targetName;
+          bool isAlreadySecondPartner = widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName;
+          bool isPartnerRole = widget.targetRole == 'Pacar' || widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri';
+
+          bool hasPacaran = actions.any((act) => act.label.contains('Pacaran'));
+          if (!hasPacaran && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
+            final bool hasExistingPartner = widget.character.partner != null;
+            actions.add(ActionItem(
+              label: hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+              icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite_border,
+              color: hasExistingPartner ? Colors.deepOrange : Colors.redAccent,
+              onTap: () {
+                bool isTargetOlder = cleanName.contains('kakak');
+                int successChance = isTargetOlder ? 10 : 40;
+                bool accepted = _random.nextInt(100) < successChance;
+
+                if (accepted) {
+                  int actualTargetAge = 7;
+                  for (var sib in widget.character.siblings) {
+                    final String expectedLabel = '${sib['name']} (${sib['relation']})';
+                    if (expectedLabel == widget.targetName) {
+                      actualTargetAge = int.tryParse(sib['age'] ?? '7') ?? 7;
+                      break;
+                    }
+                  }
+
+                  _showResultDialog(
+                    'Pacaran Baru! ❤️',
+                    'Ajakan pacaranmu diterima oleh ${widget.targetName}! Sekarang kalian adalah sepasang kekasih.',
+                    Icons.favorite,
+                    Colors.pinkAccent,
+                    () {
+                      final partnerMap = {
+                        'name': widget.targetName,
+                        'relation': 'Pacar',
+                        'gender': targetGender == 'perempuan' ? 'Perempuan' : 'Laki-laki',
+                        'age': actualTargetAge.toString(),
+                        'relationship': '80',
+                        'isDeceased': 'false',
+                      };
+
+                      if (widget.character.partner == null) {
+                        widget.character.partner = partnerMap;
+                      } else {
+                        widget.character.secondPartner = partnerMap;
+                      }
+
+                      _updateRelationship(20);
+                      _updateState();
+                    }
+                  );
+                } else {
+                  _showResultDialog(
+                    'Ajakan Ditolak',
+                    '${widget.targetName} menolak ajakanmu untuk berpacaran. Hubungan kalian menjadi sedikit canggung (-10% hubungan).',
+                    Icons.block,
+                    Colors.red,
+                    () {
+                      _updateRelationship(-10);
+                      _updateState();
+                    }
+                  );
+                }
+              },
+            ));
+          }
+        }
       }
     }
 

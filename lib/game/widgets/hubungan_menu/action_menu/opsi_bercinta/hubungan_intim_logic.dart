@@ -94,10 +94,29 @@ class HubunganIntimLogic {
     required String targetRole,
     required int partnerBonus,
     required Random random,
+    int? playerAge,
   }) {
     final String targetNameLower = targetName.toLowerCase();
     final String targetRoleLower = targetRole.toLowerCase();
     final bool isChild = targetRole == 'Laki-laki' || targetRole == 'Perempuan';
+
+    // Cek kondisi khusus incest adik/kakak lawan jenis sejak usia 7 tahun
+    final bool isSibling = targetRoleLower.contains('saudara') || 
+                           targetRoleLower.contains('kandung') || 
+                           targetNameLower.contains('kakak') || 
+                           targetNameLower.contains('adik');
+    final String cleanMyGender = myGender.trim().toLowerCase();
+    final String cleanPartnerGender = partnerGender.trim().toLowerCase();
+    final bool isOppositeGender = (cleanMyGender == 'laki-laki' && cleanPartnerGender == 'perempuan') ||
+                                  (cleanMyGender == 'perempuan' && cleanPartnerGender == 'laki-laki');
+
+    if (playerAge != null && playerAge >= 7 && isSibling && isOppositeGender) {
+      if (targetNameLower.contains('adik')) {
+        return random.nextInt(100) < 40;
+      } else if (targetNameLower.contains('kakak')) {
+        return random.nextInt(100) < 10;
+      }
+    }
 
     bool success = false;
 
@@ -132,9 +151,7 @@ class HubunganIntimLogic {
       }
     }
     // 3. Logika Saudara Kandung / Kakak/Adik
-    else if (targetRoleLower.contains('saudara') || targetNameLower.contains('kakak') || targetNameLower.contains('adik')) {
-      final bool isTargetOlder = targetNameLower.contains('kakak');
-      
+    else if (isSibling) {
       if (myGender == 'perempuan' && partnerGender == 'perempuan') {
         success = random.nextInt(100) < (20 + partnerBonus);
       } else if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
@@ -149,7 +166,13 @@ class HubunganIntimLogic {
     }
     // 4. Hubungan Normal / Bukan Incest
     else {
-      success = random.nextInt(100) < 65;
+      // Menolak jika kepuasan hubungan kurang dari 40%
+      if (partnerBonus < 0) {
+        success = false;
+      } else {
+        // Peluang normal
+        success = random.nextInt(100) < (50 + partnerBonus);
+      }
     }
 
     return success;

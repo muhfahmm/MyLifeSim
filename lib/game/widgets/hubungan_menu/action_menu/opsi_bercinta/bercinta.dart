@@ -187,6 +187,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       targetRole: widget.targetRole,
       partnerBonus: partnerBonus,
       random: _random,
+      playerAge: widget.character.age,
     );
 
     int relationChange = 0;
