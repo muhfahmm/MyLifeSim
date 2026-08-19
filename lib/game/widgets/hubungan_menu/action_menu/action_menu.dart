@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logi
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_6_11.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -477,6 +478,33 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _updateState,
         );
       }
+    }
+
+    final String cleanRole = widget.targetRole.toLowerCase();
+    final String cleanName = widget.targetName.toLowerCase();
+    final bool isFatherOrMother = cleanName.contains('ayah') || cleanName.contains('ibu') || cleanRole.contains('ayah') || cleanRole.contains('ibu');
+
+    if (isFatherOrMother) {
+      final String side = cleanName.contains('ayah') || cleanRole.contains('ayah') ? 'Ayah' : 'Ibu';
+      actions.insert(0, ActionItem(
+        label: 'Lihat Keluarga',
+        icon: Icons.people,
+        color: Colors.blueGrey,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ExtendedFamilyViewScreen(
+                character: widget.character,
+                side: side,
+                onRefresh: () {
+                  setState(() {});
+                },
+              ),
+            ),
+          );
+        },
+      ));
     }
 
     final int relationshipVal = _getCurrentRelationshipValue();

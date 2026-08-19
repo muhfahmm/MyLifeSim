@@ -62,14 +62,15 @@ class ActivityButton extends StatelessWidget {
                   onExercise();
                 },
               ),
-              ListTile(
-                leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
-                title: const Text('Masturbasi (Fantasi)'),
-                onTap: () {
-                  Navigator.pop(context);
-                  MasturbasiHelper.showMasturbationMenu(context, character, onRefresh);
-                },
-              ),
+              if (character.age >= 9)
+                ListTile(
+                  leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
+                  title: const Text('Masturbasi (Fantasi)'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    MasturbasiHelper.showMasturbationMenu(context, character, onRefresh);
+                  },
+                ),
             ],
           ),
           actions: [

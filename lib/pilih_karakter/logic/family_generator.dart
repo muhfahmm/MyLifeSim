@@ -25,6 +25,31 @@ class FamilyGenerator {
     _generateExtendedFamily(character, maleFirstNames, femaleFirstNames, lastNames);
   }
 
+  static int _generateAgeGap() {
+    // Total weight: 90 (1-2) + 80 (3-4) + 60 (5-8) + 40 (9-10) + 30 (11-20) + 20 (others) = 320
+    final int roll = _random.nextInt(320);
+    if (roll < 90) {
+      // 1-2: 90% (relative weight)
+      return 1 + _random.nextInt(2);
+    } else if (roll < 170) {
+      // 3-4: 80%
+      return 3 + _random.nextInt(2);
+    } else if (roll < 230) {
+      // 5-8: 60%
+      return 5 + _random.nextInt(4);
+    } else if (roll < 270) {
+      // 9-10: 40%
+      return 9 + _random.nextInt(2);
+    } else if (roll < 300) {
+      // 11-20: 30%
+      return 11 + _random.nextInt(10);
+    } else {
+      // Lainnya: 20% (bisa 0, atau 21-25)
+      final list = [0, 21, 22, 23, 24, 25];
+      return list[_random.nextInt(list.length)];
+    }
+  }
+
   // ============================================
   // 1. LOGIKA ORANG TUA
   // ============================================
@@ -51,8 +76,24 @@ class FamilyGenerator {
       // Orang tua lengkap
       character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
       character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
-      character.fatherAge = 22 + _random.nextInt(28); // 22 - 49 tahun
-      character.motherAge = 19 + _random.nextInt(25); // 19 - 43 tahun
+      
+      int mAge = 19 + _random.nextInt(25); // 19 - 43 tahun
+      int gap = _generateAgeGap();
+      
+      int fAge;
+      if (_random.nextInt(100) < 85) {
+        // 85% peluang ayah lebih tua
+        fAge = mAge + gap;
+      } else {
+        fAge = mAge - gap;
+      }
+      
+      // Batasi usia minimal 20, maksimal 55 untuk ayah agar logis
+      if (fAge < 20) fAge = 20;
+      if (fAge > 55) fAge = 55;
+      
+      character.motherAge = mAge;
+      character.fatherAge = fAge;
     } else if (roll < 80) {
       // Hanya ayah
       character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
@@ -77,8 +118,20 @@ class FamilyGenerator {
       // Ayah tiri (Ibu + Ayah Tiri)
       character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
       character.stepFatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
-      character.motherAge = 19 + _random.nextInt(25);
-      character.stepFatherAge = 22 + _random.nextInt(28);
+      
+      int mAge = 19 + _random.nextInt(25);
+      int gap = _generateAgeGap();
+      int fAge;
+      if (_random.nextInt(100) < 85) {
+        fAge = mAge + gap;
+      } else {
+        fAge = mAge - gap;
+      }
+      if (fAge < 20) fAge = 20;
+      if (fAge > 55) fAge = 55;
+      
+      character.motherAge = mAge;
+      character.stepFatherAge = fAge;
     }
   }
 

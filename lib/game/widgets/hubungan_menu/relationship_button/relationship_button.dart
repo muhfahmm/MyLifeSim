@@ -68,23 +68,6 @@ class RelationshipButton extends StatelessWidget {
         // 3. Urutkan dari yang tertua ke termuda (descending)
         childrenList.sort((a, b) => b['age'].compareTo(a['age']));
 
-        // --- FILTER KELUARGA BESAR BERDASARKAN SISI KELUARGA ---
-        // Asumsi: `relation` di extendedFamily sudah mencakup "(dari Ayah)" atau "(dari Ibu)".
-        final List<Map<String, dynamic>> fatherSide = [];
-        final List<Map<String, dynamic>> motherSide = [];
-
-        for (var member in character.extendedFamily) {
-          final String relation = member['relation'] ?? '';
-          if (relation.contains('Ayah')) {
-            fatherSide.add(member);
-          } else if (relation.contains('Ibu')) {
-            motherSide.add(member);
-          } else {
-            // Fallback: masukkan ke ibu jika tidak terdeteksi
-            motherSide.add(member);
-          }
-        }
-
         DialogHelper.show(
           context: context,
           title: 'Hubungan & Keluarga',
@@ -314,68 +297,6 @@ class RelationshipButton extends StatelessWidget {
                   );
                 }
               }).toList(),
-
-              // ============================================
-              // 4. BAGIAN KELUARGA BESAR (EXTENDED FAMILY)
-              // ============================================
-              if (character.extendedFamily.isNotEmpty) ...[
-                const Divider(height: 32),
-
-                // --- KELUARGA DARI AYAH ---
-                if (fatherSide.isNotEmpty) ...[
-                  const Text('👨 Keluarga dari Ayah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-                  const SizedBox(height: 8),
-                  ...fatherSide.map((ext) {
-                    final String name = ext['name'] ?? 'Keluarga';
-                    final String relation = ext['relation'] ?? 'Keluarga';
-                    final int relVal = int.tryParse(ext['relationship'] ?? '50') ?? 50;
-                    final int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
-                    final bool isDeceased = ext['isDeceased'] == 'true';
-                    final bool isMale = (ext['gender'] ?? 'Laki-laki') == 'Laki-laki';
-
-                    if (extAge < 0 && !isDeceased) return const SizedBox.shrink();
-
-                    return _buildFamilyItem(
-                      context,
-                      icon: isMale ? Icons.face : Icons.face_3,
-                      label: isDeceased ? '$name (Wafat)' : name,
-                      status: relation, // Badge akan menampilkan "Nenek (dari Ayah)", dst.
-                      color: isDeceased ? Colors.grey : (isMale ? Colors.blueGrey : Colors.brown),
-                      relationshipValue: relVal,
-                      ageText: '$extAge tahun',
-                      isDeceased: isDeceased,
-                    );
-                  }).toList(),
-                  const SizedBox(height: 12),
-                ],
-
-                // --- KELUARGA DARI IBU ---
-                if (motherSide.isNotEmpty) ...[
-                  const Text('👩 Keluarga dari Ibu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-                  const SizedBox(height: 8),
-                  ...motherSide.map((ext) {
-                    final String name = ext['name'] ?? 'Keluarga';
-                    final String relation = ext['relation'] ?? 'Keluarga';
-                    final int relVal = int.tryParse(ext['relationship'] ?? '50') ?? 50;
-                    final int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
-                    final bool isDeceased = ext['isDeceased'] == 'true';
-                    final bool isMale = (ext['gender'] ?? 'Laki-laki') == 'Laki-laki';
-
-                    if (extAge < 0 && !isDeceased) return const SizedBox.shrink();
-
-                    return _buildFamilyItem(
-                      context,
-                      icon: isMale ? Icons.face : Icons.face_3,
-                      label: isDeceased ? '$name (Wafat)' : name,
-                      status: relation, // Badge akan menampilkan "Kakek (dari Ibu)", dst.
-                      color: isDeceased ? Colors.grey : (isMale ? Colors.blueGrey : Colors.brown),
-                      relationshipValue: relVal,
-                      ageText: '$extAge tahun',
-                      isDeceased: isDeceased,
-                    );
-                  }).toList(),
-                ],
-              ],
 
               // ============================================
               // 5. BAGIAN ANAK (JIKA ADA)
