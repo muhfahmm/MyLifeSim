@@ -659,6 +659,13 @@ class _GameScreenState extends State<GameScreen> {
             const SizedBox(height: 12),
             _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true),
 
+            // --- TAMBAHAN MENU BARU ---
+            const SizedBox(height: 12),
+            _buildStatRow('Disiplin', _character.discipline, Colors.purple),
+            const SizedBox(height: 12),
+            _buildSexualityRow('Seksualitas', _character.sexuality),
+            // --------------------------
+
             // --- STATUS KEHAMILAN (PERBAIKAN) ---
             if (_character.isPregnant || _character.partnerIsPregnant) ...[
               const SizedBox(height: 16),
@@ -811,6 +818,34 @@ class _GameScreenState extends State<GameScreen> {
               minHeight: 12,
             ),
           ),
+      ],
+    );
+  }
+
+  // --- WIDGET STAT BAR UNTUK SEKSUALITAS (STRING) ---
+  Widget _buildSexualityRow(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: Colors.pink.withOpacity(0.15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.pink.withOpacity(0.3)),
+              ),
+              child: Text(
+                value,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.pink),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 6),
       ],
     );
   }
