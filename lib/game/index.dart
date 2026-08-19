@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:bitlife/avatar/avatar_generator.dart';
 
 // Import widget-widget UI
 import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
@@ -485,7 +487,24 @@ class _GameScreenState extends State<GameScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    const Icon(Icons.person, size: 64, color: Colors.blue),
+                    CircleAvatar(
+                      radius: 36,
+                      backgroundColor: Colors.blue.shade50,
+                      child: SvgPicture.network(
+                        AvatarGenerator.getDeterministicAvatarUrl(
+                          _character.name,
+                          _character.gender,
+                          happiness: _character.happiness,
+                        ),
+                        placeholderBuilder: (context) => const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        ),
+                        width: 72,
+                        height: 72,
+                      ),
+                    ),
                     const SizedBox(height: 8),
                     Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),

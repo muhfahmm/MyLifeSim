@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.0.10
 
   # Jika ada package lain yang kamu tambahkan (misal path_provider), taruh di sini
 

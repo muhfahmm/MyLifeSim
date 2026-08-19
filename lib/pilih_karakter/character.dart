@@ -1,6 +1,7 @@
 // lib/pilih_karakter/character.dart
 import 'dart:math';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
+import 'package:bitlife/avatar/avatar_generator.dart';
 
 class Character {
   String name;
@@ -13,6 +14,7 @@ class Character {
   int money;
   int appearance;
   bool isAlive;
+
 
   // --- FIELD KELUARGA BARU ---
   String? fatherName;        // Nama Ayah Kandung
