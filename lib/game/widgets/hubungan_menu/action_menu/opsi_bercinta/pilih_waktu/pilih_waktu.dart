@@ -30,6 +30,11 @@ class PilihWaktuHelper {
       description: 'Suasana syahdu di sore hari menjelang senja.',
       icon: Icons.wb_twilight,
     ),
+    TimeOption(
+      name: 'Malam',
+      description: 'Kegelapan malam menyimpan rahasia yang dalam.',
+      icon: Icons.nightlight_round,
+    ),
   ];
 
   static Future<String?> showTimeChooser(BuildContext context, String locationText) async {

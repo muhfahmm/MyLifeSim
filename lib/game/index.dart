@@ -26,11 +26,18 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   late Character _character;
+  // Cache avatar URL agar tidak di-rebuild ulang setiap kali state berubah
+  late String _avatarUrl;
 
   @override
   void initState() {
     super.initState();
     _character = widget.character;
+    // Generate avatar URL sekali saja di initState
+    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+      _character,
+      happiness: _character.happiness,
+    );
   }
 
   // --- LOGIKA RESET ---
@@ -71,6 +78,7 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     if (!_character.isAlive) {
+      if (!mounted) return;
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -89,6 +97,7 @@ class _GameScreenState extends State<GameScreen> {
         ),
       );
     } else if (events.isNotEmpty) {
+      if (!mounted) return;
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -171,6 +180,7 @@ class _GameScreenState extends State<GameScreen> {
     _character.pregnantByPartnerRole = null;
 
     // Tampilkan modal keberhasilan lahir
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -212,6 +222,7 @@ class _GameScreenState extends State<GameScreen> {
     _character.happiness = (_character.happiness - 40).clamp(0, 100);
 
     // Tampilkan modal keguguran
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -272,6 +283,7 @@ class _GameScreenState extends State<GameScreen> {
           : '$partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
     }
     
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -383,6 +395,7 @@ class _GameScreenState extends State<GameScreen> {
       riskInfo = 'Kombinasi gender: Kamu ($myGender) & Pasangan ($partnerGender) -> Risiko hamil 0% (Tidak memungkinkan secara biologis).';
     }
 
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -607,7 +620,8 @@ class _GameScreenState extends State<GameScreen> {
         onSaveProgress: _saveProgress,
         onNewGame: _startNewGame,
       ),
-      body: Padding(
+      // --- PERBAIKAN: Gunakan SingleChildScrollView agar tidak overflow ---
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -624,10 +638,7 @@ class _GameScreenState extends State<GameScreen> {
                       radius: 36,
                       backgroundColor: Colors.blue.shade50,
                       child: Image.network(
-                        AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        ),
+                        _avatarUrl, // Gunakan cache URL
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return const SizedBox(

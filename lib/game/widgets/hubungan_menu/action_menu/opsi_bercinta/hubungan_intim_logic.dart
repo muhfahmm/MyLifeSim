@@ -111,10 +111,21 @@ class HubunganIntimLogic {
                                   (cleanMyGender == 'perempuan' && cleanPartnerGender == 'laki-laki');
 
     if (playerAge != null && playerAge >= 7 && isSibling && isOppositeGender) {
-      if (targetNameLower.contains('adik')) {
-        return random.nextInt(100) < 40;
-      } else if (targetNameLower.contains('kakak')) {
-        return random.nextInt(100) < 10;
+      // Logika khusus: player perempuan mengajak kakak/adik laki-laki
+      if (cleanMyGender == 'perempuan' && cleanPartnerGender == 'laki-laki') {
+        if (targetNameLower.contains('kakak')) {
+          return random.nextInt(100) < 60; // kakak laki-laki: 60%
+        } else if (targetNameLower.contains('adik')) {
+          return random.nextInt(100) < 55; // adik laki-laki: 55%
+        }
+      }
+      // Logika lama (player laki-laki mengajak kakak/adik perempuan)
+      if (cleanMyGender == 'laki-laki' && cleanPartnerGender == 'perempuan') {
+        if (targetNameLower.contains('adik')) {
+          return random.nextInt(100) < 40;
+        } else if (targetNameLower.contains('kakak')) {
+          return random.nextInt(100) < 10;
+        }
       }
     }
 

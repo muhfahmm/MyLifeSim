@@ -204,7 +204,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
         } else if (t.contains('siang') || t.contains('sore')) {
           caughtChance = 55;
         } else if (t.contains('malam')) {
-          caughtChance = 20;
+          caughtChance = 15;
         }
       } else if (_chosenLocation.contains('Hotel')) {
         caughtChance = 20;

@@ -719,8 +719,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite_border,
               color: hasExistingPartner ? Colors.deepOrange : Colors.redAccent,
               onTap: () {
-                bool isTargetOlder = cleanName.contains('kakak');
-                int successChance = isTargetOlder ? 10 : 40;
+                // Logika berdasarkan gender player dan sibling
+                final String myGen = widget.character.gender.trim().toLowerCase();
+                int successChance;
+                if (myGen == 'perempuan' && targetGender == 'laki-laki') {
+                  // Player perempuan, target kakak laki = 35%, adik laki = 40%
+                  successChance = cleanName.contains('kakak') ? 35 : 40;
+                } else {
+                  // Player laki-laki (logika lama)
+                  successChance = cleanName.contains('kakak') ? 10 : 40;
+                }
                 bool accepted = _random.nextInt(100) < successChance;
 
                 if (accepted) {
@@ -877,6 +885,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     );
                   },
                   child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          );
+        },
+      ));
+    }
+
+    // --- TAMBAHAN: TOMBOL THREESOME UNTUK PASANGAN AKTIF ---
+    if (isActivePartner && isPartnerRole) {
+      actions.add(ActionItem(
+        label: 'Threesome',
+        icon: Icons.group,
+        color: Colors.purple,
+        onTap: () {
+          // Placeholder – fitur belum diimplementasikan
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Threesome', style: TextStyle(fontWeight: FontWeight.bold)),
+              content: const Text('Fitur Threesome sedang dalam pengembangan.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
                 ),
               ],
             ),
@@ -1098,6 +1131,48 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           ],
                         );
                       }
+                    ),
+                    // --- BADGE HAMIL (di bawah tingkat kesuburan) ---
+                    Builder(
+                      builder: (context) {
+                        final bool targetIsPregnant = widget.character.partnerIsPregnant &&
+                            (widget.character.pregnantByPartnerName == widget.targetName ||
+                             (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) ||
+                             (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName));
+                        final bool playerIsPregnant = widget.character.isPregnant &&
+                            (widget.character.pregnantByPartnerName == widget.targetName);
+
+                        if (!targetIsPregnant && !playerIsPregnant) return const SizedBox.shrink();
+
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 12),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.withOpacity(0.12),
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.pink.withOpacity(0.4)),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.pregnant_woman, color: Colors.pink, size: 18),
+                                const SizedBox(width: 8),
+                                Text(
+                                  playerIsPregnant
+                                      ? '🍼 Kamu sedang hamil dari ${widget.targetName}!'
+                                      : '👶 ${widget.targetName} sedang hamil!',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.pink,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
