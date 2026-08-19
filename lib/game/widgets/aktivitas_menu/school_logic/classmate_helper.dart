@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/aksi/aksi_ke_teman/teman_profile_screen.dart';
 
 class ClassmateHelper {
   /// Menghasilkan daftar teman sekelas secara persisten jika belum ada
@@ -132,10 +132,13 @@ class ClassmateHelper {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ActionMenuScreen(
+                            builder: (context) => TemanProfileScreen(
                               character: character,
-                              targetName: '$name (Teman Sekelas)',
-                              targetRole: 'Sekelas',
+                              temanName: name,
+                              temanGender: gender,
+                              temanAge: age,
+                              initialRelationship: relationship,
+                              onRefresh: onRefresh,
                             ),
                           ),
                         ).then((_) => onRefresh());

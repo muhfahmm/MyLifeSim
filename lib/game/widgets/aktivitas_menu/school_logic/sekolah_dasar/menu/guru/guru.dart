@@ -1,10 +1,10 @@
 // lib/game/widgets/aktivitas_menu/school_logic/sekolah_dasar/menu/guru/guru.dart
-
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/aksi/aksi_ke_guru/guru_profile_screen.dart';
 
 class GuruMenu {
   static void _generateTeachersIfNeeded(Character character) {
@@ -233,11 +233,19 @@ class GuruMenu {
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () {
                   Navigator.pop(context);
-                  if (teacher['type'] == 'headmaster') {
-                    _showHeadmasterInteraction(context, character, teacher['name']!, onRefresh);
-                  } else if (teacher['type'] == 'bk') {
-                    _showBkInteraction(context, character, teacher['name']!, onRefresh);
-                  }
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GuruProfileScreen(
+                        character: character,
+                        guruName: teacher['name']!,
+                        guruGender: teacher['gender'] ?? 'Perempuan',
+                        guruAge: int.tryParse(teacher['age'] ?? '40') ?? 40,
+                        guruRole: teacher['role']!,
+                        onRefresh: onRefresh,
+                      ),
+                    ),
+                  ).then((_) => onRefresh());
                 },
               ),
             )),
@@ -270,15 +278,19 @@ class GuruMenu {
                 trailing: const Icon(Icons.chevron_right, color: Colors.grey),
                 onTap: () {
                   Navigator.pop(context);
-                  _showTeacherInteraction(
+                  Navigator.push(
                     context,
-                    character,
-                    teacher['name']!,
-                    teacher['subject']!,
-                    teacher['desc']!,
-                    teacher['apply'] as String Function(),
-                    onRefresh,
-                  );
+                    MaterialPageRoute(
+                      builder: (context) => GuruProfileScreen(
+                        character: character,
+                        guruName: teacher['name']!,
+                        guruGender: teacher['gender'] ?? 'Perempuan',
+                        guruAge: int.tryParse(teacher['age'] ?? '40') ?? 40,
+                        guruRole: '${teacher['subject']} - ${teacher['statistic']}',
+                        onRefresh: onRefresh,
+                      ),
+                    ),
+                  ).then((_) => onRefresh());
                 },
               ),
             )),
