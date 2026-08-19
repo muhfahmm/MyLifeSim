@@ -811,13 +811,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
                     // 2. Tambahkan ke exPartners (mantan pacar)
                     widget.character.exPartners.add({
-                      'name': widget.targetName,
-                      'gender': _getTargetGender(),
-                      'age': widget.character.age.toString(),
-                      'relationship': '20',
-                      'relation': 'Mantan Pacar',
-                      'isDeceased': 'false',
-                    });
+  'name': widget.targetName,
+  'gender': _getTargetGender(),
+  'age': widget.character.age.toString(),
+  'relationship': '20',
+  'relation': 'Mantan Pacar',
+  'isDeceased': 'false',
+  // --- TAMBAHKAN DATA PENYEBAB PUTUS ---
+  'breakInitiator': widget.character.gender, // Siapa yang memutuskan (Laki-laki / Perempuan)
+  'breakReason': 'putus biasa', // Alasan putus (bisa juga 'selingkuh', 'threesome')
+});
 
                     // 3. Turunkan hubungan
                     _updateRelationship(-40);

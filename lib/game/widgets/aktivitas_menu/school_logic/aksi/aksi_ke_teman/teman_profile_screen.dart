@@ -234,15 +234,23 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
               widget.character.isHavingAffair = false;
             }
             
-            // Add to exPartners (mantan pacar)
+            // Add to exPartners (mantan pacar) - PERBAIKAN DI SINI!
             if (brokePartner != null) {
+              // Ambil data dengan aman menggunakan variabel lokal
+              final String exName = brokePartner['name'] ?? widget.temanName;
+              final String exGender = brokePartner['gender'] ?? widget.temanGender;
+              final String exAge = brokePartner['age'] ?? widget.temanAge.toString();
+
               widget.character.exPartners.add({
-                'name': brokePartner['name'] ?? widget.temanName,
-                'gender': brokePartner['gender'] ?? widget.temanGender,
-                'age': brokePartner['age'] ?? widget.temanAge.toString(),
+                'name': exName,
+                'gender': exGender,
+                'age': exAge,
                 'relationship': '20', // break up drops relationship
                 'relation': 'Mantan Pacar',
                 'isDeceased': 'false',
+                // --- DATA PENYEBAB PUTUS (PENTING UNTUK LOGIKA AJAK BALIKAN) ---
+                'breakInitiator': widget.character.gender,
+                'breakReason': 'putus biasa',
               });
             }
             

@@ -275,15 +275,13 @@ List<ActionItem> getAge12PlusActions(
 
   // 2. Ajak Pacaran (Dengan Logika Khusus Mantan Pacar)
   if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
-    // --- PERUBAHAN DI SINI ---
     final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
     final String actionLabel = isExPartner 
         ? 'Ajak Balikan' 
         : (hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran');
-    // ------------------------
 
     actions.add(ActionItem(
-      label: actionLabel, // Menggunakan label dinamis
+      label: actionLabel,
       icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite_border,
       color: hasExistingPartner ? Colors.deepOrange : Colors.redAccent,
       onTap: () {
@@ -291,50 +289,90 @@ List<ActionItem> getAge12PlusActions(
         bool accepted = false;
         String targetNameLower = targetName.toLowerCase();
 
-        bool isSibling = targetRole.contains('Saudara') || 
-                         targetNameLower.contains('kakak') || 
-                         targetNameLower.contains('adik');
-
-        if (targetNameLower.startsWith('ayah')) {
-          if (myGender == 'perempuan') {
-            accepted = random.nextInt(100) < 30;
-          } else {
-            accepted = random.nextInt(100) < 10;
+        // --- LOGIKA PERSENTASE AJAK BALIKAN (jika mantan) ---
+        if (isExPartner) {
+          // Cari data mantan pacar
+          Map<String, String>? exData;
+          for (var ex in character.exPartners) {
+            if (ex['name'] == targetName) {
+              exData = ex;
+              break;
+            }
           }
-        } else if (targetNameLower.startsWith('ibu')) {
-          if (myGender == 'perempuan') {
-            accepted = random.nextInt(100) < 5;
-          } else {
-            accepted = random.nextInt(100) < 10;
-          }
-        } else if (isSibling) {
-          bool isTargetOlder = targetNameLower.contains('kakak');
-          bool isTargetMale = partnerGender == 'laki-laki';
 
-          if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
-            accepted = random.nextInt(100) < 30;
-          } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
-            accepted = random.nextInt(100) < 50;
-          } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
-            accepted = random.nextInt(100) < 30;
-          } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
-            accepted = random.nextInt(100) < 40;
-          } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
-            accepted = random.nextInt(100) < 30;
-          } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
-            accepted = random.nextInt(100) < 20;
-          } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
-            accepted = random.nextInt(100) < 30;
-          } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
-            accepted = random.nextInt(100) < 20;
+          // Ambil data penyebab putus
+          String? breakInitiator = exData?['breakInitiator']; // 'Laki-laki' atau 'Perempuan'
+          String? breakReason = exData?['breakReason']; // 'putus biasa', 'selingkuh', 'threesome'
+
+          if (breakReason == 'selingkuh' || breakReason == 'threesome') {
+            // Jika putus karena selingkuh/3some, peluang sangat kecil
+            accepted = random.nextInt(100) < 10; // 10%
           } else {
-            accepted = random.nextInt(100) < 20;
+            // Putus biasa, cek siapa yang memutuskan
+            if (breakInitiator == 'Laki-laki') {
+              // Pria yang memutuskan, maka wanita (target) menerima 30%
+              accepted = random.nextInt(100) < 30;
+            } else if (breakInitiator == 'Perempuan') {
+              // Wanita yang memutuskan, maka pria (target) menerima 25%
+              accepted = random.nextInt(100) < 25;
+            } else {
+              // Jika tidak ada data, default 50%
+              accepted = random.nextInt(100) < 50;
+            }
           }
         } else {
-          accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
+          // Jika bukan mantan, gunakan logika pacaran biasa
+          bool isSibling = targetRole.contains('Saudara') || 
+                           targetNameLower.contains('kakak') || 
+                           targetNameLower.contains('adik');
+
+          if (targetNameLower.startsWith('ayah')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 30;
+            } else {
+              accepted = random.nextInt(100) < 10;
+            }
+          } else if (targetNameLower.startsWith('ibu')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 5;
+            } else {
+              accepted = random.nextInt(100) < 10;
+            }
+          } else if (isSibling) {
+            bool isTargetOlder = targetNameLower.contains('kakak');
+            bool isTargetMale = partnerGender == 'laki-laki';
+
+            if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
+              accepted = random.nextInt(100) < 30;
+            } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
+              accepted = random.nextInt(100) < 50;
+            } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
+              accepted = random.nextInt(100) < 30;
+            } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
+              accepted = random.nextInt(100) < 40;
+            } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
+              accepted = random.nextInt(100) < 30;
+            } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
+              accepted = random.nextInt(100) < 20;
+            } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
+              accepted = random.nextInt(100) < 30;
+            } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
+              accepted = random.nextInt(100) < 20;
+            } else {
+              accepted = random.nextInt(100) < 20;
+            }
+          } else {
+            accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
+          }
         }
 
         if (accepted) {
+          // --- HAPUS DARI EX-PARTNERS JIKA BERHASIL BALIKAN ---
+          if (isExPartner) {
+            character.exPartners.removeWhere((ex) => ex['name'] == targetName);
+          }
+          // --------------------------------------------------
+
           int actualTargetAge = 18;
           if (targetName.startsWith('Ayah')) {
             actualTargetAge = character.fatherAge ?? 40;
