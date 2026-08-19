@@ -266,7 +266,9 @@ class _BercintaScreenState extends State<BercintaScreen> {
     String title, message;
     IconData icon;
     Color color;
-    VoidCallback stateUpdate;
+    // Hanya perubahan state (happiness), TIDAK termasuk onActionComplete
+    // supaya screen tidak di-pop sebelum dialog kehamilan selesai
+    VoidCallback applyStateChange;
 
     final String relation = widget.targetName.split(' ')[0];
 
@@ -275,15 +277,13 @@ class _BercintaScreenState extends State<BercintaScreen> {
       message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan waktu yang sangat intim $_chosenLocation pada waktu $_chosenTime! (+${relationChange.abs()}% hubungan)';
       icon = Icons.favorite;
       color = Colors.pink;
-      
-      // Jika berhasil berhubungan seksual dan target adalah anak (Incest dari sisi Orang Tua mengajak Anak)
+
+      // Inbox log
       if (isChild) {
         widget.character.inbox.add(
           '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName} $_chosenLocation pada waktu $_chosenTime.'
         );
-      }
-      // Jika target adalah orang tua (Incest dari sisi Anak mengajak Orang Tua)
-      else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah') || targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
+      } else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah') || targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
         widget.character.inbox.add(
           '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan orang tuamu, $relation $_chosenLocation pada waktu $_chosenTime.'
         );
@@ -293,18 +293,16 @@ class _BercintaScreenState extends State<BercintaScreen> {
         );
       }
 
-      stateUpdate = () {
+      applyStateChange = () {
         widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
-        widget.onActionComplete.call();
       };
     } else {
       title = 'Momen Canggung';
       message = '$relation menolak ajakanmu dengan halus ketika diajak bercinta $_chosenLocation pada waktu $_chosenTime. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
       icon = Icons.sentiment_dissatisfied;
       color = Colors.orange;
-      stateUpdate = () {
+      applyStateChange = () {
         widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-        widget.onActionComplete.call();
       };
     }
 
@@ -441,21 +439,30 @@ class _BercintaScreenState extends State<BercintaScreen> {
         actions: [
           TextButton(
             onPressed: () {
+              // 1. Tutup dialog hasil bercinta
               Navigator.of(context).pop();
-              stateUpdate();
+              // 2. Terapkan perubahan state (happiness dll)
+              applyStateChange();
               if (isPregnant || isPartnerPregnant) {
-                // Tampilkan dialog pilihan beritahu ortu atau tidak
+                // 3a. Tampilkan dialog kehamilan, baru setelah selesai
+                //     tutup BercintaScreen dan panggil onActionComplete
                 BeritahuKehamilanHelper.showTellOrNotDialog(
                   context: context,
                   character: widget.character,
                   partnerName: widget.targetName,
                   partnerRole: widget.targetRole,
                   onComplete: () {
-                    Navigator.of(context).pop();
+                    // Pastikan context masih valid sebelum pop
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                    widget.onActionComplete.call();
                   },
                 );
               } else {
+                // 3b. Tidak ada kehamilan – langsung tutup dan selesai
                 Navigator.of(context).pop();
+                widget.onActionComplete.call();
               }
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
