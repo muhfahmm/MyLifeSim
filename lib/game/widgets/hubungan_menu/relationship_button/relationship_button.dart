@@ -5,6 +5,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 class RelationshipButton extends StatelessWidget {
   final Character character;
@@ -92,7 +93,12 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                   ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isFatherDeceased,
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.fatherName!, 'Laki-laki'),
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.fatherName!,
+                    gender: 'Laki-laki',
+                    age: character.fatherAge ?? 40,
+                    happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                  ),
                 ),
               if (character.motherName != null)
                 _buildFamilyItem(
@@ -104,7 +110,12 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                   ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isMotherDeceased,
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.motherName!, 'Perempuan'),
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.motherName!,
+                    gender: 'Perempuan',
+                    age: character.motherAge ?? 40,
+                    happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                  ),
                 ),
               if (character.stepFatherName != null)
                 _buildFamilyItem(
@@ -116,7 +127,12 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                   ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isStepFatherDeceased,
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.stepFatherName!, 'Laki-laki'),
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.stepFatherName!,
+                    gender: 'Laki-laki',
+                    age: character.stepFatherAge ?? 40,
+                    happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                  ),
                 ),
               if (character.stepMotherName != null)
                 _buildFamilyItem(
@@ -128,7 +144,12 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                   ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isStepMotherDeceased,
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.stepMotherName!, 'Perempuan'),
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.stepMotherName!,
+                    gender: 'Perempuan',
+                    age: character.stepMotherAge ?? 40,
+                    happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                  ),
                 ),
 
               // ============================================
@@ -157,10 +178,11 @@ class RelationshipButton extends StatelessWidget {
                   color: character.partner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                   relationshipValue: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
                   ageText: '${character.partner!['age']} tahun',
-                  isDeceased: character.partner!['isDeceased'] == 'true',
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(
-                    character.partner!['name']!,
-                    character.partner!['gender'] ?? 'Perempuan',
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.partner!['name']!,
+                    gender: character.partner!['gender'] ?? 'Perempuan',
+                    age: int.tryParse(character.partner!['age'] ?? '20') ?? 20,
+                    happiness: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
                   ),
                 ),
               ],
@@ -196,9 +218,11 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
                   ageText: '${character.secondPartner!['age']} tahun',
                   isDeceased: character.secondPartner!['isDeceased'] == 'true',
-                  avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(
-                    character.secondPartner!['name']!,
-                    character.secondPartner!['gender'] ?? 'Perempuan',
+                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                    name: character.secondPartner!['name']!,
+                    gender: character.secondPartner!['gender'] ?? 'Perempuan',
+                    age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
+                    happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
                   ),
                 ),
               ],
@@ -220,8 +244,12 @@ class RelationshipButton extends StatelessWidget {
                     color: character.isFatherInLawDeceased ? Colors.grey : Colors.blueGrey,
                     relationshipValue: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
                     ageText: character.fatherInLawAge != null ? '${character.fatherInLawAge} tahun' : 'Tidak diketahui',
-                    isDeceased: character.isFatherInLawDeceased,
-                    avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.fatherInLawName!, 'Laki-laki'),
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.fatherInLawName!,
+                      gender: 'Laki-laki',
+                      age: character.fatherInLawAge ?? 50,
+                      happiness: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
+                    ),
                   ),
                 if (character.motherInLawName != null)
                   _buildFamilyItem(
@@ -233,7 +261,12 @@ class RelationshipButton extends StatelessWidget {
                     relationshipValue: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
                     ageText: character.motherInLawAge != null ? '${character.motherInLawAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isMotherInLawDeceased,
-                    avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(character.motherInLawName!, 'Perempuan'),
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.motherInLawName!,
+                      gender: 'Perempuan',
+                      age: character.motherInLawAge ?? 50,
+                      happiness: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
+                    ),
                   ),
               ],
 
@@ -267,17 +300,19 @@ class RelationshipButton extends StatelessWidget {
                         CircleAvatar(
                           radius: 14,
                           backgroundColor: Colors.teal.withOpacity(0.15),
-                          child: SvgPicture.network(
-                            AvatarGenerator.getDeterministicAvatarUrl(
-                              character.name,
-                              character.gender,
+                          child: Image.network(
+                            AvatarAgeRules.getAgeBasedAvatarUrl(
+                              character,
                               happiness: character.happiness,
                             ),
-                            placeholderBuilder: (context) => const SizedBox(
-                              width: 14,
-                              height: 14,
-                              child: CircularProgressIndicator(strokeWidth: 1.5),
-                            ),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(strokeWidth: 1.5),
+                              );
+                            },
                             width: 28,
                             height: 28,
                           ),
@@ -327,7 +362,12 @@ class RelationshipButton extends StatelessWidget {
                     relationshipValue: child['relationship'] as int,
                     ageText: '$age tahun',
                     isDeceased: isDeceased,
-                    avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(name, gender),
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: name,
+                      gender: gender,
+                      age: age,
+                      happiness: child['relationship'] as int,
+                    ),
                   );
                 }
               }).toList(),
@@ -356,7 +396,12 @@ class RelationshipButton extends StatelessWidget {
                     relationshipValue: relVal,
                     ageText: '$childAge tahun',
                     isDeceased: isDeceased,
-                    avatarUrl: AvatarGenerator.getDeterministicAvatarUrl(name, gender),
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: name,
+                      gender: gender,
+                      age: childAge,
+                      happiness: relVal,
+                    ),
                   );
                 }).toList(),
               ],
@@ -440,13 +485,16 @@ class RelationshipButton extends StatelessWidget {
                   CircleAvatar(
                     radius: 14,
                     backgroundColor: color.withOpacity(0.15),
-                    child: SvgPicture.network(
+                    child: Image.network(
                       avatarUrl,
-                      placeholderBuilder: (context) => const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 1.5),
-                      ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 1.5),
+                        );
+                      },
                       width: 28,
                       height: 28,
                     ),
@@ -579,13 +627,16 @@ class RelationshipButton extends StatelessWidget {
                   CircleAvatar(
                     radius: 14,
                     backgroundColor: color.withOpacity(0.15),
-                    child: SvgPicture.network(
+                    child: Image.network(
                       avatarUrl,
-                      placeholderBuilder: (context) => const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(strokeWidth: 1.5),
-                      ),
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 1.5),
+                        );
+                      },
                       width: 28,
                       height: 28,
                     ),

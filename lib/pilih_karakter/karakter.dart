@@ -7,6 +7,7 @@ import 'package:flutter/services.dart';
 import 'package:bitlife/pilih_karakter/character.dart'; // Model utama
 import 'package:bitlife/game/index.dart'; // Halaman game
 import 'package:bitlife/pilih_karakter/logic/family_generator.dart';
+import 'package:bitlife/avatar/avatar_generator.dart';
 
 class KarakterScreen extends StatefulWidget {
   final String gender;
@@ -30,6 +31,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
   String _currentCountry = 'Indonesia';
   String? _currentCountryIso = 'ID';
   List<Map<String, dynamic>> _countriesList = [];
+
+  // --- STATE PARAMETER KUSTOMISASI AVATAR ---
+  late String _selectedTopType;
+  late String _selectedAccessoriesType;
+  late String _selectedHairColor;
+  late String _selectedClotheType;
+  late String _selectedClotheColor;
+  late String _selectedSkinColor;
 
   String _countryCodeToEmoji(String countryCode) {
     if (countryCode.length != 2) return '🌍';
@@ -147,6 +156,16 @@ class _KarakterScreenState extends State<KarakterScreen> {
   void initState() {
     super.initState();
     _loadCountries().then((_) => _loadNamesData());
+
+    final bool isMale = widget.gender == 'male' || widget.gender == 'laki-laki';
+    _selectedTopType = isMale
+        ? AvatarGenerator.topsMale.values.first
+        : AvatarGenerator.topsFemale.values.first;
+    _selectedAccessoriesType = AvatarGenerator.accessories.values.first;
+    _selectedHairColor = AvatarGenerator.hairColors.values.first;
+    _selectedClotheType = AvatarGenerator.clothes.values.first;
+    _selectedClotheColor = AvatarGenerator.clotheColors.values.first;
+    _selectedSkinColor = AvatarGenerator.skinColors.values.first;
   }
 
   void _generateRandomName() {
@@ -189,9 +208,17 @@ class _KarakterScreenState extends State<KarakterScreen> {
       lastName = fallbackLast[random.nextInt(fallbackLast.length)];
     }
 
+    final randomAvatar = AvatarGenerator.generateRandomAvatar(widget.gender);
+
     setState(() {
       _firstNameController.text = firstName;
       _lastNameController.text = lastName;
+      _selectedTopType = randomAvatar['topType']!;
+      _selectedAccessoriesType = randomAvatar['accessoriesType']!;
+      _selectedHairColor = randomAvatar['hairColor']!;
+      _selectedClotheType = randomAvatar['clotheType']!;
+      _selectedClotheColor = randomAvatar['clotheColor']!;
+      _selectedSkinColor = randomAvatar['skinColor']!;
     });
   }
 
@@ -203,7 +230,6 @@ class _KarakterScreenState extends State<KarakterScreen> {
       return;
     }
 
-    // --- 1. BUAT KARAKTER DASAR ---
     Character newCharacter = Character(
       name: '$firstName $lastName',
       gender: (widget.gender == 'male' || widget.gender == 'laki-laki') ? 'Laki-laki' : 'Perempuan',
@@ -217,6 +243,13 @@ class _KarakterScreenState extends State<KarakterScreen> {
       maleFirstNames: _maleFirstNames,
       femaleFirstNames: _femaleFirstNames,
       lastNames: _allLastNames,
+      avatarTopType: _selectedTopType,
+      avatarAccessoriesType: _selectedAccessoriesType,
+      avatarHairColor: _selectedHairColor,
+      avatarClotheType: _selectedClotheType,
+      avatarClotheColor: _selectedClotheColor,
+      avatarSkinColor: _selectedSkinColor,
+      avatarFacialHairType: 'blank',
     );
 
     // --- 2. GENERATE KELUARGA (PENTING!) ---
@@ -399,7 +432,33 @@ class _KarakterScreenState extends State<KarakterScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.person, size: 60, color: Colors.blue),
+                CircleAvatar(
+                  radius: 40,
+                  backgroundColor: Colors.blue.shade50,
+                  child: Image.network(
+                    AvatarGenerator.buildCustomAvatarUrl(
+                      topType: _selectedTopType,
+                      accessoriesType: _selectedAccessoriesType,
+                      hairColor: _selectedHairColor,
+                      clotheType: _selectedClotheType,
+                      clotheColor: _selectedClotheColor,
+                      skinColor: _selectedSkinColor,
+                      eyeType: 'default',
+                      eyebrowType: 'default',
+                      mouthType: 'default',
+                    ),
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return const SizedBox(
+                        width: 24,
+                        height: 24,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      );
+                    },
+                    width: 80,
+                    height: 80,
+                  ),
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'Masukkan nama karaktermu',
@@ -531,7 +590,62 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     ],
                   ),
 
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  ExpansionTile(
+                    title: const Row(
+                      children: [
+                        Icon(Icons.palette, color: Colors.blue),
+                        SizedBox(width: 8),
+                        Text('🎨 Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                      ],
+                    ),
+                    childrenPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    children: [
+                      _buildCustomizerDropdown(
+                        label: 'Gaya Rambut',
+                        value: _selectedTopType,
+                        items: (widget.gender == 'male' || widget.gender == 'laki-laki')
+                            ? AvatarGenerator.topsMale
+                            : AvatarGenerator.topsFemale,
+                        onChanged: (val) => setState(() => _selectedTopType = val!),
+                      ),
+                      _buildCustomizerDropdown(
+                        label: 'Warna Rambut',
+                        value: _selectedHairColor,
+                        items: AvatarGenerator.hairColors,
+                        onChanged: (val) => setState(() => _selectedHairColor = val!),
+                        isColorDropdown: true,
+                      ),
+                      _buildCustomizerDropdown(
+                        label: 'Warna Kulit',
+                        value: _selectedSkinColor,
+                        items: AvatarGenerator.skinColors,
+                        onChanged: (val) => setState(() => _selectedSkinColor = val!),
+                        isColorDropdown: true,
+                      ),
+                      _buildCustomizerDropdown(
+                        label: 'Aksesoris / Kacamata',
+                        value: _selectedAccessoriesType,
+                        items: AvatarGenerator.accessories,
+                        onChanged: (val) => setState(() => _selectedAccessoriesType = val!),
+                      ),
+                      _buildCustomizerDropdown(
+                        label: 'Pakaian',
+                        value: _selectedClotheType,
+                        items: AvatarGenerator.clothes,
+                        onChanged: (val) => setState(() => _selectedClotheType = val!),
+                      ),
+                      _buildCustomizerDropdown(
+                        label: 'Warna Pakaian',
+                        value: _selectedClotheColor,
+                        items: AvatarGenerator.clotheColors,
+                        onChanged: (val) => setState(() => _selectedClotheColor = val!),
+                        isColorDropdown: true,
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 24),
                   MouseRegion(
                     cursor: SystemMouseCursors.click,
                     child: ElevatedButton(
@@ -551,6 +665,68 @@ class _KarakterScreenState extends State<KarakterScreen> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildCustomizerDropdown({
+    required String label,
+    required String value,
+    required Map<String, String> items,
+    required ValueChanged<String?> onChanged,
+    bool isColorDropdown = false,
+  }) {
+    final finalValue = items.values.contains(value) ? value : items.values.first;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
+          const SizedBox(height: 4),
+          DropdownButtonFormField<String>(
+            value: finalValue,
+            decoration: InputDecoration(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              filled: true,
+              fillColor: Colors.white,
+            ),
+            items: items.entries.map((entry) {
+              Widget leading = const SizedBox.shrink();
+              if (isColorDropdown) {
+                Color swatchColor = Colors.transparent;
+                try {
+                  swatchColor = Color(int.parse('FF${entry.value}', radix: 16));
+                } catch (_) {}
+                
+                leading = Container(
+                  width: 14,
+                  height: 14,
+                  margin: const EdgeInsets.only(right: 8),
+                  decoration: BoxDecoration(
+                    color: swatchColor,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.grey.shade300, width: 1),
+                  ),
+                );
+              }
+
+              return DropdownMenuItem<String>(
+                value: entry.value,
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    leading,
+                    Text(entry.key),
+                  ],
+                ),
+              );
+            }).toList(),
+            onChanged: onChanged,
+          ),
+        ],
       ),
     );
   }

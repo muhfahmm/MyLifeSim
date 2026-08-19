@@ -5,6 +5,7 @@ import 'package:bitlife/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 // Import widget-widget UI
 import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
@@ -490,17 +491,19 @@ class _GameScreenState extends State<GameScreen> {
                     CircleAvatar(
                       radius: 36,
                       backgroundColor: Colors.blue.shade50,
-                      child: SvgPicture.network(
-                        AvatarGenerator.getDeterministicAvatarUrl(
-                          _character.name,
-                          _character.gender,
+                      child: Image.network(
+                        AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
                           happiness: _character.happiness,
                         ),
-                        placeholderBuilder: (context) => const SizedBox(
-                          width: 24,
-                          height: 24,
-                          child: CircularProgressIndicator(strokeWidth: 2),
-                        ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const SizedBox(
+                            width: 24,
+                            height: 24,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          );
+                        },
                         width: 72,
                         height: 72,
                       ),

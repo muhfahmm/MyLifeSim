@@ -4,6 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 class ExtendedFamilyViewScreen extends StatefulWidget {
   final Character character;
@@ -102,13 +103,21 @@ class _ExtendedFamilyViewScreenState extends State<ExtendedFamilyViewScreen> {
                     CircleAvatar(
                       radius: 14,
                       backgroundColor: color.withOpacity(0.15),
-                      child: SvgPicture.network(
-                        AvatarGenerator.getDeterministicAvatarUrl(name, isMale ? 'Laki-laki' : 'Perempuan'),
-                        placeholderBuilder: (context) => const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 1.5),
+                      child: Image.network(
+                        AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                          name: name,
+                          gender: isMale ? 'Laki-laki' : 'Perempuan',
+                          age: extAge,
+                          happiness: relVal,
                         ),
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const SizedBox(
+                            width: 14,
+                            height: 14,
+                            child: CircularProgressIndicator(strokeWidth: 1.5),
+                          );
+                        },
                         width: 28,
                         height: 28,
                       ),

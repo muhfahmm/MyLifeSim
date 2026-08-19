@@ -10,6 +10,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logi
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -83,6 +84,63 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
     return 'Tidak diketahui';
+  }
+
+  // Helper untuk mendapatkan nama asli target (tanpa prefiks peran seperti Ayah, Ibu, dll)
+  String _getPlainTargetName() {
+    final String role = widget.targetRole;
+    final String name = widget.targetName;
+
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+      if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
+        return widget.character.partner!['name']!;
+      }
+      if (widget.character.secondPartner != null && name.contains(widget.character.secondPartner!['name'] ?? '')) {
+        return widget.character.secondPartner!['name']!;
+      }
+    }
+
+    if (role == 'Mertua') {
+      if (name.startsWith('Ayah Mertua')) {
+        return widget.character.fatherInLawName ?? name;
+      } else {
+        return widget.character.motherInLawName ?? name;
+      }
+    }
+
+    if (role == 'Kandung' && name.startsWith('Ayah')) {
+      return widget.character.fatherName ?? name;
+    } else if (role == 'Kandung' && name.startsWith('Ibu')) {
+      return widget.character.motherName ?? name;
+    } else if (role == 'Tiri' && name.startsWith('Ayah')) {
+      return widget.character.stepFatherName ?? name;
+    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+      return widget.character.stepMotherName ?? name;
+    } else if (role == 'Laki-laki' || role == 'Perempuan') {
+      // Ini adalah anak
+      for (var child in widget.character.children) {
+        final String childName = child['name'] ?? '';
+        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
+        if (childName == cleanName) {
+          return childName;
+        }
+      }
+    } else {
+      // Cek di extended family
+      for (var ext in widget.character.extendedFamily) {
+        if (name.contains(ext['name'] ?? '')) {
+          return ext['name']!;
+        }
+      }
+      // Cek di siblings
+      for (var sib in widget.character.siblings) {
+        final String sibName = sib['name'] ?? '';
+        if (sibName.isNotEmpty && name.contains(sibName)) {
+          return sibName;
+        }
+      }
+    }
+    return name.replaceAll(' (Wafat)', '').trim();
   }
 
   // Helper untuk mengambil nilai hubungan target saat ini
@@ -538,7 +596,24 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         CircleAvatar(
                           backgroundColor: Colors.blue.shade100,
                           radius: 28,
-                          child: const Icon(Icons.person, color: Colors.blue, size: 32),
+                          child: Image.network(
+                            AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                              name: _getPlainTargetName(),
+                              gender: _getTargetGender(),
+                              age: targetAge,
+                              happiness: relationshipVal,
+                            ),
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const SizedBox(
+                                width: 28,
+                                height: 28,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              );
+                            },
+                            width: 56,
+                            height: 56,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         Expanded(

@@ -1,7 +1,6 @@
 // lib/pilih_karakter/character.dart
 import 'dart:math';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
 
 class Character {
   String name;
@@ -14,6 +13,15 @@ class Character {
   int money;
   int appearance;
   bool isAlive;
+
+  // --- PARAMETER AVATAR DARI KUSTOMISASI ---
+  String? avatarTopType;
+  String? avatarAccessoriesType;
+  String? avatarHairColor;
+  String? avatarClotheType;
+  String? avatarClotheColor;
+  String? avatarSkinColor;
+  String? avatarFacialHairType;
 
 
   // --- FIELD KELUARGA BARU ---
@@ -126,6 +134,13 @@ class Character {
     this.maleFirstNames,
     this.femaleFirstNames,
     this.lastNames,
+    this.avatarTopType,
+    this.avatarAccessoriesType,
+    this.avatarHairColor,
+    this.avatarClotheType,
+    this.avatarClotheColor,
+    this.avatarSkinColor,
+    this.avatarFacialHairType,
   }) : inbox = [];
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
