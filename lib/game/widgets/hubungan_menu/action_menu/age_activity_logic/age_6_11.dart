@@ -5,16 +5,45 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'age_base.dart';
 
 List<ActionItem> getAge6to11Actions(
+  BuildContext context,
   Character character,
   String targetName,
   String targetRole,
   Random random,
-  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialog,
+  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback,
   Function(int change) updateRelationship,
   VoidCallback updateState,
 ) {
   final String relation = targetName.split(' ')[0];
 
+  // --- Helper untuk meminta barang ---
+  void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
+    if (random.nextInt(100) < successRate) {
+      int relBonus = relationshipGain + random.nextInt(4);
+      showDialogCallback(
+        'Berhasil Mendapatkan $itemName!',
+        '$relation membelikanmu $itemName yang kamu inginkan. Kamu sangat senang! (+${relBonus.abs()}% hubungan)',
+        Icons.check_circle, Colors.green, () {
+          character.happiness = (character.happiness + happinessGain).clamp(0, 100);
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
+    } else {
+      int relPenalty = random.nextInt(6) + 5; // 5–10%
+      showDialogCallback(
+        'Permintaan Ditolak',
+        '$relation menolak membelikan $itemName untukmu. Hubunganmu merenggang (-$relPenalty%).',
+        Icons.block, Colors.red, () {
+          character.happiness = (character.happiness - 5).clamp(0, 100);
+          updateRelationship(-relPenalty);
+          updateState();
+        }
+      );
+    }
+  }
+
+  // --- Daftar aksi interaksi (menu yang sudah ada tetap dipertahankan) ---
   return [
     // 1. Minta Uang Saku
     ActionItem(
@@ -25,7 +54,7 @@ List<ActionItem> getAge6to11Actions(
         if (random.nextBool()) {
           int gotMoney = random.nextInt(10) + 5;
           int relBonus = random.nextInt(6) + 5;
-          showDialog(
+          showDialogCallback(
             'Dapat Uang Saku!',
             '$relation memberimu uang saku sebesar \$$gotMoney! (+$relBonus% hubungan).',
             Icons.monetization_on, Colors.green, () {
@@ -36,8 +65,8 @@ List<ActionItem> getAge6to11Actions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
-          showDialog(
+          int relPenalty = random.nextInt(5) + 1;
+          showDialogCallback(
             'Uang Saku Ditolak',
             '$relation tidak memberimu uang saku kali ini. Hubunganmu merenggang (-$relPenalty%).',
             Icons.money_off, Colors.red, () {
@@ -58,7 +87,7 @@ List<ActionItem> getAge6to11Actions(
       onTap: () {
         if (random.nextBool()) {
           int relBonus = random.nextInt(6) + 10;
-          showDialog(
+          showDialogCallback(
             'Minta Sepeda Sukses!',
             '$relation membelikanmu sepeda baru! Hubunganmu membaik (+$relBonus%).',
             Icons.directions_bike, Colors.green, () {
@@ -69,7 +98,7 @@ List<ActionItem> getAge6to11Actions(
           );
         } else {
           int relPenalty = random.nextInt(4) + 2;
-          showDialog(
+          showDialogCallback(
             'Minta Sepeda Gagal',
             '$relation menolak permintaanmu. Hubunganmu merenggang (-$relPenalty%).',
             Icons.block, Colors.red, () {
@@ -89,7 +118,7 @@ List<ActionItem> getAge6to11Actions(
       color: Colors.blue,
       onTap: () {
         int relBonus = random.nextInt(6) + 5;
-        showDialog(
+        showDialogCallback(
           'Memberi Pujian',
           'Kamu memuji $relation. Hubungan kalian menjadi lebih hangat! (+$relBonus% hubungan)',
           Icons.thumb_up, Colors.blue, () {
@@ -108,7 +137,7 @@ List<ActionItem> getAge6to11Actions(
       color: Colors.teal,
       onTap: () {
         int relBonus = random.nextInt(4) + 2;
-        showDialog(
+        showDialogCallback(
           'Bercakap-cakap',
           'Kamu mengobrol dengan $relation. Percakapan berjalan menyenangkan! (+$relBonus% hubungan)',
           Icons.chat, Colors.teal, () {
@@ -128,7 +157,7 @@ List<ActionItem> getAge6to11Actions(
       color: Colors.pink,
       onTap: () {
         int relBonus = random.nextInt(8) + 5;
-        showDialog(
+        showDialogCallback(
           'Memberi Hadiah',
           'Kamu memberikan hadiah kecil buatan sendiri. $relation sangat tersentuh! (+$relBonus% hubungan)',
           Icons.card_giftcard, Colors.pink, () {
@@ -147,7 +176,7 @@ List<ActionItem> getAge6to11Actions(
       color: Colors.red,
       onTap: () {
         int relPenalty = random.nextInt(11) + 5;
-        showDialog(
+        showDialogCallback(
           'Menyinggung',
           'Kamu mengatakan sesuatu yang kasar kepada $relation. Hubungan menjadi tegang (-$relPenalty% hubungan).',
           Icons.sentiment_very_dissatisfied, Colors.red, () {
@@ -167,7 +196,7 @@ List<ActionItem> getAge6to11Actions(
       onTap: () {
         if (random.nextDouble() < 0.75) {
           int relBonus = random.nextInt(6) + 10;
-          showDialog(
+          showDialogCallback(
             'Menonton Bioskop',
             'Kamu pergi menonton film bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan)',
             Icons.movie, Colors.green, () {
@@ -178,7 +207,7 @@ List<ActionItem> getAge6to11Actions(
           );
         } else {
           int relPenalty = random.nextInt(6) + 5;
-          showDialog(
+          showDialogCallback(
             'Ajakan Ditolak',
             '$relation menolak ajakan menonton karena sedang sibuk (-$relPenalty% hubungan).',
             Icons.block, Colors.red, () {
@@ -198,7 +227,7 @@ List<ActionItem> getAge6to11Actions(
       onTap: () {
         if (random.nextDouble() < 0.8) {
           int relBonus = random.nextInt(5) + 8;
-          showDialog(
+          showDialogCallback(
             'Bermain Bersama',
             'Kamu bermain board game di ruang tamu bersama $relation (+$relBonus% hubungan).',
             Icons.family_restroom, Colors.orange, () {
@@ -209,7 +238,7 @@ List<ActionItem> getAge6to11Actions(
           );
         } else {
           int relPenalty = random.nextInt(6) + 5;
-          showDialog(
+          showDialogCallback(
             'Ajakan Ditolak',
             '$relation menolak diajak bermain (-$relPenalty% hubungan).',
             Icons.block, Colors.red, () {
@@ -218,6 +247,82 @@ List<ActionItem> getAge6to11Actions(
             }
           );
         }
+      },
+    ),
+
+    // ★ MENU BARU: Minta Barang (gunakan showDialog bawaan Flutter)
+    ActionItem(
+      label: 'Minta Barang',
+      icon: Icons.shopping_bag,
+      color: Colors.purple,
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Pilih Barang yang Diinginkan'),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.shopping_bag, color: Colors.blue),
+                    title: const Text('Tas'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Tas', 70, 15, 5);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.directions_walk, color: Colors.orange),
+                    title: const Text('Sepatu'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Sepatu', 65, 10, 6);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.checkroom, color: Colors.purple),
+                    title: const Text('Jaket'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Jaket', 55, 12, 4);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.face, color: Colors.green),
+                    title: const Text('Topi'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Topi', 80, 8, 3);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.watch, color: Colors.amber),
+                    title: const Text('Jam Tangan'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Jam Tangan', 40, 20, 8);
+                    },
+                  ),
+                  ListTile(
+                    leading: const Icon(Icons.account_balance_wallet, color: Colors.brown),
+                    title: const Text('Dompet'),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _requestItem('Dompet', 60, 10, 5);
+                    },
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Batal'),
+              ),
+            ],
+          ),
+        );
       },
     ),
   ];

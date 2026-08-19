@@ -515,6 +515,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         );
       } else if (minAge >= 6 && minAge < 12) {
         actions = getAge6to11Actions(
+          context,                       // ← tambahkan context di sini
           widget.character,
           widget.targetName,
           widget.targetRole,

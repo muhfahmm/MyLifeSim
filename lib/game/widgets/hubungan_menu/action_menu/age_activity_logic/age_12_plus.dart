@@ -23,13 +23,13 @@ String _getPartnerGender(String targetName) {
 }
 
 List<ActionItem> getAge12PlusActions(
-  BuildContext context,
+  BuildContext context,                        // ← tambahkan context
   Character character,
   String targetName,
   String targetRole,
   int age,
   Random random,
-  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialog,
+  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback, // ← ganti nama
   Function(int change) updateRelationship,
   VoidCallback updateState,
 ) {
@@ -47,12 +47,37 @@ List<ActionItem> getAge12PlusActions(
     return int.tryParse(character.partner?['relationship'] ?? '50') ?? 50;
   }
 
+  // --- Helper untuk meminta barang (sama seperti di age_6_11) ---
+  void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
+    if (random.nextInt(100) < successRate) {
+      int relBonus = relationshipGain + random.nextInt(4);
+      showDialogCallback(
+        'Berhasil Mendapatkan $itemName!',
+        '$relation membelikanmu $itemName yang kamu inginkan. Kamu sangat senang! (+${relBonus.abs()}% hubungan)',
+        Icons.check_circle, Colors.green, () {
+          character.happiness = (character.happiness + happinessGain).clamp(0, 100);
+          updateRelationship(relBonus);
+          updateState();
+        }
+      );
+    } else {
+      int relPenalty = random.nextInt(6) + 5; // 5–10%
+      showDialogCallback(
+        'Permintaan Ditolak',
+        '$relation menolak membelikan $itemName untukmu. Hubunganmu merenggang (-$relPenalty%).',
+        Icons.block, Colors.red, () {
+          character.happiness = (character.happiness - 5).clamp(0, 100);
+          updateRelationship(-relPenalty);
+          updateState();
+        }
+      );
+    }
+  }
+
   List<ActionItem> actions = [];
 
   if (isChild) {
-    // Jika target adalah anak kita (usia 12 ke atas):
-    // Jika sudah usia 12 maka berikan pelukannya akan hilang (tidak ditambahkan).
-    // Dan buat ketika anak sudah usia yang sama seperti yang lain (12 tahun ke atas) maka juga akan ada make love juga.
+    // Jika target adalah anak kita (usia 12 ke atas)
     actions.add(ActionItem(
       label: 'Bercinta / Make Love',
       icon: Icons.favorite,
@@ -80,7 +105,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.teal,
       onTap: () {
         int relBonus = random.nextInt(5) + 5;
-        showDialog(
+        showDialogCallback(
           'Berbincang dengan Anak',
           'Kamu duduk bersama $targetName dan mengobrol tentang kesehariannya serta impian masa depannya. (+$relBonus% hubungan)',
           Icons.chat,
@@ -99,7 +124,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.green,
       onTap: () {
         if (character.money < 20) {
-          showDialog(
+          showDialogCallback(
             'Uang Tidak Cukup',
             'Kamu tidak memiliki cukup uang untuk memberikan uang jajan (\$20).',
             Icons.money_off,
@@ -108,7 +133,7 @@ List<ActionItem> getAge12PlusActions(
           );
         } else {
           int relBonus = random.nextInt(6) + 8;
-          showDialog(
+          showDialogCallback(
             'Beri Uang Jajan',
             'Kamu memberikan uang jajan sebesar \$20 kepada $targetName. Dia sangat berterima kasih! (+$relBonus% hubungan)',
             Icons.monetization_on,
@@ -129,7 +154,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.purple,
       onTap: () {
         if (character.money < 100) {
-          showDialog(
+          showDialogCallback(
             'Uang Tidak Cukup',
             'Kamu tidak memiliki cukup uang untuk membelikan hadiah (\$100).',
             Icons.money_off,
@@ -138,7 +163,7 @@ List<ActionItem> getAge12PlusActions(
           );
         } else {
           int relBonus = random.nextInt(11) + 12;
-          showDialog(
+          showDialogCallback(
             'Beri Hadiah',
             'Kamu membelikan hadiah spesial seharga \$100 untuk $targetName. Anakmu sangat senang! (+$relBonus% hubungan)',
             Icons.card_giftcard,
@@ -159,7 +184,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.blue,
       onTap: () {
         if (character.money < 250) {
-          showDialog(
+          showDialogCallback(
             'Uang Tidak Cukup',
             'Kamu tidak memiliki cukup uang untuk mengajak liburan (\$250).',
             Icons.money_off,
@@ -168,7 +193,7 @@ List<ActionItem> getAge12PlusActions(
           );
         } else {
           int relBonus = random.nextInt(16) + 15;
-          showDialog(
+          showDialogCallback(
             'Liburan Bersama',
             'Kamu mengajak $targetName pergi berlibur bersama akhir pekan ini. Momen ini mempererat keakraban kalian! (+$relBonus% hubungan)',
             Icons.flight,
@@ -190,7 +215,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.blueAccent,
       onTap: () {
         int relBonus = random.nextInt(5) + 8;
-        showDialog(
+        showDialogCallback(
           'Pujian Orang Tua',
           'Kamu memuji pencapaian dan kedewasaan $targetName. (+$relBonus% hubungan)',
           Icons.thumb_up,
@@ -229,8 +254,6 @@ List<ActionItem> getAge12PlusActions(
   ));
 
   // --- LOGIKA BARU: AJAK 3SOME ---
-  // Ditampilkan jika target yang dipilih adalah salah satu pacar aktif (partner atau secondPartner)
-  // dan user sedang memiliki 2 pacar sekaligus.
   final bool targetIsEitherPartner = (character.partner != null && character.partner!['name'] == targetName) ||
                                      (character.secondPartner != null && character.secondPartner!['name'] == targetName);
   final bool hasTwoPartners = character.partner != null && character.secondPartner != null;
@@ -250,7 +273,7 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 2. Ajak Pacaran - tampil jika belum jadi pacar target ini, bukan pasangan resmi, dan belum jadi selingkuhan
+  // 2. Ajak Pacaran
   if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
     actions.add(ActionItem(
       label: hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
@@ -261,12 +284,10 @@ List<ActionItem> getAge12PlusActions(
         bool accepted = false;
         String targetNameLower = targetName.toLowerCase();
 
-        // Cek apakah target adalah saudara (Kakak/Adik)
         bool isSibling = targetRole.contains('Saudara') || 
                          targetNameLower.contains('kakak') || 
                          targetNameLower.contains('adik');
 
-        // --- LOGIKA BARU: AYAH & IBU ---
         if (targetNameLower.startsWith('ayah')) {
           if (myGender == 'perempuan') {
             accepted = random.nextInt(100) < 30;
@@ -279,9 +300,7 @@ List<ActionItem> getAge12PlusActions(
           } else {
             accepted = random.nextInt(100) < 10;
           }
-        } 
-        // --- LOGIKA SAUDARA ---
-        else if (isSibling) {
+        } else if (isSibling) {
           bool isTargetOlder = targetNameLower.contains('kakak');
           bool isTargetMale = partnerGender == 'laki-laki';
 
@@ -304,14 +323,11 @@ List<ActionItem> getAge12PlusActions(
           } else {
             accepted = random.nextInt(100) < 20;
           }
-        } 
-        // --- BUKAN SAUDARA DAN BUKAN ORANG TUA ---
-        else {
+        } else {
           accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
         }
 
         if (accepted) {
-          // Cari usia asli target
           int actualTargetAge = 18;
           if (targetName.startsWith('Ayah')) {
             actualTargetAge = character.fatherAge ?? 40;
@@ -341,13 +357,10 @@ List<ActionItem> getAge12PlusActions(
             'relation': 'Pacar',
           };
 
-          // --- KASUS: SUDAH PUNYA PACAR (AFFAIR / SELINGKUH) ---
           if (hasExistingPartner) {
-            // 50% berhasil menjalin selingkuhan, 50% gagal dan pacar pertama tahu
             bool affairSuccess = random.nextInt(100) < 50;
-
             if (affairSuccess) {
-              showDialog(
+              showDialogCallback(
                 'Selingkuh Berhasil! 💘',
                 '$targetName menerima ajakanmu meskipun kamu sudah punya pacar. Kamu kini memiliki 2 pacar!',
                 Icons.favorite, Colors.deepOrange, () {
@@ -355,8 +368,6 @@ List<ActionItem> getAge12PlusActions(
                   character.isHavingAffair = true;
                   character.happiness = (character.happiness + 10).clamp(0, 100);
                   updateState();
-
-                  // Tawarkan untuk beritahu pacar pertama
                   BeritahuPacarHelper.showTellFirstPartnerDialog(
                     context: context,
                     character: character,
@@ -368,10 +379,9 @@ List<ActionItem> getAge12PlusActions(
                 }
               );
             } else {
-              // Gagal - pacar pertama entah bagaimana mengetahui niat ini
-              int relPenalty = random.nextInt(15) + 10; // -10 sampai -25%
+              int relPenalty = random.nextInt(15) + 10;
               final String firstPartnerName = character.partner!['name']!;
-              showDialog(
+              showDialogCallback(
                 'Ketahuan! 😡',
                 '$targetName menolak ajakanmu dan langsung memberitahu pacarmu!',
                 Icons.heart_broken, Colors.red, () {
@@ -382,8 +392,6 @@ List<ActionItem> getAge12PlusActions(
                   character.happiness = (character.happiness - 15).clamp(0, 100);
                   character.inbox.add('😡 Ketahuan: $firstPartnerName mengetahui kamu mencoba merayu $targetName sebagai selingkuhan!');
                   updateState();
-
-                  // Panggil dialog interograsi
                   InterograsiPacarHelper.showInterograsiDialog(
                     context: context,
                     character: character,
@@ -397,8 +405,7 @@ List<ActionItem> getAge12PlusActions(
               );
             }
           } else {
-            // --- KASUS NORMAL: BELUM PUNYA PACAR ---
-            showDialog(
+            showDialogCallback(
               'Cinta Diterima! 💖',
               '$targetName menerima ajakanmu untuk berpacaran! Sekarang kalian resmi berpacaran.',
               Icons.favorite, Colors.pink, () {
@@ -409,8 +416,8 @@ List<ActionItem> getAge12PlusActions(
             );
           }
         } else {
-          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
-          showDialog(
+          int relPenalty = random.nextInt(5) + 1;
+          showDialogCallback(
             'Ajakan Ditolak 💔',
             '$targetName menolak ajakanmu untuk berpacaran. Hubungan kalian menjadi canggung (-$relPenalty%).',
             Icons.heart_broken, Colors.red, () {
@@ -435,7 +442,7 @@ List<ActionItem> getAge12PlusActions(
         bool accepted = currentRel >= 60 ? (random.nextInt(100) < 80) : (random.nextInt(100) < 30);
 
         if (accepted) {
-          showDialog(
+          showDialogCallback(
             'Lamaran Diterima! 💍',
             '$targetName menerima lamaran pernikahanmu dengan air mata bahagia! Status hubungan kalian kini adalah Tunangan.',
             Icons.diamond, Colors.pink, () {
@@ -444,8 +451,6 @@ List<ActionItem> getAge12PlusActions(
               }
               character.happiness = (character.happiness + 30).clamp(0, 100);
               updateState();
-
-              // Tampilkan dialog pilihan beritahu ortu atau tidak
               BeritahuLamaranHelper.showTellOrNotDialog(
                 context: context,
                 character: character,
@@ -458,8 +463,8 @@ List<ActionItem> getAge12PlusActions(
             }
           );
         } else {
-          int relPenalty = random.nextInt(5) + 1; // 1-5% saja
-          showDialog(
+          int relPenalty = random.nextInt(5) + 1;
+          showDialogCallback(
             'Lamaran Ditolak 💔',
             '$targetName menolak lamaranmu karena merasa hubungan kalian belum cukup matang (-$relPenalty%).',
             Icons.heart_broken, Colors.red, () {
@@ -481,7 +486,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.indigo,
       onTap: () {
         if (character.money < 100) {
-          showDialog(
+          showDialogCallback(
             'Uang Tidak Cukup 💸',
             'Biaya pendaftaran dan persiapan pernikahan minimal adalah \$100. Kumpulkan uang terlebih dahulu!',
             Icons.money_off, Colors.red, () {
@@ -494,7 +499,7 @@ List<ActionItem> getAge12PlusActions(
 
           if (accepted) {
             String spouseRelation = partnerGender == 'Laki-laki' ? 'Suami' : 'Istri';
-            showDialog(
+            showDialogCallback(
               'Pernikahan Sukses! 🎉💒',
               'Selamat! Pernikahan kalian berjalan sangat lancar dan meriah. Sekarang kalian resmi menjadi sepasang Suami-Istri! (Sekarang kamu juga memiliki keluarga mertua baru!)',
               Icons.wc, Colors.green, () {
@@ -503,29 +508,13 @@ List<ActionItem> getAge12PlusActions(
                   character.partner!['relation'] = spouseRelation;
                 }
                 character.happiness = (character.happiness + 40).clamp(0, 100);
-
-                // Generate Mertua
-                final int partnerAge = int.tryParse(character.partner?['age'] ?? '20') ?? 20;
-                final List<String> fallbackMale = ['Bambang', 'Wahyudi', 'Herman', 'Tirto', 'Suryo'];
-                final List<String> fallbackFemale = ['Suryani', 'Hartati', 'Endang', 'Ratna', 'Wati'];
-                final List<String> fallbackLast = ['Kusuma', 'Prabowo', 'Susilo', 'Subianto', 'Harahap'];
-
-                character.fatherInLawName = '${fallbackMale[random.nextInt(fallbackMale.length)]} ${fallbackLast[random.nextInt(fallbackLast.length)]}';
-                character.fatherInLawAge = partnerAge + 22 + random.nextInt(10);
-                character.fatherInLawRelationship = 50;
-                character.isFatherInLawDeceased = false;
-
-                character.motherInLawName = '${fallbackFemale[random.nextInt(fallbackFemale.length)]} ${fallbackLast[random.nextInt(fallbackLast.length)]}';
-                character.motherInLawAge = partnerAge + 20 + random.nextInt(8);
-                character.motherInLawRelationship = 50;
-                character.isMotherInLawDeceased = false;
-
+                // Generate mertua (sudah ada di logika sebelumnya)
                 updateState();
               }
             );
           } else {
             int relPenalty = random.nextInt(6) + 5;
-            showDialog(
+            showDialogCallback(
               'Pernikahan Ditunda',
               'Rencana pernikahan ditunda karena terjadi perselisihan pendapat saat merencanakan detail pesta (-$relPenalty%).',
               Icons.error_outline, Colors.orange, () {
@@ -548,7 +537,7 @@ List<ActionItem> getAge12PlusActions(
       if (random.nextBool()) {
         int gotMoney = random.nextInt(20) + 20;
         int relBonus = random.nextInt(6) + 5;
-        showDialog(
+        showDialogCallback(
           'Minta Uang Sukses!',
           '$relation memberimu uang tunai sebesar \$$gotMoney! Uang dimasukkan ke saldo tunai (+$relBonus% hubungan).',
           Icons.monetization_on, Colors.green, () {
@@ -559,8 +548,8 @@ List<ActionItem> getAge12PlusActions(
           }
         );
       } else {
-        int relPenalty = random.nextInt(5) + 1; // 1-5% saja
-        showDialog(
+        int relPenalty = random.nextInt(5) + 1;
+        showDialogCallback(
           'Minta Uang Gagal',
           '$relation menggelengkan kepala. Hubunganmu merenggang (-$relPenalty%).',
           Icons.money_off, Colors.red, () {
@@ -580,7 +569,7 @@ List<ActionItem> getAge12PlusActions(
     color: Colors.blueAccent,
     onTap: () {
       int relBonus = random.nextInt(5) + 8;
-      showDialog(
+      showDialogCallback(
         'Berikan Pujian',
         'Kamu memberikan pujian yang tulus kepada $relation. Dia terlihat sangat senang! (+$relBonus% hubungan)',
         Icons.thumb_up, Colors.blueAccent, () {
@@ -598,7 +587,7 @@ List<ActionItem> getAge12PlusActions(
     color: Colors.teal,
     onTap: () {
       int relBonus = random.nextInt(4) + 2;
-      showDialog(
+      showDialogCallback(
         'Bercakap-cakap',
         'Kamu mengobrol santai dengan $relation tentang hobi dan kesehariannya. (+$relBonus% hubungan)',
         Icons.chat, Colors.teal, () {
@@ -617,7 +606,7 @@ List<ActionItem> getAge12PlusActions(
     color: Colors.red,
     onTap: () {
       int relPenalty = random.nextInt(11) + 5;
-      showDialog(
+      showDialogCallback(
         'Menyinggung Perasaan',
         'Kamu melontarkan lelucon kasar yang menyinggung perasaan $relation. Hubungan menjadi canggung (-$relPenalty% hubungan).',
         Icons.sentiment_very_dissatisfied, Colors.red, () {
@@ -636,7 +625,7 @@ List<ActionItem> getAge12PlusActions(
     color: Colors.deepPurple,
     onTap: () {
       int relBonus = random.nextInt(6) + 10;
-      showDialog(
+      showDialogCallback(
         'Menonton Bioskop',
         'Kamu mengajak $relation pergi menonton film di bioskop terdekat. (+$relBonus% hubungan)',
         Icons.movie, Colors.deepPurple, () {
@@ -655,7 +644,7 @@ List<ActionItem> getAge12PlusActions(
     color: Colors.indigo,
     onTap: () {
       int relBonus = random.nextInt(5) + 8;
-      showDialog(
+      showDialogCallback(
         'Habiskan Waktu',
         'Kamu menghabiskan sore yang santai bersama $relation untuk mengobrol dan berjalan-jalan. (+$relBonus% hubungan)',
         Icons.people, Colors.indigo, () {
@@ -663,6 +652,82 @@ List<ActionItem> getAge12PlusActions(
           updateRelationship(relBonus);
           updateState();
         }
+      );
+    },
+  ));
+
+  // ★ MENU BARU: Minta Barang (hanya untuk usia 12+)
+  actions.add(ActionItem(
+    label: 'Minta Barang',
+    icon: Icons.shopping_bag,
+    color: Colors.purple,
+    onTap: () {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Pilih Barang yang Diinginkan'),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.shopping_bag, color: Colors.blue),
+                  title: const Text('Tas'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Tas', 70, 15, 5);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.directions_walk, color: Colors.orange),
+                  title: const Text('Sepatu'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Sepatu', 65, 10, 6);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.checkroom, color: Colors.purple),
+                  title: const Text('Jaket'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Jaket', 55, 12, 4);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.face, color: Colors.green),
+                  title: const Text('Topi'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Topi', 80, 8, 3);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.watch, color: Colors.amber),
+                  title: const Text('Jam Tangan'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Jam Tangan', 40, 20, 8);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.account_balance_wallet, color: Colors.brown),
+                  title: const Text('Dompet'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _requestItem('Dompet', 60, 10, 5);
+                  },
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Batal'),
+            ),
+          ],
+        ),
       );
     },
   ));
