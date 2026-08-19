@@ -373,6 +373,40 @@ class RelationshipButton extends StatelessWidget {
               }).toList(),
 
               // ============================================
+              // 4. BAGIAN MANTAN PACAR (JIKA ADA)
+              // ============================================
+              if (character.exPartners.isNotEmpty) ...[
+                const Divider(height: 32),
+                const Text('💔 Mantan Pacar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                const SizedBox(height: 8),
+                ...character.exPartners.map((ex) {
+                  final String name = ex['name'] ?? 'Mantan Pacar';
+                  final String gender = ex['gender'] ?? 'Perempuan';
+                  final int relVal = int.tryParse(ex['relationship'] ?? '30') ?? 30;
+                  final int exAge = int.tryParse(ex['age'] ?? '12') ?? 12;
+                  final bool isDeceased = ex['isDeceased'] == 'true';
+                  final bool isMale = gender == 'Laki-laki';
+
+                  return _buildFamilyItem(
+                    context,
+                    icon: isMale ? Icons.male : Icons.female,
+                    label: isDeceased ? '$name (Mantan Pacar) (Wafat)' : name,
+                    status: 'Mantan Pacar',
+                    color: isDeceased ? Colors.grey : Colors.pinkAccent,
+                    relationshipValue: relVal,
+                    ageText: '$exAge tahun',
+                    isDeceased: isDeceased,
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: name,
+                      gender: gender,
+                      age: exAge,
+                      happiness: relVal,
+                    ),
+                  );
+                }).toList(),
+              ],
+
+              // ============================================
               // 5. BAGIAN ANAK (JIKA ADA)
               // ============================================
               if (character.children.isNotEmpty) ...[

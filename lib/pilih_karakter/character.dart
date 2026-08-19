@@ -86,6 +86,7 @@ class Character {
   // --- DATA PACAR KEDUA (SELINGKUHAN) ---
   Map<String, String>? secondPartner; // sama dengan struktur partner
   bool isHavingAffair = false; // true jika user sedang selingkuh
+  List<Map<String, String>> exPartners = []; // List of ex-partners/mantan pacar
 
   // --- STATUS KEMATIAN KELUARGA KANDUNG ---
   bool isFatherDeceased = false;

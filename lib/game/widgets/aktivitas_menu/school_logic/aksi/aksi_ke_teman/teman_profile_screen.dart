@@ -93,6 +93,10 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
       case 'bercinta':
         _handleBercinta();
         return;
+
+      case 'putuskan_pacaran':
+        _handlePutuskanPacaran();
+        return;
     }
 
     widget.onRefresh();
@@ -203,6 +207,67 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
         ],
       );
     }
+  }
+
+  void _handlePutuskanPacaran() {
+    DialogHelper.show(
+      context: context,
+      title: 'Putuskan Hubungan',
+      content: Text('Apakah kamu yakin ingin memutuskan hubungan pacaran dengan ${widget.temanName}?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context); // close confirm dialog
+            
+            // Remove from partner or secondPartner
+            Map<String, String>? brokePartner;
+            if (widget.character.partner != null && widget.character.partner!['name'] == widget.temanName) {
+              brokePartner = widget.character.partner;
+              widget.character.partner = null;
+            } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.temanName) {
+              brokePartner = widget.character.secondPartner;
+              widget.character.secondPartner = null;
+              widget.character.isHavingAffair = false;
+            }
+            
+            // Add to exPartners (mantan pacar)
+            if (brokePartner != null) {
+              widget.character.exPartners.add({
+                'name': brokePartner['name'] ?? widget.temanName,
+                'gender': brokePartner['gender'] ?? widget.temanGender,
+                'age': brokePartner['age'] ?? widget.temanAge.toString(),
+                'relationship': '20', // break up drops relationship
+                'relation': 'Mantan Pacar',
+                'isDeceased': 'false',
+              });
+            }
+            
+            _updateRelationship(-40); // penalty relationship
+            widget.onRefresh();
+            
+            DialogHelper.show(
+              context: context,
+              title: 'Putus Hubungan 💔',
+              content: Text('Kamu telah memutuskan hubungan dengan ${widget.temanName}. Hubungan kalian sekarang berakhir.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context); // go back to classmate list
+                  },
+                  child: const Text('Mengerti'),
+                ),
+              ],
+            );
+          },
+          child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+        ),
+      ],
+    );
   }
 
   // ★ AGE 9-11: Bercinta / Make Love (Innocent School Intimacy)
@@ -417,26 +482,55 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
                   ),
 
                   // ★ AGE 9-11 ROMANCE ACTIONS
-                  if (widget.character.age >= 9 && widget.character.age <= 11) ...[
-                    const SizedBox(height: 16),
-                    const Divider(height: 1),
-                    const SizedBox(height: 16),
-                    const Text(
-                      'AKSI ROMANTIS SEKOLAH',
-                      style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildActionCard(
-                      icon: '💕',
-                      title: 'Ajak Pacaran',
-                      onTap: () => _executeAction('ajak_pacaran'),
-                    ),
-                    _buildActionCard(
-                      icon: '❤️',
-                      title: 'Bercinta / Make Love',
-                      onTap: () => _executeAction('bercinta'),
-                    ),
-                  ],
+                  Builder(
+                    builder: (context) {
+                      final bool isPartner = (widget.character.partner != null && widget.character.partner!['name'] == widget.temanName) ||
+                                             (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.temanName);
+                      
+// Bagian AKSI ROMANTIS SEKOLAH - di dalam Builder
+if ((widget.character.age >= 9 && widget.character.age <= 11) || isPartner) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const SizedBox(height: 16),
+      const Divider(height: 1),
+      const SizedBox(height: 16),
+      const Text(
+        'AKSI ROMANTIS SEKOLAH',
+        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
+      ),
+      const SizedBox(height: 12),
+      if (isPartner) ...[
+        // Saat sudah pacar: muncul menu Putuskan Pacar DAN Bercinta
+        _buildActionCard(
+          icon: '💔',
+          title: 'Putuskan Pacar',
+          onTap: () => _executeAction('putuskan_pacaran'),
+        ),
+        _buildActionCard(
+          icon: '❤️',
+          title: 'Bercinta / Make Love',
+          onTap: () => _executeAction('bercinta'),
+        ),
+      ] else ...[
+        // Saat belum pacar: muncul Ajak Pacaran dan Bercinta
+        _buildActionCard(
+          icon: '💕',
+          title: 'Ajak Pacaran',
+          onTap: () => _executeAction('ajak_pacaran'),
+        ),
+        _buildActionCard(
+          icon: '❤️',
+          title: 'Bercinta / Make Love',
+          onTap: () => _executeAction('bercinta'),
+        ),
+      ],
+    ],
+  );
+}
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),

@@ -37,6 +37,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
+    if (role == 'Mantan Pacar') {
+      for (var ex in widget.character.exPartners) {
+        if (ex['name'] == name) {
+          return '${ex['age']} tahun';
+        }
+      }
+    }
+
     if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
       return widget.character.partner != null ? '${widget.character.partner!['age']} tahun' : 'Tidak diketahui';
     }
@@ -99,6 +107,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
+    if (role == 'Mantan Pacar') {
+      for (var ex in widget.character.exPartners) {
+        if (name.contains(ex['name'] ?? '')) {
+          return ex['name']!;
+        }
+      }
+    }
+
     if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
       if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
         return widget.character.partner!['name']!;
@@ -156,7 +172,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) {
+    if (role == 'Mantan Pacar') {
+      for (var ex in widget.character.exPartners) {
+        if (ex['name'] == name) {
+          return int.tryParse(ex['relationship'] ?? '50') ?? 50;
+        }
+      }
+      return 30;
+    }
+
+    if ((role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) && role != 'Mantan Pacar') {
       // PERBAIKAN: Tambahkan widget. di depan character
       if (widget.character.partner != null && widget.character.partner!['name'] == name) {
         return int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
@@ -220,7 +245,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) {
+    if (role == 'Mantan Pacar') {
+      for (var ex in widget.character.exPartners) {
+        if (ex['name'] == name) {
+          int currentRel = int.tryParse(ex['relationship'] ?? '50') ?? 50;
+          ex['relationship'] = (currentRel + changeAmount).clamp(0, 100).toString();
+          return;
+        }
+      }
+    }
+
+    if ((role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) && role != 'Mantan Pacar') {
       // PERBAIKAN: Tambahkan widget. di depan character
       if (widget.character.partner != null && widget.character.partner!['name'] == name) {
         int currentRel = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
@@ -317,6 +352,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String role = widget.targetRole;
     final String name = widget.targetName;
 
+    if (role == 'Mantan Pacar') {
+      for (var ex in widget.character.exPartners) {
+        if (ex['name'] == name) {
+          return ex['gender'] ?? 'Perempuan';
+        }
+      }
+    }
+
     if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
       return widget.character.partner != null ? widget.character.partner!['gender'] ?? 'Perempuan' : 'Perempuan';
     }
@@ -379,7 +422,27 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final int minAge = age < targetAge ? age : targetAge;
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
 
-    if (isChild && targetAge < 12) {
+    if ((widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)') && age < 12) {
+      final List<ActionItem> standardActions = getAge6to11Actions(
+        context,
+        widget.character,
+        widget.targetName,
+        widget.targetRole,
+        _random,
+        _showResultDialog,
+        _updateRelationship,
+        _updateState,
+      );
+      actions = standardActions.where((action) {
+        final label = action.label.toLowerCase();
+        return label == 'pujian' ||
+            label == 'hadiah' ||
+            label == 'menyinggung' ||
+            label == 'pergi ke bioskop bersama' ||
+            label == 'habiskan waktu bersama' ||
+            label == 'minta barang';
+      }).toList();
+    } else if (isChild && targetAge < 12) {
       // Jika target anak kita di bawah 12 tahun, tampilkan menu khusus orang tua mengasuh anak:
       // - Beri Uang Jajan (Minta uang dari sisi anak, di sini orang tua yang memberi uang)
       // - Beri Hadiah

@@ -104,9 +104,26 @@ class ClassmateHelper {
                               Icon(gender == 'Laki-laki' ? Icons.male : Icons.female, color: Colors.blueGrey),
                         ),
                       ),
-                      title: Text(
-                        name,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            ),
+                          ),
+                          if ((character.partner != null && character.partner!['name'] == name) ||
+                              (character.secondPartner != null && character.secondPartner!['name'] == name))
+                            const Text(
+                              '(pacar)',
+                              style: TextStyle(
+                                color: Colors.pink,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 12,
+                              ),
+                            ),
+                        ],
                       ),
                       subtitle: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
