@@ -23,13 +23,13 @@ String _getPartnerGender(String targetName) {
 }
 
 List<ActionItem> getAge12PlusActions(
-  BuildContext context,                        // ← tambahkan context
+  BuildContext context,
   Character character,
   String targetName,
   String targetRole,
   int age,
   Random random,
-  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback, // ← ganti nama
+  Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback,
   Function(int change) updateRelationship,
   VoidCallback updateState,
 ) {
@@ -273,10 +273,17 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 2. Ajak Pacaran
+  // 2. Ajak Pacaran (Dengan Logika Khusus Mantan Pacar)
   if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
+    // --- PERUBAHAN DI SINI ---
+    final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
+    final String actionLabel = isExPartner 
+        ? 'Ajak Balikan' 
+        : (hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran');
+    // ------------------------
+
     actions.add(ActionItem(
-      label: hasExistingPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+      label: actionLabel, // Menggunakan label dinamis
       icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite_border,
       color: hasExistingPartner ? Colors.deepOrange : Colors.redAccent,
       onTap: () {
@@ -301,42 +308,27 @@ List<ActionItem> getAge12PlusActions(
             accepted = random.nextInt(100) < 10;
           }
         } else if (isSibling) {
-          final String cleanMyGender = myGender.trim().toLowerCase();
-          final String cleanPartnerGender = partnerGender.trim().toLowerCase();
-          final bool isOppositeGender = (cleanMyGender == 'laki-laki' && cleanPartnerGender == 'perempuan') ||
-                                        (cleanMyGender == 'perempuan' && cleanPartnerGender == 'laki-laki');
-          
-          if (character.age >= 7 && isOppositeGender) {
-            if (targetNameLower.contains('adik')) {
-              accepted = random.nextInt(100) < 40;
-            } else if (targetNameLower.contains('kakak')) {
-              accepted = random.nextInt(100) < 10;
-            } else {
-              accepted = random.nextInt(100) < 10;
-            }
-          } else {
-            bool isTargetOlder = targetNameLower.contains('kakak');
-            bool isTargetMale = partnerGender == 'laki-laki';
+          bool isTargetOlder = targetNameLower.contains('kakak');
+          bool isTargetMale = partnerGender == 'laki-laki';
 
-            if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 50;
-            } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 40;
-            } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 20;
-            } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 20;
-            } else {
-              accepted = random.nextInt(100) < 20;
-            }
+          if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 50;
+          } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 40;
+          } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 20;
+          } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
+            accepted = random.nextInt(100) < 30;
+          } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
+            accepted = random.nextInt(100) < 20;
+          } else {
+            accepted = random.nextInt(100) < 20;
           }
         } else {
           accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);

@@ -48,14 +48,28 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  // --- LOGIKA TAMBAH UMUR ---
+  // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
   void _ageUp() {
     List<String> events = [];
     setState(() {
       events = _character.ageUp();
-      // Masukkan semua kejadian penting / peristiwa pertambahan umur ke inbox agar tidak kosong
-      _character.inbox.addAll(events);
     });
+
+    // Cek kehamilan saat bertambah umur
+    if (_character.isPregnant || _character.partnerIsPregnant) {
+      // Hitung roll kelahiran (80% berhasil, 20% keguguran)
+      int birthRoll = Random().nextInt(100);
+      bool isSuccess = birthRoll < 80;
+
+      if (isSuccess) {
+        // Logika melahirkan sukses (panggil fungsi lahir)
+        _handleBirth();
+      } else {
+        // Logika keguguran
+        _handleMiscarriage();
+      }
+    }
+
     if (!_character.isAlive) {
       showDialog(
         context: context,
@@ -107,6 +121,124 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       _checkActiveProposal();
     }
+  }
+
+  // --- LOGIKA MELAHIRKAN (80%) ---
+  void _handleBirth() {
+    final Random random = Random();
+    final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+    
+    final List<String> boys = ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
+    final List<String> girls = ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
+    
+    final String childFirstName = childGender == 'Laki-laki' 
+        ? boys[random.nextInt(boys.length)] 
+        : girls[random.nextInt(girls.length)];
+    
+    final List<String> playerParts = _character.name.split(' ');
+    final String childLastName = playerParts.length > 1 ? playerParts.last : '';
+    final String childName = childLastName.isNotEmpty ? '$childFirstName $childLastName' : childFirstName;
+
+    // Tentukan ayah/ibu dari data kehamilan
+    String father = 'Tidak diketahui';
+    String mother = 'Tidak diketahui';
+    String partnerName = _character.pregnantByPartnerName ?? 'Pasangan';
+
+    if (_character.gender.toLowerCase() == 'laki-laki') {
+      father = _character.name;
+      mother = partnerName;
+    } else {
+      father = partnerName;
+      mother = _character.name;
+    }
+
+    // Tambahkan anak ke daftar children
+    _character.children.add({
+      'name': childName,
+      'gender': childGender,
+      'relationship': '80',
+      'age': '0',
+      'father': father,
+      'mother': mother,
+      'isDeceased': 'false',
+      'trait': 'Sehat',
+    });
+
+    // Reset status hamil
+    _character.isPregnant = false;
+    _character.partnerIsPregnant = false;
+    _character.pregnantByPartnerName = null;
+    _character.pregnantByPartnerRole = null;
+
+    // Tampilkan modal keberhasilan lahir
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.celebration, color: Colors.green, size: 28),
+            SizedBox(width: 8),
+            Text('Selamat! Bayi Lahir 🍼', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Proses persalinan berjalan lancar!\n\n'
+          'Selamat, ${_character.name} telah melahirkan seorang ${childGender == 'Laki-laki' ? 'putra' : 'putri'} bernama $childName.\n\n'
+          'Hubunganmu dengan $partnerName semakin erat!',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // --- LOGIKA KEGUGURAN (20%) ---
+  void _handleMiscarriage() {
+    String partnerName = _character.pregnantByPartnerName ?? 'Pasangan';
+
+    // Reset status hamil
+    _character.isPregnant = false;
+    _character.partnerIsPregnant = false;
+    _character.pregnantByPartnerName = null;
+    _character.pregnantByPartnerRole = null;
+
+    // Penalti kebahagiaan
+    _character.happiness = (_character.happiness - 40).clamp(0, 100);
+
+    // Tampilkan modal keguguran
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.warning, color: Colors.red, size: 28),
+            SizedBox(width: 8),
+            Text('Keguguran 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Kabar duka menyelimuti keluarga.\n\n'
+          'Sayangnya, kehamilan yang dijalani bersama $partnerName tidak berhasil. '
+          'Proses persalinan berakhir dengan keguguran.\n\n'
+          'Kebahagiaanmu turun drastis (-40%).\n\n'
+          'Sabar ya, semoga ada rezeki lain nanti.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
   }
 
   // --- LOGIKA NOTIFIKASI AJAKAN KELUARGA ---

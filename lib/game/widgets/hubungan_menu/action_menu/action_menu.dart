@@ -13,6 +13,8 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/ber
 import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
+import 'package:bitlife/game/widgets/dialog_helper.dart';
+
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
   final String targetName;
@@ -772,6 +774,79 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         },
       ));
     }
+
+    // --- TAMBAHAN: TOMBOL PUTUSKAN PACAR UNTUK PASANGAN AKTIF ---
+    final bool isActivePartner = (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) ||
+                                 (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName);
+    final bool isPartnerRole = widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)' ||
+                               widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri';
+
+    if (isActivePartner && isPartnerRole) {
+      actions.add(ActionItem(
+        label: 'Putuskan Pacar',
+        icon: Icons.heart_broken,
+        color: Colors.red,
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Putuskan Hubungan', style: TextStyle(fontWeight: FontWeight.bold)),
+              content: Text('Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Tutup dialog konfirmasi
+                    
+                    // 1. Hapus dari partner
+                    if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
+                      widget.character.partner = null;
+                    } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
+                      widget.character.secondPartner = null;
+                      widget.character.isHavingAffair = false;
+                    }
+
+                    // 2. Tambahkan ke exPartners (mantan pacar)
+                    widget.character.exPartners.add({
+                      'name': widget.targetName,
+                      'gender': _getTargetGender(),
+                      'age': widget.character.age.toString(),
+                      'relationship': '20',
+                      'relation': 'Mantan Pacar',
+                      'isDeceased': 'false',
+                    });
+
+                    // 3. Turunkan hubungan
+                    _updateRelationship(-40);
+
+                    // 4. Refresh state
+                    _updateState();
+
+                    // 5. Tampilkan dialog hasil putus
+                    DialogHelper.show(
+                      context: context,
+                      title: 'Putus Hubungan 💔',
+                      content: Text('Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('Mengerti'),
+                        ),
+                      ],
+                    );
+                  },
+                  child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            ),
+          );
+        },
+      ));
+    }
+    // -------------------------------------------------------------
 
     final int relationshipVal = _getCurrentRelationshipValue();
 

@@ -270,7 +270,29 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
     );
   }
 
-  // ★ AGE 9-11: Bercinta / Make Love (Innocent School Intimacy)
+  // --- FUNGSI KESUBURAN DINAMIS (SAMA SEPERTI DI bercinta.dart) ---
+  double _getFertilityRate(int age, String gender) {
+    final String g = gender.trim().toLowerCase();
+    if (g == 'perempuan') {
+      if (age < 8 || age > 45) return 0.0;
+      if (age >= 8 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.65;
+      if (age >= 40 && age <= 45) return 0.30;
+    } else { // laki-laki
+      if (age < 9 || age > 65) return 0.0;
+      if (age >= 9 && age <= 13) return 0.35;
+      if (age >= 14 && age <= 19) return 0.55;
+      if (age >= 20 && age <= 29) return 0.85;
+      if (age >= 30 && age <= 39) return 0.75;
+      if (age >= 40 && age <= 49) return 0.55;
+      if (age >= 50 && age <= 65) return 0.35;
+    }
+    return 0.0;
+  }
+
+  // ★ AGE 9-11: Bercinta / Make Love (Innocent School Intimacy & Modal Place Selection)
   void _handleBercinta() {
     if (currentRelationship < 60) {
       // Rejection
@@ -291,61 +313,229 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
           ),
         ],
       );
-    } else if (currentRelationship >= 60 && currentRelationship < 80) {
-      // Moderate acceptance - innocent moments
-      int relationshipGain = random.nextInt(6) + 5;
-      _updateRelationship(relationshipGain);
-      widget.onRefresh();
-
-      final List<String> innocentMoments = [
-        'Kalian berciuman di sudut taman sekolah, tersembunyi dari guru. Moment yang manis dan penuh gugup! 💋',
-        '${widget.temanName} dengan malu menerima pegangan tangan mu. Kalian berjalan bersama sambil memegang tangan. 🤝❤️',
-        'Kalian berdekatan dan berciuman di samping pohon sekolah. Pelajaran yang indah untuk first kiss! 😊💕',
-      ];
-
-      String randomMoment = innocentMoments[random.nextInt(innocentMoments.length)];
-
-      DialogHelper.show(
-        context: context,
-        title: 'Moment Romantis! 💕',
-        content: Text(
-          '$randomMoment\n\nHubungan meningkat +$relationshipGain!',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Mengerti'),
-          ),
-        ],
-      );
     } else {
-      // High relationship - deep innocent moments
-      int relationshipGain = random.nextInt(8) + 12;
-      _updateRelationship(relationshipGain);
-      widget.onRefresh();
+      _startBercintaFlow();
+    }
+  }
 
-      final List<String> deepMoments = [
-        'Kalian meninggalkan kelas saat jam istirahat dan berciuman dengan penuh perasaan di belakang perpustakaan. Moment yang tak terlupakan! 😍💋',
-        'Di taman sekolah, kalian duduk berdekatan dan berbagi ciuman berkali-kali. Hati kalian berdebar-debar penuh kebahagiaan. 💕✨',
-        'Kalian berbagi momen intim yang dalam dengan berciuman dan saling merangkul erat. Ini moment terbaik di sekolah! 🌹❤️',
-      ];
-
-      String randomMoment = deepMoments[random.nextInt(deepMoments.length)];
-
-      DialogHelper.show(
-        context: context,
-        title: 'Moment Intim yang Dalam! 💕✨',
-        content: Text(
-          '$randomMoment\n\nHubungan meningkat +$relationshipGain!',
+  void _startBercintaFlow() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pilih Tempat Bercinta'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.home, color: Colors.blue),
+              title: const Text('Di Rumah'),
+              subtitle: const Text('Melakukan di lingkungan rumah.'),
+              onTap: () {
+                Navigator.pop(context);
+                _showRumahOptions();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.school, color: Colors.orange),
+              title: const Text('Di Sekolah'),
+              subtitle: const Text('Melakukan di lingkungan sekolah.'),
+              onTap: () {
+                Navigator.pop(context);
+                _showSekolahOptions();
+              },
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  void _showRumahOptions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pilih Tempat di Rumah'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.meeting_room, color: Colors.blueGrey),
+              title: const Text('Dirumahku'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPengamanConfirmation('Dirumahku');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.house, color: Colors.teal),
+              title: const Text('Di Rumah Pasangan'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPengamanConfirmation('Di Rumah Pasangan');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSekolahOptions() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Pilih Tempat di Sekolah'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.wc, color: Colors.brown),
+              title: const Text('Kamar Mandi'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPengamanConfirmation('Kamar Mandi');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.menu_book, color: Colors.indigo),
+              title: const Text('Perpustakaan'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPengamanConfirmation('Perpustakaan');
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.warehouse, color: Colors.deepOrange),
+              title: const Text('Gudang'),
+              onTap: () {
+                Navigator.pop(context);
+                _showPengamanConfirmation('Gudang');
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showPengamanConfirmation(String tempat) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Konfirmasi Pengaman'),
+        content: const Text('Apakah kamu ingin menggunakan pengaman (kondom)?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Mengerti'),
+            onPressed: () {
+              Navigator.pop(context);
+              _finishBercinta(tempat, true);
+            },
+            child: const Text('Ya, Gunakan Pengaman'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _finishBercinta(tempat, false);
+            },
+            child: const Text('Tidak, Tanpa Pengaman', style: TextStyle(color: Colors.red)),
           ),
         ],
-      );
+      ),
+    );
+  }
+
+  void _finishBercinta(String tempat, bool pakaiPengaman) {
+    int relationshipGain = random.nextInt(8) + 12;
+    _updateRelationship(relationshipGain);
+    widget.onRefresh();
+
+    String description = '';
+    if (tempat == 'Dirumahku') {
+      description = 'Kalian berdua menyelinap masuk ke kamarmu saat rumah sedang sepi dan menikmati momen intim yang penuh debar jantung.';
+    } else if (tempat == 'Di Rumah Pasangan') {
+      description = 'Kamu pergi ke rumah ${widget.temanName} ketika orang tuanya tidak ada di rumah. Momen berdua di kamarnya terasa sangat intim.';
+    } else if (tempat == 'Kamar Mandi') {
+      description = 'Saat jam istirahat sekolah, kalian diam-diam menyelinap ke kamar mandi sekolah yang sepi untuk menikmati momen intim yang mendebarkan.';
+    } else if (tempat == 'Perpustakaan') {
+      description = 'Di antara rak-rak buku perpustakaan yang sepi, kalian bersembunyi dari pandangan pustakawan dan menikmati momen romantis bersama.';
+    } else if (tempat == 'Gudang') {
+      description = 'Di dalam gudang sekolah yang berdebu namun tersembunyi, kalian mengunci pintu dari dalam dan menikmati momen romantis bersama.';
     }
+
+    String pengamanText = pakaiPengaman 
+      ? '\n\nKamu menggunakan kondom sebagai pengaman. Seks yang aman dan bertanggung jawab!' 
+      : '\n\nKamu memutuskan untuk melakukannya tanpa pengaman. Momen terasa lebih intens tetapi ada risiko!';
+
+    // --- LOGIKA KEHAMILAN DENGAN KESUBURAN DINAMIS ---
+    String pregnancyAlert = '';
+    final bool isOppositeGender = 
+      (widget.character.gender.toLowerCase().contains('laki') && widget.temanGender.toLowerCase().contains('perempuan')) ||
+      (widget.character.gender.toLowerCase().contains('perempuan') && widget.temanGender.toLowerCase().contains('laki'));
+
+    if (isOppositeGender) {
+      // Cek apakah pasangan/karakter sedang dalam kondisi hamil
+      final bool currentlyPregnant = widget.character.gender.toLowerCase().contains('perempuan')
+          ? widget.character.isPregnant
+          : widget.character.partnerIsPregnant;
+
+      if (currentlyPregnant) {
+        // SKENARIO: SUDAH HAMIL
+        pregnancyAlert = '\n\n🤰 ${widget.temanName} sudah dalam masa kehamilan. Kamu tetap menikmati momen intim, tetapi tidak ada kemungkinan hamil baru karena beliau sudah mengandung.';
+      } else {
+        // Tentukan usia yang akan dicek kesuburannya (pihak yang bisa hamil)
+        int fertileAge;
+        String fertileGender;
+        if (widget.character.gender.toLowerCase().contains('perempuan')) {
+          fertileAge = widget.character.age;
+          fertileGender = widget.character.gender;
+        } else {
+          fertileAge = widget.temanAge;
+          fertileGender = widget.temanGender;
+        }
+
+        // Ambil tingkat kesuburan dari fungsi dinamis
+        double baseFertility = _getFertilityRate(fertileAge, fertileGender);
+
+        // Jika di luar masa subur, tidak ada kemungkinan hamil
+        if (baseFertility <= 0) {
+          pregnancyAlert = '\n\n⛔ Usia ${fertileAge} tahun berada di luar masa subur (${fertileGender == 'perempuan' ? '8-45 tahun' : '9-65 tahun'}). Tidak ada kemungkinan hamil.';
+        } else {
+          // Kalkulasi akhir: jika pakai pengaman, risiko jadi 5% dari nilai dasar. Jika tidak, riskonya adalah nilai dasar.
+          double finalChance = pakaiPengaman ? (baseFertility * 0.05) : baseFertility;
+          
+          if (random.nextDouble() < finalChance) {
+            bool hamilTerjadi = true;
+            if (widget.character.gender.toLowerCase().contains('perempuan')) {
+              widget.character.isPregnant = true;
+              widget.character.pregnantByPartnerName = widget.temanName;
+              widget.character.pregnantByPartnerRole = 'Pacar';
+            } else {
+              widget.character.partnerIsPregnant = true;
+              widget.character.pregnantByPartnerName = widget.temanName;
+              widget.character.pregnantByPartnerRole = 'Pacar';
+            }
+            pregnancyAlert = widget.character.gender.toLowerCase().contains('perempuan')
+              ? '\n\n⚠️ Beberapa minggu kemudian, kamu menyadari bahwa kamu TELAH HAMIL! 🍼'
+              : '\n\n⚠️ Beberapa minggu kemudian, ${widget.temanName} menghubungimu dan mengatakan bahwa DIA HAMIL! 🍼';
+          } else {
+            pregnancyAlert = '\n\n🧪 Kali ini tidak terjadi kehamilan. (Tingkat kesuburan saat ini: ${(baseFertility * 100).toInt()}%)';
+          }
+        }
+      }
+    }
+    // -----------------------------------------------------
+
+    DialogHelper.show(
+      context: context,
+      title: 'Momen Intim! 💕',
+      content: Text('$description$pengamanText$pregnancyAlert\n\nHubungan meningkat +$relationshipGain!'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Mengerti'),
+        ),
+      ],
+    );
   }
 
   @override
@@ -399,6 +589,39 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
                     'Teman Sekelas | Umur: ${widget.temanAge} tahun',
                     style: const TextStyle(fontSize: 12, color: Colors.black54),
                   ),
+                  
+                  // --- BAGIAN STATUS KEHAMILAN ---
+                  if ((widget.character.gender.toLowerCase().contains('perempuan') && widget.character.isPregnant) ||
+                      (!widget.character.gender.toLowerCase().contains('perempuan') && widget.character.partnerIsPregnant)) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.pink.shade50,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: Colors.pink.shade200),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.pregnant_woman, color: Colors.pink, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            widget.character.gender.toLowerCase().contains('perempuan')
+                              ? 'Status: Hamil 🍼'
+                              : 'Status: Pasangan Hamil 🍼',
+                            style: const TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  // ---------------------------------------------
+
                   const SizedBox(height: 12),
                   // Relationship Bars
                   Row(
@@ -487,47 +710,44 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
                       final bool isPartner = (widget.character.partner != null && widget.character.partner!['name'] == widget.temanName) ||
                                              (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.temanName);
                       
-// Bagian AKSI ROMANTIS SEKOLAH - di dalam Builder
-if ((widget.character.age >= 9 && widget.character.age <= 11) || isPartner) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const SizedBox(height: 16),
-      const Divider(height: 1),
-      const SizedBox(height: 16),
-      const Text(
-        'AKSI ROMANTIS SEKOLAH',
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
-      ),
-      const SizedBox(height: 12),
-      if (isPartner) ...[
-        // Saat sudah pacar: muncul menu Putuskan Pacar DAN Bercinta
-        _buildActionCard(
-          icon: '💔',
-          title: 'Putuskan Pacar',
-          onTap: () => _executeAction('putuskan_pacaran'),
-        ),
-        _buildActionCard(
-          icon: '❤️',
-          title: 'Bercinta / Make Love',
-          onTap: () => _executeAction('bercinta'),
-        ),
-      ] else ...[
-        // Saat belum pacar: muncul Ajak Pacaran dan Bercinta
-        _buildActionCard(
-          icon: '💕',
-          title: 'Ajak Pacaran',
-          onTap: () => _executeAction('ajak_pacaran'),
-        ),
-        _buildActionCard(
-          icon: '❤️',
-          title: 'Bercinta / Make Love',
-          onTap: () => _executeAction('bercinta'),
-        ),
-      ],
-    ],
-  );
-}
+                      if ((widget.character.age >= 9 && widget.character.age <= 11) || isPartner) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 16),
+                            const Divider(height: 1),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'AKSI ROMANTIS SEKOLAH',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey),
+                            ),
+                            const SizedBox(height: 12),
+                            if (isPartner) ...[
+                              _buildActionCard(
+                                icon: '💔',
+                                title: 'Putuskan Pacar',
+                                onTap: () => _executeAction('putuskan_pacaran'),
+                              ),
+                              _buildActionCard(
+                                icon: '❤️',
+                                title: 'Bercinta / Make Love',
+                                onTap: () => _executeAction('bercinta'),
+                              ),
+                            ] else ...[
+                              _buildActionCard(
+                                icon: '💕',
+                                title: 'Ajak Pacaran',
+                                onTap: () => _executeAction('ajak_pacaran'),
+                              ),
+                              _buildActionCard(
+                                icon: '❤️',
+                                title: 'Bercinta / Make Love',
+                                onTap: () => _executeAction('bercinta'),
+                              ),
+                            ],
+                          ],
+                        );
+                      }
                       return const SizedBox.shrink();
                     },
                   ),
