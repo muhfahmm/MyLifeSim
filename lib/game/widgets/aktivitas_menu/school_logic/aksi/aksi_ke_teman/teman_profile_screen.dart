@@ -210,69 +210,76 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
   }
 
   void _handlePutuskanPacaran() {
+    final screenContext = context;
     DialogHelper.show(
-      context: context,
+      context: screenContext,
       title: 'Putuskan Hubungan',
       content: Text('Apakah kamu yakin ingin memutuskan hubungan pacaran dengan ${widget.temanName}?'),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
+        Builder(
+          builder: (confirmDialogContext) => TextButton(
+            onPressed: () => Navigator.pop(confirmDialogContext),
+            child: const Text('Batal'),
+          ),
         ),
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context); // close confirm dialog
-            
-            // Remove from partner or secondPartner
-            Map<String, String>? brokePartner;
-            if (widget.character.partner != null && widget.character.partner!['name'] == widget.temanName) {
-              brokePartner = widget.character.partner;
-              widget.character.partner = null;
-            } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.temanName) {
-              brokePartner = widget.character.secondPartner;
-              widget.character.secondPartner = null;
-              widget.character.isHavingAffair = false;
-            }
-            
-            // Add to exPartners (mantan pacar) - PERBAIKAN DI SINI!
-            if (brokePartner != null) {
-              // Ambil data dengan aman menggunakan variabel lokal
-              final String exName = brokePartner['name'] ?? widget.temanName;
-              final String exGender = brokePartner['gender'] ?? widget.temanGender;
-              final String exAge = brokePartner['age'] ?? widget.temanAge.toString();
+        Builder(
+          builder: (confirmDialogContext) => TextButton(
+            onPressed: () {
+              Navigator.pop(confirmDialogContext); // close confirm dialog
+              
+              // Remove from partner or secondPartner
+              Map<String, String>? brokePartner;
+              if (widget.character.partner != null && widget.character.partner!['name'] == widget.temanName) {
+                brokePartner = widget.character.partner;
+                widget.character.partner = null;
+              } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.temanName) {
+                brokePartner = widget.character.secondPartner;
+                widget.character.secondPartner = null;
+                widget.character.isHavingAffair = false;
+              }
+              
+              // Add to exPartners (mantan pacar)
+              if (brokePartner != null) {
+                // Ambil data dengan aman menggunakan variabel lokal
+                final String exName = brokePartner['name'] ?? widget.temanName;
+                final String exGender = brokePartner['gender'] ?? widget.temanGender;
+                final String exAge = brokePartner['age'] ?? widget.temanAge.toString();
 
-              widget.character.exPartners.add({
-                'name': exName,
-                'gender': exGender,
-                'age': exAge,
-                'relationship': '20', // break up drops relationship
-                'relation': 'Mantan Pacar',
-                'isDeceased': 'false',
-                // --- DATA PENYEBAB PUTUS (PENTING UNTUK LOGIKA AJAK BALIKAN) ---
-                'breakInitiator': widget.character.gender,
-                'breakReason': 'putus biasa',
-              });
-            }
-            
-            _updateRelationship(-40); // penalty relationship
-            widget.onRefresh();
-            
-            DialogHelper.show(
-              context: context,
-              title: 'Putus Hubungan 💔',
-              content: Text('Kamu telah memutuskan hubungan dengan ${widget.temanName}. Hubungan kalian sekarang berakhir.'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context); // go back to classmate list
-                  },
-                  child: const Text('Mengerti'),
-                ),
-              ],
-            );
-          },
-          child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+                widget.character.exPartners.add({
+                  'name': exName,
+                  'gender': exGender,
+                  'age': exAge,
+                  'relationship': '20', // break up drops relationship
+                  'relation': 'Mantan Pacar',
+                  'isDeceased': 'false',
+                  // --- DATA PENYEBAB PUTUS (PENTING UNTUK LOGIKA AJAK BALIKAN) ---
+                  'breakInitiator': widget.character.gender,
+                  'breakReason': 'putus biasa',
+                });
+              }
+              
+              _updateRelationship(-40); // penalty relationship
+              widget.onRefresh();
+              
+              DialogHelper.show(
+                context: screenContext,
+                title: 'Putus Hubungan 💔',
+                content: Text('Kamu telah memutuskan hubungan dengan ${widget.temanName}. Hubungan kalian sekarang berakhir.'),
+                actions: [
+                  Builder(
+                    builder: (resultDialogContext) => TextButton(
+                      onPressed: () {
+                        Navigator.pop(resultDialogContext);
+                        Navigator.pop(screenContext); // go back to classmate list
+                      },
+                      child: const Text('Mengerti'),
+                    ),
+                  ),
+                ],
+              );
+            },
+            child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+          ),
         ),
       ],
     );
@@ -594,7 +601,7 @@ class _TemanProfileScreenState extends State<TemanProfileScreen> {
                     style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                   ),
                   Text(
-                    'Teman Sekelas | Umur: ${widget.temanAge} tahun',
+                    'Teman Sekelas | Umur: ${widget.temanAge} tahun | Gender: ${widget.temanGender}',
                     style: const TextStyle(fontSize: 12, color: Colors.black54),
                   ),
                   

@@ -48,7 +48,25 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
-      return widget.character.partner != null ? '${widget.character.partner!['age']} tahun' : 'Tidak diketahui';
+      if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
+        return '${widget.character.partner!['age']} tahun';
+      }
+      if (widget.character.secondPartner != null && name.contains(widget.character.secondPartner!['name'] ?? '')) {
+        return '${widget.character.secondPartner!['age']} tahun';
+      }
+      // Check exPartners fallback
+      for (var ex in widget.character.exPartners) {
+        if (name.contains(ex['name'] ?? '')) {
+          return '${ex['age']} tahun';
+        }
+      }
+      // Check classmates fallback
+      for (var cm in widget.character.classmates) {
+        if (name.contains(cm['name'] ?? '')) {
+          return '${cm['age']} tahun';
+        }
+      }
+      return 'Tidak diketahui';
     }
 
     if (role == 'Mertua') {
@@ -184,12 +202,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     if ((role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.contains('Pacar')) && role != 'Mantan Pacar') {
-      // PERBAIKAN: Tambahkan widget. di depan character
       if (widget.character.partner != null && widget.character.partner!['name'] == name) {
         return int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
       }
       if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
         return int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
+      }
+      // Check exPartners fallback
+      for (var ex in widget.character.exPartners) {
+        if (ex['name'] == name) {
+          return int.tryParse(ex['relationship'] ?? '50') ?? 50;
+        }
+      }
+      // Check classmates fallback
+      for (var cm in widget.character.classmates) {
+        if (cm['name'] == name) {
+          return int.tryParse(cm['relationship'] ?? '50') ?? 50;
+        }
       }
       return int.tryParse(widget.character.partner?['relationship'] ?? '50') ?? 50;
     }
@@ -787,19 +816,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         icon: Icons.heart_broken,
         color: Colors.red,
         onTap: () {
+          final screenContext = context;
           showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
+            context: screenContext,
+            builder: (confirmDialogContext) => AlertDialog(
               title: const Text('Putuskan Hubungan', style: TextStyle(fontWeight: FontWeight.bold)),
               content: Text('Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?'),
               actions: [
                 TextButton(
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pop(confirmDialogContext),
                   child: const Text('Batal'),
                 ),
                 TextButton(
                   onPressed: () {
-                    Navigator.pop(context); // Tutup dialog konfirmasi
+                    Navigator.pop(confirmDialogContext); // Tutup dialog konfirmasi
                     
                     // 1. Hapus dari partner
                     if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
@@ -811,16 +841,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
                     // 2. Tambahkan ke exPartners (mantan pacar)
                     widget.character.exPartners.add({
-  'name': widget.targetName,
-  'gender': _getTargetGender(),
-  'age': widget.character.age.toString(),
-  'relationship': '20',
-  'relation': 'Mantan Pacar',
-  'isDeceased': 'false',
-  // --- TAMBAHKAN DATA PENYEBAB PUTUS ---
-  'breakInitiator': widget.character.gender, // Siapa yang memutuskan (Laki-laki / Perempuan)
-  'breakReason': 'putus biasa', // Alasan putus (bisa juga 'selingkuh', 'threesome')
-});
+                      'name': widget.targetName,
+                      'gender': _getTargetGender(),
+                      'age': widget.character.age.toString(),
+                      'relationship': '20',
+                      'relation': 'Mantan Pacar',
+                      'isDeceased': 'false',
+                      // --- TAMBAHKAN DATA PENYEBAB PUTUS ---
+                      'breakInitiator': widget.character.gender, // Siapa yang memutuskan (Laki-laki / Perempuan)
+                      'breakReason': 'putus biasa', // Alasan putus (bisa juga 'selingkuh', 'threesome')
+                    });
 
                     // 3. Turunkan hubungan
                     _updateRelationship(-40);
@@ -828,15 +858,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     // 4. Refresh state
                     _updateState();
 
-                    // 5. Tampilkan dialog hasil putus
+                    // 5. Tampilkan dialog hasil putus menggunakan screenContext
                     DialogHelper.show(
-                      context: context,
+                      context: screenContext,
                       title: 'Putus Hubungan 💔',
                       content: Text('Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'),
                       actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          child: const Text('Mengerti'),
+                        Builder(
+                          builder: (resultDialogContext) => TextButton(
+                            onPressed: () {
+                              Navigator.pop(resultDialogContext);
+                              Navigator.pop(screenContext);
+                            },
+                            child: const Text('Mengerti'),
+                          ),
                         ),
                       ],
                     );
@@ -850,6 +885,91 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       ));
     }
     // -------------------------------------------------------------
+
+    // --- TAMBAHAN: TOMBOL AJAK BALIKAN UNTUK MANTAN PACAR (BISA LEWAT MENU HUBUNGAN) ---
+    final bool isExPartner = widget.targetRole == 'Mantan Pacar' || widget.character.exPartners.any((ex) => ex['name'] == widget.targetName);
+    if (isExPartner && widget.character.age >= 9) {
+      final bool hasExistingPartner = widget.character.partner != null;
+      bool hasBalikanButton = actions.any((act) => act.label == 'Ajak Balikan' || act.label == 'Ajak Pacaran');
+      if (!hasBalikanButton) {
+        actions.add(ActionItem(
+          label: 'Ajak Balikan',
+          icon: hasExistingPartner ? Icons.heart_broken : Icons.favorite,
+          color: hasExistingPartner ? Colors.deepOrange : Colors.pinkAccent,
+          onTap: () {
+            bool accepted = false;
+            Map<String, String>? exData;
+            for (var ex in widget.character.exPartners) {
+              if (ex['name'] == widget.targetName) {
+                exData = ex;
+                break;
+              }
+            }
+
+            String? breakInitiator = exData?['breakInitiator'];
+            String? breakReason = exData?['breakReason'];
+
+            if (breakReason == 'selingkuh' || breakReason == 'threesome') {
+              accepted = _random.nextInt(100) < 10;
+            } else {
+              if (breakInitiator == 'Laki-laki') {
+                accepted = _random.nextInt(100) < 30;
+              } else if (breakInitiator == 'Perempuan') {
+                accepted = _random.nextInt(100) < 25;
+              } else {
+                accepted = _random.nextInt(100) < 50;
+              }
+            }
+
+            if (accepted) {
+              widget.character.exPartners.removeWhere((ex) => ex['name'] == widget.targetName);
+
+              int targetAgeVal = widget.character.age;
+              if (exData != null && exData['age'] != null) {
+                targetAgeVal = int.tryParse(exData['age']!) ?? widget.character.age;
+              }
+
+              _showResultDialog(
+                'Balikan Sukses! ❤️',
+                'Kamu berhasil balikan dengan mantan pacarmu, ${widget.targetName}!',
+                Icons.favorite,
+                Colors.pink,
+                () {
+                  final partnerMap = {
+                    'name': widget.targetName,
+                    'relation': 'Pacar',
+                    'gender': _getTargetGender(),
+                    'age': targetAgeVal.toString(),
+                    'relationship': '80',
+                    'isDeceased': 'false',
+                  };
+
+                  if (widget.character.partner == null) {
+                    widget.character.partner = partnerMap;
+                  } else {
+                    widget.character.secondPartner = partnerMap;
+                  }
+
+                  _updateRelationship(30);
+                  _updateState();
+                }
+              );
+            } else {
+              _showResultDialog(
+                'Balikan Ditolak 💔',
+                '${widget.targetName} belum bisa memaafkanmu atau tidak ingin balikan sekarang.',
+                Icons.block,
+                Colors.red,
+                () {
+                  _updateRelationship(-15);
+                  _updateState();
+                }
+              );
+            }
+          },
+        ));
+      }
+    }
 
     final int relationshipVal = _getCurrentRelationshipValue();
 

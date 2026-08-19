@@ -193,6 +193,20 @@ class Character {
     List<String> events = [];
     age++;
     health -= 2;
+
+    if (age == 6) {
+      final String notice = '🎒 Masuk Sekolah: Kamu sekarang resmi mulai bersekolah di Sekolah Dasar (SD) 🏫';
+      events.add(notice);
+      inbox.add(notice);
+    } else if (age == 13) {
+      final String notice = '🏫 Lulus & Naik Jenjang: Kamu mulai bersekolah di Sekolah Menengah Pertama (SMP) 📚';
+      events.add(notice);
+      inbox.add(notice);
+    } else if (age == 16) {
+      final String notice = '🎓 Naik Tingkat: Kamu mulai bersekolah di Sekolah Menengah Atas (SMA) ✍️';
+      events.add(notice);
+      inbox.add(notice);
+    }
     
     // Logika HIV mengurangi kesehatan secara perlahan setiap tahun
     if (hasHIV) {
