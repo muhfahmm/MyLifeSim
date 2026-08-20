@@ -6,10 +6,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/masturbate.dart';
 
 // Import submenus untuk sekolah
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/sd_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/smp_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/sma_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/universitas_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/school_menu_page.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
@@ -65,7 +62,15 @@ class ActivityButton extends StatelessWidget {
                   currentAge: age,
                   onTap: () {
                     Navigator.pop(context);
-                    SdMenu.showMenu(context, character, onRefresh);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SchoolMenuPage(
+                          character: character,
+                          onRefresh: onRefresh,
+                        ),
+                      ),
+                    );
                   },
                 ),
               if (age >= 13 && age <= 15)
@@ -79,7 +84,15 @@ class ActivityButton extends StatelessWidget {
                   currentAge: age,
                   onTap: () {
                     Navigator.pop(context);
-                    SmpMenu.showMenu(context, character, onRefresh);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SchoolMenuPage(
+                          character: character,
+                          onRefresh: onRefresh,
+                        ),
+                      ),
+                    );
                   },
                 ),
               if (age >= 16 && age <= 18)
@@ -93,7 +106,15 @@ class ActivityButton extends StatelessWidget {
                   currentAge: age,
                   onTap: () {
                     Navigator.pop(context);
-                    SmaMenu.showMenu(context, character, onRefresh);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SchoolMenuPage(
+                          character: character,
+                          onRefresh: onRefresh,
+                        ),
+                      ),
+                    );
                   },
                 ),
               if (age >= 19 && age <= 23)
@@ -107,7 +128,15 @@ class ActivityButton extends StatelessWidget {
                   currentAge: age,
                   onTap: () {
                     Navigator.pop(context);
-                    UniversitasMenu.showMenu(context, character, onRefresh);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SchoolMenuPage(
+                          character: character,
+                          onRefresh: onRefresh,
+                        ),
+                      ),
+                    );
                   },
                 ),
 
