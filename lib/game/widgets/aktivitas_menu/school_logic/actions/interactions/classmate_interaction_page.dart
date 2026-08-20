@@ -84,10 +84,13 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       name,
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      'Teman Sekelas • Hubungan: $rel%',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                    ),
+                    () {
+                      final String sexuality = widget.classmate['sexuality'] ?? 'Heteroseksual';
+                      return Text(
+                        'Teman Sekelas • Seksualitas: $sexuality • Hubungan: $rel%',
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      );
+                    }(),
                     const SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),

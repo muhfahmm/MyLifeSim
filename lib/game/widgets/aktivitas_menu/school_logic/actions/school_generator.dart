@@ -23,11 +23,34 @@ class SchoolGenerator {
     'Nasution', 'Simanjuntak', 'Setiawan', 'Budiman', 'Wibowo', 'Nugraha', 'Harahap', 'Ginting', 'Sutrisno', 'Purnama'
   ];
 
-  static String generateRandomName(String gender) {
-    final firstList = gender == 'Laki-laki' ? maleNames : femaleNames;
+  static String generateRandomName(String gender, Character character) {
+    List<String> firstList;
+    List<String> lastList;
+    
+    final bool useDynamic = gender == 'Laki-laki' 
+        ? (character.maleFirstNames != null && character.maleFirstNames!.isNotEmpty)
+        : (character.femaleFirstNames != null && character.femaleFirstNames!.isNotEmpty);
+
+    if (useDynamic) {
+      firstList = gender == 'Laki-laki' ? character.maleFirstNames! : character.femaleFirstNames!;
+      lastList = (character.lastNames != null && character.lastNames!.isNotEmpty) 
+          ? character.lastNames! 
+          : lastNames;
+    } else {
+      firstList = gender == 'Laki-laki' ? maleNames : femaleNames;
+      lastList = lastNames;
+    }
+
     final first = firstList[_random.nextInt(firstList.length)];
-    final last = lastNames[_random.nextInt(lastNames.length)];
+    final last = lastList[_random.nextInt(lastList.length)];
     return '$first $last';
+  }
+
+  static String _randomSexuality() {
+    final roll = _random.nextInt(100);
+    if (roll < 85) return 'Heteroseksual';
+    if (roll < 93) return 'Biseksual';
+    return 'Homoseksual';
   }
 
   static void generateClassmatesIfEmpty(Character character) {
@@ -36,13 +59,14 @@ class SchoolGenerator {
     final int count = 20 + _random.nextInt(11); // 20 to 30
     for (int i = 0; i < count; i++) {
       final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
-      final name = generateRandomName(gender);
+      final name = generateRandomName(gender, character);
       character.classmates.add({
         'name': name,
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(), // 40 to 60 initial
         'age': character.age.toString(),
         'isDeceased': 'false',
+        'sexuality': _randomSexuality(),
       });
     }
   }
@@ -52,10 +76,11 @@ class SchoolGenerator {
     if (character.headmaster == null) {
       final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
       character.headmaster = {
-        'name': generateRandomName(gender),
+        'name': generateRandomName(gender, character),
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(),
         'age': (35 + _random.nextInt(26)).toString(), // 35 to 60
+        'sexuality': _randomSexuality(),
       };
     }
 
@@ -63,10 +88,11 @@ class SchoolGenerator {
     if (character.bkTeacher == null) {
       final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
       character.bkTeacher = {
-        'name': generateRandomName(gender),
+        'name': generateRandomName(gender, character),
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(),
         'age': (28 + _random.nextInt(23)).toString(), // 28 to 50
+        'sexuality': _randomSexuality(),
       };
     }
 
@@ -75,11 +101,12 @@ class SchoolGenerator {
       for (int i = 0; i < 3; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.sdTeachers.add({
-          'name': generateRandomName(gender),
+          'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': ['Matematika', 'B. Indonesia', 'IPA', 'IPS', 'B. Inggris'][i % 5],
           'age': (25 + _random.nextInt(31)).toString(),
+          'sexuality': _randomSexuality(),
         });
       }
     }
@@ -89,11 +116,12 @@ class SchoolGenerator {
       for (int i = 0; i < 3; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.smpTeachers.add({
-          'name': generateRandomName(gender),
+          'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': ['Matematika', 'B. Indonesia', 'Fisika', 'Sejarah', 'Olahraga'][i % 5],
           'age': (25 + _random.nextInt(31)).toString(),
+          'sexuality': _randomSexuality(),
         });
       }
     }
@@ -103,11 +131,12 @@ class SchoolGenerator {
       for (int i = 0; i < 3; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.smaTeachers.add({
-          'name': generateRandomName(gender),
+          'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': ['Kalkulus', 'Kimia', 'Biologi', 'Sosiologi', 'Ekonomi'][i % 5],
           'age': (25 + _random.nextInt(31)).toString(),
+          'sexuality': _randomSexuality(),
         });
       }
     }

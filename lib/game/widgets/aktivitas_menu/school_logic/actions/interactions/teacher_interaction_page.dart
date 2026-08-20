@@ -86,10 +86,13 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                       name,
                       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    Text(
-                      '${widget.role} • Hubungan: $rel%',
-                      style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
-                    ),
+                    () {
+                      final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
+                      return Text(
+                        '${widget.role} • Seksualitas: $sexuality • Hubungan: $rel%',
+                        style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
+                      );
+                    }(),
                     const SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(6),

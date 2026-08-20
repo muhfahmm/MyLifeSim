@@ -50,15 +50,41 @@ class ActivityButton extends StatelessWidget {
               const Text('Pendidikan & Karir', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
               const SizedBox(height: 8),
 
-              // Item Sekolah (Kondisional berdasarkan usia)
-              if (age >= 6 && age <= 12)
-                _buildActivityTile(
+              // Item Sekolah (Selalu muncul, dikunci jika belum cukup umur < 6 tahun)
+              () {
+                final String label;
+                final String subtitle;
+                final Color color;
+                final int minAge;
+                if (age <= 12) {
+                  label = 'Sekolah Dasar (SD)';
+                  subtitle = 'Belajar dan bermain di Sekolah Dasar';
+                  color = Colors.blue;
+                  minAge = 6;
+                } else if (age <= 15) {
+                  label = 'Sekolah Menengah Pertama (SMP)';
+                  subtitle = 'Lanjutkan pendidikan tingkat pertama';
+                  color = Colors.blueAccent;
+                  minAge = 13;
+                } else if (age <= 18) {
+                  label = 'Sekolah Menengah Atas (SMA)';
+                  subtitle = 'Pendidikan tingkat atas persiapan karir';
+                  color = Colors.purple;
+                  minAge = 16;
+                } else {
+                  label = 'Universitas (Kuliah)';
+                  subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
+                  color = Colors.indigo;
+                  minAge = 19;
+                }
+
+                return _buildActivityTile(
                   context: context,
-                  label: 'Sekolah Dasar (SD)',
-                  subtitle: 'Belajar dan bermain di Sekolah Dasar',
+                  label: label,
+                  subtitle: subtitle,
                   icon: Icons.school,
-                  color: Colors.blue,
-                  minAge: 6,
+                  color: color,
+                  minAge: minAge,
                   currentAge: age,
                   onTap: () {
                     Navigator.pop(context);
@@ -72,73 +98,8 @@ class ActivityButton extends StatelessWidget {
                       ),
                     );
                   },
-                ),
-              if (age >= 13 && age <= 15)
-                _buildActivityTile(
-                  context: context,
-                  label: 'Sekolah Menengah Pertama (SMP)',
-                  subtitle: 'Lanjutkan pendidikan tingkat pertama',
-                  icon: Icons.school,
-                  color: Colors.blueAccent,
-                  minAge: 13,
-                  currentAge: age,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SchoolMenuPage(
-                          character: character,
-                          onRefresh: onRefresh,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              if (age >= 16 && age <= 18)
-                _buildActivityTile(
-                  context: context,
-                  label: 'Sekolah Menengah Atas (SMA)',
-                  subtitle: 'Pendidikan tingkat atas persiapan karir',
-                  icon: Icons.school,
-                  color: Colors.purple,
-                  minAge: 16,
-                  currentAge: age,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SchoolMenuPage(
-                          character: character,
-                          onRefresh: onRefresh,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              if (age >= 19 && age <= 23)
-                _buildActivityTile(
-                  context: context,
-                  label: 'Universitas (Kuliah)',
-                  subtitle: 'Menempuh pendidikan tinggi untuk karir profesional',
-                  icon: Icons.school,
-                  color: Colors.indigo,
-                  minAge: 19,
-                  currentAge: age,
-                  onTap: () {
-                    Navigator.pop(context);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => SchoolMenuPage(
-                          character: character,
-                          onRefresh: onRefresh,
-                        ),
-                      ),
-                    );
-                  },
-                ),
+                );
+              }(),
 
               // Item Bekerja (Terbuka usia 19)
               _buildActivityTile(
