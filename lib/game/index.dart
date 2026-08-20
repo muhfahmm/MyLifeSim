@@ -768,12 +768,6 @@ class _GameScreenState extends State<GameScreen> {
                       const SnackBar(content: Text('Mendapatkan uang 100!')),
                     );
                   },
-                  onStudy: () {
-                    setState(() => _character.intelligence += 10);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Kecerdasan +10!')),
-                    );
-                  },
                   onExercise: () {
                     setState(() => _character.health += 10);
                     ScaffoldMessenger.of(context).showSnackBar(

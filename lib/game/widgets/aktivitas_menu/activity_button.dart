@@ -6,16 +6,15 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/masturbate.dart';
 
 // Import submenus untuk sekolah
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/sekolah_dasar/sekolah_dasar_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/menengah_pertama/menengah_pertama_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/menengah_atas/menengah_atas_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/univ/univ_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/sd_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/smp_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/sma_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/universitas_menu.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
   final bool isAlive;
   final VoidCallback onWork;
-  final VoidCallback onStudy;
   final VoidCallback onExercise;
   final VoidCallback onRefresh;
 
@@ -24,7 +23,6 @@ class ActivityButton extends StatelessWidget {
     required this.character,
     required this.isAlive,
     required this.onWork,
-    required this.onStudy,
     required this.onExercise,
     required this.onRefresh,
   });
@@ -55,57 +53,63 @@ class ActivityButton extends StatelessWidget {
               const Text('Pendidikan & Karir', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
               const SizedBox(height: 8),
 
-              // Item Sekolah / Kuliah (Terbuka usia 6)
-              _buildActivityTile(
-                context: context,
-                label: age >= 19 ? 'Sekolah / Kuliah' : (age >= 16 ? 'Sekolah (Menengah Atas)' : (age >= 13 ? 'Sekolah (Menengah Pertama)' : 'Sekolah (Dasar)')),
-                subtitle: age >= 19 ? 'Pilih kuliah atau langsung karir' : 'Lanjutkan pendidikanmu untuk masa depan',
-                icon: Icons.school,
-                color: Colors.blue,
-                minAge: 6,
-                currentAge: age,
-                onTap: () {
-                  if (age >= 6 && age <= 12) {
+              // Item Sekolah (Kondisional berdasarkan usia)
+              if (age >= 6 && age <= 12)
+                _buildActivityTile(
+                  context: context,
+                  label: 'Sekolah Dasar (SD)',
+                  subtitle: 'Belajar dan bermain di Sekolah Dasar',
+                  icon: Icons.school,
+                  color: Colors.blue,
+                  minAge: 6,
+                  currentAge: age,
+                  onTap: () {
                     Navigator.pop(context);
-                    SekolahDasarMenu.showMenu(context, character, onRefresh);
-                  } else if (age >= 13 && age <= 15) {
+                    SdMenu.showMenu(context, character, onRefresh);
+                  },
+                ),
+              if (age >= 13 && age <= 15)
+                _buildActivityTile(
+                  context: context,
+                  label: 'Sekolah Menengah Pertama (SMP)',
+                  subtitle: 'Lanjutkan pendidikan tingkat pertama',
+                  icon: Icons.school,
+                  color: Colors.blueAccent,
+                  minAge: 13,
+                  currentAge: age,
+                  onTap: () {
                     Navigator.pop(context);
-                    MenengahPertamaMenu.showMenu(context, character, onRefresh);
-                  } else if (age >= 16 && age <= 18) {
+                    SmpMenu.showMenu(context, character, onRefresh);
+                  },
+                ),
+              if (age >= 16 && age <= 18)
+                _buildActivityTile(
+                  context: context,
+                  label: 'Sekolah Menengah Atas (SMA)',
+                  subtitle: 'Pendidikan tingkat atas persiapan karir',
+                  icon: Icons.school,
+                  color: Colors.purple,
+                  minAge: 16,
+                  currentAge: age,
+                  onTap: () {
                     Navigator.pop(context);
-                    MenengahAtasMenu.showMenu(context, character, onRefresh);
-                  } else if (age >= 19) {
+                    SmaMenu.showMenu(context, character, onRefresh);
+                  },
+                ),
+              if (age >= 19 && age <= 23)
+                _buildActivityTile(
+                  context: context,
+                  label: 'Universitas (Kuliah)',
+                  subtitle: 'Menempuh pendidikan tinggi untuk karir profesional',
+                  icon: Icons.school,
+                  color: Colors.indigo,
+                  minAge: 19,
+                  currentAge: age,
+                  onTap: () {
                     Navigator.pop(context);
-                    // Berikan dialog pilihan menggunakan Modal
-                    DialogHelper.show(
-                      context: context,
-                      title: 'Pilihan Karir & Pendidikan 🎓💼',
-                      content: const Text(
-                        'Kamu sudah berusia 19 tahun. Apakah kamu ingin melanjutkan kuliah ke Universitas atau memilih untuk langsung bekerja?',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      actions: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.blue),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            UniversitasMenu.showMenu(context, character, onRefresh);
-                          },
-                          child: const Text('Kuliah', style: TextStyle(color: Colors.white)),
-                        ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
-                          onPressed: () {
-                            Navigator.pop(context);
-                            onWork();
-                          },
-                          child: const Text('Langsung Kerja', style: TextStyle(color: Colors.white)),
-                        ),
-                      ],
-                    );
-                  }
-                },
-              ),
+                    UniversitasMenu.showMenu(context, character, onRefresh);
+                  },
+                ),
 
               // Item Bekerja (Terbuka usia 19)
               _buildActivityTile(
