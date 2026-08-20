@@ -34,7 +34,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
           builder: (dialogContext) => TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              Navigator.pop(context); // Go back to classmates list
+              setState(() {}); // Refresh current screen
             },
             child: const Text('OK'),
           ),

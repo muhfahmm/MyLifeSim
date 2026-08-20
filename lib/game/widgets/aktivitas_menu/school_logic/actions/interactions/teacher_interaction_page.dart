@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_siswi/teacher_student_romance_logic.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -35,7 +36,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
           builder: (dialogContext) => TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              Navigator.pop(context); // Go back to teachers list
+              setState(() {}); // Refresh current screen
             },
             child: const Text('OK'),
           ),
@@ -139,7 +140,40 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi 1: Cari Muka (Puji) - tetap dipertahankan
+            if (TeacherStudentRomanceLogic.shouldShowTeacherRomance(widget.character.age)) ...[
+              // Aksi 1: Bercinta / Make Love
+              _buildActionTile(
+                icon: Icons.favorite,
+                color: Colors.pink,
+                title: 'Bercinta / Make Love',
+                onTap: () {
+                  TeacherStudentRomanceLogic.bercinta(
+                    context: context,
+                    character: widget.character,
+                    teacher: widget.teacher,
+                    onRefresh: widget.onRefresh,
+                    showOutcome: (title, desc) => _showOutcome(title, desc),
+                  );
+                },
+              ),
+              // Aksi 2: Ajak Pacaran
+              _buildActionTile(
+                icon: Icons.favorite_border,
+                color: Colors.redAccent,
+                title: 'Ajak Pacaran',
+                onTap: () {
+                  TeacherStudentRomanceLogic.ajakPacaran(
+                    context: context,
+                    character: widget.character,
+                    teacher: widget.teacher,
+                    onRefresh: widget.onRefresh,
+                    showOutcome: (title, desc) => _showOutcome(title, desc),
+                  );
+                },
+              ),
+            ],
+
+            // Aksi 3: Cari Muka (Puji) - tetap dipertahankan
             _buildActionTile(
               icon: Icons.thumb_up_alt_outlined,
               color: Colors.teal,

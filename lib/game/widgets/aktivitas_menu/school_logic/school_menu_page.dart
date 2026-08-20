@@ -2,9 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'actions/pindah_sekolah.dart';
+import 'actions/belajar.dart';
 import 'actions/kelas.dart';
 import 'actions/guru.dart';
+import 'actions/pindah_sekolah.dart';
 import 'actions/bolos_sekolah.dart';
 import 'actions/keluar_sekolah.dart';
 
@@ -91,7 +92,17 @@ class SchoolMenuPage extends StatelessWidget {
             ),
             const SizedBox(height: 12),
 
-            // Pilihan Menu 1: Kelas
+            // Pilihan Menu 1: Belajar Lebih Giat
+            _buildMenuTile(
+              context: context,
+              icon: Icons.menu_book,
+              color: Colors.indigo,
+              title: 'Belajar Lebih Giat',
+              subtitle: 'Tingkatkan fokus dan kecerdasan belajarmu',
+              page: BelajarActionPage(character: character, onRefresh: onRefresh),
+            ),
+
+            // Pilihan Menu 2: Kelas
             _buildMenuTile(
               context: context,
               icon: Icons.group,
