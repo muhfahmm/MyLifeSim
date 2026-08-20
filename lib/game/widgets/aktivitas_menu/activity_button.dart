@@ -45,12 +45,19 @@ class ActivityButton extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ============================================
-              // 1. BAGIAN PENDIDIKAN & KARIR
+              // 1. PENDIDIKAN & KARIR
               // ============================================
-              const Text('Pendidikan & Karir', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+              const Text(
+                'Pendidikan & Karir',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blueGrey,
+                ),
+              ),
               const SizedBox(height: 8),
 
-              // Item Sekolah (Selalu muncul, dikunci jika belum cukup umur < 6 tahun)
+              // Item Sekolah
               () {
                 final String label;
                 final String subtitle;
@@ -101,7 +108,7 @@ class ActivityButton extends StatelessWidget {
                 );
               }(),
 
-              // Item Bekerja (Terbuka usia 19)
+              // Item Bekerja
               _buildActivityTile(
                 context: context,
                 label: 'Bekerja',
@@ -119,12 +126,19 @@ class ActivityButton extends StatelessWidget {
               const Divider(height: 32),
 
               // ============================================
-              // 2. BAGIAN KESEHATAN & KEBUGARAN
+              // 2. KESEHATAN & KEBUGARAN
               // ============================================
-              const Text('Kesehatan & Kebugaran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+              const Text(
+                'Kesehatan & Kebugaran',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blueGrey,
+                ),
+              ),
               const SizedBox(height: 8),
 
-              // Item Olahraga (Terbuka usia 7)
+              // Item Olahraga
               _buildActivityTile(
                 context: context,
                 label: 'Olahraga',
@@ -139,15 +153,293 @@ class ActivityButton extends StatelessWidget {
                 },
               ),
 
-              if (age >= 9) ...[
-                const Divider(height: 32),
-                
-                // ============================================
-                // 3. BAGIAN LAINNYA
-                // ============================================
-                const Text('Lainnya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-                const SizedBox(height: 8),
+              const Divider(height: 32),
 
+              // ============================================
+              // 3. HIBURAN & GAYA HIDUP
+              // ============================================
+              const Text(
+                'Hiburan & Gaya Hidup',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Aksesoris
+              _buildActivityTile(
+                context: context,
+                label: 'Aksesoris',
+                subtitle: 'Tambahkan aksesoris untuk gaya',
+                icon: Icons.style,
+                color: Colors.pink,
+                minAge: 0,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur aksesoris belum tersedia')),
+                  );
+                },
+              ),
+
+              // Adopsi Anak
+              _buildActivityTile(
+                context: context,
+                label: 'Adopsi Anak',
+                subtitle: 'Berikan kasih sayang pada anak',
+                icon: Icons.child_care,
+                color: Colors.orange,
+                minAge: 21,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur adopsi anak belum tersedia')),
+                  );
+                },
+              ),
+
+              // Buat Kriminal
+              _buildActivityTile(
+                context: context,
+                label: 'Buat Kriminal',
+                subtitle: 'Melakukan aksi kriminal',
+                icon: Icons.gavel,
+                color: Colors.red,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur kriminal belum tersedia')),
+                  );
+                },
+              ),
+
+              // Pergi ke Dokter
+              _buildActivityTile(
+                context: context,
+                label: 'Pergi ke Dokter',
+                subtitle: 'Periksa kesehatan',
+                icon: Icons.local_hospital,
+                color: Colors.blue,
+                minAge: 0,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur dokter belum tersedia')),
+                  );
+                },
+              ),
+
+              // Imigrasi
+              _buildActivityTile(
+                context: context,
+                label: 'Imigrasi',
+                subtitle: 'Pindah ke negara lain',
+                icon: Icons.flight_takeoff,
+                color: Colors.teal,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur imigrasi belum tersedia')),
+                  );
+                },
+              ),
+
+              // Kesuburan
+              _buildActivityTile(
+                context: context,
+                label: 'Kesuburan',
+                subtitle: 'Cek atau tingkatkan kesuburan',
+                icon: Icons.egg,
+                color: Colors.purple,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur kesuburan belum tersedia')),
+                  );
+                },
+              ),
+
+              // Lisensi
+              _buildActivityTile(
+                context: context,
+                label: 'Lisensi',
+                subtitle: 'Dapatkan lisensi (SIM, dll)',
+                icon: Icons.assignment_ind,
+                color: Colors.brown,
+                minAge: 17,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur lisensi belum tersedia')),
+                  );
+                },
+              ),
+
+              // Main Lotre
+              _buildActivityTile(
+                context: context,
+                label: 'Main Lotre',
+                subtitle: 'Coba keberuntungan',
+                icon: Icons.casino,
+                color: Colors.amber,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur lotre belum tersedia')),
+                  );
+                },
+              ),
+
+              // Bercinta
+              _buildActivityTile(
+                context: context,
+                label: 'Bercinta',
+                subtitle: 'Nikmati keintiman',
+                icon: Icons.favorite,
+                color: Colors.pinkAccent,
+                minAge: 16,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur bercinta belum tersedia')),
+                  );
+                },
+              ),
+
+              // Pikiran dan Tubuh
+              _buildActivityTile(
+                context: context,
+                label: 'Pikiran dan Tubuh',
+                subtitle: 'Meditasi, yoga, atau terapi',
+                icon: Icons.self_improvement,
+                color: Colors.indigo,
+                minAge: 0,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur pikiran dan tubuh belum tersedia')),
+                  );
+                },
+              ),
+
+              // Peliharaan
+              _buildActivityTile(
+                context: context,
+                label: 'Peliharaan',
+                subtitle: 'Adopsi hewan peliharaan',
+                icon: Icons.pets,
+                color: Colors.green,
+                minAge: 10,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur peliharaan belum tersedia')),
+                  );
+                },
+              ),
+
+              // Operasi Plastik
+              _buildActivityTile(
+                context: context,
+                label: 'Operasi Plastik',
+                subtitle: 'Ubah penampilan',
+                icon: Icons.face,
+                color: Colors.cyan,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur operasi plastik belum tersedia')),
+                  );
+                },
+              ),
+
+              // Rehabilitasi
+              _buildActivityTile(
+                context: context,
+                label: 'Rehabilitasi',
+                subtitle: 'Pulihkan diri dari kecanduan',
+                icon: Icons.healing,
+                color: Colors.deepPurple,
+                minAge: 18,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur rehabilitasi belum tersedia')),
+                  );
+                },
+              ),
+
+              // Salon & Spa
+              _buildActivityTile(
+                context: context,
+                label: 'Salon & Spa',
+                subtitle: 'Rawat diri dan kecantikan',
+                icon: Icons.spa,
+                color: Colors.pink,
+                minAge: 0,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur salon & spa belum tersedia')),
+                  );
+                },
+              ),
+
+              // Berbelanja
+              _buildActivityTile(
+                context: context,
+                label: 'Berbelanja',
+                subtitle: 'Beli barang kebutuhan',
+                icon: Icons.shopping_cart,
+                color: Colors.orangeAccent,
+                minAge: 0,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur berbelanja belum tersedia')),
+                  );
+                },
+              ),
+
+              const Divider(height: 32),
+
+              // ============================================
+              // 4. LAINNYA (di bagian paling bawah)
+              // ============================================
+              const Text(
+                'Lainnya',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: Colors.blueGrey,
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Masturbasi (hanya jika usia ≥ 9)
+              if (age >= 9)
                 Card(
                   elevation: 0,
                   margin: const EdgeInsets.only(bottom: 8),
@@ -167,7 +459,23 @@ class ActivityButton extends StatelessWidget {
                     },
                   ),
                 ),
-              ],
+
+              // Love (misalnya aktivitas romantis, usia minimal 16)
+              _buildActivityTile(
+                context: context,
+                label: 'Love (Cinta)',
+                subtitle: 'Ekspresikan perasaan cintamu',
+                icon: Icons.favorite,
+                color: Colors.redAccent,
+                minAge: 16,
+                currentAge: age,
+                onTap: () {
+                  Navigator.pop(context);
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Fitur love belum tersedia')),
+                  );
+                },
+              ),
             ],
           ),
           actions: [
@@ -258,9 +566,9 @@ class ActivityButton extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFFF3E0), // Solid light orange
+                          color: const Color(0xFFFFF3E0),
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFFFB74D)), // Solid border
+                          border: Border.all(color: const Color(0xFFFFB74D)),
                         ),
                         child: Row(
                           children: [
