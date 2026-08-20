@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswi/guru_laki_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswa/guru_perempuan_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/siswa_siswi_proposal_chance.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_proposal_chance.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
@@ -695,13 +697,30 @@ class Character {
 
         if (candRole == 'Guru') {
           if (candGender == 'Laki-laki') {
-            chance = proposalType == 'Ajak Pacaran' 
-                ? GuruLakiProposalChance.getPacaranChance(age) 
-                : GuruLakiProposalChance.getBercintaChance(age);
+            if (myGenderLower == 'laki-laki') {
+              // Gay
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruLakiSiswaLakiProposalChance.getPacaranChance(age) 
+                  : GuruLakiSiswaLakiProposalChance.getBercintaChance(age);
+            } else {
+              // Hetero
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruLakiProposalChance.getPacaranChance(age) 
+                  : GuruLakiProposalChance.getBercintaChance(age);
+            }
           } else {
-            chance = proposalType == 'Ajak Pacaran' 
-                ? GuruPerempuanProposalChance.getPacaranChance(age) 
-                : GuruPerempuanProposalChance.getBercintaChance(age);
+            // Guru Perempuan
+            if (myGenderLower == 'perempuan') {
+              // Lesbian
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruPerempuanSiswiProposalChance.getPacaranChance(age) 
+                  : GuruPerempuanSiswiProposalChance.getBercintaChance(age);
+            } else {
+              // Hetero
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruPerempuanProposalChance.getPacaranChance(age) 
+                  : GuruPerempuanProposalChance.getBercintaChance(age);
+            }
           }
         } else {
           // Teman Sekelas
