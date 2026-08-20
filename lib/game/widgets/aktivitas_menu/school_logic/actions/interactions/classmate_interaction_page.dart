@@ -137,61 +137,111 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi 1: Mengobrol
+            // Aksi 1: Berteman
             _buildActionTile(
-              icon: Icons.chat_bubble_outline,
-              color: Colors.blue,
-              title: 'Mengobrol',
+              icon: Icons.group_add,
+              color: Colors.teal,
+              title: 'Berteman',
               onTap: () {
                 final change = 5 + Random().nextInt(11);
                 widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
                 widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
                 widget.onRefresh();
-                _showOutcome('Mengobrol', 'Kamu mengobrol seru dengan $name tentang game kesukaan kalian. Hubungan kalian meningkat!');
+                _showOutcome('Berteman', 'Kamu mengajak $name untuk berteman dan dia merespon dengan hangat! Hubungan kalian meningkat!');
               },
             ),
 
-            // Aksi 2: Bermain Bersama
+            // Aksi 2: Berikan Pujian
             _buildActionTile(
-              icon: Icons.sports_esports_outlined,
-              color: Colors.green,
-              title: 'Bermain Bersama',
+              icon: Icons.thumb_up,
+              color: Colors.blueAccent,
+              title: 'Berikan Pujian',
               onTap: () {
-                final change = 8 + Random().nextInt(11);
+                final change = 5 + Random().nextInt(6);
                 widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
-                widget.character.happiness = (widget.character.happiness + 8).clamp(0, 100);
+                widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
                 widget.onRefresh();
-                _showOutcome('Bermain Bersama', 'Kamu bermain game online bersama $name selama istirahat. Menyenangkan sekali!');
+                _showOutcome('Pujian', 'Kamu memuji penampilan $name. Dia tersenyum dan terlihat sangat senang!');
               },
             ),
 
-            // Aksi 3: Jahili
+            // Aksi 3: Percakapan (Mengobrol)
             _buildActionTile(
-              icon: Icons.sentiment_very_satisfied,
-              color: Colors.orange,
-              title: 'Jahili',
+              icon: Icons.chat_bubble_outline,
+              color: Colors.blue,
+              title: 'Percakapan',
               onTap: () {
-                final success = Random().nextBool();
-                if (success) {
-                  widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
-                  widget.character.karma = (widget.character.karma - 3).clamp(0, 100);
-                  widget.onRefresh();
-                  _showOutcome('Menjahili', 'Kamu menaruh lem mainan di kursi $name. Dia kaget saat duduk dan semua orang tertawa!');
-                } else {
-                  final change = 10 + Random().nextInt(11);
+                final change = 5 + Random().nextInt(11);
+                widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+                widget.onRefresh();
+                _showOutcome('Percakapan', 'Kamu mengobrol seru dengan $name tentang game kesukaan kalian. Hubungan kalian meningkat!');
+              },
+            ),
+
+            // Aksi 4: Menggoda
+            _buildActionTile(
+              icon: Icons.favorite_border,
+              color: Colors.pink,
+              title: 'Menggoda',
+              onTap: () {
+                final int chance = Random().nextInt(100);
+                if (chance < 30) {
+                  // Gagal menggoda
+                  final change = 5 + Random().nextInt(11);
                   widget.classmate['relationship'] = (rel - change).clamp(0, 100).toString();
                   widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
                   widget.onRefresh();
-                  _showOutcome('Gagal Menjahili', 'Kamu mencoba menjahili $name, tapi kamu malah ketahuan dan dimarahi olehnya!');
+                  _showOutcome('Gagal Menggoda', 'Kamu mencoba menggoda $name tetapi dia merasa tidak nyaman dan menjauh. Hubungan menurun!');
+                } else {
+                  final change = 5 + Random().nextInt(11);
+                  widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+                  widget.onRefresh();
+                  _showOutcome('Menggoda Berhasil', 'Kamu menggoda $name dengan cara yang lucu dan dia tersipu! Hubungan meningkat!');
                 }
               },
             ),
 
-            // Aksi 4: Ajak Berkelahi
+            // Aksi 5: Berikan Hadiah
+            _buildActionTile(
+              icon: Icons.card_giftcard,
+              color: Colors.purple,
+              title: 'Berikan Hadiah',
+              onTap: () {
+                if (widget.character.money < 20) {
+                  _showOutcome('Uang Tidak Cukup', 'Kamu tidak punya uang untuk membeli hadiah. Kumpulkan uang terlebih dahulu!');
+                  return;
+                }
+                final change = 10 + Random().nextInt(16);
+                widget.character.money -= 20;
+                widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+                widget.onRefresh();
+                _showOutcome('Hadiah Diberikan', 'Kamu memberikan hadiah kecil kepada $name. Dia sangat terharu dan berterima kasih! Hubungan meningkat pesat!');
+              },
+            ),
+
+            // Aksi 6: Hina
+            _buildActionTile(
+              icon: Icons.sentiment_very_dissatisfied,
+              color: Colors.red,
+              title: 'Hina',
+              onTap: () {
+                final change = 10 + Random().nextInt(16);
+                widget.classmate['relationship'] = (rel - change).clamp(0, 100).toString();
+                widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
+                widget.character.karma = (widget.character.karma - 5).clamp(0, 100);
+                widget.onRefresh();
+                _showOutcome('Menghina', 'Kamu mengucapkan kata-kata kasar kepada $name. Dia terlihat sangat tersinggung dan hubungan memburuk!');
+              },
+            ),
+
+            // Aksi 7: Buat Keributan (Ajak Berkelahi)
             _buildActionTile(
               icon: Icons.gavel,
-              color: Colors.red,
-              title: 'Ajak Berkelahi',
+              color: Colors.orange,
+              title: 'Buat Keributan',
               onTap: () {
                 final win = Random().nextBool();
                 final relChange = 20 + Random().nextInt(21);
@@ -200,13 +250,13 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                   widget.character.health = (widget.character.health - 5).clamp(0, 100);
                   widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
                   widget.onRefresh();
-                  _showOutcome('Berkelahi', 'Kamu berkelahi dengan $name karena adu mulut dan kamu memenangkan perkelahian tersebut! Namun tubuhmu sedikit memar.');
+                  _showOutcome('Keributan', 'Kamu terlibat perkelahian dengan $name karena adu mulut dan kamu berhasil memenangkannya! Namun tubuhmu sedikit memar.');
                 } else {
                   widget.classmate['relationship'] = (rel - relChange).clamp(0, 100).toString();
                   widget.character.health = (widget.character.health - 15).clamp(0, 100);
                   widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
                   widget.onRefresh();
-                  _showOutcome('Kalah Berkelahi', 'Kamu berkelahi dengan $name and kalah telak. Kamu menderita memar parah dan merasa sangat malu!');
+                  _showOutcome('Kalah Keributan', 'Kamu berkelahi dengan $name dan kalah telak. Kamu menderita memar parah dan merasa sangat malu!');
                 }
               },
             ),

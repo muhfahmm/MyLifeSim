@@ -139,21 +139,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi 1: Belajar Giat
-            _buildActionTile(
-              icon: Icons.menu_book,
-              color: Colors.indigo,
-              title: 'Belajar Giat',
-              onTap: () {
-                final change = 6 + Random().nextInt(10);
-                widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-                widget.character.intelligence = (widget.character.intelligence + 5).clamp(0, 100);
-                widget.onRefresh();
-                _showOutcome('Belajar Giat', 'Kamu menunjukkan antusiasme yang tinggi di kelas. $name terkesan dengan ketekunanmu!');
-              },
-            ),
-
-            // Aksi 2: Cari Muka (Puji)
+            // Aksi 1: Cari Muka (Puji) - tetap dipertahankan
             _buildActionTile(
               icon: Icons.thumb_up_alt_outlined,
               color: Colors.teal,
@@ -174,7 +160,62 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               },
             ),
 
-            // Aksi 3: Menghina
+            // Aksi 2: Bertingkah Laku (BARU)
+            _buildActionTile(
+              icon: Icons.emoji_people,
+              color: Colors.blueAccent,
+              title: 'Bertingkah Laku',
+              onTap: () {
+                final change = 3 + Random().nextInt(8); // 3-10
+                widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
+                widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
+                widget.onRefresh();
+                _showOutcome('Bertingkah Laku', 'Kamu menunjukkan sikap sopan dan membantu $name. Dia sangat menghargai perilakumu!');
+              },
+            ),
+
+            // Aksi 3: Gift (BARU)
+            _buildActionTile(
+              icon: Icons.card_giftcard,
+              color: Colors.orange,
+              title: 'Gift',
+              onTap: () {
+                const int giftCost = 100;
+                if (widget.character.money >= giftCost) {
+                  final change = 10 + Random().nextInt(11); // 10-20
+                  widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
+                  widget.character.money -= giftCost;
+                  widget.onRefresh();
+                  _showOutcome('Memberi Hadiah', 'Kamu memberikan hadiah istimewa kepada $name. Dia sangat senang dan hubunganmu membaik!');
+                } else {
+                  _showOutcome('Gagal Memberi Hadiah', 'Kamu tidak memiliki cukup uang untuk membeli hadiah. (Butuh $giftCost)');
+                }
+              },
+            ),
+
+            // Aksi 4: Cium (BARU)
+            _buildActionTile(
+              icon: Icons.favorite,
+              color: Colors.pinkAccent,
+              title: 'Cium',
+              onTap: () {
+                if (rel >= 60) {
+                  final change = 10 + Random().nextInt(11); // 10-20
+                  widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+                  widget.onRefresh();
+                  _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa disayangi! Hubungan kalian semakin dekat.');
+                } else {
+                  final change = 10 + Random().nextInt(11); // 10-20 penurunan
+                  widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+                  widget.onRefresh();
+                  _showOutcome('Ciuman Ditolak', 'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
+                }
+              },
+            ),
+
+            // Aksi 5: Menghina - tetap dipertahankan
             _buildActionTile(
               icon: Icons.sentiment_very_dissatisfied,
               color: Colors.red,
