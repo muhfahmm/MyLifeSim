@@ -8,6 +8,8 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_si
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_guru_laki/siswi_guru_laki_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswa/guru_perempuan_siswa_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_guru_perempuan/siswa_guru_perempuan_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_logic.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -170,8 +172,25 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                       onRefresh: widget.onRefresh,
                       showOutcome: (t, d) => _showOutcome(t, d),
                     );
+                  } else if (userGen == 'Laki-laki' && teacherGen == 'Laki-laki') {
+                    // Siswa Laki-laki ke Guru Laki-laki (Gay)
+                    GuruLakiSiswaLakiLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else if (userGen == 'Perempuan' && teacherGen == 'Perempuan') {
+                    // Siswi Perempuan ke Guru Perempuan (Lesbian)
+                    GuruPerempuanSiswiLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
                   } else {
-                    // Fallback
                     _showOutcome('Bercinta Ditolak 🚫', '$name menolak ajakanmu.');
                   }
                 },
@@ -202,8 +221,25 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                       onRefresh: widget.onRefresh,
                       showOutcome: (t, d) => _showOutcome(t, d),
                     );
+                  } else if (userGen == 'Laki-laki' && teacherGen == 'Laki-laki') {
+                    // Siswa Laki-laki ke Guru Laki-laki (Gay)
+                    GuruLakiSiswaLakiLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else if (userGen == 'Perempuan' && teacherGen == 'Perempuan') {
+                    // Siswi Perempuan ke Guru Perempuan (Lesbian)
+                    GuruPerempuanSiswiLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
                   } else {
-                    // Fallback
                     _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan pacaranmu.');
                   }
                 },
