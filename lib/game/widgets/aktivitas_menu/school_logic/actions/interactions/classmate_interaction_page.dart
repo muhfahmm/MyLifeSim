@@ -5,6 +5,8 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/student_romance_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_logic.dart';
 import 'dart:math';
 
 class ClassmateInteractionPage extends StatefulWidget {
@@ -148,13 +150,33 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                 color: Colors.pink,
                 title: 'Bercinta / Make Love',
                 onTap: () {
-                  StudentRomanceLogic.bercinta(
-                    context: context,
-                    character: widget.character,
-                    classmate: widget.classmate,
-                    onRefresh: widget.onRefresh,
-                    showOutcome: (title, desc) => _showOutcome(title, desc),
-                  );
+                  final userGen = widget.character.gender;
+                  final mateGen = gender;
+                  if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
+                    SiswaSiswaLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
+                    SiswiSiswiLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  } else {
+                    StudentRomanceLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  }
                 },
               ),
               // Aksi 2: Ajak Pacaran
@@ -163,13 +185,33 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                 color: Colors.redAccent,
                 title: 'Ajak Pacaran',
                 onTap: () {
-                  StudentRomanceLogic.ajakPacaran(
-                    context: context,
-                    character: widget.character,
-                    classmate: widget.classmate,
-                    onRefresh: widget.onRefresh,
-                    showOutcome: (title, desc) => _showOutcome(title, desc),
-                  );
+                  final userGen = widget.character.gender;
+                  final mateGen = gender;
+                  if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
+                    SiswaSiswaLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
+                    SiswiSiswiLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  } else {
+                    StudentRomanceLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      classmate: widget.classmate,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                    );
+                  }
                 },
               ),
             ],
