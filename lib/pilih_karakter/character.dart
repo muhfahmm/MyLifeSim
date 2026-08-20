@@ -6,6 +6,8 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/actions/school_generator.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_proposal_chance.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
 class Character {
@@ -724,9 +726,22 @@ class Character {
           }
         } else {
           // Teman Sekelas
-          chance = proposalType == 'Ajak Pacaran' 
-              ? SiswaSiswiProposalChance.getPacaranChance(age) 
-              : SiswaSiswiProposalChance.getBercintaChance(age);
+          if (candGender == 'Laki-laki' && myGenderLower == 'laki-laki') {
+            // Gay classmate
+            chance = proposalType == 'Ajak Pacaran' 
+                ? SiswaSiswaProposalChance.getPacaranChance(age) 
+                : SiswaSiswaProposalChance.getBercintaChance(age);
+          } else if (candGender == 'Perempuan' && myGenderLower == 'perempuan') {
+            // Lesbian classmate
+            chance = proposalType == 'Ajak Pacaran' 
+                ? SiswiSiswiProposalChance.getPacaranChance(age) 
+                : SiswiSiswiProposalChance.getBercintaChance(age);
+          } else {
+            // Hetero classmate
+            chance = proposalType == 'Ajak Pacaran' 
+                ? SiswaSiswiProposalChance.getPacaranChance(age) 
+                : SiswaSiswiProposalChance.getBercintaChance(age);
+          }
         }
 
         // Jika user menggunakan karakter Perempuan, peluang diajak naik 5%
