@@ -633,8 +633,8 @@ class Character {
     }
 
     // --- LOGIKA AJAKAN INCEST DARI KELUARGA ATAU ROMANTIKA SEKOLAH ---
-    // Dipicu hanya jika usia karakter >= 10 tahun dan belum punya proposal aktif
-    if (age >= 10 && activeProposal == null) {
+    // Dipicu jika usia karakter >= 6 tahun dan belum punya proposal aktif
+    if (age >= 6 && activeProposal == null) {
       final String myGenderLower = gender.trim().toLowerCase();
       
       // 1. Kumpulkan kandidat sekolah
