@@ -7,6 +7,7 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/student_romance_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'dart:math';
 
 class ClassmateInteractionPage extends StatefulWidget {
@@ -139,6 +140,27 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
+
+            // ============ TOMBOL LIHAT KELUARGA ============
+            _buildActionTile(
+              icon: Icons.people,
+              color: Colors.blueGrey,
+              title: 'Lihat Keluarga',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NpcFamilyViewScreen(
+                      npcName: name,
+                      npcGender: gender,
+                      npcAge: age,
+                      npcRole: 'Teman Sekelas',
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
 
             if (StudentRomanceLogic.shouldShowRomanceButtons(
               userAge: widget.character.age,

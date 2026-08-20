@@ -10,6 +10,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempu
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_guru_perempuan/siswa_guru_perempuan_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -144,6 +145,27 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
+
+            // ============ TOMBOL LIHAT KELUARGA ============
+            _buildActionTile(
+              icon: Icons.people,
+              color: Colors.blueGrey,
+              title: 'Lihat Keluarga',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NpcFamilyViewScreen(
+                      npcName: name,
+                      npcGender: gender,
+                      npcAge: age,
+                      npcRole: widget.role,
+                    ),
+                  ),
+                );
+              },
+            ),
+            const SizedBox(height: 8),
 
             if (widget.character.age >= 10) ...[
               // Aksi 1: Bercinta / Make Love
