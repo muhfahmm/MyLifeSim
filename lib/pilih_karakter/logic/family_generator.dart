@@ -1,6 +1,7 @@
 // lib/pilih_karakter/logic/family_generator.dart
 import 'dart:math';
 import '../character.dart';
+import 'package:bitlife/avatar/skin_color_inheritance.dart';
 
 class FamilyGenerator {
   static final Random _random = Random();
@@ -101,10 +102,33 @@ class FamilyGenerator {
       
       character.motherAge = mAge;
       character.fatherAge = fAge;
+
+      // === WARNA KULIT ORANG TUA ===
+      // Generate warna kulit ayah & ibu secara acak
+      character.fatherSkinColor = SkinColorInheritance.randomSkin();
+      character.motherSkinColor = SkinColorInheritance.randomSkin();
+      // Jika user belum punya warna kulit kustom, wariskan dari orang tua
+      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+        character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
+          character.fatherSkinColor,
+          character.motherSkinColor,
+        );
+      } else {
+        // Jika user sudah pilih warna kulit sendiri, orang tua menyesuaikan
+        character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
+        character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
+      }
     } else if (roll < 80) {
       // Hanya ayah
       character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
       character.fatherAge = 22 + _random.nextInt(28);
+      // Warna kulit ayah
+      character.fatherSkinColor = SkinColorInheritance.randomSkin();
+      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+        character.avatarSkinColor = SkinColorInheritance.parentSkinFromChild(character.fatherSkinColor);
+      } else {
+        character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
+      }
       // Peluang 30% memiliki Ibu Tiri saat lahir
       if (_random.nextInt(100) < 30) {
         character.stepMotherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
@@ -115,6 +139,13 @@ class FamilyGenerator {
       // Hanya ibu
       character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
       character.motherAge = 19 + _random.nextInt(25);
+      // Warna kulit ibu
+      character.motherSkinColor = SkinColorInheritance.randomSkin();
+      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+        character.avatarSkinColor = SkinColorInheritance.parentSkinFromChild(character.motherSkinColor);
+      } else {
+        character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
+      }
       // Peluang 30% memiliki Ayah Tiri saat lahir
       if (_random.nextInt(100) < 30) {
         character.stepFatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);

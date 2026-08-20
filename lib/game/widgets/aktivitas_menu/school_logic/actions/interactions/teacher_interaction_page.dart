@@ -57,10 +57,11 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     final gender = widget.teacher['gender']!;
     final int age = int.tryParse(widget.teacher['age'] ?? '40') ?? 40;
     final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
-    final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+    final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
       name: name,
       gender: gender,
       age: age,
+      schoolLevel: 'Guru',
       happiness: rel,
     );
 

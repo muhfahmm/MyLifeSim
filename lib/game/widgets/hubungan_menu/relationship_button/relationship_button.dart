@@ -98,6 +98,7 @@ class RelationshipButton extends StatelessWidget {
                     gender: 'Laki-laki',
                     age: character.fatherAge ?? 40,
                     happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                    forcedSkinColor: character.fatherSkinColor,
                   ),
                 ),
               if (character.motherName != null)
@@ -115,6 +116,7 @@ class RelationshipButton extends StatelessWidget {
                     gender: 'Perempuan',
                     age: character.motherAge ?? 40,
                     happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                    forcedSkinColor: character.motherSkinColor,
                   ),
                 ),
               if (character.stepFatherName != null)
@@ -435,6 +437,7 @@ class RelationshipButton extends StatelessWidget {
                       gender: gender,
                       age: childAge,
                       happiness: relVal,
+                      forcedSkinColor: child['skinColor'],
                     ),
                   );
                 }).toList(),

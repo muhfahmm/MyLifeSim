@@ -85,10 +85,11 @@ class _GuruActionPageState extends State<GuruActionPage> {
     final gender = staff['gender']!;
     final int age = int.tryParse(staff['age'] ?? '40') ?? 40;
     final int rel = int.tryParse(staff['relationship'] ?? '50') ?? 50;
-    final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+    final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
       name: name,
       gender: gender,
       age: age,
+      schoolLevel: 'Guru',
       happiness: rel,
     );
 

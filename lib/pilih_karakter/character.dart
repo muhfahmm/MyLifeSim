@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/actions/school_
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
+import 'package:bitlife/avatar/skin_color_inheritance.dart';
 
 class Character {
   String name;
@@ -38,6 +39,11 @@ class Character {
   String? avatarClotheColor;
   String? avatarSkinColor;
   String? avatarFacialHairType;
+
+  // --- WARNA KULIT ORANG TUA (untuk warisan) ---
+  String? fatherSkinColor;  // hex warna kulit ayah
+  String? motherSkinColor;  // hex warna kulit ibu
+  String? partnerSkinColor; // hex warna kulit pasangan (untuk warisan ke anak)
 
 
   // --- FIELD KELUARGA BARU ---
@@ -611,6 +617,12 @@ class Character {
           mother = name;
         }
 
+        // Warna kulit anak = campuran warna kulit user dan pasangan
+        final String childSkinColor = SkinColorInheritance.blendChildSkin(
+          avatarSkinColor,
+          partnerSkinColor,
+        );
+
         children.add({
           'name': childName,
           'gender': childGender,
@@ -620,6 +632,7 @@ class Character {
           'mother': mother,
           'isDeceased': 'false',
           'trait': hasGeneticDefect ? 'Mengidap Kelainan Genetik' : 'Sehat',
+          'skinColor': childSkinColor,
         });
 
         String birthMsg = '👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia.';

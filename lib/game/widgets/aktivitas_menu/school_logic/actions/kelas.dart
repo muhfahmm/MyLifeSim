@@ -49,6 +49,9 @@ class _KelasActionPageState extends State<KelasActionPage> {
       waliKelas = teachersList.first;
     }
 
+    // Tentukan level sekolah berdasarkan usia
+    final String schoolLevel = age <= 12 ? 'SD' : age <= 15 ? 'SMP' : 'SMA';
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Teman Sekelas (Kelas)'),
@@ -68,10 +71,11 @@ class _KelasActionPageState extends State<KelasActionPage> {
             final int ageVal = int.tryParse(waliKelas['age'] ?? '40') ?? 40;
             final int rel = int.tryParse(waliKelas['relationship'] ?? '50') ?? 50;
             final String subject = waliKelas['subject'] ?? 'Mata Pelajaran';
-            final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+            final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
               name: name,
               gender: gender,
               age: ageVal,
+              schoolLevel: 'Guru',
               happiness: rel,
             );
 
@@ -144,10 +148,11 @@ class _KelasActionPageState extends State<KelasActionPage> {
           final String gender = cm['gender']!;
           final int age = int.tryParse(cm['age'] ?? '0') ?? widget.character.age;
           final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-          final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+          final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
             name: name,
             gender: gender,
             age: age,
+            schoolLevel: schoolLevel,
             happiness: rel,
           );
 

@@ -109,6 +109,7 @@ class AvatarAgeRules {
     required String gender,
     required int age,
     int happiness = 50,
+    String? forcedSkinColor, // override warna kulit (untuk warisan)
   }) {
     final dummy = Character(
       name: name,
@@ -116,7 +117,75 @@ class AvatarAgeRules {
       location: 'Indonesia',
       age: age,
       happiness: happiness,
+      avatarSkinColor: forcedSkinColor, // pakai warna kulit yang diwariskan jika ada
     );
     return getAgeBasedAvatarUrl(dummy, happiness: happiness);
+  }
+
+  /// Mendapatkan URL avatar dengan seragam sekolah.
+  /// [schoolLevel]: 'SD', 'SMP', 'SMA', 'Guru'
+  static String getSchoolAvatarUrl({
+    required String name,
+    required String gender,
+    required int age,
+    required String schoolLevel,
+    int happiness = 50,
+    String? forcedSkinColor,
+  }) {
+    final isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
+
+    // Tentukan seragam berdasarkan level sekolah
+    String clotheType;
+    String clotheColor;
+
+    switch (schoolLevel) {
+      case 'SD':
+        // Putih + celana/rok merah (SD Indonesia)
+        clotheType = 'shirtCrewNeck';
+        clotheColor = 'ffffff';
+        break;
+      case 'SMP':
+        // Putih + biru (SMP Indonesia)
+        clotheType = 'shirtCrewNeck';
+        clotheColor = '5199e4';
+        break;
+      case 'SMA':
+        // Putih + abu-abu (SMA Indonesia)
+        clotheType = 'shirtCrewNeck';
+        clotheColor = 'e6e6e6';
+        break;
+      case 'Guru':
+        // Blazer formal
+        clotheType = 'blazerAndShirt';
+        clotheColor = '262e33';
+        break;
+      default:
+        // Default: seragam SMP
+        clotheType = 'shirtCrewNeck';
+        clotheColor = '5199e4';
+    }
+
+    // Seed avatar dari nama
+    final seedMap = AvatarGenerator.generateRandomAvatar(gender, seedName: name);
+    final String top = isMale
+        ? (age <= 12 ? 'theCaesar' : age <= 18 ? 'shaggy' : seedMap['topType']!)
+        : (age <= 12 ? 'straight01' : age <= 18 ? 'straight02' : seedMap['topType']!);
+    final String hairColor = seedMap['hairColor']!;
+    final String skinColor = forcedSkinColor ?? seedMap['skinColor']!;
+    final String eyeType = AvatarGenerator.getEyeType(happiness);
+    final String eyebrowType = AvatarGenerator.getEyebrowType(happiness);
+    final String mouthType = AvatarGenerator.getMouthType(happiness);
+
+    return AvatarGenerator.buildCustomAvatarUrl(
+      topType: top,
+      accessoriesType: 'blank',
+      hairColor: hairColor,
+      clotheType: clotheType,
+      clotheColor: clotheColor,
+      skinColor: skinColor,
+      eyeType: eyeType,
+      eyebrowType: eyebrowType,
+      mouthType: mouthType,
+    );
   }
 }

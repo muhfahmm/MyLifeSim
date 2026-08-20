@@ -52,10 +52,13 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
     final gender = widget.classmate['gender']!;
     final int age = int.tryParse(widget.classmate['age'] ?? '0') ?? widget.character.age;
     final int rel = int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
-    final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+    // Tentukan level sekolah berdasarkan usia user
+    final String schoolLevel = widget.character.age <= 12 ? 'SD' : widget.character.age <= 15 ? 'SMP' : 'SMA';
+    final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
       name: name,
       gender: gender,
       age: age,
+      schoolLevel: schoolLevel,
       happiness: rel,
     );
 
