@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -48,7 +48,14 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
   Widget build(BuildContext context) {
     final name = widget.teacher['name']!;
     final gender = widget.teacher['gender']!;
+    final int age = int.tryParse(widget.teacher['age'] ?? '40') ?? 40;
     final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
+    final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: name,
+      gender: gender,
+      age: age,
+      happiness: rel,
+    );
 
     return Scaffold(
       appBar: AppBar(
@@ -72,9 +79,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     CircleAvatar(
                       radius: 40,
                       backgroundColor: Colors.transparent,
-                      backgroundImage: NetworkImage(
-                        AvatarGenerator.getDeterministicAvatarUrl(name, gender, happiness: rel),
-                      ),
+                      backgroundImage: NetworkImage(avatarUrl),
                     ),
                     const SizedBox(height: 12),
                     Text(

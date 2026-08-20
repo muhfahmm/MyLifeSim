@@ -49,6 +49,10 @@ class _GameScreenState extends State<GameScreen> {
       _character.intelligence = 50;
       _character.money = 0;
       _character.isAlive = true;
+      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+        _character,
+        happiness: _character.happiness,
+      );
     });
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('🔄 Semua status berhasil direset!'), backgroundColor: Colors.green),
@@ -60,6 +64,10 @@ class _GameScreenState extends State<GameScreen> {
     List<String> events = [];
     setState(() {
       events = _character.ageUp();
+      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+        _character,
+        happiness: _character.happiness,
+      );
     });
 
     // Cek kehamilan saat bertambah umur
@@ -743,7 +751,12 @@ class _GameScreenState extends State<GameScreen> {
                   character: _character,
                   isAlive: _character.isAlive,
                   onRefresh: () {
-                    setState(() {});
+                    setState(() {
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
                   },
                 ),
                 
@@ -751,7 +764,12 @@ class _GameScreenState extends State<GameScreen> {
                 InboxButton(
                   character: _character,
                   onRefresh: () {
-                    setState(() {});
+                    setState(() {
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
                   },
                 ),
                 
@@ -760,16 +778,33 @@ class _GameScreenState extends State<GameScreen> {
                   character: _character,
                   isAlive: _character.isAlive,
                   onRefresh: () {
-                    setState(() {});
+                    setState(() {
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
                   },
                   onWork: () {
-                    setState(() => _character.money += 100);
+                    setState(() {
+                      _character.money += 100;
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Mendapatkan uang 100!')),
                     );
                   },
                   onExercise: () {
-                    setState(() => _character.health += 10);
+                    setState(() {
+                      _character.health += 10;
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Kesehatan +10!')),
                     );

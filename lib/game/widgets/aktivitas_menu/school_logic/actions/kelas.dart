@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'school_generator.dart';
 import 'interactions/classmate_interaction_page.dart';
 
@@ -43,7 +43,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
         itemBuilder: (context, index) {
           if (index == 0) {
             // User (Kamu) Card
-            final userAvatarUrl = AvatarGenerator.getCharacterAvatarUrl(widget.character);
+            final userAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(widget.character, happiness: widget.character.happiness);
             return Card(
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 12),
@@ -75,8 +75,14 @@ class _KelasActionPageState extends State<KelasActionPage> {
           final cm = classmates[index - 1];
           final String name = cm['name']!;
           final String gender = cm['gender']!;
+          final int age = int.tryParse(cm['age'] ?? '0') ?? widget.character.age;
           final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-          final avatarUrl = AvatarGenerator.getDeterministicAvatarUrl(name, gender, happiness: rel);
+          final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+            name: name,
+            gender: gender,
+            age: age,
+            happiness: rel,
+          );
 
           return Card(
             elevation: 2,

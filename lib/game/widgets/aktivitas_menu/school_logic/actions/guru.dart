@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'school_generator.dart';
 import 'interactions/teacher_interaction_page.dart';
 
@@ -83,8 +83,14 @@ class _GuruActionPageState extends State<GuruActionPage> {
   Widget _buildStaffCard(Map<String, String> staff, String role) {
     final name = staff['name']!;
     final gender = staff['gender']!;
-    final rel = int.tryParse(staff['relationship'] ?? '50') ?? 50;
-    final avatarUrl = AvatarGenerator.getDeterministicAvatarUrl(name, gender, happiness: rel);
+    final int age = int.tryParse(staff['age'] ?? '40') ?? 40;
+    final int rel = int.tryParse(staff['relationship'] ?? '50') ?? 50;
+    final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: name,
+      gender: gender,
+      age: age,
+      happiness: rel,
+    );
 
     return Card(
       elevation: 2,
