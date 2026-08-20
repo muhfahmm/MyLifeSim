@@ -625,97 +625,180 @@ class Character {
       }
     }
 
-    // --- LOGIKA AJAKAN INCEST DARI KELUARGA ---
-    // Dipicu hanya jika usia karakter >= 12 tahun dan belum punya pacar/pasangan (atau peluang pacaran/bercinta)
-    if (age >= 12 && partner == null) {
+    // --- LOGIKA AJAKAN INCEST DARI KELUARGA ATAU ROMANTIKA SEKOLAH ---
+    // Dipicu hanya jika usia karakter >= 10 tahun dan belum punya proposal aktif
+    if (age >= 10 && activeProposal == null) {
       final String myGenderLower = gender.trim().toLowerCase();
       
-      // Kumpulkan kandidat keluarga yang hidup & usia >= 12
-      List<Map<String, dynamic>> candidates = [];
-      
-      if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 12 && myGenderLower != 'laki-laki') {
-        candidates.add({
-          'name': 'Ayah ($fatherName)',
-          'relation': 'Ayah',
-          'gender': 'Laki-laki',
-          'age': fatherAge.toString(),
-          'role': 'Kandung',
-        });
-      }
-      if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 12) {
-        candidates.add({
-          'name': 'Ibu ($motherName)',
-          'relation': 'Ibu',
-          'gender': 'Perempuan',
-          'age': motherAge.toString(),
-          'role': 'Kandung',
-        });
-      }
-      if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 12 && myGenderLower != 'laki-laki') {
-        candidates.add({
-          'name': 'Ayah Tiri ($stepFatherName)',
-          'relation': 'Ayah Tiri',
-          'gender': 'Laki-laki',
-          'age': stepFatherAge.toString(),
-          'role': 'Tiri',
-        });
-      }
-      
-      for (var sib in siblings) {
-        final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
-        final bool isDeceased = sib['isDeceased'] == 'true';
-        if (!isDeceased && sibAge >= 12) {
+      // Kumpulkan kandidat: 50% peluang dari sekolah (Teman/Guru) atau Keluarga
+      if (random.nextInt(100) < 40) {
+        // Sekolah proposal
+        List<Map<String, dynamic>> schoolCandidates = [];
+        
+        // 1. Tambah guru yang aktif
+        List<Map<String, String>> activeTeachers = [];
+        if (age >= 6 && age <= 12) activeTeachers = sdTeachers;
+        else if (age >= 13 && age <= 15) activeTeachers = smpTeachers;
+        else activeTeachers = smaTeachers;
+
+        for (var t in activeTeachers) {
+          final String sexuality = t['sexuality'] ?? 'Heteroseksual';
+          final String tGender = t['gender'] ?? 'Laki-laki';
+          
+          // Cek kecocokan orientasi seksual guru dengan gender player
+          bool match = false;
+          if (sexuality == 'Heteroseksual') match = (gender != tGender);
+          else if (sexuality == 'Biseksual') match = true;
+          else match = (gender == tGender); // Gay/Lesbian
+
+          if (match) {
+            schoolCandidates.add({
+              'name': t['name'],
+              'relation': 'Guru',
+              'gender': tGender,
+              'age': t['age'] ?? '35',
+              'role': 'Guru',
+            });
+          }
+        }
+
+        // 2. Tambah teman sekelas
+        for (var cm in classmates) {
+          final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
+          final String cmGender = cm['gender'] ?? 'Laki-laki';
+          
+          bool match = false;
+          if (sexuality == 'Heteroseksual') match = (gender != cmGender);
+          else if (sexuality == 'Biseksual') match = true;
+          else match = (gender == cmGender); // Gay/Lesbian
+
+          if (match) {
+            schoolCandidates.add({
+              'name': cm['name'],
+              'relation': 'Teman Sekelas',
+              'gender': cmGender,
+              'age': cm['age'] ?? age.toString(),
+              'role': 'Teman Sekelas',
+            });
+          }
+        }
+
+        if (schoolCandidates.isNotEmpty) {
+          final candidate = schoolCandidates[random.nextInt(schoolCandidates.length)];
+          final String candRole = candidate['role'];
+          final String candGender = candidate['gender'];
+          
+          // Tentukan peluang berdasarkan getSchoolRomanceChance versi persentase
+          int chance = 0;
+          if (candRole == 'Guru') {
+            // Guru mengajak Murid
+            if (candGender == 'Laki-laki' && gender == 'Perempuan') chance = 65;
+            else if (candGender == 'Laki-laki' && gender == 'Laki-laki') chance = 10;
+            else if (candGender == 'Perempuan' && gender == 'Laki-laki') chance = 70;
+            else if (candGender == 'Perempuan' && gender == 'Perempuan') chance = 30;
+          } else {
+            // Murid mengajak Murid (Sesama Siswa)
+            if (candGender == 'Laki-laki' && gender == 'Perempuan') chance = 80;
+            else if (candGender == 'Laki-laki' && gender == 'Laki-laki') chance = 10;
+            else if (candGender == 'Perempuan' && gender == 'Perempuan') chance = 30;
+            else if (candGender == 'Perempuan' && gender == 'Laki-laki') chance = 80; // default opposite gender
+          }
+
+          if (random.nextInt(100) < (chance ~/ 2)) { // skala kejar peluang wajar
+            final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+            activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': proposalType,
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candRole,
+            };
+          }
+        }
+      } else {
+        // Logika Keluarga kandung/tiri (Incest)
+        List<Map<String, dynamic>> candidates = [];
+        
+        if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 12 && myGenderLower != 'laki-laki') {
           candidates.add({
-            'name': '${sib['name']} (${sib['relation']})',
-            'relation': sib['relation'] ?? 'Saudara',
-            'gender': sib['gender'] ?? 'Laki-laki',
-            'age': sibAge.toString(),
+            'name': 'Ayah ($fatherName)',
+            'relation': 'Ayah',
+            'gender': 'Laki-laki',
+            'age': fatherAge.toString(),
             'role': 'Kandung',
           });
         }
-      }
-
-      if (candidates.isNotEmpty) {
-        // Pilih satu kandidat acak
-        final candidate = candidates[random.nextInt(candidates.length)];
-        final String rel = candidate['relation'].toString().toLowerCase();
+        if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 12) {
+          candidates.add({
+            'name': 'Ibu ($motherName)',
+            'relation': 'Ibu',
+            'gender': 'Perempuan',
+            'age': motherAge.toString(),
+            'role': 'Kandung',
+          });
+        }
+        if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 12 && myGenderLower != 'laki-laki') {
+          candidates.add({
+            'name': 'Ayah Tiri ($stepFatherName)',
+            'relation': 'Ayah Tiri',
+            'gender': 'Laki-laki',
+            'age': stepFatherAge.toString(),
+            'role': 'Tiri',
+          });
+        }
         
-        int chance = 0;
-        if (myGenderLower == 'perempuan') {
-          // Player adalah Perempuan (Anak Perempuan)
-          if (rel.contains('ayah')) chance = 40;
-          else if (rel.contains('ibu')) chance = 30;
-          else if (rel.contains('kakak perempuan')) chance = 30;
-          else if (rel.contains('adik perempuan')) chance = 30;
-          else if (rel.contains('adik laki')) chance = 40;
-          else if (rel.contains('kakak laki')) chance = 40;
-          else chance = 30; // keluarga yang lain
-        } else {
-          // Player adalah Laki-laki (Anak Laki-laki)
-          if (rel.contains('ayah')) chance = 10;
-          else if (rel.contains('ibu')) chance = 10;
-          else if (rel.contains('kakak perempuan')) chance = 30;
-          else if (rel.contains('adik perempuan')) chance = 40;
-          else if (rel.contains('adik laki')) chance = 5;
-          else if (rel.contains('kakak laki')) chance = 5;
-          else chance = 10; // default candidate chance
+        for (var sib in siblings) {
+          final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+          final bool isDeceased = sib['isDeceased'] == 'true';
+          if (!isDeceased && sibAge >= 12) {
+            candidates.add({
+              'name': '${sib['name']} (${sib['relation']})',
+              'relation': sib['relation'] ?? 'Saudara',
+              'gender': sib['gender'] ?? 'Laki-laki',
+              'age': sibAge.toString(),
+              'role': 'Kandung',
+            });
+          }
         }
 
-        if (random.nextInt(100) < chance) {
-          // Tentukan tipe ajakan: Ajak Pacaran (80%) atau Bercinta (20%)
-          final String proposalType = random.nextInt(100) < 80 ? 'Ajak Pacaran' : 'Bercinta';
-          activeProposal = {
-            'name': candidate['name'],
-            'relation': candidate['relation'],
-            'type': proposalType,
-            'gender': candidate['gender'],
-            'age': candidate['age'],
-            'role': candidate['role'],
-          };
+        if (candidates.isNotEmpty) {
+          final candidate = candidates[random.nextInt(candidates.length)];
+          final String rel = candidate['relation'].toString().toLowerCase();
+          
+          int chance = 0;
+          if (myGenderLower == 'perempuan') {
+            if (rel.contains('ayah')) chance = 40;
+            else if (rel.contains('ibu')) chance = 30;
+            else if (rel.contains('kakak perempuan')) chance = 30;
+            else if (rel.contains('adik perempuan')) chance = 30;
+            else if (rel.contains('adik laki')) chance = 40;
+            else if (rel.contains('kakak laki')) chance = 40;
+            else chance = 30;
+          } else {
+            if (rel.contains('ayah')) chance = 10;
+            else if (rel.contains('ibu')) chance = 10;
+            else if (rel.contains('kakak perempuan')) chance = 30;
+            else if (rel.contains('adik perempuan')) chance = 40;
+            else if (rel.contains('adik laki')) chance = 5;
+            else if (rel.contains('kakak laki')) chance = 5;
+            else chance = 10;
+          }
+
+          if (random.nextInt(100) < chance) {
+            final String proposalType = random.nextInt(100) < 80 ? 'Ajak Pacaran' : 'Bercinta';
+            activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': proposalType,
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candidate['role'],
+            };
+          }
         }
       }
-    } else if (age >= 12 && partner != null && partner!['isDeceased'] != 'true') {
-      // Logika: Jika user sudah memiliki pacar aktif, ada persentase mengajak berhubungan intim sebanyak 60% saat pertambahan umur
+    } else if (age >= 12 && partner != null && partner!['isDeceased'] != 'true' && activeProposal == null) {
       if (random.nextInt(100) < 60) {
         activeProposal = {
           'name': partner!['name'],

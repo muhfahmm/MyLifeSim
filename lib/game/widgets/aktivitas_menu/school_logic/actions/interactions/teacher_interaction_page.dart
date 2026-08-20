@@ -4,7 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_siswi/teacher_student_romance_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswi/guru_laki_siswi_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_guru_laki/siswi_guru_laki_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswa/guru_perempuan_siswa_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_guru_perempuan/siswa_guru_perempuan_logic.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -140,20 +143,37 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            if (TeacherStudentRomanceLogic.shouldShowTeacherRomance(widget.character.age)) ...[
+            if (widget.character.age >= 10) ...[
               // Aksi 1: Bercinta / Make Love
               _buildActionTile(
                 icon: Icons.favorite,
                 color: Colors.pink,
                 title: 'Bercinta / Make Love',
                 onTap: () {
-                  TeacherStudentRomanceLogic.bercinta(
-                    context: context,
-                    character: widget.character,
-                    teacher: widget.teacher,
-                    onRefresh: widget.onRefresh,
-                    showOutcome: (title, desc) => _showOutcome(title, desc),
-                  );
+                  final userGen = widget.character.gender;
+                  final teacherGen = gender;
+                  if (userGen == 'Perempuan' && teacherGen == 'Laki-laki') {
+                    // Siswi Perempuan ke Guru Laki-laki
+                    SiswiGuruLakiLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else if (userGen == 'Laki-laki' && teacherGen == 'Perempuan') {
+                    // Siswa Laki-laki ke Guru Perempuan
+                    SiswaGuruPerempuanLogic.bercinta(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else {
+                    // Fallback
+                    _showOutcome('Bercinta Ditolak 🚫', '$name menolak ajakanmu.');
+                  }
                 },
               ),
               // Aksi 2: Ajak Pacaran
@@ -162,13 +182,30 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                 color: Colors.redAccent,
                 title: 'Ajak Pacaran',
                 onTap: () {
-                  TeacherStudentRomanceLogic.ajakPacaran(
-                    context: context,
-                    character: widget.character,
-                    teacher: widget.teacher,
-                    onRefresh: widget.onRefresh,
-                    showOutcome: (title, desc) => _showOutcome(title, desc),
-                  );
+                  final userGen = widget.character.gender;
+                  final teacherGen = gender;
+                  if (userGen == 'Perempuan' && teacherGen == 'Laki-laki') {
+                    // Siswi Perempuan ke Guru Laki-laki
+                    SiswiGuruLakiLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else if (userGen == 'Laki-laki' && teacherGen == 'Perempuan') {
+                    // Siswa Laki-laki ke Guru Perempuan
+                    SiswaGuruPerempuanLogic.ajakPacaran(
+                      context: context,
+                      character: widget.character,
+                      teacher: widget.teacher,
+                      onRefresh: widget.onRefresh,
+                      showOutcome: (t, d) => _showOutcome(t, d),
+                    );
+                  } else {
+                    // Fallback
+                    _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan pacaranmu.');
+                  }
                 },
               ),
             ],
