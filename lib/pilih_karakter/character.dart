@@ -633,96 +633,98 @@ class Character {
     if (age >= 10 && activeProposal == null) {
       final String myGenderLower = gender.trim().toLowerCase();
       
-      // Kumpulkan kandidat: 50% peluang dari sekolah (Teman/Guru) atau Keluarga
-      if (random.nextInt(100) < 40) {
-        // Sekolah proposal
-        List<Map<String, dynamic>> schoolCandidates = [];
+      // 1. Kumpulkan kandidat sekolah
+      List<Map<String, dynamic>> schoolCandidates = [];
+      List<Map<String, String>> activeTeachers = [];
+      if (age >= 6 && age <= 12) activeTeachers = sdTeachers;
+      else if (age >= 13 && age <= 15) activeTeachers = smpTeachers;
+      else activeTeachers = smaTeachers;
+
+      for (var t in activeTeachers) {
+        final String sexuality = t['sexuality'] ?? 'Heteroseksual';
+        final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
         
-        // 1. Tambah guru yang aktif
-        List<Map<String, String>> activeTeachers = [];
-        if (age >= 6 && age <= 12) activeTeachers = sdTeachers;
-        else if (age >= 13 && age <= 15) activeTeachers = smpTeachers;
-        else activeTeachers = smaTeachers;
+        bool match = false;
+        if (sexuality == 'Heteroseksual') match = (myGenderLower != tGender);
+        else if (sexuality == 'Biseksual') match = true;
+        else match = (myGenderLower == tGender); // Gay/Lesbian
 
-        for (var t in activeTeachers) {
-          final String sexuality = t['sexuality'] ?? 'Heteroseksual';
-          final String tGender = t['gender'] ?? 'Laki-laki';
-          
-          // Cek kecocokan orientasi seksual guru dengan gender player
-          bool match = false;
-          if (sexuality == 'Heteroseksual') match = (gender != tGender);
-          else if (sexuality == 'Biseksual') match = true;
-          else match = (gender == tGender); // Gay/Lesbian
-
-          if (match) {
-            schoolCandidates.add({
-              'name': t['name'],
-              'relation': 'Guru',
-              'gender': tGender,
-              'age': t['age'] ?? '35',
-              'role': 'Guru',
-            });
-          }
+        if (match) {
+          schoolCandidates.add({
+            'name': t['name'],
+            'relation': 'Guru',
+            'gender': t['gender'] ?? 'Laki-laki',
+            'age': t['age'] ?? '35',
+            'role': 'Guru',
+          });
         }
+      }
 
-        // 2. Tambah teman sekelas
-        for (var cm in classmates) {
-          final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
-          final String cmGender = cm['gender'] ?? 'Laki-laki';
-          
-          bool match = false;
-          if (sexuality == 'Heteroseksual') match = (gender != cmGender);
-          else if (sexuality == 'Biseksual') match = true;
-          else match = (gender == cmGender); // Gay/Lesbian
+      for (var cm in classmates) {
+        final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
+        final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
+        
+        bool match = false;
+        if (sexuality == 'Heteroseksual') match = (myGenderLower != cmGender);
+        else if (sexuality == 'Biseksual') match = true;
+        else match = (myGenderLower == cmGender); // Gay/Lesbian
 
-          if (match) {
-            schoolCandidates.add({
-              'name': cm['name'],
-              'relation': 'Teman Sekelas',
-              'gender': cmGender,
-              'age': cm['age'] ?? age.toString(),
-              'role': 'Teman Sekelas',
-            });
-          }
+        if (match) {
+          schoolCandidates.add({
+            'name': cm['name'],
+            'relation': 'Teman Sekelas',
+            'gender': cm['gender'] ?? 'Laki-laki',
+            'age': cm['age'] ?? age.toString(),
+            'role': 'Teman Sekelas',
+          });
         }
+      }
 
-        if (schoolCandidates.isNotEmpty) {
-          final candidate = schoolCandidates[random.nextInt(schoolCandidates.length)];
-          final String candRole = candidate['role'];
-          final String candGender = candidate['gender'];
-          
-          final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
-          int chance = 0;
+      // Jika ada kandidat sekolah, jalankan logika sekolah secara langsung
+      if (schoolCandidates.isNotEmpty) {
+        final candidate = schoolCandidates[random.nextInt(schoolCandidates.length)];
+        final String candRole = candidate['role'];
+        final String candGender = candidate['gender'];
+        
+        final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+        int chance = 0;
 
-          if (candRole == 'Guru') {
-            if (candGender == 'Laki-laki') {
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruLakiProposalChance.getPacaranChance(age) 
-                  : GuruLakiProposalChance.getBercintaChance(age);
-            } else {
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruPerempuanProposalChance.getPacaranChance(age) 
-                  : GuruPerempuanProposalChance.getBercintaChance(age);
-            }
-          } else {
-            // Teman Sekelas
+        if (candRole == 'Guru') {
+          if (candGender == 'Laki-laki') {
             chance = proposalType == 'Ajak Pacaran' 
-                ? SiswaSiswiProposalChance.getPacaranChance(age) 
-                : SiswaSiswiProposalChance.getBercintaChance(age);
+                ? GuruLakiProposalChance.getPacaranChance(age) 
+                : GuruLakiProposalChance.getBercintaChance(age);
+          } else {
+            chance = proposalType == 'Ajak Pacaran' 
+                ? GuruPerempuanProposalChance.getPacaranChance(age) 
+                : GuruPerempuanProposalChance.getBercintaChance(age);
           }
-
-          if (random.nextInt(100) < chance) {
-            activeProposal = {
-              'name': candidate['name'],
-              'relation': candidate['relation'],
-              'type': proposalType,
-              'gender': candidate['gender'],
-              'age': candidate['age'],
-              'role': candRole,
-            };
-          }
+        } else {
+          // Teman Sekelas
+          chance = proposalType == 'Ajak Pacaran' 
+              ? SiswaSiswiProposalChance.getPacaranChance(age) 
+              : SiswaSiswiProposalChance.getBercintaChance(age);
         }
-      } else {
+
+        // Jika user menggunakan karakter Perempuan, peluang diajak naik 5%
+        if (gender == 'Perempuan' || gender == 'perempuan' || gender == 'female') {
+          chance += 5;
+        }
+
+        if (random.nextInt(100) < chance) {
+          activeProposal = {
+            'name': candidate['name'],
+            'relation': candidate['relation'],
+            'type': proposalType,
+            'gender': candidate['gender'],
+            'age': candidate['age'],
+            'role': candRole,
+          };
+        }
+      } 
+      
+      // Jika proposal sekolah tidak terjadi (roll gagal atau kandidat kosong), coba picu keluarga
+      if (activeProposal == null) {
         // Logika Keluarga kandung/tiri (Incest)
         List<Map<String, dynamic>> candidates = [];
         
