@@ -95,7 +95,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     () {
                       final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
                       return Text(
-                        '${widget.role} • Seksualitas: $sexuality • Hubungan: $rel%',
+                        '${widget.role} • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                         style: const TextStyle(fontSize: 14, color: Colors.black54),
                       );
                     }(),

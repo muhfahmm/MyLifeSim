@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/student_romance_logic.dart';
 import 'dart:math';
 
 class ClassmateInteractionPage extends StatefulWidget {
@@ -93,7 +94,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     () {
                       final String sexuality = widget.classmate['sexuality'] ?? 'Heteroseksual';
                       return Text(
-                        'Teman Sekelas • Seksualitas: $sexuality • Hubungan: $rel%',
+                        'Teman Sekelas • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                         style: const TextStyle(fontSize: 14, color: Colors.black54),
                       );
                     }(),
@@ -137,7 +138,43 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi 1: Berteman
+            if (StudentRomanceLogic.shouldShowRomanceButtons(
+              userAge: widget.character.age,
+              classmateAge: age,
+            )) ...[
+              // Aksi 1: Bercinta / Make Love
+              _buildActionTile(
+                icon: Icons.favorite,
+                color: Colors.pink,
+                title: 'Bercinta / Make Love',
+                onTap: () {
+                  StudentRomanceLogic.bercinta(
+                    context: context,
+                    character: widget.character,
+                    classmate: widget.classmate,
+                    onRefresh: widget.onRefresh,
+                    showOutcome: (title, desc) => _showOutcome(title, desc),
+                  );
+                },
+              ),
+              // Aksi 2: Ajak Pacaran
+              _buildActionTile(
+                icon: Icons.favorite_border,
+                color: Colors.redAccent,
+                title: 'Ajak Pacaran',
+                onTap: () {
+                  StudentRomanceLogic.ajakPacaran(
+                    context: context,
+                    character: widget.character,
+                    classmate: widget.classmate,
+                    onRefresh: widget.onRefresh,
+                    showOutcome: (title, desc) => _showOutcome(title, desc),
+                  );
+                },
+              ),
+            ],
+
+            // Aksi 3: Berteman
             _buildActionTile(
               icon: Icons.group_add,
               color: Colors.teal,

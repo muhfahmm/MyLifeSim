@@ -104,7 +104,7 @@ class _GuruActionPageState extends State<GuruActionPage> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(role, style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
+            Text('$role • Umur: $age tahun', style: TextStyle(color: Colors.grey.shade600, fontSize: 13)),
             const SizedBox(height: 6),
             Text('Hubungan: $rel%'),
             const SizedBox(height: 4),

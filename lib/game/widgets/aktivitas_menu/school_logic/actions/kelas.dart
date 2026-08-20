@@ -86,7 +86,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
                   backgroundImage: NetworkImage(avatarUrl),
                 ),
                 title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Guru Wali Kelas (Guru $subject) • Hubungan: $rel%'),
+                subtitle: Text('Guru Wali Kelas (Guru $subject) • Umur: $ageVal tahun • Hubungan: $rel%'),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -122,7 +122,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
                   backgroundImage: NetworkImage(userAvatarUrl),
                 ),
                 title: Text(widget.character.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Siswa • Kamu'),
+                subtitle: Text('Siswa • Kamu • Umur: ${widget.character.age} tahun'),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
@@ -164,6 +164,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text('Teman Sekelas • Umur: $age tahun'),
                   const SizedBox(height: 6),
                   Text('Hubungan: $rel%'),
                   const SizedBox(height: 4),

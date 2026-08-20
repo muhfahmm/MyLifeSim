@@ -23,11 +23,19 @@ class SchoolGenerator {
     for (int i = 0; i < count; i++) {
       final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
       final name = generateRandomName(gender, character);
+      // Jarak usia maksimal 1-2 tahun (-1, 0, atau +1)
+      int classmateAge = character.age + _random.nextInt(3) - 1;
+      if (character.age >= 6 && classmateAge < 6) {
+        classmateAge = 6;
+      } else if (classmateAge < 0) {
+        classmateAge = 0;
+      }
+
       character.classmates.add({
         'name': name,
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(), // 40 to 60 initial
-        'age': character.age.toString(),
+        'age': classmateAge.toString(),
         'isDeceased': 'false',
         'sexuality': SexualityLogic.getStudentSexuality(gender),
       });
