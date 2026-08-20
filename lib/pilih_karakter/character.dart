@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswi/guru_laki_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswa/guru_perempuan_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/siswa_siswi_proposal_chance.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
 class Character {
@@ -210,7 +211,10 @@ class Character {
       events.add(notice);
       inbox.add(notice);
     }
-    
+    // Generate data sekolah secara otomatis jika kosong agar bisa memicu ajakan proposal di ageUp
+    SchoolGenerator.generateClassmatesIfEmpty(this);
+    SchoolGenerator.generateTeachersIfEmpty(this);
+
     // Logika HIV mengurangi kesehatan secara perlahan setiap tahun
     if (hasHIV) {
       health -= 10;
