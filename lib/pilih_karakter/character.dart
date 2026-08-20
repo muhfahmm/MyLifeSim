@@ -1,5 +1,8 @@
 // lib/pilih_karakter/character.dart
 import 'dart:math';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswi/guru_laki_proposal_chance.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswa/guru_perempuan_proposal_chance.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/siswa_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 
 class Character {
@@ -688,24 +691,27 @@ class Character {
           final String candRole = candidate['role'];
           final String candGender = candidate['gender'];
           
-          // Tentukan peluang berdasarkan getSchoolRomanceChance versi persentase
+          final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
           int chance = 0;
+
           if (candRole == 'Guru') {
-            // Guru mengajak Murid
-            if (candGender == 'Laki-laki' && gender == 'Perempuan') chance = 65;
-            else if (candGender == 'Laki-laki' && gender == 'Laki-laki') chance = 10;
-            else if (candGender == 'Perempuan' && gender == 'Laki-laki') chance = 70;
-            else if (candGender == 'Perempuan' && gender == 'Perempuan') chance = 30;
+            if (candGender == 'Laki-laki') {
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruLakiProposalChance.getPacaranChance(age) 
+                  : GuruLakiProposalChance.getBercintaChance(age);
+            } else {
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? GuruPerempuanProposalChance.getPacaranChance(age) 
+                  : GuruPerempuanProposalChance.getBercintaChance(age);
+            }
           } else {
-            // Murid mengajak Murid (Sesama Siswa)
-            if (candGender == 'Laki-laki' && gender == 'Perempuan') chance = 80;
-            else if (candGender == 'Laki-laki' && gender == 'Laki-laki') chance = 10;
-            else if (candGender == 'Perempuan' && gender == 'Perempuan') chance = 30;
-            else if (candGender == 'Perempuan' && gender == 'Laki-laki') chance = 80; // default opposite gender
+            // Teman Sekelas
+            chance = proposalType == 'Ajak Pacaran' 
+                ? SiswaSiswiProposalChance.getPacaranChance(age) 
+                : SiswaSiswiProposalChance.getBercintaChance(age);
           }
 
-          if (random.nextInt(100) < (chance ~/ 2)) { // skala kejar peluang wajar
-            final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+          if (random.nextInt(100) < chance) {
             activeProposal = {
               'name': candidate['name'],
               'relation': candidate['relation'],
