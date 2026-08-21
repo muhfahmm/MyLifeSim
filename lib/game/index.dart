@@ -293,7 +293,7 @@ class _GameScreenState extends State<GameScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => KerjaMenu(
+                        builder: (context) => KerjaMenuScreen(
                           character: _character,
                           onRefresh: () => setState(() {}),
                         ),
