@@ -1062,16 +1062,31 @@ class Character {
             else chance = 10;
           }
 
-          if (random.nextInt(100) < chance) {
-            final String proposalType = random.nextInt(100) < 80 ? 'Ajak Pacaran' : 'Bercinta';
-            activeProposal = {
-              'name': candidate['name'],
-              'relation': candidate['relation'],
-              'type': proposalType,
-              'gender': candidate['gender'],
-              'age': candidate['age'],
-              'role': candidate['role'],
-            };
+          if (rel.contains('ayah tiri')) {
+            final String proposalType = random.nextInt(100) < 53 ? 'Ajak Pacaran' : 'Bercinta'; // Roll type first to calculate chance
+            final int tChance = proposalType == 'Ajak Pacaran' ? 70 : 60;
+            if (random.nextInt(100) < tChance) {
+              activeProposal = {
+                'name': candidate['name'],
+                'relation': candidate['relation'],
+                'type': proposalType,
+                'gender': candidate['gender'],
+                'age': candidate['age'],
+                'role': candidate['role'],
+              };
+            }
+          } else {
+            if (random.nextInt(100) < chance) {
+              final String proposalType = random.nextInt(100) < 80 ? 'Ajak Pacaran' : 'Bercinta';
+              activeProposal = {
+                'name': candidate['name'],
+                'relation': candidate['relation'],
+                'type': proposalType,
+                'gender': candidate['gender'],
+                'age': candidate['age'],
+                'role': candidate['role'],
+              };
+            }
           }
         }
       }
