@@ -456,7 +456,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
 }
 
 // ============================================================================
-// HALAMAN UTAMA UNIVERSITAS (tidak berubah)
+// HALAMAN UTAMA UNIVERSITAS
 // ============================================================================
 class UnivMenuPage extends StatefulWidget {
   final Character character;
@@ -760,13 +760,14 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
             onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Batal'),
           ),
+          // ========= PERBAIKAN: TOMBOL DROP OUT MENJADI MERAH =========
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
               Navigator.pop(dialogContext);
               _executeKeluarUniv(context);
             },
-            child: const Text('Drop Out Sekarang', style: TextStyle(color: Colors.red)),
+            child: const Text('Drop Out Sekarang', style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
