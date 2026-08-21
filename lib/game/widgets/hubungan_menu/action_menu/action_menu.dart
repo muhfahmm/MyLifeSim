@@ -1004,6 +1004,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             ),
           );
         },
+      ));
     } else if (isActivePartner && isPartnerRole) {
       // 1. Bercinta / Make Love (langsung muncul, tidak harus menunggu usia 12)
       topActions.add(ActionItem(
