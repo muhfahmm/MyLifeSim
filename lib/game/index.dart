@@ -129,7 +129,7 @@ class _GameScreenState extends State<GameScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                _checkActiveProposal();
+                _checkGraduationOptions();
               },
               child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -137,8 +137,118 @@ class _GameScreenState extends State<GameScreen> {
         ),
       );
     } else {
+      _checkGraduationOptions();
+    }
+  }
+
+  void _checkGraduationOptions() {
+    if (_character.age == 18 && _character.univMajor == null && _character.jobName == null) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.school, color: Colors.indigo),
+              SizedBox(width: 8),
+              Text('Pilihan Masa Depan 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            'Selamat! Kamu telah resmi lulus dari SMA pada usia 18 tahun. Apa rencana hidupmu selanjutnya?',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+                _showUnivMajorSelection();
+              },
+              child: const Text('Mendaftar Universitas'),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Silakan cari pekerjaan di menu "Bekerja"')),
+                );
+                _checkActiveProposal();
+              },
+              child: const Text('Mencari Pekerjaan'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
+                );
+                _checkActiveProposal();
+              },
+              child: const Text('Tidak Memilih Apapun', style: TextStyle(color: Colors.grey)),
+            ),
+          ],
+        ),
+      );
+    } else {
       _checkActiveProposal();
     }
+  }
+
+  void _showUnivMajorSelection() {
+    final List<String> majors = [
+      'Teknik Informatika 💻',
+      'Kedokteran 🩺',
+      'Hukum ⚖️',
+      'Akuntansi 📊',
+      'Sastra & Bahasa 📚'
+    ];
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text('Pilih Jurusan Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Pilih salah satu program studi / jurusan yang ingin kamu tekuni:'),
+        actions: majors.map((major) => Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo.shade50,
+                foregroundColor: Colors.indigo,
+                elevation: 0,
+              ),
+              onPressed: () {
+                setState(() {
+                  _character.univMajor = major;
+                });
+                Navigator.pop(context);
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Text('Pendaftaran Berhasil! 🎉'),
+                    content: Text('Selamat! Kamu resmi diterima di Universitas untuk program studi $major.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _checkActiveProposal();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  ),
+                );
+              },
+              child: Text(major, style: const TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ),
+        )).toList(),
+      ),
+    );
   }
 
   // --- LOGIKA MELAHIRKAN (80%) ---

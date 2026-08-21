@@ -5,8 +5,9 @@ import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/masturbate.dart';
 
-// Import submenus untuk sekolah
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/school_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/school_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
@@ -63,26 +64,26 @@ class ActivityButton extends StatelessWidget {
                 final String subtitle;
                 final Color color;
                 final int minAge;
-                if (age <= 12) {
+                if (age <= 11) {
                   label = 'Sekolah Dasar (SD)';
                   subtitle = 'Belajar dan bermain di Sekolah Dasar';
                   color = Colors.blue;
                   minAge = 6;
-                } else if (age <= 15) {
+                } else if (age <= 14) {
                   label = 'Sekolah Menengah Pertama (SMP)';
                   subtitle = 'Lanjutkan pendidikan tingkat pertama';
                   color = Colors.blueAccent;
-                  minAge = 13;
-                } else if (age <= 18) {
+                  minAge = 12;
+                } else if (age <= 17) {
                   label = 'Sekolah Menengah Atas (SMA)';
                   subtitle = 'Pendidikan tingkat atas persiapan karir';
                   color = Colors.purple;
-                  minAge = 16;
+                  minAge = 15;
                 } else {
                   label = 'Universitas (Kuliah)';
                   subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
                   color = Colors.indigo;
-                  minAge = 19;
+                  minAge = 18;
                 }
 
                 return _buildActivityTile(
@@ -98,10 +99,15 @@ class ActivityButton extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => SchoolMenuPage(
-                          character: character,
-                          onRefresh: onRefresh,
-                        ),
+                        builder: (context) => age <= 17
+                            ? SchoolMenuPage(
+                                character: character,
+                                onRefresh: onRefresh,
+                              )
+                            : UnivMenuPage(
+                                character: character,
+                                onRefresh: onRefresh,
+                              ),
                       ),
                     );
                   },
@@ -115,11 +121,19 @@ class ActivityButton extends StatelessWidget {
                 subtitle: 'Mulai bekerja untuk menghasilkan uang tunai',
                 icon: Icons.work,
                 color: Colors.green,
-                minAge: 19,
+                minAge: 18,
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  onWork();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => KerjaMenuScreen(
+                        character: character,
+                        onRefresh: onRefresh,
+                      ),
+                    ),
+                  );
                 },
               ),
 

@@ -5,7 +5,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempu
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/siswa_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_proposal_chance.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/school_logic/actions/school_generator.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_proposal_chance.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
@@ -55,7 +55,10 @@ class Character {
   List<Map<String, String>> siblings; // Daftar saudara [{name: '...', gender: 'Laki-laki', relation: '...', relationship: '50', age: '2', isDeceased: 'false'}]
   List<Map<String, String>> extendedFamily = []; // Daftar kakek, nenek, paman, bibi, sepupu [{name: '...', gender: 'Laki-laki', relation: 'Kakek (dari Ayah)', relationship: '50', age: '70', isDeceased: 'false'}]
   List<Map<String, String>> classmates = []; // Daftar teman sekelas [{name: '...', gender: 'Laki-laki', relationship: '50', age: '12', isDeceased: 'false'}]
+  List<Map<String, String>> univClassmates = []; // Daftar teman kuliah
+  List<Map<String, String>> univLecturers = []; // Daftar dosen
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
+  String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
   List<Map<String, String>> smaTeachers = []; // Daftar guru SMA
@@ -77,6 +80,10 @@ class Character {
   int? motherAge;
   int? stepFatherAge;
   int? stepMotherAge;
+
+  // --- FIELD PEKERJAAN ---
+  String? jobName;
+  int? jobSalary;
 
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
@@ -288,16 +295,28 @@ class Character {
     age++;
     health -= 2;
 
+    // Tambah gaji dari pekerjaan jika ada
+    if (jobName != null && jobSalary != null) {
+      money += jobSalary!;
+      final String notice = '💼 Gajian: Kamu menerima gaji sebesar \$${jobSalary} dari pekerjaanmu sebagai $jobName.';
+      events.add(notice);
+      inbox.add(notice);
+    }
+
     if (age == 6) {
       final String notice = '🎒 Masuk Sekolah: Kamu sekarang resmi mulai bersekolah di Sekolah Dasar (SD) 🏫';
       events.add(notice);
       inbox.add(notice);
-    } else if (age == 13) {
+    } else if (age == 12) {
       final String notice = '🏫 Lulus & Naik Jenjang: Kamu mulai bersekolah di Sekolah Menengah Pertama (SMP) 📚';
       events.add(notice);
       inbox.add(notice);
-    } else if (age == 16) {
+    } else if (age == 15) {
       final String notice = '🎓 Naik Tingkat: Kamu mulai bersekolah di Sekolah Menengah Atas (SMA) ✍️';
+      events.add(notice);
+      inbox.add(notice);
+    } else if (age == 18) {
+      final String notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
       events.add(notice);
       inbox.add(notice);
     }

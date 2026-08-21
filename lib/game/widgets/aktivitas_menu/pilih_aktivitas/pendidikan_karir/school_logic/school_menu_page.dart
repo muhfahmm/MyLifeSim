@@ -25,18 +25,15 @@ class SchoolMenuPage extends StatelessWidget {
     String schoolType = 'Sekolah';
     Color themeColor = Colors.blue;
 
-    if (age >= 6 && age <= 12) {
+    if (age >= 6 && age <= 11) {
       schoolType = 'Sekolah Dasar (SD)';
       themeColor = Colors.blue;
-    } else if (age >= 13 && age <= 15) {
+    } else if (age >= 12 && age <= 14) {
       schoolType = 'Sekolah Menengah Pertama (SMP)';
       themeColor = Colors.blueAccent;
-    } else if (age >= 16 && age <= 18) {
+    } else if (age >= 15 && age <= 17) {
       schoolType = 'Sekolah Menengah Atas (SMA)';
       themeColor = Colors.purple;
-    } else if (age >= 19 && age <= 23) {
-      schoolType = 'Universitas (Kuliah)';
-      themeColor = Colors.indigo;
     }
 
     return Scaffold(
