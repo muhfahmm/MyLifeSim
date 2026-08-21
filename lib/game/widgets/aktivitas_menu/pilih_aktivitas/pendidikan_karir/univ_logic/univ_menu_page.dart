@@ -109,7 +109,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       case 'Kedokteran':
         return Icons.health_and_safety;
       case 'Kedokteran Gigi':
-        return Icons.dentistry;
+        return Icons.medical_services;
       case 'Farmasi':
         return Icons.medical_services;
       case 'Keperawatan':

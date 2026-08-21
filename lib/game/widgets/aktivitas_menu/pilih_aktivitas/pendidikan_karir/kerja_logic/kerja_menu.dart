@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 
 class KerjaMenuScreen extends StatefulWidget {
