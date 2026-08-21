@@ -180,7 +180,7 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     child: Text(
                       targetText,
-                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.black85),
+                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.black87),
                     ),
                   ),
                   const SizedBox(height: 15),
