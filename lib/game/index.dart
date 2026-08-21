@@ -186,6 +186,8 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   onPressed: () {
                     Navigator.pop(context);
+                    final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
+                    _character.educationHistory[levelKey] = 'Belum Lulus';
                     _character.schoolType = 'Negeri';
                     _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun.');
                     _character.classmates.clear();
@@ -211,6 +213,8 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   onPressed: () {
                     Navigator.pop(context);
+                    final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
+                    _character.educationHistory[levelKey] = 'Belum Lulus';
                     _character.schoolType = 'Swasta';
                     _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun.');
                     _character.classmates.clear();

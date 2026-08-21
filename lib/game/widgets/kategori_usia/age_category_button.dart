@@ -29,9 +29,27 @@ class AgeCategoryButton extends StatelessWidget {
     required this.money,
     required this.appearance,
   });
-
   Widget _buildEducationHistorySection() {
     final history = character.educationHistory;
+    final int age = character.age;
+
+    // Auto-sync history values based on age to guarantee synchronization
+    if (age >= 6) {
+      if (history['SD'] == null || (history['SD'] == 'Belum Lulus' && age >= 12)) {
+        history['SD'] = age >= 12 ? 'Lulus' : 'Belum Lulus';
+      }
+    }
+    if (age >= 12) {
+      if (history['SMP'] == null || (history['SMP'] == 'Belum Lulus' && age >= 15)) {
+        history['SMP'] = age >= 15 ? 'Lulus' : 'Belum Lulus';
+      }
+    }
+    if (age >= 15) {
+      if (history['SMA'] == null || (history['SMA'] == 'Belum Lulus' && age >= 18)) {
+        history['SMA'] = age >= 18 ? 'Lulus' : 'Belum Lulus';
+      }
+    }
+
     final List<String> displayStages = [];
 
     if (character.age < 6) {
