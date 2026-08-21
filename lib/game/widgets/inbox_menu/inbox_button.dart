@@ -18,76 +18,110 @@ class InboxButton extends StatelessWidget {
 
     return ElevatedButton(
       onPressed: () {
-        showDialog(
+        final double screenWidth = MediaQuery.of(context).size.width;
+        final bool isMobile = screenWidth < 600;
+
+        showGeneralDialog(
           context: context,
-          builder: (context) => StatefulBuilder(
-            builder: (context, setDialogState) => AlertDialog(
-              title: Row(
-                children: [
-                  const Icon(Icons.inbox, color: Colors.blue),
-                  const SizedBox(width: 8),
-                  const Text('Kotak Masuk (Inbox)', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const Spacer(),
-                  if (character.inbox.isNotEmpty)
-                    IconButton(
-                      icon: const Icon(Icons.delete_sweep, color: Colors.red),
-                      tooltip: 'Bersihkan Semua',
-                      onPressed: () {
-                        setDialogState(() {
-                          character.inbox.clear();
-                        });
-                        onRefresh();
-                      },
-                    )
-                ],
-              ),
-              content: character.inbox.isEmpty
-                  ? const SizedBox(
-                      height: 100,
-                      child: Center(
-                        child: Text(
-                          'Kotak masuk kosong.',
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                      ),
-                    )
-                  : SizedBox(
-                      width: double.maxFinite,
-                      height: 300,
-                      child: ListView.builder(
-                        itemCount: character.inbox.length,
-                        itemBuilder: (context, index) {
-                          final item = character.inbox[index];
-                          return Card(
-                            elevation: 0,
-                            color: Colors.grey.shade50,
-                            margin: const EdgeInsets.only(bottom: 8),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              side: BorderSide(color: Colors.grey.shade200),
+          barrierDismissible: true,
+          barrierColor: Colors.black54,
+          barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
+          transitionDuration: Duration.zero,
+          transitionBuilder: (context, anim1, anim2, child) => child,
+          pageBuilder: (context, anim1, anim2) => StatefulBuilder(
+            builder: (context, setDialogState) => Center(
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  width: isMobile ? screenWidth : 500,
+                  height: isMobile ? MediaQuery.of(context).size.height : null,
+                  constraints: isMobile
+                      ? null
+                      : const BoxConstraints(maxHeight: 750, minHeight: 200),
+                  padding: const EdgeInsets.all(24.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: isMobile ? BorderRadius.zero : BorderRadius.circular(16),
+                    boxShadow: isMobile ? null : [BoxShadow(color: Colors.black26, blurRadius: 10)],
+                  ),
+                  child: SafeArea(
+                    child: Column(
+                      mainAxisSize: isMobile ? MainAxisSize.max : MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Row(
+                          children: [
+                            const Icon(Icons.inbox, color: Colors.blue),
+                            const SizedBox(width: 8),
+                            const Expanded(
+                              child: Text(
+                                'Kotak Masuk (Inbox)',
+                                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                              ),
                             ),
-                            child: ListTile(
-                              title: Text(item, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.close, size: 16, color: Colors.grey),
+                            if (character.inbox.isNotEmpty)
+                              IconButton(
+                                icon: const Icon(Icons.delete_sweep, color: Colors.red),
+                                tooltip: 'Bersihkan Semua',
                                 onPressed: () {
                                   setDialogState(() {
-                                    character.inbox.removeAt(index);
+                                    character.inbox.clear();
                                   });
                                   onRefresh();
                                 },
                               ),
+                            IconButton(
+                              icon: const Icon(Icons.close),
+                              onPressed: () => Navigator.pop(context),
                             ),
-                          );
-                        },
-                      ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        Flexible(
+                          child: character.inbox.isEmpty
+                              ? const SizedBox(
+                                  height: 200,
+                                  child: Center(
+                                    child: Text(
+                                      'Kotak masuk kosong.',
+                                      style: TextStyle(color: Colors.grey, fontSize: 14),
+                                    ),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  physics: const ClampingScrollPhysics(),
+                                  itemCount: character.inbox.length,
+                                  itemBuilder: (context, index) {
+                                    final item = character.inbox[index];
+                                    return Card(
+                                      elevation: 0,
+                                      color: Colors.grey.shade50,
+                                      margin: const EdgeInsets.only(bottom: 8),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: BorderSide(color: Colors.grey.shade200),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(item, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500)),
+                                        trailing: IconButton(
+                                          icon: const Icon(Icons.close, size: 16, color: Colors.grey),
+                                          onPressed: () {
+                                            setDialogState(() {
+                                              character.inbox.removeAt(index);
+                                            });
+                                            onRefresh();
+                                          },
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                        ),
+                      ],
                     ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
-                )
-              ],
+                  ),
+                ),
+              ),
             ),
           ),
         );

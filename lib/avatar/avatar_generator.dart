@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class AvatarGenerator {
@@ -215,5 +216,18 @@ class AvatarGenerator {
       'clotheColor': clotheColVal,
       'skinColor': skinVal,
     };
+  }
+}
+
+class AvatarImageCache {
+  static final Map<String, ImageProvider> _cache = {};
+
+  static ImageProvider getImageProvider(String url) {
+    if (_cache.containsKey(url)) {
+      return _cache[url]!;
+    }
+    final provider = NetworkImage(url);
+    _cache[url] = provider;
+    return provider;
   }
 }

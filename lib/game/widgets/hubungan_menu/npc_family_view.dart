@@ -1,6 +1,7 @@
-﻿// lib/game/widgets/hubungan_menu/npc_family_view.dart
+// lib/game/widgets/hubungan_menu/npc_family_view.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/avatar/avatar_generator.dart';
 import 'dart:math';
 
 /// Screen untuk menampilkan keluarga NPC (Guru / Siswa)
@@ -281,8 +282,8 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
                 CircleAvatar(
                   radius: 18,
                   backgroundColor: color.withValues(alpha: 0.15),
-                  child: Image.network(
-                    avatarUrl,
+                  child: Image(
+                    image: AvatarImageCache.getImageProvider(avatarUrl),
                     width: 32,
                     height: 32,
                     errorBuilder: (_, __, ___) => Icon(

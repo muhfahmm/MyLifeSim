@@ -278,34 +278,34 @@ class _GameScreenState extends State<GameScreen> {
 
     if (type == 'Ajak 3some') {
       dialogTitle = 'Ajakan 3some! 🔥';
-      dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan 3some bersama secara intim. Apakah kamu mau menerimanya?';
+      dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan hubungan intim threesome secara bersama-sama. Apakah kamu mau menerima ajakan threesome ini?';
     } else if (role == 'Guru' || role == 'Teman Sekelas') {
       final isSameSex = myGender == partnerGender;
       final orientationType = isSameSex ? (myGender == 'laki-laki' ? 'Gay' : 'Lesbian') : '';
       
       if (type == 'Ajak Pacaran') {
         dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Pacaran)!' : 'Ajakan Pacaran!';
-        dialogBody = '$role-mu, $partnerName mengajakmu berkomitmen dalam hubungan berpacaran ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerimanya?';
+        dialogBody = '$role-mu, $partnerName secara langsung mengajakmu untuk berpacaran ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan pacaran tersebut?';
       } else {
         dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Bercinta)!' : 'Ajakan Berhubungan Intim!';
-        dialogBody = '$role-mu, $partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerimanya?';
+        dialogBody = '$role-mu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan bercinta ini?';
       }
     } else {
       if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Gay (Pacaran)!' : 'Ajakan Gay (Bercinta)!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan sesama jenis (Gay) secara diam-diam. Apakah kamu mau menerimanya?'
-            : '$partnerName (Gay) mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Gay) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
       } else if (myGender == 'perempuan' && partnerGender == 'perempuan') {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Lesbian (Pacaran)!' : 'Ajakan Lesbian (Bercinta)!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerimanya?'
-            : '$partnerName (Lesbian) mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
       } else {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Berhubungan Intim!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerimanya?'
-            : '$partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
+            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love secara rahasia malam ini. Apakah kamu mau menerima ajakan bercinta tersebut?';
       }
     }
     
@@ -766,8 +766,8 @@ class _GameScreenState extends State<GameScreen> {
                     CircleAvatar(
                       radius: 36,
                       backgroundColor: Colors.blue.shade50,
-                      child: Image.network(
-                        _avatarUrl, // Gunakan cache URL
+                      child: Image(
+                        image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;
                           return const SizedBox(

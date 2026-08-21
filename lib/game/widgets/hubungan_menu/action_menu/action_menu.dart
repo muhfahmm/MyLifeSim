@@ -15,6 +15,7 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
+import 'package:bitlife/avatar/avatar_generator.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -1111,12 +1112,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         CircleAvatar(
                           backgroundColor: Colors.blue.shade100,
                           radius: 28,
-                          child: Image.network(
-                            AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                              name: _getPlainTargetName(),
-                              gender: _getTargetGender(),
-                              age: targetAge,
-                              happiness: relationshipVal,
+                          child: Image(
+                            image: AvatarImageCache.getImageProvider(
+                              AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                                name: _getPlainTargetName(),
+                                gender: _getTargetGender(),
+                                age: targetAge,
+                                happiness: relationshipVal,
+                              ),
                             ),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;

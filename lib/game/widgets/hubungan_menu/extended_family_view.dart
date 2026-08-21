@@ -103,12 +103,14 @@ class _ExtendedFamilyViewScreenState extends State<ExtendedFamilyViewScreen> {
                     CircleAvatar(
                       radius: 14,
                       backgroundColor: color.withOpacity(0.15),
-                      child: Image.network(
-                        AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                          name: name,
-                          gender: isMale ? 'Laki-laki' : 'Perempuan',
-                          age: extAge,
-                          happiness: relVal,
+                      child: Image(
+                        image: AvatarImageCache.getImageProvider(
+                          AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                            name: name,
+                            gender: isMale ? 'Laki-laki' : 'Perempuan',
+                            age: extAge,
+                            happiness: relVal,
+                          ),
                         ),
                         loadingBuilder: (context, child, loadingProgress) {
                           if (loadingProgress == null) return child;

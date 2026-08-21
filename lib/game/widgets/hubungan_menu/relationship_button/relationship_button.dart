@@ -468,10 +468,12 @@ class RelationshipButton extends StatelessWidget {
                         CircleAvatar(
                           radius: 14,
                           backgroundColor: Colors.teal.withOpacity(0.15),
-                          child: Image.network(
-                            AvatarAgeRules.getAgeBasedAvatarUrl(
-                              character,
-                              happiness: character.happiness,
+                          child: Image(
+                            image: AvatarImageCache.getImageProvider(
+                              AvatarAgeRules.getAgeBasedAvatarUrl(
+                                character,
+                                happiness: character.happiness,
+                              ),
                             ),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
@@ -688,8 +690,8 @@ class RelationshipButton extends StatelessWidget {
                   CircleAvatar(
                     radius: 14,
                     backgroundColor: color.withOpacity(0.15),
-                    child: Image.network(
-                      avatarUrl,
+                    child: Image(
+                      image: AvatarImageCache.getImageProvider(avatarUrl),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return const SizedBox(
@@ -830,8 +832,8 @@ class RelationshipButton extends StatelessWidget {
                   CircleAvatar(
                     radius: 14,
                     backgroundColor: color.withOpacity(0.15),
-                    child: Image.network(
-                      avatarUrl,
+                    child: Image(
+                      image: AvatarImageCache.getImageProvider(avatarUrl),
                       loadingBuilder: (context, child, loadingProgress) {
                         if (loadingProgress == null) return child;
                         return const SizedBox(
