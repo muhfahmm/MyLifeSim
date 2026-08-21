@@ -38,6 +38,7 @@ class SchoolGenerator {
         'age': classmateAge.toString(),
         'isDeceased': 'false',
         'sexuality': SexualityLogic.getStudentSexuality(gender),
+        'intelligence': (30 + _random.nextInt(61)).toString(),
       });
     }
   }

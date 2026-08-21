@@ -312,7 +312,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
 // ============================================================================
 // HALAMAN UTAMA UNIVERSITAS (tidak berubah)
 // ============================================================================
-class UnivMenuPage extends StatelessWidget {
+class UnivMenuPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
 
@@ -323,7 +323,15 @@ class UnivMenuPage extends StatelessWidget {
   });
 
   @override
+  State<UnivMenuPage> createState() => _UnivMenuPageState();
+}
+
+class _UnivMenuPageState extends State<UnivMenuPage> {
+
+  @override
   Widget build(BuildContext context) {
+    final character = widget.character;
+    final onRefresh = widget.onRefresh;
     if (character.univMajor == null) {
       return Scaffold(
         appBar: AppBar(
@@ -365,8 +373,8 @@ class UnivMenuPage extends StatelessWidget {
                   'Daftar Universitas Sekarang',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                onPressed: () {
-                  Navigator.push(
+                onPressed: () async {
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (_) => UnivMajorSelectionPage(
@@ -375,6 +383,7 @@ class UnivMenuPage extends StatelessWidget {
                       ),
                     ),
                   );
+                  setState(() {});
                 },
               ),
               const SizedBox(height: 16),
@@ -583,11 +592,12 @@ class UnivMenuPage extends StatelessWidget {
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
         trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-        onTap: () {
-          Navigator.push(
+        onTap: () async {
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (context) => page),
           );
+          setState(() {});
         },
       ),
     );

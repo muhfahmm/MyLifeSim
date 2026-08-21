@@ -176,7 +176,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Teman Sekelas • Umur: $age tahun'),
+                  Text('Teman Sekelas • Umur: $age tahun • Kecerdasan: ${cm['intelligence'] ?? '50'}%'),
                   const SizedBox(height: 6),
                   Text('Hubungan: $rel%'),
                   const SizedBox(height: 4),

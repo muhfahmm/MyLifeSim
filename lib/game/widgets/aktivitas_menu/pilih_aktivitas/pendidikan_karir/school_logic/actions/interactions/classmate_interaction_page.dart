@@ -99,8 +99,14 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     const SizedBox(height: 4),
                     () {
                       final String sexuality = widget.classmate['sexuality'] ?? 'Heteroseksual';
+                      String typeLabel = 'Teman Sekelas';
+                      if (widget.character.univClassmates.any((e) => e['name'] == name)) {
+                        typeLabel = 'Teman Kuliah';
+                      } else if (widget.character.coworkers.any((e) => e['name'] == name)) {
+                        typeLabel = 'Rekan Kerja';
+                      }
                       return Text(
-                        'Teman Sekelas • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
+                        '$typeLabel • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                         style: const TextStyle(fontSize: 14, color: Colors.black54),
                       );
                     }(),
@@ -128,6 +134,32 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: rel > 70 ? Colors.green : (rel > 40 ? Colors.amber : Colors.red),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        const Text('Tingkat Kecerdasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: int.parse(widget.classmate['intelligence'] ?? '50') / 100.0,
+                              backgroundColor: Colors.grey.shade200,
+                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                              minHeight: 10,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Text(
+                          '${widget.classmate['intelligence'] ?? '50'}%',
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
                           ),
                         ),
                       ],

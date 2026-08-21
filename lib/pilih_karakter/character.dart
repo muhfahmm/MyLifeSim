@@ -57,6 +57,7 @@ class Character {
   List<Map<String, String>> classmates = []; // Daftar teman sekelas [{name: '...', gender: 'Laki-laki', relationship: '50', age: '12', isDeceased: 'false'}]
   List<Map<String, String>> univClassmates = []; // Daftar teman kuliah
   List<Map<String, String>> univLecturers = []; // Daftar dosen
+  List<Map<String, String>> coworkers = []; // Daftar rekan kerja
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD

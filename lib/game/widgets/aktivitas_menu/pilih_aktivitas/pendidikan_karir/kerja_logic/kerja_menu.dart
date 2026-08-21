@@ -1,6 +1,8 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'dart:math';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -105,6 +107,33 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
   }
 
+  void _generateCoworkersIfEmpty() {
+    if (widget.character.coworkers.isNotEmpty) return;
+    
+    final random = Random();
+    final count = 5 + random.nextInt(6); // 5 to 10 coworkers
+    for (int i = 0; i < count; i++) {
+      final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      final firstList = gender == 'Laki-laki' 
+          ? (widget.character.maleFirstNames ?? ['Andi', 'Budi', 'Joko']) 
+          : (widget.character.femaleFirstNames ?? ['Siti', 'Ani', 'Dewi']);
+      final lastList = widget.character.lastNames ?? ['Santoso', 'Pratama', 'Hidayat'];
+      final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+      
+      final ageVal = 20 + random.nextInt(41); // 20 to 60 years old
+      
+      widget.character.coworkers.add({
+        'name': name,
+        'gender': gender,
+        'relationship': (40 + random.nextInt(21)).toString(), // 40 to 60 initial
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': 'Heteroseksual',
+        'intelligence': (30 + random.nextInt(61)).toString(), // 30 to 90
+      });
+    }
+  }
+
   void _resign() {
     showDialog(
       context: context,
@@ -122,6 +151,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               setState(() {
                 widget.character.jobName = null;
                 widget.character.jobSalary = null;
+                widget.character.coworkers.clear();
               });
               widget.onRefresh();
             },
@@ -198,37 +228,68 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Daftar Lowongan Pekerjaan
-            const Text(
-              'Lowongan Pekerjaan Tersedia',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
-            ),
-            const SizedBox(height: 12),
+            // Daftar Lowongan Pekerjaan vs Daftar Rekan Kerja
+            if (hasJob) ...[
+              const Text(
+                'Daftar Rekan Kerja',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              ),
+              const SizedBox(height: 12),
+              ...() {
+                _generateCoworkersIfEmpty();
+                return widget.character.coworkers.map((cm) {
+                  final String name = cm['name']!;
+                  final String gender = cm['gender']!;
+                  final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
+                  final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+                  final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
+                    name: name,
+                    gender: gender,
+                    age: age,
+                    schoolLevel: 'SMA',
+                    happiness: rel,
+                  );
 
-            if (hasJob)
-              Card(
-                color: Colors.amber.shade50,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.amber.shade300),
-                ),
-                child: const Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Row(
-                    children: [
-                      Icon(Icons.info, color: Colors.amber),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text(
-                          'Kamu sudah memiliki pekerjaan. Resign terlebih dahulu untuk melamar pekerjaan lain.',
-                          style: TextStyle(fontSize: 13, color: Colors.black87),
-                        ),
+                  return Card(
+                    elevation: 0,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: NetworkImage(avatarUrl),
                       ),
-                    ],
-                  ),
-                ),
-              )
-            else
+                      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text('Rekan Kerja • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%'),
+                      trailing: const Icon(Icons.chevron_right, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClassmateInteractionPage(
+                              classmate: cm,
+                              character: widget.character,
+                              onRefresh: () {
+                                setState(() {});
+                                widget.onRefresh();
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                });
+              }(),
+            ] else ...[
+              const Text(
+                'Lowongan Pekerjaan Tersedia',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              ),
+              const SizedBox(height: 12),
               ..._availableJobs.map((job) {
                 final meetsReq = character.intelligence >= job['minIntel'];
                 return Card(
@@ -256,6 +317,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   ),
                 );
               }),
+            ],
           ],
         ),
       ),
