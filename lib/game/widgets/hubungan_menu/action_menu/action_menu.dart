@@ -963,7 +963,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       
                       final String msg = '💔 Ayahmu memutuskan untuk menceraikan Ibu Tirimu ($oldMother) atas permintaanmu!';
                       widget.character.inbox.add(msg);
-                      widget.character.events.add(msg);
                       _updateRelationship(15);
                       _updateState();
                       
