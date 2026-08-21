@@ -210,7 +210,7 @@ class AvatarGenerator {
 
     return {
       'topType': topVal,
-      'accessoriesType': accVal,
+      'accessoriesType': 'blank',
       'hairColor': hairVal,
       'clotheType': clotheVal,
       'clotheColor': clotheColVal,

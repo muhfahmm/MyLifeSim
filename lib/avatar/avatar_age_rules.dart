@@ -69,24 +69,15 @@ class AvatarAgeRules {
       // Gunakan pilihan kustom penuh
     } else if (age <= 59) {
       // --- Usia 40-59 (Paruh Baya / Middle Aged) ---
-      // Tambahkan kacamata jika belum memakai kacamata (misal kacamata baca)
-      if (accessories == 'blank') {
-        accessories = 'prescription01';
-      }
+      // (Automatic override removed per request - glasses now determined by eye test)
     } else if (age <= 70) {
       // --- Usia 60-70 (Terlihat Tua / Lansia) ---
       hairColor = 'e8e1e1'; // Mulai beruban (warna silver/abu-abu)
-      if (accessories == 'blank') {
-        accessories = 'prescription02';
-      }
       mouthType = 'concerned'; // Ekspresi berkerut
     } else {
       // --- Usia 71-80+ (Terlihat Sangat Tua) ---
       hairColor = 'e8e1e1'; // Rambut beruban total
       top = isMale ? 'sides' : 'bun'; // Botak atas (sides) atau sanggul nenek
-      if (accessories == 'blank') {
-        accessories = 'prescription02';
-      }
       mouthType = 'sad';
     }
 
