@@ -903,7 +903,85 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri' ||
                                widget.targetRole.startsWith('Pacar');
 
-    if (isActivePartner && isPartnerRole) {
+    final bool isDatingFather = (cleanRole.contains('ayah') || cleanName.contains('ayah')) && 
+                                widget.character.isAnyPartnerNameMatching(widget.targetName);
+
+    final bool isFatherPartnerAndMotherTiriExists = widget.character.gender.toLowerCase() == 'perempuan' && 
+                                                    isDatingFather && 
+                                                    widget.character.stepMotherName != null && 
+                                                    !widget.character.isStepMotherDeceased;
+
+    if (isFatherPartnerAndMotherTiriExists) {
+      // 1. Bercinta / Make Love
+      topActions.add(ActionItem(
+        label: 'Bercinta / Make Love',
+        icon: Icons.favorite,
+        color: Colors.pink,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BercintaScreen(
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                onActionComplete: () {
+                  _updateState();
+                },
+              ),
+            ),
+          );
+        },
+      ));
+
+      // 2. Minta Cerai
+      topActions.add(ActionItem(
+        label: 'Minta Cerai dengan Ibu Tiri',
+        icon: Icons.heart_broken,
+        color: Colors.redAccent,
+        onTap: () {
+          final screenContext = context;
+          showDialog(
+            context: screenContext,
+            builder: (confirmContext) => AlertDialog(
+              title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+              content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan Ibu Tirimu (${widget.character.stepMotherName})?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(confirmContext),
+                  child: const Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(confirmContext);
+                    final bool success = _random.nextInt(100) < 40;
+                    if (success) {
+                      final String? oldMother = widget.character.stepMotherName;
+                      widget.character.stepMotherName = null;
+                      widget.character.stepMotherAge = null;
+                      widget.character.stepMotherRelationship = null;
+                      
+                      final String msg = '💔 Ayahmu memutuskan untuk menceraikan Ibu Tirimu ($oldMother) atas permintaanmu!';
+                      widget.character.inbox.add(msg);
+                      widget.character.events.add(msg);
+                      _updateRelationship(15);
+                      _updateState();
+                      
+                      _showResultDialog('Sukses 💔', 'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan Ibu Tirimu ($oldMother).', Icons.done, Colors.green, () {});
+                    } else {
+                      _updateRelationship(-15);
+                      _updateState();
+                      _showResultDialog('Ditolak 🚫', 'Ayahmu menolak untuk menceraikan Ibu Tirimu. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan istrinya.', Icons.block, Colors.red, () {});
+                    }
+                  },
+                  child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+        },
+      ));
+    } else if (isActivePartner && isPartnerRole) {
       // 1. Bercinta / Make Love (langsung muncul, tidak harus menunggu usia 12)
       topActions.add(ActionItem(
         label: 'Bercinta / Make Love',
