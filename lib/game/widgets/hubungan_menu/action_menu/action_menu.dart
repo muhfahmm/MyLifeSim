@@ -49,12 +49,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.startsWith('Pacar')) {
       if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
         return '${widget.character.partner!['age']} tahun';
       }
       if (widget.character.secondPartner != null && name.contains(widget.character.secondPartner!['name'] ?? '')) {
         return '${widget.character.secondPartner!['age']} tahun';
+      }
+      if (widget.character.thirdPartner != null && name.contains(widget.character.thirdPartner!['name'] ?? '')) {
+        return '${widget.character.thirdPartner!['age']} tahun';
+      }
+      if (widget.character.fourthPartner != null && name.contains(widget.character.fourthPartner!['name'] ?? '')) {
+        return '${widget.character.fourthPartner!['age']} tahun';
+      }
+      if (widget.character.fifthPartner != null && name.contains(widget.character.fifthPartner!['name'] ?? '')) {
+        return '${widget.character.fifthPartner!['age']} tahun';
       }
       // Check exPartners fallback
       for (var ex in widget.character.exPartners) {
@@ -137,12 +146,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.startsWith('Pacar')) {
       if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
         return widget.character.partner!['name']!;
       }
       if (widget.character.secondPartner != null && name.contains(widget.character.secondPartner!['name'] ?? '')) {
         return widget.character.secondPartner!['name']!;
+      }
+      if (widget.character.thirdPartner != null && name.contains(widget.character.thirdPartner!['name'] ?? '')) {
+        return widget.character.thirdPartner!['name']!;
+      }
+      if (widget.character.fourthPartner != null && name.contains(widget.character.fourthPartner!['name'] ?? '')) {
+        return widget.character.fourthPartner!['name']!;
+      }
+      if (widget.character.fifthPartner != null && name.contains(widget.character.fifthPartner!['name'] ?? '')) {
+        return widget.character.fifthPartner!['name']!;
       }
     }
 
@@ -393,7 +411,22 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri') {
+    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.startsWith('Pacar')) {
+      if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
+        return widget.character.partner!['gender'] ?? 'Perempuan';
+      }
+      if (widget.character.secondPartner != null && name.contains(widget.character.secondPartner!['name'] ?? '')) {
+        return widget.character.secondPartner!['gender'] ?? 'Perempuan';
+      }
+      if (widget.character.thirdPartner != null && name.contains(widget.character.thirdPartner!['name'] ?? '')) {
+        return widget.character.thirdPartner!['gender'] ?? 'Perempuan';
+      }
+      if (widget.character.fourthPartner != null && name.contains(widget.character.fourthPartner!['name'] ?? '')) {
+        return widget.character.fourthPartner!['gender'] ?? 'Perempuan';
+      }
+      if (widget.character.fifthPartner != null && name.contains(widget.character.fifthPartner!['name'] ?? '')) {
+        return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
+      }
       return widget.character.partner != null ? widget.character.partner!['gender'] ?? 'Perempuan' : 'Perempuan';
     }
 
