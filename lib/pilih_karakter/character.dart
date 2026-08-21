@@ -320,6 +320,12 @@ class Character {
       final String notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
       events.add(notice);
       inbox.add(notice);
+      classmates.clear();
+      smaTeachers.clear();
+      smpTeachers.clear();
+      sdTeachers.clear();
+      headmaster = null;
+      bkTeacher = null;
     }
     // Generate data sekolah secara otomatis jika kosong agar bisa memicu ajakan proposal di ageUp
     SchoolGenerator.generateClassmatesIfEmpty(this);
@@ -754,62 +760,167 @@ class Character {
     if (age >= 6 && activeProposal == null) {
       final String myGenderLower = gender.trim().toLowerCase();
       
-      // 1. Kumpulkan kandidat sekolah
+      // 1. Kumpulkan kandidat sekolah / kuliah / kerja
       List<Map<String, dynamic>> schoolCandidates = [];
-      List<Map<String, String>> activeTeachers = [];
-      if (age >= 6 && age <= 12) activeTeachers = sdTeachers;
-      else if (age >= 13 && age <= 15) activeTeachers = smpTeachers;
-      else activeTeachers = smaTeachers;
 
-      for (var t in activeTeachers) {
-        final String sexuality = t['sexuality'] ?? 'Heteroseksual';
-        final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
-        
-        final String name = t['name'] ?? '';
-        bool isAlreadyPartner = false;
-        if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-        if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
-        if (isAlreadyPartner) continue;
-
-        bool match = false;
-        if (sexuality == 'Heteroseksual') match = (myGenderLower != tGender);
-        else if (sexuality == 'Biseksual') match = true;
-        else match = (myGenderLower == tGender); // Gay/Lesbian
-
-        if (match) {
-          schoolCandidates.add({
-            'name': t['name'],
-            'relation': 'Guru',
-            'gender': t['gender'] ?? 'Laki-laki',
-            'age': t['age'] ?? '35',
-            'role': 'Guru',
-          });
+      if (age < 18) {
+        List<Map<String, String>> activeTeachers = [];
+        if (age >= 6 && age <= 12) {
+          activeTeachers = sdTeachers;
+        } else if (age >= 13 && age <= 15) {
+          activeTeachers = smpTeachers;
+        } else {
+          activeTeachers = smaTeachers;
         }
-      }
 
-      for (var cm in classmates) {
-        final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
-        final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
-        
-        final String name = cm['name'] ?? '';
-        bool isAlreadyPartner = false;
-        if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-        if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
-        if (isAlreadyPartner) continue;
+        for (var t in activeTeachers) {
+          final String sexuality = t['sexuality'] ?? 'Heteroseksual';
+          final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
+          final String name = t['name'] ?? '';
+          bool isAlreadyPartner = false;
+          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+          if (isAlreadyPartner) continue;
 
-        bool match = false;
-        if (sexuality == 'Heteroseksual') match = (myGenderLower != cmGender);
-        else if (sexuality == 'Biseksual') match = true;
-        else match = (myGenderLower == cmGender); // Gay/Lesbian
+          bool match = false;
+          if (sexuality == 'Heteroseksual') {
+            match = (myGenderLower != tGender);
+          } else if (sexuality == 'Biseksual') {
+            match = true;
+          } else {
+            match = (myGenderLower == tGender);
+          }
 
-        if (match) {
-          schoolCandidates.add({
-            'name': cm['name'],
-            'relation': 'Teman Sekelas',
-            'gender': cm['gender'] ?? 'Laki-laki',
-            'age': cm['age'] ?? age.toString(),
-            'role': 'Teman Sekelas',
-          });
+          if (match) {
+            schoolCandidates.add({
+              'name': t['name'],
+              'relation': 'Guru',
+              'gender': t['gender'] ?? 'Laki-laki',
+              'age': t['age'] ?? '35',
+              'role': 'Guru',
+            });
+          }
+        }
+
+        for (var cm in classmates) {
+          final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
+          final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
+          final String name = cm['name'] ?? '';
+          bool isAlreadyPartner = false;
+          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+          if (isAlreadyPartner) continue;
+
+          bool match = false;
+          if (sexuality == 'Heteroseksual') {
+            match = (myGenderLower != cmGender);
+          } else if (sexuality == 'Biseksual') {
+            match = true;
+          } else {
+            match = (myGenderLower == cmGender);
+          }
+
+          if (match) {
+            schoolCandidates.add({
+              'name': cm['name'],
+              'relation': 'Teman Sekelas',
+              'gender': cm['gender'] ?? 'Laki-laki',
+              'age': cm['age'] ?? age.toString(),
+              'role': 'Teman Sekelas',
+            });
+          }
+        }
+      } else {
+        // Age >= 18: Universitas / Kerja
+        if (univMajor != null) {
+          for (var cm in univClassmates) {
+            final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
+            final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
+            final String name = cm['name'] ?? '';
+            bool isAlreadyPartner = false;
+            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            if (isAlreadyPartner) continue;
+
+            bool match = false;
+            if (sexuality == 'Heteroseksual') {
+              match = (myGenderLower != cmGender);
+            } else if (sexuality == 'Biseksual') {
+              match = true;
+            } else {
+              match = (myGenderLower == cmGender);
+            }
+
+            if (match) {
+              schoolCandidates.add({
+                'name': cm['name'],
+                'relation': 'Teman Kuliah',
+                'gender': cm['gender'] ?? 'Laki-laki',
+                'age': cm['age'] ?? age.toString(),
+                'role': 'Teman Kuliah',
+              });
+            }
+          }
+
+          for (var t in univLecturers) {
+            final String sexuality = t['sexuality'] ?? 'Heteroseksual';
+            final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
+            final String name = t['name'] ?? '';
+            bool isAlreadyPartner = false;
+            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            if (isAlreadyPartner) continue;
+
+            bool match = false;
+            if (sexuality == 'Heteroseksual') {
+              match = (myGenderLower != tGender);
+            } else if (sexuality == 'Biseksual') {
+              match = true;
+            } else {
+              match = (myGenderLower == tGender);
+            }
+
+            if (match) {
+              schoolCandidates.add({
+                'name': t['name'],
+                'relation': 'Dosen',
+                'gender': t['gender'] ?? 'Laki-laki',
+                'age': t['age'] ?? '40',
+                'role': 'Dosen',
+              });
+            }
+          }
+        }
+
+        if (jobName != null) {
+          for (var cm in coworkers) {
+            final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
+            final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
+            final String name = cm['name'] ?? '';
+            bool isAlreadyPartner = false;
+            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            if (isAlreadyPartner) continue;
+
+            bool match = false;
+            if (sexuality == 'Heteroseksual') {
+              match = (myGenderLower != cmGender);
+            } else if (sexuality == 'Biseksual') {
+              match = true;
+            } else {
+              match = (myGenderLower == cmGender);
+            }
+
+            if (match) {
+              schoolCandidates.add({
+                'name': cm['name'],
+                'relation': 'Rekan Kerja',
+                'gender': cm['gender'] ?? 'Laki-laki',
+                'age': cm['age'] ?? age.toString(),
+                'role': 'Rekan Kerja',
+              });
+            }
+          }
         }
       }
 
@@ -822,7 +933,7 @@ class Character {
         final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
         int chance = 0;
 
-        if (candRole == 'Guru') {
+        if (candRole == 'Guru' || candRole == 'Dosen') {
           if (candGender == 'Laki-laki') {
             if (myGenderLower == 'laki-laki') {
               // Gay
@@ -836,7 +947,7 @@ class Character {
                   : GuruLakiProposalChance.getBercintaChance(age);
             }
           } else {
-            // Guru Perempuan
+            // Guru/Dosen Perempuan
             if (myGenderLower == 'perempuan') {
               // Lesbian
               chance = proposalType == 'Ajak Pacaran' 
@@ -850,7 +961,7 @@ class Character {
             }
           }
         } else {
-          // Teman Sekelas
+          // Teman Sekelas, Teman Kuliah, Rekan Kerja
           if (candGender == 'Laki-laki' && myGenderLower == 'laki-laki') {
             // Gay classmate
             chance = proposalType == 'Ajak Pacaran' 

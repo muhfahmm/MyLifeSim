@@ -16,7 +16,6 @@ import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -385,26 +384,6 @@ class _GameScreenState extends State<GameScreen> {
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
-          TextButton(
-            onPressed: () {
-              final int pAge = int.tryParse(proposal['age']?.toString() ?? '') ?? _character.age;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => NpcFamilyViewScreen(
-                    npcName: partnerName,
-                    npcGender: proposal['gender'] ?? 'Laki-laki',
-                    npcAge: pAge,
-                    npcRole: role,
-                  ),
-                ),
-              );
-            },
-            child: const Text(
-              'Lihat Profil',
-              style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold),
-            ),
-          ),
           if (_character.partner != null && (type == 'Ajak Pacaran' || type == 'Bercinta'))
             TextButton(
               onPressed: () {
