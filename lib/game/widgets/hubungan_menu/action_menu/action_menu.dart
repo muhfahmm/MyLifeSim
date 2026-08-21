@@ -905,15 +905,25 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                widget.targetRole.startsWith('Pacar') ||
                                widget.character.isAnyPartnerNameMatching(widget.targetName);
 
-    final bool isDatingFather = (cleanRole.contains('ayah') || cleanName.contains('ayah')) && 
-                                widget.character.isAnyPartnerNameMatching(widget.targetName);
+    final bool isDatingBiologicalFather = (cleanRole.contains('ayah') || cleanName.contains('ayah')) && 
+                                          !cleanRole.contains('tiri') && !cleanName.contains('tiri') &&
+                                          widget.character.isAnyPartnerNameMatching(widget.targetName);
+
+    final bool isDatingStepFather = (cleanRole.contains('tiri') || cleanName.contains('tiri')) && 
+                                    (cleanRole.contains('ayah') || cleanName.contains('ayah')) &&
+                                    widget.character.isAnyPartnerNameMatching(widget.targetName);
 
     final bool isFatherPartnerAndMotherTiriExists = widget.character.gender.toLowerCase() == 'perempuan' && 
-                                                    isDatingFather && 
+                                                    isDatingBiologicalFather && 
                                                     widget.character.stepMotherName != null && 
                                                     !widget.character.isStepMotherDeceased;
 
-    if (isFatherPartnerAndMotherTiriExists) {
+    final bool isStepFatherPartnerAndMotherExists = widget.character.gender.toLowerCase() == 'perempuan' && 
+                                                    isDatingStepFather && 
+                                                    widget.character.motherName != null && 
+                                                    !widget.character.isMotherDeceased;
+
+    if (isFatherPartnerAndMotherTiriExists || isStepFatherPartnerAndMotherExists) {
       // 1. Bercinta / Make Love
       topActions.add(ActionItem(
         label: 'Bercinta / Make Love',
@@ -937,8 +947,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       ));
 
       // 2. Minta Cerai
+      final String spouseName = isFatherPartnerAndMotherTiriExists 
+          ? (widget.character.stepMotherName ?? 'Ibu Tiri') 
+          : (widget.character.motherName ?? 'Ibu Kandung');
+      final String actionLabel = isFatherPartnerAndMotherTiriExists 
+          ? 'Minta Cerai dengan Ibu Tiri' 
+          : 'Minta Cerai dengan Ibu Kandung';
+
       topActions.add(ActionItem(
-        label: 'Minta Cerai dengan Ibu Tiri',
+        label: actionLabel,
         icon: Icons.heart_broken,
         color: Colors.redAccent,
         onTap: () {
@@ -947,7 +964,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             context: screenContext,
             builder: (confirmContext) => AlertDialog(
               title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-              content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan Ibu Tirimu (${widget.character.stepMotherName})?'),
+              content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $spouseName?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(confirmContext),
@@ -958,21 +975,27 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     Navigator.pop(confirmContext);
                     final bool success = _random.nextInt(100) < 40;
                     if (success) {
-                      final String? oldMother = widget.character.stepMotherName;
-                      widget.character.stepMotherName = null;
-                      widget.character.stepMotherAge = null;
-                      widget.character.stepMotherRelationship = null;
+                      if (isFatherPartnerAndMotherTiriExists) {
+                        widget.character.stepMotherName = null;
+                        widget.character.stepMotherAge = null;
+                        widget.character.stepMotherRelationship = null;
+                      } else {
+                        widget.character.stepFatherName = null;
+                        widget.character.stepFatherAge = null;
+                        widget.character.stepFatherRelationship = null;
+                        widget.character.isMotherDivorced = true;
+                      }
                       
-                      final String msg = '💔 Ayahmu memutuskan untuk menceraikan Ibu Tirimu ($oldMother) atas permintaanmu!';
+                      final String msg = '💔 Ayahmu memutuskan untuk menceraikan $spouseName atas permintaanmu!';
                       widget.character.inbox.add(msg);
                       _updateRelationship(15);
                       _updateState();
                       
-                      _showResultDialog('Sukses 💔', 'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan Ibu Tirimu ($oldMother).', Icons.done, Colors.green, () {});
+                      _showResultDialog('Sukses 💔', 'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $spouseName.', Icons.done, Colors.green, () {});
                     } else {
                       _updateRelationship(-15);
                       _updateState();
-                      _showResultDialog('Ditolak 🚫', 'Ayahmu menolak untuk menceraikan Ibu Tirimu. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan istrinya.', Icons.block, Colors.red, () {});
+                      _showResultDialog('Ditolak 🚫', 'Ayahmu menolak untuk menceraikan $spouseName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan istrinya.', Icons.block, Colors.red, () {});
                     }
                   },
                   child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
@@ -981,7 +1004,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             ),
           );
         },
-      ));
     } else if (isActivePartner && isPartnerRole) {
       // 1. Bercinta / Make Love (langsung muncul, tidak harus menunggu usia 12)
       topActions.add(ActionItem(

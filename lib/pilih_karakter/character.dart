@@ -1167,12 +1167,16 @@ class Character {
           }
         }
       } else {
-        final bool isFatherPartner = (partner != null && (partner!['name'] == fatherName || partner!['name']!.contains(fatherName ?? '___'))) ||
-                                     isAnyPartnerNameMatching(fatherName ?? '___');
+        final bool isBiologicalFatherPartner = (partner != null && (partner!['name'] == fatherName || partner!['name']!.contains(fatherName ?? '___'))) ||
+                                               isAnyPartnerNameMatching(fatherName ?? '___');
+        final bool isStepFatherPartner = (partner != null && (partner!['name'] == stepFatherName || partner!['name']!.contains(stepFatherName ?? '___'))) ||
+                                         isAnyPartnerNameMatching(stepFatherName ?? '___');
+
         final bool isDaughter = gender.toLowerCase() == 'perempuan';
         final bool hasNoStepMother = stepMotherName == null || isStepMotherDeceased;
+        final bool hasNoMother = motherName == null || isMotherDeceased || isMotherDivorced;
 
-        if (isDaughter && isFatherPartner && hasNoStepMother) {
+        if (isDaughter && isBiologicalFatherPartner && hasNoStepMother) {
           final String proposalType = random.nextInt(100) < 53 ? 'Bercinta' : 'Lamar Nikah';
           final int chance = proposalType == 'Bercinta' ? 70 : 60;
           if (random.nextInt(100) < chance) {
@@ -1184,6 +1188,20 @@ class Character {
               'gender': 'Laki-laki',
               'age': fAgeStr,
               'role': 'Keluarga',
+            };
+          }
+        } else if (isDaughter && isStepFatherPartner && hasNoMother) {
+          final String proposalType = random.nextInt(100) < 53 ? 'Bercinta' : 'Lamar Nikah';
+          final int chance = proposalType == 'Bercinta' ? 70 : 60;
+          if (random.nextInt(100) < chance) {
+            String sfAgeStr = stepFatherAge != null ? stepFatherAge.toString() : '40';
+            activeProposal = {
+              'name': stepFatherName ?? 'Ayah Tiri',
+              'relation': 'Pacar (Ayah Tiri)',
+              'type': proposalType,
+              'gender': 'Laki-laki',
+              'age': sfAgeStr,
+              'role': 'Tiri',
             };
           }
         } else {
