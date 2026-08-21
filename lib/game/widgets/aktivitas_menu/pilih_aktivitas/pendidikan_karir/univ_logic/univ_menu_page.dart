@@ -677,10 +677,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               color: Colors.redAccent,
               title: 'Bolos Kelas',
               subtitle: 'Meninggalkan sesi kuliah hari ini',
-              page: BolosKelasActionPage(
-                character: character,
-                onRefresh: onRefresh,
-              ),
+              onTap: () => _showBolosDialog(context),
             ),
             _buildMenuTile(
               context: context,
@@ -688,13 +685,120 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               color: Colors.black87,
               title: 'Keluar dari Universitas',
               subtitle: 'Memutuskan untuk drop out (putus kuliah)',
-              page: KeluarActionPage(
-                character: character,
-                onRefresh: onRefresh,
-              ),
+              onTap: () => _showKeluarDialog(context),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showBolosDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Rencana Bolos Kuliah 🏃‍♂️', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text(
+          'Apakah kamu yakin ingin membolos kuliah hari ini? '
+          'Tindakan ini berisiko ketahuan dosen dan merusak reputasi absensimu.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _executeBolosKelas(context);
+            },
+            child: const Text('Bolos Kuliah', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _executeBolosKelas(BuildContext context) {
+    final character = widget.character;
+    final bool success = Random().nextBool();
+
+    if (success) {
+      character.happiness = (character.happiness + 15).clamp(0, 100);
+      character.intelligence = (character.intelligence - 8).clamp(0, 100);
+      character.karma = (character.karma - 4).clamp(0, 100);
+      widget.onRefresh();
+      _showOutcomeDialog(context, 'Berhasil Membolos! 🎮☕', 'Kamu memutuskan bolos kuliah dan bersantai di kafe dekat kampus bersama mahasiswa lain. Rasanya sangat rileks! (Kebahagiaan +15, Kecerdasan -8)');
+    } else {
+      character.happiness = (character.happiness - 12).clamp(0, 100);
+      character.karma = (character.karma - 3).clamp(0, 100);
+      
+      for (var doc in character.univLecturers) {
+        final int r = int.tryParse(doc['relationship'] ?? '50') ?? 50;
+        doc['relationship'] = (r - 10).clamp(0, 100).toString();
+      }
+
+      widget.onRefresh();
+      _showOutcomeDialog(context, 'Ketahuan Titip Absen! 🚨', 'Dosen melakukan presensi manual mendadak. Kamu ketahuan menitipkan absen (titip absen/TA). Dosen menandaimu dan reputasimu di kampus anjlok! (Kebahagiaan -12, Hubungan Dosen Berkurang)');
+    }
+  }
+
+  void _showKeluarDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Peringatan Drop Out 🚪', style: TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text(
+          'Meninggalkan perkuliahan secara sepihak berarti merelakan gelar akademikmu dan menutup peluang kerja profesional berstandar ijazah sarjana. '
+          'Apakah kamu yakin ingin drop out kuliah sekarang?',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _executeKeluarUniv(context);
+            },
+            child: const Text('Drop Out Sekarang', style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _executeKeluarUniv(BuildContext context) {
+    final character = widget.character;
+    character.univClassmates.clear();
+    character.univLecturers.clear();
+    character.univMajor = null;
+    character.happiness = (character.happiness - 20).clamp(0, 100);
+
+    character.inbox.add('🎓 Drop Out: Kamu memutuskan untuk drop out dari universitas pada usia ${character.age} tahun.');
+    widget.onRefresh();
+    setState(() {});
+
+    _showOutcomeDialog(context, 'Drop Out Universitas 🛑', 'Kamu resmi keluar dari universitas. Sekarang kamu bukan lagi seorang mahasiswa. Kamu bisa melamar pekerjaan atau menikmati kebebasan tanpa kuliah!');
+  }
+
+  void _showOutcomeDialog(BuildContext context, String title, String content) {
+    showDialog(
+      context: context,
+      builder: (c) => AlertDialog(
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(c),
+            child: const Text('OK'),
+          ),
+        ],
       ),
     );
   }
@@ -725,7 +829,8 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
     required Color color,
     required String title,
     required String subtitle,
-    required Widget page,
+    Widget? page,
+    VoidCallback? onTap,
   }) {
     return Card(
       elevation: 1,
@@ -739,11 +844,15 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
         trailing: const Icon(Icons.chevron_right, color: Colors.grey),
         onTap: () async {
-          await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => page),
-          );
-          setState(() {});
+          if (onTap != null) {
+            onTap();
+          } else if (page != null) {
+            await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => page),
+            );
+            setState(() {});
+          }
         },
       ),
     );
