@@ -163,7 +163,10 @@ class _GameScreenState extends State<GameScreen> {
               style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
               onPressed: () {
                 Navigator.pop(context);
-                _showUnivMajorSelection();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Silakan pilih jurusan dan daftarkan diri di menu "Universitas (Kuliah)"')),
+                );
+                _checkActiveProposal();
               },
               child: const Text('Mendaftar Universitas'),
             ),
@@ -194,61 +197,6 @@ class _GameScreenState extends State<GameScreen> {
     } else {
       _checkActiveProposal();
     }
-  }
-
-  void _showUnivMajorSelection() {
-    final List<String> majors = [
-      'Teknik Informatika 💻',
-      'Kedokteran 🩺',
-      'Hukum ⚖️',
-      'Akuntansi 📊',
-      'Sastra & Bahasa 📚'
-    ];
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Text('Pilih Jurusan Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Pilih salah satu program studi / jurusan yang ingin kamu tekuni:'),
-        actions: majors.map((major) => Padding(
-          padding: const EdgeInsets.only(bottom: 8.0),
-          child: SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo.shade50,
-                foregroundColor: Colors.indigo,
-                elevation: 0,
-              ),
-              onPressed: () {
-                setState(() {
-                  _character.univMajor = major;
-                });
-                Navigator.pop(context);
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    title: const Text('Pendaftaran Berhasil! 🎉'),
-                    content: Text('Selamat! Kamu resmi diterima di Universitas untuk program studi $major.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          _checkActiveProposal();
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
-                  ),
-                );
-              },
-              child: Text(major, style: const TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ),
-        )).toList(),
-      ),
-    );
   }
 
   // --- LOGIKA MELAHIRKAN (80%) ---
