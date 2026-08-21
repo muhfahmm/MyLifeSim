@@ -167,6 +167,160 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     super.dispose();
   }
 
+  void _showAdmissionPathways(BuildContext context, String major) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: Text('Pendaftaran: $major 🎓', style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: const Text('Pilih jalur pendaftaran universitas yang ingin kamu ambil:'),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.account_balance),
+                label: const Text('Universitas Negeri (Tes Seleksi)', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _tryNegeri(context, major);
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.business),
+                label: const Text('Universitas Swasta (Mandiri)', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _trySwasta(context, major);
+                },
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(bottom: 8.0),
+            child: SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.purple,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Icons.stars),
+                label: const Text('Beasiswa Berprestasi', style: TextStyle(fontWeight: FontWeight.bold)),
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  _tryBeasiswa(context, major);
+                },
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _tryNegeri(BuildContext context, String major) {
+    if (widget.character.intelligence >= 60) {
+      widget.character.univMajor = '$major (Negeri)';
+      widget.onRefresh();
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Lolos Seleksi Negeri! 🎉'),
+          content: Text('Selamat! Kamu berhasil lolos tes masuk Universitas Negeri untuk jurusan $major.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Gagal Tes Masuk 🚫'),
+          content: const Text('Kecerdasanmu tidak mencukupi untuk lolos tes masuk Universitas Negeri. Coba jalur lain atau tingkatkan kecerdasanmu!'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    }
+  }
+
+  void _trySwasta(BuildContext context, String major) {
+    final parentRel = ((widget.character.fatherRelationship ?? 50) + (widget.character.motherRelationship ?? 50)) ~/ 2;
+    final bool success = Random().nextInt(100) < parentRel;
+
+    if (success) {
+      widget.character.univMajor = '$major (Swasta)';
+      widget.onRefresh();
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Pendaftaran Disetujui! 💸'),
+          content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di Universitas Swasta untuk jurusan $major.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Permintaan Ditolak 🚫'),
+          content: const Text('Orang tuamu menolak membiayaimu masuk Universitas Swasta karena keterbatasan finansial.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    }
+  }
+
+  void _tryBeasiswa(BuildContext context, String major) {
+    if (widget.character.intelligence >= 90) {
+      final isLuarNegeri = Random().nextInt(100) < 20;
+      final type = isLuarNegeri ? 'Luar Negeri' : 'Dalam Negeri';
+      widget.character.univMajor = '$major (Beasiswa $type)';
+      widget.onRefresh();
+      Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Beasiswa Diterima! 🌟'),
+          content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $type gratis sepenuhnya untuk jurusan $major.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Beasiswa Ditolak 🚫'),
+          content: const Text('Lamaran beasiswa ditolak karena kecerdasanmu berada di bawah 90%. Beasiswa hanya diberikan untuk siswa berprestasi tinggi.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -210,16 +364,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                       ),
                       trailing: const Icon(Icons.arrow_forward_ios, size: 16),
                       onTap: () {
-                        widget.character.univMajor = major;
-                        widget.onRefresh();
-                        Navigator.pop(context);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Berhasil mendaftar di $major'),
-                            backgroundColor: Colors.green,
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                        _showAdmissionPathways(context, major);
                       },
                     ),
                   );
