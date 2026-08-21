@@ -16,6 +16,10 @@ import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -129,7 +133,9 @@ class _GameScreenState extends State<GameScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                _checkGraduationOptions();
+                _checkSchoolEnrollmentOptions(() {
+                  _checkGraduationOptions();
+                });
               },
               child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -137,7 +143,96 @@ class _GameScreenState extends State<GameScreen> {
         ),
       );
     } else {
-      _checkGraduationOptions();
+      _checkSchoolEnrollmentOptions(() {
+        _checkGraduationOptions();
+      });
+    }
+  }
+
+  void _checkSchoolEnrollmentOptions(VoidCallback onDone) {
+    final int age = _character.age;
+    if (age == 6 || age == 12 || age == 15) {
+      String schoolLevel = '';
+      if (age == 6) schoolLevel = 'Sekolah Dasar (SD)';
+      if (age == 12) schoolLevel = 'Sekolah Menengah Pertama (SMP)';
+      if (age == 15) schoolLevel = 'Sekolah Menengah Atas (SMA)';
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.school, color: Colors.blue.shade700),
+              const SizedBox(width: 8),
+              Text('Pendaftaran $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          content: Text(
+            'Kamu telah memasuki usia $age tahun dan siap untuk masuk ke $schoolLevel. '
+            'Pilih jenis sekolah yang ingin kamu daftarkan:',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _character.schoolType = 'Negeri';
+                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun.');
+                    _character.classmates.clear();
+                    _character.sdTeachers.clear();
+                    _character.smpTeachers.clear();
+                    _character.smaTeachers.clear();
+                    _character.headmaster = null;
+                    _character.bkTeacher = null;
+                    SchoolGenerator.generateClassmatesIfEmpty(_character);
+                    SchoolGenerator.generateTeachersIfEmpty(_character);
+                    setState(() {});
+                    onDone();
+                  },
+                  child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _character.schoolType = 'Swasta';
+                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun.');
+                    _character.classmates.clear();
+                    _character.sdTeachers.clear();
+                    _character.smpTeachers.clear();
+                    _character.smaTeachers.clear();
+                    _character.headmaster = null;
+                    _character.bkTeacher = null;
+                    SchoolGenerator.generateClassmatesIfEmpty(_character);
+                    SchoolGenerator.generateTeachersIfEmpty(_character);
+                    setState(() {});
+                    onDone();
+                  },
+                  child: const Text('Sekolah Swasta (Berbayar/Premium)', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    } else {
+      onDone();
     }
   }
 
@@ -150,7 +245,7 @@ class _GameScreenState extends State<GameScreen> {
           title: const Row(
             children: [
               Icon(Icons.school, color: Colors.indigo),
-              SizedBox(width: 8),
+              const SizedBox(width: 8),
               Text('Pilihan Masa Depan 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
@@ -159,37 +254,70 @@ class _GameScreenState extends State<GameScreen> {
             style: TextStyle(fontSize: 14),
           ),
           actions: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.indigo, foregroundColor: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Silakan pilih jurusan dan daftarkan diri di menu "Universitas (Kuliah)"')),
-                );
-                _checkActiveProposal();
-              },
-              child: const Text('Mendaftar Universitas'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Silakan cari pekerjaan di menu "Bekerja"')),
-                );
-                _checkActiveProposal();
-              },
-              child: const Text('Mencari Pekerjaan'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
-                );
-                _checkActiveProposal();
-              },
-              child: const Text('Tidak Memilih Apapun', style: TextStyle(color: Colors.grey)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _checkActiveProposal();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UnivMenuPage(
+                          character: _character,
+                          onRefresh: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Mendaftar Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _checkActiveProposal();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KerjaMenu(
+                          character: _character,
+                          onRefresh: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Mencari Pekerjaan 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    foregroundColor: Colors.grey.shade700,
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
+                    );
+                    _checkActiveProposal();
+                  },
+                  child: const Text('Tidak Memilih Apapun (Menganggur)', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
             ),
           ],
         ),

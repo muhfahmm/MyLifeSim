@@ -152,9 +152,11 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
       themeColor = Colors.purple;
     }
 
+    final String typeSuffix = character.schoolType != null ? ' (${character.schoolType})' : '';
+
     return Scaffold(
       appBar: AppBar(
-        title: Text(schoolType),
+        title: Text(schoolType + typeSuffix),
         backgroundColor: themeColor,
         foregroundColor: Colors.white,
       ),
@@ -181,7 +183,7 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
                     Text(
-                      'Siswa • Usia: $age tahun',
+                      'Siswa$typeSuffix • Usia: $age tahun',
                       style: TextStyle(color: Colors.grey.shade600, fontSize: 14),
                     ),
                     const SizedBox(height: 16),

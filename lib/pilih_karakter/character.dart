@@ -59,6 +59,7 @@ class Character {
   List<Map<String, String>> univLecturers = []; // Daftar dosen
   List<Map<String, String>> coworkers = []; // Daftar rekan kerja
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
+  String? schoolType; // Jenis sekolah ('Negeri' atau 'Swasta')
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
@@ -304,19 +305,7 @@ class Character {
       inbox.add(notice);
     }
 
-    if (age == 6) {
-      final String notice = '🎒 Masuk Sekolah: Kamu sekarang resmi mulai bersekolah di Sekolah Dasar (SD) 🏫';
-      events.add(notice);
-      inbox.add(notice);
-    } else if (age == 12) {
-      final String notice = '🏫 Lulus & Naik Jenjang: Kamu mulai bersekolah di Sekolah Menengah Pertama (SMP) 📚';
-      events.add(notice);
-      inbox.add(notice);
-    } else if (age == 15) {
-      final String notice = '🎓 Naik Tingkat: Kamu mulai bersekolah di Sekolah Menengah Atas (SMA) ✍️';
-      events.add(notice);
-      inbox.add(notice);
-    } else if (age == 18) {
+    if (age == 18) {
       final String notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
       events.add(notice);
       inbox.add(notice);
