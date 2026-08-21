@@ -339,11 +339,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
               },
             ),
 
-            // Aksi 5: Berikan Hadiah
+            // Aksi 5: Gift
             _buildActionTile(
               icon: Icons.card_giftcard,
               color: Colors.purple,
-              title: 'Berikan Hadiah',
+              title: 'Gift',
               onTap: () {
                 if (widget.character.money < 20) {
                   _showOutcome('Uang Tidak Cukup', 'Kamu tidak punya uang untuk membeli hadiah. Kumpulkan uang terlebih dahulu!');
@@ -354,7 +354,43 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                 widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
                 widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
                 widget.onRefresh();
-                _showOutcome('Hadiah Diberikan', 'Kamu memberikan hadiah kecil kepada $name. Dia sangat terharu dan berterima kasih! Hubungan meningkat pesat!');
+                _showOutcome('Gift Diberikan', 'Kamu memberikan hadiah kecil kepada $name. Dia sangat terharu dan berterima kasih! Hubungan meningkat pesat!');
+              },
+            ),
+
+            // Aksi Bertingkah Laku
+            _buildActionTile(
+              icon: Icons.emoji_people,
+              color: Colors.blueAccent,
+              title: 'Bertingkah Laku',
+              onTap: () {
+                final change = 3 + Random().nextInt(8); // 3-10
+                widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
+                widget.onRefresh();
+                _showOutcome('Bertingkah Laku', 'Kamu menunjukkan sikap ramah dan membantu $name. Dia sangat menghargai perilakumu!');
+              },
+            ),
+
+            // Aksi Cium
+            _buildActionTile(
+              icon: Icons.favorite,
+              color: Colors.pinkAccent,
+              title: 'Cium',
+              onTap: () {
+                if (rel >= 60) {
+                  final change = 10 + Random().nextInt(11); // 10-20
+                  widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+                  widget.onRefresh();
+                  _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa senang! Hubungan kalian semakin dekat.');
+                } else {
+                  final change = 10 + Random().nextInt(11); // 10-20 penurunan
+                  widget.classmate['relationship'] = (rel - change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+                  widget.onRefresh();
+                  _showOutcome('Ciuman Ditolak', 'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
+                }
               },
             ),
 
