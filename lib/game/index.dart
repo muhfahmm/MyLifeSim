@@ -629,28 +629,22 @@ class _GameScreenState extends State<GameScreen> {
                 );
               } else if (type == 'Ajak Pacaran') {
                 setState(() {
+                  final String relationRole = _character.partner != null ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
                   final Map<String, String> newPartnerData = {
                     'name': partnerName,
                     'gender': proposal['gender']?.toString() ?? 'Perempuan',
                     'age': proposal['age']?.toString() ?? '20',
                     'relationship': '100',
-                    'relation': 'Pacar (Selingkuhan)',
+                    'relation': relationRole,
                   };
 
-                  if (_character.partner != null) {
-                    _character.secondPartner = newPartnerData;
-                    _character.isHavingAffair = true;
+                  _character.addPartnerToFreeSlot(newPartnerData);
+
+                  if (_character.partner != null && _character.partner!['name'] != partnerName) {
                     _character.inbox.add(
                       '🤫 Rahasia: Kamu menerima ajakan pacaran dari $partnerName sebagai selingkuhan!'
                     );
                   } else {
-                    _character.partner = {
-                      'name': partnerName,
-                      'gender': proposal['gender']?.toString() ?? 'Perempuan',
-                      'age': proposal['age']?.toString() ?? '20',
-                      'relationship': '100',
-                      'relation': role == 'Guru' ? 'Pacar (Guru)' : 'Pacar',
-                    };
                     _character.inbox.add(
                       '💖 Hubungan Baru: Kamu menerima ajakan pacaran dari $role-mu, $partnerName. Sekarang kalian resmi berpacaran.'
                     );
