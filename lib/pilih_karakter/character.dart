@@ -1167,15 +1167,36 @@ class Character {
           }
         }
       } else {
-        if (random.nextInt(100) < 60) {
-          activeProposal = {
-            'name': partner!['name'],
-            'relation': partner!['relation'] ?? 'Pacar',
-            'type': 'Bercinta',
-            'gender': partner!['gender'] ?? 'Perempuan',
-            'age': partner!['age'] ?? '18',
-            'role': 'Partner',
-          };
+        final bool isFatherPartner = (partner != null && (partner!['name'] == fatherName || partner!['name']!.contains(fatherName ?? '___'))) ||
+                                     isAnyPartnerNameMatching(fatherName ?? '___');
+        final bool isDaughter = gender.toLowerCase() == 'perempuan';
+        final bool hasNoStepMother = stepMotherName == null || isStepMotherDeceased;
+
+        if (isDaughter && isFatherPartner && hasNoStepMother) {
+          final String proposalType = random.nextInt(100) < 53 ? 'Bercinta' : 'Lamar Nikah';
+          final int chance = proposalType == 'Bercinta' ? 70 : 60;
+          if (random.nextInt(100) < chance) {
+            String fAgeStr = fatherAge != null ? fatherAge.toString() : '40';
+            activeProposal = {
+              'name': fatherName ?? 'Ayah',
+              'relation': 'Pacar (Ayah)',
+              'type': proposalType,
+              'gender': 'Laki-laki',
+              'age': fAgeStr,
+              'role': 'Keluarga',
+            };
+          }
+        } else {
+          if (random.nextInt(100) < 60) {
+            activeProposal = {
+              'name': partner!['name'],
+              'relation': partner!['relation'] ?? 'Pacar',
+              'type': 'Bercinta',
+              'gender': partner!['gender'] ?? 'Perempuan',
+              'age': partner!['age'] ?? '18',
+              'role': 'Partner',
+            };
+          }
         }
       }
     }

@@ -895,13 +895,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                  (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) ||
                                  (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) ||
                                  (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) ||
-                                 (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName);
+                                 (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) ||
+                                 widget.character.isAnyPartnerNameMatching(widget.targetName);
 
     final bool isPartnerRole = widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)' ||
                                widget.targetRole == 'Pacar Kedua' || widget.targetRole == 'Pacar Ketiga' ||
                                widget.targetRole == 'Pacar Keempat' || widget.targetRole == 'Pacar Kelima' ||
                                widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri' ||
-                               widget.targetRole.startsWith('Pacar');
+                               widget.targetRole.startsWith('Pacar') ||
+                               widget.character.isAnyPartnerNameMatching(widget.targetName);
 
     final bool isDatingFather = (cleanRole.contains('ayah') || cleanName.contains('ayah')) && 
                                 widget.character.isAnyPartnerNameMatching(widget.targetName);

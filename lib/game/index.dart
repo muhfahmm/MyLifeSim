@@ -466,7 +466,10 @@ class _GameScreenState extends State<GameScreen> {
 
     final String role = proposal['role'] ?? 'Keluarga';
 
-    if (type == 'Ajak 3some') {
+    if (type == 'Lamar Nikah') {
+      dialogTitle = 'Lamaran Pernikahan! 💍';
+      dialogBody = 'Ayahmu, $partnerName mengajakmu untuk berkomitmen lebih jauh dan menikah secara rahasia! Apakah kamu mau menerima lamaran pernikahan tersebut?';
+    } else if (type == 'Ajak 3some') {
       dialogTitle = 'Ajakan 3some! 🔥';
       dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan hubungan intim threesome secara bersama-sama. Apakah kamu mau menerima ajakan threesome ini?';
     } else if (role == 'Guru' || role == 'Teman Sekelas') {
@@ -592,6 +595,36 @@ class _GameScreenState extends State<GameScreen> {
                         child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
+                  ),
+                );
+              } else if (type == 'Lamar Nikah') {
+                setState(() {
+                  if (_character.partner != null && _character.partner!['name'] == partnerName) {
+                    _character.partner!['relation'] = 'Suami';
+                  } else if (_character.secondPartner != null && _character.secondPartner!['name'] == partnerName) {
+                    _character.secondPartner!['relation'] = 'Suami';
+                  } else if (_character.thirdPartner != null && _character.thirdPartner!['name'] == partnerName) {
+                    _character.thirdPartner!['relation'] = 'Suami';
+                  } else if (_character.fourthPartner != null && _character.fourthPartner!['name'] == partnerName) {
+                    _character.fourthPartner!['relation'] = 'Suami';
+                  } else if (_character.fifthPartner != null && _character.fifthPartner!['name'] == partnerName) {
+                    _character.fifthPartner!['relation'] = 'Suami';
+                  }
+                  for (var sp in _character.secretPartners) {
+                    if (sp['name'] == partnerName) {
+                      sp['relation'] = 'Suami';
+                    }
+                  }
+                  _character.inbox.add(
+                    '💍 Pernikahan Rahasia: Kamu menerima lamaran pernikahan dari Ayahmu, $partnerName! Sekarang kalian resmi menikah secara rahasia.'
+                  );
+                  _character.happiness = (_character.happiness + 40).clamp(0, 100);
+                  _character.activeProposal = null;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('💍 Kamu resmi menikah secara rahasia dengan $partnerName!'),
+                    backgroundColor: Colors.pink,
                   ),
                 );
               } else if (type == 'Ajak Pacaran') {
