@@ -104,31 +104,44 @@ class FamilyGenerator {
       character.fatherAge = fAge;
 
       // === WARNA KULIT ORANG TUA ===
-      // Generate warna kulit ayah & ibu secara acak
       character.fatherSkinColor = SkinColorInheritance.randomSkin();
       character.motherSkinColor = SkinColorInheritance.randomSkin();
-      // Jika user belum punya warna kulit kustom, wariskan dari orang tua
       if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
         character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
           character.fatherSkinColor,
           character.motherSkinColor,
         );
       } else {
-        // Jika user sudah pilih warna kulit sendiri, orang tua menyesuaikan
         character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
         character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
       }
     } else if (roll < 80) {
-      // Hanya ayah
+      // Hanya ayah (Ibu Cerai atau Meninggal)
       character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
       character.fatherAge = 22 + _random.nextInt(28);
-      // Warna kulit ayah
       character.fatherSkinColor = SkinColorInheritance.randomSkin();
+
+      character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+      character.motherAge = (character.fatherAge! - 2).clamp(20, 55);
+      character.motherSkinColor = SkinColorInheritance.randomSkin();
+
+      if (_random.nextBool()) {
+        character.isMotherDeceased = true;
+      } else {
+        character.isMotherDivorced = true;
+        character.motherRelationship = 20 + _random.nextInt(30);
+      }
+
       if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
-        character.avatarSkinColor = SkinColorInheritance.parentSkinFromChild(character.fatherSkinColor);
+        character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
+          character.fatherSkinColor,
+          character.motherSkinColor,
+        );
       } else {
         character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
+        character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
       }
+
       // Peluang 30% memiliki Ibu Tiri saat lahir
       if (_random.nextInt(100) < 30) {
         character.stepMotherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
@@ -136,16 +149,32 @@ class FamilyGenerator {
         character.stepMotherRelationship = 50;
       }
     } else if (roll < 90) {
-      // Hanya ibu
+      // Hanya ibu (Ayah Cerai atau Meninggal)
       character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
       character.motherAge = 19 + _random.nextInt(25);
-      // Warna kulit ibu
       character.motherSkinColor = SkinColorInheritance.randomSkin();
-      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
-        character.avatarSkinColor = SkinColorInheritance.parentSkinFromChild(character.motherSkinColor);
+
+      character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+      character.fatherAge = (character.motherAge! + 2).clamp(20, 55);
+      character.fatherSkinColor = SkinColorInheritance.randomSkin();
+
+      if (_random.nextBool()) {
+        character.isFatherDeceased = true;
       } else {
+        character.isFatherDivorced = true;
+        character.fatherRelationship = 20 + _random.nextInt(30);
+      }
+
+      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+        character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
+          character.fatherSkinColor,
+          character.motherSkinColor,
+        );
+      } else {
+        character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
         character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
       }
+
       // Peluang 30% memiliki Ayah Tiri saat lahir
       if (_random.nextInt(100) < 30) {
         character.stepFatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
@@ -153,7 +182,7 @@ class FamilyGenerator {
         character.stepFatherRelationship = 50;
       }
     } else {
-      // Ayah tiri (Ibu + Ayah Tiri)
+      // Ibu + Ayah Tiri (Ayah Kandung Cerai atau Meninggal)
       character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
       character.stepFatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
       
@@ -170,6 +199,29 @@ class FamilyGenerator {
       
       character.motherAge = mAge;
       character.stepFatherAge = fAge;
+      character.stepFatherRelationship = 50;
+
+      character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+      character.fatherAge = (mAge + 2).clamp(20, 55);
+      character.fatherSkinColor = SkinColorInheritance.randomSkin();
+      character.motherSkinColor = SkinColorInheritance.randomSkin();
+
+      if (_random.nextBool()) {
+        character.isFatherDeceased = true;
+      } else {
+        character.isFatherDivorced = true;
+        character.fatherRelationship = 15 + _random.nextInt(25);
+      }
+
+      if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+        character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
+          character.fatherSkinColor,
+          character.motherSkinColor,
+        );
+      } else {
+        character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
+        character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
+      }
     }
   }
 

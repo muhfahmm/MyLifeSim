@@ -168,14 +168,14 @@ class ActivityButton extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Aksesoris
+              // Aksesoris -> usia minimal 12
               _buildActivityTile(
                 context: context,
                 label: 'Aksesoris',
                 subtitle: 'Tambahkan aksesoris untuk gaya',
                 icon: Icons.style,
                 color: Colors.pink,
-                minAge: 0,
+                minAge: 12,
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
@@ -321,14 +321,14 @@ class ActivityButton extends StatelessWidget {
                 },
               ),
 
-              // Pikiran dan Tubuh
+              // Pikiran dan Tubuh -> usia minimal 12
               _buildActivityTile(
                 context: context,
                 label: 'Pikiran dan Tubuh',
                 subtitle: 'Meditasi, yoga, atau terapi',
                 icon: Icons.self_improvement,
                 color: Colors.indigo,
-                minAge: 0,
+                minAge: 12,
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
@@ -389,14 +389,14 @@ class ActivityButton extends StatelessWidget {
                 },
               ),
 
-              // Salon & Spa
+              // Salon & Spa -> usia minimal 15
               _buildActivityTile(
                 context: context,
                 label: 'Salon & Spa',
                 subtitle: 'Rawat diri dan kecantikan',
                 icon: Icons.spa,
                 color: Colors.pink,
-                minAge: 0,
+                minAge: 15,
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
@@ -406,14 +406,14 @@ class ActivityButton extends StatelessWidget {
                 },
               ),
 
-              // Berbelanja
+              // Berbelanja -> usia minimal 12
               _buildActivityTile(
                 context: context,
                 label: 'Berbelanja',
                 subtitle: 'Beli barang kebutuhan',
                 icon: Icons.shopping_cart,
                 color: Colors.orangeAccent,
-                minAge: 0,
+                minAge: 12,
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);

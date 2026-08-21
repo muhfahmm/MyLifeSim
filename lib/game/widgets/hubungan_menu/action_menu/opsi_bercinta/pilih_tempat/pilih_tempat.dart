@@ -78,7 +78,7 @@ class TempatBercintaHelper {
     LocationOption? selectedMain = await showDialog<LocationOption>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Row(
           children: [
             const Icon(Icons.location_on, color: Colors.redAccent),
@@ -93,11 +93,9 @@ class TempatBercintaHelper {
         ),
         content: SizedBox(
           width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: filteredLocations.length,
-            itemBuilder: (context, index) {
-              final loc = filteredLocations[index];
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: filteredLocations.map((loc) {
               return Card(
                 elevation: 0,
                 color: Colors.grey.shade50,
@@ -113,15 +111,15 @@ class TempatBercintaHelper {
                   ),
                   title: Text(loc.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   subtitle: Text(loc.description, style: const TextStyle(fontSize: 12)),
-                  onTap: () => Navigator.pop(context, loc),
+                  onTap: () => Navigator.pop(dialogContext, loc),
                 ),
               );
-            },
+            }).toList(),
           ),
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context, null),
+            onPressed: () => Navigator.pop(dialogContext, null),
             child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
           )
         ],
@@ -135,10 +133,116 @@ class TempatBercintaHelper {
       final String? selectedHouseOwner = await showDialog<String>(
         context: context,
         barrierDismissible: false,
-        builder: (context) {
-          final String firstPartnerName = character.partner?['name'] ?? 'Pacar';
-          final String secondPartnerName = character.secondPartner?['name'] ?? 'Pacar Rahasia';
+        builder: (dialogContext) {
           final String parentName = character.motherName != null ? 'Ibu (${character.motherName})' : 'Orang Tua';
+
+          final List<Widget> partnerHouseCards = [];
+
+          if (character.partner != null) {
+            final String name = character.partner!['name']!;
+            partnerHouseCards.add(
+              Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.favorite, color: Colors.pink),
+                  title: Text('Rumah $name'),
+                  subtitle: const Text('Rumah pacar utamamu.'),
+                  onTap: () => Navigator.pop(dialogContext, 'Pacar Pertama'),
+                ),
+              ),
+            );
+          }
+
+          if (character.secondPartner != null) {
+            final String name = character.secondPartner!['name']!;
+            final String subtitle = character.isHavingAffair ? 'Rumah pacar rahasiamu (selingkuhan).' : 'Rumah pacar keduamu.';
+            partnerHouseCards.add(
+              Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: Icon(character.isHavingAffair ? Icons.heart_broken : Icons.favorite, color: character.isHavingAffair ? Colors.deepOrange : Colors.pink),
+                  title: Text('Rumah $name'),
+                  subtitle: Text(subtitle),
+                  onTap: () => Navigator.pop(dialogContext, 'Pacar Kedua'),
+                ),
+              ),
+            );
+          }
+
+          if (character.thirdPartner != null) {
+            final String name = character.thirdPartner!['name']!;
+            partnerHouseCards.add(
+              Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.favorite, color: Colors.pink),
+                  title: Text('Rumah $name'),
+                  subtitle: const Text('Rumah pacar ketigamu.'),
+                  onTap: () => Navigator.pop(dialogContext, 'Pacar Ketiga'),
+                ),
+              ),
+            );
+          }
+
+          if (character.fourthPartner != null) {
+            final String name = character.fourthPartner!['name']!;
+            partnerHouseCards.add(
+              Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.favorite, color: Colors.pink),
+                  title: Text('Rumah $name'),
+                  subtitle: const Text('Rumah pacar keempatmu.'),
+                  onTap: () => Navigator.pop(dialogContext, 'Pacar Keempat'),
+                ),
+              ),
+            );
+          }
+
+          if (character.fifthPartner != null) {
+            final String name = character.fifthPartner!['name']!;
+            partnerHouseCards.add(
+              Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: const Icon(Icons.favorite, color: Colors.pink),
+                  title: Text('Rumah $name'),
+                  subtitle: const Text('Rumah pacar kelimamu.'),
+                  onTap: () => Navigator.pop(dialogContext, 'Pacar Kelima'),
+                ),
+              ),
+            );
+          }
 
           return AlertDialog(
             title: const Row(
@@ -148,62 +252,33 @@ class TempatBercintaHelper {
                 Text('Pilih Rumah Siapa?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               ],
             ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                if (character.motherName != null || character.fatherName != null)
-                  Card(
-                    elevation: 0,
-                    color: Colors.grey.shade50,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+            content: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (character.motherName != null || character.fatherName != null)
+                    Card(
+                      elevation: 0,
+                      color: Colors.grey.shade50,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.people, color: Colors.blue),
+                        title: Text('Rumah $parentName'),
+                        subtitle: const Text('Rumah orang tuamu sendiri.'),
+                        onTap: () => Navigator.pop(dialogContext, 'Orang Tua'),
+                      ),
                     ),
-                    child: ListTile(
-                      leading: const Icon(Icons.people, color: Colors.blue),
-                      title: Text('Rumah $parentName'),
-                      subtitle: const Text('Rumah orang tuamu sendiri.'),
-                      onTap: () => Navigator.pop(context, 'Orang Tua'),
-                    ),
-                  ),
-                if (character.partner != null)
-                  Card(
-                    elevation: 0,
-                    color: Colors.grey.shade50,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      leading: const Icon(Icons.favorite, color: Colors.pink),
-                      title: Text('Rumah $firstPartnerName'),
-                      subtitle: const Text('Rumah pacar utamamu.'),
-                      onTap: () => Navigator.pop(context, 'Pacar Pertama'),
-                    ),
-                  ),
-                if (character.secondPartner != null)
-                  Card(
-                    elevation: 0,
-                    color: Colors.grey.shade50,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      leading: const Icon(Icons.heart_broken, color: Colors.deepOrange),
-                      title: Text('Rumah $secondPartnerName'),
-                      subtitle: const Text('Rumah pacar rahasiamu (selingkuhan).'),
-                      onTap: () => Navigator.pop(context, 'Pacar Rahasia'),
-                    ),
-                  ),
-              ],
+                  ...partnerHouseCards,
+                ],
+              ),
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context, null),
+                onPressed: () => Navigator.pop(dialogContext, null),
                 child: const Text('Kembali', style: TextStyle(fontWeight: FontWeight.bold)),
               )
             ],
@@ -224,7 +299,7 @@ class TempatBercintaHelper {
       LocationOption? selectedRoom = await showDialog<LocationOption>(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
+        builder: (dialogContext) => AlertDialog(
           title: const Row(
             children: [
               Icon(Icons.meeting_room, color: Colors.redAccent),
@@ -234,11 +309,9 @@ class TempatBercintaHelper {
           ),
           content: SizedBox(
             width: double.maxFinite,
-            child: ListView.builder(
-              shrinkWrap: true,
-              itemCount: roomLocations.length,
-              itemBuilder: (context, index) {
-                final room = roomLocations[index];
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: roomLocations.map((room) {
                 return Card(
                   elevation: 0,
                   color: Colors.grey.shade50,
@@ -254,15 +327,15 @@ class TempatBercintaHelper {
                     ),
                     title: Text(room.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     subtitle: Text(room.description, style: const TextStyle(fontSize: 12)),
-                    onTap: () => Navigator.pop(context, room),
+                    onTap: () => Navigator.pop(dialogContext, room),
                   ),
                 );
-              },
+              }).toList(),
             ),
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context, null),
+              onPressed: () => Navigator.pop(dialogContext, null),
               child: const Text('Kembali', style: TextStyle(fontWeight: FontWeight.bold)),
             )
           ],

@@ -114,7 +114,14 @@ class _KelasActionPageState extends State<KelasActionPage> {
 
           if (index == 1) {
             // User (Kamu) Card
-            final userAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(widget.character, happiness: widget.character.happiness);
+            final userAvatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
+              name: widget.character.name,
+              gender: widget.character.gender,
+              age: widget.character.age,
+              schoolLevel: schoolLevel,
+              happiness: widget.character.happiness,
+              forcedSkinColor: widget.character.avatarSkinColor,
+            );
             return Card(
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 12),

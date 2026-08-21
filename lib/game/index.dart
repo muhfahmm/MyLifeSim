@@ -15,6 +15,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -275,7 +276,10 @@ class _GameScreenState extends State<GameScreen> {
 
     final String role = proposal['role'] ?? 'Keluarga';
 
-    if (role == 'Guru' || role == 'Teman Sekelas') {
+    if (type == 'Ajak 3some') {
+      dialogTitle = 'Ajakan 3some! 🔥';
+      dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan 3some bersama secara intim. Apakah kamu mau menerimanya?';
+    } else if (role == 'Guru' || role == 'Teman Sekelas') {
       final isSameSex = myGender == partnerGender;
       final orientationType = isSameSex ? (myGender == 'laki-laki' ? 'Gay' : 'Lesbian') : '';
       
@@ -283,7 +287,7 @@ class _GameScreenState extends State<GameScreen> {
         dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Pacaran)!' : 'Ajakan Pacaran!';
         dialogBody = '$role-mu, $partnerName mengajakmu berkomitmen dalam hubungan berpacaran ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerimanya?';
       } else {
-        dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Bercinta)!' : 'Ajakan Mesra!';
+        dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Bercinta)!' : 'Ajakan Berhubungan Intim!';
         dialogBody = '$role-mu, $partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerimanya?';
       }
     } else {
@@ -298,7 +302,7 @@ class _GameScreenState extends State<GameScreen> {
             ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerimanya?'
             : '$partnerName (Lesbian) mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
       } else {
-        dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Mesra!';
+        dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Berhubungan Intim!';
         dialogBody = type == 'Ajak Pacaran'
             ? 'Saudaramu/Keluargamu, $partnerName mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerimanya?'
             : '$partnerName mendekatimu dengan tatapan penuh gairah dan mengajakmu untuk bercinta secara intim malam ini. Apakah kamu mau menerimanya?';
@@ -322,33 +326,127 @@ class _GameScreenState extends State<GameScreen> {
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
+          if (_character.partner != null && (type == 'Ajak Pacaran' || type == 'Bercinta'))
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _character.activeProposal = null;
+                });
+
+                BeritahuPacarHelper.executeTellFirstPartner(
+                  context: context,
+                  character: _character,
+                  firstPartnerName: _character.partner!['name']!,
+                  secondPartnerName: partnerName,
+                  isBercinta: type == 'Bercinta',
+                  proposalData: proposal,
+                  onComplete: () {
+                    setState(() {});
+                  },
+                );
+              },
+              child: Text(
+                'Beri tahu ${_character.partner!['name']}',
+                style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+              ),
+            ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              if (type == 'Ajak Pacaran') {
+              if (type == 'Ajak 3some') {
                 setState(() {
-                  _character.partner = {
+                  if (_character.partner != null) {
+                    int rel = int.tryParse(_character.partner!['relationship'] ?? '50') ?? 50;
+                    _character.partner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+                  }
+                  if (_character.secondPartner != null) {
+                    int rel = int.tryParse(_character.secondPartner!['relationship'] ?? '50') ?? 50;
+                    _character.secondPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+                  }
+                  if (_character.thirdPartner != null) {
+                    int rel = int.tryParse(_character.thirdPartner!['relationship'] ?? '50') ?? 50;
+                    _character.thirdPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+                  }
+                  if (_character.fourthPartner != null) {
+                    int rel = int.tryParse(_character.fourthPartner!['relationship'] ?? '50') ?? 50;
+                    _character.fourthPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+                  }
+                  if (_character.fifthPartner != null) {
+                    int rel = int.tryParse(_character.fifthPartner!['relationship'] ?? '50') ?? 50;
+                    _character.fifthPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+                  }
+
+                  _character.happiness = (_character.happiness + 30).clamp(0, 100);
+                  _character.inbox.add('🔥 Sukses 3some: Kamu menerima ajakan 3some dari $partnerName!');
+                  _character.activeProposal = null;
+                });
+
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: const Row(
+                      children: [
+                        Icon(Icons.bolt, color: Colors.purple),
+                        SizedBox(width: 8),
+                        Text('Sukses Fantastis! 🔥', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    content: const Text(
+                      'Pengalaman 3some kalian berjalan sangat memuaskan dan menyenangkan!',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              } else if (type == 'Ajak Pacaran') {
+                setState(() {
+                  final Map<String, String> newPartnerData = {
                     'name': partnerName,
-                    'gender': proposal['gender'],
-                    'age': proposal['age'],
+                    'gender': proposal['gender']?.toString() ?? 'Perempuan',
+                    'age': proposal['age']?.toString() ?? '20',
                     'relationship': '100',
-                    'relation': role == 'Guru' ? 'Pacar (Guru)' : 'Pacar',
+                    'relation': 'Pacar (Selingkuhan)',
                   };
+
+                  if (_character.partner != null) {
+                    _character.secondPartner = newPartnerData;
+                    _character.isHavingAffair = true;
+                    _character.inbox.add(
+                      '🤫 Rahasia: Kamu menerima ajakan pacaran dari $partnerName sebagai selingkuhan!'
+                    );
+                  } else {
+                    _character.partner = {
+                      'name': partnerName,
+                      'gender': proposal['gender']?.toString() ?? 'Perempuan',
+                      'age': proposal['age']?.toString() ?? '20',
+                      'relationship': '100',
+                      'relation': role == 'Guru' ? 'Pacar (Guru)' : 'Pacar',
+                    };
+                    _character.inbox.add(
+                      '💖 Hubungan Baru: Kamu menerima ajakan pacaran dari $role-mu, $partnerName. Sekarang kalian resmi berpacaran.'
+                    );
+                  }
+
                   _character.happiness = (_character.happiness + 30).clamp(0, 100);
                   
                   if (role == 'Keluarga') {
                     _updateFamilyRelationship(partnerName, 20);
                   }
 
-                  _character.inbox.add(
-                    '💖 Hubungan Baru: Kamu menerima ajakan pacaran dari $role-mu, $partnerName. Sekarang kalian resmi berpacaran.'
-                  );
                   _character.activeProposal = null;
                 });
                 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('💖 Kamu menerima ajakan dari $partnerName!'),
+                    content: Text(_character.partner != null && _character.partner!['name'] != partnerName
+                        ? '🤫 Hubungan Rahasia dimulai dengan $partnerName!'
+                        : '💖 Kamu menerima ajakan dari $partnerName!'),
                     backgroundColor: Colors.pink,
                   ),
                 );
@@ -357,25 +455,33 @@ class _GameScreenState extends State<GameScreen> {
                 _showIncomingCondomDialog(proposal);
               }
             },
-            child: const Text('Terima', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+            child: Text(
+              _character.partner != null ? 'Terima menjadi selingkuhan' : 'Terima',
+              style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+            ),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               setState(() {
-                _character.happiness = (_character.happiness - 10).clamp(0, 100);
-                _updateFamilyRelationship(partnerName, -15);
+                if (type == 'Ajak 3some') {
+                  _character.inbox.add('📢 Tolak 3some: Kamu menolak ajakan 3some dari $partnerName.');
+                } else {
+                  _character.happiness = (_character.happiness - 10).clamp(0, 100);
+                  _updateFamilyRelationship(partnerName, -15);
+                  _character.inbox.add(
+                    '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName.'
+                  );
+                }
                 
-                _character.inbox.add(
-                  '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName.'
-                );
-
                 _character.activeProposal = null;
               });
               
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
-                  content: Text('💔 Kamu menolak ajakan dari $partnerName.'),
+                  content: Text(type == 'Ajak 3some'
+                      ? '💔 Kamu menolak ajakan 3some dari $partnerName.'
+                      : '💔 Kamu menolak ajakan dari $partnerName.'),
                   backgroundColor: Colors.red,
                 ),
               );

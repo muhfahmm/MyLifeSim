@@ -95,16 +95,92 @@ class Character {
   Map<String, dynamic>? activeProposal; // {'name': '...', 'relation': '...', 'type': 'Pacaran' / 'Bercinta', 'gender': '...', 'age': '...'}
 
   // --- DATA PACAR / PASANGAN ---
-  Map<String, String>? partner; // {'name': '...', 'relationship': '70', 'gender': '...', 'age': '20', 'relation': 'Pacar', 'isDeceased': 'false'}
+  Map<String, String>? _partner;
+  Map<String, String>? get partner => _partner;
+  set partner(Map<String, String>? val) {
+    _partner = val;
+    if (val != null) {
+      if (val['skinColor'] == null) {
+        val['skinColor'] = SkinColorInheritance.randomSkin();
+      }
+      partnerSkinColor = val['skinColor'];
+    } else {
+      partnerSkinColor = null;
+    }
+  }
 
   // --- DATA PACAR KEDUA (SELINGKUHAN) ---
-  Map<String, String>? secondPartner; // sama dengan struktur partner
+  Map<String, String>? _secondPartner;
+  Map<String, String>? get secondPartner => _secondPartner;
+  set secondPartner(Map<String, String>? val) {
+    _secondPartner = val;
+    if (val != null && val['skinColor'] == null) {
+      val['skinColor'] = SkinColorInheritance.randomSkin();
+    }
+  }
+
+  // --- DATA PACAR KETIGA ---
+  Map<String, String>? _thirdPartner;
+  Map<String, String>? get thirdPartner => _thirdPartner;
+  set thirdPartner(Map<String, String>? val) {
+    _thirdPartner = val;
+    if (val != null && val['skinColor'] == null) {
+      val['skinColor'] = SkinColorInheritance.randomSkin();
+    }
+  }
+
+  // --- DATA PACAR KEEMPAT ---
+  Map<String, String>? _fourthPartner;
+  Map<String, String>? get fourthPartner => _fourthPartner;
+  set fourthPartner(Map<String, String>? val) {
+    _fourthPartner = val;
+    if (val != null && val['skinColor'] == null) {
+      val['skinColor'] = SkinColorInheritance.randomSkin();
+    }
+  }
+
+  // --- DATA PACAR KELIMA ---
+  Map<String, String>? _fifthPartner;
+  Map<String, String>? get fifthPartner => _fifthPartner;
+  set fifthPartner(Map<String, String>? val) {
+    _fifthPartner = val;
+    if (val != null && val['skinColor'] == null) {
+      val['skinColor'] = SkinColorInheritance.randomSkin();
+    }
+  }
+
+  int get activePartnersCount {
+    int count = 0;
+    if (partner != null && partner!['isDeceased'] != 'true') count++;
+    if (secondPartner != null && secondPartner!['isDeceased'] != 'true') count++;
+    if (thirdPartner != null && thirdPartner!['isDeceased'] != 'true') count++;
+    if (fourthPartner != null && fourthPartner!['isDeceased'] != 'true') count++;
+    if (fifthPartner != null && fifthPartner!['isDeceased'] != 'true') count++;
+    return count;
+  }
+
+  void addPartnerToFreeSlot(Map<String, String> val) {
+    if (partner == null) {
+      partner = val;
+    } else if (secondPartner == null) {
+      secondPartner = val;
+    } else if (thirdPartner == null) {
+      thirdPartner = val;
+    } else if (fourthPartner == null) {
+      fourthPartner = val;
+    } else if (fifthPartner == null) {
+      fifthPartner = val;
+    }
+  }
+
   bool isHavingAffair = false; // true jika user sedang selingkuh
   List<Map<String, String>> exPartners = []; // List of ex-partners/mantan pacar
 
   // --- STATUS KEMATIAN KELUARGA KANDUNG ---
   bool isFatherDeceased = false;
   bool isMotherDeceased = false;
+  bool isFatherDivorced = false;
+  bool isMotherDivorced = false;
   bool isStepFatherDeceased = false;
   bool isStepMotherDeceased = false;
 
@@ -170,7 +246,7 @@ class Character {
     this.motherInLawAge,
     this.fatherInLawRelationship = 50,
     this.motherInLawRelationship = 50,
-    this.partner,
+    Map<String, String>? partner,
     this.maleFirstNames,
     this.femaleFirstNames,
     this.lastNames,
@@ -181,7 +257,11 @@ class Character {
     this.avatarClotheColor,
     this.avatarSkinColor,
     this.avatarFacialHairType,
-  }) : inbox = [];
+  }) : inbox = [] {
+    if (partner != null) {
+      this.partner = partner;
+    }
+  }
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
   List<String> inbox;
@@ -665,6 +745,12 @@ class Character {
         final String sexuality = t['sexuality'] ?? 'Heteroseksual';
         final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
         
+        final String name = t['name'] ?? '';
+        bool isAlreadyPartner = false;
+        if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+        if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+        if (isAlreadyPartner) continue;
+
         bool match = false;
         if (sexuality == 'Heteroseksual') match = (myGenderLower != tGender);
         else if (sexuality == 'Biseksual') match = true;
@@ -685,6 +771,12 @@ class Character {
         final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
         final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
         
+        final String name = cm['name'] ?? '';
+        bool isAlreadyPartner = false;
+        if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
+        if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+        if (isAlreadyPartner) continue;
+
         bool match = false;
         if (sexuality == 'Heteroseksual') match = (myGenderLower != cmGender);
         else if (sexuality == 'Biseksual') match = true;
@@ -776,10 +868,15 @@ class Character {
       
       // Jika proposal sekolah tidak terjadi (roll gagal atau kandidat kosong), coba picu keluarga
       if (activeProposal == null) {
-        // Logika Keluarga kandung/tiri (Incest)
+        bool isAlreadyPartner(String name) {
+          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return true;
+          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return true;
+          return false;
+        }
+
         List<Map<String, dynamic>> candidates = [];
-        
-        if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 12 && myGenderLower != 'laki-laki') {
+
+        if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 12 && myGenderLower != 'laki-laki' && !isAlreadyPartner(fatherName!)) {
           candidates.add({
             'name': 'Ayah ($fatherName)',
             'relation': 'Ayah',
@@ -788,7 +885,7 @@ class Character {
             'role': 'Kandung',
           });
         }
-        if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 12) {
+        if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 12 && !isAlreadyPartner(motherName!)) {
           candidates.add({
             'name': 'Ibu ($motherName)',
             'relation': 'Ibu',
@@ -797,7 +894,7 @@ class Character {
             'role': 'Kandung',
           });
         }
-        if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 12 && myGenderLower != 'laki-laki') {
+        if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 12 && myGenderLower != 'laki-laki' && !isAlreadyPartner(stepFatherName!)) {
           candidates.add({
             'name': 'Ayah Tiri ($stepFatherName)',
             'relation': 'Ayah Tiri',
@@ -810,7 +907,8 @@ class Character {
         for (var sib in siblings) {
           final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
           final bool isDeceased = sib['isDeceased'] == 'true';
-          if (!isDeceased && sibAge >= 12) {
+          final String sName = sib['name'] ?? '';
+          if (!isDeceased && sibAge >= 12 && !isAlreadyPartner(sName)) {
             candidates.add({
               'name': '${sib['name']} (${sib['relation']})',
               'relation': sib['relation'] ?? 'Saudara',
@@ -858,15 +956,39 @@ class Character {
         }
       }
     } else if (age >= 12 && partner != null && partner!['isDeceased'] != 'true' && activeProposal == null) {
-      if (random.nextInt(100) < 60) {
-        activeProposal = {
-          'name': partner!['name'],
-          'relation': partner!['relation'] ?? 'Pacar',
-          'type': 'Bercinta',
-          'gender': partner!['gender'] ?? 'Perempuan',
-          'age': partner!['age'] ?? '18',
-          'role': 'Partner',
-        };
+      final int pCount = activePartnersCount;
+      if (pCount >= 2) {
+        if (random.nextInt(100) < 60) {
+          final List<Map<String, String>> existing = [];
+          if (partner != null && partner!['isDeceased'] != 'true') existing.add(partner!);
+          if (secondPartner != null && secondPartner!['isDeceased'] != 'true') existing.add(secondPartner!);
+          if (thirdPartner != null && thirdPartner!['isDeceased'] != 'true') existing.add(thirdPartner!);
+          if (fourthPartner != null && fourthPartner!['isDeceased'] != 'true') existing.add(fourthPartner!);
+          if (fifthPartner != null && fifthPartner!['isDeceased'] != 'true') existing.add(fifthPartner!);
+
+          if (existing.isNotEmpty) {
+            final proposer = existing[random.nextInt(existing.length)];
+            activeProposal = {
+              'name': proposer['name'],
+              'relation': proposer['relation'] ?? 'Pacar',
+              'type': 'Ajak 3some',
+              'gender': proposer['gender'] ?? 'Perempuan',
+              'age': proposer['age'] ?? '20',
+              'role': 'Partner',
+            };
+          }
+        }
+      } else {
+        if (random.nextInt(100) < 60) {
+          activeProposal = {
+            'name': partner!['name'],
+            'relation': partner!['relation'] ?? 'Pacar',
+            'type': 'Bercinta',
+            'gender': partner!['gender'] ?? 'Perempuan',
+            'age': partner!['age'] ?? '18',
+            'role': 'Partner',
+          };
+        }
       }
     }
 

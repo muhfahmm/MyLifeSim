@@ -2,17 +2,18 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
 
 class ThreesomeHelper {
-  /// Memulai logika ajak 3some jika user memiliki 2 pacar (partner dan secondPartner).
-  /// - Risiko: 60% salah satu pacar memutuskan hubungan.
-  /// - Syarat: Harus punya 2 pacar aktif.
+  /// Memulai logika ajak 3some/4some/5some/6some jika user memiliki minimal 2 pacar.
   static void processThreesome({
     required BuildContext context,
     required Character character,
     required VoidCallback updateState,
   }) {
-    if (character.partner == null || character.secondPartner == null) {
+    final int count = character.activePartnersCount;
+    if (count < 2) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -24,7 +25,7 @@ class ThreesomeHelper {
             ],
           ),
           content: const Text(
-            'Untuk mengajak 3some, kamu harus memiliki pacar resmi dan pacar kedua (selingkuhan) secara aktif!',
+            'Untuk mengajak hubungan ini, kamu harus memiliki minimal 2 pacar aktif!',
             style: TextStyle(fontSize: 14),
           ),
           actions: [
@@ -38,17 +39,24 @@ class ThreesomeHelper {
       return;
     }
 
-    final String firstPartnerName = character.partner!['name']!;
-    final String secondPartnerName = character.secondPartner!['name']!;
+    final List<String> names = [];
+    if (character.partner != null && character.partner!['isDeceased'] != 'true') names.add(character.partner!['name']!);
+    if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true') names.add(character.secondPartner!['name']!);
+    if (character.thirdPartner != null && character.thirdPartner!['isDeceased'] != 'true') names.add(character.thirdPartner!['name']!);
+    if (character.fourthPartner != null && character.fourthPartner!['isDeceased'] != 'true') names.add(character.fourthPartner!['name']!);
+    if (character.fifthPartner != null && character.fifthPartner!['isDeceased'] != 'true') names.add(character.fifthPartner!['name']!);
+
+    final String partnerNamesText = names.join(' dan ');
+    final String someName = '${count + 1}some';
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
           children: [
-            Icon(Icons.people, color: Colors.purple, size: 28),
-            SizedBox(width: 8),
-            Text('Ajak 3some? 🔥', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Icon(Icons.people, color: Colors.purple, size: 28),
+            const SizedBox(width: 8),
+            Text('Ajak $someName? 🔥', style: const TextStyle(fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
@@ -56,34 +64,49 @@ class ThreesomeHelper {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Apakah kamu yakin ingin mengajak $firstPartnerName dan $secondPartnerName untuk melakukan 3some bersama-sama?',
+              'Apakah kamu yakin ingin mengajak $partnerNamesText untuk melakukan $someName bersama-sama?',
               style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
+                color: Colors.blue.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.withValues(alpha: 0.3)),
+                border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
               ),
-              child: const Text(
-                '⚠️ PERINGATAN KERAS: Aksi ini sangat strict dan berisiko tinggi! Ada 60% peluang salah satu pacarmu akan marah besar dan langsung memutuskan hubungan!',
-                style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold),
+              child: Text(
+                'ℹ️ Info: Ada 60% peluang pacar-pacarmu akan menerima ajakan ini. Jika ditolak, hubungan kalian tidak akan putus.',
+                style: const TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold),
               ),
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _executeThreesome(context, character, firstPartnerName, secondPartnerName, updateState);
+            onPressed: () async {
+              Navigator.pop(dialogContext);
+              
+              // Tampilkan dialog tempat dan waktu
+              final String? loc = await TempatBercintaHelper.showLocationChooser(
+                context: context,
+                character: character,
+                partnerName: 'Pacar-pacarmu',
+                userAge: character.age,
+                targetAge: 20,
+              );
+              if (loc == null) return;
+
+              if (!context.mounted) return;
+              final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
+              if (time == null) return;
+
+              _executeThreesome(context, character, partnerNamesText, someName, loc, time, updateState);
             },
-            child: const Text('Ya, Lakukan!', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text('Ya, Lakukan!', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
           ),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
           ),
         ],
@@ -94,44 +117,30 @@ class ThreesomeHelper {
   static void _executeThreesome(
     BuildContext context,
     Character character,
-    String firstPartnerName,
-    String secondPartnerName,
+    String partnerNamesText,
+    String someName,
+    String loc,
+    String time,
     VoidCallback updateState,
   ) {
     final Random random = Random();
     final int roll = random.nextInt(100);
 
-    if (roll < 60) {
-      // Gagal - diputuskan oleh salah satu pacar (50/50 pacar ke-1 atau pacar ke-2)
-      final bool breakWithFirst = random.nextBool();
-      String brokenName;
-      if (breakWithFirst) {
-        brokenName = firstPartnerName;
-        // Pindahkan pacar kedua ke pacar pertama karena pacar pertama pergi
-        character.partner = character.secondPartner;
-        character.secondPartner = null;
-        character.isHavingAffair = false;
-      } else {
-        brokenName = secondPartnerName;
-        character.secondPartner = null;
-        character.isHavingAffair = false;
-      }
-
-      character.happiness = (character.happiness - 35).clamp(0, 100);
-      character.inbox.add('💔 3some Gagal Total: $brokenName merasa sangat tersinggung dan murka dengan ajakan 3some ini! Dia langsung memutuskan hubungan denganmu.');
+    if (roll >= 60) {
+      character.inbox.add('📢 $someName Ditolak: $partnerNamesText menolak ajakan $someName karena merasa belum siap. Hubungan kalian tetap berjalan baik.');
 
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
           title: const Row(
             children: [
-              Icon(Icons.heart_broken, color: Colors.red),
+              Icon(Icons.info_outline, color: Colors.blueGrey),
               SizedBox(width: 8),
-              Text('Diputuskan! 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Ajakan Ditolak', style: TextStyle(fontWeight: FontWeight.bold)),
             ],
           ),
           content: Text(
-            'Ajakan 3some berakhir bencana! $brokenName merasa terhina dan langsung memutuskan hubungan denganmu saat itu juga.',
+            'Ajakan $someName ditolak. $partnerNamesText menolak ajakan $someName karena merasa belum siap. Hubungan kalian tetap berjalan baik.',
             style: const TextStyle(fontSize: 14),
           ),
           actions: [
@@ -146,7 +155,6 @@ class ThreesomeHelper {
         ),
       );
     } else {
-      // Berhasil! Menambah kepuasan dan kebahagiaan luar biasa
       if (character.partner != null) {
         int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
         character.partner!['relationship'] = (rel + 20).clamp(0, 100).toString();
@@ -155,8 +163,21 @@ class ThreesomeHelper {
         int rel = int.tryParse(character.secondPartner!['relationship'] ?? '50') ?? 50;
         character.secondPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
       }
+      if (character.thirdPartner != null) {
+        int rel = int.tryParse(character.thirdPartner!['relationship'] ?? '50') ?? 50;
+        character.thirdPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+      }
+      if (character.fourthPartner != null) {
+        int rel = int.tryParse(character.fourthPartner!['relationship'] ?? '50') ?? 50;
+        character.fourthPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+      }
+      if (character.fifthPartner != null) {
+        int rel = int.tryParse(character.fifthPartner!['relationship'] ?? '50') ?? 50;
+        character.fifthPartner!['relationship'] = (rel + 20).clamp(0, 100).toString();
+      }
+
       character.happiness = (character.happiness + 30).clamp(0, 100);
-      character.inbox.add('🔥 Sukses 3some: Kamu berhasil melakukan 3some yang luar biasa memuaskan bersama $firstPartnerName dan $secondPartnerName!');
+      character.inbox.add('🔥 Sukses $someName: Kamu berhasil melakukan $someName yang luar biasa memuaskan bersama $partnerNamesText $loc pada waktu $time!');
 
       showDialog(
         context: context,
@@ -169,7 +190,7 @@ class ThreesomeHelper {
             ],
           ),
           content: Text(
-            'Luar biasa! $firstPartnerName dan $secondPartnerName menerima ajakanmu dengan gairah yang membara. Pengalaman 3some kalian bertiga berjalan sangat memuaskan!',
+            'Luar biasa! $partnerNamesText menerima ajakanmu dengan gairah yang membara. Pengalaman $someName kalian $loc pada waktu $time berjalan sangat memuaskan!',
             style: const TextStyle(fontSize: 14),
           ),
           actions: [

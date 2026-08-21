@@ -14,6 +14,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -434,6 +435,47 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     setState(() {});
   }
 
+  String _getDetailedRelationLabel() {
+    final String role = widget.targetRole;
+    final String name = widget.targetName.toLowerCase();
+    
+    if (role == 'Kandung') {
+      if (name.startsWith('ayah')) {
+        return 'Ayah Kandung';
+      } else if (name.startsWith('ibu')) {
+        return 'Ibu Kandung';
+      }
+      for (var sib in widget.character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})'.toLowerCase();
+        if (expectedLabel == name) {
+          return '${sib['relation']} Kandung';
+        }
+      }
+      return 'Keluarga Kandung';
+    } else if (role == 'Tiri') {
+      if (name.startsWith('ayah')) {
+        return 'Ayah Tiri';
+      } else if (name.startsWith('ibu')) {
+        return 'Ibu Tiri';
+      }
+      for (var sib in widget.character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})'.toLowerCase();
+        if (expectedLabel == name) {
+          return '${sib['relation']} Tiri';
+        }
+      }
+      return 'Keluarga Tiri';
+    } else if (role == 'Cerai') {
+      if (name.startsWith('ayah')) {
+        return 'Ayah Kandung (Cerai)';
+      } else if (name.startsWith('ibu')) {
+        return 'Ibu Kandung (Cerai)';
+      }
+    }
+    
+    return role;
+  }
+
   @override
   Widget build(BuildContext context) {
     final int age = widget.character.age;
@@ -812,14 +854,46 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       ));
     }
 
-    // --- TAMBAHAN: TOMBOL PUTUSKAN PACAR UNTUK PASANGAN AKTIF ---
+    // --- TAMBAHAN: TOMBOL BERCINTA, PUTUSKAN PACAR, DAN THREESOME UNTUK PASANGAN AKTIF (DI TOP MENU) ---
+    final List<ActionItem> topActions = [];
+
     final bool isActivePartner = (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) ||
-                                 (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName);
+                                 (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) ||
+                                 (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) ||
+                                 (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) ||
+                                 (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName);
+
     final bool isPartnerRole = widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)' ||
-                               widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri';
+                               widget.targetRole == 'Pacar Kedua' || widget.targetRole == 'Pacar Ketiga' ||
+                               widget.targetRole == 'Pacar Keempat' || widget.targetRole == 'Pacar Kelima' ||
+                               widget.targetRole == 'Tunangan' || widget.targetRole == 'Suami' || widget.targetRole == 'Istri' ||
+                               widget.targetRole.startsWith('Pacar');
 
     if (isActivePartner && isPartnerRole) {
-      actions.add(ActionItem(
+      // 1. Bercinta / Make Love (langsung muncul, tidak harus menunggu usia 12)
+      topActions.add(ActionItem(
+        label: 'Bercinta / Make Love',
+        icon: Icons.favorite,
+        color: Colors.pink,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BercintaScreen(
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                onActionComplete: () {
+                  _updateState();
+                },
+              ),
+            ),
+          );
+        },
+      ));
+
+      // 2. Putuskan Pacar
+      topActions.add(ActionItem(
         label: 'Putuskan Pacar',
         icon: Icons.heart_broken,
         color: Colors.red,
@@ -839,12 +913,18 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   onPressed: () {
                     Navigator.pop(confirmDialogContext); // Tutup dialog konfirmasi
                     
-                    // 1. Hapus dari partner
+                    // 1. Hapus dari partner mana saja yang cocok
                     if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
                       widget.character.partner = null;
                     } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
                       widget.character.secondPartner = null;
                       widget.character.isHavingAffair = false;
+                    } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) {
+                      widget.character.thirdPartner = null;
+                    } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) {
+                      widget.character.fourthPartner = null;
+                    } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) {
+                      widget.character.fifthPartner = null;
                     }
 
                     // 2. Tambahkan ke exPartners (mantan pacar)
@@ -855,9 +935,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       'relationship': '20',
                       'relation': 'Mantan Pacar',
                       'isDeceased': 'false',
-                      // --- TAMBAHKAN DATA PENYEBAB PUTUS ---
-                      'breakInitiator': widget.character.gender, // Siapa yang memutuskan (Laki-laki / Perempuan)
-                      'breakReason': 'putus biasa', // Alasan putus (bisa juga 'selingkuh', 'threesome')
+                      'breakInitiator': widget.character.gender,
+                      'breakReason': 'putus biasa',
                     });
 
                     // 3. Turunkan hubungan
@@ -891,31 +970,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
+
+      // 3. Threesome (jika pacar >= 2)
+      if (widget.character.activePartnersCount >= 2) {
+        topActions.add(ActionItem(
+          label: 'Threesome',
+          icon: Icons.group,
+          color: Colors.purple,
+          onTap: () {
+            ThreesomeHelper.processThreesome(
+              context: context,
+              character: widget.character,
+              updateState: _updateState,
+            );
+          },
+        ));
+      }
     }
 
-    // --- TAMBAHAN: TOMBOL THREESOME UNTUK PASANGAN AKTIF ---
-    if (isActivePartner && isPartnerRole) {
-      actions.add(ActionItem(
-        label: 'Threesome',
-        icon: Icons.group,
-        color: Colors.purple,
-        onTap: () {
-          // Placeholder – fitur belum diimplementasikan
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Threesome', style: TextStyle(fontWeight: FontWeight.bold)),
-              content: const Text('Fitur Threesome sedang dalam pengembangan.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-        },
-      ));
+    if (topActions.isNotEmpty) {
+      // Hapus duplikasi tombol bercinta dari list bawah
+      actions.removeWhere((act) => act.label == 'Bercinta / Make Love');
+      actions.insertAll(0, topActions);
     }
     // -------------------------------------------------------------
 
@@ -1062,7 +1138,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               Text(widget.targetName, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 4),
                               Text(
-                                'Hubungan: ${widget.targetRole} | Umur: ${_getCurrentAgeValue()}',
+                                'Hubungan: ${_getDetailedRelationLabel()} | Umur: ${_getCurrentAgeValue()}',
                                 style: const TextStyle(fontSize: 14, color: Colors.black54),
                               ),
                             ],

@@ -64,32 +64,26 @@ class PilihWaktuHelper {
                 'Lokasi terpilih: $locationText',
                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
               ),
-              const SizedBox(height: 12),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: timeOptions.length,
-                itemBuilder: (context, index) {
-                  final time = timeOptions[index];
-                  return Card(
-                    elevation: 0,
-                    color: Colors.grey.shade50,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+              ...timeOptions.map((time) {
+                return Card(
+                  elevation: 0,
+                  color: Colors.grey.shade50,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.indigo.shade50,
+                      child: Icon(time.icon, color: Colors.indigoAccent),
                     ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.indigo.shade50,
-                        child: Icon(time.icon, color: Colors.indigoAccent),
-                      ),
-                      title: Text(time.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      subtitle: Text(time.description, style: const TextStyle(fontSize: 12)),
-                      onTap: () => Navigator.pop(context, time),
-                    ),
-                  );
-                },
-              ),
+                    title: Text(time.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    subtitle: Text(time.description, style: const TextStyle(fontSize: 12)),
+                    onTap: () => Navigator.pop(context, time),
+                  ),
+                );
+              }),
             ],
           ),
         ),

@@ -87,8 +87,12 @@ class RelationshipButton extends StatelessWidget {
                 _buildFamilyItem(
                   context,
                   icon: Icons.person,
-                  label: character.isFatherDeceased ? 'Ayah (${character.fatherName}) (Wafat)' : 'Ayah (${character.fatherName})',
-                  status: 'Kandung',
+                  label: character.isFatherDeceased
+                      ? 'Ayah (${character.fatherName}) (Wafat)'
+                      : (character.isFatherDivorced
+                          ? 'Ayah (${character.fatherName}) (Cerai)'
+                          : 'Ayah (${character.fatherName})'),
+                  status: character.isFatherDivorced ? 'Cerai' : 'Kandung',
                   color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                   relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                   ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
@@ -105,8 +109,12 @@ class RelationshipButton extends StatelessWidget {
                 _buildFamilyItem(
                   context,
                   icon: Icons.person_outline,
-                  label: character.isMotherDeceased ? 'Ibu (${character.motherName}) (Wafat)' : 'Ibu (${character.motherName})',
-                  status: 'Kandung',
+                  label: character.isMotherDeceased
+                      ? 'Ibu (${character.motherName}) (Wafat)'
+                      : (character.isMotherDivorced
+                          ? 'Ibu (${character.motherName}) (Cerai)'
+                          : 'Ibu (${character.motherName})'),
+                  status: character.isMotherDivorced ? 'Cerai' : 'Kandung',
                   color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                   relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                   ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
@@ -185,14 +193,171 @@ class RelationshipButton extends StatelessWidget {
                     gender: character.partner!['gender'] ?? 'Perempuan',
                     age: int.tryParse(character.partner!['age'] ?? '20') ?? 20,
                     happiness: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
+                    forcedSkinColor: character.partner!['skinColor'],
                   ),
                 ),
+                if (character.secondPartner != null && !character.isHavingAffair) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('❤️ Pacar Kedua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Pacar Resmi',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.favorite,
+                    label: character.secondPartner!['isDeceased'] == 'true'
+                        ? '${character.secondPartner!['name']!} (Wafat)'
+                        : character.secondPartner!['name']!,
+                    status: 'Pacar Kedua',
+                    color: character.secondPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
+                    relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
+                    ageText: '${character.secondPartner!['age']} tahun',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.secondPartner!['name']!,
+                      gender: character.secondPartner!['gender'] ?? 'Perempuan',
+                      age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
+                      happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
+                      forcedSkinColor: character.secondPartner!['skinColor'],
+                    ),
+                  ),
+                ],
+                if (character.thirdPartner != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('❤️ Pacar Ketiga', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Pacar Resmi',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.favorite,
+                    label: character.thirdPartner!['isDeceased'] == 'true'
+                        ? '${character.thirdPartner!['name']!} (Wafat)'
+                        : character.thirdPartner!['name']!,
+                    status: 'Pacar Ketiga',
+                    color: character.thirdPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
+                    relationshipValue: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
+                    ageText: '${character.thirdPartner!['age']} tahun',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.thirdPartner!['name']!,
+                      gender: character.thirdPartner!['gender'] ?? 'Perempuan',
+                      age: int.tryParse(character.thirdPartner!['age'] ?? '20') ?? 20,
+                      happiness: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
+                      forcedSkinColor: character.thirdPartner!['skinColor'],
+                    ),
+                  ),
+                ],
+                if (character.fourthPartner != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('❤️ Pacar Keempat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Pacar Resmi',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.favorite,
+                    label: character.fourthPartner!['isDeceased'] == 'true'
+                        ? '${character.fourthPartner!['name']!} (Wafat)'
+                        : character.fourthPartner!['name']!,
+                    status: 'Pacar Keempat',
+                    color: character.fourthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
+                    relationshipValue: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
+                    ageText: '${character.fourthPartner!['age']} tahun',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.fourthPartner!['name']!,
+                      gender: character.fourthPartner!['gender'] ?? 'Perempuan',
+                      age: int.tryParse(character.fourthPartner!['age'] ?? '20') ?? 20,
+                      happiness: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
+                      forcedSkinColor: character.fourthPartner!['skinColor'],
+                    ),
+                  ),
+                ],
+                if (character.fifthPartner != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('❤️ Pacar Kelima', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Pacar Resmi',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.favorite,
+                    label: character.fifthPartner!['isDeceased'] == 'true'
+                        ? '${character.fifthPartner!['name']!} (Wafat)'
+                        : character.fifthPartner!['name']!,
+                    status: 'Pacar Kelima',
+                    color: character.fifthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
+                    relationshipValue: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,
+                    ageText: '${character.fifthPartner!['age']} tahun',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.fifthPartner!['name']!,
+                      gender: character.fifthPartner!['gender'] ?? 'Perempuan',
+                      age: int.tryParse(character.fifthPartner!['age'] ?? '20') ?? 20,
+                      happiness: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,
+                      forcedSkinColor: character.fifthPartner!['skinColor'],
+                    ),
+                  ),
+                ],
               ],
 
               // ============================================
               // 2a. BAGIAN PACAR KEDUA (SELINGKUHAN)
               // ============================================
-              if (character.secondPartner != null) ...[
+              if (character.secondPartner != null && character.isHavingAffair) ...[
                 const Divider(height: 32),
                 Row(
                   children: [
@@ -225,6 +390,7 @@ class RelationshipButton extends StatelessWidget {
                     gender: character.secondPartner!['gender'] ?? 'Perempuan',
                     age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
                     happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
+                    forcedSkinColor: character.secondPartner!['skinColor'],
                   ),
                 ),
               ],

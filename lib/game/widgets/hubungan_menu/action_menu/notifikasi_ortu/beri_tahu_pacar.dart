@@ -1,5 +1,6 @@
 // lib/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class BeritahuPacarHelper {
@@ -51,7 +52,13 @@ class BeritahuPacarHelper {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _executeTellFirstPartner(context, character, firstPartnerName ?? 'Pacarmu', secondPartnerName, onComplete);
+              executeTellFirstPartner(
+                context: context,
+                character: character,
+                firstPartnerName: firstPartnerName ?? 'Pacarmu',
+                secondPartnerName: secondPartnerName,
+                onComplete: onComplete,
+              );
             },
             child: const Text('Ya, Beritahu Pacar', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
           ),
@@ -70,42 +77,150 @@ class BeritahuPacarHelper {
     );
   }
 
-  static void _executeTellFirstPartner(
-    BuildContext context,
-    Character character,
-    String firstPartnerName,
-    String secondPartnerName,
-    VoidCallback onComplete,
-  ) {
-    // Reaksi pacar pertama: 70% marah dan putus, 30% menerima (poliamorisme)
-    final bool accepted = (DateTime.now().millisecond % 10) < 3; // ~30% chance
+  static void executeTellFirstPartner({
+    required BuildContext context,
+    required Character character,
+    required String firstPartnerName,
+    required String secondPartnerName,
+    required VoidCallback onComplete,
+    Map<String, dynamic>? proposalData,
+    bool isBercinta = false,
+  }) {
+    final random = Random();
+    
+    final int currentCount = character.activePartnersCount;
+    
+    int successChance = 50;
+    if (currentCount == 2) successChance = 40;
+    else if (currentCount == 3) successChance = 30;
+    else if (currentCount == 4) successChance = 20;
+    else if (currentCount >= 5) successChance = 0;
+    
+    final bool accepted = random.nextInt(100) < successChance;
 
     String reactionTitle;
     String reactionText;
     Color themeColor;
 
     if (accepted) {
-      reactionTitle = 'Pacar Menerima 💔→❤️';
-      reactionText = '$firstPartnerName terkejut namun akhirnya menerima hubunganmu dengan $secondPartnerName. Kalian setuju menjalani hubungan terbuka. Hubungan dengan $firstPartnerName sedikit merenggang.';
-      themeColor = Colors.orange;
-      // Menurunkan relationship dengan pacar pertama tapi tidak putus
-      if (character.partner != null) {
-        int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
-        character.partner!['relationship'] = (rel - 20).clamp(0, 100).toString();
+      if (isBercinta) {
+        reactionTitle = '🔥 Sukses 3some!';
+        reactionText = '$firstPartnerName menyetujui ajakanmu! Kalian melakukan hubungan intim bersama yang luar biasa memuaskan.';
+        themeColor = Colors.orange;
+        
+        if (character.partner != null) {
+          int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
+          character.partner!['relationship'] = (rel + 15).clamp(0, 100).toString();
+        }
+        if (character.secondPartner != null) {
+          int rel = int.tryParse(character.secondPartner!['relationship'] ?? '50') ?? 50;
+          character.secondPartner!['relationship'] = (rel + 15).clamp(0, 100).toString();
+        }
+        if (character.thirdPartner != null) {
+          int rel = int.tryParse(character.thirdPartner!['relationship'] ?? '50') ?? 50;
+          character.thirdPartner!['relationship'] = (rel + 15).clamp(0, 100).toString();
+        }
+        if (character.fourthPartner != null) {
+          int rel = int.tryParse(character.fourthPartner!['relationship'] ?? '50') ?? 50;
+          character.fourthPartner!['relationship'] = (rel + 15).clamp(0, 100).toString();
+        }
+        if (character.fifthPartner != null) {
+          int rel = int.tryParse(character.fifthPartner!['relationship'] ?? '50') ?? 50;
+          character.fifthPartner!['relationship'] = (rel + 15).clamp(0, 100).toString();
+        }
+        character.isHavingAffair = false;
+      } else {
+        final int partnerNumber = currentCount + 1;
+        reactionTitle = 'Pacar Menerima! 💔→❤️';
+        reactionText = '$firstPartnerName terkejut namun akhirnya menerima hubunganmu dengan $secondPartnerName. Kalian setuju menjalani hubungan terbuka secara resmi! Sekarang kamu memiliki $partnerNumber pacar resmi.';
+        themeColor = Colors.green;
+        
+        if (character.partner != null) {
+          int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
+          character.partner!['relationship'] = (rel - 10).clamp(0, 100).toString();
+        }
+        if (character.secondPartner != null) {
+          int rel = int.tryParse(character.secondPartner!['relationship'] ?? '50') ?? 50;
+          character.secondPartner!['relationship'] = (rel - 10).clamp(0, 100).toString();
+        }
+        if (character.thirdPartner != null) {
+          int rel = int.tryParse(character.thirdPartner!['relationship'] ?? '50') ?? 50;
+          character.thirdPartner!['relationship'] = (rel - 10).clamp(0, 100).toString();
+        }
+        if (character.fourthPartner != null) {
+          int rel = int.tryParse(character.fourthPartner!['relationship'] ?? '50') ?? 50;
+          character.fourthPartner!['relationship'] = (rel - 10).clamp(0, 100).toString();
+        }
+        if (character.fifthPartner != null) {
+          int rel = int.tryParse(character.fifthPartner!['relationship'] ?? '50') ?? 50;
+          character.fifthPartner!['relationship'] = (rel - 10).clamp(0, 100).toString();
+        }
+        
+        final Map<String, String> newPartnerData = {
+          'name': secondPartnerName,
+          'gender': proposalData?['gender']?.toString() ?? 'Perempuan',
+          'age': proposalData?['age']?.toString() ?? '20',
+          'relationship': '100',
+          'relation': 'Pacar',
+        };
+        character.addPartnerToFreeSlot(newPartnerData);
+        character.isHavingAffair = false;
       }
-      character.isHavingAffair = true;
     } else {
-      reactionTitle = 'Putus! 💔';
-      reactionText = '$firstPartnerName sangat marah dan merasa dikhianati! Dia langsung memutuskan hubungan denganmu setelah mengetahui kamu selingkuh dengan $secondPartnerName.';
-      themeColor = Colors.red;
-      // Pacar pertama putus
-      character.partner = character.secondPartner;
-      character.secondPartner = null;
-      character.isHavingAffair = false;
-      character.happiness = (character.happiness - 20).clamp(0, 100);
+      final bool firstPartnerWins = random.nextBool();
+      reactionTitle = '⚔️ Perebutan Cinta!';
+      
+      final List<String> activeSlots = [];
+      if (character.partner != null && character.partner!['isDeceased'] != 'true') activeSlots.add('partner');
+      if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true') activeSlots.add('secondPartner');
+      if (character.thirdPartner != null && character.thirdPartner!['isDeceased'] != 'true') activeSlots.add('thirdPartner');
+      if (character.fourthPartner != null && character.fourthPartner!['isDeceased'] != 'true') activeSlots.add('fourthPartner');
+      if (character.fifthPartner != null && character.fifthPartner!['isDeceased'] != 'true') activeSlots.add('fifthPartner');
+      
+      final String targetSlot = activeSlots.isNotEmpty ? activeSlots[random.nextInt(activeSlots.length)] : 'partner';
+      
+      final Map<String, String>? existingFighter = (targetSlot == 'partner'
+          ? character.partner
+          : targetSlot == 'secondPartner'
+              ? character.secondPartner
+              : targetSlot == 'thirdPartner'
+                  ? character.thirdPartner
+                  : targetSlot == 'fourthPartner'
+                      ? character.fourthPartner
+                      : character.fifthPartner);
+                      
+      final String fighterName = existingFighter != null ? (existingFighter['name'] ?? 'Pacarmu') : 'Pacarmu';
+      
+      if (firstPartnerWins) {
+        reactionText = '$fighterName marah besar mengetahui hal ini dan berkelahi sengit dengan $secondPartnerName untuk memperebutkan cintamu. \n\n🏆 $fighterName MEMENANGKAN perkelahian! Kamu tetap bersama $fighterName dan hubungan dengan $secondPartnerName dibatalkan.';
+        themeColor = Colors.blue;
+        
+        character.isHavingAffair = false;
+        character.happiness = (character.happiness - 10).clamp(0, 100);
+      } else {
+        reactionText = '$fighterName marah besar mengetahui hal ini dan berkelahi sengit dengan $secondPartnerName untuk memperebutkan cintamu. \n\n🏆 $secondPartnerName MEMENANGKAN perkelahian! Kamu kini berpacaran resmi dengan $secondPartnerName dan memutuskan hubungan dengan $fighterName.';
+        themeColor = Colors.redAccent;
+        
+        final Map<String, String> newPartnerData = {
+          'name': secondPartnerName,
+          'gender': proposalData?['gender']?.toString() ?? 'Perempuan',
+          'age': proposalData?['age']?.toString() ?? '20',
+          'relationship': '100',
+          'relation': 'Pacar',
+        };
+        
+        if (targetSlot == 'partner') character.partner = newPartnerData;
+        else if (targetSlot == 'secondPartner') character.secondPartner = newPartnerData;
+        else if (targetSlot == 'thirdPartner') character.thirdPartner = newPartnerData;
+        else if (targetSlot == 'fourthPartner') character.fourthPartner = newPartnerData;
+        else if (targetSlot == 'fifthPartner') character.fifthPartner = newPartnerData;
+        
+        character.isHavingAffair = false;
+        character.happiness = (character.happiness - 10).clamp(0, 100);
+      }
     }
 
-    character.inbox.add('💔 Beritahu Pacar: $reactionText');
+    character.inbox.add('📢 Beritahu Pacar: $reactionText');
 
     showDialog(
       context: context,
