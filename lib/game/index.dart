@@ -1036,6 +1036,7 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 // 1. KATEGORI
                 AgeCategoryButton(
+                  character: _character,
                   ageData: ageData,
                   age: _character.age,
                   gender: _character.gender ?? 'Laki-laki',

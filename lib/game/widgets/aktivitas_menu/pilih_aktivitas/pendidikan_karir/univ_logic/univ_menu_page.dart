@@ -240,16 +240,27 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     );
   }
 
+  String _determineCurrentRegisterLevel() {
+    final history = widget.character.educationHistory;
+    if (history['S1'] != 'Lulus') return 'S1';
+    if (history['S2'] != 'Lulus') return 'S2';
+    if (history['S3'] != 'Lulus') return 'S3';
+    return 'Complete';
+  }
+
   void _tryNegeri(BuildContext context, String major) {
     if (widget.character.intelligence >= 60) {
-      widget.character.univMajor = '$major (Negeri)';
+      final String level = _determineCurrentRegisterLevel();
+      widget.character.univMajor = '$major ($level - Negeri)';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
       widget.onRefresh();
       Navigator.pop(context);
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Lolos Seleksi Negeri! 🎉'),
-          content: Text('Selamat! Kamu berhasil lolos tes masuk Universitas Negeri untuk jurusan $major.'),
+          content: Text('Selamat! Kamu berhasil lolos tes masuk Universitas Negeri untuk jenjang $level dengan jurusan $major.'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
         ),
       );
@@ -270,14 +281,17 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     final bool success = Random().nextInt(100) < parentRel;
 
     if (success) {
-      widget.character.univMajor = '$major (Swasta)';
+      final String level = _determineCurrentRegisterLevel();
+      widget.character.univMajor = '$major ($level - Swasta)';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
       widget.onRefresh();
       Navigator.pop(context);
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Pendaftaran Disetujui! 💸'),
-          content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di Universitas Swasta untuk jurusan $major.'),
+          content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di Universitas Swasta untuk jenjang $level dengan jurusan $major.'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
         ),
       );
@@ -297,14 +311,17 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     if (widget.character.intelligence >= 90) {
       final isLuarNegeri = Random().nextInt(100) < 20;
       final type = isLuarNegeri ? 'Luar Negeri' : 'Dalam Negeri';
-      widget.character.univMajor = '$major (Beasiswa $type)';
+      final String level = _determineCurrentRegisterLevel();
+      widget.character.univMajor = '$major ($level - Beasiswa $type)';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
       widget.onRefresh();
       Navigator.pop(context);
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Beasiswa Diterima! 🌟'),
-          content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $type gratis sepenuhnya untuk jurusan $major.'),
+          content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $type gratis sepenuhnya untuk jenjang $level dengan jurusan $major.'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
         ),
       );
@@ -476,10 +493,47 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   Widget build(BuildContext context) {
     final character = widget.character;
     final onRefresh = widget.onRefresh;
+    final String level = _determineCurrentRegisterLevel();
     if (character.univMajor == null) {
+      if (level == 'Complete') {
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text('Universitas (Kuliah) 🎓'),
+            backgroundColor: Colors.indigo,
+            foregroundColor: Colors.white,
+          ),
+          body: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Icon(Icons.verified, size: 80, color: Colors.amber),
+                const SizedBox(height: 24),
+                const Text(
+                  'Pendidikan Selesai! 🎉',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Kamu telah berhasil menyelesaikan semua jenjang pendidikan tinggi hingga S3 Doktoral. Tidak ada lagi jenjang pendidikan formal lanjutan untuk diambil.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+                const SizedBox(height: 32),
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Kembali', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Universitas (Kuliah) 🎓'),
+          title: Text('Daftar Kuliah ($level) 🎓'),
           backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
         ),
@@ -491,16 +545,16 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
             children: [
               const Icon(Icons.school, size: 80, color: Colors.indigo),
               const SizedBox(height: 24),
-              const Text(
-                'Belum Terdaftar di Universitas',
+              Text(
+                'Belum Terdaftar di Universitas ($level)',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'Kamu saat ini belum menempuh pendidikan tinggi. Silakan pilih jurusan dan mendaftar kuliah untuk memulai aktivitas akademik.',
+              Text(
+                'Kamu saat ini belum menempuh pendidikan tinggi jenjang $level. Silakan pilih jurusan dan mendaftar kuliah untuk memulai aktivitas akademik.',
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
@@ -513,9 +567,9 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                   ),
                 ),
                 icon: const Icon(Icons.app_registration),
-                label: const Text(
-                  'Daftar Universitas Sekarang',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                label: Text(
+                  'Daftar Jenjang $level Sekarang',
+                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 onPressed: () async {
                   await Navigator.push(
@@ -777,8 +831,14 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
     character.univClassmates.clear();
     character.univLecturers.clear();
     character.univMajor = null;
+    String currentStage = 'S1';
+    if (character.educationHistory['S2'] == 'Belum Lulus') {
+      currentStage = 'S2';
+    } else if (character.educationHistory['S3'] == 'Belum Lulus') {
+      currentStage = 'S3';
+    }
+    character.educationHistory[currentStage] = 'Putus Sekolah';
     character.happiness = (character.happiness - 20).clamp(0, 100);
-
     character.inbox.add('🎓 Drop Out: Kamu memutuskan untuk drop out dari universitas pada usia ${character.age} tahun.');
     widget.onRefresh();
     setState(() {});

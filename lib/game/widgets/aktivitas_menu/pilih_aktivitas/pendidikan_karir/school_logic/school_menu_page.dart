@@ -111,6 +111,10 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
     character.bkTeacher = null;
     character.happiness = (character.happiness - 20).clamp(0, 100);
     
+    String currentStage = 'SD';
+    if (character.age >= 12 && character.age <= 14) currentStage = 'SMP';
+    if (character.age >= 15 && character.age <= 17) currentStage = 'SMA';
+    character.educationHistory[currentStage] = 'Putus Sekolah';
     character.inbox.add('🎓 Keluar Sekolah: Kamu memutuskan untuk putus sekolah di usia ${character.age} tahun.');
     widget.onRefresh();
     Navigator.pop(context);

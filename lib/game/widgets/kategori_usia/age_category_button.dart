@@ -1,8 +1,9 @@
-// lib/game/widgets/age_category_button.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 
 class AgeCategoryButton extends StatelessWidget {
+  final Character character;
   final Map<String, dynamic> ageData;
   final int age;
   
@@ -17,6 +18,7 @@ class AgeCategoryButton extends StatelessWidget {
 
   const AgeCategoryButton({
     super.key,
+    required this.character,
     required this.ageData,
     required this.age,
     required this.gender,
@@ -27,6 +29,93 @@ class AgeCategoryButton extends StatelessWidget {
     required this.money,
     required this.appearance,
   });
+
+  Widget _buildEducationHistorySection() {
+    final history = character.educationHistory;
+    final List<String> displayStages = [];
+
+    if (character.age < 6) {
+      return const Text(
+        'Belum Memulai Pendidikan',
+        style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey),
+      );
+    }
+
+    // Selalu tampilkan SD
+    displayStages.add('SD');
+
+    if (history['SD'] == 'Lulus') {
+      displayStages.add('SMP');
+      if (history['SMP'] == 'Lulus') {
+        displayStages.add('SMA');
+        if (history['SMA'] == 'Lulus') {
+          displayStages.add('S1');
+          if (history['S1'] == 'Lulus') {
+            displayStages.add('S2');
+            if (history['S2'] == 'Lulus') {
+              displayStages.add('S3');
+            }
+          }
+        }
+      }
+    }
+
+    return Column(
+      children: displayStages.map((stage) {
+        final status = history[stage] ?? 'Belum Lulus';
+        Color badgeColor = Colors.grey;
+        String statusLabel = 'Belum Lulus';
+
+        if (status == 'Lulus') {
+          badgeColor = Colors.green;
+          statusLabel = 'Lulus';
+        } else if (status == 'Putus Sekolah') {
+          badgeColor = Colors.red;
+          statusLabel = 'Putus Sekolah';
+        } else {
+          badgeColor = Colors.blue;
+          statusLabel = 'Sedang Ditempuh';
+        }
+
+        return Card(
+          elevation: 0,
+          color: Colors.grey.shade50,
+          margin: const EdgeInsets.only(bottom: 6),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+            side: BorderSide(color: Colors.grey.shade200),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  stage,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: badgeColor,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Text(
+                    statusLabel,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }).toList(),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,6 +180,12 @@ class AgeCategoryButton extends StatelessWidget {
                   _buildStatChip(Icons.face, 'Penampilan', appearance, Colors.pink),
                 ],
               ),
+              const SizedBox(height: 16),
+
+              // --- RIWAYAT PENDIDIKAN ---
+              const Text('🎓 Riwayat Pendidikan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              const SizedBox(height: 8),
+              _buildEducationHistorySection(),
             ],
           ),
           actions: [

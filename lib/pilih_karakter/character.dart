@@ -61,6 +61,8 @@ class Character {
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
   String? schoolType; // Jenis sekolah ('Negeri' atau 'Swasta')
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
+  Map<String, String> educationHistory = {};
+  int currentUnivStudyYears = 0;
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
   List<Map<String, String>> smaTeachers = []; // Daftar guru SMA
@@ -305,7 +307,18 @@ class Character {
       inbox.add(notice);
     }
 
-    if (age == 18) {
+    if (age == 12) {
+      if (educationHistory['SD'] == 'Belum Lulus') {
+        educationHistory['SD'] = 'Lulus';
+      }
+    } else if (age == 15) {
+      if (educationHistory['SMP'] == 'Belum Lulus') {
+        educationHistory['SMP'] = 'Lulus';
+      }
+    } else if (age == 18) {
+      if (educationHistory['SMA'] == 'Belum Lulus') {
+        educationHistory['SMA'] = 'Lulus';
+      }
       final String notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
       events.add(notice);
       inbox.add(notice);
@@ -315,6 +328,30 @@ class Character {
       sdTeachers.clear();
       headmaster = null;
       bkTeacher = null;
+    }
+
+    if (univMajor != null) {
+      currentUnivStudyYears += 1;
+      int targetYears = 4;
+      String currentStage = 'S1';
+      if (educationHistory['S2'] == 'Belum Lulus') {
+        targetYears = 2;
+        currentStage = 'S2';
+      } else if (educationHistory['S3'] == 'Belum Lulus') {
+        targetYears = 3;
+        currentStage = 'S3';
+      }
+
+      if (currentUnivStudyYears >= targetYears) {
+        educationHistory[currentStage] = 'Lulus';
+        final String notice = '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang $currentStage dengan jurusan $univMajor! 🎉';
+        events.add(notice);
+        inbox.add(notice);
+        univMajor = null;
+        currentUnivStudyYears = 0;
+        univClassmates.clear();
+        univLecturers.clear();
+      }
     }
     // Generate data sekolah secara otomatis jika kosong agar bisa memicu ajakan proposal di ageUp
     SchoolGenerator.generateClassmatesIfEmpty(this);
