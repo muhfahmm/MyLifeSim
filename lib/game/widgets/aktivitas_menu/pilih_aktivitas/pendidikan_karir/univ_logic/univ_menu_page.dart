@@ -488,6 +488,13 @@ class UnivMenuPage extends StatefulWidget {
 }
 
 class _UnivMenuPageState extends State<UnivMenuPage> {
+  String _determineCurrentRegisterLevel() {
+    final history = widget.character.educationHistory;
+    if (history['S1'] != 'Lulus') return 'S1';
+    if (history['S2'] != 'Lulus') return 'S2';
+    if (history['S3'] != 'Lulus') return 'S3';
+    return 'Complete';
+  }
 
   @override
   Widget build(BuildContext context) {
