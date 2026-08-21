@@ -1174,10 +1174,10 @@ class Character {
 
         final bool isDaughter = gender.toLowerCase() == 'perempuan';
         final bool hasNoStepMother = stepMotherName == null || isStepMotherDeceased;
-        final bool hasNoMother = motherName == null || isMotherDeceased || isMotherDivorced;
+        final bool hasDeadMother = isMotherDeceased; // Hanya meninggal, bukan cerai!
 
         if (isDaughter && isBiologicalFatherPartner && hasNoStepMother) {
-          final String proposalType = random.nextInt(100) < 53 ? 'Bercinta' : 'Lamar Nikah';
+          final String proposalType = (age >= 18 && random.nextInt(100) < 50) ? 'Lamar Nikah' : 'Bercinta';
           final int chance = proposalType == 'Bercinta' ? 70 : 60;
           if (random.nextInt(100) < chance) {
             String fAgeStr = fatherAge != null ? fatherAge.toString() : '40';
@@ -1190,8 +1190,8 @@ class Character {
               'role': 'Keluarga',
             };
           }
-        } else if (isDaughter && isStepFatherPartner && hasNoMother) {
-          final String proposalType = random.nextInt(100) < 53 ? 'Bercinta' : 'Lamar Nikah';
+        } else if (isDaughter && isStepFatherPartner && hasDeadMother) {
+          final String proposalType = (age >= 18 && random.nextInt(100) < 50) ? 'Lamar Nikah' : 'Bercinta';
           final int chance = proposalType == 'Bercinta' ? 70 : 60;
           if (random.nextInt(100) < chance) {
             String sfAgeStr = stepFatherAge != null ? stepFatherAge.toString() : '40';
