@@ -952,13 +952,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       widget.character.partner = null;
                     } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
                       widget.character.secondPartner = null;
-                      widget.character.isHavingAffair = false;
                     } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) {
                       widget.character.thirdPartner = null;
                     } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) {
                       widget.character.fourthPartner = null;
                     } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) {
                       widget.character.fifthPartner = null;
+                    }
+                    widget.character.secretPartners.removeWhere((p) => p['name'] == widget.targetName);
+                    if (widget.character.secretPartners.isEmpty && widget.character.secondPartner == null) {
+                      widget.character.isHavingAffair = false;
                     }
 
                     // 2. Tambahkan ke exPartners (mantan pacar)

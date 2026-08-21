@@ -355,44 +355,65 @@ class RelationshipButton extends StatelessWidget {
               ],
 
               // ============================================
-              // 2a. BAGIAN PACAR KEDUA (SELINGKUHAN)
+              // 2a. BAGIAN HUBUNGAN RAHASIA (SELINGKUHAN)
               // ============================================
-              if (character.secondPartner != null && character.isHavingAffair) ...[
-                const Divider(height: 32),
-                Row(
-                  children: [
-                    const Text('💔 Hubungan Rahasia', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepOrange)),
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: Colors.deepOrange,
-                        borderRadius: BorderRadius.circular(8),
+              if (character.isHavingAffair) ...[
+                () {
+                  final List<Map<String, String>> secretList = [];
+                  if (character.secondPartner != null) {
+                    secretList.add(character.secondPartner!);
+                  }
+                  secretList.addAll(character.secretPartners);
+
+                  if (secretList.isEmpty) return const SizedBox.shrink();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const Divider(height: 32),
+                      Row(
+                        children: [
+                          const Text('💔 Hubungan Rahasia', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepOrange)),
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.deepOrange,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: const Text('Selingkuhan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                          ),
+                        ],
                       ),
-                      child: const Text('Selingkuhan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                _buildFamilyItem(
-                  context,
-                  icon: Icons.heart_broken,
-                  label: character.secondPartner!['isDeceased'] == 'true'
-                      ? '${character.secondPartner!['name']!} (Wafat)'
-                      : character.secondPartner!['name']!,
-                  status: 'Pacar (Rahasia)',
-                  color: character.secondPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.deepOrange,
-                  relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
-                  ageText: '${character.secondPartner!['age']} tahun',
-                  isDeceased: character.secondPartner!['isDeceased'] == 'true',
-                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.secondPartner!['name']!,
-                    gender: character.secondPartner!['gender'] ?? 'Perempuan',
-                    age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
-                    happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
-                    forcedSkinColor: character.secondPartner!['skinColor'],
-                  ),
-                ),
+                      const SizedBox(height: 8),
+                      ...secretList.map((sec) {
+                        final bool isDeceased = sec['isDeceased'] == 'true';
+                        final String sName = sec['name'] ?? '';
+                        final String relationRole = sec['relation'] ?? 'Pacar (Rahasia)';
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: _buildFamilyItem(
+                            context,
+                            icon: Icons.heart_broken,
+                            label: isDeceased ? '$sName (Wafat)' : sName,
+                            status: relationRole,
+                            color: isDeceased ? Colors.grey : Colors.deepOrange,
+                            relationshipValue: int.tryParse(sec['relationship'] ?? '70') ?? 70,
+                            ageText: sec['age'] != null ? '${sec['age']} tahun' : 'Tidak diketahui',
+                            isDeceased: isDeceased,
+                            avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                              name: sName,
+                              gender: sec['gender'] ?? 'Perempuan',
+                              age: int.tryParse(sec['age'] ?? '20') ?? 20,
+                              happiness: int.tryParse(sec['relationship'] ?? '70') ?? 70,
+                              forcedSkinColor: sec['skinColor'],
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ],
+                  );
+                }(),
               ],
 
               // ============================================

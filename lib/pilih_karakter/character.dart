@@ -63,6 +63,7 @@ class Character {
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
   Map<String, String> educationHistory = {};
   int currentUnivStudyYears = 0;
+  List<Map<String, String>> secretPartners = [];
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
   List<Map<String, String>> smaTeachers = []; // Daftar guru SMA
@@ -167,10 +168,22 @@ class Character {
     if (thirdPartner != null && thirdPartner!['isDeceased'] != 'true') count++;
     if (fourthPartner != null && fourthPartner!['isDeceased'] != 'true') count++;
     if (fifthPartner != null && fifthPartner!['isDeceased'] != 'true') count++;
+    count += secretPartners.where((p) => p['isDeceased'] != 'true').length;
     return count;
   }
 
   void addPartnerToFreeSlot(Map<String, String> val) {
+    final bool isSecret = val['relation'] == 'Pacar (Selingkuhan)' || val['relation'] == 'Pacar (Rahasia)';
+    if (isSecret) {
+      if (secondPartner == null) {
+        secondPartner = val;
+        isHavingAffair = true;
+      } else {
+        secretPartners.add(val);
+        isHavingAffair = true;
+      }
+      return;
+    }
     if (partner == null) {
       partner = val;
     } else if (secondPartner == null) {
@@ -181,7 +194,22 @@ class Character {
       fourthPartner = val;
     } else if (fifthPartner == null) {
       fifthPartner = val;
+    } else {
+      secretPartners.add(val);
+      isHavingAffair = true;
     }
+  }
+
+  bool isAnyPartnerNameMatching(String name) {
+    if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return true;
+    if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return true;
+    if (thirdPartner != null && (thirdPartner!['name'] == name || thirdPartner!['name']!.contains(name) || name.contains(thirdPartner!['name']!))) return true;
+    if (fourthPartner != null && (fourthPartner!['name'] == name || fourthPartner!['name']!.contains(name) || name.contains(fourthPartner!['name']!))) return true;
+    if (fifthPartner != null && (fifthPartner!['name'] == name || fifthPartner!['name']!.contains(name) || name.contains(fifthPartner!['name']!))) return true;
+    for (var sp in secretPartners) {
+      if (sp['name'] == name || sp['name']!.contains(name) || name.contains(sp['name']!)) return true;
+    }
+    return false;
   }
 
   bool isHavingAffair = false; // true jika user sedang selingkuh
@@ -803,9 +831,7 @@ class Character {
           final String sexuality = t['sexuality'] ?? 'Heteroseksual';
           final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
           final String name = t['name'] ?? '';
-          bool isAlreadyPartner = false;
-          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+          final bool isAlreadyPartner = isAnyPartnerNameMatching(name);
           if (isAlreadyPartner) continue;
 
           bool match = false;
@@ -832,9 +858,7 @@ class Character {
           final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
           final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
           final String name = cm['name'] ?? '';
-          bool isAlreadyPartner = false;
-          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+          final bool isAlreadyPartner = isAnyPartnerNameMatching(name);
           if (isAlreadyPartner) continue;
 
           bool match = false;
@@ -863,9 +887,7 @@ class Character {
             final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
             final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
             final String name = cm['name'] ?? '';
-            bool isAlreadyPartner = false;
-            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            final bool isAlreadyPartner = isAnyPartnerNameMatching(name);
             if (isAlreadyPartner) continue;
 
             bool match = false;
@@ -892,9 +914,7 @@ class Character {
             final String sexuality = t['sexuality'] ?? 'Heteroseksual';
             final String tGender = (t['gender'] ?? 'Laki-laki').trim().toLowerCase();
             final String name = t['name'] ?? '';
-            bool isAlreadyPartner = false;
-            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            final bool isAlreadyPartner = isAnyPartnerNameMatching(name);
             if (isAlreadyPartner) continue;
 
             bool match = false;
@@ -923,9 +943,7 @@ class Character {
             final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
             final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
             final String name = cm['name'] ?? '';
-            bool isAlreadyPartner = false;
-            if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) isAlreadyPartner = true;
-            if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) isAlreadyPartner = true;
+            final bool isAlreadyPartner = isAnyPartnerNameMatching(name);
             if (isAlreadyPartner) continue;
 
             bool match = false;
@@ -1026,9 +1044,7 @@ class Character {
       // Jika proposal sekolah tidak terjadi (roll gagal atau kandidat kosong), coba picu keluarga
       if (activeProposal == null) {
         bool isAlreadyPartner(String name) {
-          if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return true;
-          if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return true;
-          return false;
+          return isAnyPartnerNameMatching(name);
         }
 
         List<Map<String, dynamic>> candidates = [];
