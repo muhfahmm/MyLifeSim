@@ -274,8 +274,6 @@ class _GameScreenState extends State<GameScreen> {
       );
     });
 
-    _checkGlassesNeed();
-
     // Cek kehamilan saat bertambah umur
     if (_character.isPregnant || _character.partnerIsPregnant) {
       // Hitung roll kelahiran (80% berhasil, 20% keguguran)
@@ -654,7 +652,10 @@ class _GameScreenState extends State<GameScreen> {
 
   // --- LOGIKA NOTIFIKASI AJAKAN KELUARGA ---
   void _checkActiveProposal() {
-    if (_character.activeProposal == null) return;
+    if (_character.activeProposal == null) {
+      _checkGlassesNeed();
+      return;
+    }
     
     final proposal = _character.activeProposal!;
     final String partnerName = proposal['name'];
@@ -737,6 +738,7 @@ class _GameScreenState extends State<GameScreen> {
                   proposalData: proposal,
                   onComplete: () {
                     setState(() {});
+                    _checkGlassesNeed();
                   },
                 );
               },
@@ -792,7 +794,10 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     actions: [
                       TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Navigator.pop(context);
+                          _checkGlassesNeed();
+                        },
                         child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                     ],
@@ -828,6 +833,7 @@ class _GameScreenState extends State<GameScreen> {
                     backgroundColor: Colors.pink,
                   ),
                 );
+                _checkGlassesNeed();
               } else if (type == 'Ajak Pacaran') {
                 setState(() {
                   final String relationRole = _character.partner != null ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
@@ -868,6 +874,7 @@ class _GameScreenState extends State<GameScreen> {
                     backgroundColor: Colors.pink,
                   ),
                 );
+                _checkGlassesNeed();
               } else {
                 // Bercinta diterima -> Tampilkan dialog pengaman (kondom)
                 _showIncomingCondomDialog(proposal);
@@ -903,6 +910,7 @@ class _GameScreenState extends State<GameScreen> {
                   backgroundColor: Colors.red,
                 ),
               );
+              _checkGlassesNeed();
             },
             child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
@@ -1076,6 +1084,7 @@ class _GameScreenState extends State<GameScreen> {
         backgroundColor: Colors.pink,
       ),
     );
+    _checkGlassesNeed();
   }
 
   void importPenyakitSTDCheck(Map<String, dynamic> proposal) {
