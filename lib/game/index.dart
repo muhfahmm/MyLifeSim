@@ -86,16 +86,29 @@ class _GameScreenState extends State<GameScreen> {
     final int age = _character.age;
     if (age <= 0) return;
 
+    // Batasi tes hanya pada rentang usia 1-18 dan 40-60
+    if (age >= 1 && age <= 18) {
+      if (_character.eyeTestsCountYoung >= 2) return;
+    } else if (age >= 40 && age <= 60) {
+      if (_character.eyeTestsCountOld >= 2) return;
+    } else {
+      return; // Tidak ada tes di luar rentang usia tersebut
+    }
+
     int chance = 0;
     if (age >= 1 && age <= 6) chance = 5;
     else if (age >= 7 && age <= 10) chance = 20;
-    else if (age >= 11 && age <= 25) chance = 25;
-    else if (age >= 26 && age <= 30) chance = 30;
-    else if (age >= 31 && age <= 45) chance = 35;
+    else if (age >= 11 && age <= 18) chance = 25;
+    else if (age >= 40 && age <= 45) chance = 35;
     else if (age >= 46 && age <= 55) chance = 40;
-    else if (age > 55) chance = 40;
+    else if (age >= 56 && age <= 60) chance = 40;
 
     if (Random().nextInt(100) < chance) {
+      if (age >= 1 && age <= 18) {
+        _character.eyeTestsCountYoung++;
+      } else if (age >= 40 && age <= 60) {
+        _character.eyeTestsCountOld++;
+      }
       _showEyeTestMinigame();
     }
   }
@@ -668,43 +681,119 @@ class _GameScreenState extends State<GameScreen> {
 
     final String role = proposal['role'] ?? 'Keluarga';
 
+    // Parsing nama bersih dan relasi berakhiran "-mu"
+    String cleanName = partnerName;
+    String relationWithMu = relation;
+
+    if (partnerName.contains('(') && partnerName.endsWith(')')) {
+      final int openParen = partnerName.indexOf('(');
+      final String contentInside = partnerName.substring(openParen + 1, partnerName.length - 1).trim();
+      final String prefixPart = partnerName.substring(0, openParen).trim();
+      
+      if (prefixPart.toLowerCase() == relation.toLowerCase()) {
+        cleanName = contentInside;
+      } else {
+        cleanName = prefixPart;
+      }
+    }
+
+    final String relLower = relation.toLowerCase();
+    if (relLower == 'ayah' || relLower == 'ayah kandung') {
+      relationWithMu = 'Ayahmu';
+    } else if (relLower == 'ibu' || relLower == 'ibu kandung') {
+      relationWithMu = 'Ibumu';
+    } else if (relLower == 'ayah tiri') {
+      relationWithMu = 'Ayah Tirimu';
+    } else if (relLower == 'ibu tiri') {
+      relationWithMu = 'Ibu Tirimu';
+    } else if (relLower == 'kakak laki-laki') {
+      relationWithMu = 'Kakak Laki-lakimu';
+    } else if (relLower == 'kakak perempuan') {
+      relationWithMu = 'Kakak Perempuanmu';
+    } else if (relLower == 'adik laki-laki') {
+      relationWithMu = 'Adik Laki-lakimu';
+    } else if (relLower == 'adik perempuan') {
+      relationWithMu = 'Adik Perempuanmu';
+    } else if (relLower == 'paman') {
+      relationWithMu = 'Pamanmu';
+    } else if (relLower == 'bibi') {
+      relationWithMu = 'Bibimu';
+    } else if (relLower == 'sepupu') {
+      relationWithMu = 'Sepupumu';
+    } else if (relLower == 'kakek') {
+      relationWithMu = 'Kakekmu';
+    } else if (relLower == 'nenek') {
+      relationWithMu = 'Nenekmu';
+    } else {
+      relationWithMu = '${relation}mu';
+    }
+
     if (type == 'Lamar Nikah') {
       dialogTitle = 'Lamaran Pernikahan! 💍';
       dialogBody = 'Ayahmu, $partnerName mengajakmu untuk berkomitmen lebih jauh dan menikah secara rahasia! Apakah kamu mau menerima lamaran pernikahan tersebut?';
     } else if (type == 'Ajak 3some') {
       dialogTitle = 'Ajakan 3some! 🔥';
       dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan hubungan intim threesome secara bersama-sama. Apakah kamu mau menerima ajakan threesome ini?';
-    } else if (role == 'Guru' || role == 'Teman Sekelas') {
+    } else if (role == 'Guru' || role == 'Dosen' || role == 'Kepala Sekolah' || role == 'Teman Sekelas' || role == 'Teman Kuliah' || role == 'Rekan Kerja') {
       final isSameSex = myGender == partnerGender;
       final orientationType = isSameSex ? (myGender == 'laki-laki' ? 'Gay' : 'Lesbian') : '';
       
+      final String labelWithMu;
+      if (role == 'Guru') labelWithMu = 'Guru-mu';
+      else if (role == 'Dosen') labelWithMu = 'Dosenmu';
+      else if (role == 'Kepala Sekolah') labelWithMu = 'Kepala Sekolahmu';
+      else if (role == 'Teman Sekelas') labelWithMu = 'Teman Sekelasmu';
+      else if (role == 'Teman Kuliah') labelWithMu = 'Teman Kuliahmu';
+      else if (role == 'Rekan Kerja') labelWithMu = 'Rekan Kerjamu';
+      else labelWithMu = '${role}mu';
+
       if (type == 'Ajak Pacaran') {
         dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Pacaran)!' : 'Ajakan Pacaran!';
-        dialogBody = '$role-mu, $partnerName secara langsung mengajakmu untuk berpacaran ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan pacaran tersebut?';
+        dialogBody = '$labelWithMu, $cleanName secara langsung mengajakmu untuk berpacaran ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan pacaran tersebut?';
       } else {
         dialogTitle = orientationType.isNotEmpty ? 'Ajakan $orientationType (Bercinta)!' : 'Ajakan Berhubungan Intim!';
-        dialogBody = '$role-mu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan bercinta ini?';
+        dialogBody = '$labelWithMu, $cleanName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love ${orientationType.isNotEmpty ? "sesama jenis ($orientationType)" : ""}. Apakah kamu mau menerima ajakan bercinta ini?';
       }
     } else {
       if (myGender == 'laki-laki' && partnerGender == 'laki-laki') {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Gay (Pacaran)!' : 'Ajakan Gay (Bercinta)!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Gay) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
-            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
+            ? '$relationWithMu, $cleanName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Gay) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : '$relationWithMu, $cleanName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
       } else if (myGender == 'perempuan' && partnerGender == 'perempuan') {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Lesbian (Pacaran)!' : 'Ajakan Lesbian (Bercinta)!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
-            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
+            ? '$relationWithMu, $cleanName secara langsung mengajakmu untuk berkomitmen dalam hubungan pacaran sesama jenis (Lesbian) secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : '$relationWithMu, $cleanName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan bercinta tersebut?';
       } else {
         dialogTitle = type == 'Ajak Pacaran' ? 'Ajakan Pacaran!' : 'Ajakan Berhubungan Intim!';
         dialogBody = type == 'Ajak Pacaran'
-            ? 'Saudaramu/Keluargamu, $partnerName secara langsung mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
-            : 'Keluargamu, $partnerName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love secara rahasia malam ini. Apakah kamu mau menerima ajakan bercinta tersebut?';
+            ? '$relationWithMu, $cleanName secara langsung mengajakmu untuk berkomitmen dalam hubungan berpacaran secara diam-diam. Apakah kamu mau menerima ajakan pacaran tersebut?'
+            : '$relationWithMu, $cleanName secara terang-terangan mengajakmu untuk bersetubuh dan melakukan hubungan intim / make love secara rahasia malam ini. Apakah kamu mau menerima ajakan bercinta tersebut?';
       }
     }
     
     if (!mounted) return;
+
+    final String relCheck = relation.toLowerCase();
+    final bool isFatherProposal = relCheck.contains('ayah');
+    final bool isMotherProposal = relCheck.contains('ibu');
+
+    final bool showReportToMother = isFatherProposal &&
+        (type == 'Ajak Pacaran' || type == 'Bercinta') &&
+        (_character.motherName != null && !_character.isMotherDeceased);
+
+    final bool showReportToFather = isMotherProposal &&
+        (type == 'Ajak Pacaran' || type == 'Bercinta') &&
+        ((_character.fatherName != null && !_character.isFatherDeceased) ||
+         (_character.stepFatherName != null && !_character.isStepFatherDeceased));
+
+    final bool showReportToHeadmaster = (role == 'Guru' || role == 'Dosen' || relCheck.contains('guru') || relCheck.contains('dosen')) &&
+        (type == 'Ajak Pacaran' || type == 'Bercinta');
+
+    final bool showReportToTeacher = (role == 'Kepala Sekolah' || relCheck.contains('kepala sekolah')) &&
+        (type == 'Ajak Pacaran' || type == 'Bercinta');
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -721,6 +810,51 @@ class _GameScreenState extends State<GameScreen> {
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
+          if (showReportToMother)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _executeReportParent(context, partnerName, relation, 'Ibu');
+              },
+              child: const Text(
+                'Laporkan ke Ibu',
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          if (showReportToFather)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                final String reportTarget = (_character.fatherName != null && !_character.isFatherDeceased) ? 'Ayah' : 'Ayah Tiri';
+                _executeReportParent(context, partnerName, relation, reportTarget);
+              },
+              child: const Text(
+                'Laporkan ke Ayah',
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          if (showReportToHeadmaster)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _executeReportStaff(context, cleanName, role);
+              },
+              child: const Text(
+                'Laporkan ke Kepala Sekolah',
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+            ),
+          if (showReportToTeacher)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                _executeReportStaff(context, cleanName, role);
+              },
+              child: const Text(
+                'Laporkan ke Guru',
+                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              ),
+            ),
           if (_character.partner != null && (type == 'Ajak Pacaran' || type == 'Bercinta'))
             TextButton(
               onPressed: () {
@@ -913,6 +1047,236 @@ class _GameScreenState extends State<GameScreen> {
               _checkGlassesNeed();
             },
             child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _executeReportParent(BuildContext context, String partnerName, String relation, String reportTarget) {
+    final rand = Random();
+    final int roll = rand.nextInt(100);
+    final bool isJailed = roll < 40; // 40% chance of prison + divorce
+
+    setState(() {
+      final String relationLower = relation.toLowerCase();
+
+      if (reportTarget == 'Ibu') {
+        // Dilaporkan ke Ibu (pelakunya Ayah Kandung atau Ayah Tiri)
+        if (relationLower.contains('tiri')) {
+          final String originalName = _character.stepFatherName ?? partnerName;
+          _character.stepFatherName = null; // Diceraikan / dihapus
+          _character.stepFatherRelationship = 0;
+
+          if (isJailed) {
+            _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ayah Tirimu, $originalName, ke Ibumu. Ibumu sangat marah, menceraikannya, dan melaporkannya ke polisi. Ayah tirimu kini dipenjara!');
+          } else {
+            _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayah Tirimu, $originalName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya.');
+          }
+        } else {
+          _character.isFatherDivorced = true;
+          _character.fatherRelationship = 0;
+
+          if (isJailed) {
+            _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah, menceraikannya, dan melaporkannya ke polisi. Ayahmu kini dipenjara!');
+          } else {
+            _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya.');
+          }
+
+          // Peluang Ayah Kandung menikah lagi (mempunyai Ibu Tiri) sebesar 40%
+          if (rand.nextInt(100) < 40) {
+            final List<String> girls = (_character.femaleFirstNames != null && _character.femaleFirstNames!.isNotEmpty) ? _character.femaleFirstNames! : ['Dian', 'Lestari', 'Nadia', 'Sania', 'Zahra', 'Aura'];
+            final List<String> familyNames = (_character.lastNames != null && _character.lastNames!.isNotEmpty) ? _character.lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+            _character.stepMotherName = '${girls[rand.nextInt(girls.length)]} ${familyNames[rand.nextInt(familyNames.length)]}';
+            _character.stepMotherAge = (_character.fatherAge ?? 40) + rand.nextInt(5) - 2;
+            _character.stepMotherRelationship = 50;
+            _character.isStepMotherDeceased = false;
+            final String notice = '💍 Kabar Keluarga: Ayahmu ($partnerName) menikah lagi! Sekarang kamu memiliki Ibu Tiri bernama ${_character.stepMotherName}.';
+            _character.inbox.add(notice);
+          }
+        }
+
+        // Hubungan dengan Ibu meningkat karena melapor
+        _character.motherRelationship = ((_character.motherRelationship ?? 50) + 15).clamp(0, 100);
+      } else {
+        // Dilaporkan ke Ayah / Ayah Tiri (pelakunya Ibu Kandung)
+        _character.isMotherDivorced = true;
+        _character.motherRelationship = 0;
+
+        if (isJailed) {
+          _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah, menceraikannya, dan melaporkannya ke polisi. Ibumu kini dipenjara!');
+        } else {
+          _character.inbox.add('💔 Perceraian: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah dan memutuskan untuk menceraikannya.');
+        }
+
+        // Peluang Ibu Kandung menikah lagi (mempunyai Ayah Tiri) sebesar 40%
+        if (rand.nextInt(100) < 40) {
+          final List<String> boys = (_character.maleFirstNames != null && _character.maleFirstNames!.isNotEmpty) ? _character.maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
+          final List<String> familyNames = (_character.lastNames != null && _character.lastNames!.isNotEmpty) ? _character.lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+          _character.stepFatherName = '${boys[rand.nextInt(boys.length)]} ${familyNames[rand.nextInt(familyNames.length)]}';
+          _character.stepFatherAge = (_character.motherAge ?? 40) + rand.nextInt(5) - 2;
+          _character.stepFatherRelationship = 50;
+          _character.isStepFatherDeceased = false;
+          final String notice = '💍 Kabar Keluarga: Ibumu ($partnerName) menikah lagi! Sekarang kamu memiliki Ayah Tiri bernama ${_character.stepFatherName}.';
+          _character.inbox.add(notice);
+        }
+
+        // Hubungan dengan Ayah / Ayah Tiri meningkat
+        if (reportTarget == 'Ayah Tiri') {
+          _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 15).clamp(0, 100);
+        } else {
+          _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 15).clamp(0, 100);
+        }
+      }
+
+      _character.activeProposal = null;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(isJailed ? Icons.gavel : Icons.heart_broken, color: isJailed ? Colors.red : Colors.orange, size: 28),
+            const SizedBox(width: 8),
+            Text(
+              isJailed ? 'Laporan Polisi Sukses! 🚨' : 'Orang Tua Bercerai! 💔',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          isJailed
+              ? 'Laporanmu berhasil! $partnerName telah dilaporkan ke polisi oleh $reportTarget, diceraikan, dan kini mendekam di penjara.'
+              : '$reportTarget sangat terkejut mendengarnya dan memutuskan untuk menceraikan $partnerName secara langsung!',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _showCustodySelectionDialog(context, _character.fatherName ?? 'Ayah', _character.motherName ?? 'Ibu');
+            },
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showCustodySelectionDialog(BuildContext context, String fatherName, String motherName) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.home, color: Colors.blue),
+            SizedBox(width: 8),
+            Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          ],
+        ),
+        content: const Text(
+          'Karena orang tuamu bercerai, kamu harus memilih untuk tinggal bersama siapa.',
+          style: TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
+                _character.motherRelationship = ((_character.motherRelationship ?? 50) - 15).clamp(0, 100);
+                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ayahmu ($fatherName).');
+              });
+              _checkGlassesNeed();
+            },
+            child: Text('Ikut Ayah ($fatherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              setState(() {
+                _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
+                _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 15).clamp(0, 100);
+                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ibumu ($motherName).');
+              });
+              _checkGlassesNeed();
+            },
+            child: Text('Ikut Ibu ($motherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _executeReportStaff(BuildContext context, String partnerName, String role) {
+    final rand = Random();
+    final int roll = rand.nextInt(100);
+    final bool isFired = roll < 70; // 70% chance of being fired
+
+    setState(() {
+      if (isFired) {
+        final String nameLower = partnerName.toLowerCase();
+        
+        // Hapus guru SD, SMP, SMA
+        _character.sdTeachers.removeWhere((t) => (t['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((t['name'] ?? '').toLowerCase()));
+        _character.smpTeachers.removeWhere((t) => (t['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((t['name'] ?? '').toLowerCase()));
+        _character.smaTeachers.removeWhere((t) => (t['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((t['name'] ?? '').toLowerCase()));
+        
+        // Hapus dosen
+        _character.univLecturers.removeWhere((t) => (t['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((t['name'] ?? '').toLowerCase()));
+
+        // Hapus kepala sekolah jika cocok
+        if (_character.headmaster != null &&
+            ((_character.headmaster!['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((_character.headmaster!['name'] ?? '').toLowerCase()))) {
+          _character.headmaster = null;
+        }
+        if (_character.sdHeadmaster != null &&
+            ((_character.sdHeadmaster!['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((_character.sdHeadmaster!['name'] ?? '').toLowerCase()))) {
+          _character.sdHeadmaster = null;
+        }
+        if (_character.smpHeadmaster != null &&
+            ((_character.smpHeadmaster!['name'] ?? '').toLowerCase() == nameLower || nameLower.contains((_character.smpHeadmaster!['name'] ?? '').toLowerCase()))) {
+          _character.smpHeadmaster = null;
+        }
+
+        _character.inbox.add('🚨 Laporan Sekolah: Kamu melaporkan $partnerName ($role). Laporanmu diterima dan yang bersangkutan resmi dipecat dari sekolah!');
+      } else {
+        _character.inbox.add('📢 Laporan Sekolah: Laporanmu terhadap $partnerName ($role) ditolak karena kurangnya bukti.');
+      }
+      
+      _character.activeProposal = null;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Row(
+          children: [
+            Icon(isFired ? Icons.check_circle : Icons.error, color: isFired ? Colors.green : Colors.red, size: 28),
+            const SizedBox(width: 8),
+            Text(
+              isFired ? 'Laporan Diterima! 🚨' : 'Laporan Ditolak! 📢',
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+            ),
+          ],
+        ),
+        content: Text(
+          isFired
+              ? 'Laporanmu diproses. Pihak sekolah memutuskan untuk memecat $partnerName secara tidak hormat!'
+              : 'Pihak sekolah mengabaikan laporanmu karena dianggap tidak memiliki bukti yang cukup. $partnerName tetap bertugas.',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _checkGlassesNeed();
+            },
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

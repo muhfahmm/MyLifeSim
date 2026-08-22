@@ -11,6 +11,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logi
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/sibling_family_view.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 import 'package:bitlife/game/widgets/dialog_helper.dart';
@@ -96,6 +97,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.stepFatherAge != null ? '${widget.character.stepFatherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Tiri' && name.startsWith('Ibu')) {
       return widget.character.stepMotherAge != null ? '${widget.character.stepMotherAge} tahun' : 'Tidak diketahui';
+    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
+      return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
+    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
+      return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -259,6 +264,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.stepFatherRelationship ?? 50;
     } else if (role == 'Tiri' && name.startsWith('Ibu')) {
       return widget.character.stepMotherRelationship ?? 50;
+    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
+      return widget.character.fatherRelationship ?? 50;
+    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
+      return widget.character.motherRelationship ?? 50;
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -335,6 +344,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Tiri' && name.startsWith('Ibu')) {
       widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) + changeAmount).clamp(0, 100);
+    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
+      widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) + changeAmount).clamp(0, 100);
+    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
+      widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + changeAmount).clamp(0, 100);
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -864,9 +877,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String cleanRole = widget.targetRole.toLowerCase();
     final String cleanName = widget.targetName.toLowerCase();
     final bool isFatherOrMother = cleanName.contains('ayah') || cleanName.contains('ibu') || cleanRole.contains('ayah') || cleanRole.contains('ibu');
+    // Saudara juga bisa Lihat Keluarga
+    final bool isSiblingEntry = widget.character.siblings.any((sib) =>
+      '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+      sib['name']!.toLowerCase() == cleanName);
 
-    if (isFatherOrMother) {
-      final String side = cleanName.contains('ayah') || cleanRole.contains('ayah') ? 'Ayah' : 'Ibu';
+    // Cek apakah target ada di extendedFamily
+    final Map<String, String> extMember = widget.character.extendedFamily.firstWhere(
+      (ext) => ext['name'] == widget.targetName || widget.targetName.contains(ext['name'] ?? ''),
+      orElse: () => <String, String>{},
+    );
+    final bool isExtendedEntry = extMember.isNotEmpty;
+
+    if (isFatherOrMother || isSiblingEntry || isExtendedEntry) {
+      String side = 'Ayah';
+      if (isExtendedEntry) {
+        final String rel = extMember['relation'] ?? '';
+        if (rel.contains('Ibu')) {
+          side = 'Ibu';
+        }
+      } else {
+        side = (cleanName.contains('ayah') || cleanRole.contains('ayah')) ? 'Ayah' : 'Ibu';
+      }
+
       actions.insert(0, ActionItem(
         label: 'Lihat Keluarga',
         icon: Icons.people,
@@ -875,12 +908,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ExtendedFamilyViewScreen(
+              builder: (context) => SiblingFamilyViewScreen(
                 character: widget.character,
+                siblingName: widget.targetName,
                 side: side,
-                onRefresh: () {
-                  setState(() {});
-                },
+                onRefresh: () { setState(() {}); },
               ),
             ),
           );
@@ -917,6 +949,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                                     isDatingBiologicalFather && 
                                                     widget.character.stepMotherName != null && 
                                                     !widget.character.isStepMotherDeceased;
+
+    // Ayah kandung sudah cerai dengan ibu kandung → ayah single, bercinta boleh
+    final bool isFatherPartnerAndParentsDivorced = widget.character.gender.toLowerCase() == 'perempuan' &&
+                                                    isDatingBiologicalFather &&
+                                                    widget.character.isFatherDivorced &&
+                                                    (widget.character.stepMotherName == null || widget.character.isStepMotherDeceased);
 
     final bool isStepFatherPartnerAndMotherExists = widget.character.gender.toLowerCase() == 'perempuan' && 
                                                     isDatingStepFather && 
@@ -1001,6 +1039,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
                 ),
               ],
+            ),
+          );
+        },
+      ));
+    } else if (isFatherPartnerAndParentsDivorced) {
+      // Ayah kandung sudah cerai, langsung bercinta tanpa menu minta cerai
+      topActions.add(ActionItem(
+        label: 'Bercinta / Make Love',
+        icon: Icons.favorite,
+        color: Colors.pink,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BercintaScreen(
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                onActionComplete: () {
+                  _updateState();
+                },
+              ),
             ),
           );
         },

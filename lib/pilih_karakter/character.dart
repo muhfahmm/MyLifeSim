@@ -39,6 +39,8 @@ class Character {
   String? avatarClotheColor;
   String? avatarSkinColor;
   String? avatarFacialHairType;
+  int eyeTestsCountYoung = 0;
+  int eyeTestsCountOld = 0;
 
   // --- WARNA KULIT ORANG TUA (untuk warisan) ---
   String? fatherSkinColor;  // hex warna kulit ayah
@@ -1099,7 +1101,7 @@ class Character {
           int chance = 0;
           if (myGenderLower == 'perempuan') {
             if (rel.contains('ayah')) chance = 40;
-            else if (rel.contains('ibu')) chance = 30;
+            else if (rel.contains('ibu')) chance = 20;
             else if (rel.contains('kakak perempuan')) chance = 30;
             else if (rel.contains('adik perempuan')) chance = 30;
             else if (rel.contains('adik laki')) chance = 40;
@@ -1173,10 +1175,12 @@ class Character {
                                          isAnyPartnerNameMatching(stepFatherName ?? '___');
 
         final bool isDaughter = gender.toLowerCase() == 'perempuan';
+        // Tidak ada ibu tiri ATAU orang tua sudah cerai → ayah single
         final bool hasNoStepMother = stepMotherName == null || isStepMotherDeceased;
+        final bool fatherIsSingle = hasNoStepMother || isFatherDivorced;
         final bool hasDeadMother = isMotherDeceased; // Hanya meninggal, bukan cerai!
 
-        if (isDaughter && isBiologicalFatherPartner && hasNoStepMother) {
+        if (isDaughter && isBiologicalFatherPartner && fatherIsSingle) {
           final String proposalType = (age >= 18 && random.nextInt(100) < 50) ? 'Lamar Nikah' : 'Bercinta';
           final int chance = proposalType == 'Bercinta' ? 70 : 60;
           if (random.nextInt(100) < chance) {

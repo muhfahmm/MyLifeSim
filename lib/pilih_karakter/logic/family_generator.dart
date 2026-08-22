@@ -267,14 +267,45 @@ class FamilyGenerator {
       );
       // Kakak berusia lebih tua (e.g. 1 - 8 tahun lebih tua dari karakter)
       int age = 1 + _random.nextInt(8);
-      siblingsList.add({
+      
+      final Map<String, String> siblingMap = {
+        'id': 'sib_${_random.nextInt(1000000)}',
         'name': name,
         'gender': gender,
         'relation': gender == 'Laki-laki' ? 'Kakak Laki-laki' : 'Kakak Perempuan',
         'relationship': (50 + _random.nextInt(31)).toString(),
         'age': '$age',
         'isDeceased': 'false',
-      });
+      };
+
+      // Jika usia kakak >= 20 tahun saat lahir, beri peluang memiliki pasangan & anak
+      if (age >= 20) {
+        if (_random.nextInt(100) < 60) {
+          final String spouseGender = gender == 'Laki-laki' ? 'Perempuan' : 'Laki-laki';
+          final String spouseName = _generateRandomName(spouseGender == 'Laki-laki' ? 'male' : 'female', maleFirstNames, femaleFirstNames, lastNames);
+          siblingMap['spouseName'] = spouseName;
+          siblingMap['spouseAge'] = (age - 1 - _random.nextInt(4)).toString();
+          siblingMap['spouseGender'] = spouseGender;
+          
+          if (_random.nextInt(100) < 80) {
+            int childCount = _random.nextInt(2) + 1;
+            List<String> cNames = [];
+            List<String> cAges = [];
+            List<String> cGenders = [];
+            for (int c = 0; c < childCount; c++) {
+              final bool isBoy = _random.nextBool();
+              cNames.add(_generateRandomName(isBoy ? 'male' : 'female', maleFirstNames, femaleFirstNames, lastNames));
+              cAges.add((_random.nextInt(age - 18)).toString());
+              cGenders.add(isBoy ? 'Laki-laki' : 'Perempuan');
+            }
+            siblingMap['childNames'] = cNames.join(',');
+            siblingMap['childAges'] = cAges.join(',');
+            siblingMap['childGenders'] = cGenders.join(',');
+          }
+        }
+      }
+
+      siblingsList.add(siblingMap);
     }
 
     // Peluang memiliki adik adalah 50%
@@ -292,6 +323,7 @@ class FamilyGenerator {
         // Adik berusia lebih muda (negatif saat lahir, representasi belum lahir)
         int age = -(1 + _random.nextInt(6)); // -1 sampai -6
         siblingsList.add({
+          'id': 'sib_${_random.nextInt(1000000)}',
           'name': name,
           'gender': gender,
           'relation': gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan',
@@ -320,62 +352,71 @@ class FamilyGenerator {
     final int fatherBaseAge = character.fatherAge ?? (30 + _random.nextInt(15));
     final int motherBaseAge = character.motherAge ?? (28 + _random.nextInt(15));
 
-    // --- Kakek & Nenek dari Ayah (Peluang 70% hidup) ---
-    if (_random.nextInt(100) < 70) {
-      final String name = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
-      final int age = fatherBaseAge + 22 + _random.nextInt(15);
-      extList.add({
-        'name': 'Kakek ($name)',
-        'relation': 'Kakek (dari Ayah)',
-        'gender': 'Laki-laki',
-        'relationship': '50',
-        'age': '$age',
-        'isDeceased': 'false',
-      });
-    }
-    if (_random.nextInt(100) < 70) {
-      final String name = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
-      final int age = fatherBaseAge + 20 + _random.nextInt(12);
-      extList.add({
-        'name': 'Nenek ($name)',
-        'relation': 'Nenek (dari Ayah)',
-        'gender': 'Perempuan',
-        'relationship': '50',
-        'age': '$age',
-        'isDeceased': 'false',
-      });
-    }
+    // --- Kakek & Nenek dari Ayah (Selalu berpasangan, peluang hidup 70%) ---
+    final String kakekAyahId = 'kakek_ayah_${_random.nextInt(1000000)}';
+    final String nenekAyahId = 'nenek_ayah_${_random.nextInt(1000000)}';
+    final String kakekAyahName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+    final String nenekAyahName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+    final int kakekAyahAge = fatherBaseAge + 22 + _random.nextInt(15);
+    final int nenekAyahAge = fatherBaseAge + 20 + _random.nextInt(12);
+    final bool kakekAyahDeceased = _random.nextInt(100) >= 70;
+    final bool nenekAyahDeceased = _random.nextInt(100) >= 70;
 
-    // --- Kakek & Nenek dari Ibu (Peluang 70% hidup) ---
-    if (_random.nextInt(100) < 70) {
-      final String name = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
-      final int age = motherBaseAge + 22 + _random.nextInt(15);
-      extList.add({
-        'name': 'Kakek ($name)',
-        'relation': 'Kakek (dari Ibu)',
-        'gender': 'Laki-laki',
-        'relationship': '50',
-        'age': '$age',
-        'isDeceased': 'false',
-      });
-    }
-    if (_random.nextInt(100) < 70) {
-      final String name = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
-      final int age = motherBaseAge + 20 + _random.nextInt(12);
-      extList.add({
-        'name': 'Nenek ($name)',
-        'relation': 'Nenek (dari Ibu)',
-        'gender': 'Perempuan',
-        'relationship': '50',
-        'age': '$age',
-        'isDeceased': 'false',
-      });
-    }
+    extList.add({
+      'id': kakekAyahId,
+      'name': 'Kakek ($kakekAyahName)',
+      'relation': 'Kakek (dari Ayah)',
+      'gender': 'Laki-laki',
+      'relationship': '50',
+      'age': '$kakekAyahAge',
+      'isDeceased': kakekAyahDeceased.toString(),
+      'spouseId': nenekAyahId,
+    });
+    extList.add({
+      'id': nenekAyahId,
+      'name': 'Nenek ($nenekAyahName)',
+      'relation': 'Nenek (dari Ayah)',
+      'gender': 'Perempuan',
+      'relationship': '50',
+      'age': '$nenekAyahAge',
+      'isDeceased': nenekAyahDeceased.toString(),
+      'spouseId': kakekAyahId,
+    });
+
+    // --- Kakek & Nenek dari Ibu (Selalu berpasangan, peluang hidup 70%) ---
+    final String kakekIbuId = 'kakek_ibu_${_random.nextInt(1000000)}';
+    final String nenekIbuId = 'nenek_ibu_${_random.nextInt(1000000)}';
+    final String kakekIbuName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+    final String nenekIbuName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+    final int kakekIbuAge = motherBaseAge + 22 + _random.nextInt(15);
+    final int nenekIbuAge = motherBaseAge + 20 + _random.nextInt(12);
+    final bool kakekIbuDeceased = _random.nextInt(100) >= 70;
+    final bool nenekIbuDeceased = _random.nextInt(100) >= 70;
+
+    extList.add({
+      'id': kakekIbuId,
+      'name': 'Kakek ($kakekIbuName)',
+      'relation': 'Kakek (dari Ibu)',
+      'gender': 'Laki-laki',
+      'relationship': '50',
+      'age': '$kakekIbuAge',
+      'isDeceased': kakekIbuDeceased.toString(),
+      'spouseId': nenekIbuId,
+    });
+    extList.add({
+      'id': nenekIbuId,
+      'name': 'Nenek ($nenekIbuName)',
+      'relation': 'Nenek (dari Ibu)',
+      'gender': 'Perempuan',
+      'relationship': '50',
+      'age': '$nenekIbuAge',
+      'isDeceased': nenekIbuDeceased.toString(),
+      'spouseId': kakekIbuId,
+    });
 
     // --- Paman/Bibi & Sepupu ---
-    // Generate 1-2 Paman/Bibi dari Ayah dan Ibu masing-masing
-    _generateUnclesAndCousins(extList, character, 'Ayah', maleFirstNames, femaleFirstNames, lastNames, fatherBaseAge);
-    _generateUnclesAndCousins(extList, character, 'Ibu', maleFirstNames, femaleFirstNames, lastNames, motherBaseAge);
+    _generateUnclesAndCousins(extList, character, 'Ayah', kakekAyahId, nenekAyahId, maleFirstNames, femaleFirstNames, lastNames, fatherBaseAge);
+    _generateUnclesAndCousins(extList, character, 'Ibu', kakekIbuId, nenekIbuId, maleFirstNames, femaleFirstNames, lastNames, motherBaseAge);
 
     character.extendedFamily = extList;
   }
@@ -384,6 +425,8 @@ class FamilyGenerator {
     List<Map<String, String>> extList,
     Character character,
     String side,
+    String parentKakekId,
+    String parentNenekId,
     List<String> maleFirstNames,
     List<String> femaleFirstNames,
     List<String> lastNames,
@@ -395,23 +438,26 @@ class FamilyGenerator {
       final String genderStr = isMale ? 'male' : 'female';
       final String name = _generateRandomName(genderStr, maleFirstNames, femaleFirstNames, lastNames);
       final String relationLabel = isMale ? 'Paman' : 'Bibi';
+      final String memberId = 'ext_${side.toLowerCase()}_${_random.nextInt(1000000)}';
       
-      // Usia: sekitar 3 tahun lebih muda atau lebih tua dari orang tua
       final int age = baseAge + (_random.nextBool() ? 3 : -3) + _random.nextInt(6);
       
-      // Tambahkan Paman/Bibi
-      extList.add({
+      final Map<String, String> relativeMap = {
+        'id': memberId,
         'name': '$relationLabel ($name)',
         'relation': '$relationLabel (dari $side)',
         'gender': isMale ? 'Laki-laki' : 'Perempuan',
         'relationship': '50',
         'age': '$age',
         'isDeceased': 'false',
-      });
+        'parentIds': '$parentKakekId,$parentNenekId',
+      };
 
-      // Peluang 60% Paman/Bibi memiliki pasangan (Suami/Istri)
-      bool hasSpouse = _random.nextInt(100) < 60;
+      // Peluang 75% Paman/Bibi memiliki pasangan (Suami/Istri)
+      bool hasSpouse = _random.nextInt(100) < 75;
+      String? spouseId;
       if (hasSpouse) {
+        spouseId = 'spouse_${_random.nextInt(1000000)}';
         final String spouseGender = isMale ? 'Perempuan' : 'Laki-laki';
         final String spouseName = _generateRandomName(
           spouseGender == 'Laki-laki' ? 'male' : 'female',
@@ -420,20 +466,24 @@ class FamilyGenerator {
           lastNames,
         );
         final int spouseAge = age - 1 - _random.nextInt(5);
-        // Tambahkan pasangan
+        relativeMap['spouseId'] = spouseId;
+        
         extList.add({
+          'id': spouseId,
           'name': 'Pasangan $relationLabel ($spouseName)',
           'relation': 'Pasangan $relationLabel',
           'gender': spouseGender,
           'relationship': '70',
           'age': '$spouseAge',
           'isDeceased': 'false',
+          'spouseId': memberId,
         });
       }
 
-      // Peluang 90% Paman/Bibi (baik single maupun berpasangan) memiliki 1-2 anak (Sepupu)
+      // Peluang 90% memiliki 1-2 anak (Sepupu)
       if (_random.nextInt(100) < 90) {
         int cousinCount = _random.nextInt(2) + 1;
+        List<String> cousinIds = [];
         for (int c = 0; c < cousinCount; c++) {
           final bool isCousinMale = _random.nextBool();
           final String cousinName = _generateRandomName(
@@ -442,18 +492,25 @@ class FamilyGenerator {
             femaleFirstNames,
             lastNames,
           );
-          // Usia sepupu: -5 hingga +10 tahun dari karakter utama
-          final int cousinAge = _random.nextInt(16) - 5; // -5..10
+          final int cousinAge = _random.nextInt(16) - 5;
+          final String cousinId = 'cousin_${_random.nextInt(1000000)}';
+          cousinIds.add(cousinId);
+
           extList.add({
+            'id': cousinId,
             'name': 'Sepupu ($cousinName)',
             'relation': 'Sepupu (dari $side)',
             'gender': isCousinMale ? 'Laki-laki' : 'Perempuan',
             'relationship': '50',
             'age': '$cousinAge',
             'isDeceased': 'false',
+            'parentIds': spouseId != null ? '$memberId,$spouseId' : memberId,
           });
         }
+        relativeMap['childrenIds'] = cousinIds.join(',');
       }
+
+      extList.add(relativeMap);
     }
   }
 

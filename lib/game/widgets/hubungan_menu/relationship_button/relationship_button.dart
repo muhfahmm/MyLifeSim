@@ -81,52 +81,99 @@ class RelationshipButton extends StatelessWidget {
               // ============================================
               // 1. BAGIAN ORANGTUA
               // ============================================
-              const Text('👨👩👧 Orangtua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-              const SizedBox(height: 8),
-              if (character.fatherName != null)
-                _buildFamilyItem(
-                  context,
-                  icon: Icons.person,
-                  label: character.isFatherDeceased
-                      ? 'Ayah (${character.fatherName}) (Wafat)'
-                      : (character.isFatherDivorced
-                          ? 'Ayah (${character.fatherName}) (Cerai)'
-                          : 'Ayah (${character.fatherName})'),
-                  status: character.isFatherDivorced ? 'Cerai' : 'Kandung',
-                  color: character.isFatherDeceased ? Colors.grey : Colors.blue,
-                  relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
-                  ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
-                  isDeceased: character.isFatherDeceased,
-                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.fatherName!,
-                    gender: 'Laki-laki',
-                    age: character.fatherAge ?? 40,
-                    happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
-                    forcedSkinColor: character.fatherSkinColor,
+              if (character.isFatherDivorced || character.isMotherDivorced) ...[
+                if (character.fatherName != null) ...[
+                  const Text('👨 Ayah (Terpisah)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person,
+                    label: character.isFatherDeceased
+                        ? 'Ayah (${character.fatherName}) (Wafat)'
+                        : 'Ayah (${character.fatherName}) (Cerai)',
+                    status: 'Cerai',
+                    color: character.isFatherDeceased ? Colors.grey : Colors.blue,
+                    relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                    ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isFatherDeceased,
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.fatherName!,
+                      gender: 'Laki-laki',
+                      age: character.fatherAge ?? 40,
+                      happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                      forcedSkinColor: character.fatherSkinColor,
+                    ),
                   ),
-                ),
-              if (character.motherName != null)
-                _buildFamilyItem(
-                  context,
-                  icon: Icons.person_outline,
-                  label: character.isMotherDeceased
-                      ? 'Ibu (${character.motherName}) (Wafat)'
-                      : (character.isMotherDivorced
-                          ? 'Ibu (${character.motherName}) (Cerai)'
-                          : 'Ibu (${character.motherName})'),
-                  status: character.isMotherDivorced ? 'Cerai' : 'Kandung',
-                  color: character.isMotherDeceased ? Colors.grey : Colors.pink,
-                  relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
-                  ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
-                  isDeceased: character.isMotherDeceased,
-                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.motherName!,
-                    gender: 'Perempuan',
-                    age: character.motherAge ?? 40,
-                    happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
-                    forcedSkinColor: character.motherSkinColor,
+                  const SizedBox(height: 16),
+                ],
+                if (character.motherName != null) ...[
+                  const Text('👩 Ibu (Terpisah)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person_outline,
+                    label: character.isMotherDeceased
+                        ? 'Ibu (${character.motherName}) (Wafat)'
+                        : 'Ibu (${character.motherName}) (Cerai)',
+                    status: 'Cerai',
+                    color: character.isMotherDeceased ? Colors.grey : Colors.pink,
+                    relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                    ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isMotherDeceased,
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.motherName!,
+                      gender: 'Perempuan',
+                      age: character.motherAge ?? 40,
+                      happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                      forcedSkinColor: character.motherSkinColor,
+                    ),
                   ),
-                ),
+                  const SizedBox(height: 16),
+                ],
+              ] else ...[
+                const Text('👨👩👧 Orangtua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                const SizedBox(height: 8),
+                if (character.fatherName != null)
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person,
+                    label: character.isFatherDeceased
+                        ? 'Ayah (${character.fatherName}) (Wafat)'
+                        : 'Ayah (${character.fatherName})',
+                    status: 'Kandung',
+                    color: character.isFatherDeceased ? Colors.grey : Colors.blue,
+                    relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                    ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isFatherDeceased,
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.fatherName!,
+                      gender: 'Laki-laki',
+                      age: character.fatherAge ?? 40,
+                      happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                      forcedSkinColor: character.fatherSkinColor,
+                    ),
+                  ),
+                if (character.motherName != null)
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person_outline,
+                    label: character.isMotherDeceased
+                        ? 'Ibu (${character.motherName}) (Wafat)'
+                        : 'Ibu (${character.motherName})',
+                    status: 'Kandung',
+                    color: character.isMotherDeceased ? Colors.grey : Colors.pink,
+                    relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                    ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isMotherDeceased,
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.motherName!,
+                      gender: 'Perempuan',
+                      age: character.motherAge ?? 40,
+                      happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                      forcedSkinColor: character.motherSkinColor,
+                    ),
+                  ),
+              ],
               if (character.stepFatherName != null)
                 _buildFamilyItem(
                   context,
