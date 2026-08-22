@@ -651,14 +651,11 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
 
             // === PASANGAN ===
             if (spouseList.isNotEmpty) ...[
+              // Tentukan header berdasarkan relasi pasangan pertama
               _buildSectionHeader(
-                spouseList.first['relation'] == 'Mantan Istri'
-                    ? 'Mantan Istri'
-                    : (spouseList.first['relation'] == 'Mantan Suami'
-                        ? 'Mantan Suami'
-                        : 'Suami / Istri'),
-                Icons.favorite,
-                Colors.red,
+                _getSpouseHeaderTitle(spouseList.first['relation'] ?? ''),
+                _getSpouseHeaderIcon(spouseList.first['relation'] ?? ''),
+                _getSpouseHeaderColor(spouseList.first['relation'] ?? ''),
               ),
               ...spouseList.map((sp) => _buildPersonCard(
                 name: sp['name'] ?? 'Pasangan',
@@ -667,7 +664,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                 age: int.tryParse(sp['age']?.toString() ?? '0') ?? 0,
                 isDeceased: sp['isDeceased'] == 'true',
                 isDivorced: false,
-                borderColor: Colors.red,
+                borderColor: _getSpouseHeaderColor(sp['relation'] ?? ''),
                 rawMemberData: sp,
               )),
             ],
@@ -707,5 +704,33 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
         ),
       ),
     );
+  }
+
+  // Helper functions for spouse header
+  String _getSpouseHeaderTitle(String relation) {
+    final String rel = relation.toLowerCase();
+    if (rel.contains('pacar')) return 'Pacar';
+    if (rel.contains('tunangan')) return 'Tunangan';
+    if (rel.contains('suami') || rel.contains('istri')) return 'Suami / Istri';
+    if (rel.contains('mantan')) return 'Mantan';
+    return 'Pasangan';
+  }
+
+  IconData _getSpouseHeaderIcon(String relation) {
+    final String rel = relation.toLowerCase();
+    if (rel.contains('pacar')) return Icons.favorite_border;
+    if (rel.contains('tunangan')) return Icons.diamond;
+    if (rel.contains('suami') || rel.contains('istri')) return Icons.wc;
+    if (rel.contains('mantan')) return Icons.heart_broken;
+    return Icons.favorite;
+  }
+
+  Color _getSpouseHeaderColor(String relation) {
+    final String rel = relation.toLowerCase();
+    if (rel.contains('pacar')) return Colors.pinkAccent;
+    if (rel.contains('tunangan')) return Colors.amber;
+    if (rel.contains('suami') || rel.contains('istri')) return Colors.red;
+    if (rel.contains('mantan')) return Colors.grey;
+    return Colors.red;
   }
 }
