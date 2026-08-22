@@ -102,8 +102,19 @@ class AvatarAgeRules {
     int happiness = 50,
     String? forcedSkinColor, // override warna kulit (untuk warisan)
   }) {
+    // Ekstrak nama bersih dari string seperti "Ibu (Bunga Luthfi)"
+    String cleanName = name;
+    if (name.contains('(') && name.contains(')')) {
+      final int start = name.indexOf('(') + 1;
+      final int end = name.indexOf(')');
+      if (start < end) {
+        cleanName = name.substring(start, end).replaceAll(' (Wafat)', '').replaceAll('(Wafat)', '').trim();
+      }
+    }
+    cleanName = cleanName.replaceAll(' (Wafat)', '').replaceAll('(Wafat)', '').trim();
+
     final dummy = Character(
-      name: name,
+      name: cleanName,
       gender: gender,
       location: 'Indonesia',
       age: age,

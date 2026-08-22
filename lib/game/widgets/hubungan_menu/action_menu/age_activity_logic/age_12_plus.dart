@@ -434,11 +434,26 @@ List<ActionItem> getAge12PlusActions(
             }
           }
 
+          // Tentukan nilai hubungan awal yang tepat:
+          // Jika target adalah orang tua, gunakan field hubungan mereka
+          // agar kartu keluarga dan kartu pacar menampilkan angka yang sama.
+          int initialRelForPartner = currentRel;
+          final String lowerTarget = targetName.toLowerCase();
+          if (lowerTarget.startsWith('ibu') && !lowerTarget.contains('tiri')) {
+            initialRelForPartner = character.motherRelationship ?? 50;
+          } else if (lowerTarget.startsWith('ayah') && !lowerTarget.contains('tiri')) {
+            initialRelForPartner = character.fatherRelationship ?? 50;
+          } else if (lowerTarget.startsWith('ibu') && lowerTarget.contains('tiri')) {
+            initialRelForPartner = character.stepMotherRelationship ?? 50;
+          } else if (lowerTarget.startsWith('ayah') && lowerTarget.contains('tiri')) {
+            initialRelForPartner = character.stepFatherRelationship ?? 50;
+          }
+
           final newPartnerData = {
             'name': targetName,
             'gender': partnerGender,
             'age': '$actualTargetAge',
-            'relationship': currentRel.toString(),
+            'relationship': initialRelForPartner.toString(),
             'relation': 'Pacar',
           };
 

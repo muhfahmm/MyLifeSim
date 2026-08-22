@@ -3,8 +3,24 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/masturbate.dart';
-
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbasi_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/love/love_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/bercinta/bercinta_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/kesehatan/olahraga_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/aksesoris_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/adopsi_anak_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/kriminal/kriminal_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/kesuburan/kesuburan_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lisensi/lisensi_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lotre/lotre_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/pikiran_tubuh/pikiran_tubuh_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/peliharaan_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/operasi_plastik/operasi_plastik_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/rehabilitasi/rehabilitasi_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/salon_spa/salon_spa_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/school_menu_page.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
@@ -163,7 +179,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  onExercise();
+                  OlahragaMenuHelper.showOlahragaMenu(context, character, onRefresh);
                 },
               ),
 
@@ -182,7 +198,7 @@ class ActivityButton extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Aksesoris -> usia minimal 12
+              // Aksesoris
               _buildActivityTile(
                 context: context,
                 label: 'Aksesoris',
@@ -193,9 +209,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur aksesoris belum tersedia')),
-                  );
+                  AksesorisMenuHelper.showAksesorisMenu(context, character, onRefresh);
                 },
               ),
 
@@ -210,9 +224,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur adopsi anak belum tersedia')),
-                  );
+                  AdopsiAnakMenuHelper.showAdopsiAnakMenu(context, character, onRefresh);
                 },
               ),
 
@@ -227,9 +239,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur kriminal belum tersedia')),
-                  );
+                  KriminalMenuHelper.showKriminalMenu(context, character, onRefresh);
                 },
               ),
 
@@ -244,9 +254,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur dokter belum tersedia')),
-                  );
+                  DokterMenuHelper.showDokterMenu(context, character, onRefresh);
                 },
               ),
 
@@ -261,9 +269,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur imigrasi belum tersedia')),
-                  );
+                  ImigrasimMenuHelper.showImigrasimMenu(context, character, onRefresh);
                 },
               ),
 
@@ -278,9 +284,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur kesuburan belum tersedia')),
-                  );
+                  KesuburanMenuHelper.showKesuburanMenu(context, character, onRefresh);
                 },
               ),
 
@@ -295,9 +299,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur lisensi belum tersedia')),
-                  );
+                  LisensiMenuHelper.showLisensiMenu(context, character, onRefresh);
                 },
               ),
 
@@ -312,9 +314,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur lotre belum tersedia')),
-                  );
+                  LotreMenuHelper.showLotreMenu(context, character, onRefresh);
                 },
               ),
 
@@ -329,9 +329,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur bercinta belum tersedia')),
-                  );
+                  BercintaMenuHelper.showBercintaMenu(context, character, onRefresh);
                 },
               ),
 
@@ -346,9 +344,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur pikiran dan tubuh belum tersedia')),
-                  );
+                  PikiranTubuhMenuHelper.showPikiranTubuhMenu(context, character, onRefresh);
                 },
               ),
 
@@ -363,9 +359,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur peliharaan belum tersedia')),
-                  );
+                  PeliharaanMenuHelper.showPeliharaanMenu(context, character, onRefresh);
                 },
               ),
 
@@ -380,9 +374,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur operasi plastik belum tersedia')),
-                  );
+                  OperasiPlastikMenuHelper.showOperasiPlastikMenu(context, character, onRefresh);
                 },
               ),
 
@@ -397,9 +389,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur rehabilitasi belum tersedia')),
-                  );
+                  RehabilitasiMenuHelper.showRehabilitasiMenu(context, character, onRefresh);
                 },
               ),
 
@@ -414,13 +404,11 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur salon & spa belum tersedia')),
-                  );
+                  SalonSpaMenuHelper.showSalonSpaMenu(context, character, onRefresh);
                 },
               ),
 
-              // Berbelanja -> usia minimal 12
+              // Berbelanja
               _buildActivityTile(
                 context: context,
                 label: 'Berbelanja',
@@ -431,9 +419,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur berbelanja belum tersedia')),
-                  );
+                  BerbelanjaMenuHelper.showBerbelanjaMenu(context, character, onRefresh);
                 },
               ),
 
@@ -474,7 +460,7 @@ class ActivityButton extends StatelessWidget {
                   ),
                 ),
 
-              // Love (misalnya aktivitas romantis, usia minimal 16)
+              // Love (aktivitas romantis, usia minimal 16)
               _buildActivityTile(
                 context: context,
                 label: 'Love (Cinta)',
@@ -485,9 +471,7 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () {
                   Navigator.pop(context);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Fitur love belum tersedia')),
-                  );
+                  LoveMenuHelper.showLoveMenu(context, character, onRefresh);
                 },
               ),
             ],

@@ -254,13 +254,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Kandung' && name.startsWith('Ayah')) {
+    final String nameLower = name.toLowerCase();
+    if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
       return widget.character.fatherName ?? name;
-    } else if (role == 'Kandung' && name.startsWith('Ibu')) {
+    } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
       return widget.character.motherName ?? name;
-    } else if (role == 'Tiri' && name.startsWith('Ayah')) {
+    } else if (nameLower.contains('ayah tiri')) {
       return widget.character.stepFatherName ?? name;
-    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+    } else if (nameLower.contains('ibu tiri')) {
       return widget.character.stepMotherName ?? name;
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
@@ -309,14 +310,44 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             role == 'Istri' ||
             role.contains('Pacar')) &&
         role != 'Mantan Pacar') {
+      final String plainName = _getPlainTargetName().toLowerCase();
+      // SUMBER TUNGGAL: Jika pacar adalah Ibu kandung, gunakan motherRelationship
+      if (widget.character.motherName != null &&
+          widget.character.motherName!.toLowerCase() == plainName) {
+        final int val = widget.character.motherRelationship ?? 50;
+        // Sinkronkan partner map agar konsisten
+        if (widget.character.partner != null &&
+            widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+          widget.character.partner!['relationship'] = val.toString();
+        }
+        if (widget.character.secondPartner != null &&
+            widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+          widget.character.secondPartner!['relationship'] = val.toString();
+        }
+        return val;
+      }
+      // SUMBER TUNGGAL: Jika pacar adalah Ayah kandung, gunakan fatherRelationship
+      if (widget.character.fatherName != null &&
+          widget.character.fatherName!.toLowerCase() == plainName) {
+        final int val = widget.character.fatherRelationship ?? 50;
+        if (widget.character.partner != null &&
+            widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+          widget.character.partner!['relationship'] = val.toString();
+        }
+        if (widget.character.secondPartner != null &&
+            widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+          widget.character.secondPartner!['relationship'] = val.toString();
+        }
+        return val;
+      }
       if (widget.character.partner != null &&
-          widget.character.partner!['name'] == name) {
+          widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
         return int.tryParse(
                 widget.character.partner!['relationship'] ?? '50') ??
             50;
       }
       if (widget.character.secondPartner != null &&
-          widget.character.secondPartner!['name'] == name) {
+          widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
         return int.tryParse(
                 widget.character.secondPartner!['relationship'] ?? '50') ??
             50;
@@ -345,18 +376,37 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Kandung' && name.startsWith('Ayah')) {
-      return widget.character.fatherRelationship ?? 50;
-    } else if (role == 'Kandung' && name.startsWith('Ibu')) {
-      return widget.character.motherRelationship ?? 50;
-    } else if (role == 'Tiri' && name.startsWith('Ayah')) {
+    final String nameLower = name.toLowerCase();
+    if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
+      final int val = widget.character.fatherRelationship ?? 50;
+      // Sinkronkan partner map jika Ayah juga pasangan
+      final String cleanF = (widget.character.fatherName ?? '').toLowerCase();
+      if (cleanF.isNotEmpty) {
+        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanF)) {
+          widget.character.partner!['relationship'] = val.toString();
+        }
+        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanF)) {
+          widget.character.secondPartner!['relationship'] = val.toString();
+        }
+      }
+      return val;
+    } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
+      final int val = widget.character.motherRelationship ?? 50;
+      // Sinkronkan partner map jika Ibu juga pasangan
+      final String cleanM = (widget.character.motherName ?? '').toLowerCase();
+      if (cleanM.isNotEmpty) {
+        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanM)) {
+          widget.character.partner!['relationship'] = val.toString();
+        }
+        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanM)) {
+          widget.character.secondPartner!['relationship'] = val.toString();
+        }
+      }
+      return val;
+    } else if (nameLower.contains('ayah tiri')) {
       return widget.character.stepFatherRelationship ?? 50;
-    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+    } else if (nameLower.contains('ibu tiri')) {
       return widget.character.stepMotherRelationship ?? 50;
-    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
-      return widget.character.fatherRelationship ?? 50;
-    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
-      return widget.character.motherRelationship ?? 50;
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
@@ -411,16 +461,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             role == 'Istri' ||
             role.contains('Pacar')) &&
         role != 'Mantan Pacar') {
-      // PERBAIKAN: Tambahkan widget. di depan character
+      final String plainTargetName = _getPlainTargetName().toLowerCase();
+      // SYNC: Jika pacar yang diupdate adalah Ibu kandung
+      if (widget.character.motherName != null && widget.character.motherName!.toLowerCase() == plainTargetName) {
+        widget.character.motherRelationship =
+            ((widget.character.motherRelationship ?? 50) + changeAmount)
+                .clamp(0, 100);
+      }
+      // SYNC: Jika pacar yang diupdate adalah Ayah kandung
+      if (widget.character.fatherName != null && widget.character.fatherName!.toLowerCase() == plainTargetName) {
+        widget.character.fatherRelationship =
+            ((widget.character.fatherRelationship ?? 50) + changeAmount)
+                .clamp(0, 100);
+      }
+
       if (widget.character.partner != null &&
-          widget.character.partner!['name'] == name) {
+          widget.character.partner!['name']!.toLowerCase().contains(plainTargetName)) {
         int currentRel =
             int.tryParse(widget.character.partner!['relationship'] ?? '50') ??
                 50;
         widget.character.partner!['relationship'] =
             (currentRel + changeAmount).clamp(0, 100).toString();
       } else if (widget.character.secondPartner != null &&
-          widget.character.secondPartner!['name'] == name) {
+          widget.character.secondPartner!['name']!.toLowerCase().contains(plainTargetName)) {
         int currentRel = int.tryParse(
                 widget.character.secondPartner!['relationship'] ?? '50') ??
             50;
@@ -443,29 +506,42 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return;
     }
 
-    if (role == 'Kandung' && name.startsWith('Ayah')) {
+    final String nameLower = name.toLowerCase();
+    if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
       widget.character.fatherRelationship =
           ((widget.character.fatherRelationship ?? 50) + changeAmount)
               .clamp(0, 100);
-    } else if (role == 'Kandung' && name.startsWith('Ibu')) {
+      // SYNC: Update matching partner map
+      final String cleanF = (widget.character.fatherName ?? '').toLowerCase();
+      if (cleanF.isNotEmpty) {
+        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanF)) {
+          widget.character.partner!['relationship'] = widget.character.fatherRelationship.toString();
+        }
+        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanF)) {
+          widget.character.secondPartner!['relationship'] = widget.character.fatherRelationship.toString();
+        }
+      }
+    } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
       widget.character.motherRelationship =
           ((widget.character.motherRelationship ?? 50) + changeAmount)
               .clamp(0, 100);
-    } else if (role == 'Tiri' && name.startsWith('Ayah')) {
+      // SYNC: Update matching partner map
+      final String cleanM = (widget.character.motherName ?? '').toLowerCase();
+      if (cleanM.isNotEmpty) {
+        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanM)) {
+          widget.character.partner!['relationship'] = widget.character.motherRelationship.toString();
+        }
+        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanM)) {
+          widget.character.secondPartner!['relationship'] = widget.character.motherRelationship.toString();
+        }
+      }
+    } else if (nameLower.contains('ayah tiri')) {
       widget.character.stepFatherRelationship =
           ((widget.character.stepFatherRelationship ?? 50) + changeAmount)
               .clamp(0, 100);
-    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+    } else if (nameLower.contains('ibu tiri')) {
       widget.character.stepMotherRelationship =
           ((widget.character.stepMotherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
-      widget.character.fatherRelationship =
-          ((widget.character.fatherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
-      widget.character.motherRelationship =
-          ((widget.character.motherRelationship ?? 50) + changeAmount)
               .clamp(0, 100);
     } else if (role == 'Laki-laki' || role == 'Perempuan') {
       // Ini adalah anak

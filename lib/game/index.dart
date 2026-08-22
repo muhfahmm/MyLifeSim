@@ -1033,11 +1033,31 @@ class _GameScreenState extends State<GameScreen> {
               } else if (type == 'Ajak Pacaran') {
                 setState(() {
                   final String relationRole = _character.partner != null ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
+
+                  // Tentukan nilai hubungan awal: gunakan nilai orang tua yang sudah ada
+                  // agar kartu keluarga dan kartu pacar menampilkan angka yang sama.
+                  // Gunakan cleanName (nama tanpa prefix role seperti "Ibu (...)") untuk perbandingan.
+                  int initialRelationship = 50; // default
+                  final String lowerCleanName = cleanName.toLowerCase();
+                  if (_character.motherName != null &&
+                      _character.motherName!.toLowerCase() == lowerCleanName) {
+                    initialRelationship = _character.motherRelationship ?? 50;
+                  } else if (_character.fatherName != null &&
+                      _character.fatherName!.toLowerCase() == lowerCleanName) {
+                    initialRelationship = _character.fatherRelationship ?? 50;
+                  } else if (_character.stepMotherName != null &&
+                      _character.stepMotherName!.toLowerCase() == lowerCleanName) {
+                    initialRelationship = _character.stepMotherRelationship ?? 50;
+                  } else if (_character.stepFatherName != null &&
+                      _character.stepFatherName!.toLowerCase() == lowerCleanName) {
+                    initialRelationship = _character.stepFatherRelationship ?? 50;
+                  }
+
                   final Map<String, String> newPartnerData = {
                     'name': partnerName,
                     'gender': proposal['gender']?.toString() ?? 'Perempuan',
                     'age': proposal['age']?.toString() ?? '20',
-                    'relationship': '100',
+                    'relationship': initialRelationship.toString(),
                     'relation': relationRole,
                   };
 
@@ -1061,6 +1081,7 @@ class _GameScreenState extends State<GameScreen> {
 
                   _character.activeProposal = null;
                 });
+
                 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
