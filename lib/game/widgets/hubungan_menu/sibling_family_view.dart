@@ -414,7 +414,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
       // 1. Orang tua dari Ayah/Ibu (yaitu Kakek & Nenek dari side tersebut)
       for (var ext in c.extendedFamily) {
         final String extRel = ext['relation'] ?? '';
-        if ((extRel.contains('Kakek') || extRel.contains('Nenek')) && extRel.contains(side)) {
+        if ((extRel.contains('Kakek') || extRel.contains('Nenek')) && extRel.contains('dari $side')) {
           _addWithoutDuplicate(parentsList, ext);
         }
       }
@@ -442,7 +442,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
       // 3. Saudara dari Ayah/Ibu (yaitu Paman & Bibi dari side tersebut)
       for (var ext in c.extendedFamily) {
         final String extRel = ext['relation'] ?? '';
-        if ((extRel.contains('Paman') || extRel.contains('Bibi')) && extRel.contains(side) && !extRel.contains('Pasangan')) {
+        if ((extRel.contains('Paman') || extRel.contains('Bibi')) && extRel.contains('dari $side') && !extRel.contains('Pasangan')) {
           _addWithoutDuplicate(siblingsList, ext);
         }
       }

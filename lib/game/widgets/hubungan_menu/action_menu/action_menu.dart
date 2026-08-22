@@ -41,8 +41,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   String _getCurrentAgeValue() {
     final String role = widget.targetRole;
     final String name = widget.targetName;
+    final String cleanRole = role.toLowerCase();
+    final String cleanName = name.toLowerCase();
 
-    if (role == 'Mantan Pacar') {
+    // Cek Nama Biologis & Tiri Terlebih Dahulu (Agar tidak peduli role apa pun yang di-passing)
+    if (widget.character.fatherName != null &&
+        (cleanName == widget.character.fatherName!.toLowerCase() || cleanName.contains(widget.character.fatherName!.toLowerCase()))) {
+      return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
+    }
+    if (widget.character.motherName != null &&
+        (cleanName == widget.character.motherName!.toLowerCase() || cleanName.contains(widget.character.motherName!.toLowerCase()))) {
+      return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
+    }
+    if (widget.character.stepFatherName != null &&
+        (cleanName == widget.character.stepFatherName!.toLowerCase() || cleanName.contains(widget.character.stepFatherName!.toLowerCase()))) {
+      return widget.character.stepFatherAge != null ? '${widget.character.stepFatherAge} tahun' : 'Tidak diketahui';
+    }
+    if (widget.character.stepMotherName != null &&
+        (cleanName == widget.character.stepMotherName!.toLowerCase() || cleanName.contains(widget.character.stepMotherName!.toLowerCase()))) {
+      return widget.character.stepMotherAge != null ? '${widget.character.stepMotherAge} tahun' : 'Tidak diketahui';
+    }
+
+    // Cek berdasarkan Role
+    if (cleanRole.contains('mantan pacar')) {
       for (var ex in widget.character.exPartners) {
         if (ex['name'] == name) {
           return '${ex['age']} tahun';
@@ -50,7 +71,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    if (role == 'Pacar' || role == 'Tunangan' || role == 'Suami' || role == 'Istri' || role.startsWith('Pacar')) {
+    if (cleanRole.contains('pacar') || cleanRole.contains('tunangan') || cleanRole.contains('suami') || cleanRole.contains('istri')) {
       if (widget.character.partner != null && name.contains(widget.character.partner!['name'] ?? '')) {
         return '${widget.character.partner!['age']} tahun';
       }
@@ -66,13 +87,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       if (widget.character.fifthPartner != null && name.contains(widget.character.fifthPartner!['name'] ?? '')) {
         return '${widget.character.fifthPartner!['age']} tahun';
       }
-      // Check exPartners fallback
       for (var ex in widget.character.exPartners) {
         if (name.contains(ex['name'] ?? '')) {
           return '${ex['age']} tahun';
         }
       }
-      // Check classmates fallback
       for (var cm in widget.character.classmates) {
         if (name.contains(cm['name'] ?? '')) {
           return '${cm['age']} tahun';
@@ -81,33 +100,39 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return 'Tidak diketahui';
     }
 
-    if (role == 'Mertua') {
-      if (name.startsWith('Ayah Mertua')) {
+    if (cleanRole.contains('mertua')) {
+      if (name.startsWith('Ayah Mertua') || cleanRole.contains('ayah')) {
         return widget.character.fatherInLawAge != null ? '${widget.character.fatherInLawAge} tahun' : 'Tidak diketahui';
       } else {
         return widget.character.motherInLawAge != null ? '${widget.character.motherInLawAge} tahun' : 'Tidak diketahui';
       }
     }
 
-    if (role == 'Kandung' && name.startsWith('Ayah')) {
+    if (cleanRole.contains('ayah') && !cleanRole.contains('tiri')) {
       return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Kandung' && name.startsWith('Ibu')) {
+    }
+    if (cleanRole.contains('ibu') && !cleanRole.contains('tiri')) {
       return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Tiri' && name.startsWith('Ayah')) {
+    }
+
+    if (cleanRole == 'kandung' && name.startsWith('Ayah')) {
+      return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
+    } else if (cleanRole == 'kandung' && name.startsWith('Ibu')) {
+      return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
+    } else if (cleanRole == 'tiri' && name.startsWith('Ayah')) {
       return widget.character.stepFatherAge != null ? '${widget.character.stepFatherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Tiri' && name.startsWith('Ibu')) {
+    } else if (cleanRole == 'tiri' && name.startsWith('Ibu')) {
       return widget.character.stepMotherAge != null ? '${widget.character.stepMotherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Cerai' && name.startsWith('Ayah')) {
+    } else if (cleanRole == 'cerai' && name.startsWith('Ayah')) {
       return widget.character.fatherAge != null ? '${widget.character.fatherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Cerai' && name.startsWith('Ibu')) {
+    } else if (cleanRole == 'cerai' && name.startsWith('Ibu')) {
       return widget.character.motherAge != null ? '${widget.character.motherAge} tahun' : 'Tidak diketahui';
-    } else if (role == 'Laki-laki' || role == 'Perempuan') {
+    } else if (cleanRole == 'laki-laki' || cleanRole == 'perempuan') {
       // Ini adalah anak
       for (var child in widget.character.children) {
         final String childName = child['name'] ?? '';
-        // Bersihkan nama dari '(Wafat)' jika ada
-        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
-        if (childName == cleanName) {
+        final String cleanChildName = name.replaceAll(' (Wafat)', '').trim();
+        if (childName == cleanChildName) {
           int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
           return '$childAge tahun';
         }
@@ -115,14 +140,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     } else {
       // Cek di extended family
       for (var ext in widget.character.extendedFamily) {
-        if (ext['name'] == name) {
+        if (ext['name'] == name || (ext['name'] != null && name.contains(ext['name']!))) {
           int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
           return extAge < 0 ? 'Belum Lahir (Dalam Kandungan)' : '$extAge tahun';
         }
       }
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';
-        if (expectedLabel == name) {
+        if (expectedLabel == name || sib['name'] == name) {
           int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
           return sibAge < 0 ? 'Belum Lahir (Dalam Kandungan)' : '$sibAge tahun';
         }

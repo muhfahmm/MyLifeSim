@@ -365,7 +365,7 @@ class FamilyGenerator {
     extList.add({
       'id': kakekAyahId,
       'name': 'Kakek ($kakekAyahName)',
-      'relation': 'Kakek (dari Ayah)',
+      'relation': 'Kakek (Ayah dari Ayah)',
       'gender': 'Laki-laki',
       'relationship': '50',
       'age': '$kakekAyahAge',
@@ -375,7 +375,7 @@ class FamilyGenerator {
     extList.add({
       'id': nenekAyahId,
       'name': 'Nenek ($nenekAyahName)',
-      'relation': 'Nenek (dari Ayah)',
+      'relation': 'Nenek (Ibu dari Ayah)',
       'gender': 'Perempuan',
       'relationship': '50',
       'age': '$nenekAyahAge',
@@ -396,7 +396,7 @@ class FamilyGenerator {
     extList.add({
       'id': kakekIbuId,
       'name': 'Kakek ($kakekIbuName)',
-      'relation': 'Kakek (dari Ibu)',
+      'relation': 'Kakek (Ayah dari Ibu)',
       'gender': 'Laki-laki',
       'relationship': '50',
       'age': '$kakekIbuAge',
@@ -406,7 +406,7 @@ class FamilyGenerator {
     extList.add({
       'id': nenekIbuId,
       'name': 'Nenek ($nenekIbuName)',
-      'relation': 'Nenek (dari Ibu)',
+      'relation': 'Nenek (Ibu dari Ibu)',
       'gender': 'Perempuan',
       'relationship': '50',
       'age': '$nenekIbuAge',
@@ -442,10 +442,11 @@ class FamilyGenerator {
       
       final int age = baseAge + (_random.nextBool() ? 3 : -3) + _random.nextInt(6);
       
+      final String detailRelation = isMale ? 'Saudara Laki-laki dari $side' : 'Saudara Perempuan dari $side';
       final Map<String, String> relativeMap = {
         'id': memberId,
         'name': '$relationLabel ($name)',
-        'relation': '$relationLabel (dari $side)',
+        'relation': '$relationLabel ($detailRelation)',
         'gender': isMale ? 'Laki-laki' : 'Perempuan',
         'relationship': '50',
         'age': '$age',
