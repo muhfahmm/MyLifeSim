@@ -95,7 +95,13 @@ class HubunganIntimLogic {
     required int partnerBonus,
     required Random random,
     int? playerAge,
+    String? custodyParent,
+    bool isAlreadyPartner = false,
   }) {
+    // Jika sudah menjadi pacar → 80% penerimaan
+    if (isAlreadyPartner) {
+      return random.nextInt(100) < 80;
+    }
     final String targetNameLower = targetName.toLowerCase();
     final String targetRoleLower = targetRole.toLowerCase();
     final bool isChild = targetRole == 'Laki-laki' || targetRole == 'Perempuan';
@@ -149,16 +155,61 @@ class HubunganIntimLogic {
     } 
     // 2. Logika Anak Mengajak Orang Tua
     else if (targetNameLower.startsWith('ayah') || targetNameLower.contains('ayah')) {
-      if (myGender == 'laki-laki') {
+      if (custodyParent == 'Ayah' && cleanMyGender == 'perempuan') {
+        success = random.nextInt(100) < (70 + partnerBonus);
+      } else if (myGender == 'laki-laki') {
         success = random.nextInt(100) < (10 + partnerBonus);
       } else {
         success = random.nextInt(100) < (30 + partnerBonus);
       }
     } else if (targetNameLower.startsWith('ibu') || targetNameLower.contains('ibu')) {
-      if (myGender == 'laki-laki') {
+      if (custodyParent == 'Ibu' && cleanMyGender == 'laki-laki') {
+        success = random.nextInt(100) < (70 + partnerBonus);
+      } else if (myGender == 'laki-laki') {
         success = random.nextInt(100) < (10 + partnerBonus);
       } else {
         success = random.nextInt(100) < (30 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('paman')) {
+      if (cleanMyGender == 'perempuan') {
+        success = random.nextInt(100) < (30 + partnerBonus);
+      } else {
+        success = random.nextInt(100) < (10 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('bibi')) {
+      if (cleanMyGender == 'perempuan') {
+        success = random.nextInt(100) < (10 + partnerBonus);
+      } else {
+        success = random.nextInt(100) < (30 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('sepupu')) {
+      success = random.nextInt(100) < (40 + partnerBonus);
+    } else if (targetNameLower.contains('kakek')) {
+      if (cleanMyGender == 'perempuan') {
+        success = random.nextInt(100) < (15 + partnerBonus);
+      } else {
+        success = random.nextInt(100) < (5 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('nenek')) {
+      if (cleanMyGender == 'perempuan') {
+        success = random.nextInt(100) < (5 + partnerBonus);
+      } else {
+        success = random.nextInt(100) < (15 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('mertua')) {
+      if (targetNameLower.contains('ayah')) {
+        success = cleanMyGender == 'perempuan' ? random.nextInt(100) < (30 + partnerBonus) : random.nextInt(100) < (10 + partnerBonus);
+      } else {
+        success = cleanMyGender == 'perempuan' ? random.nextInt(100) < (10 + partnerBonus) : random.nextInt(100) < (30 + partnerBonus);
+      }
+    } else if (targetNameLower.contains('keponakan')) {
+      success = random.nextInt(100) < (35 + partnerBonus);
+    } else if (targetRole.toLowerCase().contains('laki-laki') || targetRole.toLowerCase().contains('perempuan') || targetRole.toLowerCase().contains('anak')) {
+      // Anak Kandung / Anak Tiri
+      if (cleanMyGender == 'perempuan') {
+        success = cleanPartnerGender == 'laki-laki' ? random.nextInt(100) < (25 + partnerBonus) : random.nextInt(100) < (5 + partnerBonus);
+      } else {
+        success = cleanPartnerGender == 'perempuan' ? random.nextInt(100) < (25 + partnerBonus) : random.nextInt(100) < (5 + partnerBonus);
       }
     }
     // 3. Logika Saudara Kandung / Kakak/Adik

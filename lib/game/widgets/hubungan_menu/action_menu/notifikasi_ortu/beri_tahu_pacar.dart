@@ -167,7 +167,6 @@ class BeritahuPacarHelper {
         character.isHavingAffair = false;
       }
     } else {
-      final bool firstPartnerWins = random.nextBool();
       reactionTitle = '⚔️ Perebutan Cinta!';
       
       final List<String> activeSlots = [];
@@ -190,6 +189,19 @@ class BeritahuPacarHelper {
                       : character.fifthPartner);
                       
       final String fighterName = existingFighter != null ? (existingFighter['name'] ?? 'Pacarmu') : 'Pacarmu';
+      
+      bool firstPartnerWins = false;
+      final String fighterNameLower = fighterName.toLowerCase();
+      final bool isParentFighter = (character.fatherName != null && fighterNameLower.contains(character.fatherName!.toLowerCase())) ||
+                                   (character.motherName != null && fighterNameLower.contains(character.motherName!.toLowerCase())) ||
+                                   (character.stepFatherName != null && fighterNameLower.contains(character.stepFatherName!.toLowerCase())) ||
+                                   (character.stepMotherName != null && fighterNameLower.contains(character.stepMotherName!.toLowerCase()));
+                                   
+      if (isParentFighter) {
+        firstPartnerWins = random.nextInt(100) < 70;
+      } else {
+        firstPartnerWins = random.nextBool();
+      }
       
       if (firstPartnerWins) {
         reactionText = '$fighterName marah besar mengetahui hal ini dan berkelahi sengit dengan $secondPartnerName untuk memperebutkan cintamu. \n\n🏆 $fighterName MEMENANGKAN perkelahian! Kamu tetap bersama $fighterName dan hubungan dengan $secondPartnerName dibatalkan.';

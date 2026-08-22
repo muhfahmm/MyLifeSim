@@ -567,6 +567,46 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final int minAge = age < targetAge ? age : targetAge;
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
 
+    // Cek apakah target SUDAH menjadi pacar aktif
+    bool isActivePartner = widget.character.isAnyPartnerNameMatching(widget.targetName);
+    if (!isActivePartner) {
+      if (widget.character.partner != null && (widget.character.partner!['name'] == widget.targetName || widget.targetName.contains(widget.character.partner!['name'] ?? '___'))) {
+        isActivePartner = true;
+      } else if (widget.character.secondPartner != null && (widget.character.secondPartner!['name'] == widget.targetName || widget.targetName.contains(widget.character.secondPartner!['name'] ?? '___'))) {
+        isActivePartner = true;
+      } else if (widget.character.thirdPartner != null && (widget.character.thirdPartner!['name'] == widget.targetName || widget.targetName.contains(widget.character.thirdPartner!['name'] ?? '___'))) {
+        isActivePartner = true;
+      } else if (widget.character.fourthPartner != null && (widget.character.fourthPartner!['name'] == widget.targetName || widget.targetName.contains(widget.character.fourthPartner!['name'] ?? '___'))) {
+        isActivePartner = true;
+      } else if (widget.character.fifthPartner != null && (widget.character.fifthPartner!['name'] == widget.targetName || widget.targetName.contains(widget.character.fifthPartner!['name'] ?? '___'))) {
+        isActivePartner = true;
+      }
+    }
+
+    // Jika sudah pacaran: langsung tampilkan Make Love tanpa batasan usia
+    if (isActivePartner && widget.targetRole != 'Laki-laki' && widget.targetRole != 'Perempuan') {
+      actions.add(ActionItem(
+        label: 'Bercinta / Make Love',
+        icon: Icons.favorite,
+        color: Colors.pink,
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => BercintaScreen(
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                onActionComplete: () {
+                  _updateState();
+                },
+              ),
+            ),
+          );
+        },
+      ));
+    }
+
     if ((widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)') && age < 12) {
       final List<ActionItem> standardActions = getAge6to11Actions(
         context,
@@ -948,12 +988,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     // --- TAMBAHAN: TOMBOL BERCINTA, PUTUSKAN PACAR, DAN THREESOME UNTUK PASANGAN AKTIF (DI TOP MENU) ---
     final List<ActionItem> topActions = [];
 
-    final bool isActivePartner = (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) ||
-                                 (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) ||
-                                 (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) ||
-                                 (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) ||
-                                 (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) ||
-                                 widget.character.isAnyPartnerNameMatching(widget.targetName);
+    // isActivePartner sudah dideklarasikan di atas (awal build method)
+    // Gunakan variabel yang sama untuk topActions
 
     final bool isPartnerRole = widget.targetRole == 'Pacar' || widget.targetRole == 'Pacar (Rahasia)' ||
                                widget.targetRole == 'Pacar Kedua' || widget.targetRole == 'Pacar Ketiga' ||

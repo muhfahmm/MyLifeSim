@@ -91,6 +91,7 @@ class Character {
   // --- FIELD PEKERJAAN ---
   String? jobName;
   int? jobSalary;
+  String? custodyParent; // 'Ayah' atau 'Ibu' setelah cerai
 
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
@@ -602,12 +603,131 @@ class Character {
         if (sibAge < 0 && nextAge == 0) {
           // Adik baru saja lahir
           events.add('👶 Adik Baru Lahir! Ibumu melahirkan seorang ${sib['relation']!.contains('Laki') ? 'Adik Laki-laki' : 'Adik Perempuan'} bernama ${sib['name']}.');
-        } else if (nextAge > 65) {
-          int deathChance = (nextAge - 65) ~/ 3 + 1;
-          if (random.nextInt(100) < deathChance) {
-            sib['isDeceased'] = 'true';
-            sib['relationship'] = '0';
-            events.add('💀 Kabar Duka: Saudaramu, ${sib['name']} (${sib['relation']}), meninggal dunia pada usia $nextAge tahun.');
+        } else {
+          // --- LOGIKA DINAMIS PACARAN, LAMARAN, PERNIKAHAN, & KEHAMILAN SAUDARA (KAKA/ADIK) ---
+          // A. Pacaran (Jika usia >= 12, belum bertunangan/menikah dan belum punya pasangan)
+          if (nextAge >= 12 && sib['spouseName'] == null) {
+            // Peluang 12% per tahun untuk dapat Pacar
+            if (random.nextInt(100) < 12) {
+              final String spouseGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
+              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha'];
+              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+              final String spouseName = spouseGender == 'Laki-laki' 
+                  ? '${boys[random.nextInt(boys.length)]} ${familyNames[random.nextInt(familyNames.length)]}'
+                  : '${girls[random.nextInt(girls.length)]} ${familyNames[random.nextInt(familyNames.length)]}';
+              
+              sib['spouseName'] = spouseName;
+              sib['spouseGender'] = spouseGender;
+              sib['spouseAge'] = (nextAge + random.nextInt(5) - 2).clamp(10, 100).toString();
+              sib['isEngaged'] = 'false';
+              sib['isMarried'] = 'false';
+              
+              final String notice = '💬 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) sekarang berpacaran dengan $spouseName!';
+              events.add(notice);
+              inbox.add(notice);
+            }
+          }
+          // B. Dilamar / Melamar (Jika sudah punya pacar, belum bertunangan/menikah)
+          else if (sib['spouseName'] != null && sib['isEngaged'] == 'false' && sib['isMarried'] == 'false') {
+            // Peluang 15% per tahun untuk bertunangan (Dilamar)
+            if (random.nextInt(100) < 15) {
+              sib['isEngaged'] = 'true';
+              final String notice = '💍 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) bertunangan dengan kekasihnya, ${sib['spouseName']}!';
+              events.add(notice);
+              inbox.add(notice);
+            }
+          }
+          // C. Menikah (Jika sudah bertunangan, belum menikah)
+          else if (sib['isEngaged'] == 'true' && sib['isMarried'] == 'false') {
+            // Peluang 20% per tahun untuk menikah
+            if (random.nextInt(100) < 20) {
+              sib['isMarried'] = 'true';
+              sib['isEngaged'] = 'false'; // ganti status
+              final String notice = '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah dengan ${sib['spouseName']}!';
+              events.add(notice);
+              inbox.add(notice);
+            }
+          }
+          
+          // D. Kehamilan / Anak
+          // Hamil luar nikah: 20% di bawah umur, 25% cukup umur. Punya suami/istri (berbeda jenis kelamin): 70%
+          if (nextAge >= 12 && nextAge <= 45) {
+            final bool isFemale = sib['gender'] == 'Perempuan';
+            final bool hasPartner = sib['spouseName'] != null;
+            final bool isMarried = sib['isMarried'] == 'true';
+            final bool hasOppositeSpouse = hasPartner && (sib['gender'] != sib['spouseGender']);
+            
+            double pregChance = 0.0;
+            if (isMarried && hasOppositeSpouse) {
+              pregChance = 70.0;
+            } else if (hasPartner && !isMarried && hasOppositeSpouse) {
+              if (nextAge < 18) {
+                pregChance = 20.0;
+              } else {
+                pregChance = 25.0;
+              }
+            } else if (!hasPartner && isFemale) {
+              if (nextAge < 18) {
+                pregChance = 2.0;
+              } else {
+                pregChance = 4.0;
+              }
+            }
+            
+            if (random.nextInt(100) < pregChance) {
+              final String babyGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi'];
+              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah'];
+              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
+              final String babyName = babyGender == 'Laki-laki'
+                  ? '${boys[random.nextInt(boys.length)]} ${familyNames[random.nextInt(familyNames.length)]}'
+                  : '${girls[random.nextInt(girls.length)]} ${familyNames[random.nextInt(familyNames.length)]}';
+                  
+              final List<String> cNames = sib['childNames'] != null && sib['childNames']!.isNotEmpty ? sib['childNames']!.split(',') : [];
+              final List<String> cAges = sib['childAges'] != null && sib['childAges']!.isNotEmpty ? sib['childAges']!.split(',') : [];
+              final List<String> cGenders = sib['childGenders'] != null && sib['childGenders']!.isNotEmpty ? sib['childGenders']!.split(',') : [];
+              
+              cNames.add(babyName);
+              cAges.add('0');
+              cGenders.add(babyGender);
+              
+              sib['childNames'] = cNames.join(',');
+              sib['childAges'] = cAges.join(',');
+              sib['childGenders'] = cGenders.join(',');
+              
+              String notice;
+              if (isFemale) {
+                notice = isMarried
+                    ? '👶 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}) melahirkan anak bernama $babyName dari suaminya!'
+                    : '👶 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}) melahirkan anak di luar nikah bernama $babyName!';
+              } else {
+                notice = isMarried
+                    ? '👶 Kabar Keluarga: Istri dari saudaramu, ${sib['name']} (${sib['relation']}) melahirkan seorang anak bernama $babyName!'
+                    : '👶 Kabar Keluarga: Pacar dari saudaramu, ${sib['name']} (${sib['relation']}) melahirkan seorang anak bernama $babyName!';
+              }
+              events.add(notice);
+              inbox.add(notice);
+            }
+          }
+          
+          // E. Umur anak-anak sibling (Keponakan) bertambah
+          if (sib['childAges'] != null && sib['childAges']!.isNotEmpty) {
+            final List<String> cAges = sib['childAges']!.split(',');
+            for (int i = 0; i < cAges.length; i++) {
+              int cAge = int.tryParse(cAges[i]) ?? 0;
+              cAges[i] = (cAge + 1).toString();
+            }
+            sib['childAges'] = cAges.join(',');
+          }
+
+          if (nextAge > 65) {
+            int deathChance = (nextAge - 65) ~/ 3 + 1;
+            if (random.nextInt(100) < deathChance) {
+              sib['isDeceased'] = 'true';
+              sib['relationship'] = '0';
+              events.add('💀 Kabar Duka: Saudaramu, ${sib['name']} (${sib['relation']}), meninggal dunia pada usia $nextAge tahun.');
+            }
           }
         }
       }
@@ -1079,17 +1199,94 @@ class Character {
           });
         }
         
-        for (var sib in siblings) {
-          final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
-          final bool isDeceased = sib['isDeceased'] == 'true';
-          final String sName = sib['name'] ?? '';
-          if (!isDeceased && sibAge >= 12 && !isAlreadyPartner(sName)) {
+        if (age >= 12) {
+          for (var sib in siblings) {
+            final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+            final bool isDeceased = sib['isDeceased'] == 'true';
+            final String sName = sib['name'] ?? '';
+            if (!isDeceased && sibAge >= 12 && !isAlreadyPartner(sName)) {
+              candidates.add({
+                'name': '${sib['name']} (${sib['relation']})',
+                'relation': sib['relation'] ?? 'Saudara',
+                'gender': sib['gender'] ?? 'Laki-laki',
+                'age': sibAge.toString(),
+                'role': 'Kandung',
+              });
+            }
+            if (sib['childNames'] != null && sib['childNames']!.isNotEmpty) {
+              final List<String> cNames = sib['childNames']!.split(',');
+              final List<String> cAges = sib['childAges']!.split(',');
+              final List<String> cGenders = sib['childGenders']!.split(',');
+              for (int i = 0; i < cNames.length; i++) {
+                int cAge = int.tryParse(cAges[i]) ?? 0;
+                if (cAge >= 12 && !isAlreadyPartner(cNames[i])) {
+                  candidates.add({
+                    'name': cNames[i],
+                    'relation': 'Keponakan',
+                    'gender': cGenders[i],
+                    'age': cAge.toString(),
+                    'role': 'Keponakan',
+                  });
+                }
+              }
+            }
+          }
+
+          for (var child in children) {
+            final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+            final bool isDeceased = child['isDeceased'] == 'true';
+            final String childName = child['name'] ?? '';
+            if (!isDeceased && childAge >= 12 && !isAlreadyPartner(childName)) {
+              candidates.add({
+                'name': childName,
+                'relation': 'Anak',
+                'gender': child['gender'] ?? 'Laki-laki',
+                'age': childAge.toString(),
+                'role': 'Anak',
+              });
+            }
+          }
+
+          if (fatherInLawName != null && fatherInLawAge != null && !isAlreadyPartner(fatherInLawName!)) {
             candidates.add({
-              'name': '${sib['name']} (${sib['relation']})',
-              'relation': sib['relation'] ?? 'Saudara',
-              'gender': sib['gender'] ?? 'Laki-laki',
-              'age': sibAge.toString(),
-              'role': 'Kandung',
+              'name': fatherInLawName!,
+              'relation': 'Ayah Mertua',
+              'gender': 'Laki-laki',
+              'age': fatherInLawAge!.toString(),
+              'role': 'Mertua',
+            });
+          }
+          if (motherInLawName != null && motherInLawAge != null && !isAlreadyPartner(motherInLawName!)) {
+            candidates.add({
+              'name': motherInLawName!,
+              'relation': 'Ibu Mertua',
+              'gender': 'Perempuan',
+              'age': motherInLawAge!.toString(),
+              'role': 'Mertua',
+            });
+          }
+        }
+
+        for (var ext in extendedFamily) {
+          final int extAge = int.tryParse(ext['age'] ?? '0') ?? 0;
+          final bool isDeceased = ext['isDeceased'] == 'true';
+          final String extName = ext['name'] ?? '';
+          final String extRel = (ext['relation'] ?? '').toLowerCase();
+          
+          bool ageValid = false;
+          if (extRel.contains('kakek')) {
+            ageValid = (age >= 10);
+          } else {
+            ageValid = (age >= 12);
+          }
+
+          if (ageValid && !isDeceased && extAge >= 12 && !isAlreadyPartner(extName)) {
+            candidates.add({
+              'name': extName,
+              'relation': ext['relation'] ?? 'Keluarga',
+              'gender': ext['gender'] ?? 'Laki-laki',
+              'age': extAge.toString(),
+              'role': 'Keluarga',
             });
           }
         }
@@ -1100,20 +1297,38 @@ class Character {
           
           int chance = 0;
           if (myGenderLower == 'perempuan') {
-            if (rel.contains('ayah')) chance = 40;
-            else if (rel.contains('ibu')) chance = 20;
+            if (rel.contains('ayah mertua')) chance = 30;
+            else if (rel.contains('ibu mertua')) chance = 5;
+            else if (rel.contains('anak')) chance = 30;
+            else if (rel.contains('keponakan')) chance = 30;
+            else if (rel.contains('pasangan paman') || rel.contains('paman')) chance = 25;
+            else if (rel.contains('pasangan bibi') || rel.contains('bibi')) chance = 15;
+            else if (rel.contains('ayah')) chance = custodyParent == 'Ayah' ? 65 : 40;
+            else if (rel.contains('ibu')) chance = custodyParent == 'Ayah' ? 10 : 20;
             else if (rel.contains('kakak perempuan')) chance = 30;
             else if (rel.contains('adik perempuan')) chance = 30;
             else if (rel.contains('adik laki')) chance = 40;
             else if (rel.contains('kakak laki')) chance = 40;
+            else if (rel.contains('sepupu')) chance = 35;
+            else if (rel.contains('kakek')) chance = 10;
+            else if (rel.contains('nenek')) chance = 5;
             else chance = 30;
           } else {
-            if (rel.contains('ayah')) chance = 10;
-            else if (rel.contains('ibu')) chance = 10;
+            if (rel.contains('ayah mertua')) chance = 5;
+            else if (rel.contains('ibu mertua')) chance = 30;
+            else if (rel.contains('anak')) chance = 30;
+            else if (rel.contains('keponakan')) chance = 30;
+            else if (rel.contains('pasangan paman') || rel.contains('paman')) chance = 5;
+            else if (rel.contains('pasangan bibi') || rel.contains('bibi')) chance = 25;
+            else if (rel.contains('ayah')) chance = 10;
+            else if (rel.contains('ibu')) chance = custodyParent == 'Ibu' ? 50 : 10;
             else if (rel.contains('kakak perempuan')) chance = 30;
             else if (rel.contains('adik perempuan')) chance = 40;
             else if (rel.contains('adik laki')) chance = 5;
             else if (rel.contains('kakak laki')) chance = 5;
+            else if (rel.contains('sepupu')) chance = 35;
+            else if (rel.contains('kakek')) chance = 5;
+            else if (rel.contains('nenek')) chance = 10;
             else chance = 10;
           }
 
@@ -1181,8 +1396,9 @@ class Character {
         final bool hasDeadMother = isMotherDeceased; // Hanya meninggal, bukan cerai!
 
         if (isDaughter && isBiologicalFatherPartner && fatherIsSingle) {
-          final String proposalType = (age >= 18 && random.nextInt(100) < 50) ? 'Lamar Nikah' : 'Bercinta';
-          final int chance = proposalType == 'Bercinta' ? 70 : 60;
+          final bool isLivingWithFather = custodyParent == 'Ayah';
+          final String proposalType = (age >= 18 && random.nextInt(100) < (isLivingWithFather ? 70 : 50)) ? 'Lamar Nikah' : 'Bercinta';
+          final int chance = isLivingWithFather ? 70 : (proposalType == 'Bercinta' ? 70 : 60);
           if (random.nextInt(100) < chance) {
             String fAgeStr = fatherAge != null ? fatherAge.toString() : '40';
             activeProposal = {

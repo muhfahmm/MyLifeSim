@@ -334,6 +334,51 @@ List<ActionItem> getAge12PlusActions(
             } else {
               accepted = random.nextInt(100) < 10;
             }
+          } else if (targetNameLower.contains('paman')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 30;
+            } else {
+              accepted = random.nextInt(100) < 10;
+            }
+          } else if (targetNameLower.contains('bibi')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 10;
+            } else {
+              accepted = random.nextInt(100) < 30;
+            }
+          } else if (targetNameLower.contains('sepupu')) {
+            accepted = random.nextInt(100) < 40;
+          } else if (targetNameLower.contains('kakek')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 15;
+            } else {
+              accepted = random.nextInt(100) < 5;
+            }
+          } else if (targetNameLower.contains('nenek')) {
+            if (myGender == 'perempuan') {
+              accepted = random.nextInt(100) < 5;
+            } else {
+              accepted = random.nextInt(100) < 15;
+            }
+          } else if (targetNameLower.contains('mertua')) {
+            if (targetNameLower.contains('ayah')) {
+              accepted = myGender == 'perempuan' ? (random.nextInt(100) < 30) : (random.nextInt(100) < 10);
+            } else {
+              accepted = myGender == 'perempuan' ? (random.nextInt(100) < 10) : (random.nextInt(100) < 30);
+            }
+          } else if (targetNameLower.contains('keponakan')) {
+            accepted = random.nextInt(100) < 35;
+          } else if (targetRole.toLowerCase().contains('laki-laki') || targetRole.toLowerCase().contains('perempuan') || targetRole.toLowerCase().contains('anak')) {
+            // Anak Kandung / Anak Tiri
+            if (targetNameLower.contains('anak') || targetRole.toLowerCase().contains('anak') || (character.children.any((c) => c['name'] == targetName))) {
+              if (myGender == 'perempuan') {
+                accepted = partnerGender == 'laki-laki' ? (random.nextInt(100) < 25) : (random.nextInt(100) < 5);
+              } else {
+                accepted = partnerGender == 'perempuan' ? (random.nextInt(100) < 25) : (random.nextInt(100) < 5);
+              }
+            } else {
+              accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
+            }
           } else if (isSibling) {
             bool isTargetOlder = targetNameLower.contains('kakak');
             bool isTargetMale = partnerGender == 'laki-laki';

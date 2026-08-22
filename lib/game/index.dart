@@ -44,6 +44,17 @@ class _GameScreenState extends State<GameScreen> {
       _character,
       happiness: _character.happiness,
     );
+    // Tampilkan pilihan hak asuh saat game baru dimulai jika orang tua sudah cerai
+    if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
+        _character.custodyParent == null &&
+        _character.fatherName != null &&
+        _character.motherName != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!);
+        }
+      });
+    }
   }
 
   // --- LOGIKA RESET ---
@@ -778,15 +789,26 @@ class _GameScreenState extends State<GameScreen> {
     final String relCheck = relation.toLowerCase();
     final bool isFatherProposal = relCheck.contains('ayah');
     final bool isMotherProposal = relCheck.contains('ibu');
+    final bool isGrandfatherProposal = relCheck.contains('kakek');
 
-    final bool showReportToMother = isFatherProposal &&
+    bool showReportToMother = (isFatherProposal || isGrandfatherProposal) &&
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
         (_character.motherName != null && !_character.isMotherDeceased);
 
-    final bool showReportToFather = isMotherProposal &&
+    bool showReportToFather = isMotherProposal &&
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
         ((_character.fatherName != null && !_character.isFatherDeceased) ||
          (_character.stepFatherName != null && !_character.isStepFatherDeceased));
+
+    if (_character.partner != null) {
+      final String pName = _character.partner!['name']!.toLowerCase();
+      if (_character.fatherName != null && (pName.contains(_character.fatherName!.toLowerCase()) || _character.fatherName!.toLowerCase().contains(pName))) {
+        showReportToFather = false;
+      }
+      if (_character.motherName != null && (pName.contains(_character.motherName!.toLowerCase()) || _character.motherName!.toLowerCase().contains(pName))) {
+        showReportToMother = false;
+      }
+    }
 
     final bool showReportToHeadmaster = (role == 'Guru' || role == 'Dosen' || relCheck.contains('guru') || relCheck.contains('dosen')) &&
         (type == 'Ajak Pacaran' || type == 'Bercinta');
@@ -816,9 +838,11 @@ class _GameScreenState extends State<GameScreen> {
                 Navigator.pop(context);
                 _executeReportParent(context, partnerName, relation, 'Ibu');
               },
-              child: const Text(
-                'Laporkan ke Ibu',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              child: Text(
+                isGrandfatherProposal && _character.motherName != null
+                    ? 'Laporkan ke Ibu (${_character.motherName})'
+                    : 'Laporkan ke Ibu',
+                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ),
           if (showReportToFather)
@@ -828,9 +852,11 @@ class _GameScreenState extends State<GameScreen> {
                 final String reportTarget = (_character.fatherName != null && !_character.isFatherDeceased) ? 'Ayah' : 'Ayah Tiri';
                 _executeReportParent(context, partnerName, relation, reportTarget);
               },
-              child: const Text(
-                'Laporkan ke Ayah',
-                style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+              child: Text(
+                isGrandfatherProposal && _character.fatherName != null
+                    ? 'Laporkan ke Ayah (${_character.fatherName})'
+                    : 'Laporkan ke Ayah',
+                style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ),
           if (showReportToHeadmaster)
@@ -1188,6 +1214,7 @@ class _GameScreenState extends State<GameScreen> {
               setState(() {
                 _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
                 _character.motherRelationship = ((_character.motherRelationship ?? 50) - 15).clamp(0, 100);
+                _character.custodyParent = 'Ayah';
                 _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ayahmu ($fatherName).');
               });
               _checkGlassesNeed();
@@ -1200,6 +1227,7 @@ class _GameScreenState extends State<GameScreen> {
               setState(() {
                 _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
                 _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 15).clamp(0, 100);
+                _character.custodyParent = 'Ibu';
                 _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ibumu ($motherName).');
               });
               _checkGlassesNeed();
@@ -1452,13 +1480,13 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void importPenyakitSTDCheck(Map<String, dynamic> proposal) {
-    // Memanggil handleSTDCheck di std_logic.dart
+    // Memanggil handleSTDCheckNoContext di std_logic.dart (tanpa modal UI)
     final String partnerName = proposal['name'];
     final String relation = proposal['relation'];
     final String role = proposal['role'] ?? relation;
     final Random random = Random();
     
-    handleSTDCheck(_character, role, partnerName, random);
+    handleSTDCheckNoContext(_character, role, partnerName, random);
   }
 
   void _updateFamilyRelationship(String targetName, int changeAmount) {

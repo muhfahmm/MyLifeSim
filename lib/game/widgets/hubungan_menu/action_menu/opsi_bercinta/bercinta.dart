@@ -162,21 +162,30 @@ class _BercintaScreenState extends State<BercintaScreen> {
     return HubunganIntimLogic.getFertilityRate(age, gender);
   }
 
-  void _executeMakeLove() {
+  Future<void> _executeMakeLove() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
     bool success = false;
     final String myGender = widget.character.gender.trim().toLowerCase();
     final String targetNameLower = widget.targetName.toLowerCase();
-    final String targetRoleLower = widget.targetRole.toLowerCase();
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
     final String partnerGender = _getPartnerGender().trim().toLowerCase();
 
     // Bonus 15% jika target tersebut sudah berstatus resmi sebagai pacar aktif
     int partnerBonus = 0;
+    bool isAlreadyActivePartner = false;
     if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
       partnerBonus = 15;
+      isAlreadyActivePartner = true;
+    } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
+      isAlreadyActivePartner = true;
+    } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) {
+      isAlreadyActivePartner = true;
+    } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) {
+      isAlreadyActivePartner = true;
+    } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) {
+      isAlreadyActivePartner = true;
     }
 
     // Gunakan logika persentase sukses terpusat
@@ -188,6 +197,8 @@ class _BercintaScreenState extends State<BercintaScreen> {
       partnerBonus: partnerBonus,
       random: _random,
       playerAge: widget.character.age,
+      custodyParent: widget.character.custodyParent,
+      isAlreadyPartner: isAlreadyActivePartner,
     );
 
     int relationChange = 0;
@@ -364,9 +375,27 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
     // Pemicu pengecekan penyakit menular seksual (STD) jika tidak pakai pengaman
     if (success && _useCondom == false) {
-      handleSTDCheck(widget.character, widget.targetRole, widget.targetName, _random);
+      if (context.mounted) {
+        await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+      }
     }
 
+    // Konsekuensi psikologis & genetik incest
+    if (success) {
+      if (context.mounted) {
+        await handleIncestAfterSex(
+          context,
+          widget.character,
+          widget.targetRole,
+          widget.targetName,
+          myGender,
+          partnerGender,
+          _random,
+        );
+      }
+    }
+
+    if (!mounted) return;
     showDialog(
       context: context,
       barrierDismissible: false,

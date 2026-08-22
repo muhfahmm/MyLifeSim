@@ -96,6 +96,7 @@ class RelationshipButton extends StatelessWidget {
                     relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                     ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isFatherDeceased,
+                    isLivingTogether: character.custodyParent == 'Ayah',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.fatherName!,
                       gender: 'Laki-laki',
@@ -120,6 +121,7 @@ class RelationshipButton extends StatelessWidget {
                     relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                     ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isMotherDeceased,
+                    isLivingTogether: character.custodyParent == 'Ibu',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.motherName!,
                       gender: 'Perempuan',
@@ -724,6 +726,7 @@ class RelationshipButton extends StatelessWidget {
     required String ageText,
     bool isDeceased = false,
     String? avatarUrl,
+    bool isLivingTogether = false,
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
@@ -805,6 +808,21 @@ class RelationshipButton extends StatelessWidget {
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                   ),
                 ),
+                if (isLivingTogether && !isDeceased) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.green.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: Colors.green.withOpacity(0.2)),
+                    ),
+                    child: const Text(
+                      'Tinggal Bersama 🏡',
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green),
+                    ),
+                  ),
+                ],
                 if (!isDeceased) ...[
                   const SizedBox(width: 8),
                   const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
