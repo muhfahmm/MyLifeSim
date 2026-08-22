@@ -40,6 +40,11 @@ class _IncestRelation {
 }
 
 _IncestRelation? _detectRelation(String roleLower, String nameLower) {
+  if (roleLower.contains('tiri') || nameLower.contains('tiri') ||
+      roleLower.contains('mertua') || nameLower.contains('mertua') ||
+      roleLower.contains('mantan') || nameLower.contains('mantan')) {
+    return null; // Non-genetic relationships do not trigger incest warnings or genetic risks
+  }
   if (nameLower.startsWith('ayah') || roleLower.contains('ayah') ||
       nameLower.startsWith('ibu') || roleLower.contains('ibu')) {
     return const _IncestRelation(level: 'parent', geneticRisk: 35, happinessPenalty: 25, karmaPenalty: 35);
@@ -161,6 +166,18 @@ Future<void> showIncestGeneticModal(
   );
 }
 
+class IncestRelationData {
+  final String level;
+  final int geneticRisk;
+  IncestRelationData(this.level, this.geneticRisk);
+}
+
+IncestRelationData? detectIncestRelation(String role, String name) {
+  final rel = _detectRelation(role.toLowerCase(), name.toLowerCase());
+  if (rel == null) return null;
+  return IncestRelationData(rel.level, rel.geneticRisk);
+}
+
 /// Dipanggil dari bercinta.dart setelah bercinta berhasil.
 Future<void> handleIncestAfterSex(
   BuildContext context,
@@ -171,27 +188,8 @@ Future<void> handleIncestAfterSex(
   String partnerGender,
   Random random,
 ) async {
-  final _IncestRelation? rel = _detectRelation(partnerRole.toLowerCase(), partnerName.toLowerCase());
-  if (rel == null) return;
-
-  final bool isSameSex = myGender.toLowerCase() == partnerGender.toLowerCase();
-  int happiness = rel.happinessPenalty;
-  int karma = rel.karmaPenalty;
-
-  // Sepupu sesama jenis: -8/-8 sesuai Tabel 2
-  if (rel.level == 'cousin' && isSameSex) { happiness = 8; karma = 8; }
-
-  character.happiness = (character.happiness - happiness).clamp(0, 100);
-  character.health = (character.health - (karma ~/ 5)).clamp(0, 100);
-  character.inbox.add(
-    '😔 Guncangan Batin: Setelah berhubungan intim dengan $partnerName ($partnerRole), '
-    'kamu mengalami guncangan psikologis (-$happiness% Kebahagiaan, -${karma ~/ 5}% Kesehatan).',
-  );
-
-  await showIncestPsychologicalModal(context, partnerName, partnerRole, happiness);
-  if (!isSameSex && rel.geneticRisk > 0 && context.mounted) {
-    await showIncestGeneticModal(context, partnerName, partnerRole, rel.geneticRisk);
-  }
+  // Guncangan psikologis dihapus secara permanen.
+  // Peringatan risiko genetik dipindahkan ke alur setelah pasangan hamil di bercinta.dart.
 }
 
 /// Dipanggil dari character.dart saat melahirkan (ageUp).

@@ -517,7 +517,23 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 3. Lamar (hanya jika sudah pacar)
-  if (isPartnerRole && character.partner != null && character.partner!['relation'] == 'Pacar' && age >= 18) {
+  Map<String, dynamic>? matchingPartner;
+  if (character.partner != null && character.partner!['name'] == targetName) {
+    matchingPartner = character.partner;
+  } else if (character.secondPartner != null && character.secondPartner!['name'] == targetName) {
+    matchingPartner = character.secondPartner;
+  } else if (character.thirdPartner != null && character.thirdPartner!['name'] == targetName) {
+    matchingPartner = character.thirdPartner;
+  } else if (character.fourthPartner != null && character.fourthPartner!['name'] == targetName) {
+    matchingPartner = character.fourthPartner;
+  } else if (character.fifthPartner != null && character.fifthPartner!['name'] == targetName) {
+    matchingPartner = character.fifthPartner;
+  }
+
+  final bool isDatingPartner = matchingPartner != null && 
+      (matchingPartner['relation']?.toString().contains('Pacar') ?? false);
+
+  if (isDatingPartner && age >= 18) {
     actions.add(ActionItem(
       label: 'Lamar',
       icon: Icons.diamond,
@@ -531,8 +547,16 @@ List<ActionItem> getAge12PlusActions(
             'Lamaran Diterima! 💍',
             '$targetName menerima lamaran pernikahanmu dengan air mata bahagia! Status hubungan kalian kini adalah Tunangan.',
             Icons.diamond, Colors.pink, () {
-              if (character.partner != null) {
+              if (character.partner != null && character.partner!['name'] == targetName) {
                 character.partner!['relation'] = 'Tunangan';
+              } else if (character.secondPartner != null && character.secondPartner!['name'] == targetName) {
+                character.secondPartner!['relation'] = 'Tunangan';
+              } else if (character.thirdPartner != null && character.thirdPartner!['name'] == targetName) {
+                character.thirdPartner!['relation'] = 'Tunangan';
+              } else if (character.fourthPartner != null && character.fourthPartner!['name'] == targetName) {
+                character.fourthPartner!['relation'] = 'Tunangan';
+              } else if (character.fifthPartner != null && character.fifthPartner!['name'] == targetName) {
+                character.fifthPartner!['relation'] = 'Tunangan';
               }
               character.happiness = (character.happiness + 30).clamp(0, 100);
               updateState();

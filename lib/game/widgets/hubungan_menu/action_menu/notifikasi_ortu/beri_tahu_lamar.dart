@@ -12,9 +12,7 @@ class BeritahuLamaranHelper {
   }) async {
     final bool hasLivingParents = 
         (character.fatherName != null && !character.isFatherDeceased) ||
-        (character.motherName != null && !character.isMotherDeceased) ||
-        (character.stepFatherName != null && !character.isStepFatherDeceased) ||
-        (character.stepMotherName != null && !character.isStepMotherDeceased);
+        (character.motherName != null && !character.isMotherDeceased);
 
     await showDialog(
       context: context,

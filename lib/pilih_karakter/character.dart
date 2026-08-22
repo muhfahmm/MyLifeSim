@@ -225,6 +225,10 @@ class Character {
   bool isMotherDivorced = false;
   bool isStepFatherDeceased = false;
   bool isStepMotherDeceased = false;
+  bool isMotherImprisoned = false;
+  int motherPrisonYears = 0;
+  bool isFatherImprisoned = false;
+  int fatherPrisonYears = 0;
 
   // --- DATA MERTUA ---
   String? fatherInLawName;
@@ -404,11 +408,19 @@ class Character {
     // 1. Cek Kematian Orang Tua
     if (fatherName != null && !isFatherDeceased && fatherAge != null) {
       fatherAge = fatherAge! + 1;
+      if (isFatherImprisoned) {
+        fatherPrisonYears--;
+        if (fatherPrisonYears <= 0) {
+          isFatherImprisoned = false;
+          events.add('📢 Ayah Bebas: Ayahmu, $fatherName, telah menyelesaikan masa hukumannya dan dibebaskan dari penjara.');
+        }
+      }
       if (fatherAge! > 60) {
         int deathChance = (fatherAge! - 60) ~/ 2 + 1; // 1% - 15%
         if (random.nextInt(100) < deathChance) {
           isFatherDeceased = true;
           fatherRelationship = 0;
+          isFatherImprisoned = false;
           events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun.');
         }
       }
@@ -416,11 +428,19 @@ class Character {
 
     if (motherName != null && !isMotherDeceased && motherAge != null) {
       motherAge = motherAge! + 1;
+      if (isMotherImprisoned) {
+        motherPrisonYears--;
+        if (motherPrisonYears <= 0) {
+          isMotherImprisoned = false;
+          events.add('📢 Ibu Bebas: Ibumu, $motherName, telah menyelesaikan masa hukumannya dan dibebaskan dari penjara.');
+        }
+      }
       if (motherAge! > 60) {
         int deathChance = (motherAge! - 60) ~/ 2 + 1;
         if (random.nextInt(100) < deathChance) {
           isMotherDeceased = true;
           motherRelationship = 0;
+          isMotherImprisoned = false;
           events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun.');
         }
       }
@@ -623,7 +643,12 @@ class Character {
               sib['isEngaged'] = 'false';
               sib['isMarried'] = 'false';
               
-              final String notice = '💬 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) sekarang berpacaran dengan $spouseName!';
+              final String sibGender = sib['gender'] ?? 'Laki-laki';
+              final String relationshipPrefix = (sibGender == spouseGender) 
+                  ? (sibGender == 'Laki-laki' ? 'menjadi gay berpacaran dengan ' : 'menjadi lesbian berpacaran dengan ') 
+                  : 'berpacaran dengan ';
+              
+              final String notice = '💬 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) sekarang $relationshipPrefix$spouseName!';
               events.add(notice);
               inbox.add(notice);
             }
@@ -633,7 +658,10 @@ class Character {
             // Peluang 15% per tahun untuk bertunangan (Dilamar)
             if (random.nextInt(100) < 15) {
               sib['isEngaged'] = 'true';
-              final String notice = '💍 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) bertunangan dengan kekasihnya, ${sib['spouseName']}!';
+              final bool isSameSex = sib['gender'] == sib['spouseGender'];
+              final String notice = isSameSex
+                  ? '💍 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) bertunangan sesama jenis dengan kekasihnya, ${sib['spouseName']}! 🏳️‍🌈'
+                  : '💍 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) bertunangan dengan kekasihnya, ${sib['spouseName']}!';
               events.add(notice);
               inbox.add(notice);
             }
@@ -644,7 +672,10 @@ class Character {
             if (random.nextInt(100) < 20) {
               sib['isMarried'] = 'true';
               sib['isEngaged'] = 'false'; // ganti status
-              final String notice = '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah dengan ${sib['spouseName']}!';
+              final bool isSameSex = sib['gender'] == sib['spouseGender'];
+              final String notice = isSameSex
+                  ? '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah sesama jenis dengan ${sib['spouseName']}! 🏳️‍🌈'
+                  : '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah dengan ${sib['spouseName']}!';
               events.add(notice);
               inbox.add(notice);
             }

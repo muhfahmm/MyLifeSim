@@ -32,6 +32,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
   final Random _random = Random();
   bool _isProcessing = false;
   bool? _useCondom;
+  bool _partnerConsentGranted = false;
 
   @override
   void initState() {
@@ -58,6 +59,22 @@ class _BercintaScreenState extends State<BercintaScreen> {
   }
 
   String _getPartnerGender() {
+    final String cleanTargetName = widget.targetName;
+    if (widget.character.partner != null && widget.character.partner!['name'] == cleanTargetName) {
+      return widget.character.partner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == cleanTargetName) {
+      return widget.character.secondPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == cleanTargetName) {
+      return widget.character.thirdPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == cleanTargetName) {
+      return widget.character.fourthPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == cleanTargetName) {
+      return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
+    }
     return HubunganIntimLogic.getPartnerGender(widget.targetName);
   }
 
@@ -162,44 +179,93 @@ class _BercintaScreenState extends State<BercintaScreen> {
     return HubunganIntimLogic.getFertilityRate(age, gender);
   }
 
+  bool _isTargetActivePartner() {
+    return (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) ||
+        (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) ||
+        (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) ||
+        (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) ||
+        (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName);
+  }
+
+  int _getPartnerBonus() {
+    return widget.character.partner != null && widget.character.partner!['name'] == widget.targetName ? 15 : 0;
+  }
+
+  void _showEarlyRejectionDialog(int satisfaction) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.heart_broken, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Ajakan Ditolak 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          '${widget.targetName} sedang tidak dalam mood yang baik meskipun hubungan kalian cukup dekat ($satisfaction%). Rawatlah hubunganmu terlebih dahulu!',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showExcusedRejectionDialog() {
+    final excuses = [
+      'sedang merasa sangat lelah setelah beraktivitas seharian.',
+      'sedang tidak enak badan (kurang sehat) hari ini.',
+      'sedang sibuk memikirkan pekerjaan/sekolah dan ingin beristirahat saja.',
+      'sedang ingin fokus mengobrol biasa daripada bermesraan.',
+      'sedang tidak mood untuk melakukan itu sekarang.'
+    ];
+    final String chosenExcuse = excuses[_random.nextInt(excuses.length)];
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.heart_broken, color: Colors.red),
+            SizedBox(width: 8),
+            Text('Ajakan Ditolak 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          '${widget.targetName} $chosenExcuse',
+          style: const TextStyle(fontSize: 14),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).pop();
+            },
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<void> _executeMakeLove() async {
     if (_isProcessing) return;
     setState(() => _isProcessing = true);
 
-    bool success = false;
+    bool success = _partnerConsentGranted;
     final String myGender = widget.character.gender.trim().toLowerCase();
     final String targetNameLower = widget.targetName.toLowerCase();
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
     final String partnerGender = _getPartnerGender().trim().toLowerCase();
-
-    // Bonus 15% jika target tersebut sudah berstatus resmi sebagai pacar aktif
-    int partnerBonus = 0;
-    bool isAlreadyActivePartner = false;
-    if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
-      partnerBonus = 15;
-      isAlreadyActivePartner = true;
-    } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
-      isAlreadyActivePartner = true;
-    } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) {
-      isAlreadyActivePartner = true;
-    } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) {
-      isAlreadyActivePartner = true;
-    } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) {
-      isAlreadyActivePartner = true;
-    }
-
-    // Gunakan logika persentase sukses terpusat
-    success = HubunganIntimLogic.calculateMakeLoveSuccess(
-      myGender: myGender,
-      partnerGender: partnerGender,
-      targetName: widget.targetName,
-      targetRole: widget.targetRole,
-      partnerBonus: partnerBonus,
-      random: _random,
-      playerAge: widget.character.age,
-      custodyParent: widget.character.custodyParent,
-      isAlreadyPartner: isAlreadyActivePartner,
-    );
 
     int relationChange = 0;
 
@@ -230,13 +296,22 @@ class _BercintaScreenState extends State<BercintaScreen> {
         final String firstPartnerName = widget.character.partner?['name'] ?? 'pasanganmu';
         final String informantDesc = _chosenLocation.contains('Rumah') ? 'keluarga/tetangga' : 'petugas hotel';
         
-        // Pinalti hubungan dengan pacar utama jika ada
-        if (widget.character.partner != null) {
+        final bool isWithMainPartner = widget.character.partner != null &&
+            (widget.targetName == widget.character.partner!['name'] ||
+             widget.targetName.contains(widget.character.partner!['name'] ?? '___') ||
+             (widget.character.partner!['name'] ?? '').contains(widget.targetName));
+
+        // Pinalti hubungan dengan pacar utama jika ada dan tidak sedang berhubungan dengan pacar utama
+        if (widget.character.partner != null && !isWithMainPartner) {
           int rel = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
           widget.character.partner!['relationship'] = (rel - 25).clamp(0, 100).toString();
         }
         widget.character.happiness = (widget.character.happiness - 20).clamp(0, 100);
-        widget.character.inbox.add('😡 Ketahuan Basah: Aksi bercintamu dengan ${widget.targetName} ketahuan oleh $informantDesc! Hubunganmu dengan $firstPartnerName memburuk drastis.');
+        if (isWithMainPartner) {
+          widget.character.inbox.add('😡 Ketahuan Basah: Aksi bercintamu dengan ${widget.targetName} ketahuan oleh $informantDesc!');
+        } else {
+          widget.character.inbox.add('😡 Ketahuan Basah: Aksi bercintamu dengan ${widget.targetName} ketahuan oleh $informantDesc! Hubunganmu dengan $firstPartnerName memburuk drastis.');
+        }
 
         showDialog(
           context: context,
@@ -250,8 +325,10 @@ class _BercintaScreenState extends State<BercintaScreen> {
               ],
             ),
             content: Text(
-              'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc! '
-              'Kabar buruk ini menyebar cepat dan pacar utamamu ($firstPartnerName) mengetahuinya!',
+              isWithMainPartner
+                  ? 'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc!'
+                  : 'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc! '
+                    'Kabar buruk ini menyebar cepat dan pacar utamamu ($firstPartnerName) mengetahuinya!',
               style: const TextStyle(fontSize: 14),
             ),
             actions: [
@@ -308,13 +385,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
         widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
       };
     } else {
-      title = 'Momen Canggung';
-      message = '$relation menolak ajakanmu dengan halus ketika diajak bercinta $_chosenLocation pada waktu $_chosenTime. Kamu merasa sedikit dipermalukan dan canggung (${relationChange.abs()}% hubungan).';
-      icon = Icons.sentiment_dissatisfied;
-      color = Colors.orange;
-      applyStateChange = () {
-        widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-      };
+      return;
     }
 
     // --- LOGIKA KEHAMILAN DINAMIS ---
@@ -373,12 +444,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       }
     }
 
-    // Pemicu pengecekan penyakit menular seksual (STD) jika tidak pakai pengaman
-    if (success && _useCondom == false) {
-      if (context.mounted) {
-        await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
-      }
-    }
+    // Pemicu pengecekan penyakit menular seksual (STD) dipindahkan ke akhir aliran dialog (pada tombol OK hasil bercinta)
 
     // Konsekuensi psikologis & genetik incest
     if (success) {
@@ -399,7 +465,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
+      builder: (dialogCtx) => AlertDialog(
         title: Row(
           children: [
             Icon(icon, color: color, size: 28),
@@ -467,9 +533,9 @@ class _BercintaScreenState extends State<BercintaScreen> {
         ),
         actions: [
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               // 1. Tutup dialog hasil bercinta
-              Navigator.of(context).pop();
+              Navigator.of(dialogCtx).pop();
               // 2. Terapkan perubahan state (happiness dll)
               applyStateChange();
               if (isPregnant || isPartnerPregnant) {
@@ -480,7 +546,19 @@ class _BercintaScreenState extends State<BercintaScreen> {
                   character: widget.character,
                   partnerName: widget.targetName,
                   partnerRole: widget.targetRole,
-                  onComplete: () {
+                  onComplete: () async {
+                    if (_useCondom == false) {
+                      final rel = detectIncestRelation(widget.targetRole, widget.targetName);
+                      if (rel != null && rel.geneticRisk > 0 && context.mounted) {
+                        await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
+                      }
+                    }
+
+                    // 4a. Pengecekan penyakit menular seksual (STD) di akhir dialog kehamilan
+                    if (success && _useCondom == false && context.mounted) {
+                      await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+                    }
+
                     // Pastikan context masih valid sebelum pop
                     if (context.mounted) {
                       Navigator.of(context).pop();
@@ -489,8 +567,14 @@ class _BercintaScreenState extends State<BercintaScreen> {
                   },
                 );
               } else {
-                // 3b. Tidak ada kehamilan – langsung tutup dan selesai
-                Navigator.of(context).pop();
+                // 3b. Tidak ada kehamilan – lakukan pengecekan penyakit dan selesai
+                if (success && _useCondom == false && context.mounted) {
+                  await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+                }
+
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
                 widget.onActionComplete.call();
               }
             },
@@ -512,17 +596,42 @@ class _BercintaScreenState extends State<BercintaScreen> {
     } else if (widget.targetName.startsWith('Ibu')) {
       targetAge = widget.character.motherAge ?? 38;
     } else {
-      for (var sib in widget.character.siblings) {
-        final String expectedLabel = '${sib['name']} (${sib['relation']})';
-        if (expectedLabel == widget.targetName) {
-          targetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
-          break;
+      bool found = false;
+      // Cek partner utama / pacar aktif
+      if (widget.character.partner != null && widget.character.partner!['name'] == widget.targetName) {
+        targetAge = int.tryParse(widget.character.partner!['age'] ?? '18') ?? 18;
+        found = true;
+      } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == widget.targetName) {
+        targetAge = int.tryParse(widget.character.secondPartner!['age'] ?? '18') ?? 18;
+        found = true;
+      } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == widget.targetName) {
+        targetAge = int.tryParse(widget.character.thirdPartner!['age'] ?? '18') ?? 18;
+        found = true;
+      } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == widget.targetName) {
+        targetAge = int.tryParse(widget.character.fourthPartner!['age'] ?? '18') ?? 18;
+        found = true;
+      } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == widget.targetName) {
+        targetAge = int.tryParse(widget.character.fifthPartner!['age'] ?? '18') ?? 18;
+        found = true;
+      }
+
+      if (!found) {
+        for (var sib in widget.character.siblings) {
+          final String expectedLabel = '${sib['name']} (${sib['relation']})';
+          if (expectedLabel == widget.targetName) {
+            targetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
+            found = true;
+            break;
+          }
         }
       }
-      for (var ext in widget.character.extendedFamily) {
-        if (ext['name'] == widget.targetName) {
-          targetAge = int.tryParse(ext['age'] ?? '18') ?? 18;
-          break;
+      if (!found) {
+        for (var ext in widget.character.extendedFamily) {
+          if (ext['name'] == widget.targetName) {
+            targetAge = int.tryParse(ext['age'] ?? '18') ?? 18;
+            found = true;
+            break;
+          }
         }
       }
     }
@@ -535,6 +644,12 @@ class _BercintaScreenState extends State<BercintaScreen> {
       currentSatisfaction = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
     } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == cleanTargetName) {
       currentSatisfaction = int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.thirdPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.fourthPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.fifthPartner!['relationship'] ?? '50') ?? 50;
     } else {
       // Cari di siblings
       for (var sib in widget.character.siblings) {
@@ -563,6 +678,29 @@ class _BercintaScreenState extends State<BercintaScreen> {
         Navigator.of(context).pop();
       },
       onAccepted: () async {
+        final bool acceptedMakeLove = HubunganIntimLogic.calculateMakeLoveSuccess(
+          myGender: widget.character.gender.trim().toLowerCase(),
+          partnerGender: _getPartnerGender().trim().toLowerCase(),
+          targetName: widget.targetName,
+          targetRole: widget.targetRole,
+          partnerBonus: _getPartnerBonus(),
+          random: _random,
+          playerAge: widget.character.age,
+          custodyParent: widget.character.custodyParent,
+          isAlreadyPartner: _isTargetActivePartner(),
+        );
+
+        if (!acceptedMakeLove) {
+          if (currentSatisfaction >= 60) {
+            _showExcusedRejectionDialog();
+          } else {
+            _showEarlyRejectionDialog(currentSatisfaction);
+          }
+          return;
+        }
+
+        _partnerConsentGranted = true;
+
         final String? loc = await TempatBercintaHelper.showLocationChooser(
           context: context,
           character: widget.character,

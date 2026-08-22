@@ -90,13 +90,15 @@ class RelationshipButton extends StatelessWidget {
                     icon: Icons.person,
                     label: character.isFatherDeceased
                         ? 'Ayah (${character.fatherName}) (Wafat)'
-                        : 'Ayah (${character.fatherName}) (Cerai)',
-                    status: 'Cerai',
+                        : character.isFatherImprisoned
+                            ? 'Ayah (${character.fatherName}) (Dipenjara)'
+                            : 'Ayah (${character.fatherName}) (Cerai)',
+                    status: character.isFatherImprisoned ? 'Dipenjara' : 'Cerai',
                     color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                     relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                     ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isFatherDeceased,
-                    isLivingTogether: character.custodyParent == 'Ayah',
+                    isLivingTogether: character.custodyParent == 'Ayah' && !character.isFatherImprisoned,
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.fatherName!,
                       gender: 'Laki-laki',
@@ -115,13 +117,15 @@ class RelationshipButton extends StatelessWidget {
                     icon: Icons.person_outline,
                     label: character.isMotherDeceased
                         ? 'Ibu (${character.motherName}) (Wafat)'
-                        : 'Ibu (${character.motherName}) (Cerai)',
-                    status: 'Cerai',
+                        : character.isMotherImprisoned
+                            ? 'Ibu (${character.motherName}) (Dipenjara)'
+                            : 'Ibu (${character.motherName}) (Cerai)',
+                    status: character.isMotherImprisoned ? 'Dipenjara' : 'Cerai',
                     color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                     relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                     ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isMotherDeceased,
-                    isLivingTogether: character.custodyParent == 'Ibu',
+                    isLivingTogether: character.custodyParent == 'Ibu' && !character.isMotherImprisoned,
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.motherName!,
                       gender: 'Perempuan',
@@ -141,12 +145,15 @@ class RelationshipButton extends StatelessWidget {
                     icon: Icons.person,
                     label: character.isFatherDeceased
                         ? 'Ayah (${character.fatherName}) (Wafat)'
-                        : 'Ayah (${character.fatherName})',
-                    status: 'Kandung',
+                        : character.isFatherImprisoned
+                            ? 'Ayah (${character.fatherName}) (Dipenjara)'
+                            : 'Ayah (${character.fatherName})',
+                    status: character.isFatherImprisoned ? 'Dipenjara' : 'Kandung',
                     color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                     relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                     ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isFatherDeceased,
+                    isLivingTogether: !character.isFatherImprisoned,
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.fatherName!,
                       gender: 'Laki-laki',
@@ -161,12 +168,15 @@ class RelationshipButton extends StatelessWidget {
                     icon: Icons.person_outline,
                     label: character.isMotherDeceased
                         ? 'Ibu (${character.motherName}) (Wafat)'
-                        : 'Ibu (${character.motherName})',
-                    status: 'Kandung',
+                        : character.isMotherImprisoned
+                            ? 'Ibu (${character.motherName}) (Dipenjara)'
+                            : 'Ibu (${character.motherName})',
+                    status: character.isMotherImprisoned ? 'Dipenjara' : 'Kandung',
                     color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                     relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                     ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                     isDeceased: character.isMotherDeceased,
+                    isLivingTogether: !character.isMotherImprisoned,
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                       name: character.motherName!,
                       gender: 'Perempuan',

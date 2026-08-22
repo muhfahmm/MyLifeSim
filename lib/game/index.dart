@@ -336,22 +336,40 @@ class _GameScreenState extends State<GameScreen> {
       if (!mounted) return;
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.notifications_active, color: Colors.orange, size: 28),
-              SizedBox(width: 8),
-              Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: events.map((e) => Padding(
-              padding: const EdgeInsets.only(bottom: 8.0),
-              child: Text(e, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-            )).toList(),
-          ),
+        builder: (context) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.notifications_active, color: Colors.orange, size: 28),
+                const SizedBox(width: 8),
+                Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: events.map((e) {
+                // Determine if this specific event line contains gay/lesbian
+                final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
+                String displayText = e;
+                if (isSameSexEvent) {
+                  // Replace the starting emoji or icon (e.g. 💬, 💍, 🎉) with 🏳️‍🌈 if possible
+                  if (displayText.startsWith('💬')) {
+                    displayText = '🏳️‍🌈' + displayText.substring(1);
+                  } else if (displayText.startsWith('💍')) {
+                    displayText = '🏳️‍🌈' + displayText.substring(1);
+                  } else if (displayText.startsWith('🎉')) {
+                    displayText = '🏳️‍🌈' + displayText.substring(1);
+                  } else if (!displayText.startsWith('🏳️‍🌈')) {
+                    displayText = '🏳️‍🌈 ' + displayText;
+                  }
+                }
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                );
+              }).toList(),
+            ),
           actions: [
             TextButton(
               onPressed: () {
@@ -363,8 +381,9 @@ class _GameScreenState extends State<GameScreen> {
               child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
           ],
-        ),
-      );
+        );
+      },
+    );
     } else {
       _checkSchoolEnrollmentOptions(() {
         _checkGraduationOptions();
@@ -787,9 +806,13 @@ class _GameScreenState extends State<GameScreen> {
     if (!mounted) return;
 
     final String relCheck = relation.toLowerCase();
-    final bool isFatherProposal = relCheck.contains('ayah');
-    final bool isMotherProposal = relCheck.contains('ibu');
-    final bool isGrandfatherProposal = relCheck.contains('kakek');
+    final bool isParent = relCheck == 'ayah' || relCheck == 'ibu' ||
+                          relCheck == 'ayah kandung' || relCheck == 'ibu kandung' ||
+                          relCheck == 'ayah tiri' || relCheck == 'ibu tiri' ||
+                          relCheck == 'ayah (cerai)' || relCheck == 'ibu (cerai)';
+    final bool isFatherProposal = isParent && relCheck.contains('ayah');
+    final bool isMotherProposal = isParent && relCheck.contains('ibu');
+    final bool isGrandfatherProposal = false;
 
     bool showReportToMother = (isFatherProposal || isGrandfatherProposal) &&
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
@@ -797,8 +820,15 @@ class _GameScreenState extends State<GameScreen> {
 
     bool showReportToFather = isMotherProposal &&
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
-        ((_character.fatherName != null && !_character.isFatherDeceased) ||
+        ((_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned) ||
          (_character.stepFatherName != null && !_character.isStepFatherDeceased));
+
+    if (_character.gender.toLowerCase() == 'laki-laki' &&
+        isMotherProposal &&
+        _character.isMotherDivorced &&
+        _character.custodyParent == 'Ibu') {
+      showReportToFather = false;
+    }
 
     if (_character.partner != null) {
       final String pName = _character.partner!['name']!.toLowerCase();
@@ -819,14 +849,18 @@ class _GameScreenState extends State<GameScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 28),
-            const SizedBox(width: 8),
-            Text(dialogTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
-        ),
+      builder: (context) {
+        final bool isGayOrLesbian = dialogTitle.contains('Gay') || dialogTitle.contains('Lesbian');
+        return AlertDialog(
+          title: Row(
+            children: [
+              isGayOrLesbian
+                  ? const Text('🏳️‍🌈', style: TextStyle(fontSize: 28))
+                  : Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 28),
+              const SizedBox(width: 8),
+              Text(dialogTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
         content: Text(
           dialogBody,
           style: const TextStyle(fontSize: 14),
@@ -849,13 +883,15 @@ class _GameScreenState extends State<GameScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                final String reportTarget = (_character.fatherName != null && !_character.isFatherDeceased) ? 'Ayah' : 'Ayah Tiri';
+                final String reportTarget = (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned) ? 'Ayah' : 'Ayah Tiri';
                 _executeReportParent(context, partnerName, relation, reportTarget);
               },
               child: Text(
                 isGrandfatherProposal && _character.fatherName != null
                     ? 'Laporkan ke Ayah (${_character.fatherName})'
-                    : 'Laporkan ke Ayah',
+                    : (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned)
+                        ? 'Laporkan ke Ayah'
+                        : 'Laporkan ke Ayah Tiri',
                 style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ),
@@ -1041,7 +1077,9 @@ class _GameScreenState extends State<GameScreen> {
               }
             },
             child: Text(
-              _character.partner != null ? 'Terima menjadi selingkuhan' : 'Terima',
+              (type == 'Bercinta' || type == 'Bersetubuh')
+                  ? 'Terima hubungan intim'
+                  : (_character.partner != null ? 'Terima menjadi selingkuhan' : 'Terima'),
               style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),
@@ -1075,9 +1113,12 @@ class _GameScreenState extends State<GameScreen> {
             child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
-      ),
-    );
-  }
+      );
+    },
+  );
+}
+
+  // --- RESTORED CLASS METHOD CLOSURE ---
 
   void _executeReportParent(BuildContext context, String partnerName, String relation, String reportTarget) {
     final rand = Random();
@@ -1130,13 +1171,17 @@ class _GameScreenState extends State<GameScreen> {
         _character.motherRelationship = 0;
 
         if (isJailed) {
-          _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah, menceraikannya, dan melaporkannya ke polisi. Ibumu kini dipenjara!');
+          final int prisonYears = rand.nextInt(5) + 1; // 1-5 years
+          _character.isMotherImprisoned = true;
+          _character.motherPrisonYears = prisonYears;
+          _character.custodyParent = null; // resets custody since she is in prison
+          _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah, menceraikannya, dan melaporkannya ke polisi. Ibumu kini dipenjara selama $prisonYears tahun!');
         } else {
           _character.inbox.add('💔 Perceraian: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah dan memutuskan untuk menceraikannya.');
         }
 
-        // Peluang Ibu Kandung menikah lagi (mempunyai Ayah Tiri) sebesar 40%
-        if (rand.nextInt(100) < 40) {
+        // Peluang Ibu Kandung menikah lagi (mempunyai Ayah Tiri) sebesar 40% (hanya jika tidak dipenjara)
+        if (!isJailed && rand.nextInt(100) < 40) {
           final List<String> boys = (_character.maleFirstNames != null && _character.maleFirstNames!.isNotEmpty) ? _character.maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
           final List<String> familyNames = (_character.lastNames != null && _character.lastNames!.isNotEmpty) ? _character.lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
           _character.stepFatherName = '${boys[rand.nextInt(boys.length)]} ${familyNames[rand.nextInt(familyNames.length)]}';
@@ -1158,6 +1203,10 @@ class _GameScreenState extends State<GameScreen> {
       _character.activeProposal = null;
     });
 
+    final String customContent = isJailed
+        ? 'Laporanmu berhasil! $partnerName telah dilaporkan ke polisi oleh $reportTarget, diceraikan, dan kini mendekam di penjara selama ${_character.motherPrisonYears} tahun.'
+        : '$reportTarget sangat terkejut mendengarnya dan memutuskan untuk menceraikan $partnerName secara langsung!';
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1173,9 +1222,7 @@ class _GameScreenState extends State<GameScreen> {
           ],
         ),
         content: Text(
-          isJailed
-              ? 'Laporanmu berhasil! $partnerName telah dilaporkan ke polisi oleh $reportTarget, diceraikan, dan kini mendekam di penjara.'
-              : '$reportTarget sangat terkejut mendengarnya dan memutuskan untuk menceraikan $partnerName secara langsung!',
+          customContent,
           style: const TextStyle(fontSize: 14),
         ),
         actions: [
@@ -1192,6 +1239,130 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _showCustodySelectionDialog(BuildContext context, String fatherName, String motherName) {
+    final bool fatherAliveAndFree = _character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned;
+    final bool stepFatherAliveAndFree = _character.stepFatherName != null && !_character.isStepFatherDeceased;
+    final bool motherAliveAndFree = _character.motherName != null && !_character.isMotherDeceased && !_character.isMotherImprisoned;
+
+    // Jika user berusia 18 tahun ke atas, tidak perlu hak asuh
+    if (_character.age >= 18) {
+      return;
+    }
+
+    // Kasus 1: Keduanya (ayah kandung/tiri dan ibu kandung) hidup bebas
+    // User bisa memilih. Pilihan ayah adalah Ayah Kandung (jika ada) atau Ayah Tiri.
+    final String fatherOrStepFatherLabel = fatherAliveAndFree ? fatherName : (_character.stepFatherName ?? 'Ayah Tiri');
+    final bool hasFatherOption = fatherAliveAndFree || stepFatherAliveAndFree;
+    final bool hasMotherOption = motherAliveAndFree;
+
+    if (!hasFatherOption && !hasMotherOption) {
+      // Kasus khusus: Semua meninggal / dipenjara -> Hidup sendiri di rumah yang ditinggalkan
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.gavel, color: Colors.red),
+              SizedBox(width: 8),
+              Text('Hidup Sendiri 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            'Kedua orang tuamu telah tiada atau dipenjara. Karena tidak ada wali yang tersisa, kamu dipaksa untuk hidup mandiri dan menempati rumah peninggalan ibumu.',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _character.custodyParent = null;
+                  _character.inbox.add('🏡 Hidup Mandiri: Kamu menempati rumah peninggalan ibumu setelah dia dipenjara.');
+                });
+              },
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Jika hanya ada 1 pilihan tersisa karena salah satu meninggal/dipenjara
+    if (hasFatherOption && !hasMotherOption) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.home, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(
+            'Karena ibumu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada $fatherOrStepFatherLabel.',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  if (fatherAliveAndFree) {
+                    _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
+                    _character.custodyParent = 'Ayah';
+                  } else {
+                    _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 20).clamp(0, 100);
+                    _character.custodyParent = 'Ayah Tiri';
+                  }
+                  _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan $fatherOrStepFatherLabel.');
+                });
+              },
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    if (!hasFatherOption && hasMotherOption) {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.home, color: Colors.pink),
+              SizedBox(width: 8),
+              Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(
+            'Karena ayahmu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada Ibumu ($motherName).',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                setState(() {
+                  _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
+                  _character.custodyParent = 'Ibu';
+                  _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan Ibumu ($motherName).');
+                });
+              },
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Jika keduanya ada, tampilkan modal pilihan (Ayah Kandung / Ayah Tiri vs Ibu)
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1212,21 +1383,29 @@ class _GameScreenState extends State<GameScreen> {
             onPressed: () {
               Navigator.pop(context);
               setState(() {
-                _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
-                _character.motherRelationship = ((_character.motherRelationship ?? 50) - 15).clamp(0, 100);
-                _character.custodyParent = 'Ayah';
-                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ayahmu ($fatherName).');
+                if (fatherAliveAndFree) {
+                  _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
+                  _character.custodyParent = 'Ayah';
+                } else {
+                  _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 20).clamp(0, 100);
+                  _character.custodyParent = 'Ayah Tiri';
+                }
+                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama $fatherOrStepFatherLabel.');
               });
               _checkGlassesNeed();
             },
-            child: Text('Ikut Ayah ($fatherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+            child: Text('Ikut Ayah ($fatherOrStepFatherLabel)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               setState(() {
                 _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
-                _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 15).clamp(0, 100);
+                if (fatherAliveAndFree) {
+                  _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 15).clamp(0, 100);
+                } else {
+                  _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) - 15).clamp(0, 100);
+                }
                 _character.custodyParent = 'Ibu';
                 _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ibumu ($motherName).');
               });

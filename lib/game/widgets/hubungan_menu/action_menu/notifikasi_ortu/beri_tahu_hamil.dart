@@ -10,12 +10,10 @@ class BeritahuKehamilanHelper {
     required String partnerRole,
     required VoidCallback onComplete,
   }) async {
-    // Mengecek apakah ada orang tua kandung/tiri yang hidup untuk diberitahu
+    // Mengecek apakah ada orang tua kandung yang hidup untuk diberitahu
     final bool hasLivingParents = 
         (character.fatherName != null && !character.isFatherDeceased) ||
-        (character.motherName != null && !character.isMotherDeceased) ||
-        (character.stepFatherName != null && !character.isStepFatherDeceased) ||
-        (character.stepMotherName != null && !character.isStepMotherDeceased);
+        (character.motherName != null && !character.isMotherDeceased);
 
     await showDialog(
       context: context,
@@ -84,6 +82,30 @@ class BeritahuKehamilanHelper {
     String reactionText = '';
     Color themeColor = Colors.green;
 
+    final int partnerAgeVal = () {
+      final String cleanPartner = partnerName.toLowerCase();
+      if (character.partner != null && character.partner!['name']!.toLowerCase().contains(cleanPartner)) {
+        return int.tryParse(character.partner!['age'] ?? '18') ?? 18;
+      }
+      if (character.secondPartner != null && character.secondPartner!['name']!.toLowerCase().contains(cleanPartner)) {
+        return int.tryParse(character.secondPartner!['age'] ?? '18') ?? 18;
+      }
+      if (character.thirdPartner != null && character.thirdPartner!['name']!.toLowerCase().contains(cleanPartner)) {
+        return int.tryParse(character.thirdPartner!['age'] ?? '18') ?? 18;
+      }
+      if (character.fourthPartner != null && character.fourthPartner!['name']!.toLowerCase().contains(cleanPartner)) {
+        return int.tryParse(character.fourthPartner!['age'] ?? '18') ?? 18;
+      }
+      if (character.fifthPartner != null && character.fifthPartner!['name']!.toLowerCase().contains(cleanPartner)) {
+        return int.tryParse(character.fifthPartner!['age'] ?? '18') ?? 18;
+      }
+      return 18;
+    }();
+
+    final bool isMinorPartner = partnerAgeVal < 18;
+    final int roll = character.ageUp().hashCode % 100; // deterministic random seed fallback or standard random roll
+    final bool minorIsAngry = isMinorPartner && (roll < 70); // 70% chance of anger
+
     if (isIncest) {
       reactionTitle = 'Reaksi Murka! 😡💣';
       reactionText = 'Orang tuamu mengetahui bahwa kamu hamil akibat hubungan dengan anggota keluarga ($partnerName)! Mereka sangat syok, kecewa, dan murka! Hubungan keluarga memburuk secara ekstrem.';
@@ -93,6 +115,15 @@ class BeritahuKehamilanHelper {
       if (character.fatherName != null) character.fatherRelationship = (character.fatherRelationship ?? 50) - 40;
       if (character.motherName != null) character.motherRelationship = (character.motherRelationship ?? 50) - 40;
       character.happiness = (character.happiness - 35).clamp(0, 100);
+    } else if (minorIsAngry) {
+      reactionTitle = 'Reaksi Marah! 😡💢';
+      reactionText = 'Orang tuamu sangat marah mengetahui kamu menghamili pacarmu ($partnerName) yang masih di bawah umur (${partnerAgeVal} tahun)! Hubungan keluarga memburuk.';
+      themeColor = Colors.red;
+
+      // Efek penalti
+      if (character.fatherName != null) character.fatherRelationship = (character.fatherRelationship ?? 50) - 20;
+      if (character.motherName != null) character.motherRelationship = (character.motherRelationship ?? 50) - 20;
+      character.happiness = (character.happiness - 20).clamp(0, 100);
     } else {
       reactionTitle = 'Reaksi Bahagia! 🎉🍼';
       reactionText = 'Orang tuamu sangat senang mendengar bahwa mereka akan segera mendapatkan cucu dari hubunganmu dengan $partnerName! Hubungan keluarga semakin hangat.';
