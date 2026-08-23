@@ -17,8 +17,11 @@ class MasturbasiHelper {
         n.startsWith('ibu');
   }
 
-  // Tampilkan dialog proses masturbasi
+  // ============================================================
+  // Fungsi publik untuk membuka menu masturbasi sebagai HALAMAN (PAGE)
+  // ============================================================
   static void showMasturbationMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    // Validasi usia
     if (character.age < 9) {
       showDialog(
         context: context,
@@ -36,106 +39,28 @@ class MasturbasiHelper {
       return;
     }
 
-    if (character.age == character.lastMasturbationAge) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Terlalu Lelah'),
-          content: const Text('Kamu sudah melakukan masturbasi tahun ini. Melakukannya terlalu sering tidak baik untuk kesehatan mentalmu.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Mengerti'),
-            ),
-          ],
+    // HAPUS LOGIKA PEMBATASAN PER TAHUN
+    // if (character.age == character.lastMasturbationAge) { ... } --> dihapus
+
+    // Navigasi ke halaman pilihan fantasi (bukan modal)
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MasturbasiMenuPage(
+          character: character,
+          onComplete: onComplete,
         ),
-      );
-      return;
-    }
-
-    // Kumpulkan opsi fantasi
-    final List<Map<String, String>> options = [
-      {'name': 'Tanpa Bayangan (Biasa)', 'relation': 'Biasa'},
-    ];
-
-    if (character.partner != null) {
-      options.add({
-        'name': character.partner!['name']!,
-        'relation': 'Pasangan',
-      });
-    }
-
-    // Tambah keluarga (Incest Fantasy)
-    if (character.fatherName != null && !character.isFatherDeceased) {
-      options.add({'name': 'Ayah (${character.fatherName})', 'relation': 'Ayah'});
-    }
-    if (character.motherName != null && !character.isMotherDeceased) {
-      options.add({'name': 'Ibu (${character.motherName})', 'relation': 'Ibu'});
-    }
-    for (var sib in character.siblings) {
-      if (sib['isDeceased'] != 'true') {
-        options.add({
-          'name': '${sib['name']} (${sib['relation']})',
-          'relation': sib['relation'] ?? 'Saudara',
-        });
-      }
-    }
-
-    // Tambah Orang Terdekat / Teman khayalan
-    options.add({'name': 'Teman Dekat / Selebriti', 'relation': 'Teman'});
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.favorite_border, color: Colors.pinkAccent),
-            SizedBox(width: 8),
-            Text('Pilih Fantasi Masturbasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: options.length,
-            itemBuilder: (context, index) {
-              final opt = options[index];
-              return Card(
-                elevation: 0,
-                color: Colors.grey.shade50,
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  leading: const Icon(Icons.psychology, color: Colors.pinkAccent),
-                  title: Text(opt['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('Bayangkan: ${opt['relation']}', style: const TextStyle(fontSize: 11)),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _executeMasturbation(context, character, opt['name']!, opt['relation']!, onComplete);
-                  },
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-        ],
       ),
     );
   }
 
-  static void _executeMasturbation(
+  // ============================================================
+  // METODE PUBLIK UNTUK EKSEKUSI (dipanggil dari halaman)
+  // ============================================================
+  static void executeMasturbation(
       BuildContext context, Character character, String targetName, String relation, VoidCallback onComplete) {
     final Random random = Random();
-    character.lastMasturbationAge = character.age;
+    character.lastMasturbationAge = character.age; // tetap dicatat untuk keperluan lain
 
     // Logika risiko Ketahuan (10%)
     final bool ketahuan = random.nextInt(100) < 10;
@@ -185,13 +110,11 @@ class MasturbasiHelper {
     // Eksekusi efek statistik sukses
     String resultMsg = '';
     if (relation == 'Biasa') {
-      // Normal: +15 Happiness, +5 Health, -5 Intelligence
       character.happiness = (character.happiness + 15).clamp(0, 100);
       character.health = (character.health + 5).clamp(0, 100);
       character.intelligence = (character.intelligence - 5).clamp(0, 100);
       resultMsg = '💦 Selesai: Kamu menyelesaikan aktivitas ini secara normal. Stres berkurang (+15% Kebahagiaan, +5% Kesehatan, -5% Kecerdasan).';
     } else if (relation == 'Pasangan') {
-      // Pasangan: +20 Happiness, +5 Health, +5 Hubungan
       character.happiness = (character.happiness + 20).clamp(0, 100);
       character.health = (character.health + 5).clamp(0, 100);
       if (character.partner != null) {
@@ -200,7 +123,6 @@ class MasturbasiHelper {
       }
       resultMsg = '💖 Bayangan Pasangan: Kamu bermasturbasi sambil membayangkan $targetName. Kamu merasa semakin dekat secara batin dengannya (+20% Kebahagiaan, +5% Hubungan).';
     } else if (_isFamily(targetName, relation)) {
-      // Inses: +20 Happiness awal, -10 Health (penyesalan), 20% peluang -25% Happiness
       character.happiness = (character.happiness + 20).clamp(0, 100);
       character.health = (character.health - 10).clamp(0, 100);
 
@@ -212,7 +134,6 @@ class MasturbasiHelper {
         resultMsg = '⚠️ Fantasi Terlarang: Kamu bermasturbasi membayangkan $targetName. Kamu merasa sangat bersalah tetapi puas (+20% Kebahagiaan awal, -10% Kesehatan karena stres batin).';
       }
     } else {
-      // Teman/Selebriti
       character.happiness = (character.happiness + 15).clamp(0, 100);
       character.health = (character.health + 5).clamp(0, 100);
       resultMsg = '✨ Fantasi Bebas: Kamu bermasturbasi membayangkan $targetName. Pikiranmu terasa segar (+15% Kebahagiaan, +5% Kesehatan).';
@@ -240,6 +161,102 @@ class MasturbasiHelper {
             child: const Text('OK'),
           ),
         ],
+      ),
+    );
+  }
+
+  // ============================================================
+  // FUNGSI PEMBANTU MEMBANGUN OPSI (digunakan oleh halaman)
+  // ============================================================
+  static List<Map<String, String>> _buildOptions(Character character) {
+    final List<Map<String, String>> options = [
+      {'name': 'Tanpa Bayangan (Biasa)', 'relation': 'Biasa'},
+    ];
+
+    if (character.partner != null) {
+      options.add({
+        'name': character.partner!['name']!,
+        'relation': 'Pasangan',
+      });
+    }
+
+    if (character.fatherName != null && !character.isFatherDeceased) {
+      options.add({'name': 'Ayah (${character.fatherName})', 'relation': 'Ayah'});
+    }
+    if (character.motherName != null && !character.isMotherDeceased) {
+      options.add({'name': 'Ibu (${character.motherName})', 'relation': 'Ibu'});
+    }
+    for (var sib in character.siblings) {
+      if (sib['isDeceased'] != 'true') {
+        options.add({
+          'name': '${sib['name']} (${sib['relation']})',
+          'relation': sib['relation'] ?? 'Saudara',
+        });
+      }
+    }
+
+    options.add({'name': 'Teman Dekat / Selebriti', 'relation': 'Teman'});
+    return options;
+  }
+}
+
+// ============================================================
+//  WIDGET HALAMAN (PAGE) UNTUK MENU MASTURBASI
+// ============================================================
+class MasturbasiMenuPage extends StatelessWidget {
+  final Character character;
+  final VoidCallback onComplete;
+
+  const MasturbasiMenuPage({Key? key, required this.character, required this.onComplete}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final options = MasturbasiHelper._buildOptions(character);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pilih Fantasi Masturbasi'),
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ListView.builder(
+          itemCount: options.length,
+          itemBuilder: (context, index) {
+            final opt = options[index];
+            return Card(
+              elevation: 2,
+              color: Colors.grey.shade50,
+              margin: const EdgeInsets.only(bottom: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: Colors.grey.shade200),
+              ),
+              child: ListTile(
+                leading: const Icon(Icons.psychology, color: Colors.pinkAccent),
+                title: Text(opt['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                subtitle: Text('Bayangkan: ${opt['relation']}', style: const TextStyle(fontSize: 11)),
+                onTap: () {
+                  // Eksekusi masturbasi, lalu tutup halaman setelah selesai
+                  void wrappedComplete() {
+                    Navigator.pop(context); // tutup halaman
+                    onComplete();           // panggil callback eksternal
+                  }
+                  MasturbasiHelper.executeMasturbation(
+                    context,
+                    character,
+                    opt['name']!,
+                    opt['relation']!,
+                    wrappedComplete,
+                  );
+                },
+              ),
+            );
+          },
+        ),
       ),
     );
   }

@@ -1883,6 +1883,7 @@ class _GameScreenState extends State<GameScreen> {
                 
                 // 2. ASSETS
                 AssetsButton(
+                  character: _character,
                   money: _character.money,
                   age: _character.age,
                 ),

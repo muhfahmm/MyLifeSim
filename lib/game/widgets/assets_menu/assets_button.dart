@@ -1,6 +1,7 @@
 // lib/game/widgets/assets_button.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 
 // Import semua widget menu baru
 import 'package:bitlife/game/widgets/assets_menu/finansial/uang_tunai.dart';
@@ -11,11 +12,13 @@ import 'package:bitlife/game/widgets/assets_menu/aset_premium/museum.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil.dart';
 
 class AssetsButton extends StatelessWidget {
+  final Character character;
   final int money;
   final int age; // Parameter umur untuk logika pembatasan
 
   const AssetsButton({
     super.key,
+    required this.character,
     required this.money,
     required this.age,
   });
@@ -37,8 +40,8 @@ class AssetsButton extends StatelessWidget {
               // ============================================
               const Text('Finansial', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
               const SizedBox(height: 8),
-              UangTunaiItem(money: money, age: age),
-              InvestasiItem(age: age),
+              UangTunaiItem(character: character),
+              InvestasiItem(character: character),
               KemewahanItem(age: age),
 
               const Divider(height: 32),
