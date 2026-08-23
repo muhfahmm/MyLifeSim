@@ -67,11 +67,17 @@ class AgeCategoryButton extends StatelessWidget {
       if (history['SMP'] == 'Lulus') {
         displayStages.add('SMA');
         if (history['SMA'] == 'Lulus') {
-          displayStages.add('S1');
-          if (history['S1'] == 'Lulus') {
-            displayStages.add('S2');
-            if (history['S2'] == 'Lulus') {
-              displayStages.add('S3');
+          if (history['S1'] != null) {
+            displayStages.add('S1');
+            if (history['S1'] == 'Lulus') {
+              if (history['S2'] != null) {
+                displayStages.add('S2');
+                if (history['S2'] == 'Lulus') {
+                  if (history['S3'] != null) {
+                    displayStages.add('S3');
+                  }
+                }
+              }
             }
           }
         }

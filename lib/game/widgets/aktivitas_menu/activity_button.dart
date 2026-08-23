@@ -5,7 +5,6 @@ import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbasi_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/love/love_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/bercinta/bercinta_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/kesehatan/olahraga_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/aksesoris_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/adopsi_anak_menu.dart';
@@ -308,20 +307,6 @@ class ActivityButton extends StatelessWidget {
                 currentAge: age,
                 onTap: () => _executeAction(context, () {
                   LotreMenuHelper.showLotreMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Bercinta
-              _buildActivityTile(
-                context: context,
-                label: 'Bercinta',
-                subtitle: 'Nikmati keintiman',
-                icon: Icons.favorite,
-                color: Colors.pinkAccent,
-                minAge: 16,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  BercintaMenuHelper.showBercintaMenu(context, character, onRefresh);
                 }),
               ),
 
