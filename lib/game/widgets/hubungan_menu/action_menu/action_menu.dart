@@ -861,6 +861,60 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       ));
     }
 
+    // Define partner-specific actions
+    final ActionItem menggodaAction = ActionItem(
+      label: 'Menggoda',
+      icon: Icons.favorite_border,
+      color: Colors.pink,
+      onTap: () {
+        final int chance = _random.nextInt(100);
+        if (chance < 30) {
+          final change = 5 + _random.nextInt(11);
+          _updateRelationship(-change);
+          widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+          _updateState();
+          _showResultDialog(
+            'Gagal Menggoda 💔',
+            'Kamu mencoba menggoda ${widget.targetName} tetapi dia merasa kurang nyaman saat ini. Hubungan menurun!',
+            Icons.sentiment_very_dissatisfied,
+            Colors.red,
+            () {},
+          );
+        } else {
+          final change = 5 + _random.nextInt(11);
+          _updateRelationship(change);
+          widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+          _updateState();
+          _showResultDialog(
+            'Menggoda Berhasil 💖',
+            'Kamu menggoda ${widget.targetName} dengan mesra dan dia tersipu malu! Hubungan meningkat!',
+            Icons.favorite,
+            Colors.pink,
+            () {},
+          );
+        }
+      },
+    );
+
+    final ActionItem bertingkahLakuAction = ActionItem(
+      label: 'Bertingkah Laku',
+      icon: Icons.emoji_people,
+      color: Colors.blueAccent,
+      onTap: () {
+        final change = 3 + _random.nextInt(8);
+        _updateRelationship(change);
+        widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
+        _updateState();
+        _showResultDialog(
+          'Bertingkah Laku Baik',
+          'Kamu menunjukkan sikap manis dan peduli kepada ${widget.targetName}. Dia sangat menghargai perilakumu!',
+          Icons.emoji_people,
+          Colors.blueAccent,
+          () {},
+        );
+      },
+    );
+
     if ((widget.targetRole == 'Pacar' ||
             widget.targetRole == 'Pacar (Rahasia)') &&
         age < 12) {
@@ -881,7 +935,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             label == 'menyinggung' ||
             label == 'pergi ke bioskop bersama' ||
             label == 'habiskan waktu bersama' ||
-            label == 'minta barang';
+            label == 'minta barang' ||
+            label == 'percakapan';
       }).toList();
     } else if (isChild && targetAge < 12) {
       // Jika target anak kita di bawah 12 tahun, tampilkan menu khusus orang tua mengasuh anak:
@@ -1100,6 +1155,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _updateRelationship,
           _updateState,
         );
+      }
+    }
+
+    if (isActivePartner) {
+      bool hasMenggoda = actions.any((act) => act.label == 'Menggoda');
+      if (!hasMenggoda) {
+        actions.add(menggodaAction);
+      }
+      bool hasBertingkah = actions.any((act) => act.label == 'Bertingkah Laku');
+      if (!hasBertingkah) {
+        actions.add(bertingkahLakuAction);
       }
     }
 

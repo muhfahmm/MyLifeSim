@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class KriminalMenuHelper {
   static void showKriminalMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -24,62 +25,59 @@ class KriminalMenuHelper {
       {'name': 'Perjudian Ilegal 🎲', 'risk': 20, 'gain': 500000, 'jail': 1, 'desc': 'Berjudi di tempat terlarang'},
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.gavel, color: Colors.red),
-          SizedBox(width: 8),
-          Text('Aksi Kriminal ⚠️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: const Text('⚠️ Tindakan kriminal berisiko dipenjara! Pilih dengan bijak.',
-                  style: TextStyle(fontSize: 12, color: Colors.red)),
+      title: 'Aksi Kriminal ⚠️',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.shade200),
             ),
-            SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: crimes.length,
-                itemBuilder: (_, i) {
-                  final crime = crimes[i];
-                  return Card(
-                    elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.grey.shade50,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      title: Text(crime['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      subtitle: Text('${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn'),
-                      isThreeLine: true,
-                      trailing: Text('+Rp ${_fmt(crime['gain'] as int)}',
-                          style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
-                      onTap: () {
-                        Navigator.pop(ctx);
-                        _executeCrime(context, character, crime, onComplete);
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal'))],
+            child: const Text('⚠️ Tindakan kriminal berisiko dipenjara! Pilih dengan bijak.',
+                style: TextStyle(fontSize: 12, color: Colors.red)),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: crimes.length,
+            itemBuilder: (_, i) {
+              final crime = crimes[i];
+              return Card(
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 8),
+                color: Colors.grey.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  title: Text(crime['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: Text('${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn'),
+                  isThreeLine: true,
+                  trailing: Text('+Rp ${_fmt(crime['gain'] as int)}',
+                      style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
+                  onTap: () {
+                    Navigator.pop(context);
+                    _executeCrime(context, character, crime, onComplete);
+                  },
+                ),
+              );
+            },
+          ),
+        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+      ],
     );
   }
 

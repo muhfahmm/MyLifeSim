@@ -41,6 +41,11 @@ class ActivityButton extends StatelessWidget {
     required this.onRefresh,
   });
 
+  void _executeAction(BuildContext context, VoidCallback action) {
+    Navigator.pop(context);
+    Future.delayed(Duration.zero, action);
+  }
+
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
@@ -110,8 +115,7 @@ class ActivityButton extends StatelessWidget {
                   color: color,
                   minAge: minAge,
                   currentAge: age,
-                  onTap: () {
-                    Navigator.pop(context);
+                  onTap: () => _executeAction(context, () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -126,7 +130,7 @@ class ActivityButton extends StatelessWidget {
                               ),
                       ),
                     );
-                  },
+                  }),
                 );
               }(),
 
@@ -139,8 +143,7 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.green,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -150,7 +153,7 @@ class ActivityButton extends StatelessWidget {
                       ),
                     ),
                   );
-                },
+                }),
               ),
 
               const Divider(height: 32),
@@ -177,10 +180,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.orange,
                 minAge: 7,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   OlahragaMenuHelper.showOlahragaMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               const Divider(height: 32),
@@ -207,10 +209,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.pink,
                 minAge: 12,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   AksesorisMenuHelper.showAksesorisMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Adopsi Anak
@@ -222,10 +223,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.orange,
                 minAge: 21,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   AdopsiAnakMenuHelper.showAdopsiAnakMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Buat Kriminal
@@ -237,10 +237,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.red,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   KriminalMenuHelper.showKriminalMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Pergi ke Dokter
@@ -252,10 +251,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.blue,
                 minAge: 0,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   DokterMenuHelper.showDokterMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Imigrasi
@@ -267,10 +265,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.teal,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   ImigrasimMenuHelper.showImigrasimMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Kesuburan
@@ -282,10 +279,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.purple,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   KesuburanMenuHelper.showKesuburanMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Lisensi
@@ -297,10 +293,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.brown,
                 minAge: 17,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   LisensiMenuHelper.showLisensiMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Main Lotre
@@ -312,10 +307,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.amber,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   LotreMenuHelper.showLotreMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Bercinta
@@ -327,10 +321,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.pinkAccent,
                 minAge: 16,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   BercintaMenuHelper.showBercintaMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Pikiran dan Tubuh -> usia minimal 12
@@ -342,10 +335,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.indigo,
                 minAge: 12,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   PikiranTubuhMenuHelper.showPikiranTubuhMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Peliharaan
@@ -357,10 +349,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.green,
                 minAge: 10,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   PeliharaanMenuHelper.showPeliharaanMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Operasi Plastik
@@ -372,10 +363,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.cyan,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   OperasiPlastikMenuHelper.showOperasiPlastikMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Rehabilitasi
@@ -387,10 +377,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.deepPurple,
                 minAge: 18,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   RehabilitasiMenuHelper.showRehabilitasiMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Salon & Spa -> usia minimal 15
@@ -402,10 +391,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.pink,
                 minAge: 15,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   SalonSpaMenuHelper.showSalonSpaMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               // Berbelanja
@@ -417,10 +405,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.orangeAccent,
                 minAge: 12,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   BerbelanjaMenuHelper.showBerbelanjaMenu(context, character, onRefresh);
-                },
+                }),
               ),
 
               const Divider(height: 32),
@@ -453,10 +440,9 @@ class ActivityButton extends StatelessWidget {
                     title: const Text('Masturbasi (Fantasi)', style: TextStyle(fontWeight: FontWeight.bold)),
                     subtitle: const Text('Mengeksplorasi fantasi pribadimu'),
                     trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                    onTap: () {
-                      Navigator.pop(context);
+                    onTap: () => _executeAction(context, () {
                       MasturbasiHelper.showMasturbationMenu(context, character, onRefresh);
-                    },
+                    }),
                   ),
                 ),
 
@@ -469,10 +455,9 @@ class ActivityButton extends StatelessWidget {
                 color: Colors.redAccent,
                 minAge: 16,
                 currentAge: age,
-                onTap: () {
-                  Navigator.pop(context);
+                onTap: () => _executeAction(context, () {
                   LoveMenuHelper.showLoveMenu(context, character, onRefresh);
-                },
+                }),
               ),
             ],
           ),
