@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class KesuburanMenuHelper {
   static void showKesuburanMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -30,92 +31,89 @@ class KesuburanMenuHelper {
       {'name': 'Bayi Tabung (IVF) 🧪', 'cost': 30000000, 'desc': 'Program bayi tabung untuk kehamilan'},
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.egg, color: Colors.purple),
-          SizedBox(width: 8),
-          Text('Kesuburan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                color: Colors.purple.shade50,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.purple.shade200),
-              ),
-              child: Row(children: [
-                const Text('🌱', style: TextStyle(fontSize: 18)),
-                const SizedBox(width: 8),
-                Text('Estimasi Kesuburanmu: $kesuburan%',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
-              ]),
+      title: 'Kesuburan 🌱',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.purple.shade50,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: Colors.purple.shade200),
             ),
-            SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: layanan.length,
-                itemBuilder: (_, i) {
-                  final l = layanan[i];
-                  final bool canAfford = character.money >= (l['cost'] as int);
-                  return Card(
-                    elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.grey.shade50,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      title: Text(l['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
-                      isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                          size: 14, color: canAfford ? Colors.purple : Colors.grey),
-                      onTap: canAfford ? () {
-                        Navigator.pop(ctx);
-                        character.money -= (l['cost'] as int);
-                        String msg;
-                        if (l['name'].toString().contains('Cek')) {
-                          msg = '🔬 Hasil tes: Tingkat kesuburanmu adalah $kesuburan%. ${kesuburan > 70 ? 'Sangat subur!' : kesuburan > 40 ? 'Cukup subur.' : 'Kesuburanmu rendah, pertimbangkan terapi.'}';
-                        } else if (l['name'].toString().contains('Hormon')) {
-                          character.health = (character.health + 5).clamp(0, 100);
-                          msg = '💊 Terapi hormon berhasil! Kesuburanmu meningkat (+5% Kesehatan).';
-                        } else {
-                          final berhasil = r.nextInt(100) < kesuburan;
-                          msg = berhasil
-                              ? '🎉 Program IVF berhasil! Kemungkinan kehamilan meningkat pesat!'
-                              : '😔 Program IVF kali ini belum berhasil. Dokter menyarankan untuk mencoba lagi.';
-                        }
-                        character.inbox.add(msg);
-                        showDialog(
-                          context: context,
-                          builder: (ctx2) => AlertDialog(
-                            title: const Row(children: [
-                              Icon(Icons.info, color: Colors.purple),
-                              SizedBox(width: 8),
-                              Text('Hasil Layanan', style: TextStyle(fontWeight: FontWeight.bold)),
-                            ]),
-                            content: Text(msg),
-                            actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
-                          ),
-                        );
-                      } : null,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+            child: Row(children: [
+              const Text('🌱', style: TextStyle(fontSize: 18)),
+              const SizedBox(width: 8),
+              Text('Estimasi Kesuburanmu: $kesuburan%',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.purple)),
+            ]),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: layanan.length,
+            itemBuilder: (_, i) {
+              final l = layanan[i];
+              final bool canAfford = character.money >= (l['cost'] as int);
+              return Card(
+                elevation: 0,
+                margin: const EdgeInsets.only(bottom: 8),
+                color: Colors.grey.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  title: Text(l['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
+                  isThreeLine: true,
+                  trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
+                      size: 14, color: canAfford ? Colors.purple : Colors.grey),
+                  onTap: canAfford ? () {
+                    Navigator.pop(context);
+                    character.money -= (l['cost'] as int);
+                    String msg;
+                    if (l['name'].toString().contains('Cek')) {
+                      msg = '🔬 Hasil tes: Tingkat kesuburanmu adalah $kesuburan%. ${kesuburan > 70 ? 'Sangat subur!' : kesuburan > 40 ? 'Cukup subur.' : 'Kesuburanmu rendah, pertimbangkan terapi.'}';
+                    } else if (l['name'].toString().contains('Hormon')) {
+                      character.health = (character.health + 5).clamp(0, 100);
+                      msg = '💊 Terapi hormon berhasil! Kesuburanmu meningkat (+5% Kesehatan).';
+                    } else {
+                      final berhasil = r.nextInt(100) < kesuburan;
+                      msg = berhasil
+                          ? '🎉 Program IVF berhasil! Kemungkinan kehamilan meningkat pesat!'
+                          : '😔 Program IVF kali ini belum berhasil. Dokter menyarankan untuk mencoba lagi.';
+                    }
+                    character.inbox.add(msg);
+                    showDialog(
+                      context: context,
+                      builder: (ctx2) => AlertDialog(
+                        title: const Row(children: [
+                          Icon(Icons.info, color: Colors.purple),
+                          SizedBox(width: 8),
+                          Text('Hasil Layanan', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ]),
+                        content: Text(msg),
+                        actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
+                      ),
+                    );
+                  } : null,
+                ),
+              );
+            },
+          ),
+        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Tutup'),
+        ),
+      ],
     );
   }
 
