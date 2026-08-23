@@ -9,7 +9,6 @@ import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/kasino.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/museum.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil.dart';
-import 'package:bitlife/game/widgets/assets_menu/lainnya/sosial_media.dart';
 
 class AssetsButton extends StatelessWidget {
   final int money;
@@ -55,12 +54,6 @@ class AssetsButton extends StatelessWidget {
 
               const Divider(height: 32),
 
-              // ============================================
-              // 3. BAGIAN LAINNYA (TERUSKAN AGE)
-              // ============================================
-              const Text('Lainnya', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-              const SizedBox(height: 8),
-              SosialMediaItem(age: age),
             ],
           ),
           actions: [

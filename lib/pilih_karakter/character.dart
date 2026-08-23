@@ -178,6 +178,10 @@ class Character {
     return count;
   }
 
+  // DATA FOLLOWERS SOSIAL MEDIA
+  Map<String, int> platformFollowers = {};
+  // DATA POSTINGAN SOSIAL MEDIA SECARA DINAMIS
+  List<Map<String, dynamic>> posts = [];
 
   void syncNPCsAndPartners() {
     void syncMap(Map<String, String>? partnerMap) {
