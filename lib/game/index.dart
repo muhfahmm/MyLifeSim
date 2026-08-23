@@ -374,8 +374,10 @@ class _GameScreenState extends State<GameScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                _checkSchoolEnrollmentOptions(() {
-                  _checkGraduationOptions();
+                _checkAdikRequestMoney(() {
+                  _checkSchoolEnrollmentOptions(() {
+                    _checkGraduationOptions();
+                  });
                 });
               },
               child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -385,9 +387,141 @@ class _GameScreenState extends State<GameScreen> {
       },
     );
     } else {
-      _checkSchoolEnrollmentOptions(() {
-        _checkGraduationOptions();
+      _checkAdikRequestMoney(() {
+        _checkSchoolEnrollmentOptions(() {
+          _checkGraduationOptions();
+        });
       });
+    }
+  }
+
+  void _checkAdikRequestMoney(VoidCallback onDone) {
+    if (!_character.isAlive) {
+      onDone();
+      return;
+    }
+
+    final candidates = _character.siblings.where((sib) {
+      final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+      final bool isDeceased = sib['isDeceased'] == 'true';
+      final String rel = (sib['relation'] ?? '').toLowerCase();
+      final bool isAdik = rel.contains('adik');
+      return !isDeceased && isAdik && sibAge >= 6 && sibAge <= 18;
+    }).toList();
+
+    if (candidates.isNotEmpty && Random().nextInt(100) < 20) {
+      final candidate = candidates[Random().nextInt(candidates.length)];
+      final String name = candidate['name'] ?? 'Adik';
+      final int sibAge = int.tryParse(candidate['age'] ?? '0') ?? 0;
+      
+      int requestedAmount = 0;
+      if (sibAge >= 6 && sibAge <= 11) {
+        requestedAmount = Random().nextInt(10) + 1;
+      } else if (sibAge >= 12 && sibAge <= 14) {
+        requestedAmount = Random().nextInt(31) + 20;
+      } else if (sibAge >= 15 && sibAge <= 18) {
+        requestedAmount = Random().nextInt(101) + 100;
+      }
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.monetization_on, color: Colors.amber, size: 28),
+                const SizedBox(width: 8),
+                Text('$name Minta Uang', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              ],
+            ),
+            content: Text(
+              'Adikmu, $name (Umur: $sibAge tahun) meminta uang saku sebesar \$$requestedAmount untuk kebutuhan sekolahnya.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  setState(() {
+                    int currentRel = int.tryParse(candidate['relationship'] ?? '50') ?? 50;
+                    candidate['relationship'] = (currentRel - 8).clamp(0, 100).toString();
+                    _character.updateRelationshipValue(name, int.parse(candidate['relationship']!));
+                  });
+                  showDialog(
+                    context: context,
+                    builder: (resContext) => AlertDialog(
+                      title: const Text('Menolak Permintaan'),
+                      content: Text('Kamu menolak memberikan uang kepada $name. Hubungan kalian sedikit merenggang.'),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(resContext);
+                            onDone();
+                          },
+                          child: const Text('OK'),
+                        )
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(dialogContext);
+                  if (_character.money < requestedAmount) {
+                    showDialog(
+                      context: context,
+                      builder: (failContext) => AlertDialog(
+                        title: const Text('Uang Tidak Cukup'),
+                        content: const Text('Uangmu tidak mencukupi untuk memenuhi permintaannya.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(failContext);
+                              onDone();
+                            },
+                            child: const Text('OK'),
+                          )
+                        ],
+                      ),
+                    );
+                  } else {
+                    setState(() {
+                      _character.money -= requestedAmount;
+                      int currentRel = int.tryParse(candidate['relationship'] ?? '50') ?? 50;
+                      candidate['relationship'] = (currentRel + 12).clamp(0, 100).toString();
+                      _character.updateRelationshipValue(name, int.parse(candidate['relationship']!));
+                      int currentWealth = _character.getTargetWealth(name, candidate['relation'] ?? 'Adik');
+                      _character.setTargetWealth(name, candidate['relation'] ?? 'Adik', currentWealth + requestedAmount);
+                    });
+                    showDialog(
+                      context: context,
+                      builder: (succContext) => AlertDialog(
+                        title: const Text('Permintaan Dipenuhi'),
+                        content: Text('Kamu memberikan \$$requestedAmount kepada $name. Dia sangat berterima kasih!'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(succContext);
+                              onDone();
+                            },
+                            child: const Text('OK'),
+                          )
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Beri Uang', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      onDone();
     }
   }
 

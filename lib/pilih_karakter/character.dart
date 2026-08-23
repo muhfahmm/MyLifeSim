@@ -85,6 +85,14 @@ class Character {
   int? stepFatherRelationship;
   int? stepMotherRelationship;
 
+  // --- KEKAYAAN KELUARGA (PARENT WEALTH) ---
+  int? fatherWealth;
+  int? motherWealth;
+  int? stepFatherWealth;
+  int? stepMotherWealth;
+  int? fatherInLawWealth;
+  int? motherInLawWealth;
+
   // --- UMUR KELUARGA ---
   int? fatherAge;
   int? motherAge;
@@ -1756,5 +1764,192 @@ class Character {
     syncPartnerDeathStatus();
     syncSocialRelationships();
     return events;
+  }
+
+  // --- LOGIKA WEALTH GETTER & SETTER KELUARGA / NPC ---
+  int getFatherWealth() {
+    if (fatherWealth == null) {
+      fatherWealth = Random().nextInt(9501) + 500;
+    }
+    return fatherWealth!;
+  }
+
+  int getMotherWealth() {
+    if (motherWealth == null) {
+      motherWealth = Random().nextInt(9501) + 500;
+    }
+    return motherWealth!;
+  }
+
+  int getStepFatherWealth() {
+    if (stepFatherWealth == null) {
+      stepFatherWealth = Random().nextInt(9501) + 500;
+    }
+    return stepFatherWealth!;
+  }
+
+  int getStepMotherWealth() {
+    if (stepMotherWealth == null) {
+      stepMotherWealth = Random().nextInt(9501) + 500;
+    }
+    return stepMotherWealth!;
+  }
+
+  int getFatherInLawWealth() {
+    if (fatherInLawWealth == null) {
+      fatherInLawWealth = Random().nextInt(9501) + 500;
+    }
+    return fatherInLawWealth!;
+  }
+
+  int getMotherInLawWealth() {
+    if (motherInLawWealth == null) {
+      motherInLawWealth = Random().nextInt(9501) + 500;
+    }
+    return motherInLawWealth!;
+  }
+
+  int getTargetWealth(String targetName, String targetRole) {
+    final String cleanName = targetName.toLowerCase();
+    final String cleanRole = targetRole.toLowerCase();
+
+    // 1. Check parent fields
+    if (fatherName != null && (cleanName == fatherName!.toLowerCase() || cleanName.contains(fatherName!.toLowerCase()))) {
+      return getFatherWealth();
+    }
+    if (motherName != null && (cleanName == motherName!.toLowerCase() || cleanName.contains(motherName!.toLowerCase()))) {
+      return getMotherWealth();
+    }
+    if (stepFatherName != null && (cleanName == stepFatherName!.toLowerCase() || cleanName.contains(stepFatherName!.toLowerCase()))) {
+      return getStepFatherWealth();
+    }
+    if (stepMotherName != null && (cleanName == stepMotherName!.toLowerCase() || cleanName.contains(stepMotherName!.toLowerCase()))) {
+      return getStepMotherWealth();
+    }
+    if (cleanRole.contains('mertua')) {
+      if (targetName.startsWith('Ayah')) {
+        return getFatherInLawWealth();
+      } else {
+        return getMotherInLawWealth();
+      }
+    }
+
+    // Helper to get from a list of maps
+    int? getFromList(List<Map<String, String>> list) {
+      for (var item in list) {
+        if (item['name'] == targetName || (item['name'] != null && cleanName.contains(item['name']!.toLowerCase()))) {
+          if (!item.containsKey('money')) {
+            int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
+            final random = Random();
+            int initialMoney = 0;
+            if (targetAge >= 6 && targetAge <= 11) {
+              initialMoney = random.nextInt(10) + 1;
+            } else if (targetAge >= 12 && targetAge <= 14) {
+              initialMoney = random.nextInt(31) + 20;
+            } else if (targetAge >= 15 && targetAge <= 18) {
+              initialMoney = random.nextInt(101) + 100;
+            } else if (targetAge >= 19) {
+              initialMoney = random.nextInt(9501) + 500;
+            }
+            item['money'] = initialMoney.toString();
+          }
+          return int.tryParse(item['money'] ?? '0') ?? 0;
+        }
+      }
+      return null;
+    }
+
+    // 2. Check siblings, extendedFamily, classmates, coworkers, exPartners, etc.
+    int? val = getFromList(siblings);
+    if (val != null) return val;
+    val = getFromList(extendedFamily);
+    if (val != null) return val;
+    val = getFromList(classmates);
+    if (val != null) return val;
+    val = getFromList(univClassmates);
+    if (val != null) return val;
+    val = getFromList(coworkers);
+    if (val != null) return val;
+    val = getFromList(exPartners);
+    if (val != null) return val;
+
+    // Check partners
+    if (partner != null && partner!['name'] == targetName) {
+      if (!partner!.containsKey('money')) {
+        int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
+        int initialMoney = targetAge >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
+        partner!['money'] = initialMoney.toString();
+      }
+      return int.tryParse(partner!['money'] ?? '0') ?? 0;
+    }
+    if (secondPartner != null && secondPartner!['name'] == targetName) {
+      if (!secondPartner!.containsKey('money')) {
+        int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
+        int initialMoney = targetAge >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
+        secondPartner!['money'] = initialMoney.toString();
+      }
+      return int.tryParse(secondPartner!['money'] ?? '0') ?? 0;
+    }
+    
+    // Fallback if not found anywhere (e.g. teachers)
+    int ageVal = 18;
+    if (cleanRole.contains('guru') || cleanRole.contains('dosen') || cleanRole.contains('kepala sekolah')) {
+      ageVal = 35;
+    }
+    int initialMoney = ageVal >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
+    return initialMoney;
+  }
+
+  void setTargetWealth(String targetName, String targetRole, int newWealth) {
+    final String cleanName = targetName.toLowerCase();
+    final String cleanRole = targetRole.toLowerCase();
+
+    if (fatherName != null && (cleanName == fatherName!.toLowerCase() || cleanName.contains(fatherName!.toLowerCase()))) {
+      fatherWealth = newWealth;
+      return;
+    }
+    if (motherName != null && (cleanName == motherName!.toLowerCase() || cleanName.contains(motherName!.toLowerCase()))) {
+      motherWealth = newWealth;
+      return;
+    }
+    if (stepFatherName != null && (cleanName == stepFatherName!.toLowerCase() || cleanName.contains(stepFatherName!.toLowerCase()))) {
+      stepFatherWealth = newWealth;
+      return;
+    }
+    if (stepMotherName != null && (cleanName == stepMotherName!.toLowerCase() || cleanName.contains(stepMotherName!.toLowerCase()))) {
+      stepMotherWealth = newWealth;
+      return;
+    }
+    if (cleanRole.contains('mertua')) {
+      if (targetName.startsWith('Ayah')) {
+        fatherInLawWealth = newWealth;
+      } else {
+        motherInLawWealth = newWealth;
+      }
+      return;
+    }
+
+    void setInList(List<Map<String, String>> list) {
+      for (var item in list) {
+        if (item['name'] == targetName || (item['name'] != null && cleanName.contains(item['name']!.toLowerCase()))) {
+          item['money'] = newWealth.toString();
+          return;
+        }
+      }
+    }
+
+    setInList(siblings);
+    setInList(extendedFamily);
+    setInList(classmates);
+    setInList(univClassmates);
+    setInList(coworkers);
+    setInList(exPartners);
+
+    if (partner != null && partner!['name'] == targetName) {
+      partner!['money'] = newWealth.toString();
+    }
+    if (secondPartner != null && secondPartner!['name'] == targetName) {
+      secondPartner!['money'] = newWealth.toString();
+    }
   }
 }

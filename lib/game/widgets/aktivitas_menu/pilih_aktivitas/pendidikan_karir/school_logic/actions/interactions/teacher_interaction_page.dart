@@ -135,6 +135,45 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    Builder(builder: (context) {
+                      final int wealthVal = widget.character.getTargetWealth(name, 'Guru');
+                      final double progressVal = (wealthVal / 1000.0).clamp(0.0, 1.0);
+                      Color barColor = Colors.red;
+                      if (wealthVal > 500) {
+                        barColor = Colors.green;
+                      } else if (wealthVal >= 100) {
+                        barColor = Colors.amber;
+                      }
+
+                      return Row(
+                        children: [
+                          const Text('Nilai Kekayaan: ',
+                              style: TextStyle(
+                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: progressVal,
+                                backgroundColor: Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                                minHeight: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '\$$wealthVal',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: barColor,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),

@@ -660,8 +660,53 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.monetization_on,
     color: Colors.amber,
     onTap: () {
+      final String cleanName = targetName.toLowerCase();
+      final String cleanRole = targetRole.toLowerCase();
+      final bool isParent = cleanName.startsWith('ayah') ||
+                            cleanName.startsWith('ibu') ||
+                            cleanRole.contains('kandung') ||
+                            cleanRole.contains('tiri') ||
+                            cleanRole.contains('cerai') ||
+                            (character.fatherName != null && cleanName.contains(character.fatherName!.toLowerCase())) ||
+                            (character.motherName != null && cleanName.contains(character.motherName!.toLowerCase())) ||
+                            (character.stepFatherName != null && cleanName.contains(character.stepFatherName!.toLowerCase())) ||
+                            (character.stepMotherName != null && cleanName.contains(character.stepMotherName!.toLowerCase()));
+
+      int gotMoney = 0;
+      if (isParent) {
+        if (character.age >= 6 && character.age <= 11) {
+          gotMoney = random.nextInt(10) + 1; // 1-10 $
+        } else if (character.age >= 12 && character.age <= 14) {
+          gotMoney = random.nextInt(31) + 20; // 20-50 $
+        } else if (character.age >= 15 && character.age <= 18) {
+          gotMoney = random.nextInt(101) + 100; // 100-200 $
+        } else {
+          gotMoney = random.nextInt(20) + 20; // fallback
+        }
+      } else {
+        // Cek jika target adalah kakak (saudara kandung/tiri/dll) yang sudah dewasa/kerja (>18)
+        bool isKakakAdult = false;
+        int targetAgeVal = 0;
+        for (var sib in character.siblings) {
+          final String expectedLabel = '${sib['name']} (${sib['relation']})';
+          if (expectedLabel == targetName || sib['name'] == targetName) {
+            targetAgeVal = int.tryParse(sib['age'] ?? '0') ?? 0;
+            if (targetAgeVal > 18 && (sib['relation'] ?? '').toLowerCase().contains('kakak')) {
+              isKakakAdult = true;
+            }
+            break;
+          }
+        }
+        
+        if (isKakakAdult) {
+          int kakakWealth = character.getTargetWealth(targetName, targetRole);
+          gotMoney = (kakakWealth * 0.05).clamp(10, 100).toInt() + random.nextInt(21);
+        } else {
+          gotMoney = random.nextInt(20) + 20; // fallback umum
+        }
+      }
+
       if (random.nextBool()) {
-        int gotMoney = random.nextInt(20) + 20;
         int relBonus = random.nextInt(6) + 5;
         showDialogCallback(
           'Minta Uang Sukses!',

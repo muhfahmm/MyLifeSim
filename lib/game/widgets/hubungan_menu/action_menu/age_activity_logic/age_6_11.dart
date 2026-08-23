@@ -52,7 +52,7 @@ List<ActionItem> getAge6to11Actions(
       color: Colors.amber,
       onTap: () {
         if (random.nextBool()) {
-          int gotMoney = random.nextInt(10) + 5;
+          int gotMoney = random.nextInt(10) + 1; // 1-10 $
           int relBonus = random.nextInt(6) + 5;
           showDialogCallback(
             'Dapat Uang Saku!',
