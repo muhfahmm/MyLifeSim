@@ -22,6 +22,7 @@ class Character {
   int money;
   int appearance;
   bool isAlive;
+  int followers = 0;
 
   // --- KUSTOMISASI ATRIBUT & TALENTA BARU ---
   int discipline;

@@ -5,6 +5,7 @@ import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbasi_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/love/love_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/sosial_media_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/kesehatan/olahraga_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/aksesoris_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/adopsi_anak_menu.dart';
@@ -408,6 +409,20 @@ class ActivityButton extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 8),
+
+              // Sosial Media (usia minimal 12)
+              _buildActivityTile(
+                context: context,
+                label: 'Sosial Media',
+                subtitle: 'Kelola akun sosial mediamu',
+                icon: Icons.phone_iphone,
+                color: Colors.blueAccent,
+                minAge: 12,
+                currentAge: age,
+                onTap: () => _executeAction(context, () {
+                  SocialMediaMenuHelper.showSocialMediaMenu(context, character, onRefresh);
+                }),
+              ),
 
               // Masturbasi (hanya jika usia ≥ 9)
               if (age >= 9)
