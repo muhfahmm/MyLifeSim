@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class BerbelanjaMenuHelper {
   static void showBerbelanjaMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -45,87 +46,84 @@ class BerbelanjaMenuHelper {
       },
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.shopping_cart, color: Colors.orangeAccent),
-          SizedBox(width: 8),
-          Text('Berbelanja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.green.shade50,
-                borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.green.shade200),
-              ),
-              child: Row(children: [
-                const Text('💰', style: TextStyle(fontSize: 16)),
-                const SizedBox(width: 6),
-                Text('Saldo: Rp ${_fmt(character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-              ]),
+      title: 'Berbelanja 🛒',
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: Colors.green.shade50,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.green.shade200),
             ),
-            SizedBox(
-              width: double.maxFinite,
-              child: ListView.builder(
-                shrinkWrap: true,
-                itemCount: toko.length,
-                itemBuilder: (_, ti) {
-                  final t = toko[ti];
-                  return ExpansionTile(
-                    leading: const Icon(Icons.store, color: Colors.orangeAccent),
-                    title: Text(t['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    children: (t['items'] as List<Map<String, dynamic>>).map((item) {
-                      final bool canAfford = character.money >= (item['cost'] as int);
-                      return ListTile(
-                        dense: true,
-                        title: Text(item['name'] as String, style: TextStyle(
-                            fontSize: 12, color: canAfford ? Colors.black87 : Colors.grey)),
-                        subtitle: Text('Rp ${_fmt(item['cost'] as int)}',
-                            style: TextStyle(fontSize: 11, color: canAfford ? Colors.green : Colors.grey)),
-                        trailing: Icon(canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
-                            size: 18, color: canAfford ? Colors.orangeAccent : Colors.grey),
-                        onTap: canAfford ? () {
-                          Navigator.pop(ctx);
-                          character.money -= (item['cost'] as int);
-                          character.happiness = (character.happiness + (item['happiness'] as int)).clamp(0, 100);
-                          if (item.containsKey('intelligence')) {
-                            character.intelligence = (character.intelligence + (item['intelligence'] as int)).clamp(0, 100);
-                          }
-                          if (item.containsKey('health')) {
-                            character.health = (character.health + (item['health'] as int)).clamp(0, 100);
-                          }
-                          final msg = '🛍️ Kamu membeli ${item['name']} seharga Rp ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
-                          character.inbox.add(msg);
-                          showDialog(
-                            context: context,
-                            builder: (ctx2) => AlertDialog(
-                              title: const Row(children: [
-                                Icon(Icons.check_circle, color: Colors.green),
-                                SizedBox(width: 8),
-                                Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ]),
-                              content: Text(msg),
-                              actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
-                            ),
-                          );
-                        } : null,
+            child: Row(children: [
+              const Text('💰', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 6),
+              Text('Saldo: Rp ${_fmt(character.money)}',
+                  style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+            ]),
+          ),
+          ListView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: toko.length,
+            itemBuilder: (_, ti) {
+              final t = toko[ti];
+              return ExpansionTile(
+                leading: const Icon(Icons.store, color: Colors.orangeAccent),
+                title: Text(t['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                children: (t['items'] as List<Map<String, dynamic>>).map((item) {
+                  final bool canAfford = character.money >= (item['cost'] as int);
+                  return ListTile(
+                    dense: true,
+                    title: Text(item['name'] as String, style: TextStyle(
+                        fontSize: 12, color: canAfford ? Colors.black87 : Colors.grey)),
+                    subtitle: Text('Rp ${_fmt(item['cost'] as int)}',
+                        style: TextStyle(fontSize: 11, color: canAfford ? Colors.green : Colors.grey)),
+                    trailing: Icon(canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
+                        size: 18, color: canAfford ? Colors.orangeAccent : Colors.grey),
+                    onTap: canAfford ? () {
+                      Navigator.pop(context);
+                      character.money -= (item['cost'] as int);
+                      character.happiness = (character.happiness + (item['happiness'] as int)).clamp(0, 100);
+                      if (item.containsKey('intelligence')) {
+                        character.intelligence = (character.intelligence + (item['intelligence'] as int)).clamp(0, 100);
+                      }
+                      if (item.containsKey('health')) {
+                        character.health = (character.health + (item['health'] as int)).clamp(0, 100);
+                      }
+                      final msg = '🛍️ Kamu membeli ${item['name']} seharga Rp ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
+                      character.inbox.add(msg);
+                      showDialog(
+                        context: context,
+                        builder: (ctx2) => AlertDialog(
+                          title: const Row(children: [
+                            Icon(Icons.check_circle, color: Colors.green),
+                            SizedBox(width: 8),
+                            Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ]),
+                          content: Text(msg),
+                          actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
+                        ),
                       );
-                    }).toList(),
+                    } : null,
                   );
-                },
-              ),
-            ),
-          ],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+                }).toList(),
+              );
+            },
+          ),
+        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Tutup'),
+        ),
+      ],
     );
   }
 

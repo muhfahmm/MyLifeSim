@@ -42,7 +42,6 @@ class ActivityButton extends StatelessWidget {
   });
 
   void _executeAction(BuildContext context, VoidCallback action) {
-    Navigator.pop(context);
     Future.delayed(Duration.zero, action);
   }
 
