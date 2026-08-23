@@ -2,26 +2,82 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
+import 'package:flutter/services.dart';
+
+// ============================================================
+// PART FILES
+// ============================================================
+part 'menu/transfer.dart';
+part 'menu/pinjaman.dart';
+
+// ============================================================
+// UTILITY FORMATTER (dari investasi.dart, kita reuse)
+// ============================================================
+class RupiahInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    final raw = newValue.text.replaceAll('.', '');
+    if (raw.isEmpty) {
+      return const TextEditingValue(text: '');
+    }
+    final parsed = int.tryParse(raw);
+    if (parsed == null) {
+      return oldValue;
+    }
+    final formatted = _formatThousands(parsed);
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+
+  static String _formatThousands(int value) {
+    final digits = value.toString().split('').reversed.toList();
+    final buffer = StringBuffer();
+    for (int i = 0; i < digits.length; i++) {
+      if (i > 0 && i % 3 == 0) {
+        buffer.write('.');
+      }
+      buffer.write(digits[i]);
+    }
+    return buffer.toString().split('').reversed.join();
+  }
+}
+
+int parseRupiah(String value) {
+  return int.tryParse(value.replaceAll('.', '').trim()) ?? 0;
+}
+
+String formatRupiah(num value) {
+  final parts = value.round().abs().toString().split('');
+  final buffer = StringBuffer();
+  for (int i = 0; i < parts.length; i++) {
+    if (i > 0 && (parts.length - i) % 3 == 0) {
+      buffer.write('.');
+    }
+    buffer.write(parts[i]);
+  }
+  final formatted = buffer.toString();
+  return value < 0 ? '-$formatted' : formatted;
+}
 
 // ============================================================
 // WIDGET ITEM UANG TUNAI (di dashboard)
 // ============================================================
 class UangTunaiItem extends StatelessWidget {
   final Character character;
-
   const UangTunaiItem({super.key, required this.character});
 
   @override
   Widget build(BuildContext context) {
     final bool isUnlocked = character.age >= 12;
-
     return InkWell(
       onTap: () {
         if (!isUnlocked) {
           _showLockedDialog(context, 'Uang Tunai', 12);
           return;
         }
-        Navigator.pop(context); // tutup dashboard
+        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -106,11 +162,10 @@ class UangTunaiItem extends StatelessWidget {
 }
 
 // ============================================================
-// HALAMAN UANG TUNAI
+// HALAMAN UANG TUNAI (Root State)
 // ============================================================
 class UangTunaiPage extends StatefulWidget {
   final Character character;
-
   const UangTunaiPage({super.key, required this.character});
 
   @override
@@ -133,6 +188,17 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
   @override
   void initState() {
     super.initState();
+    // Tambahkan data dummy
+    _addTransaction(-200000, 'Makan siang');
+    _addTransaction(500000, 'Gaji bulanan');
+    _addTransaction(-50000, 'Transportasi');
+    loans.add({
+      'jumlah': 1000000,
+      'bunga': 5,
+      'tenor': 6,
+      'sisaCicilan': 6,
+      'cicilanPerBulan': 175000,
+    });
   }
 
   void _addTransaction(int amount, String desc) {
@@ -141,208 +207,26 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
         'amount': amount,
         'desc': desc,
       });
-      // Batasi jumlah transaksi agar tidak terlalu banyak
       if (transactions.length > 50) transactions.removeLast();
     });
   }
 
-  // ========== TRANSFER & PEMBAYARAN ==========
-  void _showTransferDialog() {
-    final formKey = GlobalKey<FormState>();
-    String? tujuan;
-    int? nominal;
-    TextEditingController nominalCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Transfer / Pembayaran'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              DropdownButtonFormField<String>(
-                decoration: const InputDecoration(labelText: 'Tujuan'),
-                items: [
-                  'Bayar Listrik',
-                  'Bayar Air',
-                  'Bayar Internet',
-                  'Transfer ke Teman',
-                  'Transfer ke Keluarga',
-                ].map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                onChanged: (val) => tujuan = val,
-                validator: (val) => val == null ? 'Pilih tujuan' : null,
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: nominalCtrl,
-                keyboardType: TextInputType.number,
-                inputFormatters: [RupiahInputFormatter()],
-                decoration: const InputDecoration(labelText: 'Nominal (Rp)'),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Masukkan nominal';
-                  if (parseRupiah(val) <= 0) return 'Masukkan angka';
-                  return null;
-                },
-                onSaved: (val) => nominal = parseRupiah(val ?? ''),
-              ),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                formKey.currentState!.save();
-                if (nominal! <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Nominal harus lebih dari 0')),
-                  );
-                  return;
-                }
-                if (widget.character.money < nominal!) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Saldo tidak cukup!')),
-                  );
-                  return;
-                }
-                // Proses transfer
-                setState(() {
-                  widget.character.money -= nominal!;
-                  _addTransaction(-nominal!, 'Transfer: $tujuan');
-                });
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Berhasil transfer Rp ${formatRupiah(nominal!)} untuk $tujuan')),
-                );
-              }
-            },
-            child: const Text('Kirim'),
-          ),
-        ],
-      ),
-    );
+  // ========== METODE TRANSFER & PINJAMAN (akan dipanggil dari part) ==========
+  // Kita panggil method dari part dengan melewatkan state dan context
+  void showTransferDialog() {
+    showTransferDialogInternal(context, this);
   }
 
-  // ========== PINJAMAN ==========
-  void _showAjukanPinjamanDialog() {
-    final formKey = GlobalKey<FormState>();
-    int? jumlah;
-    int? tenor; // bulan
-    TextEditingController jumlahCtrl = TextEditingController();
-    TextEditingController tenorCtrl = TextEditingController();
-
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ajukan Pinjaman'),
-        content: Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextFormField(
-                controller: jumlahCtrl,
-                keyboardType: TextInputType.number,
-                inputFormatters: [RupiahInputFormatter()],
-                decoration: const InputDecoration(labelText: 'Jumlah Pinjaman (Rp)'),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Masukkan jumlah';
-                  if (parseRupiah(val) <= 0) return 'Masukkan angka';
-                  return null;
-                },
-                onSaved: (val) => jumlah = parseRupiah(val ?? ''),
-              ),
-              const SizedBox(height: 10),
-              TextFormField(
-                controller: tenorCtrl,
-                keyboardType: TextInputType.number,
-                decoration: const InputDecoration(labelText: 'Tenor'),
-                validator: (val) {
-                  if (val == null || val.isEmpty) return 'Masukkan tenor';
-                  if (int.tryParse(val) == null) return 'Masukkan angka';
-                  return null;
-                },
-                onSaved: (val) => tenor = int.tryParse(val!),
-              ),
-              const SizedBox(height: 10),
-              const Text('Bunga: 5% per tahun', style: TextStyle(fontSize: 12)),
-            ],
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              if (formKey.currentState!.validate()) {
-                formKey.currentState!.save();
-                if (jumlah! <= 0 || tenor! <= 0) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Jumlah dan tenor harus lebih dari 0')),
-                  );
-                  return;
-                }
-                // Simulasi persetujuan (selalu disetujui)
-                double bungaPerBulan = 0.05 / 12;
-                double totalBunga = jumlah! * bungaPerBulan * tenor!;
-                  double totalBayar = jumlah! + totalBunga;
-                  double cicilanPerBulan = totalBayar / tenor!;
-
-                setState(() {
-                  widget.character.money += jumlah!;
-                  loans.add({
-                    'jumlah': jumlah,
-                    'bunga': 5, // per tahun
-                    'tenor': tenor,
-                    'sisaCicilan': tenor,
-                    'cicilanPerBulan': cicilanPerBulan.round(),
-                  });
-                  _addTransaction(jumlah!, 'Pinjaman diterima');
-                });
-                Navigator.pop(ctx);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Pinjaman Rp ${formatRupiah(jumlah!)} disetujui!')),
-                );
-              }
-            },
-            child: const Text('Ajukan'),
-          ),
-        ],
-      ),
-    );
+  void showAjukanPinjamanDialog() {
+    showAjukanPinjamanDialogInternal(context, this);
   }
 
-  void _bayarCicilan(int index) {
-    final loan = loans[index];
-    if (loan['sisaCicilan'] <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Pinjaman sudah lunas')),
-      );
-      return;
-    }
-    int cicilan = loan['cicilanPerBulan'] as int;
-    if (widget.character.money < cicilan) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Saldo tidak cukup untuk membayar cicilan!')),
-      );
-      return;
-    }
-    setState(() {
-      widget.character.money -= cicilan;
-      loan['sisaCicilan'] = loan['sisaCicilan'] - 1;
-      _addTransaction(-cicilan, 'Bayar cicilan pinjaman');
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Cicilan Rp ${formatRupiah(cicilan)} dibayar. Sisa ${loan['sisaCicilan']} kali lagi.')),
-    );
+  void bayarCicilan(int index) {
+    bayarCicilanInternal(context, this, index);
+  }
+
+  void showLoanManagementDialog() {
+    showLoanManagementDialogInternal(context, this);
   }
 
   // ========== UI ==========
@@ -418,7 +302,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
             title: 'Transfer & Pembayaran',
             subtitle: 'Transfer ke rekening lain atau bayar tagihan',
             color: Colors.blue,
-            onTap: _showTransferDialog,
+            onTap: showTransferDialog,
           ),
           const SizedBox(height: 12),
 
@@ -428,7 +312,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
             title: 'Pinjaman / Hutang',
             subtitle: 'Kelola pinjaman aktif',
             color: Colors.orange,
-            onTap: () => _showLoanManagementDialog(),
+            onTap: showLoanManagementDialog,
           ),
           const SizedBox(height: 12),
 
@@ -449,7 +333,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
           ),
           const SizedBox(height: 20),
 
-          // RIWAYAT TRANSAKSI (opsional)
+          // RIWAYAT TRANSAKSI
           const Text(
             'Riwayat Transaksi',
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -533,72 +417,6 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
           ),
         ),
       ),
-    );
-  }
-
-  // ========== DIALOG MANAJEMEN PINJAMAN ==========
-  void _showLoanManagementDialog() {
-    showDialog(
-      context: context,
-      builder: (ctx) {
-        return StatefulBuilder(
-          builder: (ctx, setStateDialog) {
-            return AlertDialog(
-              title: const Text('Manajemen Pinjaman'),
-              content: SizedBox(
-                width: double.maxFinite,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    if (loans.isEmpty)
-                      const Text('Tidak ada pinjaman aktif.'),
-                    ...loans.asMap().entries.map((entry) {
-                      int idx = entry.key;
-                      var loan = entry.value;
-                      int sisa = loan['sisaCicilan'] as int;
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 8),
-                        child: ListTile(
-                          title: Text('Pinjaman Rp ${formatRupiah(loan['jumlah'] as num)}'),
-                          subtitle: Text(
-                            'Tenor ${loan['tenor']}, sisa $sisa cicilan, cicilan Rp ${formatRupiah(loan['cicilanPerBulan'] as num)}',
-                          ),
-                          trailing: sisa > 0
-                              ? ElevatedButton(
-                                  onPressed: () {
-                                    _bayarCicilan(idx);
-                                    setStateDialog(() {});
-                                    Navigator.pop(ctx); // tutup dialog
-                                    _showLoanManagementDialog(); // buka ulang
-                                  },
-                                  child: const Text('Bayar Cicilan'),
-                                )
-                              : const Icon(Icons.check_circle, color: Colors.green),
-                        ),
-                      );
-                    }),
-                    const SizedBox(height: 10),
-                    ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        _showAjukanPinjamanDialog();
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Ajukan Pinjaman Baru'),
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Tutup'),
-                ),
-              ],
-            );
-          },
-        );
-      },
     );
   }
 }
