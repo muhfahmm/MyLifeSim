@@ -122,6 +122,14 @@ class Character {
   List<Map<String, dynamic>> cashTransactions = [];
   List<Map<String, dynamic>> cashLoans = [];
 
+  // --- INVESTASI PERSISTEN ---
+  Map<String, int> saham = {};
+  Map<String, double> averageSahamBuyPrice = {};
+  double emasGram = 0;
+  double averageEmasBuyPrice = 0.0;
+  Map<String, double> kripto = {};
+  Map<String, double> averageKriptoBuyPrice = {};
+
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
 

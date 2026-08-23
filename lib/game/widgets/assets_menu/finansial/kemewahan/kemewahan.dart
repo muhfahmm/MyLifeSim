@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class KemewahanItem extends StatelessWidget {
   final int age;
+  final VoidCallback? onPop;
 
-  const KemewahanItem({super.key, required this.age});
+  const KemewahanItem({super.key, required this.age, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,9 @@ class KemewahanItem extends StatelessWidget {
           _showLockedDialog(context, 'Kemewahan', 15);
           return;
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const _KemewahanPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const _KemewahanPage())).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

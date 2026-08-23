@@ -37,10 +37,27 @@ class _EmasPageState extends State<EmasPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Harga Emas: \$${formatRupiah(state.hargaEmasPerGram)}/gram'),
+                          Text('Harga Emas Saat Ini: \$${formatRupiah(state.hargaEmasPerGram)}/gram'),
+                          if (state.emasGram > 0) ...[
+                            Text('Harga Beli Rata-Rata: \$${formatRupiah(state.averageEmasBuyPrice.round())}/gram'),
+                          ],
                           const SizedBox(height: 8),
                           Text('Emas dimiliki: ${state.emasGram.toStringAsFixed(2)} gram'),
                           Text('Nilai: \$${formatRupiah(state.emasGram * state.hargaEmasPerGram)}'),
+                          if (state.emasGram > 0) ...[
+                            const SizedBox(height: 8),
+                            Builder(builder: (context) {
+                              double ret = (state.hargaEmasPerGram - state.averageEmasBuyPrice) * state.emasGram;
+                              return Text(
+                                'Return/Loss: ${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())}',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: ret >= 0 ? Colors.green : Colors.red,
+                                ),
+                              );
+                            }),
+                          ],
                         ],
                       ),
                     ),

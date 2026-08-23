@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class KasinoItem extends StatelessWidget {
   final int age;
+  final VoidCallback? onPop;
 
-  const KasinoItem({super.key, required this.age});
+  const KasinoItem({super.key, required this.age, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,9 @@ class KasinoItem extends StatelessWidget {
           _showLockedDialog(context, 'Casino', 18);
           return;
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const _KasinoPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const _KasinoPage())).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

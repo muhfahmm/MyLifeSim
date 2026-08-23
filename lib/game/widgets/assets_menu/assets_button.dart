@@ -15,12 +15,14 @@ class AssetsButton extends StatelessWidget {
   final Character character;
   final int money;
   final int age; // Parameter umur untuk logika pembatasan
+  final VoidCallback? onRefresh;
 
   const AssetsButton({
     super.key,
     required this.character,
     required this.money,
     required this.age,
+    this.onRefresh,
   });
 
   @override
@@ -31,33 +33,66 @@ class AssetsButton extends StatelessWidget {
         DialogHelper.show(
           context: context,
           title: 'Dashboard Aset & Kekayaan',
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ============================================
-              // 1. BAGIAN FINANSIAL (TERUSKAN AGE)
-              // ============================================
-              const Text('Finansial', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-              const SizedBox(height: 8),
-              UangTunaiItem(character: character),
-              InvestasiItem(character: character),
-              KemewahanItem(age: age),
+          content: StatefulBuilder(
+            builder: (context, setStateDialog) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ============================================
+                  // 1. BAGIAN FINANSIAL (TERUSKAN AGE)
+                  // ============================================
+                  const Text('Finansial', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  UangTunaiItem(
+                    character: character,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  InvestasiItem(
+                    character: character,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  KemewahanItem(
+                    age: age,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
 
-              const Divider(height: 32),
+                  const Divider(height: 32),
 
-              // ============================================
-              // 2. BAGIAN ASET PREMIUM (TERUSKAN AGE)
-              // ============================================
-              const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-              const SizedBox(height: 8),
-              KasinoItem(age: age),
-              MuseumItem(age: age),
-              GarasiMobilItem(age: age),
+                  // ============================================
+                  // 2. BAGIAN ASET PREMIUM (TERUSKAN AGE)
+                  // ============================================
+                  const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  KasinoItem(
+                    age: age,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  MuseumItem(
+                    age: age,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  GarasiMobilItem(
+                    age: age,
+                    onPop: () {
+                      setStateDialog(() {});
+                    },
+                  ),
 
-              const Divider(height: 32),
-
-            ],
+                  const Divider(height: 32),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -65,7 +100,9 @@ class AssetsButton extends StatelessWidget {
               child: const Text('Tutup Dashboard'),
             ),
           ],
-        );
+        ).then((_) {
+          if (onRefresh != null) onRefresh!();
+        });
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.amber.withOpacity(0.2),

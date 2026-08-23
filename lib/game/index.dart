@@ -2020,6 +2020,9 @@ class _GameScreenState extends State<GameScreen> {
                   character: _character,
                   money: _character.money,
                   age: _character.age,
+                  onRefresh: () {
+                    setState(() {});
+                  },
                 ),
                 
                 // 3. HUBUNGAN

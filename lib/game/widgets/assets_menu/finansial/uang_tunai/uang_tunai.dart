@@ -66,7 +66,8 @@ String formatRupiah(num value) {
 // ============================================================
 class UangTunaiItem extends StatelessWidget {
   final Character character;
-  const UangTunaiItem({super.key, required this.character});
+  final VoidCallback? onPop;
+  const UangTunaiItem({super.key, required this.character, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +83,9 @@ class UangTunaiItem extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => UangTunaiPage(character: character),
           ),
-        );
+        ).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

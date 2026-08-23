@@ -39,27 +39,44 @@ class _SahamPageState extends State<SahamPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Harga: \$${formatRupiah(harga)}'),
+                  Text('Harga Saat Ini: \$${formatRupiah(harga)}'),
+                  if (jumlah > 0) ...[
+                    Builder(builder: (context) {
+                      double buyPrice = state.averageSahamBuyPrice[nama] ?? 0.0;
+                      return Text('Harga Beli Rata-Rata: \$${formatRupiah(buyPrice.round())}');
+                    }),
+                  ],
                   Text('Jumlah: $jumlah lembar', style: const TextStyle(fontSize: 12)),
+                  if (jumlah > 0) ...[
+                    const SizedBox(height: 2),
+                    Builder(builder: (context) {
+                      double buyPrice = state.averageSahamBuyPrice[nama] ?? 0.0;
+                      double ret = (harga - buyPrice) * jumlah;
+                      return Text(
+                        'Return/Loss: ${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())}',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: ret >= 0 ? Colors.green : Colors.red,
+                        ),
+                      );
+                    }),
+                  ],
                 ],
               ),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  IconButton(
-                    icon: const Icon(Icons.remove, color: Colors.red),
-                    onPressed: () {
-                      if (jumlah > 0) {
-                        state.jualSaham(nama, 1);
-                        setState(() {});
-                      }
-                    },
-                    tooltip: 'Jual 1 lembar',
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.add, color: Colors.green),
+                  if (jumlah > 0)
+                    TextButton(
+                      style: TextButton.styleFrom(foregroundColor: Colors.red),
+                      onPressed: () => _showJualSahamDialog(context, nama),
+                      child: const Text('Jual'),
+                    ),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Colors.green),
                     onPressed: () => _showBuySahamDialog(context, nama),
-                    tooltip: 'Beli',
+                    child: const Text('Beli'),
                   ),
                 ],
               ),
@@ -70,6 +87,78 @@ class _SahamPageState extends State<SahamPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showJualSahamDialog(BuildContext context, String nama) {
+    final controller = TextEditingController(text: '1');
+    final state = widget.state;
+    double harga = state.hargaSaham[nama]!;
+    int maxJual = state.saham[nama] ?? 0;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            int jumlah = int.tryParse(controller.text.replaceAll(',', '')) ?? 0;
+            double totalDapat = jumlah * harga;
+            return AlertDialog(
+              title: Text('Jual Saham $nama'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Harga saat ini: \$${formatRupiah(harga)}'),
+                  Text('Maksimal Jual: $maxJual lembar'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [RupiahInputFormatter()],
+                    decoration: const InputDecoration(
+                      labelText: 'Jumlah lembar',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (val) {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Total Pendapatan: \$${formatRupiah(totalDapat)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Batal'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                  onPressed: () {
+                    final jumlah = int.tryParse(controller.text.replaceAll(',', '')) ?? 0;
+                    if (jumlah > maxJual) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Jumlah lembar melebihi kepemilikan!')),
+                      );
+                      return;
+                    }
+                    if (jumlah > 0) {
+                      state.jualSaham(nama, jumlah);
+                      setState(() {});
+                      Navigator.pop(ctx);
+                    }
+                  },
+                  child: const Text('Jual'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

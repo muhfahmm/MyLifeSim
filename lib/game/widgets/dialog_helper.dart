@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 
 class DialogHelper {
-  static void show({
+  static Future<void> show({
     required BuildContext context,
     required String title,
     required Widget content,
@@ -19,7 +19,7 @@ class DialogHelper {
         ? screenHeight
         : (screenHeight * 0.85).clamp(300, 700);
 
-    showGeneralDialog(
+    return showGeneralDialog(
       context: context,
       barrierDismissible: true,
       barrierColor: Colors.black54,

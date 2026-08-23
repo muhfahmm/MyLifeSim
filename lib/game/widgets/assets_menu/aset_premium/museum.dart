@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class MuseumItem extends StatelessWidget {
   final int age;
+  final VoidCallback? onPop;
 
-  const MuseumItem({super.key, required this.age});
+  const MuseumItem({super.key, required this.age, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,9 @@ class MuseumItem extends StatelessWidget {
           _showLockedDialog(context, 'Museum', 18);
           return;
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const _MuseumPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const _MuseumPage())).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(

@@ -39,28 +39,45 @@ class _KriptoPageState extends State<KriptoPage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Harga: \$${formatRupiah(harga)}'),
+                        Text('Harga Saat Ini: \$${formatRupiah(harga)}'),
+                        if (jumlah > 0) ...[
+                          Builder(builder: (context) {
+                            double buyPrice = state.averageKriptoBuyPrice[nama] ?? 0.0;
+                            return Text('Harga Beli Rata-Rata: \$${formatRupiah(buyPrice.round())}');
+                          }),
+                        ],
                         Text('Jumlah: ${jumlah.toStringAsFixed(4)}'),
                         Text('Nilai: \$${formatRupiah(jumlah * harga)}'),
+                        if (jumlah > 0) ...[
+                          const SizedBox(height: 2),
+                          Builder(builder: (context) {
+                            double buyPrice = state.averageKriptoBuyPrice[nama] ?? 0.0;
+                            double ret = (harga - buyPrice) * jumlah;
+                            return Text(
+                              'Return/Loss: ${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())}',
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: ret >= 0 ? Colors.green : Colors.red,
+                              ),
+                            );
+                          }),
+                        ],
                       ],
                     ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove, color: Colors.red),
-                          onPressed: () {
-                            if (jumlah > 0.01) {
-                              state.jualKripto(nama, 0.01);
-                              setState(() {});
-                            }
-                          },
-                          tooltip: 'Jual 0.01',
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.add, color: Colors.green),
+                        if (jumlah > 0)
+                          TextButton(
+                            style: TextButton.styleFrom(foregroundColor: Colors.red),
+                            onPressed: () => _showJualKriptoDialog(context, nama),
+                            child: const Text('Jual'),
+                          ),
+                        TextButton(
+                          style: TextButton.styleFrom(foregroundColor: Colors.green),
                           onPressed: () => _showBuyKriptoDialog(context, nama),
-                          tooltip: 'Beli',
+                          child: const Text('Beli'),
                         ),
                       ],
                     ),
@@ -71,6 +88,77 @@ class _KriptoPageState extends State<KriptoPage> {
           ),
         ],
       ),
+    );
+  }
+
+  void _showJualKriptoDialog(BuildContext context, String nama) {
+    final controller = TextEditingController(text: '0.01');
+    final state = widget.state;
+    double harga = state.hargaKripto[nama]!;
+    double maxJual = state.kripto[nama] ?? 0.0;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            double jumlah = double.tryParse(controller.text) ?? 0.0;
+            double totalDapat = jumlah * harga;
+            return AlertDialog(
+              title: Text('Jual Kripto $nama'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Harga saat ini: \$${formatRupiah(harga)}'),
+                  Text('Maksimal Jual: ${maxJual.toStringAsFixed(4)}'),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: controller,
+                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                    decoration: const InputDecoration(
+                      labelText: 'Jumlah',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged: (val) {
+                      setStateDialog(() {});
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Total Pendapatan: \$${formatRupiah(totalDapat)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Batal'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
+                  onPressed: () {
+                    final jumlah = double.tryParse(controller.text) ?? 0.0;
+                    if (jumlah > maxJual) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Jumlah kripto melebihi kepemilikan!')),
+                      );
+                      return;
+                    }
+                    if (jumlah > 0) {
+                      state.jualKripto(nama, jumlah);
+                      setState(() {});
+                      Navigator.pop(ctx);
+                    }
+                  },
+                  child: const Text('Jual'),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 

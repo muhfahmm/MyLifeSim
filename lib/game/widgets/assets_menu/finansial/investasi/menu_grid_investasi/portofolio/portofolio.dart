@@ -10,6 +10,33 @@ class PortofolioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // 1. Saham
+    double sahamVal = 0;
+    double sahamCost = 0;
+    state.saham.forEach((nama, jumlah) {
+      sahamVal += jumlah * (state.hargaSaham[nama] ?? 0.0);
+      sahamCost += jumlah * (state.averageSahamBuyPrice[nama] ?? 0.0);
+    });
+    double sahamReturn = sahamVal - sahamCost;
+
+    // 2. Emas
+    double emasVal = state.emasGram * state.hargaEmasPerGram;
+    double emasCost = state.emasGram * state.averageEmasBuyPrice;
+    double emasReturn = emasVal - emasCost;
+
+    // 3. Kripto
+    double kriptoVal = 0;
+    double kriptoCost = 0;
+    state.kripto.forEach((nama, jumlah) {
+      kriptoVal += jumlah * (state.hargaKripto[nama] ?? 0.0);
+      kriptoCost += jumlah * (state.averageKriptoBuyPrice[nama] ?? 0.0);
+    });
+    double kriptoReturn = kriptoVal - kriptoCost;
+
+    // Total
+    double totalReturn = sahamReturn + emasReturn + kriptoReturn;
+    double totalInvestasiVal = sahamVal + emasVal + kriptoVal;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Portofolio'),
@@ -24,37 +51,72 @@ class PortofolioPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   const Divider(),
                   _buildRow('Uang Tunai', state.character.money),
                   _buildRow(
                     'Saham',
-                    state.saham.entries.fold<int>(0, (sum, entry) {
-                      final harga = state.hargaSaham[entry.key] ?? 0.0;
-                      return sum + (entry.value * harga).round();
-                    }),
+                    sahamVal.round(),
+                    returnVal: sahamReturn,
                   ),
-                  _buildRow('Reksa Dana', (state.reksaDanaInvestasi + state.reksaDanaReturn).round()),
+                  ...state.saham.entries.where((entry) => entry.value > 0).map((entry) {
+                    final nama = entry.key;
+                    final jumlah = entry.value;
+                    final harga = state.hargaSaham[nama] ?? 0.0;
+                    final buyPrice = state.averageSahamBuyPrice[nama] ?? 0.0;
+                    final val = jumlah * harga;
+                    final ret = (harga - buyPrice) * jumlah;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 16, bottom: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(' • $nama ($jumlah lembar @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                          Text(
+                            '\$${formatRupiah(val.round())} (${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())})',
+                            style: TextStyle(fontSize: 13, color: ret >= 0 ? Colors.green.shade700 : Colors.red, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                   _buildRow(
-                    'Properti',
-                    state.properti.fold<int>(
-                      0,
-                      (sum, p) => sum + ((p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100)).round(),
-                    ),
+                    'Emas',
+                    emasVal.round(),
+                    returnVal: emasReturn,
                   ),
-                  _buildRow('Emas', (state.emasGram * state.hargaEmasPerGram).round()),
                   _buildRow(
                     'Kripto',
-                    state.kripto.entries.fold<int>(
-                      0,
-                      (sum, entry) => sum + (entry.value * (state.hargaKripto[entry.key] ?? 0.0)).round(),
-                    ),
+                    kriptoVal.round(),
+                    returnVal: kriptoReturn,
                   ),
-                  _buildRow('Deposito', state.deposito.fold<int>(0, (sum, d) {
-                    int tahun = state.character.age - (d['tahunMulai'] as int);
-                    double bunga = (d['jumlah'] as num).toDouble() * (d['bunga'] as num).toDouble() / 100 * tahun;
-                    return sum + ((d['jumlah'] as num).toDouble() + bunga).round();
-                  })),
+                  ...state.kripto.entries.where((entry) => entry.value > 0).map((entry) {
+                    final nama = entry.key;
+                    final jumlah = entry.value;
+                    final harga = state.hargaKripto[nama] ?? 0.0;
+                    final buyPrice = state.averageKriptoBuyPrice[nama] ?? 0.0;
+                    final val = jumlah * harga;
+                    final ret = (harga - buyPrice) * jumlah;
+                    return Padding(
+                      padding: const EdgeInsets.only(left: 16, bottom: 4),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(' • $nama (${jumlah.toStringAsFixed(4)} @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                          Text(
+                            '\$${formatRupiah(val.round())} (${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())})',
+                            style: TextStyle(fontSize: 13, color: ret >= 0 ? Colors.green.shade700 : Colors.red, fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+                  const Divider(height: 24, thickness: 1.5),
+                  _buildRow(
+                    'Total Investasi',
+                    totalInvestasiVal.round(),
+                    returnVal: totalReturn,
+                    isTotal: true,
+                  ),
                 ],
               ),
             ),
@@ -64,14 +126,55 @@ class PortofolioPage extends StatelessWidget {
     );
   }
 
-  Widget _buildRow(String label, int value) {
+  Widget _buildRow(String label, int value, {double? returnVal, bool isTotal = false}) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      padding: const EdgeInsets.symmetric(vertical: 6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(label, style: const TextStyle(fontSize: 16)),
-          Text('\$${formatRupiah(value)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: isTotal ? 17 : 16,
+                  fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                ),
+              ),
+              Text(
+                '\$${formatRupiah(value)}',
+                style: TextStyle(
+                  fontSize: isTotal ? 17 : 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          if (returnVal != null) ...[
+            const SizedBox(height: 2),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  returnVal >= 0 ? '  Return' : '  Loss',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: returnVal >= 0 ? Colors.green : Colors.red,
+                    fontWeight: isTotal ? FontWeight.bold : FontWeight.normal,
+                  ),
+                ),
+                Text(
+                  '${returnVal >= 0 ? '+' : ''}\$${formatRupiah(returnVal.abs().round())}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: returnVal >= 0 ? Colors.green : Colors.red,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

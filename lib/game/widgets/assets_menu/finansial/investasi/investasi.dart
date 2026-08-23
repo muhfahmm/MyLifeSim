@@ -8,11 +8,8 @@ import 'package:bitlife/pilih_karakter/character.dart';
 // PART FILES (setiap menu akan menjadi part)
 // ============================================================
 part 'menu_grid_investasi/saham/saham.dart';
-part 'menu_grid_investasi/reksa_dana/reksa_dana.dart';
-part 'menu_grid_investasi/properti/properti.dart';
 part 'menu_grid_investasi/emas/emas.dart';
 part 'menu_grid_investasi/kripto/kripto.dart';
-part 'menu_grid_investasi/deposito/deposito.dart';
 part 'menu_grid_investasi/portofolio/portofolio.dart';
 
 // ============================================================
@@ -79,17 +76,6 @@ Widget _buildCashHeader(dynamic state, {String? assetType}) {
     });
     returnVal = sahamVal - sahamCost;
     showReturn = true;
-  } else if (assetType == 'reksa') {
-    returnVal = state.reksaDanaReturn;
-    showReturn = true;
-  } else if (assetType == 'properti') {
-    double propertiReturn = 0;
-    for (var p in state.properti) {
-      int hargaJual = ((p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100)).round();
-      propertiReturn += hargaJual - (p['hargaBeli'] as num);
-    }
-    returnVal = propertiReturn;
-    showReturn = true;
   } else if (assetType == 'emas') {
     returnVal = (state.emasGram * state.hargaEmasPerGram) - (state.emasGram * state.averageEmasBuyPrice);
     showReturn = true;
@@ -101,14 +87,6 @@ Widget _buildCashHeader(dynamic state, {String? assetType}) {
       kriptoCost += jumlah * (state.averageKriptoBuyPrice[nama] ?? 0.0);
     });
     returnVal = kriptoVal - kriptoCost;
-    showReturn = true;
-  } else if (assetType == 'deposito') {
-    double depositoReturn = 0;
-    for (var d in state.deposito) {
-      int tahun = state.character.age - (d['tahunMulai'] as int);
-      depositoReturn += (d['jumlah'] as num).toDouble() * (d['bunga'] as num).toDouble() / 100 * tahun;
-    }
-    returnVal = depositoReturn;
     showReturn = true;
   }
 
@@ -130,10 +108,10 @@ Widget _buildCashHeader(dynamic state, {String? assetType}) {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(returnVal >= 0 ? 'Return:' : 'Loss:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.blue : Colors.red)),
+              Text(returnVal >= 0 ? 'Return:' : 'Loss:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.green : Colors.red)),
               Text(
                 '${returnVal >= 0 ? '+' : ''}\$${formatRupiah(returnVal.abs())}',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.blue : Colors.red),
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.green : Colors.red),
               ),
             ],
           ),
@@ -148,7 +126,8 @@ Widget _buildCashHeader(dynamic state, {String? assetType}) {
 // ============================================================
 class InvestasiItem extends StatelessWidget {
   final Character character;
-  const InvestasiItem({super.key, required this.character});
+  final VoidCallback? onPop;
+  const InvestasiItem({super.key, required this.character, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -172,7 +151,9 @@ class InvestasiItem extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => InvestasiPage(character: character),
           ),
-        );
+        ).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
@@ -219,26 +200,28 @@ class InvestasiPage extends StatefulWidget {
 class _InvestasiPageState extends State<InvestasiPage> {
   late Character character;
 
-  // ---- DATA INVESTASI (state bersama untuk semua menu) ----
-  Map<String, int> saham = {};
+  // ---- DATA INVESTASI DINAMIS & PERSISTEN DARI OBJEK KARAKTER ----
+  Map<String, int> get saham => character.saham;
+  set saham(Map<String, int> val) => character.saham = val;
+
+  Map<String, double> get averageSahamBuyPrice => character.averageSahamBuyPrice;
+  set averageSahamBuyPrice(Map<String, double> val) => character.averageSahamBuyPrice = val;
+
+  double get emasGram => character.emasGram;
+  set emasGram(double val) => character.emasGram = val;
+
+  double get averageEmasBuyPrice => character.averageEmasBuyPrice;
+  set averageEmasBuyPrice(double val) => character.averageEmasBuyPrice = val;
+
+  Map<String, double> get kripto => character.kripto;
+  set kripto(Map<String, double> val) => character.kripto = val;
+
+  Map<String, double> get averageKriptoBuyPrice => character.averageKriptoBuyPrice;
+  set averageKriptoBuyPrice(Map<String, double> val) => character.averageKriptoBuyPrice = val;
+
   Map<String, double> hargaSaham = {};
-  Map<String, double> averageSahamBuyPrice = {};
-
-  double reksaDanaInvestasi = 0;
-  String risikoReksa = 'Sedang';
-  double reksaDanaReturn = 0;
-
-  List<Map<String, dynamic>> properti = [];
-
-  double emasGram = 0;
   double hargaEmasPerGram = 0;
-  double averageEmasBuyPrice = 0.0;
-
-  Map<String, double> kripto = {};
   Map<String, double> hargaKripto = {};
-  Map<String, double> averageKriptoBuyPrice = {};
-
-  List<Map<String, dynamic>> deposito = [];
 
   List<String> berita = [];
 
@@ -247,19 +230,10 @@ class _InvestasiPageState extends State<InvestasiPage> {
     saham.forEach((nama, jumlah) {
       total += jumlah * (hargaSaham[nama] ?? 0);
     });
-    total += reksaDanaInvestasi + reksaDanaReturn;
-    for (var p in properti) {
-      total += (p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100);
-    }
     total += emasGram * hargaEmasPerGram;
     kripto.forEach((nama, jumlah) {
       total += jumlah * (hargaKripto[nama] ?? 0);
     });
-    for (var d in deposito) {
-      int tahunBerjalan = character.age - (d['tahunMulai'] as int);
-      double bunga = (d['jumlah'] as num).toDouble() * (d['bunga'] as num).toDouble() / 100 * tahunBerjalan;
-      total += (d['jumlah'] as num).toDouble() + bunga;
-    }
     return total;
   }
 
@@ -274,13 +248,27 @@ class _InvestasiPageState extends State<InvestasiPage> {
     final List<String> sahamList = ['Tech Corp', 'Energy Giant', 'Health Plus', 'Fin Bank', 'Auto Drive'];
     for (var s in sahamList) {
       hargaSaham[s] = (1000 + Random().nextInt(4000)).toDouble();
-      saham[s] = 0;
+      if (!saham.containsKey(s)) {
+        saham[s] = 0;
+      }
+      if (saham[s]! > 0 && (averageSahamBuyPrice[s] == null || averageSahamBuyPrice[s] == 0.0)) {
+        averageSahamBuyPrice[s] = hargaSaham[s]!;
+      }
     }
     hargaEmasPerGram = (800000 + Random().nextInt(400000)).toDouble();
+    if (emasGram > 0 && averageEmasBuyPrice == 0.0) {
+      averageEmasBuyPrice = hargaEmasPerGram;
+    }
+    
     final List<String> kriptoList = ['Bitcoin', 'Ethereum', 'Dogecoin', 'Solana'];
     for (var k in kriptoList) {
       hargaKripto[k] = (10000 + Random().nextInt(90000)).toDouble();
-      kripto[k] = 0;
+      if (!kripto.containsKey(k)) {
+        kripto[k] = 0;
+      }
+      if (kripto[k]! > 0 && (averageKriptoBuyPrice[k] == null || averageKriptoBuyPrice[k] == 0.0)) {
+        averageKriptoBuyPrice[k] = hargaKripto[k]!;
+      }
     }
     berita.add('Selamat datang di dunia investasi! Mulailah dengan bijak.');
   }
@@ -292,31 +280,6 @@ class _InvestasiPageState extends State<InvestasiPage> {
       for (var key in hargaSaham.keys) {
         double change = (Random().nextDouble() * 0.4) - 0.2;
         hargaSaham[key] = (hargaSaham[key]! * (1 + change)).clamp(100.0, 10000.0);
-      }
-
-      // Update reksa dana
-      double returnRate;
-      switch (risikoReksa) {
-        case 'Rendah':
-          returnRate = 0.05 + (Random().nextDouble() * 0.03 - 0.015);
-          break;
-        case 'Sedang':
-          returnRate = 0.10 + (Random().nextDouble() * 0.06 - 0.03);
-          break;
-        case 'Tinggi':
-          returnRate = 0.15 + (Random().nextDouble() * 0.10 - 0.05);
-          break;
-        default:
-          returnRate = 0.08;
-      }
-      reksaDanaReturn += reksaDanaInvestasi * returnRate;
-
-      // Update properti
-      for (var p in properti) {
-        double kenaikan = 5 + Random().nextDouble() * 10;
-        p['kenaikan'] = (p['kenaikan'] as num).toDouble() + kenaikan;
-        double sewaNaik = 3 + Random().nextDouble() * 2;
-        p['hargaSewa'] = ((p['hargaSewa'] as num).toDouble() * (1 + sewaNaik / 100)).round();
       }
 
       // Update emas
@@ -341,10 +304,8 @@ class _InvestasiPageState extends State<InvestasiPage> {
     List<String> events = [
       '🔥 Krisis ekonomi! Semua harga saham turun 15%.',
       '🚀 Booming teknologi! Saham Tech Corp naik 30%.',
-      '🏠 Gelembung properti pecah! Harga properti turun 10%.',
       '💰 Penemuan tambang emas baru! Harga emas turun 8%.',
       '📈 Bitcoin mencapai ATH! Harga Bitcoin naik 40%.',
-      '🏦 Suku bunga naik, deposito lebih menguntungkan.',
     ];
     String event = events[Random().nextInt(events.length)];
     berita.add('⚠️ EVENT: $event');
@@ -354,10 +315,6 @@ class _InvestasiPageState extends State<InvestasiPage> {
     } else if (event.contains('krisis ekonomi')) {
       for (var key in hargaSaham.keys) {
         hargaSaham[key] = (hargaSaham[key]! * 0.85).clamp(100.0, 10000.0);
-      }
-    } else if (event.contains('properti turun')) {
-      for (var p in properti) {
-        p['kenaikan'] = (p['kenaikan'] as num).toDouble() - 10;
       }
     } else if (event.contains('emas turun')) {
       hargaEmasPerGram *= 0.92;
@@ -479,73 +436,6 @@ class _InvestasiPageState extends State<InvestasiPage> {
     });
   }
 
-  void investasiReksaDana(double jumlah, String risiko) {
-    setState(() {
-      if (character.money >= jumlah.toInt()) {
-        character.money -= jumlah.toInt();
-        reksaDanaInvestasi += jumlah;
-        risikoReksa = risiko;
-        berita.add('Investasi Reksa Dana sebesar \$${formatRupiah(jumlah)} (risiko $risiko)');
-      } else {
-        _showSnackbar('Uang tidak cukup!');
-      }
-    });
-  }
-
-  void cairkanReksaDana() {
-    setState(() {
-      double nilai = reksaDanaInvestasi + reksaDanaReturn;
-      character.money += nilai.toInt();
-      reksaDanaInvestasi = 0;
-      reksaDanaReturn = 0;
-      berita.add('Cairkan Reksa Dana senilai \$${formatRupiah(nilai)}');
-    });
-  }
-
-  void beliProperti(String nama, int harga, int sewa) {
-    setState(() {
-      if (character.money >= harga) {
-        character.money -= harga;
-        properti.add({
-          'nama': nama,
-          'hargaBeli': harga,
-          'hargaSewa': sewa,
-          'kenaikan': 0.0,
-        });
-        berita.add('Beli properti $nama seharga \$${formatRupiah(harga)}');
-      } else {
-        _showSnackbar('Uang tidak cukup!');
-      }
-    });
-  }
-
-  void jualProperti(int index) {
-    setState(() {
-      var p = properti[index];
-      int hargaJual = ((p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100)).round();
-      character.money += hargaJual;
-      properti.removeAt(index);
-      berita.add('Jual properti ${p['nama']} seharga \$${formatRupiah(hargaJual)}');
-    });
-  }
-
-  void buatDeposito(int jumlah, int tenor, double bunga) {
-    setState(() {
-      if (character.money >= jumlah) {
-        character.money -= jumlah;
-        deposito.add({
-          'jumlah': jumlah,
-          'tenor': tenor,
-          'bunga': bunga,
-          'tahunMulai': character.age,
-        });
-        berita.add('Buka deposito \$${formatRupiah(jumlah)}, tenor $tenor tahun, bunga $bunga%');
-      } else {
-        _showSnackbar('Uang tidak cukup!');
-      }
-    });
-  }
-
   void _showSnackbar(String msg) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
@@ -593,17 +483,14 @@ class _InvestasiPageState extends State<InvestasiPage> {
             GridView.count(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 3,
-              childAspectRatio: 1.1,
+              crossAxisCount: 2,
+              childAspectRatio: 1.3,
               crossAxisSpacing: 10,
               mainAxisSpacing: 10,
               children: [
                 _buildMenuCard(Icons.trending_up, 'Saham', () => _navigateTo(SahamPage(state: this))),
-                _buildMenuCard(Icons.account_balance, 'Reksa Dana', () => _navigateTo(ReksaDanaPage(state: this))),
-                _buildMenuCard(Icons.house, 'Properti', () => _navigateTo(PropertiPage(state: this))),
                 _buildMenuCard(Icons.monetization_on, 'Emas', () => _navigateTo(EmasPage(state: this))),
                 _buildMenuCard(Icons.currency_bitcoin, 'Kripto', () => _navigateTo(KriptoPage(state: this))),
-                _buildMenuCard(Icons.savings, 'Deposito', () => _navigateTo(DepositoPage(state: this))),
                 _buildMenuCard(Icons.pie_chart, 'Portofolio', () => _navigateTo(PortofolioPage(state: this))),
               ],
             ),
@@ -632,6 +519,8 @@ class _InvestasiPageState extends State<InvestasiPage> {
   }
 
   void _navigateTo(Widget page) {
-    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page)).then((_) {
+      setState(() {});
+    });
   }
 }

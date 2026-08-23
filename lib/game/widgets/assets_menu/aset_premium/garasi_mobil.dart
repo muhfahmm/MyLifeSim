@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 
 class GarasiMobilItem extends StatelessWidget {
   final int age;
+  final VoidCallback? onPop;
 
-  const GarasiMobilItem({super.key, required this.age});
+  const GarasiMobilItem({super.key, required this.age, this.onPop});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +18,9 @@ class GarasiMobilItem extends StatelessWidget {
           _showLockedDialog(context, 'Garasi Mobil', 18);
           return;
         }
-        Navigator.push(context, MaterialPageRoute(builder: (context) => const _GarasiMobilPage()));
+        Navigator.push(context, MaterialPageRoute(builder: (context) => const _GarasiMobilPage())).then((_) {
+          if (onPop != null) onPop!();
+        });
       },
       borderRadius: BorderRadius.circular(12),
       child: Container(
