@@ -36,7 +36,7 @@ void showTransferDialogInternal(BuildContext context, _UangTunaiPageState state)
               controller: nominalCtrl,
               keyboardType: TextInputType.number,
               inputFormatters: [RupiahInputFormatter()],
-              decoration: const InputDecoration(labelText: 'Nominal (Rp)'),
+              decoration: const InputDecoration(labelText: 'Nominal (\$)'),
               validator: (val) {
                 if (val == null || val.isEmpty) return 'Masukkan nominal';
                 if (parseRupiah(val) <= 0) return 'Masukkan angka';
@@ -75,7 +75,7 @@ void showTransferDialogInternal(BuildContext context, _UangTunaiPageState state)
               });
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Berhasil transfer Rp ${formatRupiah(nominal!)} untuk $tujuan')),
+                SnackBar(content: Text('Berhasil transfer \$${formatRupiah(nominal!)} untuk $tujuan')),
               );
             }
           },

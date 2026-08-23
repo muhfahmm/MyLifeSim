@@ -745,7 +745,6 @@ class RelationshipButton extends StatelessWidget {
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -902,7 +901,6 @@ class RelationshipButton extends StatelessWidget {
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(

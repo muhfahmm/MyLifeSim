@@ -17,7 +17,6 @@ class GarasiMobilItem extends StatelessWidget {
           _showLockedDialog(context, 'Garasi Mobil', 18);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const _GarasiMobilPage()));
       },
       borderRadius: BorderRadius.circular(12),

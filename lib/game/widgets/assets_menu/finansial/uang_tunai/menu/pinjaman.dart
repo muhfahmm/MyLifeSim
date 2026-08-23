@@ -24,7 +24,7 @@ void showAjukanPinjamanDialogInternal(BuildContext context, _UangTunaiPageState 
               controller: jumlahCtrl,
               keyboardType: TextInputType.number,
               inputFormatters: [RupiahInputFormatter()],
-              decoration: const InputDecoration(labelText: 'Jumlah Pinjaman (Rp)'),
+              decoration: const InputDecoration(labelText: 'Jumlah Pinjaman (\$)'),
               validator: (val) {
                 if (val == null || val.isEmpty) return 'Masukkan jumlah';
                 if (parseRupiah(val) <= 0) return 'Masukkan angka';
@@ -83,7 +83,7 @@ void showAjukanPinjamanDialogInternal(BuildContext context, _UangTunaiPageState 
               });
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Pinjaman Rp ${formatRupiah(jumlah!)} disetujui!')),
+                SnackBar(content: Text('Pinjaman \$${formatRupiah(jumlah!)} disetujui!')),
               );
             }
           },
@@ -115,7 +115,7 @@ void bayarCicilanInternal(BuildContext context, _UangTunaiPageState state, int i
     state._addTransaction(-cicilan, 'Bayar cicilan pinjaman');
   });
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Cicilan Rp ${formatRupiah(cicilan)} dibayar. Sisa ${loan['sisaCicilan']} kali lagi.')),
+    SnackBar(content: Text('Cicilan \$${formatRupiah(cicilan)} dibayar. Sisa ${loan['sisaCicilan']} kali lagi.')),
   );
 }
 
@@ -141,9 +141,9 @@ void showLoanManagementDialogInternal(BuildContext context, _UangTunaiPageState 
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
-                        title: Text('Pinjaman Rp ${formatRupiah(loan['jumlah'] as num)}'),
+                        title: Text('Pinjaman \$${formatRupiah(loan['jumlah'] as num)}'),
                         subtitle: Text(
-                          'Tenor ${loan['tenor']}, sisa $sisa cicilan, cicilan Rp ${formatRupiah(loan['cicilanPerBulan'] as num)}',
+                          'Tenor ${loan['tenor']}, sisa $sisa cicilan, cicilan \$${formatRupiah(loan['cicilanPerBulan'] as num)}',
                         ),
                         trailing: sisa > 0
                             ? ElevatedButton(

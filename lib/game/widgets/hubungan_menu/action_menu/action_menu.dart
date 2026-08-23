@@ -1997,29 +1997,48 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         barColor = Colors.amber;
                       }
 
-                      return Row(
+                      final jobInfo = widget.character.getNPCJobInfo(widget.targetName, widget.targetRole);
+                      final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
+                          ? 'Status: Sekolah/Kuliah'
+                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: \$${jobInfo['salary']}/bln)';
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Nilai Kekayaan: ',
-                              style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(4),
-                              child: LinearProgressIndicator(
-                                value: progressVal,
-                                backgroundColor: Colors.grey.shade200,
-                                valueColor: AlwaysStoppedAnimation<Color>(barColor),
-                                minHeight: 10,
+                          Row(
+                            children: [
+                              const Text('Nilai Kekayaan: ',
+                                  style: TextStyle(
+                                      fontSize: 12, fontWeight: FontWeight.bold)),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: progressVal,
+                                    backgroundColor: Colors.grey.shade200,
+                                    valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                                    minHeight: 10,
+                                  ),
+                                ),
                               ),
-                            ),
+                              const SizedBox(width: 12),
+                              Text(
+                                '\$$wealthVal',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: barColor,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(height: 6),
                           Text(
-                            '\$$wealthVal',
+                            statusText,
                             style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: barColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
                             ),
                           ),
                         ],

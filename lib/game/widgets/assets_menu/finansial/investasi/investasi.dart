@@ -14,8 +14,6 @@ part 'menu_grid_investasi/emas/emas.dart';
 part 'menu_grid_investasi/kripto/kripto.dart';
 part 'menu_grid_investasi/deposito/deposito.dart';
 part 'menu_grid_investasi/portofolio/portofolio.dart';
-part 'menu_grid_investasi/konsultasi/konsultasi.dart';
-part 'menu_grid_investasi/berita/berita.dart';
 
 // ============================================================
 // UTILITY FUNCTIONS & FORMATTERS
@@ -23,7 +21,7 @@ part 'menu_grid_investasi/berita/berita.dart';
 class RupiahInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final raw = newValue.text.replaceAll('.', '');
+    final raw = newValue.text.replaceAll(',', '');
     if (raw.isEmpty) {
       return const TextEditingValue(text: '');
     }
@@ -43,7 +41,7 @@ class RupiahInputFormatter extends TextInputFormatter {
     final buffer = StringBuffer();
     for (int i = 0; i < digits.length; i++) {
       if (i > 0 && i % 3 == 0) {
-        buffer.write('.');
+        buffer.write(',');
       }
       buffer.write(digits[i]);
     }
@@ -52,7 +50,7 @@ class RupiahInputFormatter extends TextInputFormatter {
 }
 
 int parseRupiah(String value) {
-  return int.tryParse(value.replaceAll('.', '').trim()) ?? 0;
+  return int.tryParse(value.replaceAll(',', '').trim()) ?? 0;
 }
 
 String formatRupiah(num value) {
@@ -60,12 +58,89 @@ String formatRupiah(num value) {
   final buffer = StringBuffer();
   for (int i = 0; i < parts.length; i++) {
     if (i > 0 && (parts.length - i) % 3 == 0) {
-      buffer.write('.');
+      buffer.write(',');
     }
     buffer.write(parts[i]);
   }
   final formatted = buffer.toString();
   return value < 0 ? '-$formatted' : formatted;
+}
+
+Widget _buildCashHeader(dynamic state, {String? assetType}) {
+  double returnVal = 0.0;
+  bool showReturn = false;
+
+  if (assetType == 'saham') {
+    double sahamVal = 0;
+    double sahamCost = 0;
+    state.saham.forEach((nama, jumlah) {
+      sahamVal += jumlah * (state.hargaSaham[nama] ?? 0.0);
+      sahamCost += jumlah * (state.averageSahamBuyPrice[nama] ?? 0.0);
+    });
+    returnVal = sahamVal - sahamCost;
+    showReturn = true;
+  } else if (assetType == 'reksa') {
+    returnVal = state.reksaDanaReturn;
+    showReturn = true;
+  } else if (assetType == 'properti') {
+    double propertiReturn = 0;
+    for (var p in state.properti) {
+      int hargaJual = ((p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100)).round();
+      propertiReturn += hargaJual - (p['hargaBeli'] as num);
+    }
+    returnVal = propertiReturn;
+    showReturn = true;
+  } else if (assetType == 'emas') {
+    returnVal = (state.emasGram * state.hargaEmasPerGram) - (state.emasGram * state.averageEmasBuyPrice);
+    showReturn = true;
+  } else if (assetType == 'kripto') {
+    double kriptoVal = 0;
+    double kriptoCost = 0;
+    state.kripto.forEach((nama, jumlah) {
+      kriptoVal += jumlah * (state.hargaKripto[nama] ?? 0.0);
+      kriptoCost += jumlah * (state.averageKriptoBuyPrice[nama] ?? 0.0);
+    });
+    returnVal = kriptoVal - kriptoCost;
+    showReturn = true;
+  } else if (assetType == 'deposito') {
+    double depositoReturn = 0;
+    for (var d in state.deposito) {
+      int tahun = state.character.age - (d['tahunMulai'] as int);
+      depositoReturn += (d['jumlah'] as num).toDouble() * (d['bunga'] as num).toDouble() / 100 * tahun;
+    }
+    returnVal = depositoReturn;
+    showReturn = true;
+  }
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+    color: Colors.green.shade50,
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text('Uang Tunai:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            Text('\$${formatRupiah(state.character.money)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+          ],
+        ),
+        if (showReturn) ...[
+          const SizedBox(height: 4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(returnVal >= 0 ? 'Return:' : 'Loss:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.blue : Colors.red)),
+              Text(
+                '${returnVal >= 0 ? '+' : ''}\$${formatRupiah(returnVal.abs())}',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: returnVal >= 0 ? Colors.blue : Colors.red),
+              ),
+            ],
+          ),
+        ],
+      ],
+    ),
+  );
 }
 
 // ============================================================
@@ -93,7 +168,6 @@ class InvestasiItem extends StatelessWidget {
           return;
         }
         final navigator = Navigator.of(context, rootNavigator: true);
-        navigator.pop(); // tutup dashboard
         navigator.push(
           MaterialPageRoute(
             builder: (context) => InvestasiPage(character: character),
@@ -148,6 +222,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
   // ---- DATA INVESTASI (state bersama untuk semua menu) ----
   Map<String, int> saham = {};
   Map<String, double> hargaSaham = {};
+  Map<String, double> averageSahamBuyPrice = {};
 
   double reksaDanaInvestasi = 0;
   String risikoReksa = 'Sedang';
@@ -157,9 +232,11 @@ class _InvestasiPageState extends State<InvestasiPage> {
 
   double emasGram = 0;
   double hargaEmasPerGram = 0;
+  double averageEmasBuyPrice = 0.0;
 
   Map<String, double> kripto = {};
   Map<String, double> hargaKripto = {};
+  Map<String, double> averageKriptoBuyPrice = {};
 
   List<Map<String, dynamic>> deposito = [];
 
@@ -308,8 +385,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
       int totalBiaya = (harga * jumlah).round();
       if (character.money >= totalBiaya) {
         character.money -= totalBiaya;
-        saham[nama] = (saham[nama] ?? 0) + jumlah;
-        berita.add('Beli $jumlah lembar $nama seharga Rp ${formatRupiah(totalBiaya)}');
+        int count = saham[nama] ?? 0;
+        double oldCost = count * (averageSahamBuyPrice[nama] ?? 0.0);
+        double newCost = jumlah * harga;
+        averageSahamBuyPrice[nama] = (oldCost + newCost) / (count + jumlah);
+        saham[nama] = count + jumlah;
+        berita.add('Beli $jumlah lembar $nama seharga \$${formatRupiah(totalBiaya)}');
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -323,7 +404,10 @@ class _InvestasiPageState extends State<InvestasiPage> {
         int totalDapat = (harga * jumlah).round();
         character.money += totalDapat;
         saham[nama] = saham[nama]! - jumlah;
-        berita.add('Jual $jumlah lembar $nama seharga Rp ${formatRupiah(totalDapat)}');
+        if (saham[nama] == 0) {
+          averageSahamBuyPrice[nama] = 0.0;
+        }
+        berita.add('Jual $jumlah lembar $nama seharga \$${formatRupiah(totalDapat)}');
       } else {
         _showSnackbar('Saham tidak cukup!');
       }
@@ -335,6 +419,9 @@ class _InvestasiPageState extends State<InvestasiPage> {
       int biaya = (hargaEmasPerGram * gram).round();
       if (character.money >= biaya) {
         character.money -= biaya;
+        double oldCost = emasGram * averageEmasBuyPrice;
+        double newCost = gram * hargaEmasPerGram;
+        averageEmasBuyPrice = (oldCost + newCost) / (emasGram + gram);
         emasGram += gram;
         berita.add('Beli emas $gram gram');
       } else {
@@ -349,6 +436,9 @@ class _InvestasiPageState extends State<InvestasiPage> {
         int hasil = (hargaEmasPerGram * gram).round();
         character.money += hasil;
         emasGram -= gram;
+        if (emasGram == 0) {
+          averageEmasBuyPrice = 0.0;
+        }
         berita.add('Jual emas $gram gram');
       } else {
         _showSnackbar('Emas tidak cukup!');
@@ -361,7 +451,11 @@ class _InvestasiPageState extends State<InvestasiPage> {
       int biaya = (hargaKripto[nama]! * jumlah).round();
       if (character.money >= biaya) {
         character.money -= biaya;
-        kripto[nama] = (kripto[nama] ?? 0) + jumlah;
+        double count = kripto[nama] ?? 0.0;
+        double oldCost = count * (averageKriptoBuyPrice[nama] ?? 0.0);
+        double newCost = jumlah * hargaKripto[nama]!;
+        averageKriptoBuyPrice[nama] = (oldCost + newCost) / (count + jumlah);
+        kripto[nama] = count + jumlah;
         berita.add('Beli $jumlah $nama');
       } else {
         _showSnackbar('Uang tidak cukup!');
@@ -375,6 +469,9 @@ class _InvestasiPageState extends State<InvestasiPage> {
         int hasil = (hargaKripto[nama]! * jumlah).round();
         character.money += hasil;
         kripto[nama] = kripto[nama]! - jumlah;
+        if (kripto[nama] == 0.0) {
+          averageKriptoBuyPrice[nama] = 0.0;
+        }
         berita.add('Jual $jumlah $nama');
       } else {
         _showSnackbar('Kripto tidak cukup!');
@@ -388,7 +485,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
         character.money -= jumlah.toInt();
         reksaDanaInvestasi += jumlah;
         risikoReksa = risiko;
-        berita.add('Investasi Reksa Dana sebesar Rp ${formatRupiah(jumlah)} (risiko $risiko)');
+        berita.add('Investasi Reksa Dana sebesar \$${formatRupiah(jumlah)} (risiko $risiko)');
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -401,7 +498,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
       character.money += nilai.toInt();
       reksaDanaInvestasi = 0;
       reksaDanaReturn = 0;
-      berita.add('Cairkan Reksa Dana senilai Rp ${formatRupiah(nilai)}');
+      berita.add('Cairkan Reksa Dana senilai \$${formatRupiah(nilai)}');
     });
   }
 
@@ -415,7 +512,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
           'hargaSewa': sewa,
           'kenaikan': 0.0,
         });
-        berita.add('Beli properti $nama seharga Rp ${formatRupiah(harga)}');
+        berita.add('Beli properti $nama seharga \$${formatRupiah(harga)}');
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -428,7 +525,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
       int hargaJual = ((p['hargaBeli'] as num).toDouble() * (1 + (p['kenaikan'] as num).toDouble() / 100)).round();
       character.money += hargaJual;
       properti.removeAt(index);
-      berita.add('Jual properti ${p['nama']} seharga Rp ${formatRupiah(hargaJual)}');
+      berita.add('Jual properti ${p['nama']} seharga \$${formatRupiah(hargaJual)}');
     });
   }
 
@@ -442,7 +539,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
           'bunga': bunga,
           'tahunMulai': character.age,
         });
-        berita.add('Buka deposito Rp ${formatRupiah(jumlah)}, tenor $tenor tahun, bunga $bunga%');
+        berita.add('Buka deposito \$${formatRupiah(jumlah)}, tenor $tenor tahun, bunga $bunga%');
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -482,11 +579,11 @@ class _InvestasiPageState extends State<InvestasiPage> {
                   children: [
                     Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
                     Text(
-                      'Rp ${formatRupiah(totalKekayaan)}',
+                      '\$${formatRupiah(totalKekayaan)}',
                       style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                     const SizedBox(height: 8),
-                    Text('Uang Tunai: Rp ${formatRupiah(character.money)}'),
+                    Text('Uang Tunai: \$${formatRupiah(character.money)}'),
                     Text('Usia: ${character.age} tahun'),
                   ],
                 ),
@@ -508,8 +605,6 @@ class _InvestasiPageState extends State<InvestasiPage> {
                 _buildMenuCard(Icons.currency_bitcoin, 'Kripto', () => _navigateTo(KriptoPage(state: this))),
                 _buildMenuCard(Icons.savings, 'Deposito', () => _navigateTo(DepositoPage(state: this))),
                 _buildMenuCard(Icons.pie_chart, 'Portofolio', () => _navigateTo(PortofolioPage(state: this))),
-                _buildMenuCard(Icons.support_agent, 'Konsultasi', () => _navigateTo(KonsultasiPage(state: this))),
-                _buildMenuCard(Icons.newspaper, 'Berita', () => _navigateTo(BeritaPage(state: this))),
               ],
             ),
           ],

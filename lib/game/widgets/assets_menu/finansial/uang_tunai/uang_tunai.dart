@@ -16,7 +16,7 @@ part 'menu/pinjaman.dart';
 class RupiahInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
-    final raw = newValue.text.replaceAll('.', '');
+    final raw = newValue.text.replaceAll(',', '');
     if (raw.isEmpty) {
       return const TextEditingValue(text: '');
     }
@@ -36,7 +36,7 @@ class RupiahInputFormatter extends TextInputFormatter {
     final buffer = StringBuffer();
     for (int i = 0; i < digits.length; i++) {
       if (i > 0 && i % 3 == 0) {
-        buffer.write('.');
+        buffer.write(',');
       }
       buffer.write(digits[i]);
     }
@@ -45,7 +45,7 @@ class RupiahInputFormatter extends TextInputFormatter {
 }
 
 int parseRupiah(String value) {
-  return int.tryParse(value.replaceAll('.', '').trim()) ?? 0;
+  return int.tryParse(value.replaceAll(',', '').trim()) ?? 0;
 }
 
 String formatRupiah(num value) {
@@ -53,7 +53,7 @@ String formatRupiah(num value) {
   final buffer = StringBuffer();
   for (int i = 0; i < parts.length; i++) {
     if (i > 0 && (parts.length - i) % 3 == 0) {
-      buffer.write('.');
+      buffer.write(',');
     }
     buffer.write(parts[i]);
   }
@@ -77,7 +77,6 @@ class UangTunaiItem extends StatelessWidget {
           _showLockedDialog(context, 'Uang Tunai', 12);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -105,7 +104,7 @@ class UangTunaiItem extends StatelessWidget {
               ),
             ),
             Text(
-              'Rp ${formatRupiah(character.money)}',
+              '\$${formatRupiah(character.money)}',
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -173,10 +172,10 @@ class UangTunaiPage extends StatefulWidget {
 }
 
 class _UangTunaiPageState extends State<UangTunaiPage> {
-  // Data transaksi (simulasi)
-  List<Map<String, dynamic>> transactions = [];
-  // Data pinjaman
-  List<Map<String, dynamic>> loans = [];
+  // Data transaksi dinamis dari objek karakter
+  List<Map<String, dynamic>> get transactions => widget.character.cashTransactions;
+  // Data pinjaman dinamis dari objek karakter
+  List<Map<String, dynamic>> get loans => widget.character.cashLoans;
 
   // Ringkasan perubahan saldo dari seluruh transaksi
   int get netChange {
@@ -188,17 +187,6 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
   @override
   void initState() {
     super.initState();
-    // Tambahkan data dummy
-    _addTransaction(-200000, 'Makan siang');
-    _addTransaction(500000, 'Gaji bulanan');
-    _addTransaction(-50000, 'Transportasi');
-    loans.add({
-      'jumlah': 1000000,
-      'bunga': 5,
-      'tenor': 6,
-      'sisaCicilan': 6,
-      'cicilanPerBulan': 175000,
-    });
   }
 
   void _addTransaction(int amount, String desc) {
@@ -260,7 +248,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   Text(
-                    'Rp ${formatRupiah(widget.character.money)}',
+                    '\$${formatRupiah(widget.character.money)}',
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -277,7 +265,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${netChange >= 0 ? '+' : ''}Rp ${formatRupiah(netChange.abs())}',
+                        '\$${netChange >= 0 ? '+' : ''}${formatRupiah(netChange.abs())}',
                         style: TextStyle(
                           fontSize: 14,
                           color: netChange >= 0 ? Colors.green : Colors.red,
@@ -356,7 +344,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                   ),
                   title: Text(t['desc']),
                   trailing: Text(
-                    '${amount >= 0 ? '+' : ''}Rp ${formatRupiah(amount)}',
+                    '\$${amount >= 0 ? '+' : ''}${formatRupiah(amount)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: amount >= 0 ? Colors.green : Colors.red,

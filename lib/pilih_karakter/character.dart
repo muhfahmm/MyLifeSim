@@ -93,6 +93,20 @@ class Character {
   int? fatherInLawWealth;
   int? motherInLawWealth;
 
+  // --- PEKERJAAN ORANG TUA / MERTUA ---
+  String? fatherJob;
+  int? fatherSalary;
+  String? motherJob;
+  int? motherSalary;
+  String? stepFatherJob;
+  int? stepFatherSalary;
+  String? stepMotherJob;
+  int? stepMotherSalary;
+  String? fatherInLawJob;
+  int? fatherInLawSalary;
+  String? motherInLawJob;
+  int? motherInLawSalary;
+
   // --- UMUR KELUARGA ---
   int? fatherAge;
   int? motherAge;
@@ -103,6 +117,10 @@ class Character {
   String? jobName;
   int? jobSalary;
   String? custodyParent; // 'Ayah' atau 'Ibu' setelah cerai
+
+  // --- FINANSIAL TRANSAKSI & PINJAMAN ---
+  List<Map<String, dynamic>> cashTransactions = [];
+  List<Map<String, dynamic>> cashLoans = [];
 
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
@@ -611,6 +629,7 @@ class Character {
     List<String> events = [];
     age++;
     health -= 2;
+    accumulateNPCsWealth();
 
     // Tambah gaji dari pekerjaan jika ada
     if (jobName != null && jobSalary != null) {
@@ -1950,6 +1969,287 @@ class Character {
     }
     if (secondPartner != null && secondPartner!['name'] == targetName) {
       secondPartner!['money'] = newWealth.toString();
+    }
+  }
+
+  // --- LOGIKA PEKERJAAN & GAJI NPC ---
+  Map<String, dynamic> _generateRandomJob() {
+    final random = Random();
+    final int roll = random.nextInt(100);
+    String category = 'Medium';
+    if (roll < 20) {
+      category = 'Low';
+    } else if (roll < 60) {
+      category = 'Medium';
+    } else if (roll < 90) {
+      category = 'High';
+    } else {
+      category = 'Very High';
+    }
+
+    String jobNameVal = '';
+    int salaryVal = 0;
+
+    if (category == 'Low') {
+      final jobs = ['Buruh Pabrik', 'Petani', 'Kuli Bangunan', 'Satpam', 'Kasir Minimarket', 'Penjual Sayur', 'Ojek Online', 'Cleaning Service'];
+      jobNameVal = jobs[random.nextInt(jobs.length)];
+      salaryVal = random.nextInt(1001) + 500;
+    } else if (category == 'Medium') {
+      final jobs = ['Karyawan Swasta', 'Staff Admin', 'HRD', 'Marketing', 'Guru SD', 'Guru SMP', 'Perawat', 'Polisi', 'Montir', 'Teknisi Listrik', 'Pemilik Warung'];
+      jobNameVal = jobs[random.nextInt(jobs.length)];
+      salaryVal = random.nextInt(3001) + 2000;
+    } else if (category == 'High') {
+      final jobs = ['Dokter Umum', 'Pengacara', 'Manajer Perusahaan', 'Dosen', 'Pilot', 'Arsitek', 'Software Engineer', 'Pemilik Restoran'];
+      jobNameVal = jobs[random.nextInt(jobs.length)];
+      salaryVal = random.nextInt(9001) + 6000;
+    } else {
+      final jobs = ['Artis', 'CEO', 'Pebisnis Sukses', 'Atlet Profesional', 'Dokter Bedah', 'Pemilik Konglomerat'];
+      jobNameVal = jobs[random.nextInt(jobs.length)];
+      salaryVal = random.nextInt(80001) + 20000;
+    }
+
+    return {'job': jobNameVal, 'salary': salaryVal};
+  }
+
+  Map<String, dynamic> getNPCJobInfo(String targetName, String targetRole) {
+    final String cleanName = targetName.toLowerCase();
+    final String cleanRole = targetRole.toLowerCase();
+
+    int ageVal = 0;
+    if (fatherName != null && (cleanName == fatherName!.toLowerCase() || cleanName.contains(fatherName!.toLowerCase()))) {
+      ageVal = fatherAge ?? 40;
+      if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (fatherJob == null) {
+        final j = _generateRandomJob();
+        fatherJob = j['job'];
+        fatherSalary = j['salary'];
+      }
+      return {'status': 'Bekerja', 'job': fatherJob, 'salary': fatherSalary};
+    }
+    if (motherName != null && (cleanName == motherName!.toLowerCase() || cleanName.contains(motherName!.toLowerCase()))) {
+      ageVal = motherAge ?? 38;
+      if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (motherJob == null) {
+        final j = _generateRandomJob();
+        motherJob = j['job'];
+        motherSalary = j['salary'];
+      }
+      return {'status': 'Bekerja', 'job': motherJob, 'salary': motherSalary};
+    }
+    if (stepFatherName != null && (cleanName == stepFatherName!.toLowerCase() || cleanName.contains(stepFatherName!.toLowerCase()))) {
+      ageVal = stepFatherAge ?? 40;
+      if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (stepFatherJob == null) {
+        final j = _generateRandomJob();
+        stepFatherJob = j['job'];
+        stepFatherSalary = j['salary'];
+      }
+      return {'status': 'Bekerja', 'job': stepFatherJob, 'salary': stepFatherSalary};
+    }
+    if (stepMotherName != null && (cleanName == stepMotherName!.toLowerCase() || cleanName.contains(stepMotherName!.toLowerCase()))) {
+      ageVal = stepMotherAge ?? 38;
+      if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (stepMotherJob == null) {
+        final j = _generateRandomJob();
+        stepMotherJob = j['job'];
+        stepMotherSalary = j['salary'];
+      }
+      return {'status': 'Bekerja', 'job': stepMotherJob, 'salary': stepMotherSalary};
+    }
+    if (cleanRole.contains('mertua')) {
+      if (targetName.startsWith('Ayah')) {
+        ageVal = fatherInLawAge ?? 50;
+        if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+        if (fatherInLawJob == null) {
+          final j = _generateRandomJob();
+          fatherInLawJob = j['job'];
+          fatherInLawSalary = j['salary'];
+        }
+        return {'status': 'Bekerja', 'job': fatherInLawJob, 'salary': fatherInLawSalary};
+      } else {
+        ageVal = motherInLawAge ?? 48;
+        if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+        if (motherInLawJob == null) {
+          final j = _generateRandomJob();
+          motherInLawJob = j['job'];
+          motherInLawSalary = j['salary'];
+        }
+        return {'status': 'Bekerja', 'job': motherInLawJob, 'salary': motherInLawSalary};
+      }
+    }
+
+    Map<String, dynamic>? getFromList(List<Map<String, String>> list) {
+      for (var item in list) {
+        if (item['name'] == targetName || (item['name'] != null && cleanName.contains(item['name']!.toLowerCase()))) {
+          int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
+          if (targetAge < 19) {
+            return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+          }
+          if (!item.containsKey('job')) {
+            final j = _generateRandomJob();
+            item['job'] = j['job'];
+            item['salary'] = j['salary'].toString();
+          }
+          return {
+            'status': 'Bekerja',
+            'job': item['job'],
+            'salary': int.tryParse(item['salary'] ?? '0') ?? 0
+          };
+        }
+      }
+      return null;
+    }
+
+    var val = getFromList(siblings);
+    if (val != null) return val;
+    val = getFromList(extendedFamily);
+    if (val != null) return val;
+    val = getFromList(classmates);
+    if (val != null) return val;
+    val = getFromList(univClassmates);
+    if (val != null) return val;
+    val = getFromList(coworkers);
+    if (val != null) return val;
+    val = getFromList(exPartners);
+    if (val != null) return val;
+
+    if (partner != null && partner!['name'] == targetName) {
+      int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
+      if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (!partner!.containsKey('job')) {
+        final j = _generateRandomJob();
+        partner!['job'] = j['job'];
+        partner!['salary'] = j['salary'].toString();
+      }
+      return {
+        'status': 'Bekerja',
+        'job': partner!['job'],
+        'salary': int.tryParse(partner!['salary'] ?? '0') ?? 0
+      };
+    }
+    if (secondPartner != null && secondPartner!['name'] == targetName) {
+      int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
+      if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (!secondPartner!.containsKey('job')) {
+        final j = _generateRandomJob();
+        secondPartner!['job'] = j['job'];
+        secondPartner!['salary'] = j['salary'].toString();
+      }
+      return {
+        'status': 'Bekerja',
+        'job': secondPartner!['job'],
+        'salary': int.tryParse(secondPartner!['salary'] ?? '0') ?? 0
+      };
+    }
+
+    int fallbackAge = 18;
+    if (cleanRole.contains('guru') || cleanRole.contains('dosen') || cleanRole.contains('kepala sekolah')) {
+      fallbackAge = 35;
+    }
+    if (fallbackAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+    
+    String jobStr = 'Dosen';
+    int salaryVal = 7000;
+    if (cleanRole.contains('guru')) {
+      jobStr = 'Guru';
+      salaryVal = 3000;
+    } else if (cleanRole.contains('kepala sekolah')) {
+      jobStr = 'Kepala Sekolah';
+      salaryVal = 5000;
+    }
+    return {'status': 'Bekerja', 'job': jobStr, 'salary': salaryVal};
+  }
+
+  void accumulateNPCsWealth() {
+    if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 19) {
+      final jobInfo = getNPCJobInfo(fatherName!, 'Kandung');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getFatherWealth();
+        fatherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+    if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 19) {
+      final jobInfo = getNPCJobInfo(motherName!, 'Kandung');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getMotherWealth();
+        motherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+    if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 19) {
+      final jobInfo = getNPCJobInfo(stepFatherName!, 'Tiri');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getStepFatherWealth();
+        stepFatherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+    if (stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null && stepMotherAge! >= 19) {
+      final jobInfo = getNPCJobInfo(stepMotherName!, 'Tiri');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getStepMotherWealth();
+        stepMotherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+    if (fatherInLawName != null && !isFatherInLawDeceased && fatherInLawAge != null && fatherInLawAge! >= 19) {
+      final jobInfo = getNPCJobInfo(fatherInLawName!, 'Mertua');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getFatherInLawWealth();
+        fatherInLawWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+    if (motherInLawName != null && !isMotherInLawDeceased && motherInLawAge != null && motherInLawAge! >= 19) {
+      final jobInfo = getNPCJobInfo(motherInLawName!, 'Mertua');
+      if (jobInfo['status'] == 'Bekerja') {
+        int currentW = getMotherInLawWealth();
+        motherInLawWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+      }
+    }
+
+    void accumulateList(List<Map<String, String>> list, String role) {
+      for (var item in list) {
+        final String name = item['name'] ?? '';
+        final int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
+        final bool isDeceased = item['isDeceased'] == 'true';
+        if (name.isNotEmpty && !isDeceased && targetAge >= 19) {
+          final jobInfo = getNPCJobInfo(name, role);
+          if (jobInfo['status'] == 'Bekerja') {
+            int currentW = getTargetWealth(name, role);
+            int newW = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+            item['money'] = newW.toString();
+          }
+        }
+      }
+    }
+
+    accumulateList(siblings, 'Saudara');
+    accumulateList(extendedFamily, 'Keluarga');
+    accumulateList(classmates, 'Teman Sekelas');
+    accumulateList(univClassmates, 'Teman Kuliah');
+    accumulateList(coworkers, 'Rekan Kerja');
+    accumulateList(exPartners, 'Mantan');
+
+    if (partner != null && partner!['name'] != null) {
+      final name = partner!['name']!;
+      final int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
+      if (targetAge >= 19) {
+        final jobInfo = getNPCJobInfo(name, 'Partner');
+        if (jobInfo['status'] == 'Bekerja') {
+          int currentW = getTargetWealth(name, 'Partner');
+          int newW = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+          partner!['money'] = newW.toString();
+        }
+      }
+    }
+    if (secondPartner != null && secondPartner!['name'] != null) {
+      final name = secondPartner!['name']!;
+      final int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
+      if (targetAge >= 19) {
+        final jobInfo = getNPCJobInfo(name, 'Partner');
+        if (jobInfo['status'] == 'Bekerja') {
+          int currentW = getTargetWealth(name, 'Partner');
+          int newW = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+          secondPartner!['money'] = newW.toString();
+        }
+      }
     }
   }
 }

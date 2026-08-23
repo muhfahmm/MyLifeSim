@@ -17,7 +17,6 @@ class KasinoItem extends StatelessWidget {
           _showLockedDialog(context, 'Casino', 18);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const _KasinoPage()));
       },
       borderRadius: BorderRadius.circular(12),

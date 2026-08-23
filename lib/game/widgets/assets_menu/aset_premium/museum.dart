@@ -17,7 +17,6 @@ class MuseumItem extends StatelessWidget {
           _showLockedDialog(context, 'Museum', 18);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const _MuseumPage()));
       },
       borderRadius: BorderRadius.circular(12),

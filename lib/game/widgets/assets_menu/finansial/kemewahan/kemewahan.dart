@@ -17,7 +17,6 @@ class KemewahanItem extends StatelessWidget {
           _showLockedDialog(context, 'Kemewahan', 15);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(context, MaterialPageRoute(builder: (context) => const _KemewahanPage()));
       },
       borderRadius: BorderRadius.circular(12),
