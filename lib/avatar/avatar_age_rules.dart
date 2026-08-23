@@ -94,6 +94,30 @@ class AvatarAgeRules {
     );
   }
 
+  /// Membersihkan nama NPC untuk mendapatkan nama asli yang konsisten sebagai seed
+  static String getCleanNPCName(String name) {
+    String clean = name.replaceAll(' (Wafat)', '').replaceAll('(Wafat)', '').replaceAll(' (Anda)', '').trim();
+    if (clean.contains('(') && clean.contains(')')) {
+      final int openParen = clean.indexOf('(');
+      final int closeParen = clean.indexOf(')');
+      final String inside = clean.substring(openParen + 1, closeParen).trim();
+      final String outside = clean.substring(0, openParen).trim();
+      
+      final List<String> relations = [
+        'ibu', 'ayah', 'kakak', 'adik', 'tiri', 'kandung', 'paman', 'bibi', 
+        'kakek', 'nenek', 'anak', 'istri', 'suami', 'pacar', 'tunangan', 'mertua'
+      ];
+      
+      bool outsideIsRelation = relations.any((rel) => outside.toLowerCase().contains(rel));
+      if (outsideIsRelation) {
+        return inside;
+      } else {
+        return outside;
+      }
+    }
+    return clean;
+  }
+
   /// Mendapatkan URL avatar untuk NPC/Anggota Keluarga berdasarkan nama, gender, dan usia
   static String getAgeBasedAvatarUrlForNPC({
     required String name,
@@ -102,16 +126,7 @@ class AvatarAgeRules {
     int happiness = 50,
     String? forcedSkinColor, // override warna kulit (untuk warisan)
   }) {
-    // Ekstrak nama bersih dari string seperti "Ibu (Bunga Luthfi)"
-    String cleanName = name;
-    if (name.contains('(') && name.contains(')')) {
-      final int start = name.indexOf('(') + 1;
-      final int end = name.indexOf(')');
-      if (start < end) {
-        cleanName = name.substring(start, end).replaceAll(' (Wafat)', '').replaceAll('(Wafat)', '').trim();
-      }
-    }
-    cleanName = cleanName.replaceAll(' (Wafat)', '').replaceAll('(Wafat)', '').trim();
+    final String cleanName = getCleanNPCName(name);
 
     final dummy = Character(
       name: cleanName,

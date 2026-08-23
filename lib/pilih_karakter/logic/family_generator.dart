@@ -147,6 +147,7 @@ class FamilyGenerator {
         character.stepMotherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
         character.stepMotherAge = character.fatherAge! + _random.nextInt(5) - 2;
         character.stepMotherRelationship = 50;
+        character.stepMotherSkinColor = SkinColorInheritance.randomSkin();
       }
     } else if (roll < 90) {
       // Hanya ibu (Ayah Cerai atau Meninggal)
@@ -276,6 +277,7 @@ class FamilyGenerator {
         'relationship': (50 + _random.nextInt(31)).toString(),
         'age': '$age',
         'isDeceased': 'false',
+        'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
       };
 
       // Jika usia kakak >= 20 tahun saat lahir, beri peluang memiliki pasangan & anak
@@ -330,6 +332,7 @@ class FamilyGenerator {
           'relationship': (50 + _random.nextInt(31)).toString(),
           'age': '$age',
           'isDeceased': 'false',
+          'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
         });
       }
     }

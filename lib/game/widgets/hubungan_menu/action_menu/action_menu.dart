@@ -340,6 +340,46 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
         return val;
       }
+      // 1. Cari di classmates
+      for (var cm in widget.character.classmates) {
+        if (cm['name']!.toLowerCase() == plainName) {
+          final int val = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.partner!['relationship'] = val.toString();
+          }
+          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.secondPartner!['relationship'] = val.toString();
+          }
+          return val;
+        }
+      }
+      // 2. Cari di univClassmates
+      for (var cm in widget.character.univClassmates) {
+        if (cm['name']!.toLowerCase() == plainName) {
+          final int val = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.partner!['relationship'] = val.toString();
+          }
+          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.secondPartner!['relationship'] = val.toString();
+          }
+          return val;
+        }
+      }
+      // 3. Cari di coworkers
+      for (var cw in widget.character.coworkers) {
+        if (cw['name']!.toLowerCase() == plainName) {
+          final int val = int.tryParse(cw['relationship'] ?? '50') ?? 50;
+          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.partner!['relationship'] = val.toString();
+          }
+          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+            widget.character.secondPartner!['relationship'] = val.toString();
+          }
+          return val;
+        }
+      }
+
       if (widget.character.partner != null &&
           widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
         return int.tryParse(
@@ -584,6 +624,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     }
+    
+    // Sinkronkan nilai hubungan terbaru ke semua list sosial (classmate, partner, dll)
+    final int updatedVal = _getCurrentRelationshipValue();
+    widget.character.updateRelationshipValue(name, updatedVal);
   }
 
   void _showResultDialog(String title, String message, IconData icon,
@@ -1169,6 +1213,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       'Ajakan pacaranmu diterima oleh ${widget.targetName}! Sekarang kalian adalah sepasang kekasih.',
                       Icons.favorite,
                       Colors.pinkAccent, () {
+                    final String? familySkinColor = widget.character.getFamilyMemberSkinColor(widget.targetName);
                     final partnerMap = {
                       'name': widget.targetName,
                       'relation': 'Pacar',
@@ -1178,6 +1223,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       'age': actualTargetAge.toString(),
                       'relationship': '80',
                       'isDeceased': 'false',
+                      if (familySkinColor != null) 'skinColor': familySkinColor,
                     };
 
                     if (widget.character.partner == null) {

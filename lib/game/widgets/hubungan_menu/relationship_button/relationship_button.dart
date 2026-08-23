@@ -30,6 +30,11 @@ class RelationshipButton extends StatelessWidget {
           return;
         }
 
+        // Sinkronkan status kematian pasangan/keluarga & rekan kerja/sekolah
+        character.syncNPCsAndPartners();
+        character.syncPartnerDeathStatus();
+        character.syncSocialRelationships();
+
         // --- BUAT DAFTAR SAUDARA & DIRI SENDIRI ---
         final List<Map<String, dynamic>> childrenList = [];
 
@@ -39,11 +44,7 @@ class RelationshipButton extends StatelessWidget {
           final bool isDeceased = sib['isDeceased'] == 'true';
           final String expectedLabel = '${sib['name']} (${sib['relation']})';
 
-          // Hindari duplikasi jika saudara adalah pasangan
-          if (character.partner != null && character.partner!['name'] == expectedLabel) {
-            continue;
-          }
-
+          // Tampilkan saudara meskipun mereka berpacaran dengan player
           if (sibAge >= 0) {
             childrenList.add({
               'isPlayer': false,
@@ -53,6 +54,7 @@ class RelationshipButton extends StatelessWidget {
               'relationship': int.tryParse(sib['relationship'] ?? '50') ?? 50,
               'age': sibAge,
               'isDeceased': isDeceased,
+              'skinColor': sib['skinColor'],
             });
           }
         }
@@ -201,6 +203,7 @@ class RelationshipButton extends StatelessWidget {
                     gender: 'Laki-laki',
                     age: character.stepFatherAge ?? 40,
                     happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                    forcedSkinColor: character.stepFatherSkinColor,
                   ),
                 ),
               if (character.stepMotherName != null)
@@ -218,6 +221,7 @@ class RelationshipButton extends StatelessWidget {
                     gender: 'Perempuan',
                     age: character.stepMotherAge ?? 40,
                     happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                    forcedSkinColor: character.stepMotherSkinColor,
                   ),
                 ),
 
@@ -617,6 +621,7 @@ class RelationshipButton extends StatelessWidget {
                       gender: gender,
                       age: age,
                       happiness: child['relationship'] as int,
+                      forcedSkinColor: child['skinColor'] as String?,
                     ),
                   );
                 }

@@ -263,7 +263,29 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                         backgroundColor: Colors.transparent,
                         backgroundImage: NetworkImage(avatarUrl),
                       ),
-                      title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                          ),
+                          (() {
+                            final String? relStr = widget.character.getPartnerRelation(name);
+                            if (relStr == null) return const SizedBox.shrink();
+                            return Container(
+                              margin: const EdgeInsets.only(left: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.pink,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                relStr,
+                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          }()),
+                        ],
+                      ),
                       subtitle: Text('Rekan Kerja • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%'),
                       trailing: const Icon(Icons.chevron_right, size: 16),
                       onTap: () {

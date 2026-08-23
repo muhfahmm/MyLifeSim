@@ -172,7 +172,29 @@ class _KelasActionPageState extends State<KelasActionPage> {
                 backgroundColor: Colors.transparent,
                 backgroundImage: NetworkImage(avatarUrl),
               ),
-              title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                  ),
+                  (() {
+                    final String? relStr = widget.character.getPartnerRelation(name);
+                    if (relStr == null) return const SizedBox.shrink();
+                    return Container(
+                      margin: const EdgeInsets.only(left: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.pink,
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        relStr,
+                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    );
+                  }()),
+                ],
+              ),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

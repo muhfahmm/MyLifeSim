@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswi/
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/siswa_siswa_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import 'dart:math';
 
 class ClassmateInteractionPage extends StatefulWidget {
@@ -49,6 +50,30 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
   @override
   Widget build(BuildContext context) {
     final name = widget.classmate['name']!;
+    
+    // Jika teman sekelas ini sudah menjadi pasangan/pacar aktif, tampilkan menu ActionMenuScreen pacar agar menunya konsisten
+    final bool isPartner = widget.character.isAnyPartnerNameMatching(name);
+    if (isPartner) {
+      String partnerRole = 'Pacar';
+      if (widget.character.partner != null && widget.character.partner!['name'] == name) {
+        partnerRole = widget.character.partner!['relation'] ?? 'Pacar';
+      } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
+        partnerRole = widget.character.secondPartner!['relation'] ?? 'Pacar';
+      } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == name) {
+        partnerRole = widget.character.thirdPartner!['relation'] ?? 'Pacar';
+      } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == name) {
+        partnerRole = widget.character.fourthPartner!['relation'] ?? 'Pacar';
+      } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == name) {
+        partnerRole = widget.character.fifthPartner!['relation'] ?? 'Pacar';
+      }
+      
+      return ActionMenuScreen(
+        character: widget.character,
+        targetName: name,
+        targetRole: partnerRole,
+      );
+    }
+
     final gender = widget.classmate['gender']!;
     final int age = int.tryParse(widget.classmate['age'] ?? '0') ?? widget.character.age;
     final int rel = int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;

@@ -12,10 +12,11 @@ class DialogHelper {
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isMobile = screenWidth < 600;
 
-    // Selalu beri bounded height agar render box tidak kehilangan ukuran
+    // Selalu beri bounded height agar render box tidak kehilangan ukuran.
+    // Di mobile, kita buat fullscreen seperti Kotak Masuk (Inbox).
     final double dialogWidth = isMobile ? screenWidth : 500;
     final double dialogHeight = isMobile
-        ? screenHeight * 0.92
+        ? screenHeight
         : (screenHeight * 0.85).clamp(300, 700);
 
     showGeneralDialog(
@@ -33,7 +34,7 @@ class DialogHelper {
           child: Container(
             width: dialogWidth,
             height: dialogHeight,
-            padding: const EdgeInsets.all(24.0),
+            padding: isMobile ? const EdgeInsets.fromLTRB(16, 8, 16, 8) : const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: isMobile ? BorderRadius.zero : BorderRadius.circular(16),

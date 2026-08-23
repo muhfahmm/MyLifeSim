@@ -46,6 +46,8 @@ class Character {
   String? fatherSkinColor;  // hex warna kulit ayah
   String? motherSkinColor;  // hex warna kulit ibu
   String? partnerSkinColor; // hex warna kulit pasangan (untuk warisan ke anak)
+  String? stepFatherSkinColor; // hex warna kulit ayah tiri
+  String? stepMotherSkinColor; // hex warna kulit ibu tiri
 
 
   // --- FIELD KELUARGA BARU ---
@@ -175,6 +177,257 @@ class Character {
     return count;
   }
 
+
+  void syncNPCsAndPartners() {
+    void syncMap(Map<String, String>? partnerMap) {
+      if (partnerMap == null) return;
+      final String pName = (partnerMap['name'] ?? '').toLowerCase();
+      if (pName.isEmpty) return;
+
+      // 1. Cari di classmates
+      for (var cm in classmates) {
+        final String cmName = (cm['name'] ?? '').toLowerCase();
+        if (cmName == pName || cmName.contains(pName) || pName.contains(cmName)) {
+          partnerMap['relationship'] = cm['relationship'] ?? partnerMap['relationship'] ?? '50';
+          partnerMap['age'] = cm['age'] ?? partnerMap['age'] ?? '18';
+          partnerMap['isDeceased'] = cm['isDeceased'] ?? partnerMap['isDeceased'] ?? 'false';
+          final String? sc = cm['skinColor'] ?? partnerMap['skinColor'];
+          if (sc != null) partnerMap['skinColor'] = sc;
+          return;
+        }
+      }
+      // 2. Cari di univClassmates
+      for (var cm in univClassmates) {
+        final String cmName = (cm['name'] ?? '').toLowerCase();
+        if (cmName == pName || cmName.contains(pName) || pName.contains(cmName)) {
+          partnerMap['relationship'] = cm['relationship'] ?? partnerMap['relationship'] ?? '50';
+          partnerMap['age'] = cm['age'] ?? partnerMap['age'] ?? '18';
+          partnerMap['isDeceased'] = cm['isDeceased'] ?? partnerMap['isDeceased'] ?? 'false';
+          final String? sc = cm['skinColor'] ?? partnerMap['skinColor'];
+          if (sc != null) partnerMap['skinColor'] = sc;
+          return;
+        }
+      }
+      // 3. Cari di coworkers
+      for (var cw in coworkers) {
+        final String cwName = (cw['name'] ?? '').toLowerCase();
+        if (cwName == pName || cwName.contains(pName) || pName.contains(cwName)) {
+          partnerMap['relationship'] = cw['relationship'] ?? partnerMap['relationship'] ?? '50';
+          partnerMap['age'] = cw['age'] ?? partnerMap['age'] ?? '18';
+          partnerMap['isDeceased'] = cw['isDeceased'] ?? partnerMap['isDeceased'] ?? 'false';
+          final String? scCw = cw['skinColor'] ?? partnerMap['skinColor'];
+          if (scCw != null) partnerMap['skinColor'] = scCw;
+          return;
+        }
+      }
+    }
+
+    syncMap(partner);
+    syncMap(secondPartner);
+    syncMap(thirdPartner);
+    syncMap(fourthPartner);
+    syncMap(fifthPartner);
+    for (var sp in secretPartners) {
+      syncMap(sp);
+    }
+  }
+
+  void syncPartnerDeathStatus() {
+    bool checkIfDeceased(String partnerName) {
+      final String nameLower = partnerName.toLowerCase();
+      if (motherName != null && isMotherDeceased) {
+        final String mName = motherName!.toLowerCase();
+        if (nameLower == mName || nameLower.contains(mName) || mName.contains(nameLower)) return true;
+      }
+      if (fatherName != null && isFatherDeceased) {
+        final String fName = fatherName!.toLowerCase();
+        if (nameLower == fName || nameLower.contains(fName) || fName.contains(nameLower)) return true;
+      }
+      if (stepMotherName != null && isStepMotherDeceased) {
+        final String smName = stepMotherName!.toLowerCase();
+        if (nameLower == smName || nameLower.contains(smName) || smName.contains(nameLower)) return true;
+      }
+      if (stepFatherName != null && isStepFatherDeceased) {
+        final String sfName = stepFatherName!.toLowerCase();
+        if (nameLower == sfName || nameLower.contains(sfName) || sfName.contains(nameLower)) return true;
+      }
+      for (var sib in siblings) {
+        if (sib['isDeceased'] == 'true') {
+          final String sibName = (sib['name'] ?? '').toLowerCase();
+          if (sibName.isNotEmpty && (nameLower == sibName || nameLower.contains(sibName) || sibName.contains(nameLower))) {
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+
+    if (partner != null && checkIfDeceased(partner!['name'] ?? '')) {
+      partner = null;
+    }
+    if (secondPartner != null && checkIfDeceased(secondPartner!['name'] ?? '')) {
+      secondPartner = null;
+    }
+    if (thirdPartner != null && checkIfDeceased(thirdPartner!['name'] ?? '')) {
+      thirdPartner = null;
+    }
+    if (fourthPartner != null && checkIfDeceased(fourthPartner!['name'] ?? '')) {
+      fourthPartner = null;
+    }
+    if (fifthPartner != null && checkIfDeceased(fifthPartner!['name'] ?? '')) {
+      fifthPartner = null;
+    }
+    secretPartners.removeWhere((p) => checkIfDeceased(p['name'] ?? ''));
+  }
+
+  String? getFamilyMemberSkinColor(String targetName) {
+    final String lowerTarget = targetName.toLowerCase();
+    if (lowerTarget.startsWith('ibu') && !lowerTarget.contains('tiri')) {
+      return motherSkinColor;
+    }
+    if (lowerTarget.startsWith('ayah') && !lowerTarget.contains('tiri')) {
+      return fatherSkinColor;
+    }
+    if (lowerTarget.startsWith('ibu') && lowerTarget.contains('tiri')) {
+      return stepMotherSkinColor;
+    }
+    if (lowerTarget.startsWith('ayah') && lowerTarget.contains('tiri')) {
+      return stepFatherSkinColor;
+    }
+    for (var sib in siblings) {
+      final String sibName = sib['name'] ?? '';
+      final String expectedLabel = '$sibName (${sib['relation']})';
+      if (expectedLabel == targetName || sibName == targetName) {
+        return sib['skinColor'];
+      }
+    }
+    return null;
+  }
+
+  void syncSocialRelationships() {
+    void syncSinglePartner(Map<String, String>? partnerMap) {
+      if (partnerMap == null) return;
+      final String partnerName = (partnerMap['name'] ?? '').toLowerCase();
+      if (partnerName.isEmpty) return;
+
+      // 1. Cari di classmates
+      for (var cm in classmates) {
+        final String cmName = (cm['name'] ?? '').toLowerCase();
+        if (cmName == partnerName || partnerName.contains(cmName) || cmName.contains(partnerName)) {
+          // Partner map (pacar aktif) adalah source of truth untuk umur dan skinColor
+          cm['age'] = partnerMap['age'] ?? cm['age'] ?? '18';
+          if (partnerMap['skinColor'] != null) cm['skinColor'] = partnerMap['skinColor']!;
+          // Hubungan diselaraskan ke rata-rata atau salah satunya
+          final int pRel = int.tryParse(partnerMap['relationship'] ?? '50') ?? 50;
+          final int cRel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+          final int targetRel = (pRel + cRel) ~/ 2;
+          partnerMap['relationship'] = targetRel.toString();
+          cm['relationship'] = targetRel.toString();
+          return;
+        }
+      }
+
+      // 2. Cari di univClassmates
+      for (var cm in univClassmates) {
+        final String cmName = (cm['name'] ?? '').toLowerCase();
+        if (cmName == partnerName || partnerName.contains(cmName) || cmName.contains(partnerName)) {
+          cm['age'] = partnerMap['age'] ?? cm['age'] ?? '18';
+          if (partnerMap['skinColor'] != null) cm['skinColor'] = partnerMap['skinColor']!;
+          final int pRel = int.tryParse(partnerMap['relationship'] ?? '50') ?? 50;
+          final int cRel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+          final int targetRel = (pRel + cRel) ~/ 2;
+          partnerMap['relationship'] = targetRel.toString();
+          cm['relationship'] = targetRel.toString();
+          return;
+        }
+      }
+
+      // 3. Cari di coworkers
+      for (var cw in coworkers) {
+        final String cwName = (cw['name'] ?? '').toLowerCase();
+        if (cwName == partnerName || partnerName.contains(cwName) || cwName.contains(partnerName)) {
+          cw['age'] = partnerMap['age'] ?? cw['age'] ?? '18';
+          if (partnerMap['skinColor'] != null) cw['skinColor'] = partnerMap['skinColor']!;
+          final int pRel = int.tryParse(partnerMap['relationship'] ?? '50') ?? 50;
+          final int cRel = int.tryParse(cw['relationship'] ?? '50') ?? 50;
+          final int targetRel = (pRel + cRel) ~/ 2;
+          partnerMap['relationship'] = targetRel.toString();
+          cw['relationship'] = targetRel.toString();
+          return;
+        }
+      }
+    }
+
+    syncSinglePartner(partner);
+    syncSinglePartner(secondPartner);
+    syncSinglePartner(thirdPartner);
+    syncSinglePartner(fourthPartner);
+    syncSinglePartner(fifthPartner);
+    for (var sp in secretPartners) {
+      syncSinglePartner(sp);
+    }
+  }
+
+  void updateRelationshipValue(String targetName, int newValue) {
+    final String nameLower = targetName.toLowerCase();
+    final String valStr = newValue.toString();
+
+    if (partner != null && (partner!['name']!.toLowerCase() == nameLower || partner!['name']!.toLowerCase().contains(nameLower))) {
+      partner!['relationship'] = valStr;
+    }
+    if (secondPartner != null && (secondPartner!['name']!.toLowerCase() == nameLower || secondPartner!['name']!.toLowerCase().contains(nameLower))) {
+      secondPartner!['relationship'] = valStr;
+    }
+    if (thirdPartner != null && (thirdPartner!['name']!.toLowerCase() == nameLower || thirdPartner!['name']!.toLowerCase().contains(nameLower))) {
+      thirdPartner!['relationship'] = valStr;
+    }
+    if (fourthPartner != null && (fourthPartner!['name']!.toLowerCase() == nameLower || fourthPartner!['name']!.toLowerCase().contains(nameLower))) {
+      fourthPartner!['relationship'] = valStr;
+    }
+    if (fifthPartner != null && (fifthPartner!['name']!.toLowerCase() == nameLower || fifthPartner!['name']!.toLowerCase().contains(nameLower))) {
+      fifthPartner!['relationship'] = valStr;
+    }
+    for (var sp in secretPartners) {
+      if (sp['name']!.toLowerCase() == nameLower || sp['name']!.toLowerCase().contains(nameLower)) {
+        sp['relationship'] = valStr;
+      }
+    }
+
+    for (var cm in classmates) {
+      if (cm['name']!.toLowerCase() == nameLower || cm['name']!.toLowerCase().contains(nameLower)) {
+        cm['relationship'] = valStr;
+      }
+    }
+    for (var cm in univClassmates) {
+      if (cm['name']!.toLowerCase() == nameLower || cm['name']!.toLowerCase().contains(nameLower)) {
+        cm['relationship'] = valStr;
+      }
+    }
+    for (var cw in coworkers) {
+      if (cw['name']!.toLowerCase() == nameLower || cw['name']!.toLowerCase().contains(nameLower)) {
+        cw['relationship'] = valStr;
+      }
+    }
+    
+    if (motherName != null && motherName!.toLowerCase() == nameLower) {
+      motherRelationship = newValue;
+    }
+    if (fatherName != null && fatherName!.toLowerCase() == nameLower) {
+      fatherRelationship = newValue;
+    }
+    if (stepMotherName != null && stepMotherName!.toLowerCase() == nameLower) {
+      stepMotherRelationship = newValue;
+    }
+    if (stepFatherName != null && stepFatherName!.toLowerCase() == nameLower) {
+      stepFatherRelationship = newValue;
+    }
+    for (var sib in siblings) {
+      if (sib['name']!.toLowerCase() == nameLower) {
+        sib['relationship'] = valStr;
+      }
+    }
+  }
+
   void addPartnerToFreeSlot(Map<String, String> val) {
     final bool isSecret = val['relation'] == 'Pacar (Selingkuhan)' || val['relation'] == 'Pacar (Rahasia)';
     if (isSecret) {
@@ -213,6 +466,18 @@ class Character {
       if (sp['name'] == name || sp['name']!.contains(name) || name.contains(sp['name']!)) return true;
     }
     return false;
+  }
+
+  String? getPartnerRelation(String name) {
+    if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return partner!['relation'] ?? 'Pacar';
+    if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return secondPartner!['relation'] ?? 'Pacar';
+    if (thirdPartner != null && (thirdPartner!['name'] == name || thirdPartner!['name']!.contains(name) || name.contains(thirdPartner!['name']!))) return thirdPartner!['relation'] ?? 'Pacar';
+    if (fourthPartner != null && (fourthPartner!['name'] == name || fourthPartner!['name']!.contains(name) || name.contains(fourthPartner!['name']!))) return fourthPartner!['relation'] ?? 'Pacar';
+    if (fifthPartner != null && (fifthPartner!['name'] == name || fifthPartner!['name']!.contains(name) || name.contains(fifthPartner!['name']!))) return fifthPartner!['relation'] ?? 'Pacar';
+    for (var sp in secretPartners) {
+      if (sp['name'] == name || sp['name']!.contains(name) || name.contains(sp['name']!)) return sp['relation'] ?? 'Pacar';
+    }
+    return null;
   }
 
   bool isHavingAffair = false; // true jika user sedang selingkuh
@@ -502,6 +767,7 @@ class Character {
         stepFatherName = 'Fajar Pratama'; // Default fallback name
         stepFatherAge = motherAge! + random.nextInt(5) - 2;
         stepFatherRelationship = 50;
+        stepFatherSkinColor = SkinColorInheritance.randomSkin();
         isStepFatherDeceased = false;
         final String notice = '💍 Kabar Keluarga: Ibumu menikah lagi! Sekarang kamu memiliki Ayah Tiri bernama $stepFatherName.';
         events.add(notice);
@@ -514,6 +780,7 @@ class Character {
         stepMotherName = 'Dian Lestari'; // Default fallback name
         stepMotherAge = fatherAge! + random.nextInt(5) - 2;
         stepMotherRelationship = 50;
+        stepMotherSkinColor = SkinColorInheritance.randomSkin();
         isStepMotherDeceased = false;
         final String notice = '💍 Kabar Keluarga: Ayahmu menikah lagi! Sekarang kamu memiliki Ibu Tiri bernama $stepMotherName.';
         events.add(notice);
@@ -858,22 +1125,32 @@ class Character {
       }
     }
 
-    // 4. Partner Aging & Death
-    if (partner != null) {
-      bool isDeceased = partner!['isDeceased'] == 'true';
+    // 4. Partner Aging & Death (Untuk semua partner)
+    void ageUpPartnerMap(Map<String, String>? pMap, String defaultLabel) {
+      if (pMap == null) return;
+      bool isDeceased = pMap['isDeceased'] == 'true';
       if (!isDeceased) {
-        int partnerAge = int.tryParse(partner!['age'] ?? '0') ?? 0;
+        int partnerAge = int.tryParse(pMap['age'] ?? '0') ?? 0;
         int nextAge = partnerAge + 1;
-        partner!['age'] = nextAge.toString();
+        pMap['age'] = nextAge.toString();
         if (nextAge > 60) {
           int deathChance = (nextAge - 60) ~/ 2 + 1;
           if (random.nextInt(100) < deathChance) {
-            partner!['isDeceased'] = 'true';
-            partner!['relationship'] = '0';
-            events.add('💔 Kabar Duka: Pacarmu, ${partner!['name']}, meninggal dunia pada usia $nextAge tahun.');
+            pMap['isDeceased'] = 'true';
+            pMap['relationship'] = '0';
+            events.add('💔 Kabar Duka: $defaultLabel-mu, ${pMap['name']}, meninggal dunia pada usia $nextAge tahun.');
           }
         }
       }
+    }
+
+    ageUpPartnerMap(partner, 'Pacar');
+    ageUpPartnerMap(secondPartner, 'Pacar');
+    ageUpPartnerMap(thirdPartner, 'Pacar');
+    ageUpPartnerMap(fourthPartner, 'Pacar');
+    ageUpPartnerMap(fifthPartner, 'Pacar');
+    for (var sp in secretPartners) {
+      ageUpPartnerMap(sp, 'Pacar (Rahasia)');
     }
 
     // --- LOGIKA MELAHIRKAN ---
@@ -1470,6 +1747,9 @@ class Character {
       }
     }
 
+    syncNPCsAndPartners();
+    syncPartnerDeathStatus();
+    syncSocialRelationships();
     return events;
   }
 }

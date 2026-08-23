@@ -449,12 +449,14 @@ List<ActionItem> getAge12PlusActions(
             initialRelForPartner = character.stepFatherRelationship ?? 50;
           }
 
+          final String? familySkinColor = character.getFamilyMemberSkinColor(targetName);
           final newPartnerData = {
             'name': targetName,
             'gender': partnerGender,
             'age': '$actualTargetAge',
             'relationship': initialRelForPartner.toString(),
             'relation': 'Pacar',
+            if (familySkinColor != null) 'skinColor': familySkinColor,
           };
 
           if (hasExistingPartner) {
