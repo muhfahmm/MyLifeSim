@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class LotreMenuHelper {
   static void showLotreMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -24,51 +25,48 @@ class LotreMenuHelper {
       {'name': 'Mega Jackpot 💰', 'cost': 500000, 'prize': 5000000000, 'chance': 1, 'desc': 'Jackpot terbesar, peluang sangat kecil'},
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.casino, color: Colors.amber),
-          SizedBox(width: 8),
-          Text('Main Lotre 🍀', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: jenis.length,
-            itemBuilder: (_, i) {
-              final j = jenis[i];
-              final bool canAfford = character.money >= (j['cost'] as int);
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 8),
-                color: Colors.grey.shade50,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  title: Text(j['name'], style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 13,
-                    color: canAfford ? Colors.black87 : Colors.grey,
-                  )),
-                  subtitle: Text('${j['desc']}\nHarga: Rp ${_fmt(j['cost'] as int)} | Peluang menang: ${j['chance']}%'),
-                  isThreeLine: true,
-                  trailing: Text('Rp ${_fmt(j['prize'] as int)}',
-                      style: TextStyle(color: canAfford ? Colors.amber.shade700 : Colors.grey,
-                          fontWeight: FontWeight.bold, fontSize: 11)),
-                  onTap: canAfford ? () {
-                    Navigator.pop(ctx);
-                    _executeLottery(context, character, j, onComplete);
-                  } : null,
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+      title: 'Main Lotre 🍀',
+      content: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: jenis.length,
+        itemBuilder: (_, i) {
+          final j = jenis[i];
+          final bool canAfford = character.money >= (j['cost'] as int);
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            color: Colors.grey.shade50,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: ListTile(
+              title: Text(j['name'], style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 13,
+                color: canAfford ? Colors.black87 : Colors.grey,
+              )),
+              subtitle: Text('${j['desc']}\nHarga: Rp ${_fmt(j['cost'] as int)} | Peluang menang: ${j['chance']}%'),
+              isThreeLine: true,
+              trailing: Text('Rp ${_fmt(j['prize'] as int)}',
+                  style: TextStyle(color: canAfford ? Colors.amber.shade700 : Colors.grey,
+                      fontWeight: FontWeight.bold, fontSize: 11)),
+              onTap: canAfford ? () {
+                Navigator.pop(context);
+                _executeLottery(context, character, j, onComplete);
+              } : null,
+            ),
+          );
+        },
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Tutup'),
+        ),
+      ],
     );
   }
 

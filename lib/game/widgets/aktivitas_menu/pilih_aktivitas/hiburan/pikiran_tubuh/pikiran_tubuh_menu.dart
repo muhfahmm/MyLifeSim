@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/pikiran_tubuh/pikiran_tubuh_menu.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class PikiranTubuhMenuHelper {
   static void showPikiranTubuhMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -24,63 +25,60 @@ class PikiranTubuhMenuHelper {
       {'name': 'Journaling ✍️', 'cost': 0, 'happiness': 8, 'intelligence': 7, 'health': 2, 'desc': 'Menulis jurnal untuk ekspresi diri'},
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.self_improvement, color: Colors.indigo),
-          SizedBox(width: 8),
-          Text('Pikiran & Tubuh', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: aktivitas.length,
-            itemBuilder: (_, i) {
-              final a = aktivitas[i];
-              final bool canAfford = a['cost'] == 0 || character.money >= (a['cost'] as int);
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 8),
-                color: Colors.grey.shade50,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  title: Text(a['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: Rp ${_fmt(a['cost'] as int)}"}'),
-                  isThreeLine: true,
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.indigo),
-                  onTap: canAfford ? () {
-                    Navigator.pop(ctx);
-                    if (a['cost'] as int > 0) character.money -= (a['cost'] as int);
-                    character.happiness = (character.happiness + (a['happiness'] as int)).clamp(0, 100);
-                    character.intelligence = (character.intelligence + (a['intelligence'] as int)).clamp(0, 100);
-                    character.health = (character.health + (a['health'] as int)).clamp(0, 100);
-                    final msg = '${a['name']} selesai! Kamu merasa lebih tenang dan fokus. (+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)';
-                    character.inbox.add(msg);
-                    showDialog(
-                      context: context,
-                      builder: (ctx2) => AlertDialog(
-                        title: const Row(children: [
-                          Icon(Icons.check_circle, color: Colors.green),
-                          SizedBox(width: 8),
-                          Text('Sesi Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
-                        ]),
-                        content: Text(msg),
-                        actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
-                      ),
-                    );
-                  } : null,
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+      title: 'Pikiran & Tubuh 🧘',
+      content: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: aktivitas.length,
+        itemBuilder: (_, i) {
+          final a = aktivitas[i];
+          final bool canAfford = a['cost'] == 0 || character.money >= (a['cost'] as int);
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            color: Colors.grey.shade50,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: ListTile(
+              title: Text(a['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              subtitle: Text('${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: Rp ${_fmt(a['cost'] as int)}"}'),
+              isThreeLine: true,
+              trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.indigo),
+              onTap: canAfford ? () {
+                Navigator.pop(context);
+                if (a['cost'] as int > 0) character.money -= (a['cost'] as int);
+                character.happiness = (character.happiness + (a['happiness'] as int)).clamp(0, 100);
+                character.intelligence = (character.intelligence + (a['intelligence'] as int)).clamp(0, 100);
+                character.health = (character.health + (a['health'] as int)).clamp(0, 100);
+                final msg = '${a['name']} selesai! Kamu merasa lebih tenang dan fokus. (+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)';
+                character.inbox.add(msg);
+                showDialog(
+                  context: context,
+                  builder: (ctx2) => AlertDialog(
+                    title: const Row(children: [
+                      Icon(Icons.check_circle, color: Colors.green),
+                      SizedBox(width: 8),
+                      Text('Sesi Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ]),
+                    content: Text(msg),
+                    actions: [TextButton(onPressed: () { Navigator.pop(ctx2); onComplete(); }, child: const Text('OK'))],
+                  ),
+                );
+              } : null,
+            ),
+          );
+        },
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Tutup'),
+        ),
+      ],
     );
   }
 

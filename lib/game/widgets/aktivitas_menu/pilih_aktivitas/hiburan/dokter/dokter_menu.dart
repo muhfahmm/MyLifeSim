@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class DokterMenuHelper {
   static void showDokterMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -13,50 +14,47 @@ class DokterMenuHelper {
       {'name': 'Medical Check Up Lengkap 📋', 'cost': 2000000, 'desc': 'Pemeriksaan menyeluruh tubuh'},
     ];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.local_hospital, color: Colors.blue),
-          SizedBox(width: 8),
-          Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-        ]),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: layanan.length,
-            itemBuilder: (_, i) {
-              final l = layanan[i];
-              final bool canAfford = character.money >= (l['cost'] as int);
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 8),
-                color: Colors.grey.shade50,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  title: Text(l['name'], style: TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 13,
-                    color: canAfford ? Colors.black87 : Colors.grey,
-                  )),
-                  subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
-                  isThreeLine: true,
-                  trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                      size: 14, color: canAfford ? Colors.blue : Colors.grey),
-                  onTap: canAfford ? () {
-                    Navigator.pop(ctx);
-                    _executeDokter(context, character, l, onComplete);
-                  } : null,
-                ),
-              );
-            },
-          ),
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Tutup'))],
+      title: 'Pergi ke Dokter 🏥',
+      content: ListView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: layanan.length,
+        itemBuilder: (_, i) {
+          final l = layanan[i];
+          final bool canAfford = character.money >= (l['cost'] as int);
+          return Card(
+            elevation: 0,
+            margin: const EdgeInsets.only(bottom: 8),
+            color: Colors.grey.shade50,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.grey.shade200),
+            ),
+            child: ListTile(
+              title: Text(l['name'], style: TextStyle(
+                fontWeight: FontWeight.bold, fontSize: 13,
+                color: canAfford ? Colors.black87 : Colors.grey,
+              )),
+              subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
+              isThreeLine: true,
+              trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
+                  size: 14, color: canAfford ? Colors.blue : Colors.grey),
+              onTap: canAfford ? () {
+                Navigator.pop(context);
+                _executeDokter(context, character, l, onComplete);
+              } : null,
+            ),
+          );
+        },
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Tutup'),
+        ),
+      ],
     );
   }
 
