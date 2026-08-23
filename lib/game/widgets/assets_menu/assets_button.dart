@@ -4,9 +4,9 @@ import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 // Import semua widget menu baru
-import 'package:bitlife/game/widgets/assets_menu/finansial/uang_tunai.dart';
-import 'package:bitlife/game/widgets/assets_menu/finansial/investasi.dart';
-import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan.dart';
+import 'package:bitlife/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart';
+import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
+import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/kasino.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/museum.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil.dart';
