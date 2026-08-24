@@ -231,9 +231,9 @@ class RelationshipButton extends StatelessWidget {
               if (character.partner != null) ...[
                 const Divider(height: 32),
                 Text(
-                  character.partner!['relation'] == 'Pacar'
+                  (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
                       ? '💖 Pacar'
-                      : character.partner!['relation'] == 'Tunangan'
+                      : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
                           ? '💍 Tunangan'
                           : '👩❤️👨 Pasangan Hidup',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
@@ -241,18 +241,20 @@ class RelationshipButton extends StatelessWidget {
                 const SizedBox(height: 8),
                 _buildFamilyItem(
                   context,
-                  icon: character.partner!['relation'] == 'Pacar'
+                  icon: (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
                       ? Icons.favorite
-                      : character.partner!['relation'] == 'Tunangan'
+                      : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
                           ? Icons.diamond
                           : Icons.wc,
-                  label: character.partner!['isDeceased'] == 'true' ? '${character.partner!['name']!} (Wafat)' : character.partner!['name']!,
-                  status: character.partner!['relation']!,
+                  label: character.partner!['isDeceased'] == 'true'
+                      ? '${character.partner!['name'] ?? 'Pasangan'} (Wafat)'
+                      : (character.partner!['name'] ?? 'Pasangan'),
+                  status: character.partner!['relation'] ?? 'Pacar',
                   color: character.partner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                   relationshipValue: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
-                  ageText: '${character.partner!['age']} tahun',
+                  ageText: '${character.partner!['age'] ?? '20'} tahun',
                   avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.partner!['name']!,
+                    name: character.partner!['name'] ?? 'Pasangan',
                     gender: character.partner!['gender'] ?? 'Perempuan',
                     age: int.tryParse(character.partner!['age'] ?? '20') ?? 20,
                     happiness: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
@@ -283,14 +285,14 @@ class RelationshipButton extends StatelessWidget {
                     context,
                     icon: Icons.favorite,
                     label: character.secondPartner!['isDeceased'] == 'true'
-                        ? '${character.secondPartner!['name']!} (Wafat)'
-                        : character.secondPartner!['name']!,
+                        ? '${character.secondPartner!['name'] ?? 'Pacar'} (Wafat)'
+                        : (character.secondPartner!['name'] ?? 'Pacar'),
                     status: 'Pacar Kedua',
                     color: character.secondPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                     relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
-                    ageText: '${character.secondPartner!['age']} tahun',
+                    ageText: '${character.secondPartner!['age'] ?? '20'} tahun',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                      name: character.secondPartner!['name']!,
+                      name: character.secondPartner!['name'] ?? 'Pacar',
                       gender: character.secondPartner!['gender'] ?? 'Perempuan',
                       age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
                       happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
@@ -322,14 +324,14 @@ class RelationshipButton extends StatelessWidget {
                     context,
                     icon: Icons.favorite,
                     label: character.thirdPartner!['isDeceased'] == 'true'
-                        ? '${character.thirdPartner!['name']!} (Wafat)'
-                        : character.thirdPartner!['name']!,
+                        ? '${character.thirdPartner!['name'] ?? 'Pacar'} (Wafat)'
+                        : (character.thirdPartner!['name'] ?? 'Pacar'),
                     status: 'Pacar Ketiga',
                     color: character.thirdPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                     relationshipValue: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
-                    ageText: '${character.thirdPartner!['age']} tahun',
+                    ageText: '${character.thirdPartner!['age'] ?? '20'} tahun',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                      name: character.thirdPartner!['name']!,
+                      name: character.thirdPartner!['name'] ?? 'Pacar',
                       gender: character.thirdPartner!['gender'] ?? 'Perempuan',
                       age: int.tryParse(character.thirdPartner!['age'] ?? '20') ?? 20,
                       happiness: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
@@ -361,14 +363,14 @@ class RelationshipButton extends StatelessWidget {
                     context,
                     icon: Icons.favorite,
                     label: character.fourthPartner!['isDeceased'] == 'true'
-                        ? '${character.fourthPartner!['name']!} (Wafat)'
-                        : character.fourthPartner!['name']!,
+                        ? '${character.fourthPartner!['name'] ?? 'Pacar'} (Wafat)'
+                        : (character.fourthPartner!['name'] ?? 'Pacar'),
                     status: 'Pacar Keempat',
                     color: character.fourthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                     relationshipValue: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
-                    ageText: '${character.fourthPartner!['age']} tahun',
+                    ageText: '${character.fourthPartner!['age'] ?? '20'} tahun',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                      name: character.fourthPartner!['name']!,
+                      name: character.fourthPartner!['name'] ?? 'Pacar',
                       gender: character.fourthPartner!['gender'] ?? 'Perempuan',
                       age: int.tryParse(character.fourthPartner!['age'] ?? '20') ?? 20,
                       happiness: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
@@ -400,14 +402,14 @@ class RelationshipButton extends StatelessWidget {
                     context,
                     icon: Icons.favorite,
                     label: character.fifthPartner!['isDeceased'] == 'true'
-                        ? '${character.fifthPartner!['name']!} (Wafat)'
-                        : character.fifthPartner!['name']!,
+                        ? '${character.fifthPartner!['name'] ?? 'Pacar'} (Wafat)'
+                        : (character.fifthPartner!['name'] ?? 'Pacar'),
                     status: 'Pacar Kelima',
                     color: character.fifthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
                     relationshipValue: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,
-                    ageText: '${character.fifthPartner!['age']} tahun',
+                    ageText: '${character.fifthPartner!['age'] ?? '20'} tahun',
                     avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                      name: character.fifthPartner!['name']!,
+                      name: character.fifthPartner!['name'] ?? 'Pacar',
                       gender: character.fifthPartner!['gender'] ?? 'Perempuan',
                       age: int.tryParse(character.fifthPartner!['age'] ?? '20') ?? 20,
                       happiness: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,

@@ -127,6 +127,7 @@ class Character {
   List<Map<String, String>> idolTrainees = [];
   List<Map<String, String>> idolMainMembers = [];
   List<Map<String, String>> idolStaff = [];
+  List<String> idolNews = [];
 
   // --- FINANSIAL TRANSAKSI & PINJAMAN ---
   List<Map<String, dynamic>> cashTransactions = [];
@@ -515,25 +516,37 @@ class Character {
   }
 
   bool isAnyPartnerNameMatching(String name) {
-    if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return true;
-    if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return true;
-    if (thirdPartner != null && (thirdPartner!['name'] == name || thirdPartner!['name']!.contains(name) || name.contains(thirdPartner!['name']!))) return true;
-    if (fourthPartner != null && (fourthPartner!['name'] == name || fourthPartner!['name']!.contains(name) || name.contains(fourthPartner!['name']!))) return true;
-    if (fifthPartner != null && (fifthPartner!['name'] == name || fifthPartner!['name']!.contains(name) || name.contains(fifthPartner!['name']!))) return true;
+    bool checkPartner(Map<String, String>? p) {
+      if (p == null) return false;
+      final pName = p['name'];
+      if (pName == null) return false;
+      return pName == name || pName.contains(name) || name.contains(pName);
+    }
+    if (checkPartner(partner)) return true;
+    if (checkPartner(secondPartner)) return true;
+    if (checkPartner(thirdPartner)) return true;
+    if (checkPartner(fourthPartner)) return true;
+    if (checkPartner(fifthPartner)) return true;
     for (var sp in secretPartners) {
-      if (sp['name'] == name || sp['name']!.contains(name) || name.contains(sp['name']!)) return true;
+      if (checkPartner(sp)) return true;
     }
     return false;
   }
 
   String? getPartnerRelation(String name) {
-    if (partner != null && (partner!['name'] == name || partner!['name']!.contains(name) || name.contains(partner!['name']!))) return partner!['relation'] ?? 'Pacar';
-    if (secondPartner != null && (secondPartner!['name'] == name || secondPartner!['name']!.contains(name) || name.contains(secondPartner!['name']!))) return secondPartner!['relation'] ?? 'Pacar';
-    if (thirdPartner != null && (thirdPartner!['name'] == name || thirdPartner!['name']!.contains(name) || name.contains(thirdPartner!['name']!))) return thirdPartner!['relation'] ?? 'Pacar';
-    if (fourthPartner != null && (fourthPartner!['name'] == name || fourthPartner!['name']!.contains(name) || name.contains(fourthPartner!['name']!))) return fourthPartner!['relation'] ?? 'Pacar';
-    if (fifthPartner != null && (fifthPartner!['name'] == name || fifthPartner!['name']!.contains(name) || name.contains(fifthPartner!['name']!))) return fifthPartner!['relation'] ?? 'Pacar';
+    bool checkPartner(Map<String, String>? p) {
+      if (p == null) return false;
+      final pName = p['name'];
+      if (pName == null) return false;
+      return pName == name || pName.contains(name) || name.contains(pName);
+    }
+    if (checkPartner(partner)) return partner!['relation'] ?? 'Pacar';
+    if (checkPartner(secondPartner)) return secondPartner!['relation'] ?? 'Pacar';
+    if (checkPartner(thirdPartner)) return thirdPartner!['relation'] ?? 'Pacar';
+    if (checkPartner(fourthPartner)) return fourthPartner!['relation'] ?? 'Pacar';
+    if (checkPartner(fifthPartner)) return fifthPartner!['relation'] ?? 'Pacar';
     for (var sp in secretPartners) {
-      if (sp['name'] == name || sp['name']!.contains(name) || name.contains(sp['name']!)) return sp['relation'] ?? 'Pacar';
+      if (checkPartner(sp)) return sp['relation'] ?? 'Pacar';
     }
     return null;
   }

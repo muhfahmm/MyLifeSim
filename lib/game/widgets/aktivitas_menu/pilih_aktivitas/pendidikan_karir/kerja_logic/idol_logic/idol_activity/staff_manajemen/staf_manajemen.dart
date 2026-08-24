@@ -72,9 +72,25 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
                         ),
                       ),
                     ),
-                    title: Text(
-                      name,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    title: Row(
+                      children: [
+                        Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        if (widget.character.isAnyPartnerNameMatching(name)) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.shade50,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: Colors.pink.shade200, width: 0.5),
+                            ),
+                            child: const Text(
+                              'Pacar ❤️',
+                              style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,

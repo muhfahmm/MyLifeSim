@@ -20,10 +20,14 @@ class IdolManager {
     'Rian', 'Dimas', 'Reza', 'Riko', 'Eko', 'Agus', 'Tono', 'Dodi', 'Roni', 'Ari'
   ];
 
-  static String _generateName(String gender, Random rand) {
-    final firstList = gender == 'Perempuan' ? femaleFirstNames : maleFirstNames;
+  static String _generateName(String gender, Random rand, Character character) {
+    final firstList = gender == 'Perempuan'
+        ? ((character.femaleFirstNames != null && character.femaleFirstNames!.isNotEmpty) ? character.femaleFirstNames! : femaleFirstNames)
+        : ((character.maleFirstNames != null && character.maleFirstNames!.isNotEmpty) ? character.maleFirstNames! : maleFirstNames);
+    final lastList = (character.lastNames != null && character.lastNames!.isNotEmpty) ? character.lastNames! : lastNames;
+
     final first = firstList[rand.nextInt(firstList.length)];
-    final last = lastNames[rand.nextInt(lastNames.length)];
+    final last = lastList[rand.nextInt(lastList.length)];
     return '$first $last';
   }
 
@@ -39,7 +43,7 @@ class IdolManager {
     final numTrainees = 8 + rand.nextInt(8); // 8 to 15
     for (int i = 0; i < numTrainees; i++) {
       character.idolTrainees.add({
-        'name': _generateName('Perempuan', rand),
+        'name': _generateName('Perempuan', rand, character),
         'gender': 'Perempuan',
         'age': (12 + rand.nextInt(4)).toString(), // 12 to 15
         'relationship': (40 + rand.nextInt(41)).toString(), // 40% to 80%
@@ -54,7 +58,7 @@ class IdolManager {
         memberAge = 26 + rand.nextInt(5); // 26 to 30
       }
       character.idolMainMembers.add({
-        'name': _generateName('Perempuan', rand),
+        'name': _generateName('Perempuan', rand, character),
         'gender': 'Perempuan',
         'age': memberAge.toString(),
         'relationship': (40 + rand.nextInt(41)).toString(),
@@ -78,7 +82,7 @@ class IdolManager {
         memberAge = 26 + rand.nextInt(5); // 26 to 30
       }
       character.idolMainMembers.add({
-        'name': _generateName('Perempuan', rand),
+        'name': _generateName('Perempuan', rand, character),
         'gender': 'Perempuan',
         'age': memberAge.toString(),
         'relationship': (40 + rand.nextInt(41)).toString(),
@@ -96,7 +100,7 @@ class IdolManager {
     
     // 1 General Manager
     character.idolStaff.add({
-      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
       'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
       'age': (30 + rand.nextInt(21)).toString(), // 30 to 50
       'role': 'General Manager',
@@ -105,7 +109,7 @@ class IdolManager {
 
     // 1 Deputy GM
     character.idolStaff.add({
-      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
       'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
       'age': (25 + rand.nextInt(21)).toString(), // 25 to 45
       'role': 'Deputy General Manager',
@@ -116,7 +120,7 @@ class IdolManager {
     final numOps = 10 + rand.nextInt(6); // 10 to 15
     for (int i = 0; i < numOps; i++) {
       character.idolStaff.add({
-        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
         'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
         'age': (22 + rand.nextInt(24)).toString(), // 22 to 45
         'role': 'Operations Staff',
@@ -174,7 +178,7 @@ class IdolManager {
       final ageVal = int.tryParse(member['age'] ?? '15') ?? 15;
       if (ageVal >= 16) {
         final gradNotice = '📢 Trainee Keluar: Trainee ${member['name']} (${member['age']} tahun) telah meninggalkan grup trainee.';
-        events.add(gradNotice);
+        character.idolNews.add(gradNotice);
         inbox.add(gradNotice);
       } else {
         character.idolTrainees.add(member);
@@ -184,12 +188,16 @@ class IdolManager {
     // Replenish trainee team: 8 to 15 members
     final targetTrainees = 8 + rand.nextInt(8);
     while (character.idolTrainees.length < targetTrainees) {
+      final name = _generateName('Perempuan', rand, character);
       character.idolTrainees.add({
-        'name': _generateName('Perempuan', rand),
+        'name': name,
         'gender': 'Perempuan',
         'age': '12', // fresh trainee
         'relationship': (40 + rand.nextInt(41)).toString(),
       });
+      final entryNotice = '🆕 Generasi Baru: Trainee Baru $name (12 tahun) telah bergabung ke tim Trainee!';
+      character.idolNews.add(entryNotice);
+      inbox.add(entryNotice);
     }
 
     // 4. Main Team Graduation / Leaving & Replacements
@@ -214,7 +222,7 @@ class IdolManager {
 
       if (shouldLeave) {
         final gradNotice = '🎓 Anggota Lulus: Anggota tim utamamu, ${member['name']} (${member['age']} tahun), telah resmi lulus (graduate) dari grup Idol.';
-        events.add(gradNotice);
+        character.idolNews.add(gradNotice);
         inbox.add(gradNotice);
       } else {
         character.idolMainMembers.add(member);
@@ -224,12 +232,16 @@ class IdolManager {
     // Replenish main team: 20 to 30 members
     final targetMain = 20 + rand.nextInt(11);
     while (character.idolMainMembers.length < targetMain) {
+      final name = _generateName('Perempuan', rand, character);
       character.idolMainMembers.add({
-        'name': _generateName('Perempuan', rand),
+        'name': name,
         'gender': 'Perempuan',
         'age': '16', // fresh main member
         'relationship': (40 + rand.nextInt(41)).toString(),
       });
+      final entryNotice = '🆕 Promosi Tim Utama: $name (16 tahun) resmi bergabung ke Tim Utama!';
+      character.idolNews.add(entryNotice);
+      inbox.add(entryNotice);
     }
 
     // Replenish staff if they get too old (> 65) or leave
@@ -251,7 +263,7 @@ class IdolManager {
     bool hasDeputy = character.idolStaff.any((s) => s['role'] == 'Deputy General Manager');
     if (!hasGM) {
       character.idolStaff.add({
-        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
         'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
         'age': (30 + rand.nextInt(10)).toString(),
         'role': 'General Manager',
@@ -260,7 +272,7 @@ class IdolManager {
     }
     if (!hasDeputy) {
       character.idolStaff.add({
-        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
         'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
         'age': (25 + rand.nextInt(10)).toString(),
         'role': 'Deputy General Manager',
@@ -273,7 +285,7 @@ class IdolManager {
     int currentOps = character.idolStaff.where((s) => s['role'] == 'Operations Staff').length;
     while (currentOps < targetOps) {
       character.idolStaff.add({
-        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand),
+        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
         'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
         'age': (22 + rand.nextInt(15)).toString(),
         'role': 'Operations Staff',

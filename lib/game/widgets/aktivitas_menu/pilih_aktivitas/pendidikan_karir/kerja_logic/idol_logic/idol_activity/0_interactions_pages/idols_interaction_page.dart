@@ -4,6 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 
 class IdolsInteractionPage extends StatefulWidget {
   final Map<String, String> person;
@@ -120,9 +121,29 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Text(
-                      name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          name,
+                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        ),
+                        if (widget.character.isAnyPartnerNameMatching(name)) ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.pink.shade50,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: Colors.pink.shade200, width: 0.5),
+                            ),
+                            child: const Text(
+                              'Pacar ❤️',
+                              style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -234,6 +255,26 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             ),
             const SizedBox(height: 12),
 
+            // Aksi Lihat Keluarga dipaling atas
+            _buildActionTile(
+              icon: Icons.people,
+              color: Colors.blueGrey,
+              title: 'Lihat Keluarga',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NpcFamilyViewScreen(
+                      npcName: name,
+                      npcGender: gender,
+                      npcAge: age,
+                      npcRole: role,
+                    ),
+                  ),
+                );
+              },
+            ),
+
             // Aksi 1: Bercinta / Make Love (Hanya jika berpacaran dengan rekan kerja/staff)
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
               _buildActionTile(
@@ -251,6 +292,76 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   }
                 },
               ),
+              _buildActionTile(
+                icon: Icons.heart_broken,
+                color: Colors.red,
+                title: 'Putuskan Pacar',
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (confirmContext) => AlertDialog(
+                      title: const Text('Putuskan Hubungan', style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: Text('Apakah kamu yakin ingin memutuskan hubungan dengan $name?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(confirmContext),
+                          child: const Text('Batal'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(confirmContext);
+                            setState(() {
+                              if (widget.character.partner != null && widget.character.partner!['name'] == name) {
+                                widget.character.partner = null;
+                              } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
+                                widget.character.secondPartner = null;
+                              } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == name) {
+                                widget.character.thirdPartner = null;
+                              } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == name) {
+                                widget.character.fourthPartner = null;
+                              } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == name) {
+                                widget.character.fifthPartner = null;
+                              }
+                              widget.character.secretPartners.removeWhere((p) => p['name'] == name);
+                              if (widget.character.secretPartners.isEmpty && widget.character.secondPartner == null) {
+                                widget.character.isHavingAffair = false;
+                              }
+
+                              widget.character.exPartners.add({
+                                'name': name,
+                                'gender': gender,
+                                'age': widget.character.age.toString(),
+                                'relationship': '20',
+                                'relation': 'Mantan Pacar',
+                                'isDeceased': 'false',
+                                'breakInitiator': widget.character.gender,
+                                'breakReason': 'putus biasa',
+                              });
+                            });
+                            _updateRelationship(-40);
+                            
+                            DialogHelper.show(
+                              context: context,
+                              title: 'Putus Hubungan 💔',
+                              content: Text('Kamu telah memutuskan hubungan dengan $name. Hubungan kalian sekarang berakhir.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.pop(context);
+                                  },
+                                  child: const Text('Mengerti'),
+                                ),
+                              ],
+                            );
+                          },
+                          child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
             ],
 
             // Aksi 2: Ajak Pacaran (Jika belum pacaran)
@@ -262,14 +373,16 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                 onTap: () {
                   final accepted = relationship >= 70 && (_random.nextInt(100) < 65);
                   if (accepted) {
-                    widget.character.partner = {
+                    final partnerMap = {
                       'name': name,
                       'gender': gender,
                       'relationship': relationship.toString(),
                       'age': age.toString(),
                       'isDeceased': 'false',
                       'sexuality': sexuality,
+                      'relation': 'Pacar',
                     };
+                    widget.character.addPartnerToFreeSlot(partnerMap);
                     _updateRelationship(20);
                     _showOutcome('Pacaran Sukses! ❤️', 'Luar biasa! $name menerima ajakan pacaranmu. Sekarang kalian resmi berpasangan! 😍');
                   } else {
