@@ -96,38 +96,165 @@ class IdolManager {
 
   static void _generateManagementStaff(Character character, Random rand) {
     character.idolStaff.clear();
-    
-    // 1 General Manager
-    character.idolStaff.add({
-      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
-      'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
-      'age': (30 + rand.nextInt(21)).toString(), // 30 to 50
-      'role': 'General Manager',
-      'relationship': (50 + rand.nextInt(31)).toString(),
-      'skinColor': _generateSkinColor(rand),
-    });
 
-    // 1 Deputy GM
-    character.idolStaff.add({
-      'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
-      'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
-      'age': (25 + rand.nextInt(21)).toString(), // 25 to 45
-      'role': 'Deputy General Manager',
-      'relationship': (50 + rand.nextInt(31)).toString(),
-      'skinColor': _generateSkinColor(rand),
-    });
-
-    // 10-15 Operations Team (aged 22-45)
-    final numOps = 10 + rand.nextInt(6); // 10 to 15
-    for (int i = 0; i < numOps; i++) {
+    void addStaff(String role, String dept, {String? forcedGender, int minAge = 22, int maxAge = 45}) {
+      final gender = forcedGender ?? (rand.nextBool() ? 'Laki-laki' : 'Perempuan');
       character.idolStaff.add({
-        'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),
-        'gender': rand.nextBool() ? 'Laki-laki' : 'Perempuan',
-        'age': (22 + rand.nextInt(24)).toString(), // 22 to 45
-        'role': 'Operations Staff',
+        'name': _generateName(gender, rand, character),
+        'gender': gender,
+        'age': (minAge + rand.nextInt(maxAge - minAge + 1)).toString(),
+        'role': role,
+        'department': dept,
         'relationship': (40 + rand.nextInt(41)).toString(),
         'skinColor': _generateSkinColor(rand),
       });
+    }
+
+    // ============================================================
+    // 1. MANAJEMEN PUNCAK & ADMIN (5-10 orang)
+    // ============================================================
+    // General Manager (1 orang)
+    final gmGender = rand.nextBool() ? 'Laki-laki' : 'Perempuan';
+    character.idolStaff.add({
+      'name': _generateName(gmGender, rand, character),
+      'gender': gmGender,
+      'age': (35 + rand.nextInt(16)).toString(), // 35-50
+      'role': 'General Manager',
+      'department': 'Manajemen Puncak & Admin',
+      'relationship': (55 + rand.nextInt(26)).toString(),
+      'skinColor': _generateSkinColor(rand),
+    });
+
+    // Deputy General Manager (1 orang)
+    final dgmGender = rand.nextBool() ? 'Laki-laki' : 'Perempuan';
+    character.idolStaff.add({
+      'name': _generateName(dgmGender, rand, character),
+      'gender': dgmGender,
+      'age': (28 + rand.nextInt(18)).toString(), // 28-45
+      'role': 'Deputy General Manager',
+      'department': 'Manajemen Puncak & Admin',
+      'relationship': (50 + rand.nextInt(31)).toString(),
+      'skinColor': _generateSkinColor(rand),
+    });
+
+    // Manajer Divisi: Promosi, Operasional, Keuangan (3 orang)
+    for (final divisi in ['Manajer Divisi Promosi', 'Manajer Divisi Operasional', 'Manajer Divisi Keuangan']) {
+      addStaff(divisi, 'Manajemen Puncak & Admin', minAge: 27, maxAge: 45);
+    }
+
+    // Staf Administrasi & HRD (2-4 orang)
+    final numAdmin = 2 + rand.nextInt(3);
+    for (int i = 0; i < numAdmin; i++) {
+      final adminRoles = ['Staf Administrasi', 'Staf HRD', 'Staf Administrasi Kontrak'];
+      addStaff(adminRoles[rand.nextInt(adminRoles.length)], 'Manajemen Puncak & Admin', minAge: 22, maxAge: 40);
+    }
+
+    // ============================================================
+    // 2. TIM PELATIHAN / TRAINER (5-8 orang)
+    // ============================================================
+    // Pelatih Tari / Koreografer (2-3 orang)
+    final numDance = 2 + rand.nextInt(2);
+    for (int i = 0; i < numDance; i++) {
+      addStaff('Pelatih Tari (Koreografer)', 'Tim Pelatihan (Trainer)', minAge: 25, maxAge: 40);
+    }
+    // Pelatih Vokal (1-2 orang)
+    final numVokal = 1 + rand.nextInt(2);
+    for (int i = 0; i < numVokal; i++) {
+      addStaff('Pelatih Vokal', 'Tim Pelatihan (Trainer)', minAge: 25, maxAge: 45);
+    }
+    // Pelatih Akting/MC (1-2 orang)
+    final numAkting = 1 + rand.nextInt(2);
+    for (int i = 0; i < numAkting; i++) {
+      addStaff('Pelatih Akting/MC', 'Tim Pelatihan (Trainer)', minAge: 25, maxAge: 45);
+    }
+
+    // ============================================================
+    // 3. TIM PRODUKSI TEATER & ACARA (10-15 orang)
+    // ============================================================
+    // Sound Engineer (1-2)
+    final numSound = 1 + rand.nextInt(2);
+    for (int i = 0; i < numSound; i++) {
+      addStaff('Sound Engineer', 'Tim Produksi Teater & Acara', minAge: 23, maxAge: 42);
+    }
+    // Lighting Engineer (1-2)
+    final numLight = 1 + rand.nextInt(2);
+    for (int i = 0; i < numLight; i++) {
+      addStaff('Lighting Engineer', 'Tim Produksi Teater & Acara', minAge: 23, maxAge: 42);
+    }
+    // Stage Manager (1)
+    addStaff('Stage Manager', 'Tim Produksi Teater & Acara', minAge: 27, maxAge: 45);
+    // Tim Backstage (3-5)
+    final numBackstage = 3 + rand.nextInt(3);
+    for (int i = 0; i < numBackstage; i++) {
+      addStaff('Staf Backstage', 'Tim Produksi Teater & Acara', minAge: 20, maxAge: 38);
+    }
+    // Tim Properti Panggung (2-3)
+    final numProps = 2 + rand.nextInt(2);
+    for (int i = 0; i < numProps; i++) {
+      addStaff('Staf Properti Panggung', 'Tim Produksi Teater & Acara', minAge: 20, maxAge: 38);
+    }
+
+    // ============================================================
+    // 4. TIM KREATIF & KONTEN DIGITAL (5-10 orang)
+    // ============================================================
+    // Fotografer dan Videografer (2-3)
+    final numFotoVideo = 2 + rand.nextInt(2);
+    final fotoVideoRoles = ['Fotografer Resmi', 'Videografer Resmi'];
+    for (int i = 0; i < numFotoVideo; i++) {
+      addStaff(fotoVideoRoles[i % 2], 'Tim Kreatif & Konten Digital', minAge: 22, maxAge: 38);
+    }
+    // Editor Video (1-2)
+    final numEditor = 1 + rand.nextInt(2);
+    for (int i = 0; i < numEditor; i++) {
+      addStaff('Editor Video', 'Tim Kreatif & Konten Digital', minAge: 22, maxAge: 38);
+    }
+    // Desainer Grafis (1-2)
+    final numDesainer = 1 + rand.nextInt(2);
+    for (int i = 0; i < numDesainer; i++) {
+      addStaff('Desainer Grafis', 'Tim Kreatif & Konten Digital', minAge: 22, maxAge: 38);
+    }
+    // Social Media Manager (1-2)
+    final numSosmed = 1 + rand.nextInt(2);
+    for (int i = 0; i < numSosmed; i++) {
+      addStaff('Pengelola Sosial Media', 'Tim Kreatif & Konten Digital', minAge: 20, maxAge: 35);
+    }
+
+    // ============================================================
+    // 5. TIM MERCHANDISE & OFFICIAL STORE (3-5 orang)
+    // ============================================================
+    final numMerch = 3 + rand.nextInt(3);
+    for (int i = 0; i < numMerch; i++) {
+      final merchRoles = ['Staf Merchandise', 'Staf Penjualan Toko', 'Koordinator Merchandise'];
+      addStaff(merchRoles[rand.nextInt(merchRoles.length)], 'Tim Merchandise & Official Store', minAge: 20, maxAge: 38);
+    }
+
+    // ============================================================
+    // 6. TIM MAKEUP ARTIST (MUA) & KOSTUM (3-5 orang)
+    // ============================================================
+    // MUA (2-3)
+    final numMUA = 2 + rand.nextInt(2);
+    for (int i = 0; i < numMUA; i++) {
+      addStaff('Makeup Artist (MUA)', 'Tim MUA & Kostum', forcedGender: 'Perempuan', minAge: 22, maxAge: 40);
+    }
+    // Kostum (1-2)
+    final numKostum = 1 + rand.nextInt(2);
+    for (int i = 0; i < numKostum; i++) {
+      addStaff('Staf Kostum', 'Tim MUA & Kostum', forcedGender: 'Perempuan', minAge: 22, maxAge: 40);
+    }
+
+    // ============================================================
+    // 7. TIM KEAMANAN & OPERASIONAL TEATER (5-10 orang)
+    // ============================================================
+    // Satpam / Penjaga Keamanan (3-5)
+    final numSatpam = 3 + rand.nextInt(3);
+    for (int i = 0; i < numSatpam; i++) {
+      addStaff('Petugas Keamanan', 'Tim Keamanan & Operasional Teater', forcedGender: 'Laki-laki', minAge: 22, maxAge: 45);
+    }
+    // Staf Tiket & Pintu Masuk (2-4)
+    final numTiket = 2 + rand.nextInt(3);
+    for (int i = 0; i < numTiket; i++) {
+      final tiketRoles = ['Staf Tiket', 'Penjaga Pintu Masuk'];
+      addStaff(tiketRoles[rand.nextInt(tiketRoles.length)], 'Tim Keamanan & Operasional Teater', minAge: 20, maxAge: 38);
     }
   }
 

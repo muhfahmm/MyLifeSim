@@ -19,34 +19,99 @@ class StafManajemenPage extends StatefulWidget {
 }
 
 class _StafManajemenPageState extends State<StafManajemenPage> {
-  Widget _buildRoleBadge(String role) {
-    String text = 'Staf ⚙️';
-    Color color = Colors.blueGrey;
-    Color bgColor = Colors.blueGrey.shade50;
-    Color borderColor = Colors.blueGrey.shade200;
+  // --- BADGE CONFIGS: role → (text, color) ---
+  static const Map<String, Map<String, dynamic>> _badgeConfigs = {
+    'General Manager':             {'text': 'GM 👑',              'color': 0xFF7B1FA2},
+    'Deputy General Manager':      {'text': 'Deputy GM 💼',       'color': 0xFF303F9F},
+    'Manajer Divisi Promosi':      {'text': 'Manajer 📣',         'color': 0xFF1565C0},
+    'Manajer Divisi Operasional':  {'text': 'Manajer ⚙️',        'color': 0xFF1565C0},
+    'Manajer Divisi Keuangan':     {'text': 'Manajer 💰',        'color': 0xFF1565C0},
+    'Staf Administrasi':           {'text': 'Admin 📑',           'color': 0xFF00796B},
+    'Staf HRD':                    {'text': 'HRD 🧑‍💼',            'color': 0xFF00796B},
+    'Staf Administrasi Kontrak':   {'text': 'Kontrak 📝',         'color': 0xFF00796B},
+    'Pelatih Tari (Koreografer)':  {'text': 'Koreografer 💃',     'color': 0xFFE91E63},
+    'Pelatih Vokal':               {'text': 'Pelatih Vokal 🎤',   'color': 0xFF009688},
+    'Pelatih Akting/MC':           {'text': 'Pelatih MC 🎭',      'color': 0xFFFF5722},
+    'Sound Engineer':              {'text': 'Sound Eng. 🎛️',      'color': 0xFF0097A7},
+    'Lighting Engineer':           {'text': 'Lighting 💡',        'color': 0xFFF9A825},
+    'Stage Manager':               {'text': 'Stage Mgr 🎬',       'color': 0xFF6A1B9A},
+    'Staf Backstage':              {'text': 'Backstage 🚪',       'color': 0xFF546E7A},
+    'Staf Properti Panggung':      {'text': 'Properti 📦',        'color': 0xFF6D4C41},
+    'Fotografer Resmi':            {'text': 'Foto 📷',            'color': 0xFF2E7D32},
+    'Videografer Resmi':           {'text': 'Video 🎥',           'color': 0xFF1B5E20},
+    'Editor Video':                {'text': 'Editor 💻',          'color': 0xFF424242},
+    'Desainer Grafis':             {'text': 'Desainer 🎨',        'color': 0xFF6A1B9A},
+    'Pengelola Sosial Media':      {'text': 'Sosmed 📱',          'color': 0xFF1565C0},
+    'Staf Merchandise':            {'text': 'Merch 🛍️',           'color': 0xFFE65100},
+    'Staf Penjualan Toko':         {'text': 'Store 🏪',           'color': 0xFFE65100},
+    'Koordinator Merchandise':     {'text': 'Koordinator 🎁',     'color': 0xFFBF360C},
+    'Makeup Artist (MUA)':         {'text': 'MUA 💄',             'color': 0xFFC2185B},
+    'Staf Kostum':                 {'text': 'Kostum 👗',          'color': 0xFFAD1457},
+    'Petugas Keamanan':            {'text': 'Satpam 👮',          'color': 0xFFC62828},
+    'Staf Tiket':                  {'text': 'Tiket 🎟️',           'color': 0xFF283593},
+    'Penjaga Pintu Masuk':         {'text': 'Pintu Masuk 🚪',     'color': 0xFF283593},
+  };
 
-    if (role.contains('General Manager') && !role.contains('Deputy')) {
-      text = 'GM 👑';
-      color = Colors.purple;
-      bgColor = Colors.purple.shade50;
-      borderColor = Colors.purple.shade200;
-    } else if (role.contains('Deputy')) {
-      text = 'Deputy GM 💼';
-      color = Colors.indigo;
-      bgColor = Colors.indigo.shade50;
-      borderColor = Colors.indigo.shade200;
-    }
+  static const Map<String, Map<String, dynamic>> _deptConfigs = {
+    'Manajemen Puncak & Admin':       {'emoji': '🏢', 'color': 0xFF7B1FA2},
+    'Tim Pelatihan (Trainer)':        {'emoji': '🎓', 'color': 0xFFE91E63},
+    'Tim Produksi Teater & Acara':    {'emoji': '🎭', 'color': 0xFF1565C0},
+    'Tim Kreatif & Konten Digital':   {'emoji': '🎨', 'color': 0xFF2E7D32},
+    'Tim Merchandise & Official Store': {'emoji': '🛍️', 'color': 0xFFE65100},
+    'Tim MUA & Kostum':               {'emoji': '💄', 'color': 0xFFC2185B},
+    'Tim Keamanan & Operasional Teater': {'emoji': '🛡️', 'color': 0xFFC62828},
+  };
+
+  static const List<String> _deptOrder = [
+    'Manajemen Puncak & Admin',
+    'Tim Pelatihan (Trainer)',
+    'Tim Produksi Teater & Acara',
+    'Tim Kreatif & Konten Digital',
+    'Tim Merchandise & Official Store',
+    'Tim MUA & Kostum',
+    'Tim Keamanan & Operasional Teater',
+  ];
+
+  Widget _buildRoleBadge(String role) {
+    final cfg = _badgeConfigs[role];
+    final String text = cfg != null ? cfg['text'] as String : 'Staf ⚙️';
+    final Color color = cfg != null ? Color(cfg['color'] as int) : Colors.blueGrey;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: bgColor,
+        color: color.withAlpha(25),
         borderRadius: BorderRadius.circular(6),
-        border: Border.all(color: borderColor, width: 0.5),
+        border: Border.all(color: color.withAlpha(80), width: 0.5),
       ),
       child: Text(
         text,
         style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
+  Widget _buildDeptHeader(String dept) {
+    final cfg = _deptConfigs[dept];
+    final emoji = cfg?['emoji'] as String? ?? '📋';
+    final Color color = cfg != null ? Color(cfg['color'] as int) : Colors.blueGrey;
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 20, bottom: 10),
+      child: Row(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 16)),
+          const SizedBox(width: 8),
+          Text(
+            dept,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: color,
+              letterSpacing: 0.3,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -94,8 +159,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         subtitle: Row(
           children: [
-            Text('$role • Umur: ${widget.character.age} tahun'),
-            const SizedBox(width: 8),
+            Expanded(child: Text('$role • Umur: ${widget.character.age} tahun')),
             _buildRoleBadge(role),
           ],
         ),
@@ -144,9 +208,8 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         title: Row(
           children: [
-            Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold))),
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
-              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -167,12 +230,11 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
           children: [
             Row(
               children: [
-                Text('Umur: $age tahun • Hubungan: $rel%'),
-                const SizedBox(width: 8),
+                Expanded(child: Text('$role • $age tahun')),
                 _buildRoleBadge(role),
               ],
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             ClipRRect(
               borderRadius: BorderRadius.circular(4),
               child: LinearProgressIndicator(
@@ -182,6 +244,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
                 minHeight: 4,
               ),
             ),
+            Text('Hubungan: $rel%', style: const TextStyle(fontSize: 11, color: Colors.grey)),
           ],
         ),
         trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
@@ -209,16 +272,47 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
   Widget build(BuildContext context) {
     final staffList = widget.character.idolStaff;
     final isUserStaff = widget.character.isIdolStaff;
+    final userJob = widget.character.jobName ?? '';
 
-    // Separate GM and Deputy GM from regular Operations staff
-    final leaders = staffList.where((s) => s['role'] == 'General Manager' || s['role'] == 'Deputy General Manager').toList();
-    final opsStaff = staffList.where((s) => s['role'] == 'Operations Staff').toList();
+    // Group staff by department
+    final Map<String, List<Map<String, String>>> byDept = {};
+    for (final dept in _deptOrder) {
+      byDept[dept] = [];
+    }
+    for (final staff in staffList) {
+      final dept = staff['department'] ?? 'Manajemen Puncak & Admin';
+      byDept.putIfAbsent(dept, () => []);
+      byDept[dept]!.add(staff);
+    }
+
+    // Figure out which dept the user belongs to (based on role string)
+    String userDept = 'Manajemen Puncak & Admin';
+    if (userJob.contains('Staf Operasional') || userJob == 'Staf Operasional Idol') {
+      // legacy – could be any dept; default to Manajemen
+      userDept = 'Manajemen Puncak & Admin';
+    } else if (userJob.contains('General Manager')) {
+      userDept = 'Manajemen Puncak & Admin';
+    }
+
+    final totalStaff = staffList.length + (isUserStaff ? 1 : 0);
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staf & Manajemen 👥'),
         backgroundColor: Colors.pink.shade700,
         foregroundColor: Colors.white,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(28),
+          child: Container(
+            width: double.infinity,
+            color: Colors.pink.shade800,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: Text(
+              'Total staf: $totalStaff orang',
+              style: const TextStyle(color: Colors.white70, fontSize: 12),
+            ),
+          ),
+        ),
       ),
       body: staffList.isEmpty && !isUserStaff
           ? const Center(
@@ -228,32 +322,40 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
               ),
             )
           : ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                // 1. LEADERS SECTION
-                if (isUserStaff && (widget.character.jobName == 'General Manager Idol' || widget.character.jobName == 'Deputy General Manager Idol')) ...[
-                  _buildUserStaffCard(context),
-                ],
-                for (var staff in leaders) ...[
-                  _buildNPCStaffCard(context, staff),
-                ],
-
-                const SizedBox(height: 16),
-                const Text(
-                  'Daftar Staf Operasional',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                ),
-                const SizedBox(height: 12),
-
-                // 2. OPERATIONS STAFF SECTION
-                if (isUserStaff && widget.character.jobName == 'Staf Operasional Idol') ...[
-                  _buildUserStaffCard(context),
-                ],
-                for (var staff in opsStaff) ...[
-                  _buildNPCStaffCard(context, staff),
-                ],
-              ],
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              children: _buildAllSections(context, byDept, isUserStaff),
             ),
     );
   }
+
+  List<Widget> _buildAllSections(
+    BuildContext context,
+    Map<String, List<Map<String, String>>> byDept,
+    bool isUserStaff,
+  ) {
+    final result = <Widget>[];
+    final userJob = widget.character.jobName ?? '';
+    final isGMRole = userJob.contains('General Manager');
+
+    for (final dept in _deptOrder) {
+      final deptStaff = byDept[dept] ?? [];
+      final showUserHere = isUserStaff && isGMRole && dept == 'Manajemen Puncak & Admin';
+
+      if (deptStaff.isEmpty && !showUserHere) continue;
+
+      result.add(_buildDeptHeader(dept));
+      if (showUserHere) result.add(_buildUserStaffCard(context));
+      for (final staff in deptStaff) {
+        result.add(_buildNPCStaffCard(context, staff));
+      }
+    }
+
+    // Fallback: if user is ops staff with no dept match, prepend at top
+    if (isUserStaff && !isGMRole) {
+      result.insert(0, _buildUserStaffCard(context));
+    }
+
+    return result;
+  }
 }
+
