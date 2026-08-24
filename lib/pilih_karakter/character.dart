@@ -122,6 +122,12 @@ class Character {
   List<Map<String, dynamic>> cashTransactions = [];
   List<Map<String, dynamic>> cashLoans = [];
 
+  // --- KASINO PERSISTEN ---
+  List<Map<String, dynamic>> casinoHistory = [];
+  int casinoTotalWin = 0;
+  int casinoTotalLoss = 0;
+  int casinoSlotJackpot = 0;
+
   // --- INVESTASI PERSISTEN ---
   Map<String, int> saham = {};
   Map<String, double> averageSahamBuyPrice = {};

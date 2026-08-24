@@ -103,13 +103,29 @@ class _KasinoPageState extends State<KasinoPage> {
   void _recordResult(String game, int amount, bool isWin, {String detail = ''}) {
     setState(() {
       history.insert(0, {'game': game, 'amount': amount, 'isWin': isWin, 'detail': detail, 'time': DateTime.now()});
-      if (isWin) totalWin += amount;
-      else totalLoss += amount;
+      if (isWin) {
+        totalWin += amount;
+        character.casinoTotalWin = totalWin;
+      } else {
+        totalLoss += amount;
+        character.casinoTotalLoss = totalLoss;
+      }
     });
   }
 
-  void _addToSlotJackpot(int amount) => setState(() => slotJackpot += amount);
-  void _resetSlotJackpot() => setState(() => slotJackpot = 0);
+  void _addToSlotJackpot(int amount) {
+    setState(() {
+      slotJackpot += amount;
+      character.casinoSlotJackpot = slotJackpot;
+    });
+  }
+
+  void _resetSlotJackpot() {
+    setState(() {
+      slotJackpot = 0;
+      character.casinoSlotJackpot = 0;
+    });
+  }
 
   // --- Efek judi (tambahan penalti jika kalah besar) ---
   void _applyGamblingEffect(bool isWin, int bet, {int happinessBonus = 10, int happinessPenalty = 5, int healthPenalty = 3}) {
@@ -125,6 +141,10 @@ class _KasinoPageState extends State<KasinoPage> {
   void initState() {
     super.initState();
     character = widget.character;
+    history = character.casinoHistory;
+    totalWin = character.casinoTotalWin;
+    totalLoss = character.casinoTotalLoss;
+    slotJackpot = character.casinoSlotJackpot;
   }
 
   @override
