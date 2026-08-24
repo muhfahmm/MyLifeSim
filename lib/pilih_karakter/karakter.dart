@@ -5,7 +5,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bitlife/pilih_karakter/character.dart'; // Model utama
-import 'package:bitlife/game/index.dart'; // Halaman game
+import '../game/index.dart'; // Halaman game // Halaman game
 import 'package:bitlife/pilih_karakter/logic/family_generator.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/pilih_karakter/customization/appearance_customization.dart';
