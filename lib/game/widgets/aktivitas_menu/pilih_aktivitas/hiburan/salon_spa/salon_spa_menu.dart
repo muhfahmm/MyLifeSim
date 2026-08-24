@@ -50,7 +50,7 @@ class SalonSpaMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${l['desc']}\nHarga: Rp ${_fmt(l['cost'] as int)}'),
+              subtitle: Text('${l['desc']}\nHarga: \$${_fmt(l['cost'] as int)}'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                   size: 14, color: canAfford ? Colors.pink : Colors.grey),

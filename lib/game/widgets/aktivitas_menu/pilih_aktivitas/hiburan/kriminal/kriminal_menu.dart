@@ -60,7 +60,7 @@ class KriminalMenuHelper {
                   title: Text(crime['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   subtitle: Text('${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn'),
                   isThreeLine: true,
-                  trailing: Text('+Rp ${_fmt(crime['gain'] as int)}',
+                  trailing: Text('+\$${_fmt(crime['gain'] as int)}',
                       style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12)),
                   onTap: () {
                     Navigator.pop(context);
@@ -95,7 +95,7 @@ class KriminalMenuHelper {
     } else {
       character.money += (crime['gain'] as int);
       character.happiness = (character.happiness + 10).clamp(0, 100);
-      msg = '😈 BERHASIL! Kamu berhasil melakukan ${crime['name']} dan mendapatkan Rp ${_fmt(crime['gain'] as int)}! (+10% Kebahagiaan)';
+      msg = '😈 BERHASIL! Kamu berhasil melakukan ${crime['name']} dan mendapatkan \$${_fmt(crime['gain'] as int)}! (+10% Kebahagiaan)';
     }
 
     character.inbox.add(msg);

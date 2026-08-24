@@ -44,7 +44,7 @@ class RehabilitasiMenuHelper {
             ),
             child: ListTile(
               title: Text(p['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              subtitle: Text('${p['desc']}\nBiaya: Rp ${_fmt(p['cost'] as int)} | Durasi: ${p['duration']} hari'),
+              subtitle: Text('${p['desc']}\nBiaya: \$${_fmt(p['cost'] as int)} | Durasi: ${p['duration']} hari'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                   size: 14, color: canAfford ? Colors.deepPurple : Colors.grey),

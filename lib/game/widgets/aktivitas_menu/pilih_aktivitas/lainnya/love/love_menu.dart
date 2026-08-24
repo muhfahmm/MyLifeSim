@@ -54,7 +54,7 @@ class LoveMenuHelper {
             child: ListTile(
               leading: const Icon(Icons.phone_iphone, color: Colors.pinkAccent),
               title: const Text('Aplikasi Kencan (Dating App) 📱', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              subtitle: const Text('Cari pasangan ideal berdasarkan kriteria umur (Biaya: Rp 50.000)'),
+              subtitle: const Text('Cari pasangan ideal berdasarkan kriteria umur (Biaya: \$50.000)'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
               onTap: () {
                 Navigator.pop(context);
@@ -101,7 +101,7 @@ class LoveMenuHelper {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Uang Tidak Cukup'),
-          content: const Text('Kamu butuh minimal Rp 50.000 untuk menggunakan aplikasi kencan.'),
+          content: const Text('Kamu butuh minimal \$50.000 untuk menggunakan aplikasi kencan.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );
@@ -169,7 +169,7 @@ class LoveMenuHelper {
                   character.money -= 50000;
                   _generateDatingAppCandidate(context, character, selectedGender, selectedAgeRange, onComplete);
                 },
-                child: const Text('Cari Pasangan (Rp 50.000)', style: TextStyle(color: Colors.white)),
+                child: const Text('Cari Pasangan (\$50.000)', style: TextStyle(color: Colors.white)),
               ),
             ],
           );
@@ -225,7 +225,7 @@ class LoveMenuHelper {
               Text(' $smart%'),
             ]),
             const SizedBox(height: 8),
-            Text('Perkiraan Uang/Gaji: Rp ${moneyValue.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}'),
+            Text('Perkiraan Uang/Gaji: \$${moneyValue.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}'),
           ],
         ),
         actions: [

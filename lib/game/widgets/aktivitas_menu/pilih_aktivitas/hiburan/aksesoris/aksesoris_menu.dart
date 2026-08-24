@@ -48,7 +48,7 @@ class AksesorisMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${item['desc']}\nHarga: Rp ${_formatMoney(item['price'] as int)}'),
+              subtitle: Text('${item['desc']}\nHarga: \$${_formatMoney(item['price'] as int)}'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.shopping_cart : Icons.lock_outline,
                   color: canAfford ? Colors.pink : Colors.grey),
@@ -56,7 +56,7 @@ class AksesorisMenuHelper {
                 Navigator.pop(context);
                 character.money -= (item['price'] as int);
                 character.happiness = (character.happiness + (item['happiness'] as int)).clamp(0, 100);
-                final msg = '🛍️ Kamu membeli ${item['name']}! (-Rp ${_formatMoney(item['price'] as int)}, +${item['happiness']}% Kebahagiaan)';
+                final msg = '🛍️ Kamu membeli ${item['name']}! (-\$${_formatMoney(item['price'] as int)}, +${item['happiness']}% Kebahagiaan)';
                 character.inbox.add(msg);
                 showDialog(
                   context: context,

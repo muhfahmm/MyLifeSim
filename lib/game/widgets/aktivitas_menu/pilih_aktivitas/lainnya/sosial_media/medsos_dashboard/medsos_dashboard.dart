@@ -223,7 +223,7 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Uang Tidak Cukup'),
-          content: const Text('Kamu butuh minimal Rp 1.000.000 untuk membeli pengikut bot.'),
+          content: const Text('Kamu butuh minimal \$1.000.000 untuk membeli pengikut bot.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );

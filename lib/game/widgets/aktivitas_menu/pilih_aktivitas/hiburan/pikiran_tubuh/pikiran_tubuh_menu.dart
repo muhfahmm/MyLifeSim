@@ -45,7 +45,7 @@ class PikiranTubuhMenuHelper {
             ),
             child: ListTile(
               title: Text(a['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-              subtitle: Text('${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: Rp ${_fmt(a['cost'] as int)}"}'),
+              subtitle: Text('${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: \$${_fmt(a['cost'] as int)}"}'),
               isThreeLine: true,
               trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.indigo),
               onTap: canAfford ? () {

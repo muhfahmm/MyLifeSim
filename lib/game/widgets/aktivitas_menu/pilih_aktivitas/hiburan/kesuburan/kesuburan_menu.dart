@@ -69,7 +69,7 @@ class KesuburanMenuHelper {
                 ),
                 child: ListTile(
                   title: Text(l['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
+                  subtitle: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}'),
                   isThreeLine: true,
                   trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                       size: 14, color: canAfford ? Colors.purple : Colors.grey),

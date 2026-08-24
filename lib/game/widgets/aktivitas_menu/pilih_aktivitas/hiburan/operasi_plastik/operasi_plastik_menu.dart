@@ -60,7 +60,7 @@ class OperasiPlastikMenuHelper {
                 ),
                 child: ListTile(
                   title: Text(o['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('${o['desc']}\nBiaya: Rp ${_fmt(o['cost'] as int)} | Risiko: ${o['risk']}%'),
+                  subtitle: Text('${o['desc']}\nBiaya: \$${_fmt(o['cost'] as int)} | Risiko: ${o['risk']}%'),
                   isThreeLine: true,
                   trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                       size: 14, color: canAfford ? Colors.cyan : Colors.grey),

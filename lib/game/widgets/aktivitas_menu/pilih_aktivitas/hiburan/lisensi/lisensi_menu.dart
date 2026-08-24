@@ -50,7 +50,7 @@ class LisensiMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: available ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)} | Min. usia: ${l['minAge']} thn'),
+              subtitle: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)} | Min. usia: ${l['minAge']} thn'),
               isThreeLine: true,
               trailing: Icon(available ? Icons.arrow_forward_ios : Icons.lock_outline,
                   size: 14, color: available ? Colors.brown : Colors.grey),
@@ -58,7 +58,7 @@ class LisensiMenuHelper {
                 Navigator.pop(context);
                 character.money -= (l['cost'] as int);
                 character.intelligence = (character.intelligence + 3).clamp(0, 100);
-                final msg = '📋 Kamu berhasil mendapatkan ${l['name']}! (+3% Kecerdasan, -Rp ${_fmt(l['cost'] as int)})';
+                final msg = '📋 Kamu berhasil mendapatkan ${l['name']}! (+3% Kecerdasan, -\$${_fmt(l['cost'] as int)})';
                 character.inbox.add(msg);
                 showDialog(
                   context: context,

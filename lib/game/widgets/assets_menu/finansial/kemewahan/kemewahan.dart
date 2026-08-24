@@ -78,7 +78,7 @@ class KemewahanItem extends StatelessWidget {
               ),
             ),
             Text(
-              'Rp ${formatRupiah(character.money)}',
+              '\$${formatRupiah(character.money)}',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -310,7 +310,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
         int bonus = 10 + (nominal ~/ 1000000) * 2;
         character.happiness = (character.happiness + bonus).clamp(0, 100);
         _checkAchievements();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Donasi Rp ${formatRupiah(nominal)} berhasil! +$bonus Happiness')));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Donasi \$${formatRupiah(nominal)} berhasil! +$bonus Happiness')));
       } else {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
       }
@@ -366,7 +366,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Harga: Rp ${formatRupiah(item['harga'])}'),
+                  Text('Harga: \$${formatRupiah(item['harga'])}'),
                   Text('+${item['happiness']} Happiness', style: const TextStyle(color: Colors.green)),
                 ],
               ),
@@ -415,9 +415,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Total Aset Kemewahan', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    Text('Rp ${formatRupiah(totalNilaiKemewahan)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
+                    Text('\$${formatRupiah(totalNilaiKemewahan)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
                     const SizedBox(height: 8),
-                    Text('Uang Tunai: Rp ${formatRupiah(character.money)}'),
+                    Text('Uang Tunai: \$${formatRupiah(character.money)}'),
                     Text('Penghargaan: ${penghargaan.length}'),
                   ],
                 ),

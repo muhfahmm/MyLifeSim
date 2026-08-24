@@ -63,7 +63,7 @@ class BerbelanjaMenuHelper {
             child: Row(children: [
               const Text('💰', style: TextStyle(fontSize: 16)),
               const SizedBox(width: 6),
-              Text('Saldo: Rp ${_fmt(character.money)}',
+              Text('Saldo: \$${_fmt(character.money)}',
                   style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
             ]),
           ),
@@ -82,7 +82,7 @@ class BerbelanjaMenuHelper {
                     dense: true,
                     title: Text(item['name'] as String, style: TextStyle(
                         fontSize: 12, color: canAfford ? Colors.black87 : Colors.grey)),
-                    subtitle: Text('Rp ${_fmt(item['cost'] as int)}',
+                    subtitle: Text('\$${_fmt(item['cost'] as int)}',
                         style: TextStyle(fontSize: 11, color: canAfford ? Colors.green : Colors.grey)),
                     trailing: Icon(canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
                         size: 18, color: canAfford ? Colors.orangeAccent : Colors.grey),
@@ -96,7 +96,7 @@ class BerbelanjaMenuHelper {
                       if (item.containsKey('health')) {
                         character.health = (character.health + (item['health'] as int)).clamp(0, 100);
                       }
-                      final msg = '🛍️ Kamu membeli ${item['name']} seharga Rp ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
+                      final msg = '🛍️ Kamu membeli ${item['name']} seharga \$${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
                       character.inbox.add(msg);
                       showDialog(
                         context: context,

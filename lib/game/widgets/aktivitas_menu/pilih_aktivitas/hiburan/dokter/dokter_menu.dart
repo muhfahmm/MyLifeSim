@@ -37,7 +37,7 @@ class DokterMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${l['desc']}\nBiaya: Rp ${_fmt(l['cost'] as int)}'),
+              subtitle: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                   size: 14, color: canAfford ? Colors.blue : Colors.grey),
@@ -91,7 +91,7 @@ class DokterMenuHelper {
     character.happiness = (character.happiness + happinessGain).clamp(0, 100);
     character.intelligence = (character.intelligence + intelligenceGain).clamp(0, 100);
 
-    final msg = '🏥 ${l['name']}: $detail (+${healthGain}% Kesehatan${happinessGain > 0 ? ', +${happinessGain}% Kebahagiaan' : ''}) | Biaya: -Rp ${_fmt(l['cost'] as int)}';
+    final msg = '🏥 ${l['name']}: $detail (+${healthGain}% Kesehatan${happinessGain > 0 ? ', +${happinessGain}% Kebahagiaan' : ''}) | Biaya: -\$${_fmt(l['cost'] as int)}';
     character.inbox.add(msg);
 
     showDialog(

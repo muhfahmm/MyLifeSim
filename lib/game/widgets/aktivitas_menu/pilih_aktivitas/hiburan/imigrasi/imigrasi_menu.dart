@@ -49,7 +49,7 @@ class ImigrasimMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${n['desc']}\nBiaya: Rp ${_fmt(n['cost'] as int)}'),
+              subtitle: Text('${n['desc']}\nBiaya: \$${_fmt(n['cost'] as int)}'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                   size: 14, color: canAfford ? Colors.teal : Colors.grey),

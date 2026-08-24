@@ -30,7 +30,7 @@ class FilantropiPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Total Donasi Terkumpul', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    Text('Rp ${formatRupiah(state.donasi.fold<int>(0, (sum, d) => sum + (d['jumlah'] as int)))}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent)),
+                    Text('\$${formatRupiah(state.donasi.fold<int>(0, (sum, d) => sum + (d['jumlah'] as int)))}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent)),
                     const SizedBox(height: 8),
                     Text('Jumlah Donasi: ${state.donasi.length} kali'),
                   ],
@@ -43,7 +43,7 @@ class FilantropiPage extends StatelessWidget {
             ...nominalList.map((nominal) => Card(
               margin: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                title: Text('Rp ${formatRupiah(nominal)}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Text('\$${formatRupiah(nominal)}', style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text('+${10 + (nominal ~/ 1000000) * 2} Happiness'),
                 trailing: ElevatedButton(
                   onPressed: () {

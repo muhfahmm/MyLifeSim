@@ -50,7 +50,7 @@ class PeliharaanMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${h['desc']}\nHarga: Rp ${_fmt(h['cost'] as int)}'),
+              subtitle: Text('${h['desc']}\nHarga: \$${_fmt(h['cost'] as int)}'),
               isThreeLine: true,
               trailing: Icon(canAfford ? Icons.favorite : Icons.lock_outline,
                   color: canAfford ? Colors.green : Colors.grey),
@@ -60,7 +60,7 @@ class PeliharaanMenuHelper {
                 character.happiness = (character.happiness + (h['happiness'] as int)).clamp(0, 100);
                 final names = ['Buddy', 'Luna', 'Max', 'Bella', 'Charlie', 'Mochi'];
                 final petName = names[Random().nextInt(names.length)];
-                final msg = '🐾 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -Rp ${_fmt(h['cost'] as int)})';
+                final msg = '🐾 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -\$${_fmt(h['cost'] as int)})';
                 character.inbox.add(msg);
                 showDialog(
                   context: context,

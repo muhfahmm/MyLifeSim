@@ -48,9 +48,9 @@ class LotreMenuHelper {
                 fontWeight: FontWeight.bold, fontSize: 13,
                 color: canAfford ? Colors.black87 : Colors.grey,
               )),
-              subtitle: Text('${j['desc']}\nHarga: Rp ${_fmt(j['cost'] as int)} | Peluang menang: ${j['chance']}%'),
+              subtitle: Text('${j['desc']}\nHarga: \$${_fmt(j['cost'] as int)} | Peluang menang: ${j['chance']}%'),
               isThreeLine: true,
-              trailing: Text('Rp ${_fmt(j['prize'] as int)}',
+              trailing: Text('\$${_fmt(j['prize'] as int)}',
                   style: TextStyle(color: canAfford ? Colors.amber.shade700 : Colors.grey,
                       fontWeight: FontWeight.bold, fontSize: 11)),
               onTap: canAfford ? () {
@@ -79,10 +79,10 @@ class LotreMenuHelper {
     if (menang) {
       character.money += (j['prize'] as int);
       character.happiness = (character.happiness + 30).clamp(0, 100);
-      msg = '🎉 SELAMAT! Kamu MENANG ${j['name']}! Hadiahnya: Rp ${_fmt(j['prize'] as int)}! (+30% Kebahagiaan)';
+      msg = '🎉 SELAMAT! Kamu MENANG ${j['name']}! Hadiahnya: \$${_fmt(j['prize'] as int)}! (+30% Kebahagiaan)';
     } else {
       character.happiness = (character.happiness - 5).clamp(0, 100);
-      msg = '😢 Kamu tidak menang ${j['name']} kali ini. Mungkin lain kali lebih beruntung! (-5% Kebahagiaan, -Rp ${_fmt(j['cost'] as int)})';
+      msg = '😢 Kamu tidak menang ${j['name']} kali ini. Mungkin lain kali lebih beruntung! (-5% Kebahagiaan, -\$${_fmt(j['cost'] as int)})';
     }
 
     character.inbox.add(msg);

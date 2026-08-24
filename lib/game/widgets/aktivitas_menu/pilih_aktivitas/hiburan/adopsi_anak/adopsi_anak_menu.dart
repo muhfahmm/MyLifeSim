@@ -22,7 +22,7 @@ class AdopsiAnakMenuHelper {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Dana Tidak Cukup'),
-          content: const Text('Proses adopsi memerlukan biaya minimal Rp 5.000.000 untuk biaya administrasi dan perawatan.'),
+          content: const Text('Proses adopsi memerlukan biaya minimal \$5.000.000 untuk biaya administrasi dan perawatan.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );
@@ -61,7 +61,7 @@ class AdopsiAnakMenuHelper {
                 ),
                 child: ListTile(
                   title: Text(c['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  subtitle: Text('${c['desc']}\nBiaya: Rp ${_fmt(c['cost'] as int)}'),
+                  subtitle: Text('${c['desc']}\nBiaya: \$${_fmt(c['cost'] as int)}'),
                   isThreeLine: true,
                   trailing: Icon(canAfford ? Icons.favorite : Icons.lock_outline,
                       color: canAfford ? Colors.orange : Colors.grey),
@@ -80,7 +80,7 @@ class AdopsiAnakMenuHelper {
                       'relation': 'Anak Adopsi',
                       'relationship': '80',
                     });
-                    final msg = '👨‍👩‍👧 Kamu berhasil mengadopsi $childName ($childGender, ${c['age']} tahun)! (+20% Kebahagiaan, -Rp ${_fmt(c['cost'] as int)})';
+                    final msg = '👨‍👩‍👧 Kamu berhasil mengadopsi $childName ($childGender, ${c['age']} tahun)! (+20% Kebahagiaan, -\$${_fmt(c['cost'] as int)})';
                     character.inbox.add(msg);
                     showDialog(
                       context: context,
