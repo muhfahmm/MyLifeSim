@@ -7,6 +7,7 @@ import 'idol_activity/staff_manajemen/staf_manajemen.dart';
 import 'idol_activity/anggota_tim_utama/tim_utama.dart';
 import 'idol_activity/anggota_trainee/anggota_trainee.dart';
 import 'idol_activity/aktivitas/aktivitas_panggung.dart';
+import 'idol_activity/berita_idol/berita_idol.dart';
 
 class IdolMenuScreen extends StatefulWidget {
   final Character character;
@@ -35,11 +36,16 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
     }
   }
   void _resignOrGraduate() {
-    final isMain = widget.character.jobName == 'Idol (Main Performer)';
-    final String title = isMain ? 'Resign / Lulus (Graduation)' : 'Resign / Keluar Trainee';
-    final String content = isMain
-        ? 'Apakah kamu yakin ingin melangsungkan kelulusan (graduation) dari grup Idol ini?'
-        : 'Apakah kamu yakin ingin mengundurkan diri sebagai Trainee Idol?';
+    final char = widget.character;
+    final isMain = char.jobName == 'Idol (Main Performer)';
+    final String title = char.isIdol
+        ? (isMain ? 'Resign / Lulus (Graduation)' : 'Resign / Keluar Trainee')
+        : 'Resign / Keluar Kerja';
+    final String content = char.isIdol
+        ? (isMain
+            ? 'Apakah kamu yakin ingin melangsungkan kelulusan (graduation) dari grup Idol ini?'
+            : 'Apakah kamu yakin ingin mengundurkan diri sebagai Trainee Idol?')
+        : 'Apakah kamu yakin ingin berhenti bekerja di grup Idol ini?';
 
     showDialog(
       context: context,
@@ -55,7 +61,11 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
             onPressed: () {
               Navigator.pop(context);
               setState(() {
+                if (char.isIdol && isMain) {
+                  widget.character.hasGraduatedIdol = true;
+                }
                 widget.character.jobName = null;
+                widget.character.jobSalary = null;
                 widget.character.idolTrainees.clear();
                 widget.character.idolMainMembers.clear();
                 widget.character.idolStaff.clear();
@@ -65,11 +75,15 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
 
               DialogHelper.show(
                 context: context,
-                title: isMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢',
+                title: char.isIdol 
+                    ? (isMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
+                    : 'Resign Kerja 📢',
                 content: Text(
-                  isMain
-                      ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
-                      : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.',
+                  char.isIdol
+                      ? (isMain
+                          ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
+                          : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
+                      : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
                 ),
                 actions: [
                   TextButton(
@@ -90,13 +104,24 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
   Widget build(BuildContext context) {
     final char = widget.character;
     final isMain = char.jobName == 'Idol (Main Performer)';
-    final String roleTitle = isMain ? 'Anggota Tim Utama' : 'Anggota Trainee';
+    final String roleTitle;
+    if (char.jobName == 'Idol (Main Performer)') {
+      roleTitle = 'Anggota Tim Utama';
+    } else if (char.jobName == 'Idol (Trainee)') {
+      roleTitle = 'Anggota Trainee';
+    } else {
+      roleTitle = char.jobName ?? 'Staf';
+    }
+
+    final String appBarTitle = char.isIdol 
+        ? (isMain ? 'Tim Utama Idol ⭐' : 'Trainee Idol ⭐️')
+        : 'Grup Idol JKT48 🎤';
 
     return Scaffold(
       backgroundColor: const Color(0xFFF7F9FC),
       appBar: AppBar(
         title: Text(
-          isMain ? 'Tim Utama Idol ⭐' : 'Trainee Idol ⭐️',
+          appBarTitle,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.pink.shade700,
@@ -128,7 +153,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Idol ($roleTitle) • Usia: ${char.age} tahun',
+                      '${char.isIdol ? 'Idol' : 'Staf'} ($roleTitle) • Usia: ${char.age} tahun',
                       style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                     const SizedBox(height: 16),
@@ -228,19 +253,33 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               ),
             ),
 
-            // Aktivitas Panggung (Sub-menu)
+            if (char.isIdol) ...[
+              // Aktivitas Panggung (Sub-menu)
+              _buildMenuTile(
+                context: context,
+                icon: Icons.audiotrack,
+                color: Colors.pink,
+                title: 'Aktivitas',
+                subtitle: 'Latihan vokal & koreografi, teater, dan media sosial',
+                page: AktivitasPanggungPage(
+                  character: char,
+                  onRefresh: () {
+                    if (mounted) setState(() {});
+                    widget.onRefresh();
+                  },
+                ),
+              ),
+            ],
+
+            // Berita Grup Idol
             _buildMenuTile(
               context: context,
-              icon: Icons.audiotrack,
-              color: Colors.pink,
-              title: 'Aktivitas',
-              subtitle: 'Latihan vokal & koreografi, teater, dan media sosial',
-              page: AktivitasPanggungPage(
+              icon: Icons.newspaper,
+              color: Colors.teal,
+              title: 'Berita Grup Idol',
+              subtitle: 'Lihat berita generasi baru dan kelulusan anggota teater',
+              page: BeritaIdolPage(
                 character: char,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
               ),
             ),
 
@@ -249,8 +288,12 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               context: context,
               icon: Icons.exit_to_app,
               color: Colors.red,
-              title: isMain ? 'Keluar / Kelulusan (Graduasi)' : 'Mengundurkan Diri',
-              subtitle: isMain ? 'Menyelesaikan perjalananmu sebagai Idol' : 'Keluar dari grup trainee Idol',
+              title: char.isIdol 
+                  ? (isMain ? 'Keluar / Kelulusan (Graduasi)' : 'Mengundurkan Diri')
+                  : 'Resign / Keluar Kerja',
+              subtitle: char.isIdol 
+                  ? (isMain ? 'Menyelesaikan perjalananmu sebagai Idol' : 'Keluar dari grup trainee Idol')
+                  : 'Berhenti bekerja sebagai staf Idol',
               onTap: _resignOrGraduate,
             ),
             const SizedBox(height: 20),
@@ -279,7 +322,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
       color: Colors.white,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: color.withOpacity(0.1),
+          backgroundColor: color.withAlpha(26),
           child: Icon(icon, color: color),
         ),
         title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),

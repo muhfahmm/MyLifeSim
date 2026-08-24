@@ -105,6 +105,7 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                   gender: gender,
                   age: age,
                   happiness: rel,
+                  forcedSkinColor: member['skinColor'],
                 );
 
                 return Card(

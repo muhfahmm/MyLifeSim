@@ -105,6 +105,7 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                   gender: gender,
                   age: age,
                   happiness: rel,
+                  forcedSkinColor: member['skinColor'],
                 );
 
                 return Card(

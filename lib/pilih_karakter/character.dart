@@ -123,11 +123,14 @@ class Character {
 
   // --- FIELD PEKERJAAN IDOL ---
   bool get isIdol => jobName == 'Idol (Trainee)' || jobName == 'Idol (Main Performer)';
+  bool get isIdolStaff => jobName == 'General Manager Idol' || jobName == 'Deputy General Manager Idol' || jobName == 'Staf Operasional Idol';
+  bool get isIdolRelated => isIdol || isIdolStaff;
   int yearsInTrainee = 0;
   List<Map<String, String>> idolTrainees = [];
   List<Map<String, String>> idolMainMembers = [];
   List<Map<String, String>> idolStaff = [];
   List<String> idolNews = [];
+  bool hasGraduatedIdol = false;
 
   // --- FINANSIAL TRANSAKSI & PINJAMAN ---
   List<Map<String, dynamic>> cashTransactions = [];

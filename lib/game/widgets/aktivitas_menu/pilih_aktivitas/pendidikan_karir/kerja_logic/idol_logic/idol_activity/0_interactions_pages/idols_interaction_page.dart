@@ -82,6 +82,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
       gender: gender,
       age: age,
       happiness: relationship,
+      forcedSkinColor: widget.person['skinColor'],
     );
 
     return Scaffold(

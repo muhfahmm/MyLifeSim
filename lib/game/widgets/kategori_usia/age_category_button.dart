@@ -173,6 +173,7 @@ class AgeCategoryButton extends StatelessWidget {
         DialogHelper.show(
           context: context,
           title: '📊 Kategori & Status',
+          isNotification: false,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

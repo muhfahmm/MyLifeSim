@@ -24,7 +24,7 @@ class AvatarAgeRules {
       baseHairColor = seedMap['hairColor'] ?? '2c1b18';
       baseClothe = seedMap['clotheType'] ?? 'blazerAndShirt';
       baseClotheColor = seedMap['clotheColor'] ?? '262e33';
-      baseSkinColor = seedMap['skinColor'] ?? 'ffdbb4';
+      baseSkinColor = character.avatarSkinColor ?? (seedMap['skinColor'] ?? 'ffdbb4');
     }
 
     // 2. Terapkan logika umur

@@ -22,8 +22,10 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
   final Random _random = Random();
 
   void _lakukanBelajar(String tipe, int intGain, int stressCost) {
+    final int discGain = (intGain / 1.5).ceil();
     setState(() {
       widget.character.intelligence = (widget.character.intelligence + intGain).clamp(0, 100);
+      widget.character.discipline = (widget.character.discipline + discGain).clamp(0, 100);
       widget.character.happiness = (widget.character.happiness - stressCost).clamp(0, 100);
     });
     widget.onRefresh();
@@ -32,7 +34,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
       context: context,
       title: 'Belajar Sukses 📚',
       content: Text(
-        'Kamu belajar dengan metode "$tipe". Kecerdasanmu meningkat +$intGain%! '
+        'Kamu belajar dengan metode "$tipe". Kecerdasanmu meningkat +$intGain% dan Kedisiplinanmu meningkat +$discGain%! '
         'Namun kebahagiaanmu sedikit menurun -$stressCost% karena lelah belajar.',
       ),
       actions: [
@@ -106,7 +108,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
             color: Colors.blue,
             title: 'Membaca Buku Perpustakaan',
             subtitle: 'Membaca buku teks sekolah di perpustakaan',
-            gain: 'Kecerdasan +3%',
+            gain: 'Kecerdasan +3%, Kedisiplinan +2%',
             onTap: () => _lakukanBelajar('Membaca Buku Perpustakaan', 3, 1),
           ),
 
@@ -116,7 +118,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
             color: Colors.teal,
             title: 'Mengerjakan PR & Latihan',
             subtitle: 'Menyelesaikan semua pekerjaan rumah tepat waktu',
-            gain: 'Kecerdasan +5%',
+            gain: 'Kecerdasan +5%, Kedisiplinan +4%',
             onTap: () => _lakukanBelajar('Mengerjakan PR & Latihan', 5, 2),
           ),
 
@@ -126,7 +128,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
             color: Colors.orange,
             title: 'Belajar Kelompok / Diskusi',
             subtitle: 'Berbagi materi pelajaran dengan teman sekelas',
-            gain: 'Kecerdasan +6%',
+            gain: 'Kecerdasan +6%, Kedisiplinan +4%',
             onTap: () => _lakukanBelajar('Belajar Kelompok / Diskusi', 6, 3),
           ),
 
@@ -136,7 +138,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
             color: Colors.purple,
             title: 'Mengikuti Les Tambahan',
             subtitle: 'Bimbingan intensif materi ujian sekolah',
-            gain: 'Kecerdasan +8%',
+            gain: 'Kecerdasan +8%, Kedisiplinan +6%',
             onTap: () => _lakukanBelajar('Mengikuti Les Tambahan', 8, 4),
           ),
         ],

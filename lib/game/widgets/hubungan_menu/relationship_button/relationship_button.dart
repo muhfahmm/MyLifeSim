@@ -76,6 +76,7 @@ class RelationshipButton extends StatelessWidget {
         DialogHelper.show(
           context: context,
           title: 'Hubungan & Keluarga',
+          isNotification: false,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

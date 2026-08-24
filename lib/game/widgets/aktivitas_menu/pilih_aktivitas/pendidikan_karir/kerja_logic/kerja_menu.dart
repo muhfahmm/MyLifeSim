@@ -814,6 +814,28 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   // ============================================================
   void _applyJob(Map<String, dynamic> job) {
     if (job['title'] == 'Idol (Trainee)') {
+      if (widget.character.hasGraduatedIdol) {
+        if (widget.character.age < 18) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Lamaran Ditolak 🚫'),
+              content: Text(
+                'Kamu sudah pernah melangsungkan kelulusan (graduation) sebagai JKT48 Idol.\n\n'
+                'Untuk bekerja kembali di manajemen sebagai Staf, kamu harus berusia minimal 18 tahun!\n'
+                '(Usiamu saat ini: ${widget.character.age} tahun)',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+      }
       if (widget.character.health < 80 || widget.character.discipline < 75) {
         showDialog(
           context: context,
@@ -883,11 +905,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
     }
 
+    final isGraduatedRedirect = (job['title'] == 'Idol (Trainee)' && widget.character.hasGraduatedIdol);
+    final String finalTitle = isGraduatedRedirect ? 'Staf Operasional Idol' : job['title'];
+    final int finalSalary = isGraduatedRedirect ? 500 : job['salary'];
+
     // Lamaran diterima
     setState(() {
-      widget.character.jobName = job['title'];
-      widget.character.jobSalary = job['salary'];
-      if (job['title'] == 'Idol (Trainee)') {
+      widget.character.jobName = finalTitle;
+      widget.character.jobSalary = finalSalary;
+      if (finalTitle == 'Idol (Trainee)' || widget.character.isIdolStaff) {
         IdolManager.initializeTraineeTeam(widget.character);
       }
     });
@@ -897,8 +923,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       builder: (context) => AlertDialog(
         title: const Text('Lamaran Diterima! 🎉💼'),
         content: Text(
-          'Selamat! Kamu resmi bekerja sebagai ${job['title']} dengan gaji \$${job['salary']}/tahun.\n\n'
-          'Gaji akan dibayarkan setiap kali kamu bertambah umur.',
+          isGraduatedRedirect
+              ? 'Karena kamu sudah pernah melangsungkan kelulusan (graduation) sebagai Idol, manajemen memutuskan untuk merekrutmu sebagai Staf Operasional Idol dengan gaji \$500/tahun!'
+              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle dengan gaji \$$finalSalary/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
         ),
         actions: [
           TextButton(
@@ -1060,7 +1087,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   @override
   Widget build(BuildContext context) {
     final character = widget.character;
-    if (character.isIdol) {
+    if (character.isIdolRelated) {
       return IdolMenuScreen(
         character: character,
         onRefresh: () {

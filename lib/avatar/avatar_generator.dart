@@ -1,12 +1,12 @@
+// lib/avatar/avatar_generator.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class AvatarGenerator {
-  // --- OPTIONS DATA FOR CUSTOMIZER ---
-  
+  // --- OPTIONS DATA ---
   static const Map<String, String> topsMale = {
-    'Botak': 'noHair', // special handling: topProbability=0
+    'Botak': 'noHair',
     'Gimbal Pendek': 'dreads01',
     'Gimbal Medium': 'dreads02',
     'Keriting Pendek': 'frizzle',
@@ -61,7 +61,7 @@ class AvatarGenerator {
   };
 
   static const Map<String, String> accessories = {
-    'Tanpa Kacamata': 'blank', // special handling: accessoriesProbability=0
+    'Tanpa Kacamata': 'blank',
     'Bundar': 'round',
     'Kotak': 'prescription01',
     'Besar': 'prescription02',
@@ -92,39 +92,45 @@ class AvatarGenerator {
     'Kuning': 'ffffb1',
   };
 
-  // Tentukan mata berdasarkan tingkat kebahagiaan
+  // --- Ekspresi wajah berdasarkan happiness ---
   static String getEyeType(int happiness) {
     if (happiness > 75) return 'happy';
     if (happiness < 30) return 'cry';
     return 'default';
   }
 
-  // Tentukan mulut berdasarkan tingkat kebahagiaan
   static String getMouthType(int happiness) {
     if (happiness > 75) return 'smile';
     if (happiness < 35) return 'sad';
     return 'default';
   }
 
-  // Tentukan alis berdasarkan tingkat kebahagiaan
   static String getEyebrowType(int happiness) {
     if (happiness > 75) return 'raisedExcited';
     if (happiness < 30) return 'angry';
     return 'default';
   }
 
-  /// Membuat URL avatar PNG dari seed dan parameter ekspresi wajah (untuk mode acak/NPC)
+  // --- URL BUILDER (SEMUA MENGGUNAKAN Uri.https) ---
   static String buildAvatarUrl({
     required String seed,
     required String eyeType,
     required String eyebrowType,
     required String mouthType,
   }) {
-    final cleanSeed = Uri.encodeComponent(seed);
-    return 'https://api.dicebear.com/9.x/avataaars/png?seed=$cleanSeed&eyes=$eyeType&eyebrows=$eyebrowType&mouth=$mouthType';
+    final uri = Uri.https(
+      'api.dicebear.com',
+      '/9.x/avataaars/png',
+      {
+        'seed': seed,
+        'eyes': eyeType,
+        'eyebrows': eyebrowType,
+        'mouth': mouthType,
+      },
+    );
+    return uri.toString();
   }
 
-  /// Membuat URL avatar PNG lengkap dengan parameter kustomisasi manual
   static String buildCustomAvatarUrl({
     required String topType,
     required String accessoriesType,
@@ -142,39 +148,27 @@ class AvatarGenerator {
     final accProb = accessoriesType == 'blank' ? 0 : 100;
     final finalAccType = accessoriesType == 'blank' ? 'prescription01' : accessoriesType;
 
-    final params = [
-      'top=$finalTopType',
-      'topProbability=$topProb',
-      'accessories=$finalAccType',
-      'accessoriesProbability=$accProb',
-      'accessoriesColor=ffffff',
-      'hairColor=$hairColor',
-      'clothing=$clotheType',
-      'clothesColor=$clotheColor',
-      'skinColor=$skinColor',
-      'eyes=$eyeType',
-      'eyebrows=$eyebrowType',
-      'mouth=$mouthType',
-    ];
-    return 'https://api.dicebear.com/9.x/avataaars/png?${params.join('&')}';
-  }
-
-  /// Membangun URL avatar untuk karakter tertentu berdasarkan nama dan kebahagiaan
-  static String getDeterministicAvatarUrl(String name, String gender, {int happiness = 50}) {
-    final seedString = '$name-$gender';
-    final eye = getEyeType(happiness);
-    final eyebrow = getEyebrowType(happiness);
-    final mouth = getMouthType(happiness);
-
-    return buildAvatarUrl(
-      seed: seedString,
-      eyeType: eye,
-      eyebrowType: eyebrow,
-      mouthType: mouth,
+    final uri = Uri.https(
+      'api.dicebear.com',
+      '/9.x/avataaars/png',
+      {
+        'top': finalTopType,
+        'topProbability': topProb.toString(),
+        'accessories': finalAccType,
+        'accessoriesProbability': accProb.toString(),
+        'accessoriesColor': 'ffffff',
+        'hairColor': hairColor,
+        'clothing': clotheType,
+        'clothesColor': clotheColor,
+        'skinColor': skinColor,
+        'eyes': eyeType,
+        'eyebrows': eyebrowType,
+        'mouth': mouthType,
+      },
     );
+    return uri.toString();
   }
 
-  /// Membangun URL avatar untuk karakter (mengutamakan parameter kustom jika ada)
   static String getCharacterAvatarUrl(Character character, {int happiness = 50}) {
     if (character.avatarTopType != null) {
       return buildCustomAvatarUrl(
@@ -192,42 +186,83 @@ class AvatarGenerator {
     return getDeterministicAvatarUrl(character.name, character.gender, happiness: happiness);
   }
 
-  /// Membuat parameter kustomisasi acak untuk pemain
+  static String getDeterministicAvatarUrl(String name, String gender, {int happiness = 50}) {
+    final seedString = '$name-$gender';
+    return buildAvatarUrl(
+      seed: seedString,
+      eyeType: getEyeType(happiness),
+      eyebrowType: getEyebrowType(happiness),
+      mouthType: getMouthType(happiness),
+    );
+  }
+
   static Map<String, String> generateRandomAvatar(String gender, {String? seedName}) {
-    final isMale = gender.trim().toLowerCase() == 'laki-laki' || gender.trim().toLowerCase() == 'male';
+    final isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
     final topMap = isMale ? topsMale : topsFemale;
-    
-    // Seed generator agar hasil selalu konsisten untuk nama yang sama
     final seed = seedName != null ? seedName.hashCode : null;
     final random = seed != null ? Random(seed) : Random();
 
-    final topVal = topMap.values.elementAt(random.nextInt(topMap.length));
-    final hairVal = hairColors.values.elementAt(random.nextInt(hairColors.length));
-    final skinVal = skinColors.values.elementAt(random.nextInt(skinColors.length));
-    final accVal = accessories.values.elementAt(random.nextInt(accessories.length));
-    final clotheVal = clothes.values.elementAt(random.nextInt(clothes.length));
-    final clotheColVal = clotheColors.values.elementAt(random.nextInt(clotheColors.length));
-
     return {
-      'topType': topVal,
+      'topType': topMap.values.elementAt(random.nextInt(topMap.length)),
       'accessoriesType': 'blank',
-      'hairColor': hairVal,
-      'clotheType': clotheVal,
-      'clotheColor': clotheColVal,
-      'skinColor': skinVal,
+      'hairColor': hairColors.values.elementAt(random.nextInt(hairColors.length)),
+      'clotheType': clothes.values.elementAt(random.nextInt(clothes.length)),
+      'clotheColor': clotheColors.values.elementAt(random.nextInt(clotheColors.length)),
+      'skinColor': skinColors.values.elementAt(random.nextInt(skinColors.length)),
     };
+  }
+
+  // --- WIDGET AVATAR DENGAN LOADING INDICATOR DAN FALLBACK ---
+  static Widget avatarImage({
+    required String url,
+    double width = 80,
+    double height = 80,
+    String fallbackAsset = 'assets/avatar_placeholder.png',
+    BoxFit fit = BoxFit.cover,
+  }) {
+    return Image.network(
+      url,
+      width: width,
+      height: height,
+      fit: fit,
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            shape: BoxShape.circle,
+          ),
+          child: const Center(
+            child: SizedBox(
+              width: 24,
+              height: 24,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Image.asset(
+          fallbackAsset,
+          width: width,
+          height: height,
+          fit: fit,
+        );
+      },
+    );
   }
 }
 
+// --- CACHE UNTUK IMAGE PROVIDER (SEDERHANA) ---
 class AvatarImageCache {
   static final Map<String, ImageProvider> _cache = {};
 
   static ImageProvider getImageProvider(String url) {
-    if (_cache.containsKey(url)) {
-      return _cache[url]!;
+    if (!_cache.containsKey(url)) {
+      _cache[url] = NetworkImage(url);
     }
-    final provider = NetworkImage(url);
-    _cache[url] = provider;
-    return provider;
+    return _cache[url]!;
   }
 }

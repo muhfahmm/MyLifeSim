@@ -61,6 +61,7 @@ class ActivityButton extends StatelessWidget {
         DialogHelper.show(
           context: context,
           title: 'Pilih Aktivitas',
+          isNotification: false,
           content: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,

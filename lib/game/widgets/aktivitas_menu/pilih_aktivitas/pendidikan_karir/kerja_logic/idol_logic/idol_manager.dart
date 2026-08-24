@@ -2,33 +2,29 @@ import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class IdolManager {
-  static const List<String> femaleFirstNames = [
-    'Melody', 'Nabilah', 'Shania', 'Veranda', 'Haruka', 'Ayana', 'Kinal', 'Beby', 'Gaby', 'Sonia',
-    'Frieska', 'Jessica', 'Sendy', 'Dhike', 'Ghaida', 'Rona', 'Shani', 'Gracia', 'Zee', 'Freya',
-    'Adel', 'Christy', 'Muthe', 'Eli', 'Gita', 'Lulu', 'Oniel', 'Flora', 'Feni', 'Indah',
-    'Siti', 'Ani', 'Dewi', 'Aisyah', 'Putri', 'Sari', 'Fitri', 'Mega', 'Rini', 'Wati',
-    'Nadia', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Aura', 'Sania', 'Fatimah'
-  ];
-
-  static const List<String> lastNames = [
-    'Laksani', 'Ayu', 'Gracia', 'Junianatha', 'Devi', 'Aditya', 'Putri', 'Sari', 'Pratama', 'Santoso',
-    'Saputra', 'Wijaya', 'Kurniawan', 'Setiawan', 'Nugroho', 'Hidayat', 'Siregar', 'Lubis', 'Simanjuntak'
-  ];
-
-  static const List<String> maleFirstNames = [
-    'Andi', 'Budi', 'Joko', 'Fajar', 'Aditya', 'Rafi', 'Daffa', 'Gibran', 'Hendra', 'Indra',
-    'Rian', 'Dimas', 'Reza', 'Riko', 'Eko', 'Agus', 'Tono', 'Dodi', 'Roni', 'Ari'
-  ];
-
   static String _generateName(String gender, Random rand, Character character) {
     final firstList = gender == 'Perempuan'
-        ? ((character.femaleFirstNames != null && character.femaleFirstNames!.isNotEmpty) ? character.femaleFirstNames! : femaleFirstNames)
-        : ((character.maleFirstNames != null && character.maleFirstNames!.isNotEmpty) ? character.maleFirstNames! : maleFirstNames);
-    final lastList = (character.lastNames != null && character.lastNames!.isNotEmpty) ? character.lastNames! : lastNames;
+        ? (character.femaleFirstNames ?? [])
+        : (character.maleFirstNames ?? []);
+    final lastList = character.lastNames ?? [];
+
+    if (firstList.isEmpty || lastList.isEmpty) {
+      return gender == 'Perempuan' ? 'Putri Laksani' : 'Budi Saputra';
+    }
 
     final first = firstList[rand.nextInt(firstList.length)];
     final last = lastList[rand.nextInt(lastList.length)];
     return '$first $last';
+  }
+
+  static String _generateSkinColor(Random rand) {
+    if (rand.nextDouble() < 0.90) {
+      final lightSkins = ['ffdbb4', 'edb98a', 'f8d25c'];
+      return lightSkins[rand.nextInt(lightSkins.length)];
+    } else {
+      final darkSkins = ['fd9841', 'ae5d29', 'd08b5b', '614335'];
+      return darkSkins[rand.nextInt(darkSkins.length)];
+    }
   }
 
   // Initialize trainees (8 to 15 members, aged 12-15) and staff
@@ -47,6 +43,7 @@ class IdolManager {
         'gender': 'Perempuan',
         'age': (12 + rand.nextInt(4)).toString(), // 12 to 15
         'relationship': (40 + rand.nextInt(41)).toString(), // 40% to 80%
+        'skinColor': _generateSkinColor(rand),
       });
     }
 
@@ -62,6 +59,7 @@ class IdolManager {
         'gender': 'Perempuan',
         'age': memberAge.toString(),
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
     }
 
@@ -86,6 +84,7 @@ class IdolManager {
         'gender': 'Perempuan',
         'age': memberAge.toString(),
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
     }
 
@@ -105,6 +104,7 @@ class IdolManager {
       'age': (30 + rand.nextInt(21)).toString(), // 30 to 50
       'role': 'General Manager',
       'relationship': (50 + rand.nextInt(31)).toString(),
+      'skinColor': _generateSkinColor(rand),
     });
 
     // 1 Deputy GM
@@ -114,6 +114,7 @@ class IdolManager {
       'age': (25 + rand.nextInt(21)).toString(), // 25 to 45
       'role': 'Deputy General Manager',
       'relationship': (50 + rand.nextInt(31)).toString(),
+      'skinColor': _generateSkinColor(rand),
     });
 
     // 10-15 Operations Team (aged 22-45)
@@ -125,6 +126,7 @@ class IdolManager {
         'age': (22 + rand.nextInt(24)).toString(), // 22 to 45
         'role': 'Operations Staff',
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
     }
   }
@@ -194,6 +196,7 @@ class IdolManager {
         'gender': 'Perempuan',
         'age': '12', // fresh trainee
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
       final entryNotice = '🆕 Generasi Baru: Trainee Baru $name (12 tahun) telah bergabung ke tim Trainee!';
       character.idolNews.add(entryNotice);
@@ -238,6 +241,7 @@ class IdolManager {
         'gender': 'Perempuan',
         'age': '16', // fresh main member
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
       final entryNotice = '🆕 Promosi Tim Utama: $name (16 tahun) resmi bergabung ke Tim Utama!';
       character.idolNews.add(entryNotice);
@@ -268,6 +272,7 @@ class IdolManager {
         'age': (30 + rand.nextInt(10)).toString(),
         'role': 'General Manager',
         'relationship': (50 + rand.nextInt(31)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
     }
     if (!hasDeputy) {
@@ -277,6 +282,7 @@ class IdolManager {
         'age': (25 + rand.nextInt(10)).toString(),
         'role': 'Deputy General Manager',
         'relationship': (50 + rand.nextInt(31)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
     }
 
@@ -290,6 +296,7 @@ class IdolManager {
         'age': (22 + rand.nextInt(15)).toString(),
         'role': 'Operations Staff',
         'relationship': (40 + rand.nextInt(41)).toString(),
+        'skinColor': _generateSkinColor(rand),
       });
       currentOps++;
     }
@@ -308,6 +315,7 @@ class IdolManager {
         character.idolTrainees.clear();
         character.idolMainMembers.clear();
         character.idolStaff.clear();
+        character.hasGraduatedIdol = true;
         
         final gradNotice = '🎓 Hari Kelulusan (Graduation): Selamat! Setelah bertahun-tahun bersinar di atas panggung dan memikat hati fans, hari ini kamu resmi melangsungkan konser kelulusan (graduation concert) dan lulus dari grup Idol pada usia ${character.age} tahun. Terima kasih atas kerja keras dan dedikasimu! 🎉✨';
         events.add(gradNotice);

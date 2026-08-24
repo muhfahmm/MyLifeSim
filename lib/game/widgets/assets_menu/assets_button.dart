@@ -25,6 +25,7 @@ class AssetsButton extends StatelessWidget {
         DialogHelper.show(
           context: context,
           title: 'Dashboard Aset & Kekayaan',
+          isNotification: false,
           content: StatefulBuilder(
             builder: (context, setStateDialog) {
               return Column(
