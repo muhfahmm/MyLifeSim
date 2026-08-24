@@ -1,0 +1,104 @@
+part of '../kasino.dart';
+
+class PokerPage extends StatefulWidget {
+  final _KasinoPageState state;
+  const PokerPage({super.key, required this.state});
+
+  @override
+  State<PokerPage> createState() => _PokerPageState();
+}
+
+class _PokerPageState extends State<PokerPage> {
+  List<int> playerHand = [];
+  List<int> dealerHand = [];
+  int bet = 100000;
+  bool gameOver = false;
+  String result = '';
+
+  void startGame() {
+    if (widget.state.character.money < bet) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Uang tidak cukup!')),
+      );
+      return;
+    }
+    setState(() {
+      playerHand = List.generate(5, (_) => Random().nextInt(13) + 2);
+      dealerHand = List.generate(5, (_) => Random().nextInt(13) + 2);
+      gameOver = false;
+      result = '';
+    });
+  }
+
+  int _handValue(List<int> hand) => hand.fold(0, (a, b) => a + b);
+
+  void compareHands() {
+    final int playerVal = _handValue(playerHand);
+    final int dealerVal = _handValue(dealerHand);
+    setState(() {
+      gameOver = true;
+      if (playerVal > dealerVal) {
+        final int winAmount = bet * 2;
+        widget.state.character.money += winAmount;
+        widget.state.character.happiness = (widget.state.character.happiness + 12).clamp(0, 100);
+        widget.state._recordResult('Poker', winAmount, true);
+        result = '🎉 Kamu menang! +\$${formatRupiah(winAmount)}';
+      } else if (playerVal < dealerVal) {
+        widget.state.character.money -= bet;
+        widget.state.character.happiness = (widget.state.character.happiness - 5).clamp(0, 100);
+        widget.state._recordResult('Poker', bet, false);
+        result = '💸 Kamu kalah, kehilangan \$${formatRupiah(bet)}';
+      } else {
+        result = '🤝 Seri! Uang kembali';
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Poker'), backgroundColor: Colors.blue),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            if (!gameOver && playerHand.isNotEmpty) ...[
+              Text('Kartu Anda: ${playerHand.map((c) => c.toString()).join(' ')}'),
+              Text('Kartu Dealer: ${dealerHand.map((c) => c.toString()).join(' ')}'),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: compareHands,
+                child: const Text('Bandingkan Kartu'),
+              ),
+            ],
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: playerHand.isEmpty ? startGame : () => setState(() { playerHand.clear(); dealerHand.clear(); gameOver = false; result = ''; }),
+              child: Text(playerHand.isEmpty ? 'Mulai Game' : 'Main Lagi'),
+            ),
+            const SizedBox(height: 16),
+            if (result.isNotEmpty) Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () => setState(() { if (bet > 10000) bet -= 10000; }),
+                ),
+                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => setState(() { if (bet < 10000000) bet += 10000; }),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

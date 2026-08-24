@@ -49,7 +49,7 @@ class AssetsButton extends StatelessWidget {
                   const Divider(height: 32),
                   const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
-                  KasinoItem(age: character.age, onPop: () => setStateDialog(() {})),
+                  KasinoItem(character: character, onPop: () => setStateDialog(() {})),
                   MuseumItem(age: character.age, onPop: () => setStateDialog(() {})),
                   GarasiMobilItem(age: character.age, onPop: () => setStateDialog(() {})),
                 ],
