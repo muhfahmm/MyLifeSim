@@ -20,6 +20,16 @@ class _EmasPageState extends State<EmasPage> {
       appBar: AppBar(
         title: const Text('Emas'),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              state.nextYear();
+              setState(() {});
+            },
+            tooltip: 'Update Harga Pasar',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -42,7 +52,12 @@ class _EmasPageState extends State<EmasPage> {
                             Text('Harga Beli Rata-Rata: \$${formatRupiah(state.averageEmasBuyPrice.round())}/gram'),
                           ],
                           const SizedBox(height: 8),
-                          Text('Emas dimiliki: ${state.emasGram.toStringAsFixed(2)} gram'),
+                          Builder(builder: (context) {
+                            double modal = state.emasGram * state.averageEmasBuyPrice;
+                            return Text(
+                              'Emas dimiliki: ${state.emasGram.toStringAsFixed(2)} gram ${state.emasGram > 0 ? '(Modal: \$${formatRupiah(modal.round())})' : ''}',
+                            );
+                          }),
                           Text('Nilai: \$${formatRupiah(state.emasGram * state.hargaEmasPerGram)}'),
                           if (state.emasGram > 0) ...[
                             const SizedBox(height: 8),

@@ -2,8 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-
-// Import semua widget menu baru
 import 'package:bitlife/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
@@ -13,15 +11,11 @@ import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil.dart'
 
 class AssetsButton extends StatelessWidget {
   final Character character;
-  final int money;
-  final int age; // Parameter umur untuk logika pembatasan
   final VoidCallback? onRefresh;
 
   const AssetsButton({
     super.key,
     required this.character,
-    required this.money,
-    required this.age,
     this.onRefresh,
   });
 
@@ -29,7 +23,6 @@ class AssetsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: () {
-        // --- BUKA DASHBOARD UNTUK SEMUA USIA ---
         DialogHelper.show(
           context: context,
           title: 'Dashboard Aset & Kekayaan',
@@ -39,57 +32,26 @@ class AssetsButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // ============================================
-                  // 1. BAGIAN FINANSIAL (TERUSKAN AGE)
-                  // ============================================
                   const Text('Finansial', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   UangTunaiItem(
                     character: character,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
+                    onPop: () => setStateDialog(() {}),
                   ),
                   InvestasiItem(
                     character: character,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
+                    onPop: () => setStateDialog(() {}),
                   ),
                   KemewahanItem(
-                    age: age,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
+                    character: character,
+                    onPop: () => setStateDialog(() {}),
                   ),
-
                   const Divider(height: 32),
-
-                  // ============================================
-                  // 2. BAGIAN ASET PREMIUM (TERUSKAN AGE)
-                  // ============================================
                   const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
-                  KasinoItem(
-                    age: age,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
-                  ),
-                  MuseumItem(
-                    age: age,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
-                  ),
-                  GarasiMobilItem(
-                    age: age,
-                    onPop: () {
-                      setStateDialog(() {});
-                    },
-                  ),
-
-                  const Divider(height: 32),
+                  KasinoItem(age: character.age, onPop: () => setStateDialog(() {})),
+                  MuseumItem(age: character.age, onPop: () => setStateDialog(() {})),
+                  GarasiMobilItem(age: character.age, onPop: () => setStateDialog(() {})),
                 ],
               );
             },
@@ -100,9 +62,7 @@ class AssetsButton extends StatelessWidget {
               child: const Text('Tutup Dashboard'),
             ),
           ],
-        ).then((_) {
-          if (onRefresh != null) onRefresh!();
-        });
+        ).then((_) => onRefresh?.call());
       },
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.amber.withOpacity(0.2),
@@ -119,10 +79,7 @@ class AssetsButton extends StatelessWidget {
         children: [
           Icon(Icons.account_balance_wallet, size: 28),
           SizedBox(height: 4),
-          Text(
-            'Assets',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.amber),
-          ),
+          Text('Assets', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.amber)),
         ],
       ),
     );

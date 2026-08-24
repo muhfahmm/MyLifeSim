@@ -63,7 +63,7 @@ String formatRupiah(num value) {
   return value < 0 ? '-$formatted' : formatted;
 }
 
-Widget _buildCashHeader(dynamic state, {String? assetType}) {
+Widget _buildCashHeader(_InvestasiPageState state, {String? assetType}) {
   double returnVal = 0.0;
   bool showReturn = false;
 
@@ -120,6 +120,7 @@ Widget _buildCashHeader(dynamic state, {String? assetType}) {
     ),
   );
 }
+
 
 // ============================================================
 // WIDGET INVESTASI ITEM (untuk dashboard)
@@ -348,6 +349,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
         averageSahamBuyPrice[nama] = (oldCost + newCost) / (count + jumlah);
         saham[nama] = count + jumlah;
         berita.add('Beli $jumlah lembar $nama seharga \$${formatRupiah(totalBiaya)}');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': -totalBiaya,
+          'desc': 'Beli Saham $nama ($jumlah lembar)',
+        });
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -365,6 +372,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
           averageSahamBuyPrice[nama] = 0.0;
         }
         berita.add('Jual $jumlah lembar $nama seharga \$${formatRupiah(totalDapat)}');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': totalDapat,
+          'desc': 'Jual Saham $nama ($jumlah lembar)',
+        });
       } else {
         _showSnackbar('Saham tidak cukup!');
       }
@@ -381,6 +394,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
         averageEmasBuyPrice = (oldCost + newCost) / (emasGram + gram);
         emasGram += gram;
         berita.add('Beli emas $gram gram');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': -biaya,
+          'desc': 'Beli Emas (${gram.toStringAsFixed(2)} gram)',
+        });
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -397,6 +416,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
           averageEmasBuyPrice = 0.0;
         }
         berita.add('Jual emas $gram gram');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': hasil,
+          'desc': 'Jual Emas (${gram.toStringAsFixed(2)} gram)',
+        });
       } else {
         _showSnackbar('Emas tidak cukup!');
       }
@@ -414,6 +439,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
         averageKriptoBuyPrice[nama] = (oldCost + newCost) / (count + jumlah);
         kripto[nama] = count + jumlah;
         berita.add('Beli $jumlah $nama');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': -biaya,
+          'desc': 'Beli Kripto $nama (${jumlah.toStringAsFixed(4)})',
+        });
       } else {
         _showSnackbar('Uang tidak cukup!');
       }
@@ -430,6 +461,12 @@ class _InvestasiPageState extends State<InvestasiPage> {
           averageKriptoBuyPrice[nama] = 0.0;
         }
         berita.add('Jual $jumlah $nama');
+        
+        // Catat transaksi uang tunai
+        character.cashTransactions.insert(0, {
+          'amount': hasil,
+          'desc': 'Jual Kripto $nama (${jumlah.toStringAsFixed(4)})',
+        });
       } else {
         _showSnackbar('Kripto tidak cukup!');
       }
@@ -440,7 +477,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
   }
 
-  // ---- UI ROOT (Grid Menu) ----
+  // ---- UI ROOT (Tampilan daftar / Column) ----
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -449,9 +486,9 @@ class _InvestasiPageState extends State<InvestasiPage> {
         backgroundColor: Colors.blue,
         actions: [
           IconButton(
-            icon: const Icon(Icons.calendar_today),
+            icon: const Icon(Icons.refresh),
             onPressed: nextYear,
-            tooltip: 'Tahun Berikutnya',
+            tooltip: 'Update Harga Pasar',
           ),
         ],
       ),
@@ -460,6 +497,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Ringkasan kekayaan (seperti halaman lain)
             Card(
               color: Colors.blue.shade50,
               child: Padding(
@@ -467,32 +505,50 @@ class _InvestasiPageState extends State<InvestasiPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: Colors.grey.shade700)),
+                    const Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: Colors.grey)),
                     Text(
                       '\$${formatRupiah(totalKekayaan)}',
                       style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                     const SizedBox(height: 8),
                     Text('Uang Tunai: \$${formatRupiah(character.money)}'),
-                    Text('Usia: ${character.age} tahun'),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              childAspectRatio: 1.3,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
-              children: [
-                _buildMenuCard(Icons.trending_up, 'Saham', () => _navigateTo(SahamPage(state: this))),
-                _buildMenuCard(Icons.monetization_on, 'Emas', () => _navigateTo(EmasPage(state: this))),
-                _buildMenuCard(Icons.currency_bitcoin, 'Kripto', () => _navigateTo(KriptoPage(state: this))),
-                _buildMenuCard(Icons.pie_chart, 'Portofolio', () => _navigateTo(PortofolioPage(state: this))),
-              ],
+
+            // Menu dalam bentuk daftar vertikal
+            _buildMenuTile(
+              icon: Icons.trending_up,
+              label: 'Saham',
+              subtitle: 'Beli & jual saham perusahaan',
+              color: Colors.blue,
+              onTap: () => _navigateTo(SahamPage(state: this)),
+            ),
+            const SizedBox(height: 8),
+            _buildMenuTile(
+              icon: Icons.monetization_on,
+              label: 'Emas',
+              subtitle: 'Investasi emas batangan',
+              color: Colors.amber,
+              onTap: () => _navigateTo(EmasPage(state: this)),
+            ),
+            const SizedBox(height: 8),
+            _buildMenuTile(
+              icon: Icons.currency_bitcoin,
+              label: 'Kripto',
+              subtitle: 'Trading cryptocurrency',
+              color: Colors.orange,
+              onTap: () => _navigateTo(KriptoPage(state: this)),
+            ),
+            const SizedBox(height: 8),
+            _buildMenuTile(
+              icon: Icons.pie_chart,
+              label: 'Portofolio',
+              subtitle: 'Lihat semua aset investasi',
+              color: Colors.purple,
+              onTap: () => _navigateTo(PortofolioPage(state: this)),
             ),
           ],
         ),
@@ -500,19 +556,54 @@ class _InvestasiPageState extends State<InvestasiPage> {
     );
   }
 
-  Widget _buildMenuCard(IconData icon, String label, VoidCallback onTap) {
+  // ---- Helper untuk menu tile (sama seperti di UangTunai & Kemewahan) ----
+  Widget _buildMenuTile({
+    required IconData icon,
+    required String label,
+    required String subtitle,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
     return Card(
-      elevation: 2,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: color.withOpacity(0.3)),
+      ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 36, color: Colors.blue),
-            const SizedBox(height: 6),
-            Text(label, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13)),
-          ],
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          child: Row(
+            children: [
+              Icon(icon, color: color, size: 32),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: color,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      subtitle,
+                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+            ],
+          ),
         ),
       ),
     );

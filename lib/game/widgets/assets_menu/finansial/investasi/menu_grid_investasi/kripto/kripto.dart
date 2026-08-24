@@ -20,6 +20,16 @@ class _KriptoPageState extends State<KriptoPage> {
       appBar: AppBar(
         title: const Text('Kripto'),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              state.nextYear();
+              setState(() {});
+            },
+            tooltip: 'Update Harga Pasar',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -46,7 +56,13 @@ class _KriptoPageState extends State<KriptoPage> {
                             return Text('Harga Beli Rata-Rata: \$${formatRupiah(buyPrice.round())}');
                           }),
                         ],
-                        Text('Jumlah: ${jumlah.toStringAsFixed(4)}'),
+                        Builder(builder: (context) {
+                          double buyPrice = state.averageKriptoBuyPrice[nama] ?? 0.0;
+                          double modal = jumlah * buyPrice;
+                          return Text(
+                            'Jumlah: ${jumlah.toStringAsFixed(4)} ${jumlah > 0 ? '(Modal: \$${formatRupiah(modal.round())})' : ''}',
+                          );
+                        }),
                         Text('Nilai: \$${formatRupiah(jumlah * harga)}'),
                         if (jumlah > 0) ...[
                           const SizedBox(height: 2),

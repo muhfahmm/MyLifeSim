@@ -319,7 +319,9 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                 MaterialPageRoute(
                   builder: (context) => InvestasiPage(character: widget.character),
                 ),
-              );
+              ).then((_) {
+                setState(() {});
+              });
             },
           ),
           const SizedBox(height: 20),

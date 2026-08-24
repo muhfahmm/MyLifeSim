@@ -2018,12 +2018,15 @@ class _GameScreenState extends State<GameScreen> {
                 // 2. ASSETS
                 AssetsButton(
                   character: _character,
-                  money: _character.money,
-                  age: _character.age,
                   onRefresh: () {
-                    setState(() {});
-                  },
-                ),
+                    setState(() {
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+      );
+    });
+  },
+),
                 
                 // 3. HUBUNGAN
                 RelationshipButton(

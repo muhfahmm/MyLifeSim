@@ -20,6 +20,16 @@ class _SahamPageState extends State<SahamPage> {
       appBar: AppBar(
         title: const Text('Saham'),
         backgroundColor: Colors.blue,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () {
+              state.nextYear();
+              setState(() {});
+            },
+            tooltip: 'Update Harga Pasar',
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -46,7 +56,14 @@ class _SahamPageState extends State<SahamPage> {
                       return Text('Harga Beli Rata-Rata: \$${formatRupiah(buyPrice.round())}');
                     }),
                   ],
-                  Text('Jumlah: $jumlah lembar', style: const TextStyle(fontSize: 12)),
+                  Builder(builder: (context) {
+                    double buyPrice = state.averageSahamBuyPrice[nama] ?? 0.0;
+                    double modal = jumlah * buyPrice;
+                    return Text(
+                      'Jumlah: $jumlah lembar ${jumlah > 0 ? '(Modal: \$${formatRupiah(modal.round())})' : ''}',
+                      style: const TextStyle(fontSize: 12),
+                    );
+                  }),
                   if (jumlah > 0) ...[
                     const SizedBox(height: 2),
                     Builder(builder: (context) {
