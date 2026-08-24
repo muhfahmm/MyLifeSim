@@ -5,9 +5,9 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/kasino.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/museum.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/kasino/kasino.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/museum/museum.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/garasi_mobil.dart';
 
 class AssetsButton extends StatelessWidget {
   final Character character;
