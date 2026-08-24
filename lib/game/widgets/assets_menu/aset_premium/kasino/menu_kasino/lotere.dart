@@ -29,7 +29,7 @@ class _LoterePageState extends State<LoterePage> {
         widget.state._recordResult('Lotere', winAmount, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🎉 JACKPOT LOTERE! Menang USD ${formatRupiah(winAmount)}!'),
+            content: Text('JACKPOT LOTERE! Menang USD ${formatRupiah(winAmount)}!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -39,7 +39,7 @@ class _LoterePageState extends State<LoterePage> {
         widget.state._recordResult('Lotere', bet, false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('💸 Tiket tidak beruntung. Kehilangan USD ${formatRupiah(bet)}'),
+            content: Text('Tiket tidak beruntung. Kehilangan USD ${formatRupiah(bet)}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -84,7 +84,7 @@ class _LoterePageState extends State<LoterePage> {
                 backgroundColor: Colors.orange,
                 padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
               ),
-              child: const Text('Beli Tiket 🎟️'),
+              child: const Text('Beli Tiket'),
             ),
           ],
         ),

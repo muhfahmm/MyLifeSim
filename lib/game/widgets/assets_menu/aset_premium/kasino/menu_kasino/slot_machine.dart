@@ -9,7 +9,7 @@ class SlotMachinePage extends StatefulWidget {
 }
 
 class _SlotMachinePageState extends State<SlotMachinePage> {
-  final List<String> symbols = ['🍒', '🍋', '🍊', '🍇', '🔔', '⭐', '7️⃣'];
+  final List<String> symbols = ['CH', 'LE', 'OR', 'GR', 'BL', 'ST', '7'];
   List<String> currentSymbols = ['?', '?', '?', '?', '?'];
   bool isSpinning = false;
   int bet = 100000;
@@ -52,16 +52,16 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
         else if (maxCount == 4) multiplier = 10;
         else if (maxCount == 5) {
           multiplier = 50;
-          if (newSymbols.every((s) => s == '7️⃣')) {
+          if (newSymbols.every((s) => s == '7')) {
             winAmount = widget.state.slotJackpot;
             widget.state._resetSlotJackpot();
-            msg = '🎉 JACKPOT! Kamu memenangkan seluruh jackpot \$${formatRupiah(winAmount)}!';
+            msg = 'JACKPOT! Kamu memenangkan seluruh jackpot \$${formatRupiah(winAmount)}!';
             isWin = true;
           }
         }
         if (!isWin && multiplier > 0) {
           winAmount = bet * multiplier;
-          msg = '🎉 Menang $multiplier x! +\$${formatRupiah(winAmount)}';
+          msg = 'Menang $multiplier x! +\$${formatRupiah(winAmount)}';
           isWin = true;
         }
       }
@@ -81,7 +81,7 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 3);
         widget.state._recordResult('Slot Machine', bet, false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('💸 Kalah, - \$${formatRupiah(bet)}'), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kalah, - \$${formatRupiah(bet)}'), backgroundColor: Colors.red));
       }
     });
   }
@@ -103,7 +103,7 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
                 children: currentSymbols.map((s) => Container(
                   width: 70, height: 70, margin: const EdgeInsets.symmetric(horizontal: 4),
                   decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber, width: 2)),
-                  child: Center(child: Text(s, style: const TextStyle(fontSize: 36))),
+                  child: Center(child: Text(s, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
                 )).toList()
             ),
             const SizedBox(height: 20),
@@ -116,7 +116,7 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
             ElevatedButton(
               onPressed: isSpinning ? null : spin,
               style: ElevatedButton.styleFrom(backgroundColor: Colors.deepPurple, padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16)),
-              child: Text(isSpinning ? 'Memutar...' : 'Spin 🎰'),
+              child: Text(isSpinning ? 'Memutar...' : 'Spin'),
             ),
           ],
         ),

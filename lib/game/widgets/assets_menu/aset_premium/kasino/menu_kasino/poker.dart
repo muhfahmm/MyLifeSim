@@ -40,14 +40,14 @@ class _PokerPageState extends State<PokerPage> {
         widget.state.character.money += win;
         widget.state._applyGamblingEffect(true, bet, happinessBonus: 12);
         widget.state._recordResult('Poker', win, true);
-        result = '🎉 Menang! +\$${formatRupiah(win)}';
+        result = 'Menang! +\$${formatRupiah(win)}';
       } else if (playerVal < dealerVal) {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 3);
         widget.state._recordResult('Poker', bet, false);
-        result = '💸 Kalah, - \$${formatRupiah(bet)}';
+        result = 'Kalah, - \$${formatRupiah(bet)}';
       } else {
-        result = '🤝 Seri!';
+        result = 'Seri!';
       }
     });
   }

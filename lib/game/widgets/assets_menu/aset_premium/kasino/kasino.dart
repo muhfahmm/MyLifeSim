@@ -169,23 +169,23 @@ class _KasinoPageState extends State<KasinoPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Saldo Anda', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    Text('\$${formatRupiah(character.money)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)),
+                    Text('USD ${formatRupiah(character.money)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)),
                     const SizedBox(height: 8),
                     Row(
                       children: [
                         const Icon(Icons.trending_up, color: Colors.green, size: 16),
                         const SizedBox(width: 4),
-                        Text('Total Menang: \$${formatRupiah(totalWin)}', style: const TextStyle(color: Colors.green)),
+                        Text('Total Menang: USD ${formatRupiah(totalWin)}', style: const TextStyle(color: Colors.green)),
                         const SizedBox(width: 16),
                         const Icon(Icons.trending_down, color: Colors.red, size: 16),
                         const SizedBox(width: 4),
-                        Text('Total Kalah: \$${formatRupiah(totalLoss)}', style: const TextStyle(color: Colors.red)),
+                        Text('Total Kalah: USD ${formatRupiah(totalLoss)}', style: const TextStyle(color: Colors.red)),
                       ],
                     ),
                     if (slotJackpot > 0)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
-                        child: Text('🎰 Jackpot Slot: \$${formatRupiah(slotJackpot)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                        child: Text('Jackpot Slot: USD ${formatRupiah(slotJackpot)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
                       ),
                   ],
                 ),

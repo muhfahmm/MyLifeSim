@@ -50,20 +50,20 @@ class _BlackjackPageState extends State<BlackjackPage> {
       result = '';
 
       if (_isBlackjack(playerCards) && _isBlackjack(dealerCards)) {
-        result = '🤝 Kedua blackjack! Seri.';
+        result = 'Kedua blackjack! Seri.';
         gameOver = true;
       } else if (_isBlackjack(playerCards)) {
         int win = (bet * 1.5).round();
         widget.state.character.money += win;
         widget.state._applyGamblingEffect(true, bet, happinessBonus: 20);
         widget.state._recordResult('Blackjack', win, true);
-        result = '🎉 BLACKJACK! Kamu menang \$${formatRupiah(win)}!';
+        result = 'BLACKJACK! Kamu menang \$${formatRupiah(win)}!';
         gameOver = true;
       } else if (_isBlackjack(dealerCards)) {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 10, healthPenalty: 5);
         widget.state._recordResult('Blackjack', bet, false);
-        result = '💸 Dealer blackjack! Kamu kalah \$${formatRupiah(bet)}';
+        result = 'Dealer blackjack! Kamu kalah \$${formatRupiah(bet)}';
         gameOver = true;
       }
     });
@@ -97,14 +97,14 @@ class _BlackjackPageState extends State<BlackjackPage> {
         widget.state.character.money += win;
         widget.state._applyGamblingEffect(true, bet, happinessBonus: 12);
         widget.state._recordResult('Blackjack', win, true);
-        result = '🎉 Kamu menang! +\$${formatRupiah(win)}';
+        result = 'Kamu menang! +\$${formatRupiah(win)}';
       } else if (isWin == false) {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 3);
         widget.state._recordResult('Blackjack', bet, false);
-        result = '💸 Kalah, - \$${formatRupiah(bet)}';
+        result = 'Kalah, - \$${formatRupiah(bet)}';
       } else {
-        result = '🤝 Seri! Uang kembali.';
+        result = 'Seri! Uang kembali.';
       }
     });
   }

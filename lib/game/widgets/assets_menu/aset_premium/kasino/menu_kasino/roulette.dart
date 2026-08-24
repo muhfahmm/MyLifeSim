@@ -66,12 +66,12 @@ class _RoulettePageState extends State<RoulettePage> {
           widget.state.character.money += winAmount;
           widget.state._applyGamblingEffect(true, bet, happinessBonus: 20);
           widget.state._recordResult('Roulette', winAmount, true, detail: detail);
-          result = '🎉 Menang! $detail -> +\$${formatRupiah(winAmount)}';
+          result = 'Menang! $detail -> +\$${formatRupiah(winAmount)}';
         } else {
           widget.state.character.money -= bet;
           widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 2);
           widget.state._recordResult('Roulette', bet, false, detail: detail);
-          result = '💸 Kalah! $detail -> -\$${formatRupiah(bet)}';
+          result = 'Kalah! $detail -> -\$${formatRupiah(bet)}';
         }
       });
     });
@@ -149,7 +149,7 @@ class _RoulettePageState extends State<RoulettePage> {
                 IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
               ]),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: isSpinning ? null : spin, style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: Text(isSpinning ? 'Memutar...' : 'Spin 🎡')),
+              ElevatedButton(onPressed: isSpinning ? null : spin, style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: Text(isSpinning ? 'Memutar...' : 'Spin')),
               const SizedBox(height: 16),
               Text(result, style: const TextStyle(fontSize: 16)),
             ],
