@@ -25,21 +25,21 @@ class _LoterePageState extends State<LoterePage> {
       if (isWin) {
         final int winAmount = bet * 50; // jackpot 50x
         widget.state.character.money += winAmount;
-        widget.state.character.happiness = (widget.state.character.happiness + 25).clamp(0, 100);
+        widget.state._applyGamblingEffect(true, bet, happinessBonus: 25);
         widget.state._recordResult('Lotere', winAmount, true);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('🎉 JACKPOT LOTERE! Menang \$${formatRupiah(winAmount)}!'),
+            content: Text('🎉 JACKPOT LOTERE! Menang USD ${formatRupiah(winAmount)}!'),
             backgroundColor: Colors.green,
           ),
         );
       } else {
         widget.state.character.money -= bet;
-        widget.state.character.happiness = (widget.state.character.happiness - 3).clamp(0, 100);
+        widget.state._applyGamblingEffect(false, bet, happinessPenalty: 3);
         widget.state._recordResult('Lotere', bet, false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('💸 Tiket tidak beruntung. Kehilangan \$${formatRupiah(bet)}'),
+            content: Text('💸 Tiket tidak beruntung. Kehilangan USD ${formatRupiah(bet)}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -56,7 +56,7 @@ class _LoterePageState extends State<LoterePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
+            Text('Saldo: USD ${formatRupiah(widget.state.character.money)}',
                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 20),
             const Text('Beli tiket undian dengan peluang jackpot 5%!'),
@@ -70,7 +70,7 @@ class _LoterePageState extends State<LoterePage> {
                   icon: const Icon(Icons.remove),
                   onPressed: () => setState(() { if (bet > 10000) bet -= 10000; }),
                 ),
-                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                Text('USD ${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () => setState(() { if (bet < 10000000) bet += 10000; }),

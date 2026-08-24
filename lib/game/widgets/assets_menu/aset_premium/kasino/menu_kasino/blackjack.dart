@@ -9,52 +9,89 @@ class BlackjackPage extends StatefulWidget {
 }
 
 class _BlackjackPageState extends State<BlackjackPage> {
+  List<int> deck = [];
   List<int> playerCards = [];
   List<int> dealerCards = [];
   int bet = 100000;
   bool gameOver = false;
   String result = '';
 
+  List<int> _buildDeck() {
+    List<int> d = [];
+    for (int i = 0; i < 4; i++) {
+      for (int v = 1; v <= 13; v++) d.add(v);
+    }
+    d.shuffle();
+    return d;
+  }
+
+  int _handValue(List<int> hand) {
+    int total = hand.fold(0, (a, b) => a + b);
+    int aces = hand.where((c) => c == 1).length;
+    while (total > 21 && aces > 0) {
+      total -= 10;
+      aces--;
+    }
+    return total;
+  }
+
+  bool _isBlackjack(List<int> hand) => hand.length == 2 && _handValue(hand) == 21;
+
   void startGame() {
     if (widget.state.character.money < bet) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Uang tidak cukup!')),
-      );
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
       return;
     }
     setState(() {
-      playerCards = [_drawCard(), _drawCard()];
-      dealerCards = [_drawCard(), _drawCard()];
+      deck = _buildDeck();
+      playerCards = [deck.removeLast(), deck.removeLast()];
+      dealerCards = [deck.removeLast(), deck.removeLast()];
       gameOver = false;
       result = '';
+
+      // Cek blackjack langsung
+      if (_isBlackjack(playerCards) && _isBlackjack(dealerCards)) {
+        result = '🤝 Kedua blackjack! Seri.';
+        gameOver = true;
+      } else if (_isBlackjack(playerCards)) {
+        int win = (bet * 1.5).round();
+        widget.state.character.money += win;
+        widget.state._applyGamblingEffect(true, bet, happinessBonus: 20);
+        widget.state._recordResult('Blackjack', win, true);
+        result = '🎉 BLACKJACK! Kamu menang \$${formatRupiah(win)}!';
+        gameOver = true;
+      } else if (_isBlackjack(dealerCards)) {
+        widget.state.character.money -= bet;
+        widget.state._applyGamblingEffect(false, bet, happinessPenalty: 10, healthPenalty: 5);
+        widget.state._recordResult('Blackjack', bet, false);
+        result = '💸 Dealer blackjack! Kamu kalah \$${formatRupiah(bet)}';
+        gameOver = true;
+      }
     });
   }
 
-  int _drawCard() => Random().nextInt(11) + 2; // 2-12 (sederhana, Ace = 11)
-
-  int _sumCards(List<int> cards) => cards.fold(0, (a, b) => a + b);
-
   void hit() {
+    if (gameOver) return;
     setState(() {
-      playerCards.add(_drawCard());
-      if (_sumCards(playerCards) > 21) {
+      playerCards.add(deck.removeLast());
+      if (_handValue(playerCards) > 21) {
         _finishGame(false);
       }
     });
   }
 
   void stand() {
+    if (gameOver) return;
     setState(() {
-      // Dealer mainkan otomatis sampai >=17
-      while (_sumCards(dealerCards) < 17) {
-        dealerCards.add(_drawCard());
+      while (_handValue(dealerCards) < 17) {
+        dealerCards.add(deck.removeLast());
       }
-      final int playerTotal = _sumCards(playerCards);
-      final int dealerTotal = _sumCards(dealerCards);
-      if (dealerTotal > 21 || playerTotal > dealerTotal) {
+      int playerVal = _handValue(playerCards);
+      int dealerVal = _handValue(dealerCards);
+      if (dealerVal > 21 || playerVal > dealerVal) {
         _finishGame(true);
-      } else if (playerTotal == dealerTotal) {
-        _finishGame(null); // draw
+      } else if (playerVal == dealerVal) {
+        _finishGame(null);
       } else {
         _finishGame(false);
       }
@@ -65,21 +102,18 @@ class _BlackjackPageState extends State<BlackjackPage> {
     setState(() {
       gameOver = true;
       if (isWin == true) {
-        final int winAmount = bet * 2;
-        widget.state.character.money += winAmount;
-        widget.state.character.happiness = (widget.state.character.happiness + 12).clamp(0, 100);
-        widget.state._recordResult('Blackjack', winAmount, true);
-        result = '🎉 Kamu menang! +\$${formatRupiah(winAmount)}';
+        int win = bet * 2;
+        widget.state.character.money += win;
+        widget.state._applyGamblingEffect(true, bet, happinessBonus: 12);
+        widget.state._recordResult('Blackjack', win, true);
+        result = '🎉 Kamu menang! +\$${formatRupiah(win)}';
       } else if (isWin == false) {
         widget.state.character.money -= bet;
-        widget.state.character.happiness = (widget.state.character.happiness - 5).clamp(0, 100);
+        widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 3);
         widget.state._recordResult('Blackjack', bet, false);
-        if (bet > 1000000) {
-          widget.state.character.health = (widget.state.character.health - 3).clamp(0, 100);
-        }
-        result = '💸 Kamu kalah, kehilangan \$${formatRupiah(bet)}';
+        result = '💸 Kalah, - \$${formatRupiah(bet)}';
       } else {
-        result = '🤝 Seri! Uang kembali';
+        result = '🤝 Seri! Uang kembali.';
       }
     });
   }
@@ -92,60 +126,31 @@ class _BlackjackPageState extends State<BlackjackPage> {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Saldo: \$${formatRupiah(widget.state.character.money)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             const SizedBox(height: 16),
             if (!gameOver) ...[
-              Text('Kartu Dealer: ${dealerCards.map((c) => c.toString()).join(' ')}'),
-              const SizedBox(height: 8),
-              Text('Kartu Anda: ${playerCards.map((c) => c.toString()).join(' ')}'),
-              const SizedBox(height: 8),
-              Text('Total: ${_sumCards(playerCards)}'),
+              Text('Dealer: ${dealerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(dealerCards)})'),
+              const Divider(),
+              Text('Anda: ${playerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(playerCards)})'),
+              const SizedBox(height: 20),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                ElevatedButton(onPressed: hit, child: const Text('Hit')),
+                const SizedBox(width: 16),
+                ElevatedButton(onPressed: stand, child: const Text('Stand')),
+              ]),
               const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  ElevatedButton(
-                    onPressed: (gameOver || playerCards.isEmpty) ? null : hit,
-                    child: const Text('Hit'),
-                  ),
-                  const SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: (gameOver || playerCards.isEmpty) ? null : stand,
-                    child: const Text('Stand'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: playerCards.isEmpty ? startGame : null,
-                child: const Text('Mulai Game'),
-              ),
+              ElevatedButton(onPressed: startGame, child: const Text('Mulai')),
             ] else ...[
               Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() { playerCards.clear(); dealerCards.clear(); gameOver = false; result = ''; });
-                },
-                child: const Text('Main Lagi'),
-              ),
+              ElevatedButton(onPressed: startGame, child: const Text('Main Lagi')),
             ],
             const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => setState(() { if (bet > 10000) bet -= 10000; }),
-                ),
-                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => setState(() { if (bet < 10000000) bet += 10000; }),
-                ),
-              ],
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
+              Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+              IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
+            ]),
           ],
         ),
       ),
