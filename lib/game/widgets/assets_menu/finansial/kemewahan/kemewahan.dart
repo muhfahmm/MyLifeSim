@@ -3,6 +3,21 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
+// ============================================================
+// PART FILES
+// ============================================================
+part 'menu_kemewahan/perhiasan/perhiasan_mewah.dart';
+part 'menu_kemewahan/kendaraan_mewah/kendaraan_mewah.dart';
+part 'menu_kemewahan/properti_eksklusif/properti_eksklusif.dart';
+part 'menu_kemewahan/koleksi_seni_antik/koleksi_antik.dart';
+part 'menu_kemewahan/gaya_hidup_premium/gaya_hidup_premium.dart';
+part 'menu_kemewahan/filantropi/filantropi.dart';
+part 'menu_kemewahan/koleksi_digital_nft/nft.dart';
+part 'menu_kemewahan/layanan_pribadi/layanan_pribadi.dart';
+
+// ============================================================
+// UTILITY FORMAT RUPIAH
+// ============================================================
 String formatRupiah(num value) {
   final parts = value.round().abs().toString().split('');
   final buffer = StringBuffer();
@@ -16,6 +31,9 @@ String formatRupiah(num value) {
   return value < 0 ? '-$formatted' : formatted;
 }
 
+// ============================================================
+// WIDGET ITEM KEMEWAHAN (dashboard)
+// ============================================================
 class KemewahanItem extends StatelessWidget {
   final Character character;
   final VoidCallback? onPop;
@@ -116,6 +134,9 @@ class KemewahanItem extends StatelessWidget {
   }
 }
 
+// ============================================================
+// HALAMAN KEMEWAHAN UTAMA (ROOT)
+// ============================================================
 class KemewahanPage extends StatefulWidget {
   final Character character;
   const KemewahanPage({super.key, required this.character});
@@ -127,7 +148,7 @@ class KemewahanPage extends StatefulWidget {
 class _KemewahanPageState extends State<KemewahanPage> {
   late Character character;
 
-  // Data (tanpa pengalamanLiburan dan layananPribadi)
+  // ---- DATA KEPEMILIKAN ----
   List<Map<String, dynamic>> perhiasan = [];
   List<Map<String, dynamic>> kendaraan = [];
   List<Map<String, dynamic>> propertiEksklusif = [];
@@ -135,8 +156,63 @@ class _KemewahanPageState extends State<KemewahanPage> {
   List<Map<String, dynamic>> keanggotaan = [];
   List<Map<String, dynamic>> donasi = [];
   List<Map<String, dynamic>> koleksiDigital = [];
+  List<Map<String, dynamic>> layananPribadi = [];
+
   List<String> penghargaan = [];
 
+  // ---- DATA ITEM (DAFTAR YANG TERSEDIA UNTUK DIBELI) ----
+  final List<Map<String, dynamic>> _perhiasanData = [
+    {'nama': 'Jam Tangan Rolex', 'harga': 50000000, 'happiness': 15},
+    {'nama': 'Kalung Berlian', 'harga': 75000000, 'happiness': 20},
+    {'nama': 'Tas Hermès Birkin', 'harga': 120000000, 'happiness': 25},
+    {'nama': 'Cincin Emas 24K', 'harga': 15000000, 'happiness': 10},
+    {'nama': 'Koleksi Perhiasan Eksklusif', 'harga': 300000000, 'happiness': 30},
+  ];
+
+  final List<Map<String, dynamic>> _kendaraanData = [
+    {'nama': 'Ferrari F8', 'harga': 2000000000, 'happiness': 25},
+    {'nama': 'Lamborghini Aventador', 'harga': 3500000000, 'happiness': 30},
+    {'nama': 'Rolls Royce Phantom', 'harga': 4000000000, 'happiness': 35},
+    {'nama': 'Yacht 50 Kaki', 'harga': 7500000000, 'happiness': 40},
+    {'nama': 'Jet Pribadi', 'harga': 15000000000, 'happiness': 50},
+  ];
+
+  final List<Map<String, dynamic>> _propertiData = [
+    {'nama': 'Villa di Bali', 'harga': 5000000000, 'happiness': 30},
+    {'nama': 'Penthouse di Jakarta', 'harga': 8000000000, 'happiness': 35},
+    {'nama': 'Kastil di Eropa', 'harga': 15000000000, 'happiness': 45},
+    {'nama': 'Pulau Pribadi', 'harga': 50000000000, 'happiness': 60},
+  ];
+
+  final List<Map<String, dynamic>> _seniData = [
+    {'nama': 'Lukisan Monalisa (replika)', 'harga': 1000000000, 'happiness': 20},
+    {'nama': 'Patung David (replika)', 'harga': 800000000, 'happiness': 18},
+    {'nama': 'Koleksi Lukisan Modern', 'harga': 2000000000, 'happiness': 25},
+    {'nama': 'Barang Antik Eropa', 'harga': 1500000000, 'happiness': 22},
+  ];
+
+  final List<Map<String, dynamic>> _keanggotaanData = [
+    {'nama': 'Klub Golf Eksklusif', 'harga': 20000000, 'happiness': 12},
+    {'nama': 'Spa Premium', 'harga': 15000000, 'happiness': 10},
+    {'nama': 'Gym Elite', 'harga': 10000000, 'happiness': 8},
+    {'nama': 'Klub Malam VIP', 'harga': 25000000, 'happiness': 15},
+  ];
+
+  final List<Map<String, dynamic>> _digitalData = [
+    {'nama': 'NFT Karya Seni', 'harga': 50000000, 'happiness': 15},
+    {'nama': 'NFT Koleksi Game', 'harga': 30000000, 'happiness': 12},
+    {'nama': 'NFT Domain Premium', 'harga': 100000000, 'happiness': 20},
+    {'nama': 'Koleksi Crypto Art', 'harga': 75000000, 'happiness': 18},
+  ];
+
+  final List<Map<String, dynamic>> _layananData = [
+    {'nama': 'Asisten Pribadi', 'harga': 15000000, 'happiness': 15},
+    {'nama': 'Koki Pribadi', 'harga': 12000000, 'happiness': 12},
+    {'nama': 'Sopir Pribadi', 'harga': 10000000, 'happiness': 10},
+    {'nama': 'Penata Gaya', 'harga': 8000000, 'happiness': 8},
+  ];
+
+  // ---- TOTAL ASET ----
   double get totalNilaiKemewahan {
     double total = 0;
     for (var item in perhiasan) { total += (item['harga'] as num).toDouble(); }
@@ -154,7 +230,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
     _checkAchievements();
   }
 
-  // ----- PENCAPAIAN (tanpa pengalamanLiburan dan layananPribadi) -----
+  // ---- PENCAPAIAN ----
   void _checkAchievements() {
     List<String> newAchievements = [];
     if (perhiasan.length >= 3 && !penghargaan.contains('Kolektor Perhiasan')) newAchievements.add('💎 Kolektor Perhiasan');
@@ -173,41 +249,145 @@ class _KemewahanPageState extends State<KemewahanPage> {
     }
   }
 
-  // ----- FUNGSI UNTUK MENAMPILKAN HALAMAN PLACEHOLDER -----
-  void _showPlaceholderPage(String title, IconData icon) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-            backgroundColor: Colors.purple,
-          ),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, size: 80, color: Colors.purple),
-                const SizedBox(height: 20),
-                Text(
-                  'Fitur "$title" sedang dalam pengembangan.',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500, color: Colors.grey),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('Kembali'),
-                ),
-              ],
+  // ---- FUNGSI TRANSAKSI ----
+  void beliPerhiasan(Map<String, dynamic> item) {
+    _buyItem('perhiasan', item);
+  }
+
+  void beliKendaraan(Map<String, dynamic> item) {
+    _buyItem('kendaraan', item);
+  }
+
+  void beliProperti(Map<String, dynamic> item) {
+    _buyItem('properti', item);
+  }
+
+  void beliSeni(Map<String, dynamic> item) {
+    _buyItem('seni', item);
+  }
+
+  void beliKeanggotaan(Map<String, dynamic> item) {
+    setState(() {
+      int harga = (item['harga'] as num).toInt();
+      if (character.money >= harga) {
+        character.money -= harga;
+        keanggotaan.add(item);
+        int h = item['happiness'] ?? 8;
+        character.happiness = (character.happiness + h).clamp(0, 100);
+        _checkAchievements();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bergabung dengan ${item['nama']}! +$h Happiness')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+      }
+    });
+  }
+
+  void beliDigital(Map<String, dynamic> item) {
+    _buyItem('digital', item);
+  }
+
+  void beliLayanan(Map<String, dynamic> item) {
+    setState(() {
+      int harga = (item['harga'] as num).toInt();
+      if (character.money >= harga) {
+        character.money -= harga;
+        layananPribadi.add(item);
+        int h = item['happiness'] ?? 10;
+        character.happiness = (character.happiness + h).clamp(0, 100);
+        _checkAchievements();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Menyewa ${item['nama']}! +$h Happiness')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+      }
+    });
+  }
+
+  void lakukanDonasi(int nominal) {
+    setState(() {
+      if (character.money >= nominal) {
+        character.money -= nominal;
+        donasi.add({'jumlah': nominal, 'tanggal': DateTime.now()});
+        int bonus = 10 + (nominal ~/ 1000000) * 2;
+        character.happiness = (character.happiness + bonus).clamp(0, 100);
+        _checkAchievements();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Donasi Rp ${formatRupiah(nominal)} berhasil! +$bonus Happiness')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+      }
+    });
+  }
+
+  void _buyItem(String category, Map<String, dynamic> item) {
+    setState(() {
+      int harga = (item['harga'] as num).toInt();
+      if (character.money >= harga) {
+        character.money -= harga;
+        switch (category) {
+          case 'perhiasan': perhiasan.add(item); break;
+          case 'kendaraan': kendaraan.add(item); break;
+          case 'properti': propertiEksklusif.add(item); break;
+          case 'seni': koleksiSeni.add(item); break;
+          case 'digital': koleksiDigital.add(item); break;
+        }
+        int bonus = item['happiness'] ?? 10;
+        character.happiness = (character.happiness + bonus).clamp(0, 100);
+        _checkAchievements();
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Berhasil membeli ${item['nama']}! +$bonus Happiness')));
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+      }
+    });
+  }
+
+
+  // ---- HELPER GENERIK UNTUK MENAMPILKAN DAFTAR ITEM ----
+  // Fungsi ini akan dipanggil oleh masing-masing part file untuk menampilkan halaman belanja.
+  Widget _buildItemPage({
+    required String title,
+    required List<Map<String, dynamic>> items,
+    required List<Map<String, dynamic>> ownedItems,
+    required void Function(Map<String, dynamic>) onBuy,
+  }) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(title),
+        backgroundColor: Colors.purple,
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: items.length,
+        itemBuilder: (ctx, i) {
+          final item = items[i];
+          bool owned = ownedItems.any((e) => e['nama'] == item['nama']);
+          return Card(
+            margin: const EdgeInsets.only(bottom: 8),
+            child: ListTile(
+              title: Text(item['nama'], style: const TextStyle(fontWeight: FontWeight.bold)),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Harga: Rp ${formatRupiah(item['harga'])}'),
+                  Text('+${item['happiness']} Happiness', style: const TextStyle(color: Colors.green)),
+                ],
+              ),
+              trailing: owned
+                  ? const Icon(Icons.check_circle, color: Colors.green)
+                  : ElevatedButton(
+                      onPressed: () {
+                        onBuy(item);
+                        Navigator.pop(ctx);
+                      },
+                      style: ElevatedButton.styleFrom(backgroundColor: Colors.purple),
+                      child: const Text('Beli', style: TextStyle(color: Colors.white)),
+                    ),
             ),
-          ),
-        ),
+          );
+        },
       ),
     );
   }
 
-  // ----- UI UTAMA -----
+  // ---- UI ROOT ----
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -226,6 +406,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Ringkasan
             Card(
               color: Colors.purple.shade50,
               child: Padding(
@@ -244,13 +425,13 @@ class _KemewahanPageState extends State<KemewahanPage> {
             ),
             const SizedBox(height: 20),
 
-            // MENU DAFTAR (8 menu setelah penghapusan)
+            // Menu daftar (mengarah ke part files)
             _buildMenuTile(
               icon: Icons.weekend,
               label: 'Perhiasan & Aksesori Mewah',
               subtitle: 'Koleksi perhiasan, jam tangan, tas desainer',
               color: Colors.pink,
-              onTap: () => _showPlaceholderPage('Perhiasan & Aksesori Mewah', Icons.weekend),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PerhiasanMewahPage(state: this))),
             ),
             const SizedBox(height: 8),
 
@@ -259,7 +440,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
               label: 'Kendaraan Mewah',
               subtitle: 'Mobil sport, yacht, jet pribadi',
               color: Colors.blue,
-              onTap: () => _showPlaceholderPage('Kendaraan Mewah', Icons.directions_car),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => KendaraanMewahPage(state: this))),
             ),
             const SizedBox(height: 8),
 
@@ -268,7 +449,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
               label: 'Properti Eksklusif',
               subtitle: 'Villa, penthouse, pulau pribadi',
               color: Colors.orange,
-              onTap: () => _showPlaceholderPage('Properti Eksklusif', Icons.holiday_village),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PropertiEksklusifPage(state: this))),
             ),
             const SizedBox(height: 8),
 
@@ -277,19 +458,16 @@ class _KemewahanPageState extends State<KemewahanPage> {
               label: 'Koleksi Seni & Antik',
               subtitle: 'Lukisan, patung, barang antik',
               color: Colors.red,
-              onTap: () => _showPlaceholderPage('Koleksi Seni & Antik', Icons.art_track),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => KoleksiAntikPage(state: this))),
             ),
             const SizedBox(height: 8),
-
-            // Menu Pengalaman Mewah dihapus
-            // _buildMenuTile(... Icons.flight ...)  ----- DIHAPUS -----
 
             _buildMenuTile(
               icon: Icons.sports_golf,
               label: 'Gaya Hidup Premium',
               subtitle: 'Klub, spa, gym elit',
               color: Colors.green,
-              onTap: () => _showPlaceholderPage('Gaya Hidup Premium', Icons.sports_golf),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => GayaHidupPremiumPage(state: this))),
             ),
             const SizedBox(height: 8),
 
@@ -298,28 +476,25 @@ class _KemewahanPageState extends State<KemewahanPage> {
               label: 'Filantropi',
               subtitle: 'Donasi untuk amal dan yayasan',
               color: Colors.redAccent,
-              onTap: () => _showPlaceholderPage('Filantropi', Icons.favorite),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => FilantropiPage(state: this))),
             ),
             const SizedBox(height: 8),
-
-            _buildMenuTile(
-              icon: Icons.emoji_events,
-              label: 'Status & Penghargaan',
-              subtitle: 'Lihat semua penghargaan yang diperoleh',
-              color: Colors.amber,
-              onTap: () => _showPlaceholderPage('Status & Penghargaan', Icons.emoji_events),
-            ),
-            const SizedBox(height: 8),
-
-            // Menu Layanan Pribadi dihapus
-            // _buildMenuTile(... Icons.person ...)  ----- DIHAPUS -----
 
             _buildMenuTile(
               icon: Icons.image,
               label: 'Koleksi Digital & NFT',
               subtitle: 'Karya seni digital, NFT, domain premium',
               color: Colors.cyan,
-              onTap: () => _showPlaceholderPage('Koleksi Digital & NFT', Icons.image),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => NFTPage(state: this))),
+            ),
+            const SizedBox(height: 8),
+
+            _buildMenuTile(
+              icon: Icons.person,
+              label: 'Layanan Pribadi',
+              subtitle: 'Asisten, koki, sopir, penata gaya',
+              color: Colors.indigo,
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => LayananPribadiPage(state: this))),
             ),
           ],
         ),
