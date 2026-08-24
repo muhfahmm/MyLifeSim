@@ -9,15 +9,12 @@ class JualBeliMobilPage extends StatefulWidget {
 }
 
 class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
-  final List<String> filterTypes = ['Semua', 'SUV', 'Sedan', 'Sport'];
+  final List<String> filterTypes = ['Semua', 'SUV', 'Sedan', 'Sport', 'Hypercar'];
 
   List<Map<String, dynamic>> _filteredMobil(int index) {
     final all = widget.state._mobilTersedia;
     if (index == 0) return all;
     final type = filterTypes[index];
-    if (type == 'Sport') {
-      return all.where((m) => m['tipe'] == 'Sport' || m['tipe'] == 'Hypercar').toList();
-    }
     return all.where((m) => m['tipe'] == type).toList();
   }
 
@@ -51,7 +48,8 @@ class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
               children: [
                 Text('${mobil['merek']} | ${mobil['tipe']} | ${mobil['kondisi']}'),
                 Text('HP: ${mobil['hp']} | Top Speed: ${mobil['topSpeed']} km/h'),
-                Text('Harga: USD ${formatRupiah(mobil['harga'])}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                // Perbaikan: gunakan \$ untuk menampilkan simbol $
+                Text('Harga: \$${formatRupiah(mobil['harga'])}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
               ],
             ),
             trailing: owned
@@ -89,6 +87,7 @@ class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
           ],
           bottom: TabBar(
             tabs: filterTypes.map((label) => Tab(text: label)).toList(),
+            isScrollable: true,
           ),
         ),
         body: TabBarView(
@@ -101,7 +100,6 @@ class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
     );
   }
 
-  // Dialog untuk menjual mobil (diperbaiki)
   void _showJualDialog(BuildContext context, _GarasiMobilPageState state) {
     showDialog(
       context: context,
@@ -122,20 +120,14 @@ class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
                       if (mobil['kondisi'] == 'Sangat Baik') hargaJual = (hargaJual * 1.2).round();
                       return ListTile(
                         title: Text(mobil['nama']),
-                        subtitle: Text('Harga Jual: USD ${formatRupiah(hargaJual)}'),
+                        // Perbaikan: gunakan \$ untuk menampilkan simbol $
+                        subtitle: Text('Harga Jual: \$${formatRupiah(hargaJual)}'),
                         trailing: ElevatedButton(
                           onPressed: () {
-                            // Jual mobil, lalu tutup dialog, lalu refresh state setelah dialog tertutup
                             state.jualMobil(i);
-                            // Tutup dialog terlebih dahulu
                             Navigator.pop(ctx);
-                            // Setelah dialog tertutup, refresh state (tanpa setState langsung di sini)
-                            // Kita panggil setState setelah dialog benar-benar hilang
-                            // Gunakan WidgetsBinding untuk memastikan setelah pop selesai
                             WidgetsBinding.instance.addPostFrameCallback((_) {
-                              if (mounted) {
-                                setState(() {});
-                              }
+                              if (mounted) setState(() {});
                             });
                           },
                           style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
@@ -149,11 +141,8 @@ class _JualBeliMobilPageState extends State<JualBeliMobilPage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                // Refresh setelah dialog ditutup jika diperlukan (misal ada perubahan dari luar)
                 WidgetsBinding.instance.addPostFrameCallback((_) {
-                  if (mounted) {
-                    setState(() {});
-                  }
+                  if (mounted) setState(() {});
                 });
               },
               child: const Text('Tutup'),
