@@ -10,6 +10,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_proposal_chance.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/avatar/skin_color_inheritance.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
 
 class Character {
   String name;
@@ -63,9 +64,11 @@ class Character {
   List<Map<String, String>> univClassmates = []; // Daftar teman kuliah
   List<Map<String, String>> univLecturers = []; // Daftar dosen
   List<Map<String, String>> coworkers = []; // Daftar rekan kerja
+  Map<String, String>? supervisor; // Supervisor / Atasan kerja
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
   String? schoolType; // Jenis sekolah ('Negeri' atau 'Swasta')
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
+  List<String> graduatedMajors = [];
   Map<String, String> educationHistory = {};
   int currentUnivStudyYears = 0;
   List<Map<String, String>> secretPartners = [];
@@ -117,6 +120,13 @@ class Character {
   String? jobName;
   int? jobSalary;
   String? custodyParent; // 'Ayah' atau 'Ibu' setelah cerai
+
+  // --- FIELD PEKERJAAN IDOL ---
+  bool get isIdol => jobName == 'Idol (Trainee)' || jobName == 'Idol (Main Performer)';
+  int yearsInTrainee = 0;
+  List<Map<String, String>> idolTrainees = [];
+  List<Map<String, String>> idolMainMembers = [];
+  List<Map<String, String>> idolStaff = [];
 
   // --- FINANSIAL TRANSAKSI & PINJAMAN ---
   List<Map<String, dynamic>> cashTransactions = [];
@@ -644,17 +654,104 @@ class Character {
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
     List<String> events = [];
+    final random = Random();
     age++;
     health -= 2;
     accumulateNPCsWealth();
+
+    // Age up all NPCs
+    for (var list in [classmates, univClassmates, univLecturers, sdTeachers, smpTeachers, smaTeachers, coworkers]) {
+      for (var npc in list) {
+        if (npc['age'] != null) {
+          final currentAge = int.tryParse(npc['age']!) ?? 0;
+          npc['age'] = (currentAge + 1).toString();
+        }
+      }
+    }
+    if (supervisor != null && supervisor!['age'] != null) {
+      final currentAge = int.tryParse(supervisor!['age']!) ?? 0;
+      supervisor!['age'] = (currentAge + 1).toString();
+    }
+
+    // Check supervisor retirement (retired age: 60-65)
+    if (jobName != null && supervisor != null) {
+      final supAge = int.tryParse(supervisor!['age'] ?? '40') ?? 40;
+      final retiredThreshold = 60 + random.nextInt(6); // 60 to 65
+      if (supAge >= retiredThreshold) {
+        final oldSupName = supervisor!['name']!;
+        // Generate new supervisor (minimal age 26)
+        final supGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+        final firstList = supGender == 'Laki-laki'
+            ? (maleFirstNames ?? ['Andi', 'Budi', 'Joko', 'Fajar', 'Aditya', 'Rafi', 'Daffa', 'Gibran', 'Hendra', 'Indra'])
+            : (femaleFirstNames ?? ['Siti', 'Ani', 'Dewi', 'Aisyah', 'Putri', 'Sari', 'Fitri', 'Mega', 'Rini', 'Wati']);
+        final lastList = lastNames ?? ['Santoso', 'Pratama', 'Hidayat', 'Saputra', 'Wijaya', 'Kurniawan', 'Setiawan', 'Nugroho'];
+        final newSupName = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+        final newSupAge = 26 + random.nextInt(34); // Minimal 26 to 59
+        
+        supervisor = {
+          'name': newSupName,
+          'gender': supGender,
+          'relationship': (40 + random.nextInt(21)).toString(),
+          'age': newSupAge.toString(),
+          'isDeceased': 'false',
+          'sexuality': 'Heteroseksual',
+          'intelligence': (50 + random.nextInt(41)).toString(),
+        };
+
+        final String notice = '💼 Atasan Pensiun: Atasan lamamu, $oldSupName ($supAge tahun), telah pensiun. Atasan barumu kini adalah $newSupName ($newSupAge tahun).';
+        events.add(notice);
+        inbox.add(notice);
+      }
+    }
+
+    // Check coworkers retirement/resignation (retired age: 60-65)
+    if (jobName != null && coworkers.isNotEmpty) {
+      final List<Map<String, String>> retiredCoworkers = [];
+      for (var cm in coworkers) {
+        final cmAge = int.tryParse(cm['age'] ?? '30') ?? 30;
+        final retiredThreshold = 60 + random.nextInt(6);
+        if (cmAge >= retiredThreshold) {
+          retiredCoworkers.add(cm);
+        }
+      }
+
+      for (var retired in retiredCoworkers) {
+        coworkers.remove(retired);
+        
+        // Generate new coworker (fresh graduate: 22-23 years old)
+        final cmGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+        final firstList = cmGender == 'Laki-laki'
+            ? (maleFirstNames ?? ['Andi', 'Budi', 'Joko', 'Fajar', 'Aditya', 'Rafi', 'Daffa', 'Gibran', 'Hendra', 'Indra'])
+            : (femaleFirstNames ?? ['Siti', 'Ani', 'Dewi', 'Aisyah', 'Putri', 'Sari', 'Fitri', 'Mega', 'Rini', 'Wati']);
+        final lastList = lastNames ?? ['Santoso', 'Pratama', 'Hidayat', 'Saputra', 'Wijaya', 'Kurniawan', 'Setiawan', 'Nugroho'];
+        final newCmName = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+        final newCmAge = 22 + random.nextInt(2); // 22 to 23 (fresh grad)
+        
+        coworkers.add({
+          'name': newCmName,
+          'gender': cmGender,
+          'relationship': (40 + random.nextInt(21)).toString(),
+          'age': newCmAge.toString(),
+          'isDeceased': 'false',
+          'sexuality': 'Heteroseksual',
+          'intelligence': (30 + random.nextInt(61)).toString(),
+        });
+
+        final String notice = '💼 Pergantian Rekan Kerja: Rekan kerjamu, ${retired['name']} (${retired['age']} tahun), telah pensiun/keluar dan digantikan oleh $newCmName ($newCmAge tahun).';
+        events.add(notice);
+        inbox.add(notice);
+      }
+    }
 
     // Tambah gaji dari pekerjaan jika ada
     if (jobName != null && jobSalary != null) {
       money += jobSalary!;
       final String notice = '💼 Gajian: Kamu menerima gaji sebesar \$${jobSalary} dari pekerjaanmu sebagai $jobName.';
-      events.add(notice);
       inbox.add(notice);
     }
+
+    // Update karir Idol jika ada
+    IdolManager.ageUpIdol(this, events, inbox);
 
     if (age == 12) {
       if (educationHistory['SD'] == 'Belum Lulus') {
@@ -696,6 +793,12 @@ class Character {
         final String notice = '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang $currentStage dengan jurusan $univMajor! 🎉';
         events.add(notice);
         inbox.add(notice);
+        if (univMajor != null) {
+          final baseName = univMajor!.split(' (').first;
+          if (!graduatedMajors.contains(baseName)) {
+            graduatedMajors.add(baseName);
+          }
+        }
         univMajor = null;
         currentUnivStudyYears = 0;
         univClassmates.clear();
@@ -716,8 +819,6 @@ class Character {
     if (health <= 0 || age > 100) {
       isAlive = false;
     }
-
-    final Random random = Random();
 
     // 1. Cek Kematian Orang Tua
     if (fatherName != null && !isFatherDeceased && fatherAge != null) {
@@ -1452,71 +1553,124 @@ class Character {
         final candidate = schoolCandidates[random.nextInt(schoolCandidates.length)];
         final String candRole = candidate['role'];
         final String candGender = candidate['gender'];
-        
-        final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
-        int chance = 0;
 
-        if (candRole == 'Guru' || candRole == 'Dosen') {
-          if (candGender == 'Laki-laki') {
-            if (myGenderLower == 'laki-laki') {
-              // Gay
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruLakiSiswaLakiProposalChance.getPacaranChance(age) 
-                  : GuruLakiSiswaLakiProposalChance.getBercintaChance(age);
+        if (candRole == 'Rekan Kerja') {
+          String? chosenType;
+          if (myGenderLower == 'laki-laki') {
+            if (candGender == 'Laki-laki') {
+              // Rekan Kerja Laki-laki mengajak User Laki-laki (Gay)
+              final int roll = random.nextInt(100);
+              if (roll < 20) {
+                chosenType = 'Ajak Pacaran';
+              } else if (roll < 30) { // 20% pacaran + 10% bercinta
+                chosenType = 'Bercinta';
+              }
             } else {
-              // Hetero
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruLakiProposalChance.getPacaranChance(age) 
-                  : GuruLakiProposalChance.getBercintaChance(age);
+              // Rekan Kerja Perempuan mengajak User Laki-laki
+              final int roll = random.nextInt(100);
+              if (roll < 30) {
+                chosenType = 'Ajak Pacaran';
+              } else if (roll < 60) { // 30% pacaran + 30% bercinta
+                chosenType = 'Bercinta';
+              }
             }
           } else {
-            // Guru/Dosen Perempuan
-            if (myGenderLower == 'perempuan') {
-              // Lesbian
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruPerempuanSiswiProposalChance.getPacaranChance(age) 
-                  : GuruPerempuanSiswiProposalChance.getBercintaChance(age);
+            // User Perempuan
+            if (candGender == 'Perempuan') {
+              // Lesbian (20% pacaran, 10% bercinta)
+              final int roll = random.nextInt(100);
+              if (roll < 20) {
+                chosenType = 'Ajak Pacaran';
+              } else if (roll < 30) {
+                chosenType = 'Bercinta';
+              }
             } else {
-              // Hetero
-              chance = proposalType == 'Ajak Pacaran' 
-                  ? GuruPerempuanProposalChance.getPacaranChance(age) 
-                  : GuruPerempuanProposalChance.getBercintaChance(age);
+              // Laki-laki mengajak User Perempuan (30% pacaran, 30% bercinta)
+              final int roll = random.nextInt(100);
+              if (roll < 30) {
+                chosenType = 'Ajak Pacaran';
+              } else if (roll < 60) {
+                chosenType = 'Bercinta';
+              }
             }
+          }
+
+          if (chosenType != null) {
+            activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': chosenType,
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candRole,
+            };
           }
         } else {
-          // Teman Sekelas, Teman Kuliah, Rekan Kerja
-          if (candGender == 'Laki-laki' && myGenderLower == 'laki-laki') {
-            // Gay classmate
-            chance = proposalType == 'Ajak Pacaran' 
-                ? SiswaSiswaProposalChance.getPacaranChance(age) 
-                : SiswaSiswaProposalChance.getBercintaChance(age);
-          } else if (candGender == 'Perempuan' && myGenderLower == 'perempuan') {
-            // Lesbian classmate
-            chance = proposalType == 'Ajak Pacaran' 
-                ? SiswiSiswiProposalChance.getPacaranChance(age) 
-                : SiswiSiswiProposalChance.getBercintaChance(age);
+          final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+          int chance = 0;
+
+          if (candRole == 'Guru' || candRole == 'Dosen') {
+            if (candGender == 'Laki-laki') {
+              if (myGenderLower == 'laki-laki') {
+                // Gay
+                chance = proposalType == 'Ajak Pacaran' 
+                    ? GuruLakiSiswaLakiProposalChance.getPacaranChance(age) 
+                    : GuruLakiSiswaLakiProposalChance.getBercintaChance(age);
+              } else {
+                // Hetero
+                chance = proposalType == 'Ajak Pacaran' 
+                    ? GuruLakiProposalChance.getPacaranChance(age) 
+                    : GuruLakiProposalChance.getBercintaChance(age);
+              }
+            } else {
+              // Guru/Dosen Perempuan
+              if (myGenderLower == 'perempuan') {
+                // Lesbian
+                chance = proposalType == 'Ajak Pacaran' 
+                    ? GuruPerempuanSiswiProposalChance.getPacaranChance(age) 
+                    : GuruPerempuanSiswiProposalChance.getBercintaChance(age);
+              } else {
+                // Hetero
+                chance = proposalType == 'Ajak Pacaran' 
+                    ? GuruPerempuanProposalChance.getPacaranChance(age) 
+                    : GuruPerempuanProposalChance.getBercintaChance(age);
+              }
+            }
           } else {
-            // Hetero classmate
-            chance = proposalType == 'Ajak Pacaran' 
-                ? SiswaSiswiProposalChance.getPacaranChance(age) 
-                : SiswaSiswiProposalChance.getBercintaChance(age);
+            // Teman Sekelas, Teman Kuliah
+            if (candGender == 'Laki-laki' && myGenderLower == 'laki-laki') {
+              // Gay classmate
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? SiswaSiswaProposalChance.getPacaranChance(age) 
+                  : SiswaSiswaProposalChance.getBercintaChance(age);
+            } else if (candGender == 'Perempuan' && myGenderLower == 'perempuan') {
+              // Lesbian classmate
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? SiswiSiswiProposalChance.getPacaranChance(age) 
+                  : SiswiSiswiProposalChance.getBercintaChance(age);
+            } else {
+              // Hetero classmate
+              chance = proposalType == 'Ajak Pacaran' 
+                  ? SiswaSiswiProposalChance.getPacaranChance(age) 
+                  : SiswaSiswiProposalChance.getBercintaChance(age);
+            }
           }
-        }
 
-        // Jika user menggunakan karakter Perempuan, peluang diajak naik 5%
-        if (gender == 'Perempuan' || gender == 'perempuan' || gender == 'female') {
-          chance += 5;
-        }
+          // Jika user menggunakan karakter Perempuan, peluang diajak naik 5%
+          if (gender == 'Perempuan' || gender == 'perempuan' || gender == 'female') {
+            chance += 5;
+          }
 
-        if (random.nextInt(100) < chance) {
-          activeProposal = {
-            'name': candidate['name'],
-            'relation': candidate['relation'],
-            'type': proposalType,
-            'gender': candidate['gender'],
-            'age': candidate['age'],
-            'role': candRole,
-          };
+          if (random.nextInt(100) < chance) {
+            activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': proposalType,
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candRole,
+            };
+          }
         }
       } 
       
@@ -1909,6 +2063,15 @@ class Character {
     val = getFromList(exPartners);
     if (val != null) return val;
 
+    // Check supervisor
+    if (supervisor != null && supervisor!['name'] == targetName) {
+      if (!supervisor!.containsKey('money')) {
+        int initialMoney = (Random().nextInt(9501) + 500) * 2;
+        supervisor!['money'] = initialMoney.toString();
+      }
+      return int.tryParse(supervisor!['money'] ?? '0') ?? 0;
+    }
+
     // Check partners
     if (partner != null && partner!['name'] == targetName) {
       if (!partner!.containsKey('money')) {
@@ -2095,7 +2258,7 @@ class Character {
       }
     }
 
-    Map<String, dynamic>? getFromList(List<Map<String, String>> list) {
+    Map<String, dynamic>? getFromList(List<Map<String, String>> list, String listRole) {
       for (var item in list) {
         if (item['name'] == targetName || (item['name'] != null && cleanName.contains(item['name']!.toLowerCase()))) {
           int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
@@ -2103,9 +2266,14 @@ class Character {
             return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
           }
           if (!item.containsKey('job')) {
-            final j = _generateRandomJob();
-            item['job'] = j['job'];
-            item['salary'] = j['salary'].toString();
+            if (listRole == 'Rekan Kerja' && jobName != null) {
+              item['job'] = jobName!;
+              item['salary'] = (jobSalary ?? 2000).toString();
+            } else {
+              final j = _generateRandomJob();
+              item['job'] = j['job'];
+              item['salary'] = j['salary'].toString();
+            }
           }
           return {
             'status': 'Bekerja',
@@ -2117,18 +2285,34 @@ class Character {
       return null;
     }
 
-    var val = getFromList(siblings);
+    var val = getFromList(siblings, 'Saudara');
     if (val != null) return val;
-    val = getFromList(extendedFamily);
+    val = getFromList(extendedFamily, 'Keluarga');
     if (val != null) return val;
-    val = getFromList(classmates);
+    val = getFromList(classmates, 'Teman Sekelas');
     if (val != null) return val;
-    val = getFromList(univClassmates);
+    val = getFromList(univClassmates, 'Teman Kuliah');
     if (val != null) return val;
-    val = getFromList(coworkers);
+    val = getFromList(coworkers, 'Rekan Kerja');
     if (val != null) return val;
-    val = getFromList(exPartners);
+    val = getFromList(exPartners, 'Mantan');
     if (val != null) return val;
+
+    if (supervisor != null && supervisor!['name'] == targetName) {
+      int targetAge = int.tryParse(supervisor!['age'] ?? '35') ?? 35;
+      if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (!supervisor!.containsKey('job')) {
+        final String supJob = 'Supervisor (${jobName ?? "Perusahaan"})';
+        final int supSalary = (jobSalary ?? 2000) * 2;
+        supervisor!['job'] = supJob;
+        supervisor!['salary'] = supSalary.toString();
+      }
+      return {
+        'status': 'Bekerja',
+        'job': supervisor!['job'],
+        'salary': int.tryParse(supervisor!['salary'] ?? '0') ?? 0
+      };
+    }
 
     if (partner != null && partner!['name'] == targetName) {
       int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
@@ -2243,6 +2427,19 @@ class Character {
     accumulateList(univClassmates, 'Teman Kuliah');
     accumulateList(coworkers, 'Rekan Kerja');
     accumulateList(exPartners, 'Mantan');
+
+    if (supervisor != null && supervisor!['name'] != null) {
+      final name = supervisor!['name']!;
+      final int targetAge = int.tryParse(supervisor!['age'] ?? '18') ?? 18;
+      if (targetAge >= 19) {
+        final jobInfo = getNPCJobInfo(name, 'Supervisor');
+        if (jobInfo['status'] == 'Bekerja') {
+          int currentW = getTargetWealth(name, 'Supervisor');
+          int newW = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+          supervisor!['money'] = newW.toString();
+        }
+      }
+    }
 
     if (partner != null && partner!['name'] != null) {
       final name = partner!['name']!;

@@ -129,6 +129,8 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                         typeLabel = 'Teman Kuliah';
                       } else if (widget.character.coworkers.any((e) => e['name'] == name)) {
                         typeLabel = 'Rekan Kerja';
+                      } else if (widget.character.supervisor != null && widget.character.supervisor!['name'] == name) {
+                        typeLabel = 'Supervisor / Atasan';
                       }
                       return Text(
                         '$typeLabel • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
@@ -191,16 +193,25 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     ),
                     const SizedBox(height: 12),
                     Builder(builder: (context) {
-                      final int wealthVal = widget.character.getTargetWealth(name, 'Teman Sekelas');
-                      final double progressVal = (wealthVal / 1000.0).clamp(0.0, 1.0);
+                      String targetRole = 'Teman Sekelas';
+                      if (widget.character.univClassmates.any((e) => e['name'] == name)) {
+                        targetRole = 'Teman Kuliah';
+                      } else if (widget.character.coworkers.any((e) => e['name'] == name)) {
+                        targetRole = 'Rekan Kerja';
+                      } else if (widget.character.supervisor != null && widget.character.supervisor!['name'] == name) {
+                        targetRole = 'Supervisor';
+                      }
+
+                      final int wealthVal = widget.character.getTargetWealth(name, targetRole);
+                      final double progressVal = (wealthVal / 10000.0).clamp(0.0, 1.0);
                       Color barColor = Colors.red;
-                      if (wealthVal > 500) {
+                      if (wealthVal > 5000) {
                         barColor = Colors.green;
-                      } else if (wealthVal >= 100) {
+                      } else if (wealthVal >= 1000) {
                         barColor = Colors.amber;
                       }
 
-                      final jobInfo = widget.character.getNPCJobInfo(name, 'Teman Sekelas');
+                      final jobInfo = widget.character.getNPCJobInfo(name, targetRole);
                       final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
                           ? 'Status: Sekolah/Kuliah'
                           : 'Pekerjaan: ${jobInfo['job']} (Gaji: \$${jobInfo['salary']}/bln)';

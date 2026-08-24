@@ -101,6 +101,27 @@ class AgeCategoryButton extends StatelessWidget {
           statusLabel = 'Sedang Ditempuh';
         }
 
+        String stageLabel = stage;
+        if (stage == 'S1') {
+          if (status == 'Lulus' && character.graduatedMajors.isNotEmpty) {
+            stageLabel = 'S1 - ${character.graduatedMajors[0]}';
+          } else if (statusLabel == 'Sedang Ditempuh' && character.univMajor != null) {
+            stageLabel = 'S1 - ${character.univMajor!.split(" (").first}';
+          }
+        } else if (stage == 'S2') {
+          if (status == 'Lulus' && character.graduatedMajors.length >= 2) {
+            stageLabel = 'S2 - ${character.graduatedMajors[1]}';
+          } else if (statusLabel == 'Sedang Ditempuh' && character.univMajor != null) {
+            stageLabel = 'S2 - ${character.univMajor!.split(" (").first}';
+          }
+        } else if (stage == 'S3') {
+          if (status == 'Lulus' && character.graduatedMajors.length >= 3) {
+            stageLabel = 'S3 - ${character.graduatedMajors[2]}';
+          } else if (statusLabel == 'Sedang Ditempuh' && character.univMajor != null) {
+            stageLabel = 'S3 - ${character.univMajor!.split(" (").first}';
+          }
+        }
+
         return Card(
           elevation: 0,
           color: Colors.grey.shade50,
@@ -114,9 +135,12 @@ class AgeCategoryButton extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  stage,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                Expanded(
+                  child: Text(
+                    stageLabel,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),

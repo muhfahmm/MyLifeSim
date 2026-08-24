@@ -4,16 +4,25 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
+import 'actions/rekan_kerja.dart';
+import 'actions/bekerja_keras.dart';
+import 'idol_logic/idol_manager.dart';
+import 'idol_logic/idol_menu.dart';
 
 // ============================================================
 // EXTENSION untuk menambahkan isUnivGraduated ke Character
 // ============================================================
 extension CharacterExtension on Character {
   bool get isUnivGraduated {
-    // Jika belum kuliah, false
-    if (univMajor == null) return false;
-    // Anggap lulus jika usia >= 22 (kuliah 4 tahun, masuk 18)
-    return age >= 22;
+    // Cek riwayat kelulusan pendidikan tinggi
+    if (educationHistory['S1'] == 'Lulus' ||
+        educationHistory['S2'] == 'Lulus' ||
+        educationHistory['S3'] == 'Lulus') {
+      return true;
+    }
+    // Fallback jika sedang kuliah dan sudah mencapai umur kelulusan (>= 22)
+    if (univMajor != null && age >= 22) return true;
+    return false;
   }
 }
 
@@ -667,9 +676,165 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
   // ============================================================
   // FUNGSI UTAMA
+  String? _getBaseMajor(String? fullMajor) {
+    if (fullMajor == null) return null;
+    return fullMajor.split(' (').first;
+  }
+
+  List<String> _getAllowedMajors(String jobTitle) {
+    switch (jobTitle) {
+      // STEM & TEKNIK
+      case 'Junior Software Engineer':
+      case 'Network Engineer':
+        return ['Teknik Informatika', 'Sistem Informasi', 'Teknik Elektro'];
+      case 'Data Analyst':
+        return ['Teknik Informatika', 'Sistem Informasi', 'Akuntansi', 'Ekonomi Pembangunan', 'Manajemen'];
+      case 'Civil Engineer':
+        return ['Teknik Sipil'];
+      case 'Mechanical Engineer':
+        return ['Teknik Mesin'];
+      case 'Electrical Engineer':
+        return ['Teknik Elektro'];
+      case 'Chemical Engineer':
+        return ['Teknik Kimia'];
+      case 'Architect':
+      case 'Arsitek Senior':
+        return ['Arsitektur'];
+
+      // KESEHATAN
+      case 'Dokter Umum':
+      case 'Dokter Spesialis':
+        return ['Kedokteran'];
+      case 'Dokter Gigi':
+        return ['Kedokteran Gigi'];
+      case 'Apoteker':
+        return ['Farmasi'];
+      case 'Perawat':
+        return ['Keperawatan'];
+      case 'Ahli Gizi':
+        return ['Gizi & Ilmu Pangan'];
+
+      // BISNIS & EKONOMI
+      case 'Manajer Keuangan':
+        return ['Manajemen', 'Akuntansi', 'Perbankan & Keuangan'];
+      case 'Akuntan':
+        return ['Akuntansi'];
+      case 'Analis Ekonomi':
+        return ['Ekonomi Pembangunan', 'Akuntansi', 'Perbankan & Keuangan'];
+      case 'Bankir':
+        return ['Perbankan & Keuangan', 'Akuntansi', 'Manajemen'];
+      case 'Marketing Specialist':
+        return ['Pemasaran Digital', 'Manajemen', 'Ilmu Komunikasi'];
+      case 'CEO Startup':
+        return ['Manajemen', 'Akuntansi', 'Teknik Informatika', 'Sistem Informasi', 'Ekonomi Pembangunan'];
+      case 'Konsultan Manajemen':
+        return ['Manajemen', 'Akuntansi', 'Ekonomi Pembangunan', 'Perbankan & Keuangan'];
+
+      // HUKUM & SOSIAL
+      case 'Pengacara':
+      case 'Pengacara Senior':
+      case 'Jaksa':
+        return ['Hukum'];
+      case 'Diplomat':
+        return ['Hubungan Internasional', 'Hukum'];
+      case 'Jurnalis':
+        return ['Ilmu Komunikasi', 'Sastra & Bahasa'];
+      case 'Psikolog':
+        return ['Psikologi'];
+      case 'Pegawai Negeri Sipil (PNS)':
+        return ['Administrasi Publik', 'Hukum', 'Hubungan Internasional', 'Ekonomi Pembangunan'];
+
+      // PENDIDIKAN & BAHASA
+      case 'Guru SD':
+        return ['Pendidikan / PGSD', 'Pendidikan Agama Islam'];
+      case 'Guru SMP':
+      case 'Guru SMA':
+      case 'Dosen':
+        return ['Pendidikan / PGSD', 'Pendidikan Agama Islam', 'Sastra & Bahasa', 'Hukum', 'Kedokteran', 'Teknik Informatika'];
+      case 'Penerjemah':
+        return ['Sastra & Bahasa', 'Hubungan Internasional'];
+      case 'Penulis':
+        return ['Sastra & Bahasa', 'Ilmu Komunikasi', 'Pendidikan / PGSD'];
+
+      // KREATIF & SENI
+      case 'Desainer Grafis':
+        return ['Desain Komunikasi Visual (DKV)'];
+      case 'Desainer Mode':
+        return ['Desain Mode'];
+      case 'Sutradara Film':
+        return ['Film & Televisi'];
+      case 'Produser Musik':
+        return ['Seni Musik'];
+      case 'Seniman':
+        return ['Desain Komunikasi Visual (DKV)', 'Desain Mode', 'Film & Televisi', 'Seni Musik'];
+
+      // PERTANIAN & LAINNYA
+      case 'Agronom':
+        return ['Agroteknologi'];
+      case 'Manajer Hotel':
+        return ['Manajemen Perhotelan', 'Manajemen'];
+
+      // LAINNYA
+      case 'Pilot':
+        return ['Teknik Elektro', 'Teknik Mesin', 'Teknik Sipil', 'Teknik Kimia', 'Teknik Informatika', 'Sistem Informasi', 'Arsitektur', 'Kedokteran'];
+
+      // STAF IDOL
+      case 'General Manager Idol':
+      case 'Deputy General Manager Idol':
+        return ['Manajemen', 'Akuntansi', 'Ilmu Komunikasi'];
+
+      default:
+        return [];
+    }
+  }
+
+
+
+  bool _hasMatchingMajor(Character character, List<String> allowed) {
+    if (!character.isUnivGraduated) return false;
+
+    // Fallback: jika educationHistory sudah Lulus tapi graduatedMajors kosong (save game lama)
+    final hasLulus = character.educationHistory['S1'] == 'Lulus' ||
+                     character.educationHistory['S2'] == 'Lulus' ||
+                     character.educationHistory['S3'] == 'Lulus';
+    if (hasLulus && character.graduatedMajors.isEmpty) {
+      return true;
+    }
+
+    for (final major in character.graduatedMajors) {
+      if (allowed.contains(major)) return true;
+    }
+    final baseMajor = _getBaseMajor(character.univMajor);
+    if (baseMajor != null && allowed.contains(baseMajor)) {
+      return true;
+    }
+    return false;
+  }
+
   // ============================================================
   void _applyJob(Map<String, dynamic> job) {
-    if (widget.character.intelligence < job['minIntel']) {
+    if (job['title'] == 'Idol (Trainee)') {
+      if (widget.character.health < 80 || widget.character.discipline < 75) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Lamaran Ditolak 🚫'),
+            content: Text(
+              'Persyaratan menjadi Idol tidak terpenuhi.\n\n'
+              '• Kesehatan minimal: 80% (Kesehantanmu: ${widget.character.health}%)\n'
+              '• Kedisiplinan minimal: 75% (Kedisiplinanmu: ${widget.character.discipline}%)',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    } else if (widget.character.intelligence < (job['minIntel'] ?? 0)) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -690,13 +855,21 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     // Cek jika pekerjaan membutuhkan gelar
     if (job['category'] == 'Profesional' || job['category'] == 'Prestise') {
-      if (!widget.character.isUnivGraduated) {
+      final allowed = _getAllowedMajors(job['title']);
+      if (!_hasMatchingMajor(widget.character, allowed)) {
+        final baseMajor = _getBaseMajor(widget.character.univMajor);
+        final currentMajors = widget.character.graduatedMajors.isNotEmpty 
+            ? widget.character.graduatedMajors.join(", ") 
+            : (baseMajor ?? "Belum lulus / Tidak ada");
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('Gelar Diperlukan 🎓'),
+            title: const Text('Gelar Tidak Sesuai 🎓'),
             content: Text(
-              'Posisi ${job['title']} membutuhkan gelar sarjana. Kamu belum lulus kuliah.',
+              'Posisi ${job['title']} membutuhkan gelar sarjana yang sesuai.\n\n'
+              'Gelar/Jurusan yang diterima:\n'
+              '• ${allowed.join("\n• ")}\n\n'
+              'Jurusanmu: $currentMajors.',
             ),
             actions: [
               TextButton(
@@ -714,6 +887,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     setState(() {
       widget.character.jobName = job['title'];
       widget.character.jobSalary = job['salary'];
+      if (job['title'] == 'Idol (Trainee)') {
+        IdolManager.initializeTraineeTeam(widget.character);
+      }
     });
     widget.onRefresh();
     showDialog(
@@ -735,8 +911,27 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   }
 
   void _generateCoworkersIfEmpty() {
-    if (widget.character.coworkers.isNotEmpty) return;
     final random = Random();
+    if (widget.character.supervisor == null) {
+      final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      final firstList = gender == 'Laki-laki'
+          ? (widget.character.maleFirstNames ?? ['Andi', 'Budi', 'Joko'])
+          : (widget.character.femaleFirstNames ?? ['Siti', 'Ani', 'Dewi']);
+      final lastList = widget.character.lastNames ?? ['Santoso', 'Pratama', 'Hidayat'];
+      final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+      final ageVal = 30 + random.nextInt(31);
+      widget.character.supervisor = {
+        'name': name,
+        'gender': gender,
+        'relationship': (40 + random.nextInt(21)).toString(),
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': 'Heteroseksual',
+        'intelligence': (50 + random.nextInt(41)).toString(),
+      };
+    }
+
+    if (widget.character.coworkers.isNotEmpty) return;
     final count = 5 + random.nextInt(6);
     for (int i = 0; i < count; i++) {
       final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
@@ -776,6 +971,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                 widget.character.jobName = null;
                 widget.character.jobSalary = null;
                 widget.character.coworkers.clear();
+                widget.character.supervisor = null;
               });
               widget.onRefresh();
             },
@@ -786,13 +982,98 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     );
   }
 
+  List<Map<String, dynamic>> _getFilteredJobsList(Character character) {
+    final age = character.age;
+    final gender = character.gender;
+
+    // Female age 12-17: ONLY show "Idol (Trainee)"
+    if (gender == 'Perempuan' && age >= 12 && age < 18) {
+      return [
+        {
+          'title': 'Idol (Trainee)',
+          // 10M - 20M IDR -> $667 to $1,333 USD
+          'salary': 667 + Random().nextInt(667),
+          'minIntel': 0,
+          'category': 'Khusus',
+          'desc': 'Bergabunglah dengan grup trainee Idol baru',
+          'icon': Icons.music_note,
+          'color': Colors.pink,
+        }
+      ];
+    }
+
+    // Other cases: start with standard jobs
+    List<Map<String, dynamic>> jobs = List.from(_availableJobs);
+
+    // If female >= 18, also add "Idol (Trainee)"
+    if (gender == 'Perempuan' && age >= 18) {
+      jobs.insert(0, {
+        'title': 'Idol (Trainee)',
+        'salary': 667 + Random().nextInt(667),
+        'minIntel': 0,
+        'category': 'Khusus',
+        'desc': 'Bergabunglah dengan grup trainee Idol baru',
+        'icon': Icons.music_note,
+        'color': Colors.pink,
+      });
+    }
+
+    // If male (or anyone >= 18), they see staff positions
+    if (age >= 18) {
+      jobs.addAll([
+        {
+          'title': 'General Manager Idol',
+          'salary': 5000, // $5,000 USD (50M-100M IDR)
+          'minIntel': 75,
+          'category': 'Profesional',
+          'desc': 'Memimpin operasional dan strategi grup Idol',
+          'icon': Icons.manage_accounts,
+          'color': Colors.purple,
+        },
+        {
+          'title': 'Deputy General Manager Idol',
+          'salary': 3500, // $3,500 USD (40M-75M IDR)
+          'minIntel': 65,
+          'category': 'Profesional',
+          'desc': 'Membantu General Manager mengelola grup',
+          'icon': Icons.supervisor_account,
+          'color': Colors.indigo,
+        },
+        {
+          'title': 'Staf Operasional Idol',
+          'salary': 500, // $500 USD (5M-10M IDR)
+          'minIntel': 30,
+          'category': 'Dasar',
+          'desc': 'Mengurus kebutuhan panggung dan member Idol',
+          'icon': Icons.run_circle,
+          'color': Colors.blueGrey,
+        }
+      ]);
+    }
+
+    return jobs;
+  }
+
   // ============================================================
   // UI
   // ============================================================
   @override
   Widget build(BuildContext context) {
     final character = widget.character;
+    if (character.isIdol) {
+      return IdolMenuScreen(
+        character: character,
+        onRefresh: () {
+          if (mounted) setState(() {});
+          widget.onRefresh();
+        },
+      );
+    }
     final hasJob = character.jobName != null;
+
+    if (hasJob) {
+      _generateCoworkersIfEmpty();
+    }
 
     // Cari kategori pekerjaan saat ini (untuk badge)
     String currentCategory = '';
@@ -882,81 +1163,38 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             // Daftar Lowongan Pekerjaan vs Daftar Rekan Kerja
             if (hasJob) ...[
               const Text(
-                'Daftar Rekan Kerja',
+                'Aktivitas Pekerjaan',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
               ),
               const SizedBox(height: 12),
-              ...() {
-                _generateCoworkersIfEmpty();
-                return widget.character.coworkers.map((cm) {
-                  final String name = cm['name']!;
-                  final String gender = cm['gender']!;
-                  final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
-                  final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-                  final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
-                    name: name,
-                    gender: gender,
-                    age: age,
-                    schoolLevel: 'SMA',
-                    happiness: rel,
-                  );
-
-                  return Card(
-                    elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        backgroundImage: NetworkImage(avatarUrl),
-                      ),
-                      title: Row(
-                        children: [
-                          Expanded(
-                            child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                          ),
-                          (() {
-                            final String? relStr = widget.character.getPartnerRelation(name);
-                            if (relStr == null) return const SizedBox.shrink();
-                            return Container(
-                              margin: const EdgeInsets.only(left: 8),
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: Colors.pink,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                relStr,
-                                style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                              ),
-                            );
-                          }()),
-                        ],
-                      ),
-                      subtitle: Text('Rekan Kerja • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%'),
-                      trailing: const Icon(Icons.chevron_right, size: 16),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ClassmateInteractionPage(
-                              classmate: cm,
-                              character: widget.character,
-                              onRefresh: () {
-                                setState(() {});
-                                widget.onRefresh();
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                });
-              }(),
+              _buildMenuTile(
+                context: context,
+                icon: Icons.trending_up,
+                color: Colors.green,
+                title: 'Bekerja Lebih Giat',
+                subtitle: 'Meningkatkan performa kerja dan hubungan dengan atasan',
+                page: BekerjaKerasActionPage(
+                  character: character,
+                  onRefresh: () {
+                    if (mounted) setState(() {});
+                    widget.onRefresh();
+                  },
+                ),
+              ),
+              _buildMenuTile(
+                context: context,
+                icon: Icons.group,
+                color: Colors.orange,
+                title: 'Rekan Kerja',
+                subtitle: 'Berinteraksi dengan rekan sekerja',
+                page: RekanKerjaPage(
+                  character: character,
+                  onRefresh: () {
+                    if (mounted) setState(() {});
+                    widget.onRefresh();
+                  },
+                ),
+              ),
             ] else ...[
               const Text(
                 'Lowongan Pekerjaan Tersedia',
@@ -964,8 +1202,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               ),
               const SizedBox(height: 12),
               (() {
-                final nonDegreeJobs = _availableJobs.where((j) => j['category'] != 'Profesional' && j['category'] != 'Prestise').toList();
-                final degreeJobs = _availableJobs.where((j) => j['category'] == 'Profesional' || j['category'] == 'Prestise').toList();
+                final filteredJobsList = _getFilteredJobsList(character);
+                final nonDegreeJobs = filteredJobsList.where((j) => j['category'] != 'Profesional' && j['category'] != 'Prestise').toList();
+                final degreeJobs = filteredJobsList.where((j) => j['category'] == 'Profesional' || j['category'] == 'Prestise').toList();
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
@@ -1022,8 +1261,10 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
   Widget _buildJobCard(Map<String, dynamic> job, Character character) {
     final meetsIntel = character.intelligence >= job['minIntel'];
-    final meetsGelar = job['category'] == 'Profesional' || job['category'] == 'Prestise'
-        ? character.isUnivGraduated
+    final requiresGelar = job['category'] == 'Profesional' || job['category'] == 'Prestise';
+    final allowed = _getAllowedMajors(job['title']);
+    final meetsGelar = requiresGelar
+        ? _hasMatchingMajor(character, allowed)
         : true;
     final canApply = meetsIntel && meetsGelar;
 
@@ -1048,8 +1289,12 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               job['desc'],
               style: const TextStyle(fontSize: 12, color: Colors.grey),
             ),
-            if (!meetsGelar)
-              const Text('⚠️ Membutuhkan gelar sarjana', style: TextStyle(fontSize: 11, color: Colors.orange)),
+            if (requiresGelar) ...[
+              if (!character.isUnivGraduated)
+                const Text('⚠️ Membutuhkan gelar sarjana', style: TextStyle(fontSize: 11, color: Colors.orange))
+              else if (!meetsGelar)
+                Text('⚠️ Butuh Gelar: ${allowed.join(", ")}', style: const TextStyle(fontSize: 11, color: Colors.orange))
+            ],
           ],
         ),
         trailing: Icon(
@@ -1064,7 +1309,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                 content: Text(
                   !meetsIntel
                       ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
-                      : 'Butuh gelar sarjana untuk posisi ini',
+                      : (!character.isUnivGraduated
+                          ? 'Butuh gelar sarjana untuk posisi ini'
+                          : 'Jurusan Anda tidak sesuai. Butuh: ${allowed.join(", ")}'),
                 ),
                 backgroundColor: Colors.red,
               ),
@@ -1072,6 +1319,38 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             return;
           }
           _applyJob(job);
+        },
+      ),
+    );
+  }
+
+  Widget _buildMenuTile({
+    required BuildContext context,
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String subtitle,
+    Widget? page,
+    VoidCallback? onTap,
+  }) {
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(color: Colors.grey.shade200),
+      ),
+      child: ListTile(
+        leading: Icon(icon, color: color, size: 28),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        onTap: () {
+          if (page != null) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => page));
+          } else if (onTap != null) {
+            onTap();
+          }
         },
       ),
     );

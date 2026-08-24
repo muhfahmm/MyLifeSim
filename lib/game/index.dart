@@ -1937,6 +1937,34 @@ class _GameScreenState extends State<GameScreen> {
                     Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
                     Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 16, color: Colors.grey)),
+                    const SizedBox(height: 4),
+                    (() {
+                      if (_character.jobName != null) {
+                        return Text(
+                          'Pekerjaan: ${_character.jobName}',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
+                        );
+                      } else if (_character.univMajor != null) {
+                        return Text(
+                          'Pendidikan: ${_character.univMajor!.split(" (").first}',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
+                        );
+                      } else if (_character.age >= 6 && _character.age < 18) {
+                        String school = 'SD';
+                        if (_character.age >= 12 && _character.age < 15) school = 'SMP';
+                        else if (_character.age >= 15) school = 'SMA';
+                        return Text(
+                          'Pendidikan: $school',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
+                        );
+                      } else if (_character.age >= 18) {
+                        return const Text(
+                          'Status: Pengangguran',
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
+                        );
+                      }
+                      return const SizedBox.shrink();
+                    }()),
                   ],
                 ),
               ),
