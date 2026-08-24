@@ -49,7 +49,6 @@ class _BlackjackPageState extends State<BlackjackPage> {
       gameOver = false;
       result = '';
 
-      // Cek blackjack langsung
       if (_isBlackjack(playerCards) && _isBlackjack(dealerCards)) {
         result = '🤝 Kedua blackjack! Seri.';
         gameOver = true;
@@ -74,27 +73,19 @@ class _BlackjackPageState extends State<BlackjackPage> {
     if (gameOver) return;
     setState(() {
       playerCards.add(deck.removeLast());
-      if (_handValue(playerCards) > 21) {
-        _finishGame(false);
-      }
+      if (_handValue(playerCards) > 21) _finishGame(false);
     });
   }
 
   void stand() {
     if (gameOver) return;
     setState(() {
-      while (_handValue(dealerCards) < 17) {
-        dealerCards.add(deck.removeLast());
-      }
+      while (_handValue(dealerCards) < 17) dealerCards.add(deck.removeLast());
       int playerVal = _handValue(playerCards);
       int dealerVal = _handValue(dealerCards);
-      if (dealerVal > 21 || playerVal > dealerVal) {
-        _finishGame(true);
-      } else if (playerVal == dealerVal) {
-        _finishGame(null);
-      } else {
-        _finishGame(false);
-      }
+      if (dealerVal > 21 || playerVal > dealerVal) _finishGame(true);
+      else if (playerVal == dealerVal) _finishGame(null);
+      else _finishGame(false);
     });
   }
 
@@ -122,36 +113,41 @@ class _BlackjackPageState extends State<BlackjackPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Blackjack'), backgroundColor: Colors.red),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text('Saldo: \$${formatRupiah(widget.state.character.money)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            if (!gameOver) ...[
-              Text('Dealer: ${dealerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(dealerCards)})'),
-              const Divider(),
-              Text('Anda: ${playerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(playerCards)})'),
-              const SizedBox(height: 20),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              if (!gameOver) ...[
+                Text('Dealer: ${dealerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(dealerCards)})'),
+                const Divider(),
+                Text('Anda: ${playerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(playerCards)})'),
+                const SizedBox(height: 20),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  ElevatedButton(onPressed: hit, child: const Text('Hit')),
+                  const SizedBox(width: 16),
+                  ElevatedButton(onPressed: stand, child: const Text('Stand')),
+                ]),
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: startGame, child: const Text('Mulai')),
+              ] else ...[
+                Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: startGame, child: const Text('Main Lagi')),
+              ],
+              const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                ElevatedButton(onPressed: hit, child: const Text('Hit')),
-                const SizedBox(width: 16),
-                ElevatedButton(onPressed: stand, child: const Text('Stand')),
+                IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
+                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
               ]),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: startGame, child: const Text('Mulai')),
-            ] else ...[
-              Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(height: 16),
-              ElevatedButton(onPressed: startGame, child: const Text('Main Lagi')),
             ],
-            const SizedBox(height: 16),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-              Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
-              IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
-            ]),
-          ],
+          ),
         ),
       ),
     );

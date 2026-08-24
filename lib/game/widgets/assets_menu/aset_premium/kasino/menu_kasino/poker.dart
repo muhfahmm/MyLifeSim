@@ -15,13 +15,7 @@ class _PokerPageState extends State<PokerPage> {
   bool gameOver = false;
   String result = '';
 
-  // Kartu: 2-14 (J=11,Q=12,K=13,A=14) dan suit untuk flush
-  // Kita sederhanakan: evaluasi berdasarkan nilai saja (high card)
-
-  int _rankHand(List<int> hand) {
-    // Sederhana: jumlah semua nilai
-    return hand.fold(0, (a, b) => a + b);
-  }
+  int _rankHand(List<int> hand) => hand.fold(0, (a, b) => a + b);
 
   void startGame() {
     if (widget.state.character.money < bet) {
@@ -62,30 +56,37 @@ class _PokerPageState extends State<PokerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Poker'), backgroundColor: Colors.blue),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            Text('Saldo: \$${formatRupiah(widget.state.character.money)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            if (!gameOver && playerHand.isNotEmpty) ...[
-              Text('Kartu Anda: ${playerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
-              Text('Kartu Dealer: ${dealerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
-              ElevatedButton(onPressed: compareHands, child: const Text('Bandingkan')),
+              if (!gameOver && playerHand.isNotEmpty) ...[
+                Text('Kartu Anda: ${playerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
+                Text('Kartu Dealer: ${dealerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
+                const SizedBox(height: 16),
+                ElevatedButton(onPressed: compareHands, child: const Text('Bandingkan')),
+              ],
+              const SizedBox(height: 16),
+              ElevatedButton(
+                onPressed: playerHand.isEmpty ? startGame : () => setState(() { playerHand.clear(); dealerHand.clear(); gameOver = false; result = ''; }),
+                child: Text(playerHand.isEmpty ? 'Mulai Game' : 'Main Lagi'),
+              ),
+              const SizedBox(height: 16),
+              if (result.isNotEmpty) Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 16),
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
+                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
+              ]),
             ],
-            const SizedBox(height: 16),
-            ElevatedButton(onPressed: playerHand.isEmpty ? startGame : () => setState(() { playerHand.clear(); dealerHand.clear(); gameOver = false; result = ''; }),
-                child: Text(playerHand.isEmpty ? 'Mulai Game' : 'Main Lagi')),
-            const SizedBox(height: 16),
-            if (result.isNotEmpty) Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-              Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
-              IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
-            ]),
-          ],
+          ),
         ),
       ),
     );
