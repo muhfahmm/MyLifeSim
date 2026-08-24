@@ -50,7 +50,7 @@ class AssetsButton extends StatelessWidget {
                   const SizedBox(height: 8),
                   KasinoItem(character: character, onPop: () => setStateDialog(() {})),
                   // MuseumItem telah dihapus
-                  GarasiMobilItem(age: character.age, onPop: () => setStateDialog(() {})),
+                  GarasiMobilItem(character: character, onPop: () => setStateDialog(() {})),
                 ],
               );
             },
