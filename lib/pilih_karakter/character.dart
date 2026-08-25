@@ -5,7 +5,7 @@ import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/avatar/skin_color_inheritance.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/parent_remarriage.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 
 class Character {
   String name;

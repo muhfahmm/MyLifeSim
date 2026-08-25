@@ -4,7 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
 import 'dart:async';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/parent_remarriage.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
@@ -953,6 +953,13 @@ class _GameScreenState extends State<GameScreen> {
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
         (_character.motherName != null && !_character.isMotherDeceased);
 
+    if (_character.gender.toLowerCase() == 'perempuan' &&
+        isFatherProposal &&
+        (_character.isFatherDivorced || _character.isMotherDivorced) &&
+        _character.custodyParent == 'Ayah') {
+      showReportToMother = false;
+    }
+
     bool showReportToFather = isMotherProposal &&
         (type == 'Ajak Pacaran' || type == 'Bercinta') &&
         ((_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned) ||
@@ -960,7 +967,7 @@ class _GameScreenState extends State<GameScreen> {
 
     if (_character.gender.toLowerCase() == 'laki-laki' &&
         isMotherProposal &&
-        _character.isMotherDivorced &&
+        (_character.isMotherDivorced || _character.isFatherDivorced) &&
         _character.custodyParent == 'Ibu') {
       showReportToFather = false;
     }

@@ -199,6 +199,7 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                   ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isStepFatherDeceased,
+                  isLivingTogether: character.custodyParent == 'Ayah',
                   avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                     name: character.stepFatherName!,
                     gender: 'Laki-laki',
@@ -217,6 +218,7 @@ class RelationshipButton extends StatelessWidget {
                   relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                   ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
                   isDeceased: character.isStepMotherDeceased,
+                  isLivingTogether: character.custodyParent == 'Ibu',
                   avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                     name: character.stepMotherName!,
                     gender: 'Perempuan',

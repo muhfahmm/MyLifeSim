@@ -1,5 +1,9 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'sibling_incest_handler.dart';
+import 'child_incest_handler.dart';
+import 'inlaw_incest_handler.dart';
+import 'extended_family_incest_handler.dart';
 
 class FamilyIncestHandler {
   static void checkAndGenerateProposal(Character character, Random random) {
@@ -10,6 +14,12 @@ class FamilyIncestHandler {
     final String? custody = character.custodyParent; // 'Ayah' atau 'Ibu'
 
     List<Map<String, dynamic>> candidates = [];
+
+    // Panggil handler incest keluarga lainnya
+    SiblingIncestHandler.checkAndGenerateProposal(character, random, candidates);
+    ChildIncestHandler.checkAndGenerateProposal(character, random, candidates);
+    InLawIncestHandler.checkAndGenerateProposal(character, random, candidates);
+    ExtendedFamilyIncestHandler.checkAndGenerateProposal(character, random, candidates);
 
     bool isAlreadyPartner(String name) {
       return character.isAnyPartnerNameMatching(name);
