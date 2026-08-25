@@ -1,31 +1,26 @@
-# Analisis Persentase Ajakan Romantis di Lingkungan Kerja
+# Analisis Persentase Ajakan Romantis di Lingkungan Kerja & Faktor Peredam
 
-Dokumen ini menganalisis logika, mekanisme pencocokan, serta peluang (persentase) munculnya ajakan romantis (pacaran/bercinta) dari rekan kerja (coworkers).
+Berikut adalah tabel peluang (persentase) munculnya ajakan romantis (pacaran/bercinta) dari rekan kerja (coworkers) serta mekanisme peredaman proposal.
 
 ---
 
 ## 1. NPC Coworker Mengajak User (Inisiasi oleh NPC)
-Logika di lingkungan kerja diatur di [ajakan_handler.dart](file:///c:/utama/project/project-sendiri/bitlife/lib/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart) untuk ajakan dari NPC Coworker kepada user.
 
-Ketika kandidat terpilih adalah Rekan Kerja, persentase kemunculan proposal didasarkan pada orientasi jenis kelamin:
+Ketika kandidat yang terpilih secara acak adalah Rekan Kerja (Coworker), peluang terjadinya proposal adalah sebagai berikut:
 
-### A. Sesama Jenis (Gay / Lesbian)
-*   **Peluang Ajak Pacaran**: **20%**
-    *   Menggunakan check logic dari `AjakanPacaranGayCoworker` / `AjakanPacaranLesbianCoworker`
-*   **Peluang Ajak Hubungan Intim (Bercinta)**: **10%**
-    *   Menggunakan check logic dari `AjakanMlGayCoworker` / `AjakanMlLesbianCoworker`
-*   **Total Peluang Terjadi Proposal**: **30%**
-
-### B. Lawan Jenis (Straight / Heteroseksual)
-*   **Peluang Ajak Pacaran**: **30%**
-    *   Menggunakan check logic dari `AjakanPacaranHeteroCoworker`
-*   **Peluang Ajak Hubungan Intim (Bercinta)**: **30%**
-    *   Menggunakan check logic dari `AjakanMlHeteroCoworker`
-*   **Total Peluang Terjadi Proposal**: **60%**
+| Hubungan Seksualitas | Aksi Romantis | Persentase Peluang Terjadi | Total Peluang (Salah Satu Terjadi) |
+| :--- | :--- | :---: | :---: |
+| **Sesama Jenis (Gay / Lesbian)** | Ajak Pacaran | 20% | **30%** |
+| **Sesama Jenis (Gay / Lesbian)** | Bercinta (Make Love) | 10% | |
+| **Lawan Jenis (Straight)** | Ajak Pacaran | 30% | **60%** |
+| **Lawan Jenis (Straight)** | Bercinta (Make Love) | 30% | |
 
 ---
 
-## 2. Faktor Pengurang (Peredam Aktivitas Proposal)
-Jika user sudah memiliki pasangan lawan jenis (opposite-sex partner), game secara otomatis meredam proposal baru dari rekan kerja/pihak lain dengan peluang berikut:
-*   Jika proposal baru adalah **sesama jenis (Gay/Lesbian)**: Ada peluang **90%** ajakan tersebut akan **dibatalkan/dihapus** secara otomatis.
-*   Jika proposal baru adalah **lawan jenis (Straight)** dari orang baru: Ada peluang **85%** ajakan tersebut akan **dibatalkan/dihapus** secara otomatis.
+## 2. Faktor Pengurang / Peredam Proposal Baru
+Jika user **sudah memiliki pasangan lawan jenis (opposite-sex partner)**, game akan secara otomatis menyaring dan meredam proposal baru dari pihak lain dengan persentase pembersihan (dihapus/dibatalkan):
+
+| Tipe Ajakan Baru | Persentase Dibatalkan Otomatis | Peluang Lolos Masuk ke User |
+| :--- | :---: | :---: |
+| **Sesama Jenis (Gay / Lesbian)** | 90% | 10% |
+| **Lawan Jenis (Straight) dari Orang Lain** | 85% | 15% |
