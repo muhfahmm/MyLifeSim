@@ -4,7 +4,8 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/avatar/skin_color_inheritance.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_menu/ajakan_handler.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/parent_remarriage.dart';
 
 class Character {
   String name;
@@ -919,34 +920,8 @@ class Character {
       }
     }
 
-    // --- LOGIKA REMARRY: PENDAPATAN AYAH/IBU TIRI SETELAH LAHIR (35% CHANCE, 20% JIKA IBU 60+ TAHUN) ---
-    // Kasus 1: Ibu kandung hidup, tetapi tidak ada ayah kandung (atau wafat) dan belum punya ayah tiri
-    if (motherName != null && !isMotherDeceased && (fatherName == null || isFatherDeceased) && stepFatherName == null) {
-      final int remarryChance = (motherAge != null && motherAge! >= 60) ? 20 : 35;
-      if (random.nextInt(100) < remarryChance) {
-        stepFatherName = 'Fajar Pratama'; // Default fallback name
-        stepFatherAge = motherAge! + random.nextInt(5) - 2;
-        stepFatherRelationship = 50;
-        stepFatherSkinColor = SkinColorInheritance.randomSkin();
-        isStepFatherDeceased = false;
-        final String notice = '💍 Kabar Keluarga: Ibumu menikah lagi! Sekarang kamu memiliki Ayah Tiri bernama $stepFatherName.';
-        events.add(notice);
-        inbox.add(notice);
-      }
-    }
-    // Kasus 2: Ayah kandung hidup, tetapi tidak ada ibu kandung (atau wafat) dan belum punya ibu tiri
-    else if (fatherName != null && !isFatherDeceased && (motherName == null || isMotherDeceased) && stepMotherName == null) {
-      if (random.nextInt(100) < 35) {
-        stepMotherName = 'Dian Lestari'; // Default fallback name
-        stepMotherAge = fatherAge! + random.nextInt(5) - 2;
-        stepMotherRelationship = 50;
-        stepMotherSkinColor = SkinColorInheritance.randomSkin();
-        isStepMotherDeceased = false;
-        final String notice = '💍 Kabar Keluarga: Ayahmu menikah lagi! Sekarang kamu memiliki Ibu Tiri bernama $stepMotherName.';
-        events.add(notice);
-        inbox.add(notice);
-      }
-    }
+    // --- LOGIKA REMARRY: DELEGASI KE PARENT_REMARRIAGE ---
+    ParentRemarriage.checkAndApplyRemarriage(this, random, events);
 
     // Pastikan list siblings mutable agar bisa ditambahkan adik baru
     siblings = List<Map<String, String>>.from(siblings);

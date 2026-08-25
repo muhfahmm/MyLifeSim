@@ -4,6 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
 import 'dart:async';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/parent_remarriage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
@@ -1305,17 +1306,8 @@ class _GameScreenState extends State<GameScreen> {
             _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya.');
           }
 
-          // Peluang Ayah Kandung menikah lagi (mempunyai Ibu Tiri) sebesar 40%
-          if (rand.nextInt(100) < 40) {
-            final List<String> girls = (_character.femaleFirstNames != null && _character.femaleFirstNames!.isNotEmpty) ? _character.femaleFirstNames! : ['Dian', 'Lestari', 'Nadia', 'Sania', 'Zahra', 'Aura'];
-            final List<String> familyNames = (_character.lastNames != null && _character.lastNames!.isNotEmpty) ? _character.lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
-            _character.stepMotherName = '${girls[rand.nextInt(girls.length)]} ${familyNames[rand.nextInt(familyNames.length)]}';
-            _character.stepMotherAge = (_character.fatherAge ?? 40) + rand.nextInt(5) - 2;
-            _character.stepMotherRelationship = 50;
-            _character.isStepMotherDeceased = false;
-            final String notice = '💍 Kabar Keluarga: Ayahmu ($partnerName) menikah lagi! Sekarang kamu memiliki Ibu Tiri bernama ${_character.stepMotherName}.';
-            _character.inbox.add(notice);
-          }
+          // Delegasikan peluang Ayah Kandung menikah lagi ke ParentRemarriage
+          ParentRemarriage.checkAndApplyRemarriage(_character, rand, []);
         }
 
         // Hubungan dengan Ibu meningkat karena melapor
@@ -1335,16 +1327,9 @@ class _GameScreenState extends State<GameScreen> {
           _character.inbox.add('💔 Perceraian: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah dan memutuskan untuk menceraikannya.');
         }
 
-        // Peluang Ibu Kandung menikah lagi (mempunyai Ayah Tiri) sebesar 40% (hanya jika tidak dipenjara)
-        if (!isJailed && rand.nextInt(100) < 40) {
-          final List<String> boys = (_character.maleFirstNames != null && _character.maleFirstNames!.isNotEmpty) ? _character.maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
-          final List<String> familyNames = (_character.lastNames != null && _character.lastNames!.isNotEmpty) ? _character.lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
-          _character.stepFatherName = '${boys[rand.nextInt(boys.length)]} ${familyNames[rand.nextInt(familyNames.length)]}';
-          _character.stepFatherAge = (_character.motherAge ?? 40) + rand.nextInt(5) - 2;
-          _character.stepFatherRelationship = 50;
-          _character.isStepFatherDeceased = false;
-          final String notice = '💍 Kabar Keluarga: Ibumu ($partnerName) menikah lagi! Sekarang kamu memiliki Ayah Tiri bernama ${_character.stepFatherName}.';
-          _character.inbox.add(notice);
+        // Delegasikan peluang Ibu Kandung menikah lagi ke ParentRemarriage
+        if (!isJailed) {
+          ParentRemarriage.checkAndApplyRemarriage(_character, rand, []);
         }
 
         // Hubungan dengan Ayah / Ayah Tiri meningkat

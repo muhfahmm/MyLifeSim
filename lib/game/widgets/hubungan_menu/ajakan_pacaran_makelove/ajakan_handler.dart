@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 // Imports for gay dating
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/family_incest_handler.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_guru_sekolah.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_dosen.dart';
@@ -397,38 +398,14 @@ class AjakanHandler {
 
     // 2. If no school/work proposal occurred, check family
     if (character.activeProposal == null) {
+      // First, check parent/step-parent incest logic using the new handler
+      FamilyIncestHandler.checkAndGenerateProposal(character, random);
+      if (character.activeProposal != null) return;
+
       List<Map<String, dynamic>> familyCandidates = [];
 
       bool isAlreadyPartner(String name) {
         return character.isAnyPartnerNameMatching(name);
-      }
-
-      if (character.fatherName != null && !character.isFatherDeceased && character.fatherAge != null && character.fatherAge! >= 12 && myGenderLower != 'laki-laki' && !isAlreadyPartner(character.fatherName!)) {
-        familyCandidates.add({
-          'name': 'Ayah (${character.fatherName})',
-          'relation': 'Ayah',
-          'gender': 'Laki-laki',
-          'age': character.fatherAge.toString(),
-          'role': 'Kandung',
-        });
-      }
-      if (character.motherName != null && !character.isMotherDeceased && character.motherAge != null && character.motherAge! >= 12 && !isAlreadyPartner(character.motherName!)) {
-        familyCandidates.add({
-          'name': 'Ibu (${character.motherName})',
-          'relation': 'Ibu',
-          'gender': 'Perempuan',
-          'age': character.motherAge.toString(),
-          'role': 'Kandung',
-        });
-      }
-      if (character.stepFatherName != null && !character.isStepFatherDeceased && character.stepFatherAge != null && character.stepFatherAge! >= 12 && myGenderLower != 'laki-laki' && !isAlreadyPartner(character.stepFatherName!)) {
-        familyCandidates.add({
-          'name': 'Ayah Tiri (${character.stepFatherName})',
-          'relation': 'Ayah Tiri',
-          'gender': 'Laki-laki',
-          'age': character.stepFatherAge.toString(),
-          'role': 'Tiri',
-        });
       }
 
       if (age >= 12) {

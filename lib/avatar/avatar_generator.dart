@@ -120,7 +120,7 @@ class AvatarGenerator {
   }) {
     final uri = Uri.https(
       'api.dicebear.com',
-      '/9.x/avataaars/png',
+      '/5.x/avataaars/png',
       {
         'seed': seed,
         'eyes': eyeType,
@@ -150,7 +150,7 @@ class AvatarGenerator {
 
     final uri = Uri.https(
       'api.dicebear.com',
-      '/9.x/avataaars/png',
+      '/5.x/avataaars/png',
       {
         'top': finalTopType,
         'topProbability': topProb.toString(),
@@ -217,40 +217,50 @@ class AvatarGenerator {
     required String url,
     double width = 80,
     double height = 80,
-    String fallbackAsset = 'assets/avatar_placeholder.png',
+    String gender = 'Perempuan',
     BoxFit fit = BoxFit.cover,
   }) {
-    return Image.network(
-      url,
-      width: width,
-      height: height,
-      fit: fit,
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: Colors.grey.shade200,
-            shape: BoxShape.circle,
-          ),
-          child: const Center(
-            child: SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(strokeWidth: 2),
+    return ClipOval(
+      child: Image.network(
+        url,
+        width: width,
+        height: height,
+        fit: fit,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            width: width,
+            height: height,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              shape: BoxShape.circle,
             ),
-          ),
-        );
-      },
-      errorBuilder: (context, error, stackTrace) {
-        return Image.asset(
-          fallbackAsset,
-          width: width,
-          height: height,
-          fit: fit,
-        );
-      },
+            child: const Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(strokeWidth: 1.5),
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          final isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
+          return Container(
+            width: width,
+            height: height,
+            decoration: BoxDecoration(
+              color: isMale ? Colors.blue.shade50 : Colors.pink.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              isMale ? Icons.face : Icons.face_3,
+              color: isMale ? Colors.blue.shade300 : Colors.pink.shade300,
+              size: width * 0.65,
+            ),
+          );
+        },
+      ),
     );
   }
 }
