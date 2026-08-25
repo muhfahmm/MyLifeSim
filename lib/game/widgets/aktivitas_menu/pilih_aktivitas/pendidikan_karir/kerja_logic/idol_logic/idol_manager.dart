@@ -450,36 +450,5 @@ class IdolManager {
         return; // Early return
       }
     }
-
-    // 6. Custom Dating Proposals (25% staff, 20% lesbian members)
-    if (character.activeProposal == null && character.gender == 'Perempuan' && character.age >= 12) {
-      if (rand.nextDouble() < 0.20) {
-        final roll = rand.nextInt(100);
-        if (roll < 25) {
-          if (character.idolStaff.isNotEmpty) {
-            final staff = character.idolStaff[rand.nextInt(character.idolStaff.length)];
-            character.activeProposal = {
-              'name': '${staff['name']} (Staf ${staff['role']})',
-              'relation': 'Staf Idol (${staff['role']})',
-              'type': 'Ajak Pacaran',
-              'gender': staff['gender'] ?? 'Laki-laki',
-              'age': staff['age'] ?? '30',
-            };
-          }
-        } else if (roll < 45) {
-          final sourceList = isMainTeam ? character.idolMainMembers : character.idolTrainees;
-          if (sourceList.isNotEmpty) {
-            final member = sourceList[rand.nextInt(sourceList.length)];
-            character.activeProposal = {
-              'name': '${member['name']} (Rekan Idol)',
-              'relation': 'Rekan Idol',
-              'type': 'Ajak Pacaran',
-              'gender': 'Perempuan',
-              'age': member['age'] ?? '16',
-            };
-          }
-        }
-      }
-    }
   }
 }
