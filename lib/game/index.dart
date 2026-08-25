@@ -397,7 +397,7 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _checkAdikRequestMoney(VoidCallback onDone) {
-    if (!_character.isAlive) {
+    if (!_character.isAlive || _character.age < 12) {
       onDone();
       return;
     }
@@ -407,13 +407,24 @@ class _GameScreenState extends State<GameScreen> {
       final bool isDeceased = sib['isDeceased'] == 'true';
       final String rel = (sib['relation'] ?? '').toLowerCase();
       final bool isAdik = rel.contains('adik');
-      return !isDeceased && isAdik && sibAge >= 6 && sibAge <= 18;
+      final bool isKakak = rel.contains('kakak');
+      
+      if (isDeceased) return false;
+      if (isAdik) {
+        return sibAge >= 6 && sibAge <= 18;
+      }
+      if (isKakak) {
+        // Kakak jika usianya sudah > 12 tahun tidak meminta uang ke user
+        return sibAge >= 6 && sibAge <= 12;
+      }
+      return false;
     }).toList();
 
     if (candidates.isNotEmpty && Random().nextInt(100) < 20) {
       final candidate = candidates[Random().nextInt(candidates.length)];
-      final String name = candidate['name'] ?? 'Adik';
+      final String name = candidate['name'] ?? 'Saudara';
       final int sibAge = int.tryParse(candidate['age'] ?? '0') ?? 0;
+      final String relLabel = candidate['relation'] ?? 'Saudara';
       
       int requestedAmount = 0;
       if (sibAge >= 6 && sibAge <= 11) {
@@ -437,7 +448,7 @@ class _GameScreenState extends State<GameScreen> {
               ],
             ),
             content: Text(
-              'Adikmu, $name (Umur: $sibAge tahun) meminta uang saku sebesar \$$requestedAmount untuk kebutuhan sekolahnya.',
+              '$relLabel, $name (Umur: $sibAge tahun) meminta uang saku sebesar \$$requestedAmount untuk kebutuhan sekolahnya.',
               style: const TextStyle(fontSize: 14),
             ),
             actions: [

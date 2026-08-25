@@ -3,7 +3,21 @@ import 'package:bitlife/pilih_karakter/character.dart';
 
 class AjakanPacaranHeteroStafIdol {
   static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
-    if (rand.nextDouble() < 0.25) {
+    final String rel = candidate['relation'].toString().toLowerCase();
+    int chance = 15;
+
+    if (rel.contains('manager') || rel.contains('gm') || rel.contains('direktur')) {
+      // Manager / GM: +10%
+      chance += 10;
+    } else if (rel.contains('staf operasional') || rel.contains('operasional') || rel.contains('staf biasa')) {
+      // Staf Operasional Biasa: +5%
+      chance += 5;
+    } else if (rel.contains('produser') || rel.contains('director')) {
+      // Produser / Director: +15%
+      chance += 15;
+    }
+
+    if (rand.nextDouble() < (chance / 100.0)) {
       return {
         'name': '${candidate['name']} (Staf ${candidate['role']})',
         'relation': 'Staf Idol (${candidate['role']})',

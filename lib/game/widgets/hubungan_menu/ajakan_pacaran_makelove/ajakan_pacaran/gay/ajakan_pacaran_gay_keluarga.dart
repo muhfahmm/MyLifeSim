@@ -7,22 +7,31 @@ class AjakanPacaranGayKeluarga {
     int chance = 10;
 
     if (rel.contains('ayah mertua')) {
+      // Ayah Mertua: 5%
       chance = 5;
     } else if (rel.contains('anak')) {
+      // Anak Kandung/Tiri: 30%
       chance = 30;
     } else if (rel.contains('keponakan')) {
+      // Keponakan: 30%
       chance = 30;
     } else if (rel.contains('paman')) {
+      // Paman: 5%
       chance = 5;
     } else if (rel.contains('ayah')) {
+      // Ayah Kandung: 10%
       chance = 10;
     } else if (rel.contains('adik laki')) {
+      // Adik Laki-laki: 5%
       chance = 5;
     } else if (rel.contains('kakak laki')) {
+      // Kakak Laki-laki: 5%
       chance = 5;
     } else if (rel.contains('sepupu')) {
+      // Sepupu: 35%
       chance = 35;
     } else if (rel.contains('kakek')) {
+      // Kakek: 5%
       chance = 5;
     }
 
