@@ -372,7 +372,44 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                 color: Colors.redAccent,
                 title: 'Ajak Pacaran',
                 onTap: () {
-                  final accepted = relationship >= 70 && (_random.nextInt(100) < 65);
+                  final isFemale = widget.character.gender.trim().toLowerCase() == 'perempuan';
+                  final isStaff = widget.category == 'Staff';
+
+                  if (isFemale && isStaff && widget.character.idolStaffDatingFailures >= 3) {
+                    setState(() {
+                      widget.character.jobName = null;
+                      widget.character.jobSalary = null;
+                      widget.character.idolTrainees.clear();
+                      widget.character.idolMainMembers.clear();
+                      widget.character.idolStaff.clear();
+                    });
+
+                    DialogHelper.show(
+                      context: context,
+                      title: 'Dipecat dari Grup Idol 😡',
+                      content: const Text('Karena kamu terus-menerus mencoba merayu dan mengajak pacaran staff manajemen secara agresif (percobaan ke-4), manajemen menganggap tindakanmu mengganggu profesionalisme kerja secara serius. Kamu resmi dipecat dari grup!'),
+                      actions: [
+                        Builder(
+                          builder: (dialogContext) => TextButton(
+                            onPressed: () {
+                              Navigator.pop(dialogContext); // close dialog
+                              Navigator.pop(context); // close interaction page
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ),
+                      ],
+                    );
+                    return;
+                  }
+
+                  bool accepted = false;
+                  if (widget.category == 'Trainee' || widget.category == 'Main Team') {
+                    accepted = _random.nextInt(100) < 30; // 30% berhasil, 70% gagal
+                  } else {
+                    accepted = relationship >= 70 && (_random.nextInt(100) < 65);
+                  }
+
                   if (accepted) {
                     final partnerMap = {
                       'name': name,
@@ -388,7 +425,57 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                     _showOutcome('Pacaran Sukses! ❤️', 'Luar biasa! $name menerima ajakan pacaranmu. Sekarang kalian resmi berpasangan! 😍');
                   } else {
                     _updateRelationship(-10);
-                    _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakan pacaranmu dengan sopan karena ingin menjaga profesionalitas kerja saat ini.');
+                    if (isFemale && isStaff) {
+                      widget.character.idolStaffDatingFailures++;
+                      final remaining = 3 - widget.character.idolStaffDatingFailures;
+                      if (remaining > 0) {
+                        _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakan pacaranmu dengan sopan karena ingin menjaga profesionalitas kerja saat ini.\n(Peringatan: Kamu memiliki $remaining kesempatan lagi sebelum tindakan merayu staff ini membuatmu dipecat!)');
+                      } else {
+                        _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakan pacaranmu dengan sopan.\n(Peringatan Keras: Ini adalah kegagalan ke-3 merayu staff! Jika kamu mencoba merayu staff lagi, kamu akan langsung dipecat!)');
+                      }
+                    } else {
+                      _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakan pacaranmu dengan sopan.');
+                    }
+                  }
+                },
+              ),
+            ],
+
+            // Aksi Minta Naik Gaji (Khusus General Manager)
+            if (role == 'General Manager') ...[
+              _buildActionTile(
+                icon: Icons.monetization_on_outlined,
+                color: Colors.green,
+                title: 'Minta Naik Gaji',
+                onTap: () {
+                  if (widget.character.idolSalaryRaiseCount >= 2) {
+                    _showOutcome('Minta Naik Gaji 🚫', 'General Manager menolak mentah-mentah permintaanmu. Kamu sudah mencapai batas maksimal kenaikan gaji (1-2 kali)!');
+                    return;
+                  }
+
+                  final bool isTrainee = widget.character.jobName == 'Idol (Trainee)';
+                  final bool isMainTeam = widget.character.jobName == 'Idol (Main Performer)';
+
+                  int successChance = 0;
+                  if (isTrainee) {
+                    successChance = 20;
+                  } else if (isMainTeam) {
+                    successChance = 40;
+                  }
+
+                  final bool success = _random.nextInt(100) < successChance;
+                  if (success) {
+                    setState(() {
+                      widget.character.idolSalaryRaiseCount++;
+                      int currentSalary = widget.character.jobSalary ?? 1000;
+                      int raiseAmount = (currentSalary * 0.20).toInt(); // Naik 20%
+                      widget.character.jobSalary = currentSalary + raiseAmount;
+                    });
+                    _updateRelationship(10);
+                    _showOutcome('Naik Gaji Berhasil! 💰', 'Selamat! General Manager menyetujui permintaanmu. Gajimu naik menjadi \$${widget.character.jobSalary} per bulan!');
+                  } else {
+                    _updateRelationship(-8);
+                    _showOutcome('Naik Gaji Gagal ❌', 'General Manager menolak permintaan naik gajimu. Dia merasa kinerjamu saat ini belum cukup menonjol.');
                   }
                 },
               ),

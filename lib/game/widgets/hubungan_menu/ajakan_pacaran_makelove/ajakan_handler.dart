@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 // Imports for gay dating
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_incest/family_incest_handler.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_guru_sekolah.dart';
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_dosen.dart';
@@ -433,9 +432,137 @@ class AjakanHandler {
       }
     }
 
-    // Try processing school/work proposal
-    if (schoolCandidates.isNotEmpty) {
-      final candidate = schoolCandidates[random.nextInt(schoolCandidates.length)];
+    // Collect Family candidates
+    List<Map<String, dynamic>> familyCandidates = [];
+    if (character.fatherName != null && !character.isFatherDeceased && !character.isAnyPartnerNameMatching(character.fatherName!)) {
+      familyCandidates.add({
+        'name': character.fatherName!,
+        'relation': 'Ayah',
+        'gender': 'Laki-laki',
+        'age': (character.fatherAge ?? 40).toString(),
+        'role': 'Keluarga',
+      });
+    }
+    if (character.motherName != null && !character.isMotherDeceased && !character.isAnyPartnerNameMatching(character.motherName!)) {
+      familyCandidates.add({
+        'name': character.motherName!,
+        'relation': 'Ibu',
+        'gender': 'Perempuan',
+        'age': (character.motherAge ?? 38).toString(),
+        'role': 'Keluarga',
+      });
+    }
+    if (character.stepFatherName != null && !character.isStepFatherDeceased && !character.isAnyPartnerNameMatching(character.stepFatherName!)) {
+      familyCandidates.add({
+        'name': character.stepFatherName!,
+        'relation': 'Ayah Tiri',
+        'gender': 'Laki-laki',
+        'age': (character.stepFatherAge ?? 40).toString(),
+        'role': 'Tiri',
+      });
+    }
+    if (character.stepMotherName != null && !character.isStepMotherDeceased && !character.isAnyPartnerNameMatching(character.stepMotherName!)) {
+      familyCandidates.add({
+        'name': character.stepMotherName!,
+        'relation': 'Ibu Tiri',
+        'gender': 'Perempuan',
+        'age': (character.stepMotherAge ?? 38).toString(),
+        'role': 'Tiri',
+      });
+    }
+    for (var sib in character.siblings) {
+      final sName = sib['name'] ?? '';
+      if (sib['isDeceased'] != 'true' && sName.isNotEmpty && !character.isAnyPartnerNameMatching(sName)) {
+        familyCandidates.add({
+          'name': sName,
+          'relation': sib['relation'] ?? 'Saudara',
+          'gender': sib['gender'] ?? 'Laki-laki',
+          'age': sib['age'] ?? '18',
+          'role': 'Keluarga',
+        });
+      }
+    }
+    for (var ext in character.extendedFamily) {
+      final eName = ext['name'] ?? '';
+      if (ext['isDeceased'] != 'true' && eName.isNotEmpty && !character.isAnyPartnerNameMatching(eName)) {
+        familyCandidates.add({
+          'name': eName,
+          'relation': ext['relation'] ?? 'Keluarga',
+          'gender': ext['gender'] ?? 'Laki-laki',
+          'age': ext['age'] ?? '18',
+          'role': 'Keluarga',
+        });
+      }
+    }
+
+    // Tentukan pool kandidat terpilih (Beri peluang 35% untuk keluarga agar tidak tenggelam)
+    List<Map<String, dynamic>> selectedPool = [];
+    if (familyCandidates.isNotEmpty && random.nextInt(100) < 35) {
+      selectedPool = familyCandidates;
+    } else {
+      selectedPool = schoolCandidates;
+    }
+
+    if (selectedPool.isEmpty && familyCandidates.isNotEmpty) {
+      selectedPool = familyCandidates;
+    }
+    if (selectedPool.isEmpty && schoolCandidates.isNotEmpty) {
+      selectedPool = schoolCandidates;
+    }
+
+    // Try processing proposal
+    if (selectedPool.isNotEmpty) {
+      List<Map<String, dynamic>> sameSexCandidates = [];
+      List<Map<String, dynamic>> oppositeSexCandidates = [];
+      for (var c in selectedPool) {
+        final String candGender = (c['gender'] ?? 'Laki-laki').trim().toLowerCase();
+        if (candGender == myGenderLower) {
+          sameSexCandidates.add(c);
+        } else {
+          oppositeSexCandidates.add(c);
+        }
+      }
+
+      Map<String, dynamic>? candidate;
+      final String mySexuality = character.sexuality.trim().toLowerCase();
+      final int roll = random.nextInt(100);
+
+      if (mySexuality == 'heteroseksual') {
+        if (roll < 70) {
+          if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          }
+        } else if (roll < 85) {
+          if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          }
+        }
+        // remaining 15% (roll >= 85) results in no proposal (candidate remains null)
+      } else if (mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') {
+        if (roll < 40) {
+          if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          }
+        } else {
+          if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          }
+        }
+      } else {
+        // Bisexual or others: 50% opposite sex, 50% same sex
+        if (roll < 50) {
+          if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          }
+        } else {
+          if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          }
+        }
+      }
+
+      if (candidate == null) return;
+
       final String candRole = candidate['role'];
       final String candGender = (candidate['gender'] ?? 'Laki-laki').trim().toLowerCase();
 
@@ -464,6 +591,25 @@ class AjakanHandler {
             character.activeProposal = AjakanPacaranHeteroCoworker.check(character, candidate, random);
           } else if (roll < 60) {
             character.activeProposal = AjakanMlHeteroCoworker.check(character, candidate, random);
+          }
+        }
+      } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
+        final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+        if (proposalType == 'Ajak Pacaran') {
+          if (isGay) {
+            character.activeProposal = AjakanPacaranGayKeluarga.check(character, candidate, random);
+          } else if (isLesbian) {
+            character.activeProposal = AjakanPacaranLesbianKeluarga.check(character, candidate, random);
+          } else {
+            character.activeProposal = AjakanPacaranHeteroKeluarga.check(character, candidate, random);
+          }
+        } else {
+          if (isGay) {
+            character.activeProposal = AjakanMlGayKeluarga.check(character, candidate, random);
+          } else if (isLesbian) {
+            character.activeProposal = AjakanMlLesbianKeluarga.check(character, candidate, random);
+          } else {
+            character.activeProposal = AjakanMlHeteroKeluarga.check(character, candidate, random);
           }
         }
       } else {
@@ -552,11 +698,7 @@ class AjakanHandler {
       }
     }
 
-    // 2. If no school/work proposal occurred, check family
-    if (character.activeProposal == null) {
-      // First, check parent/step-parent incest logic using the new handler
-      FamilyIncestHandler.checkAndGenerateProposal(character, random);
-    }
+
 
 
 

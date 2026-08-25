@@ -679,6 +679,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       },
       onAccepted: () async {
         final bool acceptedMakeLove = HubunganIntimLogic.calculateMakeLoveSuccess(
+          character: widget.character,
           myGender: widget.character.gender.trim().toLowerCase(),
           partnerGender: _getPartnerGender().trim().toLowerCase(),
           targetName: widget.targetName,

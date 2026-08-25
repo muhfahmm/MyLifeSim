@@ -87,9 +87,9 @@ Future<void> showIncestPsychologicalModal(
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Color(0xFFFFEBEE),
+            color: const Color(0xFFFFEBEE),
             borderRadius: BorderRadius.circular(10),
-            border: Border.all(color: Color(0xFFEF9A9A)),
+            border: Border.all(color: const Color(0xFFEF9A9A)),
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Row(children: [
@@ -143,7 +143,7 @@ Future<void> showIncestGeneticModal(
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Color(0xFFFFF3E0),
+            color: const Color(0xFFFFF3E0),
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: Colors.orange),
           ),

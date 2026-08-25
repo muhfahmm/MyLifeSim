@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/b
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 
 /// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {
@@ -317,94 +318,8 @@ List<ActionItem> getAge12PlusActions(
             }
           }
         } else {
-          // Jika bukan mantan, gunakan logika pacaran biasa
-          bool isSibling = targetRole.contains('Saudara') || 
-                           targetNameLower.contains('kakak') || 
-                           targetNameLower.contains('adik');
-
-          if (targetNameLower.startsWith('ayah')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 30;
-            } else {
-              accepted = random.nextInt(100) < 10;
-            }
-          } else if (targetNameLower.startsWith('ibu')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 5;
-            } else {
-              accepted = random.nextInt(100) < 10;
-            }
-          } else if (targetNameLower.contains('paman')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 30;
-            } else {
-              accepted = random.nextInt(100) < 10;
-            }
-          } else if (targetNameLower.contains('bibi')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 10;
-            } else {
-              accepted = random.nextInt(100) < 30;
-            }
-          } else if (targetNameLower.contains('sepupu')) {
-            accepted = random.nextInt(100) < 40;
-          } else if (targetNameLower.contains('kakek')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 15;
-            } else {
-              accepted = random.nextInt(100) < 5;
-            }
-          } else if (targetNameLower.contains('nenek')) {
-            if (myGender == 'perempuan') {
-              accepted = random.nextInt(100) < 5;
-            } else {
-              accepted = random.nextInt(100) < 15;
-            }
-          } else if (targetNameLower.contains('mertua')) {
-            if (targetNameLower.contains('ayah')) {
-              accepted = myGender == 'perempuan' ? (random.nextInt(100) < 30) : (random.nextInt(100) < 10);
-            } else {
-              accepted = myGender == 'perempuan' ? (random.nextInt(100) < 10) : (random.nextInt(100) < 30);
-            }
-          } else if (targetNameLower.contains('keponakan')) {
-            accepted = random.nextInt(100) < 35;
-          } else if (targetRole.toLowerCase().contains('laki-laki') || targetRole.toLowerCase().contains('perempuan') || targetRole.toLowerCase().contains('anak')) {
-            // Anak Kandung / Anak Tiri
-            if (targetNameLower.contains('anak') || targetRole.toLowerCase().contains('anak') || (character.children.any((c) => c['name'] == targetName))) {
-              if (myGender == 'perempuan') {
-                accepted = partnerGender == 'laki-laki' ? (random.nextInt(100) < 25) : (random.nextInt(100) < 5);
-              } else {
-                accepted = partnerGender == 'perempuan' ? (random.nextInt(100) < 25) : (random.nextInt(100) < 5);
-              }
-            } else {
-              accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
-            }
-          } else if (isSibling) {
-            bool isTargetOlder = targetNameLower.contains('kakak');
-            bool isTargetMale = partnerGender == 'laki-laki';
-
-            if (myGender == 'perempuan' && isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'perempuan' && isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 50;
-            } else if (myGender == 'perempuan' && !isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'perempuan' && !isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 40;
-            } else if (myGender == 'laki-laki' && isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'laki-laki' && isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 20;
-            } else if (myGender == 'laki-laki' && !isTargetOlder && !isTargetMale) {
-              accepted = random.nextInt(100) < 30;
-            } else if (myGender == 'laki-laki' && !isTargetOlder && isTargetMale) {
-              accepted = random.nextInt(100) < 20;
-            } else {
-              accepted = random.nextInt(100) < 20;
-            }
-          } else {
-            accepted = currentRel >= 50 ? (random.nextInt(100) < 75) : (random.nextInt(100) < 25);
-          }
+          // Gunakan logika kelas penentu dari folder ajakan_pacaran
+          accepted = AjakanResolver.checkPacaran(character, targetName, targetRole, random);
         }
 
         if (accepted) {

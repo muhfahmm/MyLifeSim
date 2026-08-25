@@ -38,6 +38,8 @@ class Character {
   String? avatarFacialHairType;
   int eyeTestsCountYoung = 0;
   int eyeTestsCountOld = 0;
+  int idolStaffDatingFailures = 0;
+  int idolSalaryRaiseCount = 0;
 
   // --- WARNA KULIT ORANG TUA (untuk warisan) ---
   String? fatherSkinColor;  // hex warna kulit ayah

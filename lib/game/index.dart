@@ -1217,12 +1217,9 @@ class _GameScreenState extends State<GameScreen> {
                 _checkGlassesNeed();
               } else if (type == 'Ajak Pacaran') {
                 setState(() {
-                  final String relationRole = _character.partner != null ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
+                  final String relationRole = (_character.partner != null && !_character.isAnyPartnerNameMatching(partnerName)) ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
 
-                  // Tentukan nilai hubungan awal: gunakan nilai orang tua yang sudah ada
-                  // agar kartu keluarga dan kartu pacar menampilkan angka yang sama.
-                  // Gunakan cleanName (nama tanpa prefix role seperti "Ibu (...)") untuk perbandingan.
-                  int initialRelationship = 50; // default
+                  int initialRelationship = 50;
                   final String lowerCleanName = cleanName.toLowerCase();
                   if (_character.motherName != null &&
                       _character.motherName!.toLowerCase() == lowerCleanName) {
@@ -1248,7 +1245,7 @@ class _GameScreenState extends State<GameScreen> {
 
                   _character.addPartnerToFreeSlot(newPartnerData);
 
-                  if (_character.partner != null && _character.partner!['name'] != partnerName) {
+                  if (_character.partner != null && !_character.isAnyPartnerNameMatching(partnerName)) {
                     _character.inbox.add(
                       '🤫 Rahasia: Kamu menerima ajakan pacaran dari $partnerName sebagai selingkuhan!'
                     );
@@ -1258,11 +1255,11 @@ class _GameScreenState extends State<GameScreen> {
                     );
                   }
 
-                  _character.happiness = (_character.happiness + 30).clamp(0, 100);
-                  
-                  if (role == 'Keluarga') {
-                    _updateFamilyRelationship(partnerName, 20);
-                  }
+                  // _character.happiness = (_character.happiness + 30).clamp(0, 100);
+                  // 
+                  // if (role == 'Keluarga') {
+                  //   _updateFamilyRelationship(partnerName, 20);
+                  // }
 
                   _character.activeProposal = null;
                 });
@@ -1270,7 +1267,7 @@ class _GameScreenState extends State<GameScreen> {
                 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text(_character.partner != null && _character.partner!['name'] != partnerName
+                    content: Text((_character.partner != null && !_character.isAnyPartnerNameMatching(partnerName))
                         ? '🤫 Hubungan Rahasia dimulai dengan $partnerName!'
                         : '💖 Kamu menerima ajakan dari $partnerName!'),
                     backgroundColor: Colors.pink,
@@ -1278,14 +1275,13 @@ class _GameScreenState extends State<GameScreen> {
                 );
                 _checkGlassesNeed();
               } else {
-                // Bercinta diterima -> Tampilkan dialog pengaman (kondom)
                 _showIncomingCondomDialog(proposal);
               }
             },
             child: Text(
               (type == 'Bercinta' || type == 'Bersetubuh')
                   ? 'Terima hubungan intim'
-                  : (_character.partner != null ? 'Terima menjadi selingkuhan' : 'Terima'),
+                  : ((type == 'Ajak Pacaran' && _character.partner != null && !_character.isAnyPartnerNameMatching(partnerName)) ? 'Terima menjadi selingkuhan' : 'Terima'),
               style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
             ),
           ),
@@ -1296,8 +1292,8 @@ class _GameScreenState extends State<GameScreen> {
                 if (type == 'Ajak 3some') {
                   _character.inbox.add('📢 Tolak 3some: Kamu menolak ajakan 3some dari $partnerName.');
                 } else {
-                  _character.happiness = (_character.happiness - 10).clamp(0, 100);
-                  _updateFamilyRelationship(partnerName, -15);
+                  // _character.happiness = (_character.happiness - 10).clamp(0, 100);
+                  // _updateFamilyRelationship(partnerName, -15);
                   _character.inbox.add(
                     '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName.'
                   );
@@ -1802,8 +1798,8 @@ class _GameScreenState extends State<GameScreen> {
     final Random random = Random();
 
     setState(() {
-      _character.happiness = (_character.happiness + 20).clamp(0, 100);
-      _updateFamilyRelationship(partnerName, 15);
+      // _character.happiness = (_character.happiness + 20).clamp(0, 100);
+      // _updateFamilyRelationship(partnerName, 15);
 
       String additionalMsg = '';
       if (!useCondom && myGender != partnerGender) {
