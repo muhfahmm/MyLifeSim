@@ -895,7 +895,12 @@ class _GameScreenState extends State<GameScreen> {
 
     if (type == 'Lamar Nikah') {
       dialogTitle = 'Lamaran Pernikahan! 💍';
-      dialogBody = 'Ayahmu, $partnerName mengajakmu untuk berkomitmen lebih jauh dan menikah secara rahasia! Apakah kamu mau menerima lamaran pernikahan tersebut?';
+      final String who = (relLower == 'pacar' || relLower.isEmpty) ? partnerName : '$relationWithMu, $partnerName';
+      dialogBody = '$who ingin mengajakmu bertunangan dan berkomitmen lebih serius! Apakah kamu mau menerima lamarannya dan menjadi tunangannya?';
+    } else if (type == 'Rencanakan Nikah') {
+      dialogTitle = 'Ajakan Menikah! 💒';
+      final String who = (relLower == 'pacar' || relLower.isEmpty) ? partnerName : '$relationWithMu, $partnerName';
+      dialogBody = '$who ingin mengajak kalian untuk segera menikah dan meresmikan hubungan kalian! Apakah kamu mau menyetujui rencana pernikahan ini?';
     } else if (type == 'Ajak 3some') {
       dialogTitle = 'Ajakan 3some! 🔥';
       dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan hubungan intim threesome secara bersama-sama. Apakah kamu mau menerima ajakan threesome ini?';
@@ -1059,7 +1064,11 @@ class _GameScreenState extends State<GameScreen> {
                 style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
               ),
             ),
-          if (_character.partner != null && (type == 'Ajak Pacaran' || type == 'Bercinta'))
+          if (_character.partner != null &&
+              _character.partner!['name'] != partnerName &&
+              !partnerName.contains(_character.partner!['name']!) &&
+              !_character.partner!['name']!.contains(partnerName) &&
+              (type == 'Ajak Pacaran' || type == 'Bercinta'))
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
@@ -1144,30 +1153,64 @@ class _GameScreenState extends State<GameScreen> {
               } else if (type == 'Lamar Nikah') {
                 setState(() {
                   if (_character.partner != null && _character.partner!['name'] == partnerName) {
-                    _character.partner!['relation'] = 'Suami';
+                    _character.partner!['relation'] = 'Tunangan';
                   } else if (_character.secondPartner != null && _character.secondPartner!['name'] == partnerName) {
-                    _character.secondPartner!['relation'] = 'Suami';
+                    _character.secondPartner!['relation'] = 'Tunangan';
                   } else if (_character.thirdPartner != null && _character.thirdPartner!['name'] == partnerName) {
-                    _character.thirdPartner!['relation'] = 'Suami';
+                    _character.thirdPartner!['relation'] = 'Tunangan';
                   } else if (_character.fourthPartner != null && _character.fourthPartner!['name'] == partnerName) {
-                    _character.fourthPartner!['relation'] = 'Suami';
+                    _character.fourthPartner!['relation'] = 'Tunangan';
                   } else if (_character.fifthPartner != null && _character.fifthPartner!['name'] == partnerName) {
-                    _character.fifthPartner!['relation'] = 'Suami';
+                    _character.fifthPartner!['relation'] = 'Tunangan';
                   }
                   for (var sp in _character.secretPartners) {
-                    if (sp['name'] == partnerName) {
-                      sp['relation'] = 'Suami';
-                    }
+                    if (sp['name'] == partnerName) sp['relation'] = 'Tunangan';
                   }
+                  final String who = (relLower == 'pacar' || relLower.isEmpty)
+                      ? partnerName
+                      : '$relationWithMu ($partnerName)';
                   _character.inbox.add(
-                    '💍 Pernikahan Rahasia: Kamu menerima lamaran pernikahan dari Ayahmu, $partnerName! Sekarang kalian resmi menikah secara rahasia.'
+                    '💍 Pertunangan: Kamu menerima lamaran dari $who! Kalian kini resmi bertunangan. Rencanakan pernikahan kalian bersama!'
+                  );
+                  _character.happiness = (_character.happiness + 25).clamp(0, 100);
+                  _character.activeProposal = null;
+                });
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('💍 Selamat! Kamu kini bertunangan dengan $partnerName!'),
+                    backgroundColor: Colors.pinkAccent,
+                  ),
+                );
+                _checkGlassesNeed();
+              } else if (type == 'Rencanakan Nikah') {
+                setState(() {
+                  final spouseRelation = partnerGender == 'perempuan' ? 'Istri' : 'Suami';
+                  if (_character.partner != null && _character.partner!['name'] == partnerName) {
+                    _character.partner!['relation'] = spouseRelation;
+                  } else if (_character.secondPartner != null && _character.secondPartner!['name'] == partnerName) {
+                    _character.secondPartner!['relation'] = spouseRelation;
+                  } else if (_character.thirdPartner != null && _character.thirdPartner!['name'] == partnerName) {
+                    _character.thirdPartner!['relation'] = spouseRelation;
+                  } else if (_character.fourthPartner != null && _character.fourthPartner!['name'] == partnerName) {
+                    _character.fourthPartner!['relation'] = spouseRelation;
+                  } else if (_character.fifthPartner != null && _character.fifthPartner!['name'] == partnerName) {
+                    _character.fifthPartner!['relation'] = spouseRelation;
+                  }
+                  for (var sp in _character.secretPartners) {
+                    if (sp['name'] == partnerName) sp['relation'] = spouseRelation;
+                  }
+                  final String who = (relLower == 'pacar' || relLower.isEmpty)
+                      ? partnerName
+                      : '$relationWithMu ($partnerName)';
+                  _character.inbox.add(
+                    '💒 Pernikahan: Kamu resmi menikah dengan $who! Selamat menjalani kehidupan bersama!'
                   );
                   _character.happiness = (_character.happiness + 40).clamp(0, 100);
                   _character.activeProposal = null;
                 });
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('💍 Kamu resmi menikah secara rahasia dengan $partnerName!'),
+                    content: Text('💒 Selamat! Kamu kini resmi menikah dengan $partnerName!'),
                     backgroundColor: Colors.pink,
                   ),
                 );
@@ -1313,7 +1356,8 @@ class _GameScreenState extends State<GameScreen> {
             _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya.');
           }
 
-          // Delegasikan peluang Ayah Kandung menikah lagi ke ParentRemarriage
+          // Karena Ayah diceraikan, Ibu kandung kini menjadi janda.
+          // Berikan kesempatan Ibu kandung menikah lagi (menghasilkan Ayah Tiri).
           ParentRemarriage.checkAndApplyRemarriage(_character, rand, []);
         }
 
@@ -1334,7 +1378,8 @@ class _GameScreenState extends State<GameScreen> {
           _character.inbox.add('💔 Perceraian: Kamu melaporkan Ibumu, $partnerName, ke $reportTarget. $reportTarget sangat marah dan memutuskan untuk menceraikannya.');
         }
 
-        // Delegasikan peluang Ibu Kandung menikah lagi ke ParentRemarriage
+        // Karena Ibu diceraikan/dipenjara, Ayah kandung (jika ada) kini menjadi duda.
+        // Berikan kesempatan Ayah kandung menikah lagi (menghasilkan Ibu Tiri).
         if (!isJailed) {
           ParentRemarriage.checkAndApplyRemarriage(_character, rand, []);
         }

@@ -932,14 +932,16 @@ class Character {
 
     // Kelahiran dari Ibu Kandung
     if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 18 && motherAge! <= 45) {
-      // Peluang 6% per tahun untuk melahirkan anak baru
-      if (random.nextInt(100) < 6) {
+      // Jika orang tua sudah cerai, ibu tidak bisa melahirkan kecuali menikah lagi dengan pria lain (ada ayah tiri)
+      final bool cannotHaveChild = isMotherDivorced && (stepFatherName == null || isStepFatherDeceased);
+      
+      if (!cannotHaveChild && random.nextInt(100) < 6) {
         final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
         final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
         
         // Ambil nama belakang dari ayah kandung atau ayah tiri, jika tidak ada pakai nama belakang player/ibu
         String lastName = '';
-        if (fatherName != null && !isFatherDeceased) {
+        if (fatherName != null && !isFatherDeceased && !isMotherDivorced) {
           final parts = fatherName!.split(' ');
           if (parts.length > 1) lastName = parts.last;
         } else if (stepFatherName != null && !isStepFatherDeceased) {
@@ -955,8 +957,8 @@ class Character {
         final String babyName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
         
         // Tentukan apakah saudara tiri atau kandung
-        // Jika tidak ada ayah kandung atau ayah kandung sudah meninggal, tapi ada ayah tiri -> adik tiri
-        final bool isStepSibling = (fatherName == null || isFatherDeceased);
+        // Jika tidak ada ayah kandung, atau ayah kandung meninggal, atau orang tua sudah cerai tapi ada ayah tiri -> adik tiri
+        final bool isStepSibling = (fatherName == null || isFatherDeceased || isMotherDivorced);
         final String relType = isStepSibling
             ? (gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan')
             : (gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan');

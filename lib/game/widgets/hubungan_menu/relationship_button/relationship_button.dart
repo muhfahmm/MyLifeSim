@@ -110,6 +110,25 @@ class RelationshipButton extends StatelessWidget {
                       forcedSkinColor: character.fatherSkinColor,
                     ),
                   ),
+                  if (character.stepMotherName != null)
+                    _buildFamilyItem(
+                      context,
+                      icon: Icons.person_add,
+                      label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
+                      status: 'Tiri',
+                      color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
+                      relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                      ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
+                      isDeceased: character.isStepMotherDeceased,
+                      isLivingTogether: character.custodyParent == 'Ayah',
+                      avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                        name: character.stepMotherName!,
+                        gender: 'Perempuan',
+                        age: character.stepMotherAge ?? 40,
+                        happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                        forcedSkinColor: character.stepMotherSkinColor,
+                      ),
+                    ),
                   const SizedBox(height: 16),
                 ],
                 if (character.motherName != null) ...[
@@ -137,6 +156,25 @@ class RelationshipButton extends StatelessWidget {
                       forcedSkinColor: character.motherSkinColor,
                     ),
                   ),
+                  if (character.stepFatherName != null)
+                    _buildFamilyItem(
+                      context,
+                      icon: Icons.person_add,
+                      label: character.isStepFatherDeceased ? 'Ayah Tiri (${character.stepFatherName}) (Wafat)' : 'Ayah Tiri (${character.stepFatherName})',
+                      status: 'Tiri',
+                      color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
+                      relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                      ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
+                      isDeceased: character.isStepFatherDeceased,
+                      isLivingTogether: character.custodyParent == 'Ibu',
+                      avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                        name: character.stepFatherName!,
+                        gender: 'Laki-laki',
+                        age: character.stepFatherAge ?? 40,
+                        happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                        forcedSkinColor: character.stepFatherSkinColor,
+                      ),
+                    ),
                   const SizedBox(height: 16),
                 ],
               ] else ...[
@@ -165,6 +203,25 @@ class RelationshipButton extends StatelessWidget {
                       forcedSkinColor: character.fatherSkinColor,
                     ),
                   ),
+                if (character.stepMotherName != null && !(character.isFatherDivorced || character.isMotherDivorced))
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person_add,
+                    label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
+                    status: 'Tiri',
+                    color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
+                    relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                    ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isStepMotherDeceased,
+                    isLivingTogether: character.custodyParent == 'Ayah',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.stepMotherName!,
+                      gender: 'Perempuan',
+                      age: character.stepMotherAge ?? 40,
+                      happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                      forcedSkinColor: character.stepMotherSkinColor,
+                    ),
+                  ),
                 if (character.motherName != null)
                   _buildFamilyItem(
                     context,
@@ -188,45 +245,27 @@ class RelationshipButton extends StatelessWidget {
                       forcedSkinColor: character.motherSkinColor,
                     ),
                   ),
+                if (character.stepFatherName != null && !(character.isFatherDivorced || character.isMotherDivorced))
+                  _buildFamilyItem(
+                    context,
+                    icon: Icons.person_add,
+                    label: character.isStepFatherDeceased ? 'Ayah Tiri (${character.stepFatherName}) (Wafat)' : 'Ayah Tiri (${character.stepFatherName})',
+                    status: 'Tiri',
+                    color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
+                    relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                    ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
+                    isDeceased: character.isStepFatherDeceased,
+                    isLivingTogether: character.custodyParent == 'Ibu',
+                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: character.stepFatherName!,
+                      gender: 'Laki-laki',
+                      age: character.stepFatherAge ?? 40,
+                      happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                      forcedSkinColor: character.stepFatherSkinColor,
+                    ),
+                  ),
               ],
-              if (character.stepFatherName != null)
-                _buildFamilyItem(
-                  context,
-                  icon: Icons.person_add,
-                  label: character.isStepFatherDeceased ? 'Ayah Tiri (${character.stepFatherName}) (Wafat)' : 'Ayah Tiri (${character.stepFatherName})',
-                  status: 'Tiri',
-                  color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
-                  relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
-                  ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
-                  isDeceased: character.isStepFatherDeceased,
-                  isLivingTogether: character.custodyParent == 'Ayah',
-                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.stepFatherName!,
-                    gender: 'Laki-laki',
-                    age: character.stepFatherAge ?? 40,
-                    happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
-                    forcedSkinColor: character.stepFatherSkinColor,
-                  ),
-                ),
-              if (character.stepMotherName != null)
-                _buildFamilyItem(
-                  context,
-                  icon: Icons.person_add,
-                  label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
-                  status: 'Tiri',
-                  color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
-                  relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
-                  ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
-                  isDeceased: character.isStepMotherDeceased,
-                  isLivingTogether: character.custodyParent == 'Ibu',
-                  avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                    name: character.stepMotherName!,
-                    gender: 'Perempuan',
-                    age: character.stepMotherAge ?? 40,
-                    happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
-                    forcedSkinColor: character.stepMotherSkinColor,
-                  ),
-                ),
+
 
               // ============================================
               // 2. BAGIAN PACAR / TUNANGAN / SUAMI / ISTRI

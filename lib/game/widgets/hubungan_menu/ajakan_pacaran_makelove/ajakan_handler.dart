@@ -66,7 +66,163 @@ class AjakanHandler {
 
     final String myGenderLower = character.gender.trim().toLowerCase();
     
-    // 1. Collect School / College / Job candidates
+    bool hasOppositeSexPartner = false;
+    bool isOppositeSex(Map<String, String>? p) {
+      if (p == null || p['isDeceased'] == 'true') return false;
+      final pGender = (p['gender'] ?? '').trim().toLowerCase();
+      return pGender.isNotEmpty && pGender != myGenderLower;
+    }
+    if (isOppositeSex(character.partner) ||
+        isOppositeSex(character.secondPartner) ||
+        isOppositeSex(character.thirdPartner) ||
+        isOppositeSex(character.fourthPartner) ||
+        isOppositeSex(character.fifthPartner)) {
+      hasOppositeSexPartner = true;
+    }
+    for (var sp in character.secretPartners) {
+      if (isOppositeSex(sp)) {
+        hasOppositeSexPartner = true;
+        break;
+      }
+    }
+    
+    // 1. Intimacy/Romance proposals from existing partner
+    if (age >= 12 && character.partner != null && character.partner!['isDeceased'] != 'true' && character.activeProposal == null) {
+      final int pCount = character.activePartnersCount;
+      if (pCount >= 2) {
+        if (random.nextInt(100) < 60) {
+          final List<Map<String, String>> existing = [];
+          if (character.partner != null && character.partner!['isDeceased'] != 'true') existing.add(character.partner!);
+          if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true') existing.add(character.secondPartner!);
+          if (character.thirdPartner != null && character.thirdPartner!['isDeceased'] != 'true') existing.add(character.thirdPartner!);
+          if (character.fourthPartner != null && character.fourthPartner!['isDeceased'] != 'true') existing.add(character.fourthPartner!);
+          if (character.fifthPartner != null && character.fifthPartner!['isDeceased'] != 'true') existing.add(character.fifthPartner!);
+
+          if (existing.isNotEmpty) {
+            final proposer = existing[random.nextInt(existing.length)];
+            character.activeProposal = {
+              'name': proposer['name'],
+              'relation': proposer['relation'] ?? 'Pacar',
+              'type': 'Ajak 3some',
+              'gender': proposer['gender'] ?? 'Perempuan',
+              'age': proposer['age'] ?? '20',
+              'role': 'Partner',
+            };
+          }
+        }
+      } else {
+        final partnerName = character.partner!['name'] ?? '';
+        final partnerGender = (character.partner!['gender'] ?? 'Perempuan').trim().toLowerCase();
+        final partnerAgeStr = character.partner!['age'] ?? '18';
+        final partnerAge = int.tryParse(partnerAgeStr) ?? 18;
+        final partnerRelation = character.partner!['relation'] ?? 'Pacar';
+
+        bool isFather = (character.fatherName != null && partnerName.contains(character.fatherName!));
+        bool isStepFather = (character.stepFatherName != null && partnerName.contains(character.stepFatherName!));
+        bool isMother = (character.motherName != null && partnerName.contains(character.motherName!));
+        bool isStepMother = (character.stepMotherName != null && partnerName.contains(character.stepMotherName!));
+
+        bool isSibling = false;
+        String siblingRelation = 'Saudara';
+        for (var sib in character.siblings) {
+          final sName = sib['name'];
+          if (sName != null && partnerName.contains(sName)) {
+            isSibling = true;
+            siblingRelation = sib['relation'] ?? 'Saudara';
+            break;
+          }
+        }
+
+        bool isExtendedFamily = false;
+        String extRelation = 'Keluarga';
+        for (var ext in character.extendedFamily) {
+          final extName = ext['name'];
+          if (extName != null && partnerName.contains(extName)) {
+            isExtendedFamily = true;
+            extRelation = ext['relation'] ?? 'Keluarga';
+            break;
+          }
+        }
+
+        bool canProposeMarriage = false;
+        String relationLabel = partnerRelation;
+
+        if (age >= 18 && partnerAge >= 18) {
+          if (isFather) {
+            final bool hasNoStepMother = character.stepMotherName == null || character.isStepMotherDeceased;
+            final bool fatherIsSingle = hasNoStepMother || character.isFatherDivorced;
+            if (fatherIsSingle) {
+              canProposeMarriage = true;
+              relationLabel = 'Ayah';
+            }
+          } else if (isStepFather) {
+            if (character.isMotherDeceased) {
+              canProposeMarriage = true;
+              relationLabel = 'Ayah Tiri';
+            }
+          } else if (isMother) {
+            final bool hasNoStepFather = character.stepFatherName == null || character.isStepFatherDeceased;
+            final bool motherIsSingle = hasNoStepFather || character.isMotherDivorced;
+            if (motherIsSingle) {
+              canProposeMarriage = true;
+              relationLabel = 'Ibu';
+            }
+          } else if (isStepMother) {
+            if (character.isFatherDeceased) {
+              canProposeMarriage = true;
+              relationLabel = 'Ibu Tiri';
+            }
+          } else if (isSibling) {
+            canProposeMarriage = true;
+            relationLabel = siblingRelation;
+          } else if (isExtendedFamily) {
+            canProposeMarriage = true;
+            relationLabel = extRelation;
+          } else {
+            // Regular partner
+            canProposeMarriage = true;
+            relationLabel = partnerRelation;
+          }
+        }
+
+        if (random.nextInt(100) < 65) {
+          String proposalType = 'Bercinta';
+          final bool isTunangan = partnerRelation == 'Tunangan';
+          final bool isSuamiIstri = partnerRelation == 'Suami' || partnerRelation == 'Istri';
+
+          if (isSuamiIstri) {
+            // Sudah menikah: hanya ajak bercinta
+            proposalType = 'Bercinta';
+          } else if (isTunangan && age >= 18) {
+            // Sudah tunangan: tawarkan rencanakan nikah (50%) atau bercinta (50%)
+            proposalType = (random.nextInt(100) < 50) ? 'Rencanakan Nikah' : 'Bercinta';
+          } else if (canProposeMarriage) {
+            int marriageChance = 40;
+            if (isFather || isMother) {
+              final bool isLivingWithProposer = (isFather && character.custodyParent == 'Ayah') ||
+                                                (isMother && character.custodyParent == 'Ibu');
+              marriageChance = isLivingWithProposer ? 70 : 50;
+            } else if (isStepFather || isStepMother || isSibling || isExtendedFamily) {
+              marriageChance = 50;
+            }
+            proposalType = (random.nextInt(100) < marriageChance) ? 'Lamar Nikah' : 'Bercinta';
+          }
+
+          character.activeProposal = {
+            'name': partnerName,
+            'relation': relationLabel,
+            'type': proposalType,
+            'gender': partnerGender == 'laki-laki' ? 'Laki-laki' : 'Perempuan',
+            'age': partnerAgeStr,
+            'role': (isFather || isMother || isSibling || isExtendedFamily) 
+                ? 'Keluarga' 
+                : ((isStepFather || isStepMother) ? 'Tiri' : 'Partner'),
+          };
+        }
+      }
+    }
+
+    // 2. Collect School / College / Job candidates
     List<Map<String, dynamic>> schoolCandidates = [];
 
     if (age < 18) {
@@ -403,81 +559,19 @@ class AjakanHandler {
     }
 
 
-    // 3. Intimacy/Romance proposals from existing partner
-    if (age >= 12 && character.partner != null && character.partner!['isDeceased'] != 'true' && character.activeProposal == null) {
-      final int pCount = character.activePartnersCount;
-      if (pCount >= 2) {
-        if (random.nextInt(100) < 60) {
-          final List<Map<String, String>> existing = [];
-          if (character.partner != null && character.partner!['isDeceased'] != 'true') existing.add(character.partner!);
-          if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true') existing.add(character.secondPartner!);
-          if (character.thirdPartner != null && character.thirdPartner!['isDeceased'] != 'true') existing.add(character.thirdPartner!);
-          if (character.fourthPartner != null && character.fourthPartner!['isDeceased'] != 'true') existing.add(character.fourthPartner!);
-          if (character.fifthPartner != null && character.fifthPartner!['isDeceased'] != 'true') existing.add(character.fifthPartner!);
 
-          if (existing.isNotEmpty) {
-            final proposer = existing[random.nextInt(existing.length)];
-            character.activeProposal = {
-              'name': proposer['name'],
-              'relation': proposer['relation'] ?? 'Pacar',
-              'type': 'Ajak 3some',
-              'gender': proposer['gender'] ?? 'Perempuan',
-              'age': proposer['age'] ?? '20',
-              'role': 'Partner',
-            };
-          }
+    if (character.activeProposal != null) {
+      final String propGender = (character.activeProposal!['gender'] ?? '').trim().toLowerCase();
+      final bool isSameSex = (myGenderLower == propGender);
+      final bool isFromOthers = !character.isAnyPartnerNameMatching(character.activeProposal!['name'] ?? '');
+
+      if (isSameSex) {
+        if (hasOppositeSexPartner && random.nextInt(100) >= 10) {
+          character.activeProposal = null;
         }
       } else {
-        final bool isBiologicalFatherPartner = (character.partner != null && (character.partner!['name'] == character.fatherName || character.partner!['name']!.contains(character.fatherName ?? '___'))) ||
-                                               character.isAnyPartnerNameMatching(character.fatherName ?? '___');
-        final bool isStepFatherPartner = (character.partner != null && (character.partner!['name'] == character.stepFatherName || character.partner!['name']!.contains(character.stepFatherName ?? '___'))) ||
-                                         character.isAnyPartnerNameMatching(character.stepFatherName ?? '___');
-
-        final bool isDaughter = myGenderLower == 'perempuan';
-        final bool hasNoStepMother = character.stepMotherName == null || character.isStepMotherDeceased;
-        final bool fatherIsSingle = hasNoStepMother || character.isFatherDivorced;
-        final bool hasDeadMother = character.isMotherDeceased;
-
-        if (isDaughter && isBiologicalFatherPartner && fatherIsSingle) {
-          final bool isLivingWithFather = character.custodyParent == 'Ayah';
-          final String proposalType = (age >= 18 && random.nextInt(100) < (isLivingWithFather ? 70 : 50)) ? 'Lamar Nikah' : 'Bercinta';
-          final int chance = isLivingWithFather ? 70 : (proposalType == 'Bercinta' ? 70 : 60);
-          if (random.nextInt(100) < chance) {
-            String fAgeStr = character.fatherAge != null ? character.fatherAge.toString() : '40';
-            character.activeProposal = {
-              'name': character.fatherName ?? 'Ayah',
-              'relation': 'Pacar (Ayah)',
-              'type': proposalType,
-              'gender': 'Laki-laki',
-              'age': fAgeStr,
-              'role': 'Keluarga',
-            };
-          }
-        } else if (isDaughter && isStepFatherPartner && hasDeadMother) {
-          final String proposalType = (age >= 18 && random.nextInt(100) < 50) ? 'Lamar Nikah' : 'Bercinta';
-          final int chance = proposalType == 'Bercinta' ? 70 : 60;
-          if (random.nextInt(100) < chance) {
-            String sfAgeStr = character.stepFatherAge != null ? character.stepFatherAge.toString() : '40';
-            character.activeProposal = {
-              'name': character.stepFatherName ?? 'Ayah Tiri',
-              'relation': 'Pacar (Ayah Tiri)',
-              'type': proposalType,
-              'gender': 'Laki-laki',
-              'age': sfAgeStr,
-              'role': 'Tiri',
-            };
-          }
-        } else {
-          if (random.nextInt(100) < 60) {
-            character.activeProposal = {
-              'name': character.partner!['name'],
-              'relation': character.partner!['relation'] ?? 'Pacar',
-              'type': 'Bercinta',
-              'gender': character.partner!['gender'] ?? 'Perempuan',
-              'age': character.partner!['age'] ?? '18',
-              'role': 'Partner',
-            };
-          }
+        if (isFromOthers && hasOppositeSexPartner && random.nextInt(100) >= 15) {
+          character.activeProposal = null;
         }
       }
     }
