@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 
 class IdolManager {
   static String _generateName(String gender, Random rand, Character character) {
@@ -276,10 +277,10 @@ class IdolManager {
 
       if (getPromoted) {
         character.jobName = 'Idol (Main Performer)';
-        // 20M-40M IDR -> $1,333 to $2,667 USD
-        character.jobSalary = 1333 + rand.nextInt(1335); 
+        final double salaryMult = getCountrySalaryMultiplier(character.location);
+        character.jobSalary = ((1333 + rand.nextInt(1335)) * salaryMult).round(); 
         
-        final notice = '✨ Promosi Idol: Selamat! Setelah berjuang sebagai Trainee, kamu resmi dipromosikan menjadi anggota tim utama (Main Team) dengan gaji \$${character.jobSalary}/tahun! 🎤🌟';
+        final String notice = '✨ Promosi Idol: Selamat! Setelah berjuang sebagai Trainee, kamu resmi dipromosikan menjadi anggota tim utama (Main Team) dengan gaji \$${character.jobSalary}/tahun! 🎤🌟';
         events.add(notice);
         inbox.add(notice);
       }

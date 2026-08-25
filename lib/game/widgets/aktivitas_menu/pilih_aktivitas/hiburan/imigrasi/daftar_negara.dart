@@ -416,3 +416,23 @@ final List<Map<String, dynamic>> negaraList = [
   // 207
   {'name': 'yunani', 'cost': 4000000, 'happiness': 15, 'desc': 'Kebudayaan Yunani kuno dan pulau-pulau indah'},
 ];
+
+double getCountrySalaryMultiplier(String locationName) {
+  final String query = locationName.toLowerCase().trim();
+  
+  final Map<String, dynamic> map = negaraList.firstWhere(
+    (n) => n['name'].toString().toLowerCase().trim() == query,
+    orElse: () => <String, dynamic>{},
+  );
+  
+  if (map.isEmpty) {
+    return 1.0; 
+  }
+  
+  final int cost = map['cost'] as int;
+  // Gunakan Indonesia (1.500.000) sebagai basis 1.0x
+  double mult = cost / 1500000.0;
+  
+  // Clamping agar multiplier berada di rentang 0.2x hingga 8.0x
+  return mult.clamp(0.2, 8.0);
+}

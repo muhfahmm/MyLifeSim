@@ -8,7 +8,7 @@ import 'actions/rekan_kerja.dart';
 import 'actions/bekerja_keras.dart';
 import 'idol_logic/idol_manager.dart';
 import 'idol_logic/idol_menu.dart';
-
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 // ============================================================
 // EXTENSION untuk menambahkan isUnivGraduated ke Character
 // ============================================================
@@ -907,7 +907,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     final isGraduatedRedirect = (job['title'] == 'Idol (Trainee)' && widget.character.hasGraduatedIdol);
     final String finalTitle = isGraduatedRedirect ? 'Staf Operasional Idol' : job['title'];
-    final int finalSalary = isGraduatedRedirect ? 500 : job['salary'];
+    final int baseSalary = isGraduatedRedirect ? 500 : job['salary'];
+    final double salaryMult = getCountrySalaryMultiplier(widget.character.location);
+    final int finalSalary = (baseSalary * salaryMult).round();
 
     // Lamaran diterima
     setState(() {
@@ -1031,19 +1033,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     // Other cases: start with standard jobs
     List<Map<String, dynamic>> jobs = List.from(_availableJobs);
-
-    // If female >= 18, also add "Idol (Trainee)"
-    if (gender == 'Perempuan' && age >= 18) {
-      jobs.insert(0, {
-        'title': 'Idol (Trainee)',
-        'salary': 667 + Random().nextInt(667),
-        'minIntel': 0,
-        'category': 'Khusus',
-        'desc': 'Bergabunglah dengan grup trainee Idol baru',
-        'icon': Icons.music_note,
-        'color': Colors.pink,
-      });
-    }
 
     // If male (or anyone >= 18), they see staff positions
     if (age >= 18) {
@@ -1311,7 +1300,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Gaji: \$${job['salary']}/tahun • ${job['category']}'),
+            Text('Gaji: \$${(job['salary'] * getCountrySalaryMultiplier(character.location)).round()}/tahun • ${job['category']}'),
             Text(
               job['desc'],
               style: const TextStyle(fontSize: 12, color: Colors.grey),
