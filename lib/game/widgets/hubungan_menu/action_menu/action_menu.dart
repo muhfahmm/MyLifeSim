@@ -1235,8 +1235,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               widget.targetRole == 'Suami' ||
               widget.targetRole == 'Istri';
 
-          bool hasPacaran = actions.any((act) => act.label.contains('Pacaran'));
+          bool hasPacaran = actions.any((act) => act.label.contains('Pacaran') || act.label.contains('Balikan'));
           if (!hasPacaran &&
+              !isActivePartner &&
               !isAlreadyPartner &&
               !isAlreadySecondPartner &&
               !isPartnerRole) {
@@ -1667,7 +1668,109 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         },
       ));
 
-      // 3. Threesome (jika pacar >= 2)
+      // 3. Minta Cerai (jika target adalah ayah/ibu kandung/tiri yang sedang pacaran dengan anak dan pasangannya masih ada)
+      final String myGenderLower = widget.character.gender.toLowerCase();
+      final bool isDatingMother = (cleanRole.contains('ibu') || cleanName.contains('ibu')) &&
+          !cleanRole.contains('tiri') && !cleanName.contains('tiri') &&
+          widget.character.isAnyPartnerNameMatching(widget.targetName);
+      final bool isDatingStepMother = (cleanRole.contains('tiri') || cleanName.contains('tiri')) &&
+          (cleanRole.contains('ibu') || cleanName.contains('ibu')) &&
+          widget.character.isAnyPartnerNameMatching(widget.targetName);
+
+      final bool isMotherPartnerAndFatherTiriExists = myGenderLower == 'laki-laki' &&
+          isDatingMother && widget.character.stepFatherName != null && !widget.character.isStepFatherDeceased;
+      final bool isStepMotherPartnerAndFatherExists = myGenderLower == 'laki-laki' &&
+          isDatingStepMother && widget.character.fatherName != null && !widget.character.isFatherDeceased;
+
+      final bool showMintaCerai = isFatherPartnerAndMotherTiriExists ||
+          isStepFatherPartnerAndMotherExists ||
+          isMotherPartnerAndFatherTiriExists ||
+          isStepMotherPartnerAndFatherExists;
+
+      if (showMintaCerai) {
+        final String spouseName = (isFatherPartnerAndMotherTiriExists)
+            ? (widget.character.stepMotherName ?? 'Ibu Tiri')
+            : (isStepFatherPartnerAndMotherExists)
+                ? (widget.character.motherName ?? 'Ibu Kandung')
+                : (isMotherPartnerAndFatherTiriExists)
+                    ? (widget.character.stepFatherName ?? 'Ayah Tiri')
+                    : (widget.character.fatherName ?? 'Ayah Kandung');
+
+        final String targetParentLabel = (isFatherPartnerAndMotherTiriExists || isStepFatherPartnerAndMotherExists) ? 'Ayah' : 'Ibu';
+
+        topActions.add(ActionItem(
+          label: 'Minta Cerai dengan $spouseName',
+          icon: Icons.heart_broken,
+          color: Colors.redAccent,
+          onTap: () {
+            final screenContext = context;
+            showDialog(
+              context: screenContext,
+              builder: (confirmContext) => AlertDialog(
+                title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+                content: Text('Apakah kamu yakin ingin meminta ${targetParentLabel}mu untuk menceraikan $spouseName?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(confirmContext),
+                    child: const Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(confirmContext);
+                      final bool success = _random.nextInt(100) < 40;
+                      if (success) {
+                        if (isFatherPartnerAndMotherTiriExists) {
+                          widget.character.stepMotherName = null;
+                          widget.character.stepMotherAge = null;
+                          widget.character.stepMotherRelationship = null;
+                        } else if (isStepFatherPartnerAndMotherExists) {
+                          widget.character.motherName = null;
+                          widget.character.motherAge = null;
+                          widget.character.motherRelationship = null;
+                        } else if (isMotherPartnerAndFatherTiriExists) {
+                          widget.character.stepFatherName = null;
+                          widget.character.stepFatherAge = null;
+                          widget.character.stepFatherRelationship = null;
+                        } else if (isStepMotherPartnerAndFatherExists) {
+                          widget.character.fatherName = null;
+                          widget.character.fatherAge = null;
+                          widget.character.fatherRelationship = null;
+                        }
+
+                        final String msg = '💔 ${targetParentLabel}mu memutuskan untuk menceraikan $spouseName atas permintaanmu!';
+                        widget.character.inbox.add(msg);
+                        _updateRelationship(15);
+                        _updateState();
+
+                        _showResultDialog(
+                          'Sukses 💔',
+                          '${targetParentLabel}mu menyetujui permintaanmu dan kini resmi menceraikan $spouseName.',
+                          Icons.done,
+                          Colors.green,
+                          () {}
+                        );
+                      } else {
+                        _updateRelationship(-15);
+                        _updateState();
+                        _showResultDialog(
+                          'Ditolak 🚫',
+                          '${targetParentLabel}mu menolak untuk menceraikan $spouseName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
+                          Icons.block,
+                          Colors.red,
+                          () {}
+                        );
+                      }
+                    },
+                    child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            );
+          },
+        ));
+      }
+
+      // 4. Threesome (jika pacar >= 2)
       if (widget.character.activePartnersCount >= 2) {
         topActions.add(ActionItem(
           label: 'Threesome',
@@ -1807,6 +1910,58 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             .removeWhere((act) => act.label.toLowerCase().contains('bioskop'));
       }
     }
+
+    // Cek apakah target berada di negara yang sama dengan pemain
+    bool isDifferentCountry = false;
+    Map<String, String>? currentPartnerMap;
+    final List<Map<String, String>> allPartners = [];
+    if (widget.character.partner != null) allPartners.add(widget.character.partner!);
+    if (widget.character.secondPartner != null) allPartners.add(widget.character.secondPartner!);
+    if (widget.character.thirdPartner != null) allPartners.add(widget.character.thirdPartner!);
+    if (widget.character.fourthPartner != null) allPartners.add(widget.character.fourthPartner!);
+    if (widget.character.fifthPartner != null) allPartners.add(widget.character.fifthPartner!);
+    for (var p in allPartners) {
+      if (p['name'] == widget.targetName || widget.targetName.contains(p['name'] ?? '___')) {
+        currentPartnerMap = p;
+        break;
+      }
+    }
+    
+    if (currentPartnerMap != null) {
+      final String partnerLoc = currentPartnerMap['location'] ?? widget.character.birthCountry ?? 'Indonesia';
+      if (widget.character.location.toLowerCase() != partnerLoc.toLowerCase()) {
+        isDifferentCountry = true;
+      }
+    } else {
+      final bool isTargetFamily = isFatherOrMother || isSiblingEntry || isExtendedEntry;
+      if (isTargetFamily) {
+        if (widget.character.location.toLowerCase() != (widget.character.birthCountry ?? 'Indonesia').toLowerCase()) {
+          isDifferentCountry = true;
+        }
+      }
+    }
+
+    if (isDifferentCountry) {
+      actions.removeWhere((act) =>
+          act.label.toLowerCase().contains('bercinta') ||
+          act.label.toLowerCase().contains('make love') ||
+          act.label.toLowerCase().contains('threesome') ||
+          act.label.toLowerCase().contains('3some'));
+    }
+
+    // Pindahkan Lihat Keluarga ke posisi pertama paling atas
+    ActionItem? lihatKeluargaAct;
+    for (var act in actions) {
+      if (act.label == 'Lihat Keluarga') {
+        lihatKeluargaAct = act;
+        break;
+      }
+    }
+    if (lihatKeluargaAct != null) {
+      actions.remove(lihatKeluargaAct);
+      actions.insert(0, lihatKeluargaAct);
+    }
+
     final int relationshipVal = _getCurrentRelationshipValue();
 
     return Scaffold(

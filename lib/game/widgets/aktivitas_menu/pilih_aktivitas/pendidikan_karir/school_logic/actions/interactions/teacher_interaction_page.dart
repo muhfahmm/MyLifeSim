@@ -278,9 +278,9 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               ),
               // Aksi 2: Ajak Pacaran
               _buildActionTile(
-                icon: Icons.favorite_border,
-                color: Colors.redAccent,
-                title: 'Ajak Pacaran',
+                icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
+                color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
+                title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
                 onTap: () {
                   final userGen = widget.character.gender;
                   final teacherGen = gender;

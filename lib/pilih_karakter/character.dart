@@ -11,6 +11,7 @@ class Character {
   String name;
   String gender;
   String location;
+  String? birthCountry;
   int age;
   int health;
   int happiness;
@@ -640,6 +641,7 @@ class Character {
     this.avatarSkinColor,
     this.avatarFacialHairType,
   }) : inbox = [] {
+    birthCountry = location;
     if (partner != null) {
       this.partner = partner;
     }

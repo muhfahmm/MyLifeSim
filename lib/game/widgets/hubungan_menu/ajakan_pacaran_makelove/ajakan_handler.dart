@@ -184,29 +184,58 @@ class AjakanHandler {
           }
         }
 
-        if (random.nextInt(100) < 65) {
-          String proposalType = 'Bercinta';
-          final bool isTunangan = partnerRelation == 'Tunangan';
-          final bool isSuamiIstri = partnerRelation == 'Suami' || partnerRelation == 'Istri';
+        final String partnerLoc = character.partner?['location'] ?? character.birthCountry ?? 'Indonesia';
+        final bool differentCountry = character.location.toLowerCase() != partnerLoc.toLowerCase();
 
-          if (isSuamiIstri) {
-            // Sudah menikah: hanya ajak bercinta
+        final bool isSuamiIstri = partnerRelation == 'Suami' || partnerRelation == 'Istri';
+        final bool isTunangan = partnerRelation == 'Tunangan';
+        String? proposalType;
+
+        if (isSuamiIstri) {
+          // Jika sudah menikah: peluang murni ajak bercinta 70% (khusus perempuan-laki), default 65%
+          int bercintaChance = (myGenderLower == 'perempuan' && partnerGender == 'laki-laki') ? 70 : 65;
+          if (!differentCountry && random.nextInt(100) < bercintaChance) {
             proposalType = 'Bercinta';
-          } else if (isTunangan && age >= 18) {
-            // Sudah tunangan: tawarkan rencanakan nikah (50%) atau bercinta (50%)
-            proposalType = (random.nextInt(100) < 50) ? 'Rencanakan Nikah' : 'Bercinta';
-          } else if (canProposeMarriage) {
-            int marriageChance = 40;
-            if (isFather || isMother) {
-              final bool isLivingWithProposer = (isFather && character.custodyParent == 'Ayah') ||
-                                                (isMother && character.custodyParent == 'Ibu');
-              marriageChance = isLivingWithProposer ? 70 : 50;
-            } else if (isStepFather || isStepMother || isSibling || isExtendedFamily) {
-              marriageChance = 50;
-            }
-            proposalType = (random.nextInt(100) < marriageChance) ? 'Lamar Nikah' : 'Bercinta';
           }
+        } else if (isTunangan && age >= 18) {
+          // Jika tunangan: peluang murni ajakan 60% (khusus perempuan-laki), default 65%
+          int triggerChance = (myGenderLower == 'perempuan' && partnerGender == 'laki-laki') ? 60 : 65;
+          if (random.nextInt(100) < triggerChance) {
+            proposalType = differentCountry ? 'Rencanakan Nikah' : ((random.nextInt(100) < 50) ? 'Rencanakan Nikah' : 'Bercinta');
+          }
+        } else if (canProposeMarriage) {
+          // Jika pacaran biasa:
+          if (myGenderLower == 'perempuan' && partnerGender == 'laki-laki') {
+            // Peluang Lamar Nikah murni 60%
+            if (random.nextInt(100) < 60) {
+              proposalType = 'Lamar Nikah';
+            }
+            // Jika tidak melamar, peluang Bercinta murni 60%
+            else if (!differentCountry && random.nextInt(100) < 60) {
+              proposalType = 'Bercinta';
+            }
+          } else {
+            // Default logic untuk gender/orientasi lainnya (peluang total 65%)
+            if (random.nextInt(100) < 65) {
+              int marriageChance = 40;
+              if (isFather || isMother) {
+                final bool isLivingWithProposer = (isFather && character.custodyParent == 'Ayah') ||
+                                                  (isMother && character.custodyParent == 'Ibu');
+                marriageChance = isLivingWithProposer ? 70 : 50;
+              } else if (isStepFather || isStepMother || isSibling || isExtendedFamily) {
+                marriageChance = 50;
+              }
+              
+              if (differentCountry) {
+                proposalType = 'Lamar Nikah';
+              } else {
+                proposalType = (random.nextInt(100) < marriageChance) ? 'Lamar Nikah' : 'Bercinta';
+              }
+            }
+          }
+        }
 
+        if (proposalType != null) {
           character.activeProposal = {
             'name': partnerName,
             'relation': relationLabel,

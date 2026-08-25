@@ -368,9 +368,9 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             // Aksi 2: Ajak Pacaran (Jika belum pacaran)
             if (!widget.character.isAnyPartnerNameMatching(name)) ...[
               _buildActionTile(
-                icon: Icons.favorite_border,
-                color: Colors.redAccent,
-                title: 'Ajak Pacaran',
+                icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
+                color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
+                title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
                 onTap: () {
                   final isFemale = widget.character.gender.trim().toLowerCase() == 'perempuan';
                   final isStaff = widget.category == 'Staff';

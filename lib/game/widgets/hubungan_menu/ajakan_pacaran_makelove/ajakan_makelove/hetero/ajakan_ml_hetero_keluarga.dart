@@ -51,16 +51,14 @@ class AjakanMlHeteroKeluarga {
     }
 
     if (rand.nextInt(100) < chance) {
-      if (rand.nextInt(100) >= 80) {
-        return {
-          'name': candidate['name'],
-          'relation': candidate['relation'],
-          'type': 'Bercinta',
-          'gender': candidate['gender'],
-          'age': candidate['age'],
-          'role': candidate['role'],
-        };
-      }
+      return {
+        'name': candidate['name'],
+        'relation': candidate['relation'],
+        'type': 'Bercinta',
+        'gender': candidate['gender'],
+        'age': candidate['age'],
+        'role': candidate['role'],
+      };
     }
     return null;
   }

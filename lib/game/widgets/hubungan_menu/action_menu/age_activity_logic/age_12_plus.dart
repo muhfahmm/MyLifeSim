@@ -42,6 +42,19 @@ List<ActionItem> getAge12PlusActions(
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
   final bool isAlreadyPartner = character.partner != null && character.partner!['name'] == targetName;
   final bool isAlreadySecondPartner = character.secondPartner != null && character.secondPartner!['name'] == targetName;
+  bool isActivePartner = character.isAnyPartnerNameMatching(targetName);
+  if (!isActivePartner) {
+    if (character.partner != null &&
+        (character.partner!['name'] == targetName ||
+            targetName.contains(character.partner!['name'] ?? '___'))) {
+      isActivePartner = true;
+    }
+    if (character.secondPartner != null &&
+        (character.secondPartner!['name'] == targetName ||
+            targetName.contains(character.secondPartner!['name'] ?? '___'))) {
+      isActivePartner = true;
+    }
+  }
   final bool hasExistingPartner = character.partner != null;
   final bool isChild = targetRole == 'Laki-laki' || targetRole == 'Perempuan';
 
@@ -278,7 +291,7 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 2. Ajak Pacaran / Ajak Balikan (dengan logika khusus mantan pacar)
-  if (!isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
+  if (!isActivePartner && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
     final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
     final String actionLabel = isExPartner 
         ? 'Ajak Balikan' 

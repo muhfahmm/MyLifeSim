@@ -59,9 +59,13 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
           ),
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              final bool wasIdol = char.isIdol;
+              final bool wasMain = isMain;
+              final navigator = Navigator.of(context);
+              Navigator.pop(context); // Pop confirmation dialog
+
               setState(() {
-                if (char.isIdol && isMain) {
+                if (wasIdol && wasMain) {
                   widget.character.hasGraduatedIdol = true;
                 }
                 widget.character.jobName = null;
@@ -71,24 +75,28 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                 widget.character.idolStaff.clear();
               });
               widget.onRefresh();
-              Navigator.pop(context); // Go back out
 
               DialogHelper.show(
                 context: context,
-                title: char.isIdol 
-                    ? (isMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
+                title: wasIdol 
+                    ? (wasMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
                     : 'Resign Kerja 📢',
                 content: Text(
-                  char.isIdol
-                      ? (isMain
+                  wasIdol
+                      ? (wasMain
                           ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
                           : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
                       : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
                 ),
                 actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: const Text('Mulai Langkah Baru'),
+                  Builder(
+                    builder: (btnContext) => TextButton(
+                      onPressed: () {
+                        Navigator.pop(btnContext); // Pop the dialog
+                        navigator.pop(); // Pop the IdolMenu screen
+                      },
+                      child: const Text('Mulai Langkah Baru'),
+                    ),
                   ),
                 ],
               );

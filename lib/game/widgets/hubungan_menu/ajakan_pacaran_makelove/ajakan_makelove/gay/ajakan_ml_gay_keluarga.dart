@@ -36,17 +36,14 @@ class AjakanMlGayKeluarga {
     }
 
     if (rand.nextInt(100) < chance) {
-      // bercinta check is 20% of the normal dating proposal
-      if (rand.nextInt(100) >= 80) {
-        return {
-          'name': candidate['name'],
-          'relation': candidate['relation'],
-          'type': 'Bercinta',
-          'gender': candidate['gender'],
-          'age': candidate['age'],
-          'role': candidate['role'],
-        };
-      }
+      return {
+        'name': candidate['name'],
+        'relation': candidate['relation'],
+        'type': 'Bercinta',
+        'gender': candidate['gender'],
+        'age': candidate['age'],
+        'role': candidate['role'],
+      };
     }
     return null;
   }

@@ -428,7 +428,8 @@ class IdolManager {
       currentOps++;
     }
 
-    // 5. User graduation check
+    // 5. User graduation check (Disabled: User only graduates manually)
+    /*
     final bool isMainTeam = character.jobName == 'Idol (Main Performer)';
     if (isMainTeam && character.age >= 25) {
       bool delayGraduation = false;
@@ -450,5 +451,6 @@ class IdolManager {
         return; // Early return
       }
     }
+    */
   }
 }

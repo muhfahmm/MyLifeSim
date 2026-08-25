@@ -766,6 +766,15 @@ class _GameScreenState extends State<GameScreen> {
     _character.pregnantByPartnerName = null;
     _character.pregnantByPartnerRole = null;
 
+    final bool hasLivingParents = 
+        (_character.fatherName != null && !_character.isFatherDeceased) ||
+        (_character.motherName != null && !_character.isMotherDeceased) ||
+        (_character.stepFatherName != null && !_character.isStepFatherDeceased) ||
+        (_character.stepMotherName != null && !_character.isStepMotherDeceased);
+
+    final bool isMarried = _character.partner != null && 
+        (_character.partner!['relation'] == 'Suami' || _character.partner!['relation'] == 'Istri');
+
     // Tampilkan modal keberhasilan lahir
     if (!mounted) return;
     showDialog(
@@ -784,6 +793,135 @@ class _GameScreenState extends State<GameScreen> {
           'Selamat, ${_character.name} telah melahirkan seorang ${childGender == 'Laki-laki' ? 'putra' : 'putri'} bernama $childName.\n\n'
           'Hubunganmu dengan $partnerName semakin erat!',
           style: const TextStyle(fontSize: 14),
+        ),
+        actions: hasLivingParents
+            ? [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showTellParentsResult(isMarried);
+                  },
+                  child: const Text('Beri tahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                    _showHideParentsResult();
+                  },
+                  child: const Text('Sembunyikan dari Orang Tua', style: TextStyle(color: Colors.grey)),
+                ),
+              ]
+            : [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+      ),
+    );
+  }
+
+  void _showTellParentsResult(bool isMarried) {
+    if (!isMarried) {
+      // Hamil/Melahirkan di luar nikah -> Ortu marah, hubungan turun
+      setState(() {
+        if (_character.fatherName != null && !_character.isFatherDeceased) {
+          _character.fatherRelationship = (_character.fatherRelationship! - 40).clamp(0, 100);
+        }
+        if (_character.motherName != null && !_character.isMotherDeceased) {
+          _character.motherRelationship = (_character.motherRelationship! - 40).clamp(0, 100);
+        }
+        if (_character.stepFatherName != null && !_character.isStepFatherDeceased) {
+          _character.stepFatherRelationship = (_character.stepFatherRelationship! - 40).clamp(0, 100);
+        }
+        if (_character.stepMotherName != null && !_character.isStepMotherDeceased) {
+          _character.stepMotherRelationship = (_character.stepMotherRelationship! - 40).clamp(0, 100);
+        }
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.sentiment_very_dissatisfied, color: Colors.red, size: 28),
+              SizedBox(width: 8),
+              Text('Orang Tua Marah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            'Orang tuamu sangat terkejut dan marah besar mengetahui kamu melahirkan anak di luar nikah!\n\n'
+            'Hubungan kalian memburuk secara drastis (-40% hubungan).',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Menikah -> Ortu senang, hubungan naik
+      setState(() {
+        if (_character.fatherName != null && !_character.isFatherDeceased) {
+          _character.fatherRelationship = (_character.fatherRelationship! + 15).clamp(0, 100);
+        }
+        if (_character.motherName != null && !_character.isMotherDeceased) {
+          _character.motherRelationship = (_character.motherRelationship! + 15).clamp(0, 100);
+        }
+        if (_character.stepFatherName != null && !_character.isStepFatherDeceased) {
+          _character.stepFatherRelationship = (_character.stepFatherRelationship! + 15).clamp(0, 100);
+        }
+        if (_character.stepMotherName != null && !_character.isStepMotherDeceased) {
+          _character.stepMotherRelationship = (_character.stepMotherRelationship! + 15).clamp(0, 100);
+        }
+      });
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.sentiment_very_satisfied, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Text('Orang Tua Senang! 🥰', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            'Orang tuamu sangat bahagia menyambut kelahiran cucu baru mereka!\n\n'
+            'Hubungan kalian semakin erat (+15% hubungan).',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        ),
+      );
+    }
+  }
+
+  void _showHideParentsResult() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Row(
+          children: [
+            Icon(Icons.vpn_key, color: Colors.blueGrey, size: 28),
+            SizedBox(width: 8),
+            Text('Rahasia Terjaga 🤫', style: TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: const Text(
+          'Kamu memilih untuk merahasiakan kelahiran anakmu dari orang tua demi menghindari konflik atau ketegangan.',
+          style: TextStyle(fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -1980,6 +2118,8 @@ class _GameScreenState extends State<GameScreen> {
                     const SizedBox(height: 8),
                     Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 2),
+                    Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: const TextStyle(fontSize: 13, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
                     Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 16, color: Colors.grey)),
                     const SizedBox(height: 4),
                     (() {
