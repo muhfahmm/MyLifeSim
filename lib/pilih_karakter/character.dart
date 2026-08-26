@@ -21,6 +21,10 @@ class Character {
   bool isAlive;
   int followers = 0;
 
+  // --- WAKTU PERMAINAN (TANGGAL DINAMIS) ---
+  DateTime? birthDate;
+  DateTime? currentDate;
+
   // --- KUSTOMISASI ATRIBUT & TALENTA BARU ---
   int discipline;
   int fertility;
@@ -645,6 +649,9 @@ class Character {
     if (partner != null) {
       this.partner = partner;
     }
+    // Default game date to real life DateTime
+    birthDate ??= DateTime.now();
+    currentDate ??= birthDate;
   }
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
@@ -673,6 +680,11 @@ class Character {
     age++;
     health -= 2;
     accumulateNPCsWealth();
+
+    // Tambah tahun pada currentDate jika tidak null
+    if (currentDate != null) {
+      currentDate = DateTime(currentDate!.year + 1, currentDate!.month, currentDate!.day);
+    }
 
     // Age up all NPCs
     for (var list in [classmates, univClassmates, univLecturers, sdTeachers, smpTeachers, smaTeachers, coworkers]) {

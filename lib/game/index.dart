@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_re
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 
 // Import widget-widget UI
 import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
@@ -15,6 +16,7 @@ import 'package:bitlife/game/widgets/assets_menu/assets_button.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/relationship_button.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
+import 'package:bitlife/game/widgets/kategori_usia/next_day_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
@@ -286,6 +288,59 @@ class _GameScreenState extends State<GameScreen> {
     ).then((_) {
       countdownTimer?.cancel();
     });
+  }
+
+  // --- LOGIKA TAMBAH HARI ---
+  void _nextDay() {
+    if (!_character.isAlive) return;
+    setState(() {
+      if (_character.currentDate != null) {
+        _character.currentDate = _character.currentDate!.add(const Duration(days: 1));
+      } else {
+        _character.currentDate = DateTime.now().add(const Duration(days: 1));
+      }
+    });
+
+    final random = Random();
+    // Panggil checkAndGenerateProposal secara langsung agar persentase internal (ml, pacaran, 3some) tetap sama persis seperti saat bertambah umur
+    AjakanHandler.checkAndGenerateProposal(_character, random);
+    if (_character.activeProposal != null) {
+      _checkActiveProposal();
+      return;
+    }
+
+    // 15% peluang memicu kejadian harian acak biasa jika tidak ada proposal
+    if (random.nextInt(100) < 15) {
+      final dailyEvents = [
+        'Kamu menemukan uang Rp 10.000 di jalan!',
+        'Kamu tidak sengaja terpeleset, untungnya tidak terluka.',
+        'Tetanggamu menyapamu dengan sangat ramah hari ini.',
+        'Hari ini cuaca sangat cerah dan membuat suasana hatimu tenang.',
+        'Kamu menghabiskan waktu luang dengan membaca buku favoritmu.',
+        'Kamu merasa sangat bugar setelah tidur yang nyenyak tadi malam.',
+        'Seorang teman lama mengirimkan pesan menanyakan kabarmu.'
+      ];
+      final eventText = dailyEvents[random.nextInt(dailyEvents.length)];
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.info_outline, color: Colors.blueAccent, size: 28),
+              SizedBox(width: 8),
+              Text('Kejadian Hari Ini', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(eventText),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
@@ -2071,13 +2126,35 @@ class _GameScreenState extends State<GameScreen> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
-        automaticallyImplyLeading: false,
         leading: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.menu),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+          builder: (context) {
+            final date = _character.currentDate ?? DateTime.now();
+            final months = [
+              'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+            ];
+            final formattedDate = "${date.day} ${months[date.month - 1]} ${date.year}";
+
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.menu),
+                  onPressed: () => Scaffold.of(context).openDrawer(),
+                ),
+                Text(
+                  formattedDate,
+                  style: const TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blueGrey,
+                  ),
+                ),
+              ],
+            );
+          },
         ),
+        leadingWidth: 200, // Beri space yang cukup untuk hamburger + tanggal
       ),
       drawer: PausedMenu(
         onRestart: _resetGame,
@@ -2116,6 +2193,22 @@ class _GameScreenState extends State<GameScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
+                    // Display Tanggal Lahir & Tanggal Sekarang
+                    (() {
+                      final months = [
+                        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+                      ];
+                      final birth = _character.birthDate ?? DateTime.now();
+                      final formattedBirth = "${birth.day} ${months[birth.month - 1]} ${birth.year}";
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6.0),
+                        child: Text(
+                          'Tanggal Lahir: $formattedBirth',
+                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                        ),
+                      );
+                    })(),
                     Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
                     Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
                     const SizedBox(height: 2),
@@ -2308,6 +2401,11 @@ class _GameScreenState extends State<GameScreen> {
                 // 5. TAMBAH UMUR
                 AgeUpButton(
                   onPressed: _character.isAlive ? _ageUp : null,
+                ),
+
+                // 6. TAMBAH HARI
+                NextDayButton(
+                  onPressed: _character.isAlive ? _nextDay : null,
                 ),
               ],
             ),
