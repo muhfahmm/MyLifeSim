@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 
 // ============================================================
 // PART FILES
@@ -122,18 +123,7 @@ class _GarasiMobilPageState extends State<GarasiMobilPage> {
   int totalPengunjungShowroom = 0;
 
   // ---- DATA MOBIL YANG TERSEDIA UNTUK DIBELI ----
-  final List<Map<String, dynamic>> _mobilTersedia = [
-    {'id': '1', 'nama': 'Toyota Avanza', 'merek': 'Toyota', 'tahun': 2022, 'harga': 250000000, 'tipe': 'SUV', 'kondisi': 'Baru', 'hp': 120, 'topSpeed': 180},
-    {'id': '2', 'nama': 'Honda Civic', 'merek': 'Honda', 'tahun': 2023, 'harga': 450000000, 'tipe': 'Sedan', 'kondisi': 'Baru', 'hp': 180, 'topSpeed': 220},
-    {'id': '3', 'nama': 'Toyota Fortuner', 'merek': 'Toyota', 'tahun': 2022, 'harga': 600000000, 'tipe': 'SUV', 'kondisi': 'Baru', 'hp': 200, 'topSpeed': 190},
-    {'id': '4', 'nama': 'BMW M4', 'merek': 'BMW', 'tahun': 2023, 'harga': 1200000000, 'tipe': 'Sport', 'kondisi': 'Baru', 'hp': 350, 'topSpeed': 290},
-    {'id': '5', 'nama': 'Mercedes AMG GT', 'merek': 'Mercedes', 'tahun': 2023, 'harga': 2500000000, 'tipe': 'Sport', 'kondisi': 'Baru', 'hp': 450, 'topSpeed': 310},
-    {'id': '6', 'nama': 'Ferrari F8', 'merek': 'Ferrari', 'tahun': 2022, 'harga': 5000000000, 'tipe': 'Hypercar', 'kondisi': 'Baru', 'hp': 700, 'topSpeed': 340},
-    {'id': '7', 'nama': 'Lamborghini Aventador', 'merek': 'Lamborghini', 'tahun': 2022, 'harga': 6000000000, 'tipe': 'Hypercar', 'kondisi': 'Baru', 'hp': 750, 'topSpeed': 350},
-    {'id': '8', 'nama': 'Porsche 911', 'merek': 'Porsche', 'tahun': 2023, 'harga': 2000000000, 'tipe': 'Sport', 'kondisi': 'Baru', 'hp': 380, 'topSpeed': 300},
-    {'id': '9', 'nama': 'Mitsubishi Pajero', 'merek': 'Mitsubishi', 'tahun': 2021, 'harga': 500000000, 'tipe': 'SUV', 'kondisi': 'Bekas', 'hp': 160, 'topSpeed': 180},
-    {'id': '10', 'nama': 'Ford Mustang', 'merek': 'Ford', 'tahun': 2022, 'harga': 800000000, 'tipe': 'Sport', 'kondisi': 'Baru', 'hp': 400, 'topSpeed': 280},
-  ];
+  final List<Map<String, dynamic>> _mobilTersedia = mobilTersediaList;
 
   @override
   void initState() {
