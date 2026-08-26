@@ -18,7 +18,14 @@ List<ActionItem> getAge6to11Actions(
 
   // --- Helper untuk meminta barang ---
   void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
-    if (random.nextInt(100) < successRate) {
+    final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+        character.fatherName != null &&
+        targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+        character.isAnyPartnerNameMatching(targetName);
+
+    final int actualRate = isDatingFather ? 90 : successRate;
+
+    if (random.nextInt(100) < actualRate) {
       int relBonus = relationshipGain + random.nextInt(4);
       showDialogCallback(
         'Berhasil Mendapatkan $itemName!',
@@ -51,8 +58,18 @@ List<ActionItem> getAge6to11Actions(
       icon: Icons.monetization_on,
       color: Colors.amber,
       onTap: () {
-        if (random.nextBool()) {
+        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+            character.fatherName != null &&
+            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+            character.isAnyPartnerNameMatching(targetName);
+
+        final bool accepted = isDatingFather ? (random.nextInt(100) < 90) : random.nextBool();
+
+        if (accepted) {
           int gotMoney = random.nextInt(10) + 1; // 1-10 $
+          if (isDatingFather) {
+            gotMoney = (gotMoney * 1.5).round(); // uangnya naik 50%
+          }
           int relBonus = random.nextInt(6) + 5;
           showDialogCallback(
             'Dapat Uang Saku!',
@@ -194,7 +211,13 @@ List<ActionItem> getAge6to11Actions(
       icon: Icons.movie,
       color: Colors.deepPurple,
       onTap: () {
-        if (random.nextDouble() < 0.75) {
+        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+            character.fatherName != null &&
+            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+            character.isAnyPartnerNameMatching(targetName);
+
+        final double rate = isDatingFather ? 0.80 : 0.75;
+        if (random.nextDouble() < rate) {
           int relBonus = random.nextInt(6) + 10;
           showDialogCallback(
             'Menonton Bioskop',
@@ -225,7 +248,13 @@ List<ActionItem> getAge6to11Actions(
       icon: Icons.family_restroom,
       color: Colors.orange,
       onTap: () {
-        if (random.nextDouble() < 0.8) {
+        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+            character.fatherName != null &&
+            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+            character.isAnyPartnerNameMatching(targetName);
+
+        final double rate = isDatingFather ? 0.80 : 0.80; // set 80%
+        if (random.nextDouble() < rate) {
           int relBonus = random.nextInt(5) + 8;
           showDialogCallback(
             'Bermain Bersama',

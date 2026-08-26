@@ -65,7 +65,14 @@ List<ActionItem> getAge12PlusActions(
 
   // --- Helper untuk meminta barang (sama seperti di age_6_11) ---
   void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
-    if (random.nextInt(100) < successRate) {
+    final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+        character.fatherName != null &&
+        targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+        character.isAnyPartnerNameMatching(targetName);
+
+    final int actualRate = isDatingFather ? 90 : successRate;
+
+    if (random.nextInt(100) < actualRate) {
       int relBonus = relationshipGain + random.nextInt(4);
       showDialogCallback(
         'Berhasil Mendapatkan $itemName!',
@@ -600,6 +607,11 @@ List<ActionItem> getAge12PlusActions(
                             (character.stepFatherName != null && cleanName.contains(character.stepFatherName!.toLowerCase())) ||
                             (character.stepMotherName != null && cleanName.contains(character.stepMotherName!.toLowerCase()));
 
+      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+          character.fatherName != null &&
+          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+          character.isAnyPartnerNameMatching(targetName);
+
       int gotMoney = 0;
       if (isParent) {
         if (character.age >= 6 && character.age <= 11) {
@@ -634,7 +646,13 @@ List<ActionItem> getAge12PlusActions(
         }
       }
 
-      if (random.nextBool()) {
+      if (isDatingFather) {
+        gotMoney = (gotMoney * 1.5).round(); // uang naik 50%
+      }
+
+      final bool accepted = isDatingFather ? (random.nextInt(100) < 90) : random.nextBool();
+
+      if (accepted) {
         int relBonus = random.nextInt(6) + 5;
         showDialogCallback(
           'Minta Uang Sukses!',
@@ -723,16 +741,34 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.movie,
     color: Colors.deepPurple,
     onTap: () {
-      int relBonus = random.nextInt(6) + 10;
-      showDialogCallback(
-        'Menonton Bioskop',
-        'Kamu mengajak $relation pergi menonton film di bioskop terdekat. (+$relBonus% hubungan)',
-        Icons.movie, Colors.deepPurple, () {
-          character.happiness = (character.happiness + 15).clamp(0, 100);
-          updateRelationship(relBonus);
-          updateState();
-        }
-      );
+      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+          character.fatherName != null &&
+          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+          character.isAnyPartnerNameMatching(targetName);
+
+      final double rate = isDatingFather ? 0.80 : 0.75;
+      if (random.nextDouble() < rate) {
+        int relBonus = random.nextInt(6) + 10;
+        showDialogCallback(
+          'Menonton Bioskop',
+          'Kamu mengajak $relation pergi menonton film di bioskop terdekat. (+$relBonus% hubungan)',
+          Icons.movie, Colors.deepPurple, () {
+            character.happiness = (character.happiness + 15).clamp(0, 100);
+            updateRelationship(relBonus);
+            updateState();
+          }
+        );
+      } else {
+        int relPenalty = random.nextInt(6) + 5;
+        showDialogCallback(
+          'Ajakan Ditolak',
+          '$relation menolak ajakan menonton bioskop kali ini (-$relPenalty% hubungan).',
+          Icons.block, Colors.red, () {
+            updateRelationship(-relPenalty);
+            updateState();
+          }
+        );
+      }
     },
   ));
 
@@ -742,16 +778,34 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.people,
     color: Colors.indigo,
     onTap: () {
-      int relBonus = random.nextInt(5) + 8;
-      showDialogCallback(
-        'Habiskan Waktu',
-        'Kamu menghabiskan sore yang santai bersama $relation untuk mengobrol dan berjalan-jalan. (+$relBonus% hubungan)',
-        Icons.people, Colors.indigo, () {
-          character.happiness = (character.happiness + 10).clamp(0, 100);
-          updateRelationship(relBonus);
-          updateState();
-        }
-      );
+      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
+          character.fatherName != null &&
+          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
+          character.isAnyPartnerNameMatching(targetName);
+
+      final double rate = isDatingFather ? 0.80 : 0.80; // set 80%
+      if (random.nextDouble() < rate) {
+        int relBonus = random.nextInt(5) + 8;
+        showDialogCallback(
+          'Habiskan Waktu',
+          'Kamu menghabiskan sore yang santai bersama $relation untuk mengobrol dan berjalan-jalan. (+$relBonus% hubungan)',
+          Icons.people, Colors.indigo, () {
+            character.happiness = (character.happiness + 10).clamp(0, 100);
+            updateRelationship(relBonus);
+            updateState();
+          }
+        );
+      } else {
+        int relPenalty = random.nextInt(6) + 5;
+        showDialogCallback(
+          'Ajakan Ditolak',
+          '$relation menolak diajak menghabiskan waktu bersama (-$relPenalty% hubungan).',
+          Icons.block, Colors.red, () {
+            updateRelationship(-relPenalty);
+            updateState();
+          }
+        );
+      }
     },
   ));
 
