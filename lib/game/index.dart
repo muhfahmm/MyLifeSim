@@ -1439,12 +1439,36 @@ class _GameScreenState extends State<GameScreen> {
                     initialRelationship = _character.stepFatherRelationship ?? 50;
                   }
 
+                  final String? familySkinColor = () {
+                    final String lowerName = partnerName.toLowerCase();
+                    if (_character.fatherName != null && _character.fatherName!.toLowerCase() == lowerName) {
+                      return _character.fatherSkinColor;
+                    }
+                    if (_character.motherName != null && _character.motherName!.toLowerCase() == lowerName) {
+                      return _character.motherSkinColor;
+                    }
+                    if (_character.stepFatherName != null && _character.stepFatherName!.toLowerCase() == lowerName) {
+                      return _character.stepFatherSkinColor;
+                    }
+                    if (_character.stepMotherName != null && _character.stepMotherName!.toLowerCase() == lowerName) {
+                      return _character.stepMotherSkinColor;
+                    }
+                    for (var sib in _character.siblings) {
+                      final String sibName = sib['name'] ?? '';
+                      if (sibName.toLowerCase() == lowerName) {
+                        return sib['skinColor'];
+                      }
+                    }
+                    return null;
+                  }();
+
                   final Map<String, String> newPartnerData = {
                     'name': partnerName,
                     'gender': proposal['gender']?.toString() ?? 'Perempuan',
                     'age': proposal['age']?.toString() ?? '20',
                     'relationship': initialRelationship.toString(),
                     'relation': relationRole,
+                    if (familySkinColor != null) 'skinColor': familySkinColor,
                   };
 
                   _character.addPartnerToFreeSlot(newPartnerData);
