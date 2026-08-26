@@ -1889,6 +1889,12 @@ class _GameScreenState extends State<GameScreen> {
     final String partnerGender = (proposal['gender'] ?? 'Laki-laki').trim().toLowerCase();
     final bool isHetero = myGender != partnerGender;
 
+    // Jika sesama jenis (Gay/Lesbian), lewati dialog kondom dan langsung eksekusi tanpa kondom
+    if (!isHetero) {
+      _executeIncomingBercinta(proposal, false);
+      return;
+    }
+
     String riskInfo = '';
     String whoGetsPregnant = '';
     int ageMin = 0, ageMax = 0;
@@ -1935,7 +1941,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              'Gender: Kamu ($_character.gender) & $relation ($partnerGender)',
+              'Gender: Kamu (${_character.gender}) & $relation ($partnerGender)',
               style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
             ),
             const SizedBox(height: 8),

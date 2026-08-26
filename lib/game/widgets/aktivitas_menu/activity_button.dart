@@ -249,7 +249,7 @@ class ActivityButton extends StatelessWidget {
                 subtitle: 'Periksa kesehatan',
                 icon: Icons.local_hospital,
                 color: Colors.blue,
-                minAge: 0,
+                minAge: 6,
                 currentAge: age,
                 onTap: () => _executeAction(context, () {
                   DokterMenuHelper.showDokterMenu(context, character, onRefresh);

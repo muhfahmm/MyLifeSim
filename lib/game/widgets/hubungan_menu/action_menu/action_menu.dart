@@ -1412,22 +1412,58 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             widget.character.stepMotherName != null &&
             !widget.character.isStepMotherDeceased;
 
-    // Ayah kandung sudah cerai dengan ibu kandung → ayah single, bercinta boleh
-    final bool isFatherPartnerAndParentsDivorced =
-        widget.character.gender.toLowerCase() == 'perempuan' &&
-            isDatingBiologicalFather &&
-            widget.character.isFatherDivorced &&
-            (widget.character.stepMotherName == null ||
-                widget.character.isStepMotherDeceased);
-
     final bool isStepFatherPartnerAndMotherExists =
         widget.character.gender.toLowerCase() == 'perempuan' &&
             isDatingStepFather &&
             widget.character.motherName != null &&
             !widget.character.isMotherDeceased;
 
+    final bool isDatingBiologicalMother =
+        (cleanRole.contains('ibu') || cleanName.contains('ibu')) &&
+            !cleanRole.contains('tiri') &&
+            !cleanName.contains('tiri') &&
+            widget.character.isAnyPartnerNameMatching(widget.targetName);
+
+    final bool isMotherPartnerAndFatherTiriExists =
+        widget.character.gender.toLowerCase() == 'laki-laki' &&
+            isDatingBiologicalMother &&
+            widget.character.stepFatherName != null &&
+            !widget.character.isStepFatherDeceased;
+
+    final bool isMotherPartnerAndFatherExists =
+        widget.character.gender.toLowerCase() == 'laki-laki' &&
+            isDatingBiologicalMother &&
+            widget.character.fatherName != null &&
+            !widget.character.isFatherDeceased;
+
+    // True when dating a parent whose spouse doesn't exist anymore (already divorced)
+    // so we show Bercinta directly without the Minta Cerai button
+    final bool isFatherPartnerAndParentsDivorced =
+        widget.character.gender.toLowerCase() == 'perempuan' &&
+            isDatingBiologicalFather &&
+            (widget.character.stepMotherName == null ||
+                widget.character.isStepMotherDeceased) &&
+            (widget.character.motherName == null ||
+                widget.character.isMotherDeceased);
+
+    final bool isStepFatherPartnerAndParentsDivorced =
+        widget.character.gender.toLowerCase() == 'perempuan' &&
+            isDatingStepFather &&
+            (widget.character.motherName == null ||
+                widget.character.isMotherDeceased);
+
+    final bool isMotherPartnerAndParentsDivorced =
+        widget.character.gender.toLowerCase() == 'laki-laki' &&
+            isDatingBiologicalMother &&
+            (widget.character.stepFatherName == null ||
+                widget.character.isStepFatherDeceased) &&
+            (widget.character.fatherName == null ||
+                widget.character.isFatherDeceased);
+
     if (isFatherPartnerAndMotherTiriExists ||
-        isStepFatherPartnerAndMotherExists) {
+        isStepFatherPartnerAndMotherExists ||
+        isMotherPartnerAndFatherTiriExists ||
+        isMotherPartnerAndFatherExists) {
       // 1. Bercinta / Make Love
       topActions.add(ActionItem(
         label: 'Bercinta / Make Love',
@@ -1453,10 +1489,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // 2. Minta Cerai
       final String spouseName = isFatherPartnerAndMotherTiriExists
           ? (widget.character.stepMotherName ?? 'Ibu Tiri')
-          : (widget.character.motherName ?? 'Ibu Kandung');
+          : isStepFatherPartnerAndMotherExists
+              ? (widget.character.motherName ?? 'Ibu Kandung')
+              : isMotherPartnerAndFatherTiriExists
+                  ? (widget.character.stepFatherName ?? 'Ayah Tiri')
+                  : (widget.character.fatherName ?? 'Ayah Kandung');
+
       final String actionLabel = isFatherPartnerAndMotherTiriExists
           ? 'Minta Cerai dengan Ibu Tiri'
-          : 'Minta Cerai dengan Ibu Kandung';
+          : isStepFatherPartnerAndMotherExists
+              ? 'Minta Cerai dengan Ibu Kandung'
+              : isMotherPartnerAndFatherTiriExists
+                  ? 'Minta Cerai dengan Ayah Tiri'
+                  : 'Minta Cerai dengan Ayah Kandung';
+
+      final String askerTitle = (isFatherPartnerAndMotherTiriExists || isStepFatherPartnerAndMotherExists)
+          ? 'Ayahmu'
+          : 'Ibumu';
 
       topActions.add(ActionItem(
         label: actionLabel,
@@ -1470,7 +1519,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               title: const Text('Minta Cerai 💔',
                   style: TextStyle(fontWeight: FontWeight.bold)),
               content: Text(
-                  'Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $spouseName?'),
+                  'Apakah kamu yakin ingin meminta ${askerTitle} untuk menceraikan $spouseName?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(confirmContext),
@@ -1485,22 +1534,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         widget.character.stepMotherName = null;
                         widget.character.stepMotherAge = null;
                         widget.character.stepMotherRelationship = null;
-                      } else {
+                      } else if (isStepFatherPartnerAndMotherExists) {
                         widget.character.stepFatherName = null;
                         widget.character.stepFatherAge = null;
                         widget.character.stepFatherRelationship = null;
                         widget.character.isMotherDivorced = true;
+                      } else if (isMotherPartnerAndFatherTiriExists) {
+                        widget.character.stepFatherName = null;
+                        widget.character.stepFatherAge = null;
+                        widget.character.stepFatherRelationship = null;
+                      } else if (isMotherPartnerAndFatherExists) {
+                        widget.character.stepMotherName = null;
+                        widget.character.stepMotherAge = null;
+                        widget.character.stepMotherRelationship = null;
+                        widget.character.isFatherDivorced = true;
                       }
 
                       final String msg =
-                          '💔 Ayahmu memutuskan untuk menceraikan $spouseName atas permintaanmu!';
+                          '💔 ${askerTitle} memutuskan untuk menceraikan $spouseName atas permintaanmu!';
                       widget.character.inbox.add(msg);
                       _updateRelationship(15);
                       _updateState();
 
                       _showResultDialog(
                           'Sukses 💔',
-                          'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $spouseName.',
+                          '${askerTitle} menyetujui permintaanmu dan kini resmi menceraikan $spouseName.',
                           Icons.done,
                           Colors.green,
                           () {});
@@ -1509,7 +1567,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       _updateState();
                       _showResultDialog(
                           'Ditolak 🚫',
-                          'Ayahmu menolak untuk menceraikan $spouseName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan istrinya.',
+                          '${askerTitle} menolak untuk menceraikan $spouseName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
                           Icons.block,
                           Colors.red,
                           () {});
@@ -1524,8 +1582,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
-    } else if (isFatherPartnerAndParentsDivorced) {
-      // Ayah kandung sudah cerai, langsung bercinta tanpa menu minta cerai
+    } else if (isFatherPartnerAndParentsDivorced ||
+        isStepFatherPartnerAndParentsDivorced ||
+        isMotherPartnerAndParentsDivorced) {
+      // Orang tua sudah cerai, langsung bercinta tanpa menu minta cerai
       topActions.add(ActionItem(
         label: 'Bercinta / Make Love',
         icon: Icons.favorite,
@@ -1677,26 +1737,38 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           (cleanRole.contains('ibu') || cleanName.contains('ibu')) &&
           widget.character.isAnyPartnerNameMatching(widget.targetName);
 
+      final bool localIsFatherPartnerAndMotherTiriExists =
+          myGenderLower == 'perempuan' &&
+          isDatingBiologicalFather &&
+          widget.character.stepMotherName != null &&
+          !widget.character.isStepMotherDeceased;
+
+      final bool localIsStepFatherPartnerAndMotherExists =
+          myGenderLower == 'perempuan' &&
+          isDatingStepFather &&
+          widget.character.motherName != null &&
+          !widget.character.isMotherDeceased;
+
       final bool isMotherPartnerAndFatherTiriExists = myGenderLower == 'laki-laki' &&
           isDatingMother && widget.character.stepFatherName != null && !widget.character.isStepFatherDeceased;
       final bool isStepMotherPartnerAndFatherExists = myGenderLower == 'laki-laki' &&
           isDatingStepMother && widget.character.fatherName != null && !widget.character.isFatherDeceased;
 
-      final bool showMintaCerai = isFatherPartnerAndMotherTiriExists ||
-          isStepFatherPartnerAndMotherExists ||
+      final bool showMintaCerai = localIsFatherPartnerAndMotherTiriExists ||
+          localIsStepFatherPartnerAndMotherExists ||
           isMotherPartnerAndFatherTiriExists ||
           isStepMotherPartnerAndFatherExists;
 
       if (showMintaCerai) {
-        final String spouseName = (isFatherPartnerAndMotherTiriExists)
+        final String spouseName = (localIsFatherPartnerAndMotherTiriExists)
             ? (widget.character.stepMotherName ?? 'Ibu Tiri')
-            : (isStepFatherPartnerAndMotherExists)
+            : (localIsStepFatherPartnerAndMotherExists)
                 ? (widget.character.motherName ?? 'Ibu Kandung')
                 : (isMotherPartnerAndFatherTiriExists)
                     ? (widget.character.stepFatherName ?? 'Ayah Tiri')
                     : (widget.character.fatherName ?? 'Ayah Kandung');
 
-        final String targetParentLabel = (isFatherPartnerAndMotherTiriExists || isStepFatherPartnerAndMotherExists) ? 'Ayah' : 'Ibu';
+        final String targetParentLabel = (localIsFatherPartnerAndMotherTiriExists || localIsStepFatherPartnerAndMotherExists) ? 'Ayah' : 'Ibu';
 
         topActions.add(ActionItem(
           label: 'Minta Cerai dengan $spouseName',
@@ -1719,11 +1791,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       Navigator.pop(confirmContext);
                       final bool success = _random.nextInt(100) < 40;
                       if (success) {
-                        if (isFatherPartnerAndMotherTiriExists) {
+                        if (localIsFatherPartnerAndMotherTiriExists) {
                           widget.character.stepMotherName = null;
                           widget.character.stepMotherAge = null;
                           widget.character.stepMotherRelationship = null;
-                        } else if (isStepFatherPartnerAndMotherExists) {
+                        } else if (localIsStepFatherPartnerAndMotherExists) {
                           widget.character.motherName = null;
                           widget.character.motherAge = null;
                           widget.character.motherRelationship = null;
