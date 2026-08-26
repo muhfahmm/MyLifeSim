@@ -95,7 +95,7 @@ class RelationshipButton extends StatelessWidget {
                         ? 'Ayah (${character.fatherName}) (Wafat)'
                         : character.isFatherImprisoned
                             ? 'Ayah (${character.fatherName}) (Dipenjara)'
-                            : 'Ayah (${character.fatherName}) (Cerai)',
+                            : 'Ayah (${character.fatherName})',
                     status: character.isFatherImprisoned ? 'Dipenjara' : 'Cerai',
                     color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                     relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
@@ -141,7 +141,7 @@ class RelationshipButton extends StatelessWidget {
                         ? 'Ibu (${character.motherName}) (Wafat)'
                         : character.isMotherImprisoned
                             ? 'Ibu (${character.motherName}) (Dipenjara)'
-                            : 'Ibu (${character.motherName}) (Cerai)',
+                            : 'Ibu (${character.motherName})',
                     status: character.isMotherImprisoned ? 'Dipenjara' : 'Cerai',
                     color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                     relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
@@ -651,6 +651,21 @@ class RelationshipButton extends StatelessWidget {
                     ),
                   );
                 } else {
+                  final bool isParentsDivorced = character.isFatherDivorced || character.isMotherDivorced;
+                  String? custodyBadgeText;
+                  Color? custodyBadgeColor;
+                  if (isParentsDivorced && !isDeceased) {
+                    final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+                    final String custody = (hash % 2 == 0) ? 'Ayah' : 'Ibu';
+                    if (custody == 'Ayah') {
+                      custodyBadgeText = 'Ikut Ayah';
+                      custodyBadgeColor = Colors.blue;
+                    } else {
+                      custodyBadgeText = 'Ikut Ibu';
+                      custodyBadgeColor = Colors.pink;
+                    }
+                  }
+
                   return _buildFamilyItem(
                     context,
                     icon: isMale ? Icons.male : Icons.female,
@@ -667,6 +682,8 @@ class RelationshipButton extends StatelessWidget {
                       happiness: child['relationship'] as int,
                       forcedSkinColor: child['skinColor'] as String?,
                     ),
+                    extraBadgeText: custodyBadgeText,
+                    extraBadgeColor: custodyBadgeColor,
                   );
                 }
               }).toList(),
@@ -786,6 +803,8 @@ class RelationshipButton extends StatelessWidget {
     bool isDeceased = false,
     String? avatarUrl,
     bool isLivingTogether = false,
+    String? extraBadgeText,
+    Color? extraBadgeColor,
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
@@ -866,6 +885,21 @@ class RelationshipButton extends StatelessWidget {
                     style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                   ),
                 ),
+                if (extraBadgeText != null && !isDeceased) ...[
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: (extraBadgeColor ?? Colors.green).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: (extraBadgeColor ?? Colors.green).withOpacity(0.2)),
+                    ),
+                    child: Text(
+                      extraBadgeText,
+                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: extraBadgeColor ?? Colors.green),
+                    ),
+                  ),
+                ],
                 if (isLivingTogether && !isDeceased) ...[
                   const SizedBox(width: 4),
                   Container(

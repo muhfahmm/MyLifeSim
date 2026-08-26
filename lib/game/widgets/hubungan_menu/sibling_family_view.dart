@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/sibling_family_view.dart
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
@@ -230,6 +230,13 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                      (c.fatherName != null && (cleanSearch.contains(c.fatherName!.toLowerCase()) || cleanParsedName.contains(c.fatherName!.toLowerCase())));
     bool isMother = (cleanSearch.contains('ibu') && !cleanSearch.contains('tiri') && !cleanSearch.contains('mertua')) ||
                      (c.motherName != null && (cleanSearch.contains(c.motherName!.toLowerCase()) || cleanParsedName.contains(c.motherName!.toLowerCase())));
+    bool isStepFather = (cleanSearch.contains('ayah tiri') || cleanSearch.contains('ayah') && cleanSearch.contains('tiri')) ||
+                     (c.stepFatherName != null && (cleanSearch.contains(c.stepFatherName!.toLowerCase()) || cleanParsedName.contains(c.stepFatherName!.toLowerCase())));
+    bool isStepMother = (cleanSearch.contains('ibu tiri') || cleanSearch.contains('ibu') && cleanSearch.contains('tiri')) ||
+                     (c.stepMotherName != null && (cleanSearch.contains(c.stepMotherName!.toLowerCase()) || cleanParsedName.contains(c.stepMotherName!.toLowerCase())));
+    // Jika tiri cocok, pastikan kandung tidak salah terdeteksi
+    if (isStepFather) isFather = false;
+    if (isStepMother) isMother = false;
 
     // 1. Cari target orang dari siblings atau extendedFamily atau parents
     Map<String, String>? targetMap;
@@ -256,6 +263,24 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
         'gender': 'Perempuan',
         'age': (c.motherAge ?? 40).toString(),
         'isDeceased': c.isMotherDeceased.toString(),
+      };
+    } else if (isStepFather) {
+      isParent = true;
+      targetMap = {
+        'name': c.stepFatherName ?? 'Ayah Tiri',
+        'relation': 'Ayah Tiri',
+        'gender': 'Laki-laki',
+        'age': (c.stepFatherAge ?? 40).toString(),
+        'isDeceased': c.isStepFatherDeceased.toString(),
+      };
+    } else if (isStepMother) {
+      isParent = true;
+      targetMap = {
+        'name': c.stepMotherName ?? 'Ibu Tiri',
+        'relation': 'Ibu Tiri',
+        'gender': 'Perempuan',
+        'age': (c.stepMotherAge ?? 40).toString(),
+        'isDeceased': c.isStepMotherDeceased.toString(),
       };
     } else {
       // Cari di siblings
@@ -407,56 +432,159 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
         }
       }
     } else if (isParent) {
-      // Jika orang tua kandung (Ayah/Ibu)
+      // Jika orang tua (Ayah/Ibu kandung atau Ayah/Ibu Tiri)
       final bool isAyah = relation.toLowerCase().contains('ayah');
-      final String side = isAyah ? 'Ayah' : 'Ibu';
 
-      // 1. Orang tua dari Ayah/Ibu (yaitu Kakek & Nenek dari side tersebut)
-      for (var ext in c.extendedFamily) {
-        final String extRel = ext['relation'] ?? '';
-        if ((extRel.contains('Kakek') || extRel.contains('Nenek')) && extRel.contains('dari $side')) {
-          _addWithoutDuplicate(parentsList, ext);
-        }
+      // Tentukan "side" dari orang tua ini:
+      // - Ayah Kandung => kakek/nenek dari sisi Ayah
+      // - Ibu Kandung  => kakek/nenek dari sisi Ibu
+      // - Ayah Tiri    => pasangan Ibu kandung, kakek/nenek-nya dari side Ibu juga
+      // - Ibu Tiri     => pasangan Ayah kandung, kakek/nenek-nya dari side Ayah juga
+      final bool isTiri = relation.toLowerCase().contains('tiri');
+
+      String grandparentSide;
+      if (!isTiri) {
+        grandparentSide = isAyah ? 'Ayah' : 'Ibu';
+      } else {
+        // Ayah Tiri => Keluarga-nya sendiri tidak ada di extendedFamily user
+        // Ibu Tiri  => Keluarga-nya sendiri tidak ada di extendedFamily user
+        // Tetap generate data acak dari user's extendedFamily yang memiliki
+        // relasi dengan pasangan/tiri tersebut
+        grandparentSide = isAyah ? 'Ayah' : 'Ibu';
       }
 
-      // 2. Pasangan (Suami/Istri) dari Ayah/Ibu
-      final bool isDivorced = c.isFatherDivorced || c.isMotherDivorced;
-      if (isAyah && c.motherName != null) {
-        _addWithoutDuplicate(spouseList, {
-          'name': c.motherName!,
-          'relation': isDivorced ? 'Mantan Istri' : 'Ibu Kandung',
-          'gender': 'Perempuan',
-          'age': (c.motherAge ?? 40).toString(),
-          'isDeceased': c.isMotherDeceased.toString(),
-        });
-      } else if (!isAyah && c.fatherName != null) {
-        _addWithoutDuplicate(spouseList, {
-          'name': c.fatherName!,
-          'relation': isDivorced ? 'Mantan Suami' : 'Ayah Kandung',
+      if (isTiri) {
+        // Ayah Tiri / Ibu Tiri: generate keluarga acak menggunakan seed dari nama
+        // agar konsisten setiap kali dibuka
+        final int seed = name.codeUnits.fold(0, (a, b) => a + b);
+        final Random rng = Random(seed);
+        final int parentAge = (tMap['age'] != null ? int.tryParse(tMap['age']!) ?? 40 : 40) + 20 + rng.nextInt(10);
+        // Kakek (orang tua dari Ayah/Ibu Tiri)
+        final List<String> maleNames = ['Bambang','Sutrisno','Haryono','Ahmad','Budi','Slamet','Joko','Agus'];
+        final List<String> femaleNames = ['Sutini','Sri','Wati','Sari','Dewi','Yuni','Ningsih','Ratna'];
+        final List<String> lastNames = ['Santoso','Wijaya','Prasetyo','Kusuma','Setiawan','Utama','Nugroho','Wahyu'];
+        final String grandpaName = maleNames[rng.nextInt(maleNames.length)] + ' ' + lastNames[rng.nextInt(lastNames.length)];
+        final String grandmaName = femaleNames[rng.nextInt(femaleNames.length)] + ' ' + lastNames[rng.nextInt(lastNames.length)];
+        _addWithoutDuplicate(parentsList, {
+          'name': grandpaName,
+          'relation': 'Orang Tua ${name} (Kakek)',
           'gender': 'Laki-laki',
-          'age': (c.fatherAge ?? 40).toString(),
-          'isDeceased': c.isFatherDeceased.toString(),
+          'age': parentAge.toString(),
+          'isDeceased': (rng.nextInt(100) >= 70).toString(),
         });
-      }
-
-      // 3. Saudara dari Ayah/Ibu (yaitu Paman & Bibi dari side tersebut)
-      for (var ext in c.extendedFamily) {
-        final String extRel = ext['relation'] ?? '';
-        if ((extRel.contains('Paman') || extRel.contains('Bibi')) && extRel.contains('dari $side') && !extRel.contains('Pasangan')) {
-          _addWithoutDuplicate(siblingsList, ext);
+        _addWithoutDuplicate(parentsList, {
+          'name': grandmaName,
+          'relation': 'Orang Tua ${name} (Nenek)',
+          'gender': 'Perempuan',
+          'age': (parentAge - 2).toString(),
+          'isDeceased': (rng.nextInt(100) >= 72).toString(),
+        });
+        // Saudara dari Ayah/Ibu Tiri (1-2 orang)
+        int sibCount = rng.nextInt(2) + 1;
+        for (int i = 0; i < sibCount; i++) {
+          final bool isMaleSib = rng.nextBool();
+          final String sibName = (isMaleSib ? maleNames : femaleNames)[rng.nextInt(isMaleSib ? maleNames.length : femaleNames.length)] + ' ' + lastNames[rng.nextInt(lastNames.length)];
+          final int sibAge = (tMap['age'] != null ? int.tryParse(tMap['age']!) ?? 40 : 40) + (rng.nextBool() ? 3 : -3) + rng.nextInt(4);
+          _addWithoutDuplicate(siblingsList, {
+            'name': sibName,
+            'relation': isMaleSib ? 'Saudara Laki-laki ${name}' : 'Saudara Perempuan ${name}',
+            'gender': isMaleSib ? 'Laki-laki' : 'Perempuan',
+            'age': sibAge.toString(),
+            'isDeceased': 'false',
+          });
+        }
+      } else {
+        // Orang tua kandung: ambil dari extendedFamily
+        for (var ext in c.extendedFamily) {
+          final String extRel = ext['relation'] ?? '';
+          if ((extRel.contains('Kakek') || extRel.contains('Nenek')) &&
+              extRel.contains('dari $grandparentSide')) {
+            _addWithoutDuplicate(parentsList, ext);
+          }
+        }
+        // Saudara dari target (Paman & Bibi yang satu side)
+        for (var ext in c.extendedFamily) {
+          final String extRel = ext['relation'] ?? '';
+          if ((extRel.contains('Paman') || extRel.contains('Bibi')) &&
+              extRel.contains('dari $grandparentSide') &&
+              !extRel.contains('Pasangan')) {
+            _addWithoutDuplicate(siblingsList, ext);
+          }
         }
       }
-
-      // 4. Anak-anak dari Ayah/Ibu (yaitu User sendiri + Saudara Kandung User)
+      // Pasangan dari target
+      if (isTiri) {
+        // Ayah Tiri => pasangannya adalah Ibu Kandung
+        // Ibu Tiri  => pasangannya adalah Ayah Kandung
+        if (isAyah && c.motherName != null) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.motherName!,
+            'relation': 'Ibu Kandung (Pasangannya)',
+            'gender': 'Perempuan',
+            'age': (c.motherAge ?? 40).toString(),
+            'isDeceased': c.isMotherDeceased.toString(),
+          });
+        } else if (!isAyah && c.fatherName != null) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.fatherName!,
+            'relation': 'Ayah Kandung (Pasangannya)',
+            'gender': 'Laki-laki',
+            'age': (c.fatherAge ?? 40).toString(),
+            'isDeceased': c.isFatherDeceased.toString(),
+          });
+        }
+      } else {
+        // Kandung: pasangannya adalah orangtua lainnya
+        final bool isDivorced = c.isFatherDivorced || c.isMotherDivorced;
+        if (isAyah && c.motherName != null) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.motherName!,
+            'relation': isDivorced ? 'Mantan Istri' : 'Ibu Kandung',
+            'gender': 'Perempuan',
+            'age': (c.motherAge ?? 40).toString(),
+            'isDeceased': c.isMotherDeceased.toString(),
+          });
+        } else if (!isAyah && c.fatherName != null) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.fatherName!,
+            'relation': isDivorced ? 'Mantan Suami' : 'Ayah Kandung',
+            'gender': 'Laki-laki',
+            'age': (c.fatherAge ?? 40).toString(),
+            'isDeceased': c.isFatherDeceased.toString(),
+          });
+        }
+        // Pasangan tiri saat ini
+        if (isAyah && c.stepMotherName != null && !c.isStepMotherDeceased) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.stepMotherName!,
+            'relation': 'Istri Baru (Ibu Tiri)',
+            'gender': 'Perempuan',
+            'age': (c.stepMotherAge ?? 35).toString(),
+            'isDeceased': 'false',
+          });
+        }
+        if (!isAyah && c.stepFatherName != null && !c.isStepFatherDeceased) {
+          _addWithoutDuplicate(spouseList, {
+            'name': c.stepFatherName!,
+            'relation': 'Suami Baru (Ayah Tiri)',
+            'gender': 'Laki-laki',
+            'age': (c.stepFatherAge ?? 35).toString(),
+            'isDeceased': 'false',
+          });
+        }
+      }
       _addWithoutDuplicate(childrenList, {
         'name': c.name,
-        'relation': 'Kamu',
+        'relation': 'Kamu (Anaknya)',
         'gender': c.gender,
         'age': c.age.toString(),
         'isDeceased': 'false',
       });
       for (var sib in c.siblings) {
-        _addWithoutDuplicate(childrenList, sib);
+        _addWithoutDuplicate(childrenList, {
+          ...sib,
+          'relation': sib['relation'] ?? 'Saudara Kandung',
+        });
       }
     } else {
       // Jika Extended Family (Kakek, Nenek, Paman, Bibi, Sepupu)

@@ -774,9 +774,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return 'Keluarga Tiri';
     } else if (role == 'Cerai') {
       if (name.startsWith('ayah')) {
-        return 'Ayah Kandung (Cerai)';
+        return 'Ayah Kandung';
       } else if (name.startsWith('ibu')) {
-        return 'Ibu Kandung (Cerai)';
+        return 'Ibu Kandung';
       }
     }
 
@@ -1853,6 +1853,180 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               context: context,
               character: widget.character,
               updateState: _updateState,
+            );
+          },
+        ));
+      }
+    }
+
+    // --- TAMBAHAN: LAPORKAN PERSELINGKUHAN KEPADA PASANGAN SAH ---
+    String getCleanName(String name) {
+      return name.replaceAll(RegExp(r'.*\(|\)'), '').trim();
+    }
+
+    Map<String, String>? targetSpouse;
+    final String cleanTargetName = getCleanName(widget.targetName).toLowerCase();
+    
+    // 1. Check in extended family
+    for (var ext in widget.character.extendedFamily) {
+      final String extClean = getCleanName(ext['name'] ?? '').toLowerCase();
+      if (extClean == cleanTargetName) {
+        if (ext['spouseId'] != null) {
+          for (var spouse in widget.character.extendedFamily) {
+            if (spouse['id'] == ext['spouseId']) {
+              targetSpouse = spouse;
+              break;
+            }
+          }
+        }
+        break;
+      }
+    }
+    // 2. Check in parents
+    if (widget.targetRole == 'Cerai' || widget.targetRole.contains('kandung') || widget.targetRole.contains('tiri') ||
+        cleanTargetName.contains('ayah') || cleanTargetName.contains('ibu')) {
+      if (cleanTargetName.contains('mother') || cleanTargetName.contains('ibu')) {
+        if (widget.character.stepFatherName != null && !widget.character.isStepFatherDeceased) {
+          targetSpouse = {'name': widget.character.stepFatherName!, 'relation': 'Ayah Tiri'};
+        } else if (widget.character.fatherName != null && !widget.character.isFatherDeceased && !widget.character.isFatherDivorced) {
+          targetSpouse = {'name': widget.character.fatherName!, 'relation': 'Ayah Kandung'};
+        }
+      } else if (cleanTargetName.contains('father') || cleanTargetName.contains('ayah')) {
+        if (widget.character.stepMotherName != null && !widget.character.isStepMotherDeceased) {
+          targetSpouse = {'name': widget.character.stepMotherName!, 'relation': 'Ibu Tiri'};
+        } else if (widget.character.motherName != null && !widget.character.isMotherDeceased && !widget.character.isMotherDivorced) {
+          targetSpouse = {'name': widget.character.motherName!, 'relation': 'Ibu Kandung'};
+        }
+      }
+    }
+
+    bool isCheatingSpouseDatingPlayer(String spouseName) {
+      final List<Map<String, String>> allPartners = [];
+      if (widget.character.partner != null) allPartners.add(widget.character.partner!);
+      if (widget.character.secondPartner != null) allPartners.add(widget.character.secondPartner!);
+      if (widget.character.thirdPartner != null) allPartners.add(widget.character.thirdPartner!);
+      if (widget.character.fourthPartner != null) allPartners.add(widget.character.fourthPartner!);
+      if (widget.character.fifthPartner != null) allPartners.add(widget.character.fifthPartner!);
+      for (var sp in widget.character.secretPartners) {
+        allPartners.add(sp);
+      }
+      
+      final String cleanSpouse = spouseName.replaceAll(RegExp(r'.*\(|\)'), '').trim().toLowerCase();
+      for (var p in allPartners) {
+        final String pName = (p['name'] ?? '').toLowerCase();
+        final String cleanP = pName.replaceAll(RegExp(r'.*\(|\)'), '').trim().toLowerCase();
+        if (cleanP == cleanSpouse || pName.contains(cleanSpouse) || cleanSpouse.contains(cleanP)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    if (targetSpouse != null) {
+      final String spouseName = targetSpouse['name'] ?? '';
+      final String spouseRelation = targetSpouse['relation'] ?? 'Pasangan';
+      
+      // If we are currently interacting with the cheating partner (who is our partner)
+      final bool isReportingSelf = isActivePartner;
+      
+      // We can report if either the target is the cheater, or target is the victim and spouse is the cheater
+      final bool showReport = isReportingSelf || isCheatingSpouseDatingPlayer(spouseName);
+      
+      if (showReport) {
+        actions.add(ActionItem(
+          label: isReportingSelf
+              ? 'Laporkan Hubungan Kalian ke $spouseRelation'
+              : 'Laporkan Perselingkuhan $spouseName',
+          icon: Icons.campaign,
+          color: Colors.orange,
+          onTap: () {
+            final String cleanSpouse = getCleanName(spouseName);
+            final String cleanTarget = getCleanName(widget.targetName);
+
+            // 1. Break up relationship with the cheating partner
+            final String cheaterName = isReportingSelf ? cleanTarget : cleanSpouse;
+            final String lowerCheater = cheaterName.toLowerCase();
+            if (widget.character.partner != null && getCleanName(widget.character.partner!['name'] ?? '').toLowerCase() == lowerCheater) {
+              widget.character.partner = null;
+            } else if (widget.character.secondPartner != null && getCleanName(widget.character.secondPartner!['name'] ?? '').toLowerCase() == lowerCheater) {
+              widget.character.secondPartner = null;
+            } else if (widget.character.thirdPartner != null && getCleanName(widget.character.thirdPartner!['name'] ?? '').toLowerCase() == lowerCheater) {
+              widget.character.thirdPartner = null;
+            } else if (widget.character.fourthPartner != null && getCleanName(widget.character.fourthPartner!['name'] ?? '').toLowerCase() == lowerCheater) {
+              widget.character.fourthPartner = null;
+            } else if (widget.character.fifthPartner != null && getCleanName(widget.character.fifthPartner!['name'] ?? '').toLowerCase() == lowerCheater) {
+              widget.character.fifthPartner = null;
+            }
+            widget.character.secretPartners.removeWhere((p) => getCleanName(p['name'] ?? '').toLowerCase() == lowerCheater);
+            if (widget.character.secretPartners.isEmpty && widget.character.secondPartner == null) {
+              widget.character.isHavingAffair = false;
+            }
+
+            // 2. Divorce / break spouse connection
+            if (widget.character.fatherName != null && widget.character.fatherName!.toLowerCase() == lowerCheater) {
+              widget.character.isFatherDivorced = true;
+              widget.character.stepMotherName = null;
+            } else if (widget.character.motherName != null && widget.character.motherName!.toLowerCase() == lowerCheater) {
+              widget.character.isMotherDivorced = true;
+              widget.character.stepFatherName = null;
+            } else if (widget.character.stepFatherName != null && widget.character.stepFatherName!.toLowerCase() == lowerCheater) {
+              widget.character.stepFatherName = null;
+            } else if (widget.character.stepMotherName != null && widget.character.stepMotherName!.toLowerCase() == lowerCheater) {
+              widget.character.stepMotherName = null;
+            }
+
+            // If it's extendedFamily:
+            String spouseId = '';
+            for (var ext in widget.character.extendedFamily) {
+              final String extClean = getCleanName(ext['name'] ?? '').toLowerCase();
+              if (extClean == cleanTarget.toLowerCase()) {
+                spouseId = ext['spouseId'] ?? '';
+                ext['spouseId'] = '';
+                ext['relation'] = ext['relation']?.replaceAll(RegExp(r'Pasangan\s*'), '').trim() ?? '';
+              }
+            }
+            if (spouseId.isNotEmpty) {
+              widget.character.extendedFamily.removeWhere((ext) => ext['id'] == spouseId);
+            }
+
+            // 3. Update relationship with Y (the victim)
+            final String victimName = isReportingSelf ? spouseName : widget.targetName;
+            final String cleanVictim = getCleanName(victimName);
+            final String lowerVictim = cleanVictim.toLowerCase();
+            
+            if (widget.character.fatherName != null && widget.character.fatherName!.toLowerCase() == lowerVictim) {
+              widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) + 20).clamp(0, 100);
+            } else if (widget.character.motherName != null && widget.character.motherName!.toLowerCase() == lowerVictim) {
+              widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + 20).clamp(0, 100);
+            } else if (widget.character.stepFatherName != null && widget.character.stepFatherName!.toLowerCase() == lowerVictim) {
+              widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) + 20).clamp(0, 100);
+            } else if (widget.character.stepMotherName != null && widget.character.stepMotherName!.toLowerCase() == lowerVictim) {
+              widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) + 20).clamp(0, 100);
+            } else {
+              for (var ext in widget.character.extendedFamily) {
+                final String extClean = getCleanName(ext['name'] ?? '').toLowerCase();
+                if (extClean == lowerVictim) {
+                  int currentRel = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+                  ext['relationship'] = (currentRel + 20).clamp(0, 100).toString();
+                  break;
+                }
+              }
+            }
+
+            _updateState();
+
+            final String victimTitle = isReportingSelf ? spouseRelation : _getDetailedRelationLabel();
+            _showResultDialog(
+              'Laporan Perselingkuhan 📢',
+              'Kamu melaporkan bahwa $cheaterName berselingkuh/berpacaran denganmu kepada $victimTitle ($cleanVictim). '
+              'Dia sangat terkejut, berterima kasih atas kejujuranmu, dan langsung memutuskan hubungan dengan $cheaterName! Hubunganmu dengan $cleanVictim membaik (+20%).',
+              Icons.campaign,
+              Colors.orange,
+              () {
+                if (isReportingSelf) {
+                  Navigator.pop(context);
+                }
+              }
             );
           },
         ));
