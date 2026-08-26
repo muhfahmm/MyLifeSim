@@ -27,7 +27,7 @@ class AjakanPacaranHeteroKeluarga {
       else if (rel.contains('anak')) chance = 30; // Anak: 30%
       else if (rel.contains('keponakan')) chance = 30; // Keponakan: 30%
       else if (rel.contains('paman')) chance = 25; // Paman: 25%
-      else if (rel.contains('ayah')) chance = character.custodyParent == 'Ayah' ? 65 : 40; // Ayah: 65% jika hak asuh di Ayah, 40% jika tidak
+      else if (rel.contains('ayah')) chance = character.custodyParent == 'Ayah' ? (character.age >= 12 ? 75 : 65) : 40; // Ayah: 75% jika hak asuh di Ayah & usia >= 12, 65% jika hak asuh di Ayah saja, 40% jika tidak
       else if (rel.contains('adik laki')) chance = 40; // Adik Laki-laki: 40%
       else if (rel.contains('kakak laki')) chance = 40; // Kakak Laki-laki: 40%
       else if (rel.contains('sepupu')) chance = 35; // Sepupu: 35%

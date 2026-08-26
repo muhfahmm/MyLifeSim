@@ -40,18 +40,20 @@ class ParentRemarriage {
       }
     }
 
-    // Case 2: Ayah kandung hidup, tetapi tidak ada ibu kandung (atau wafat/cerai) dan belum punya ibu tiri
     if (character.fatherName != null && !character.isFatherDeceased && character.stepMotherName == null) {
       bool shouldRemarry = false;
+      final bool isFemaleUserWithFather = character.gender.toLowerCase() == 'perempuan' && character.custodyParent == 'Ayah';
 
       if (character.isFatherDivorced) {
-        // jika cerai ayah menikah lagi 30%
-        if (random.nextInt(100) < 30) {
+        // jika cerai ayah menikah lagi 30%, jika perempuan ikut ayah cuma 10%
+        final int limit = isFemaleUserWithFather ? 10 : 30;
+        if (random.nextInt(100) < limit) {
           shouldRemarry = true;
         }
       } else if (character.motherName == null || character.isMotherDeceased) {
-        // jika istri meninggal ayah menikah lagi 40%
-        if (random.nextInt(100) < 40) {
+        // jika istri meninggal ayah menikah lagi 40%, jika perempuan ikut ayah cuma 10%
+        final int limit = isFemaleUserWithFather ? 10 : 40;
+        if (random.nextInt(100) < limit) {
           shouldRemarry = true;
         }
       }

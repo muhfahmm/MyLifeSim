@@ -206,8 +206,9 @@ class AjakanHandler {
         } else if (canProposeMarriage) {
           // Jika pacaran biasa:
           if (myGenderLower == 'perempuan' && partnerGender == 'laki-laki') {
-            // Peluang Lamar Nikah murni 60%
-            if (random.nextInt(100) < 60) {
+            // Peluang Lamar Nikah murni 60%, bertambah 10% (menjadi 70%) jika ayah dan ikut ayah
+            final int marrChance = (isFather && character.custodyParent == 'Ayah') ? 70 : 60;
+            if (random.nextInt(100) < marrChance) {
               proposalType = 'Lamar Nikah';
             }
             // Jika tidak melamar, peluang Bercinta murni 60%
