@@ -367,6 +367,12 @@ class Character {
         return sib['skinColor'];
       }
     }
+    for (var child in children) {
+      final String childName = child['name'] ?? '';
+      if (childName.toLowerCase() == lowerTarget) {
+        return child['skinColor'];
+      }
+    }
     return null;
   }
 
@@ -1552,7 +1558,9 @@ class Character {
     }
 
     // 2. Check siblings, extendedFamily, classmates, coworkers, exPartners, etc.
-    int? val = getFromList(siblings);
+    int? val = getFromList(children);
+    if (val != null) return val;
+    val = getFromList(siblings);
     if (val != null) return val;
     val = getFromList(extendedFamily);
     if (val != null) return val;
@@ -1639,6 +1647,7 @@ class Character {
       }
     }
 
+    setInList(children);
     setInList(siblings);
     setInList(extendedFamily);
     setInList(classmates);

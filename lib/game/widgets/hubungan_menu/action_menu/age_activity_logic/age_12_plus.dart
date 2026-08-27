@@ -9,6 +9,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/thr
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 
 /// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {
@@ -101,6 +102,28 @@ List<ActionItem> getAge12PlusActions(
 
   // Jika target adalah anak (dengan status Laki-laki atau Perempuan)
   if (isChild) {
+    // 1. Lihat Keluarga
+    actions.add(ActionItem(
+      label: 'Lihat Keluarga',
+      icon: Icons.people,
+      color: Colors.blueGrey,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NpcFamilyViewScreen(
+              npcName: targetName,
+              npcGender: partnerGender == 'perempuan' ? 'Perempuan' : 'Laki-laki',
+              npcAge: AjakanResolver.getTargetAge(character, targetName, targetRole),
+              npcRole: targetRole,
+              character: character,
+            ),
+          ),
+        );
+      },
+    ));
+
+    // 2. Bercinta / Make Love
     actions.add(ActionItem(
       label: 'Bercinta / Make Love',
       icon: Icons.favorite,
@@ -122,25 +145,61 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
+    // 3. Ajak Pacaran (Anak) - 60% success rate
     actions.add(ActionItem(
-      label: 'Bercakap-cakap',
-      icon: Icons.chat,
-      color: Colors.teal,
+      label: 'Ajak Pacaran',
+      icon: Icons.favorite_border,
+      color: Colors.redAccent,
       onTap: () {
-        int relBonus = random.nextInt(5) + 5;
-        showDialogCallback(
-          'Berbincang dengan Anak',
-          'Kamu duduk bersama $targetName dan mengobrol tentang kesehariannya serta impian masa depannya. (+$relBonus% hubungan)',
-          Icons.chat,
-          Colors.teal,
-          () {
-            updateRelationship(relBonus);
-            updateState();
-          },
-        );
+        final bool success = random.nextInt(100) < 60;
+        if (success) {
+          showDialogCallback(
+            'Ajakan Diterima! 💖',
+            '$targetName tersipu malu dan menerima ajakanmu untuk berpacaran! Sekarang hubungan kalian adalah Pacar.',
+            Icons.favorite,
+            Colors.pink,
+            () {
+              String? skinCol;
+              for (var child in character.children) {
+                if (child['name'] == targetName) {
+                  skinCol = child['skinColor'];
+                  break;
+                }
+              }
+              final newPartner = {
+                'name': targetName,
+                'gender': targetRole,
+                'age': '${AjakanResolver.getTargetAge(character, targetName, targetRole)}',
+                'relationship': '80',
+                'relation': 'Pacar',
+                if (skinCol != null) 'skinColor': skinCol,
+              };
+              if (character.partner == null) {
+                character.partner = newPartner;
+              } else {
+                character.secondPartner = newPartner;
+              }
+              character.happiness = (character.happiness + 20).clamp(0, 100);
+              updateState();
+            },
+          );
+        } else {
+          showDialogCallback(
+            'Ajakan Ditolak 💔',
+            '$targetName merasa canggung dan menolak ajakanmu untuk berpacaran.',
+            Icons.heart_broken,
+            Colors.red,
+            () {
+              character.happiness = (character.happiness - 10).clamp(0, 100);
+              updateRelationship(-10);
+              updateState();
+            },
+          );
+        }
       },
     ));
 
+    // 4. Beri Uang Jajan
     actions.add(ActionItem(
       label: 'Beri Uang Jajan',
       icon: Icons.monetization_on,
@@ -163,6 +222,8 @@ List<ActionItem> getAge12PlusActions(
             Colors.green,
             () {
               character.money -= 20;
+              final int childW = character.getTargetWealth(targetName, targetRole);
+              character.setTargetWealth(targetName, targetRole, childW + 20);
               updateRelationship(relBonus);
               updateState();
             },
@@ -171,6 +232,7 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
+    // 5. Beri Hadiah Spesial
     actions.add(ActionItem(
       label: 'Beri Hadiah Spesial',
       icon: Icons.card_giftcard,
@@ -193,6 +255,8 @@ List<ActionItem> getAge12PlusActions(
             Colors.purple,
             () {
               character.money -= 100;
+              final int childW = character.getTargetWealth(targetName, targetRole);
+              character.setTargetWealth(targetName, targetRole, childW + 100);
               updateRelationship(relBonus);
               updateState();
             },
@@ -201,6 +265,7 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
+    // 6. Ajak Liburan Bersama
     actions.add(ActionItem(
       label: 'Ajak Liburan Bersama',
       icon: Icons.flight,
@@ -232,6 +297,59 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
+    // 7. Pergi ke Bioskop Bersama
+    actions.add(ActionItem(
+      label: 'Pergi ke Bioskop Bersama',
+      icon: Icons.movie,
+      color: Colors.deepPurple,
+      onTap: () {
+        if (character.money < 30) {
+          showDialogCallback(
+            'Uang Tidak Cukup',
+            'Kamu tidak memiliki cukup uang untuk pergi ke bioskop (\$30).',
+            Icons.money_off,
+            Colors.red,
+            () {},
+          );
+        } else {
+          int relBonus = random.nextInt(10) + 10;
+          showDialogCallback(
+            'Nonton Bioskop Bersama',
+            'Kamu mengajak $targetName pergi menonton film seru di bioskop bersama. Kalian bersenang-senang menikmati popcorn dan film! (+$relBonus% hubungan)',
+            Icons.movie,
+            Colors.deepPurple,
+            () {
+              character.money -= 30;
+              character.happiness = (character.happiness + 15).clamp(0, 100);
+              updateRelationship(relBonus);
+              updateState();
+            },
+          );
+        }
+      },
+    ));
+
+    // 8. Habiskan Waktu Bersama
+    actions.add(ActionItem(
+      label: 'Habiskan Waktu Bersama',
+      icon: Icons.sunny,
+      color: Colors.orange,
+      onTap: () {
+        int relBonus = random.nextInt(8) + 6;
+        showDialogCallback(
+          'Habiskan Waktu Bersama',
+          'Kamu menghabiskan waktu luang berkualitas bersama $targetName dengan santai. (+$relBonus% hubungan)',
+          Icons.sunny,
+          Colors.orange,
+          () {
+            updateRelationship(relBonus);
+            updateState();
+          },
+        );
+      },
+    ));
+
+    // 9. Puji Anak
     actions.add(ActionItem(
       label: 'Puji Anak',
       icon: Icons.thumb_up,
@@ -243,6 +361,26 @@ List<ActionItem> getAge12PlusActions(
           'Kamu memuji pencapaian dan kedewasaan $targetName. (+$relBonus% hubungan)',
           Icons.thumb_up,
           Colors.blueAccent,
+          () {
+            updateRelationship(relBonus);
+            updateState();
+          },
+        );
+      },
+    ));
+
+    // 10. Percakapan
+    actions.add(ActionItem(
+      label: 'Percakapan',
+      icon: Icons.chat,
+      color: Colors.teal,
+      onTap: () {
+        int relBonus = random.nextInt(5) + 5;
+        showDialogCallback(
+          'Percakapan dengan Anak',
+          'Kamu duduk bersama $targetName dan mengobrol tentang kesehariannya serta impian masa depannya. (+$relBonus% hubungan)',
+          Icons.chat,
+          Colors.teal,
           () {
             updateRelationship(relBonus);
             updateState();

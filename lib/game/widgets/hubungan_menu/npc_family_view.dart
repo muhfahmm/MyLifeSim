@@ -2,15 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 
-/// Screen untuk menampilkan keluarga NPC (Guru / Siswa)
+/// Screen untuk menampilkan keluarga NPC (Guru / Siswa / Anak)
 /// Desain mengikuti gaya RelationshipButton (Hubungan & Keluarga).
 class NpcFamilyViewScreen extends StatefulWidget {
   final String npcName;
   final String npcGender;
   final int npcAge;
   final String npcRole;
+  final Character? character;
 
   const NpcFamilyViewScreen({
     super.key,
@@ -18,6 +20,7 @@ class NpcFamilyViewScreen extends StatefulWidget {
     required this.npcGender,
     required this.npcAge,
     required this.npcRole,
+    this.character,
   });
 
   @override
@@ -59,31 +62,87 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     final List<Map<String, dynamic>> family = [];
 
     // === ORANG TUA ===
-    final int ayahAge = age + 25 + rng.nextInt(10);
-    family.add({
-      'section': 'orangtua',
-      'name': _randomName('Laki-laki', seed + 1),
-      'relation': 'Ayah',
-      'relLabel': 'Ayah',
-      'gender': 'Laki-laki',
-      'age': ayahAge,
-      'isDeceased': ayahAge >= 80,
-      'rel': 40 + rng.nextInt(50),
-      'color': Colors.blue,
-    });
+    final Character? char = widget.character;
+    final bool isChildOfPlayer = char != null && (widget.npcRole == 'Laki-laki' || widget.npcRole == 'Perempuan');
 
-    final int ibuAge = age + 23 + rng.nextInt(8);
-    family.add({
-      'section': 'orangtua',
-      'name': _randomName('Perempuan', seed + 2),
-      'relation': 'Ibu',
-      'relLabel': 'Ibu',
-      'gender': 'Perempuan',
-      'age': ibuAge,
-      'isDeceased': ibuAge >= 78,
-      'rel': 45 + rng.nextInt(50),
-      'color': Colors.pink,
-    });
+    String fatherNameVal = _randomName('Laki-laki', seed + 1);
+    int fatherAgeVal = age + 25 + rng.nextInt(10);
+    int fatherRelVal = 40 + rng.nextInt(50);
+    bool fatherDeceasedVal = fatherAgeVal >= 80;
+
+    String motherNameVal = _randomName('Perempuan', seed + 2);
+    int motherAgeVal = age + 23 + rng.nextInt(8);
+    int motherRelVal = 45 + rng.nextInt(50);
+    bool motherDeceasedVal = motherAgeVal >= 78;
+
+    if (isChildOfPlayer) {
+      int childRel = 80;
+      for (var c in char.children) {
+        if (c['name'] == widget.npcName) {
+          childRel = int.tryParse(c['relationship'] ?? '80') ?? 80;
+          break;
+        }
+      }
+      
+      final bool playerIsMale = char.gender.toLowerCase() == 'laki-laki';
+      if (playerIsMale) {
+        fatherNameVal = char.name;
+        fatherAgeVal = char.age;
+        fatherRelVal = childRel;
+        fatherDeceasedVal = false;
+        
+        if (char.partner != null) {
+          motherNameVal = char.partner!['name'] ?? motherNameVal;
+          motherAgeVal = int.tryParse(char.partner!['age'] ?? '') ?? motherAgeVal;
+          motherRelVal = childRel;
+          motherDeceasedVal = char.partner!['isDeceased'] == 'true';
+        }
+      } else {
+        motherNameVal = char.name;
+        motherAgeVal = char.age;
+        motherRelVal = childRel;
+        motherDeceasedVal = false;
+        
+        if (char.partner != null) {
+          fatherNameVal = char.partner!['name'] ?? fatherNameVal;
+          fatherAgeVal = int.tryParse(char.partner!['age'] ?? '') ?? fatherAgeVal;
+          fatherRelVal = childRel;
+          fatherDeceasedVal = char.partner!['isDeceased'] == 'true';
+        }
+      }
+    }
+
+    final bool playerIsMale = char != null && char.gender.toLowerCase() == 'laki-laki';
+    final bool includeFather = !isChildOfPlayer || playerIsMale || char.partner != null;
+    final bool includeMother = !isChildOfPlayer || !playerIsMale || char.partner != null;
+
+    if (includeFather) {
+      family.add({
+        'section': 'orangtua',
+        'name': fatherNameVal,
+        'relation': 'Ayah',
+        'relLabel': 'Ayah',
+        'gender': 'Laki-laki',
+        'age': fatherAgeVal,
+        'isDeceased': fatherDeceasedVal,
+        'rel': fatherRelVal,
+        'color': Colors.blue,
+      });
+    }
+
+    if (includeMother) {
+      family.add({
+        'section': 'orangtua',
+        'name': motherNameVal,
+        'relation': 'Ibu',
+        'relLabel': 'Ibu',
+        'gender': 'Perempuan',
+        'age': motherAgeVal,
+        'isDeceased': motherDeceasedVal,
+        'rel': motherRelVal,
+        'color': Colors.pink,
+      });
+    }
 
     // === PASANGAN ===
     if (age >= 18 && rng.nextBool()) {
@@ -142,6 +201,27 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
           'color': Colors.teal,
         });
       }
+    }
+
+    if (isChildOfPlayer) {
+      int childRel = 80;
+      for (var c in char.children) {
+        if (c['name'] == widget.npcName) {
+          childRel = int.tryParse(c['relationship'] ?? '80') ?? 80;
+          break;
+        }
+      }
+      family.add({
+        'section': 'anak',
+        'name': widget.npcName,
+        'relation': 'Anak',
+        'relLabel': 'Anak Anda',
+        'gender': widget.npcGender,
+        'age': widget.npcAge,
+        'isDeceased': false,
+        'rel': childRel,
+        'color': Colors.teal,
+      });
     }
 
     return family;

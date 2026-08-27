@@ -9,9 +9,9 @@ class AjakanPacaranLesbianKeluarga {
     if (rel.contains('ibu mertua')) {
       // Ibu Mertua: 5%
       chance = 5;
-    } else if (rel.contains('anak')) {
-      // Anak Kandung/Tiri: 30%
-      chance = 30;
+    } else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') {
+      // Anak Kandung/Tiri: 60%
+      chance = 60;
     } else if (rel.contains('keponakan')) {
       // Keponakan: 30%
       chance = 30;

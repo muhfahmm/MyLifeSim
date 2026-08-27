@@ -43,6 +43,16 @@ class _BercintaScreenState extends State<BercintaScreen> {
   }
 
   String _getTargetRoleLabel() {
+    final String cleanTargetName = widget.targetName;
+    for (var child in widget.character.children) {
+      if (child['name'] == cleanTargetName) {
+        return 'Anak';
+      }
+    }
+    final String role = widget.targetRole;
+    if (role == 'Laki-laki' || role == 'Perempuan') {
+      return 'Anak';
+    }
     final String name = widget.targetName;
     if (name.startsWith('Ayah')) {
       return widget.targetRole == 'Tiri' ? 'Ayah Tiri' : 'Ayah';
@@ -74,6 +84,11 @@ class _BercintaScreenState extends State<BercintaScreen> {
     }
     if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == cleanTargetName) {
       return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
+    }
+    for (var child in widget.character.children) {
+      if (child['name'] == cleanTargetName) {
+        return child['gender'] ?? 'Perempuan';
+      }
     }
     return HubunganIntimLogic.getPartnerGender(widget.targetName);
   }
@@ -548,7 +563,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
                   partnerRole: widget.targetRole,
                   onComplete: () async {
                     if (_useCondom == false) {
-                      final rel = detectIncestRelation(widget.targetRole, widget.targetName);
+                      final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
                       if (rel != null && rel.geneticRisk > 0 && context.mounted) {
                         await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
                       }
@@ -615,6 +630,15 @@ class _BercintaScreenState extends State<BercintaScreen> {
         found = true;
       }
 
+      if (!found) {
+        for (var child in widget.character.children) {
+          if (child['name'] == widget.targetName) {
+            targetAge = int.tryParse(child['age'] ?? '18') ?? 18;
+            found = true;
+            break;
+          }
+        }
+      }
       if (!found) {
         for (var sib in widget.character.siblings) {
           final String expectedLabel = '${sib['name']} (${sib['relation']})';

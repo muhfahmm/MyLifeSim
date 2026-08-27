@@ -68,15 +68,26 @@ class BeritahuKehamilanHelper {
 
   static void _executeTellParents(
       BuildContext context, Character character, String partnerName, String partnerRole, VoidCallback onComplete) {
-    // Hitung reaksi orang tua
-    // Jika pacar adalah keluarga (Incest), reaksi ortu negatif
+    bool isPartnerChild = false;
+    bool isAdoptedChild = false;
+    for (var child in character.children) {
+      if (child['name'] == partnerName) {
+        isPartnerChild = true;
+        if (child['relation'] == 'Anak Adopsi') {
+          isAdoptedChild = true;
+        }
+        break;
+      }
+    }
+
     final bool isIncest = partnerRole.contains('Saudara') ||
         partnerRole.contains('Kandung') ||
         partnerRole.contains('Tiri') ||
         partnerName.toLowerCase().contains('kakak') ||
         partnerName.toLowerCase().contains('adik') ||
         partnerName.toLowerCase().contains('ayah') ||
-        partnerName.toLowerCase().contains('ibu');
+        partnerName.toLowerCase().contains('ibu') ||
+        isPartnerChild;
 
     String reactionTitle = '';
     String reactionText = '';
@@ -106,7 +117,20 @@ class BeritahuKehamilanHelper {
     final int roll = character.ageUp().hashCode % 100; // deterministic random seed fallback or standard random roll
     final bool minorIsAngry = isMinorPartner && (roll < 70); // 70% chance of anger
 
-    if (isIncest) {
+    if (isPartnerChild) {
+      reactionTitle = 'Reaksi Murka Besar! 😡💣💥';
+      if (isAdoptedChild) {
+        reactionText = 'Orang tuamu mengetahui bahwa kamu menghamili anak angkatmu sendiri ($partnerName)! Mereka sangat syok, menganggap hal ini sebagai aib keluarga yang sangat memalukan, dan murka luar biasa! Hubungan keluarga hancur.';
+      } else {
+        reactionText = 'Orang tuamu mengetahui bahwa kamu menghamili anak kandungmu sendiri ($partnerName)! Mereka sangat syok, menganggap hubungan inses ini menjijikkan, dan murka luar biasa! Hubungan keluarga hancur.';
+      }
+      themeColor = Colors.red;
+
+      // Efek penalti ekstrem
+      if (character.fatherName != null) character.fatherRelationship = (character.fatherRelationship ?? 50) - 50;
+      if (character.motherName != null) character.motherRelationship = (character.motherRelationship ?? 50) - 50;
+      character.happiness = (character.happiness - 50).clamp(0, 100);
+    } else if (isIncest) {
       reactionTitle = 'Reaksi Murka! 😡💣';
       reactionText = 'Orang tuamu mengetahui bahwa kamu hamil akibat hubungan dengan anggota keluarga ($partnerName)! Mereka sangat syok, kecewa, dan murka! Hubungan keluarga memburuk secara ekstrem.';
       themeColor = Colors.red;

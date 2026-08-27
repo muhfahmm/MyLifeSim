@@ -25,7 +25,7 @@ class AjakanMlHeteroKeluarga {
 
     if (myGenderLower == 'perempuan') {
       if (rel.contains('ayah mertua')) chance = 30; // Ayah Mertua: 30%
-      else if (rel.contains('anak')) chance = 30; // Anak Kandung/Tiri: 30%
+      else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') chance = 60; // Anak Kandung/Tiri: 60%
       else if (rel.contains('keponakan')) chance = 30; // Keponakan: 30%
       else if (rel.contains('ayah')) chance = character.custodyParent == 'Ayah' ? (character.age >= 12 ? 10 : 65) : 40; // Ayah Kandung: 15% (10 + 5) jika hak asuh di Ayah & usia >= 12, 65% jika hak asuh di Ayah saja, 40% jika tidak
       else if (rel.contains('adik laki')) chance = 40; // Adik Laki-laki: 40%
@@ -34,7 +34,7 @@ class AjakanMlHeteroKeluarga {
       else if (rel.contains('kakek')) chance = 10; // Kakek: 10%
     } else {
       if (rel.contains('ibu mertua')) chance = 30; // Ibu Mertua: 30%
-      else if (rel.contains('anak')) chance = 30; // Anak Kandung/Tiri: 30%
+      else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') chance = 60; // Anak Kandung/Tiri: 60%
       else if (rel.contains('keponakan')) chance = 30; // Keponakan: 30%
       else if (rel.contains('pasangan paman')) chance = 5; // Pasangan Paman: 5%
       else if (rel.contains('bibi')) chance = 25; // Bibi: 25%

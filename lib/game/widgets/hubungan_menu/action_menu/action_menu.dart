@@ -778,6 +778,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       } else if (name.startsWith('ibu')) {
         return 'Ibu Kandung';
       }
+    } else if (role == 'Laki-laki') {
+      return 'Anak Laki-laki';
+    } else if (role == 'Perempuan') {
+      return 'Anak Perempuan';
     }
 
     return role;
@@ -1957,7 +1961,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   widget.character.exPartners.add({
                     'name': widget.targetName,
                     'gender': _getTargetGender(),
-                    'age': widget.character.age.toString(),
+                    'age': targetAge.toString(),
                     'relationship': '20',
                     'relation': 'Mantan Pacar',
                     'isDeceased': 'false',

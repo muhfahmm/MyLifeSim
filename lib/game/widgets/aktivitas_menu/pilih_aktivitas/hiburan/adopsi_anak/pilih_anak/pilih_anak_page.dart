@@ -25,12 +25,13 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
   late List<Map<String, dynamic>> _availableChildren;
   final Random _random = Random();
 
-  String _getChildAvatarUrl(String name, String gender, int age) {
+  String _getChildAvatarUrl(String name, String gender, int age, String skinColor) {
     return AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
       name: name,
       gender: gender,
       age: age,
       happiness: 90, // smile expression matching the game
+      forcedSkinColor: skinColor,
     );
   }
 
@@ -84,12 +85,15 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
 
       final String desc = _descriptions[_random.nextInt(_descriptions.length)];
 
+      final String skinColor = AvatarGenerator.skinColors.values.elementAt(_random.nextInt(AvatarGenerator.skinColors.length));
+
       return {
         'name': fullName,
         'gender': gender,
         'age': age,
         'cost': cost,
         'desc': desc,
+        'skinColor': skinColor,
       };
     });
   }
@@ -163,6 +167,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
       'gender': child['gender'],
       'relation': 'Anak Adopsi',
       'relationship': '80',
+      'skinColor': child['skinColor'],
     });
 
     // Kirim pesan ke inbox
@@ -256,6 +261,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
                               child['name'] as String,
                               child['gender'] as String,
                               child['age'] as int,
+                              child['skinColor'] as String,
                             ),
                             fit: BoxFit.cover,
                             errorBuilder: (_, __, ___) => const Icon(

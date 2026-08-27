@@ -39,19 +39,28 @@ class _IncestRelation {
   });
 }
 
-_IncestRelation? _detectRelation(String roleLower, String nameLower) {
+_IncestRelation? _detectRelation(Character character, String roleLower, String nameLower) {
+  // Cek apakah target adalah anak angkat/adopsi player
+  for (var child in character.children) {
+    if (child['name']?.toLowerCase() == nameLower) {
+      if (child['relation'] == 'Anak Adopsi') {
+        return null; // Anak adopsi tidak sedarah, 0% risiko genetik!
+      }
+    }
+  }
+
   if (roleLower.contains('tiri') || nameLower.contains('tiri') ||
       roleLower.contains('mertua') || nameLower.contains('mertua') ||
       roleLower.contains('mantan') || nameLower.contains('mantan')) {
     return null; // Non-genetic relationships do not trigger incest warnings or genetic risks
   }
   if (nameLower.startsWith('ayah') || roleLower.contains('ayah') ||
-      nameLower.startsWith('ibu') || roleLower.contains('ibu')) {
+      nameLower.startsWith('ibu') || roleLower.contains('ibu') ||
+      roleLower == 'laki-laki' || roleLower == 'perempuan' || roleLower.contains('anak')) {
     return const _IncestRelation(level: 'parent', geneticRisk: 35, happinessPenalty: 25, karmaPenalty: 35);
   }
   if (roleLower.contains('saudara') || roleLower.contains('kandung') ||
-      nameLower.contains('kakak') || nameLower.contains('adik') ||
-      roleLower == 'laki-laki' || roleLower == 'perempuan') {
+      nameLower.contains('kakak') || nameLower.contains('adik')) {
     return const _IncestRelation(level: 'sibling', geneticRisk: 32, happinessPenalty: 20, karmaPenalty: 30);
   }
   if (roleLower.contains('kakek') || roleLower.contains('nenek')) {
@@ -172,8 +181,8 @@ class IncestRelationData {
   IncestRelationData(this.level, this.geneticRisk);
 }
 
-IncestRelationData? detectIncestRelation(String role, String name) {
-  final rel = _detectRelation(role.toLowerCase(), name.toLowerCase());
+IncestRelationData? detectIncestRelation(Character character, String role, String name) {
+  final rel = _detectRelation(character, role.toLowerCase(), name.toLowerCase());
   if (rel == null) return null;
   return IncestRelationData(rel.level, rel.geneticRisk);
 }
@@ -198,7 +207,7 @@ Map<String, dynamic> handleIncestPregnancyEffect(Character character, Random ran
   final String? partnerName = character.pregnantByPartnerName;
   if (role == null || partnerName == null) return {'keguguran': false, 'kelainanGenetik': false};
 
-  final _IncestRelation? rel = _detectRelation(role.toLowerCase(), partnerName.toLowerCase());
+  final _IncestRelation? rel = _detectRelation(character, role.toLowerCase(), partnerName.toLowerCase());
   if (rel == null || rel.geneticRisk == 0) return {'keguguran': false, 'kelainanGenetik': false};
 
   final int roll = random.nextInt(100);

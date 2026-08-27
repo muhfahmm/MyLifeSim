@@ -91,6 +91,11 @@ class AjakanResolver {
         return int.tryParse(ex['age'] ?? '18') ?? 18;
       }
     }
+    for (var child in character.children) {
+      if (child['name'] == targetName) {
+        return int.tryParse(child['age'] ?? '12') ?? 12;
+      }
+    }
     final List<Map<String, String>> active = [];
     if (character.partner != null) active.add(character.partner!);
     if (character.secondPartner != null) active.add(character.secondPartner!);
@@ -144,7 +149,9 @@ class AjakanResolver {
         cleanName.startsWith('ayah') ||
         cleanName.startsWith('ibu') ||
         cleanRole.contains('ayah') ||
-        cleanRole.contains('ibu')) {
+        cleanRole.contains('ibu') ||
+        cleanRole == 'laki-laki' ||
+        cleanRole == 'perempuan') {
       return true;
     }
     return false;
