@@ -2191,268 +2191,300 @@ class _GameScreenState extends State<GameScreen> {
         onSaveProgress: _saveProgress,
         onNewGame: _startNewGame,
       ),
-      // --- PERBAIKAN: Gunakan SingleChildScrollView agar tidak overflow ---
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Character Card Info
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  children: [
-                    CircleAvatar(
-                      radius: 36,
-                      backgroundColor: Colors.blue.shade50,
-                      child: Image(
-                        image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          );
-                        },
-                        width: 72,
-                        height: 72,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16.0, 8.0, 16.0, 8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Character Card Info
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                      child: Column(
+                        children: [
+                          CircleAvatar(
+                            radius: 30,
+                            backgroundColor: Colors.blue.shade50,
+                            child: Image(
+                              image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
+                              loadingBuilder: (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                );
+                              },
+                              width: 60,
+                              height: 60,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          // Display Tanggal Lahir & Tanggal Sekarang
+                          (() {
+                            final months = [
+                              'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+                            ];
+                            final birth = _character.birthDate ?? DateTime.now();
+                            final formattedBirth = "${birth.day} ${months[birth.month - 1]} ${birth.year}";
+                            return Padding(
+                              padding: const EdgeInsets.only(bottom: 2.0),
+                              child: Text(
+                                'Tanggal Lahir: $formattedBirth',
+                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                              ),
+                            );
+                          })(),
+                          Text(_character.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                          Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 2),
+                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: const TextStyle(fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+                          Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                          const SizedBox(height: 2),
+                          (() {
+                            if (_character.jobName != null) {
+                              return Text(
+                                'Pekerjaan: ${_character.jobName}',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
+                              );
+                            } else if (_character.univMajor != null) {
+                              return Text(
+                                'Pendidikan: ${_character.univMajor!.split(" (").first}',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                              );
+                            } else if (_character.age >= 6 && _character.age < 18) {
+                              String school = 'SD';
+                              if (_character.age >= 12 && _character.age < 15) school = 'SMP';
+                              else if (_character.age >= 15) school = 'SMA';
+                              return Text(
+                                'Pendidikan: $school',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                              );
+                            } else if (_character.age >= 18) {
+                              return const Text(
+                                'Status: Pengangguran',
+                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey),
+                              );
+                            }
+                            return const SizedBox.shrink();
+                          }()),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    // Display Tanggal Lahir & Tanggal Sekarang
-                    (() {
-                      final months = [
-                        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                      ];
-                      final birth = _character.birthDate ?? DateTime.now();
-                      final formattedBirth = "${birth.day} ${months[birth.month - 1]} ${birth.year}";
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6.0),
-                        child: Text(
-                          'Tanggal Lahir: $formattedBirth',
-                          style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
-                        ),
-                      );
-                    })(),
-                    Text(_character.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                    Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 14, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
-                    const SizedBox(height: 2),
-                    Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: const TextStyle(fontSize: 13, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
-                    Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 16, color: Colors.grey)),
-                    const SizedBox(height: 4),
-                    (() {
-                      if (_character.jobName != null) {
-                        return Text(
-                          'Pekerjaan: ${_character.jobName}',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
-                        );
-                      } else if (_character.univMajor != null) {
-                        return Text(
-                          'Pendidikan: ${_character.univMajor!.split(" (").first}',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
-                        );
-                      } else if (_character.age >= 6 && _character.age < 18) {
-                        String school = 'SD';
-                        if (_character.age >= 12 && _character.age < 15) school = 'SMP';
-                        else if (_character.age >= 15) school = 'SMA';
-                        return Text(
-                          'Pendidikan: $school',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
-                        );
-                      } else if (_character.age >= 18) {
-                        return const Text(
-                          'Status: Pengangguran',
-                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey),
-                        );
-                      }
-                      return const SizedBox.shrink();
-                    }()),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Stats - 2 Column Layout to save vertical space
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatRow('Kesehatan', _character.health, Colors.red)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatRow('Kebahagiaan', _character.happiness, Colors.green)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatRow('Kecerdasan', _character.intelligence, Colors.blue)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true)),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(child: _buildStatRow('Disiplin', _character.discipline, Colors.purple)),
+                      const SizedBox(width: 12),
+                      Expanded(child: _buildSexualityRow('Seksualitas', _character.sexuality)),
+                    ],
+                  ),
+
+                  // --- STATUS KEHAMILAN (PERBAIKAN) ---
+                  if (_character.isPregnant || _character.partnerIsPregnant) ...[
+                    const SizedBox(height: 10),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.pink.shade50,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: Colors.pink.shade200, width: 1.2),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            _character.isPregnant ? Icons.pregnant_woman : Icons.child_care,
+                            color: Colors.pink,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            _character.isPregnant 
+                              ? 'Status: Hamil 🍼' 
+                              : 'Status: ${_character.partner?['name'] ?? 'Pasangan'} Hamil 👶',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.pink,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
-                ),
+
+                  // Jika karakter mati
+                  if (!_character.isAlive)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16.0),
+                      child: Center(
+                        child: Text(
+                          '💀 Karakter telah meninggal pada usia ${_character.age} tahun',
+                          style: const TextStyle(fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ),
+                ],
               ),
             ),
-            const SizedBox(height: 24),
+          ),
 
-            // Stats
-            _buildStatRow('Kesehatan', _character.health, Colors.red),
-            const SizedBox(height: 12),
-            _buildStatRow('Kebahagiaan', _character.happiness, Colors.green),
-            const SizedBox(height: 12),
-            _buildStatRow('Kecerdasan', _character.intelligence, Colors.blue),
-            const SizedBox(height: 12),
-            _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true),
-
-            // --- TAMBAHAN MENU BARU ---
-            const SizedBox(height: 12),
-            _buildStatRow('Disiplin', _character.discipline, Colors.purple),
-            const SizedBox(height: 12),
-            _buildSexualityRow('Seksualitas', _character.sexuality),
-            // --------------------------
-
-            // --- STATUS KEHAMILAN (PERBAIKAN) ---
-            if (_character.isPregnant || _character.partnerIsPregnant) ...[
-              const SizedBox(height: 16),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                decoration: BoxDecoration(
-                  color: Colors.pink.shade50,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: Colors.pink.shade200, width: 1.5),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(
-                      _character.isPregnant ? Icons.pregnant_woman : Icons.child_care,
-                      color: Colors.pink,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      _character.isPregnant 
-                        ? 'Status: Hamil 🍼' 
-                        : 'Status: ${_character.partner?['name'] ?? 'Pasangan'} Hamil 👶',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.pink,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-
-            const SizedBox(height: 24),
-
-            // --- 5 MENU UTAMA ---
-            Wrap(
-              spacing: 12.0,
-              runSpacing: 12.0,
-              alignment: WrapAlignment.center,
-              children: [
-                // 1. KATEGORI
-                AgeCategoryButton(
-                  character: _character,
-                  ageData: ageData,
-                  age: _character.age,
-                  gender: _character.gender ?? 'Laki-laki',
-                  location: _character.location ?? 'Indonesia',
-                  health: _character.health,
-                  happiness: _character.happiness,
-                  intelligence: _character.intelligence,
-                  money: _character.money,
-                  appearance: _character.appearance ?? 50,
-                ),
-                
-                // 2. ASSETS
-                AssetsButton(
-                  character: _character,
-                  onRefresh: () {
-                    setState(() {
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-      );
-    });
-  },
-),
-                
-                // 3. HUBUNGAN
-                RelationshipButton(
-                  character: _character,
-                  isAlive: _character.isAlive,
-                  onRefresh: () {
-                    setState(() {
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-                      );
-                    });
-                  },
-                ),
-                
-                // INBOX NOTIFIKASI
-                InboxButton(
-                  character: _character,
-                  onRefresh: () {
-                    setState(() {
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-                      );
-                    });
-                  },
-                ),
-                
-                // 4. AKTIVITAS
-                ActivityButton(
-                  character: _character,
-                  isAlive: _character.isAlive,
-                  onRefresh: () {
-                    setState(() {
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-                      );
-                    });
-                  },
-                  onWork: () {
-                    setState(() {
-                      _character.money += 100;
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-                      );
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Mendapatkan uang 100!')),
-                    );
-                  },
-                  onExercise: () {
-                    setState(() {
-                      _character.health += 10;
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                        _character,
-                        happiness: _character.happiness,
-                      );
-                    });
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Kesehatan +10!')),
-                    );
-                  },
-                ),
-                
-                // 5. TAMBAH UMUR
-                AgeUpButton(
-                  onPressed: _character.isAlive ? _ageUp : null,
-                ),
-
-                // 6. TAMBAH HARI
-                NextDayButton(
-                  onPressed: _character.isAlive ? _nextDay : null,
+          // Sticky Bottom Actions Container
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.06),
+                  blurRadius: 10,
+                  offset: const Offset(0, -4),
                 ),
               ],
-            ),
-            
-            // Jika karakter mati
-            if (!_character.isAlive)
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: Center(
-                  child: Text(
-                    '💀 Karakter telah meninggal pada usia ${_character.age} tahun',
-                    style: const TextStyle(fontSize: 16, color: Colors.red, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              border: Border(
+                top: BorderSide(color: Colors.grey.shade200, width: 1),
               ),
-          ],
-        ),
+            ),
+            child: SafeArea(
+              top: false,
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 8.0,
+                alignment: WrapAlignment.center,
+                children: [
+                  // 1. KATEGORI
+                  AgeCategoryButton(
+                    character: _character,
+                    ageData: ageData,
+                    age: _character.age,
+                    gender: _character.gender ?? 'Laki-laki',
+                    location: _character.location ?? 'Indonesia',
+                    health: _character.health,
+                    happiness: _character.happiness,
+                    intelligence: _character.intelligence,
+                    money: _character.money,
+                    appearance: _character.appearance ?? 50,
+                  ),
+                  
+                  // 2. ASSETS
+                  AssetsButton(
+                    character: _character,
+                    onRefresh: () {
+                      setState(() {
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                    },
+                  ),
+                  
+                  // 3. HUBUNGAN
+                  RelationshipButton(
+                    character: _character,
+                    isAlive: _character.isAlive,
+                    onRefresh: () {
+                      setState(() {
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                    },
+                  ),
+                  
+                  // INBOX NOTIFIKASI
+                  InboxButton(
+                    character: _character,
+                    onRefresh: () {
+                      setState(() {
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                    },
+                  ),
+                  
+                  // 4. AKTIVITAS
+                  ActivityButton(
+                    character: _character,
+                    isAlive: _character.isAlive,
+                    onRefresh: () {
+                      setState(() {
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                    },
+                    onWork: () {
+                      setState(() {
+                        _character.money += 100;
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Mendapatkan uang 100!')),
+                      );
+                    },
+                    onExercise: () {
+                      setState(() {
+                        _character.health += 10;
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Kesehatan +10!')),
+                      );
+                    },
+                  ),
+                  
+                  // 5. TAMBAH UMUR
+                  AgeUpButton(
+                    onPressed: _character.isAlive ? _ageUp : null,
+                  ),
+
+                  // 6. TAMBAH HARI
+                  NextDayButton(
+                    onPressed: _character.isAlive ? _nextDay : null,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -2465,19 +2497,19 @@ class _GameScreenState extends State<GameScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-            Text(isMoney ? '\$$value' : '$value%', style: const TextStyle(fontSize: 14)),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            Text(isMoney ? '\$$value' : '$value%', style: const TextStyle(fontSize: 12)),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         if (!isMoney)
           ClipRRect(
-            borderRadius: BorderRadius.circular(8),
+            borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: (value.clamp(0, 100)) / 100.0,
               backgroundColor: Colors.grey.shade200,
               color: color,
-              minHeight: 12,
+              minHeight: 8,
             ),
           ),
       ],
@@ -2492,22 +2524,22 @@ class _GameScreenState extends State<GameScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.pink.withOpacity(0.15),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: Colors.pink.withOpacity(0.3)),
               ),
               child: Text(
                 value,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.pink),
+                style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.pink),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
       ],
     );
   }

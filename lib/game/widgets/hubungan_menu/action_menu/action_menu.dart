@@ -1460,6 +1460,103 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             (widget.character.fatherName == null ||
                 widget.character.isFatherDeceased);
 
+    final ActionItem putuskanPacarAction = ActionItem(
+      label: 'Putuskan Pacar',
+      icon: Icons.heart_broken,
+      color: Colors.red,
+      onTap: () {
+        final screenContext = context;
+        showDialog(
+          context: screenContext,
+          builder: (confirmDialogContext) => AlertDialog(
+            title: const Text('Putuskan Hubungan',
+                style: TextStyle(fontWeight: FontWeight.bold)),
+            content: Text(
+                'Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(confirmDialogContext),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(confirmDialogContext); // Tutup dialog konfirmasi
+
+                  // 1. Hapus dari partner mana saja yang cocok
+                  if (widget.character.partner != null &&
+                      widget.character.partner!['name'] ==
+                          widget.targetName) {
+                    widget.character.partner = null;
+                  } else if (widget.character.secondPartner != null &&
+                      widget.character.secondPartner!['name'] ==
+                          widget.targetName) {
+                    widget.character.secondPartner = null;
+                  } else if (widget.character.thirdPartner != null &&
+                      widget.character.thirdPartner!['name'] ==
+                          widget.targetName) {
+                    widget.character.thirdPartner = null;
+                  } else if (widget.character.fourthPartner != null &&
+                      widget.character.fourthPartner!['name'] ==
+                          widget.targetName) {
+                    widget.character.fourthPartner = null;
+                  } else if (widget.character.fifthPartner != null &&
+                      widget.character.fifthPartner!['name'] ==
+                          widget.targetName) {
+                    widget.character.fifthPartner = null;
+                  }
+                  widget.character.secretPartners
+                      .removeWhere((p) => p['name'] == widget.targetName);
+                  if (widget.character.secretPartners.isEmpty &&
+                      widget.character.secondPartner == null) {
+                    widget.character.isHavingAffair = false;
+                  }
+
+                  // 2. Tambahkan ke exPartners (mantan pacar)
+                  widget.character.exPartners.add({
+                    'name': widget.targetName,
+                    'gender': _getTargetGender(),
+                    'age': widget.character.age.toString(),
+                    'relationship': '20',
+                    'relation': 'Mantan Pacar',
+                    'isDeceased': 'false',
+                    'breakInitiator': widget.character.gender,
+                    'breakReason': 'putus biasa',
+                  });
+
+                  // 3. Turunkan hubungan
+                  _updateRelationship(-40);
+
+                  // 4. Refresh state
+                  _updateState();
+
+                  // 5. Tampilkan dialog hasil putus menggunakan screenContext
+                  DialogHelper.show(
+                    context: screenContext,
+                    title: 'Putus Hubungan 💔',
+                    content: Text(
+                        'Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'),
+                    actions: [
+                      Builder(
+                        builder: (resultDialogContext) => TextButton(
+                          onPressed: () {
+                            Navigator.pop(resultDialogContext);
+                            Navigator.pop(screenContext);
+                          },
+                          child: const Text('Mengerti'),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+                child: const Text('Ya, Putuskan',
+                    style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
     if (isFatherPartnerAndMotherTiriExists ||
         isStepFatherPartnerAndMotherExists ||
         isMotherPartnerAndFatherTiriExists ||
@@ -1485,6 +1582,65 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
+
+      // Putuskan Pacar
+      topActions.add(putuskanPacarAction);
+
+      // Minta Tidak Menikah Lagi
+      if (isDatingBiologicalFather && !widget.character.isFatherPersuadedNotToRemarry) {
+        topActions.add(ActionItem(
+          label: 'Minta Tidak Menikah Lagi',
+          icon: Icons.block,
+          color: Colors.orange,
+          onTap: () {
+            final screenContext = context;
+            showDialog(
+              context: screenContext,
+              builder: (confirmContext) => AlertDialog(
+                title: const Text('Minta Tidak Menikah Lagi 💍',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                content: const Text(
+                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(confirmContext),
+                    child: const Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(confirmContext);
+                      final bool success = _random.nextInt(100) < 70;
+                      if (success) {
+                        widget.character.isFatherPersuadedNotToRemarry = true;
+                        _updateRelationship(15);
+                        _updateState();
+                        _showResultDialog(
+                            'Sukses 💍',
+                            'Ayahmu menyetujui permintaanmu. Dia berjanji tidak akan menikah lagi dengan orang lain.',
+                            Icons.done,
+                            Colors.green,
+                            () {});
+                      } else {
+                        _updateRelationship(-15);
+                        _updateState();
+                        _showResultDialog(
+                            'Ditolak 🚫',
+                            'Ayahmu menolak permintaanmu. Dia merasa masih membutuhkan pendamping hidup kelak.',
+                            Icons.block,
+                            Colors.red,
+                            () {});
+                      }
+                    },
+                    child: const Text('Bujuk Ayah',
+                        style: TextStyle(
+                            color: Colors.orange, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            );
+          },
+        ));
+      }
 
       // 2. Minta Cerai
       final String spouseName = isFatherPartnerAndMotherTiriExists
@@ -1606,6 +1762,65 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
+
+      // Putuskan Pacar
+      topActions.add(putuskanPacarAction);
+
+      // Minta Tidak Menikah Lagi
+      if (isDatingBiologicalFather && !widget.character.isFatherPersuadedNotToRemarry) {
+        topActions.add(ActionItem(
+          label: 'Minta Tidak Menikah Lagi',
+          icon: Icons.block,
+          color: Colors.orange,
+          onTap: () {
+            final screenContext = context;
+            showDialog(
+              context: screenContext,
+              builder: (confirmContext) => AlertDialog(
+                title: const Text('Minta Tidak Menikah Lagi 💍',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                content: const Text(
+                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(confirmContext),
+                    child: const Text('Batal'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(confirmContext);
+                      final bool success = _random.nextInt(100) < 70;
+                      if (success) {
+                        widget.character.isFatherPersuadedNotToRemarry = true;
+                        _updateRelationship(15);
+                        _updateState();
+                        _showResultDialog(
+                            'Sukses 💍',
+                            'Ayahmu menyetujui permintaanmu. Dia berjanji tidak akan menikah lagi dengan orang lain.',
+                            Icons.done,
+                            Colors.green,
+                            () {});
+                      } else {
+                        _updateRelationship(-15);
+                        _updateState();
+                        _showResultDialog(
+                            'Ditolak 🚫',
+                            'Ayahmu menolak permintaanmu. Dia merasa masih membutuhkan pendamping hidup kelak.',
+                            Icons.block,
+                            Colors.red,
+                            () {});
+                      }
+                    },
+                    child: const Text('Bujuk Ayah',
+                        style: TextStyle(
+                            color: Colors.orange, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            );
+          },
+        ));
+      }
     } else if (isActivePartner && isPartnerRole) {
       // 1. Bercinta / Make Love (langsung muncul, tidak harus menunggu usia 12)
       topActions.add(ActionItem(
@@ -1630,103 +1845,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       ));
 
       // 2. Putuskan Pacar
-      topActions.add(ActionItem(
-        label: 'Putuskan Pacar',
-        icon: Icons.heart_broken,
-        color: Colors.red,
-        onTap: () {
-          final screenContext = context;
-          showDialog(
-            context: screenContext,
-            builder: (confirmDialogContext) => AlertDialog(
-              title: const Text('Putuskan Hubungan',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
-              content: Text(
-                  'Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(confirmDialogContext),
-                  child: const Text('Batal'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(
-                        confirmDialogContext); // Tutup dialog konfirmasi
-
-                    // 1. Hapus dari partner mana saja yang cocok
-                    if (widget.character.partner != null &&
-                        widget.character.partner!['name'] ==
-                            widget.targetName) {
-                      widget.character.partner = null;
-                    } else if (widget.character.secondPartner != null &&
-                        widget.character.secondPartner!['name'] ==
-                            widget.targetName) {
-                      widget.character.secondPartner = null;
-                    } else if (widget.character.thirdPartner != null &&
-                        widget.character.thirdPartner!['name'] ==
-                            widget.targetName) {
-                      widget.character.thirdPartner = null;
-                    } else if (widget.character.fourthPartner != null &&
-                        widget.character.fourthPartner!['name'] ==
-                            widget.targetName) {
-                      widget.character.fourthPartner = null;
-                    } else if (widget.character.fifthPartner != null &&
-                        widget.character.fifthPartner!['name'] ==
-                            widget.targetName) {
-                      widget.character.fifthPartner = null;
-                    }
-                    widget.character.secretPartners
-                        .removeWhere((p) => p['name'] == widget.targetName);
-                    if (widget.character.secretPartners.isEmpty &&
-                        widget.character.secondPartner == null) {
-                      widget.character.isHavingAffair = false;
-                    }
-
-                    // 2. Tambahkan ke exPartners (mantan pacar)
-                    widget.character.exPartners.add({
-                      'name': widget.targetName,
-                      'gender': _getTargetGender(),
-                      'age': widget.character.age.toString(),
-                      'relationship': '20',
-                      'relation': 'Mantan Pacar',
-                      'isDeceased': 'false',
-                      'breakInitiator': widget.character.gender,
-                      'breakReason': 'putus biasa',
-                    });
-
-                    // 3. Turunkan hubungan
-                    _updateRelationship(-40);
-
-                    // 4. Refresh state
-                    _updateState();
-
-                    // 5. Tampilkan dialog hasil putus menggunakan screenContext
-                    DialogHelper.show(
-                      context: screenContext,
-                      title: 'Putus Hubungan 💔',
-                      content: Text(
-                          'Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'),
-                      actions: [
-                        Builder(
-                          builder: (resultDialogContext) => TextButton(
-                            onPressed: () {
-                              Navigator.pop(resultDialogContext);
-                              Navigator.pop(screenContext);
-                            },
-                            child: const Text('Mengerti'),
-                          ),
-                        ),
-                      ],
-                    );
-                  },
-                  child: const Text('Ya, Putuskan',
-                      style: TextStyle(color: Colors.red)),
-                ),
-              ],
-            ),
-          );
-        },
-      ));
+      topActions.add(putuskanPacarAction);
 
       // 3. Minta Cerai (jika target adalah ayah/ibu kandung/tiri yang sedang pacaran dengan anak dan pasangannya masih ada)
       final String myGenderLower = widget.character.gender.toLowerCase();

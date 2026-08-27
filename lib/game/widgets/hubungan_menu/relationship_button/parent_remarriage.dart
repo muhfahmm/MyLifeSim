@@ -40,7 +40,7 @@ class ParentRemarriage {
       }
     }
 
-    if (character.fatherName != null && !character.isFatherDeceased && character.stepMotherName == null) {
+    if (character.fatherName != null && !character.isFatherDeceased && character.stepMotherName == null && !character.isFatherPersuadedNotToRemarry) {
       bool shouldRemarry = false;
       final bool isFemaleUserWithFather = character.gender.toLowerCase() == 'perempuan' && character.custodyParent == 'Ayah';
 

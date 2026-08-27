@@ -564,6 +564,7 @@ class Character {
   bool isMotherDeceased = false;
   bool isFatherDivorced = false;
   bool isMotherDivorced = false;
+  bool isFatherPersuadedNotToRemarry = false;
   bool isStepFatherDeceased = false;
   bool isStepMotherDeceased = false;
   bool isMotherImprisoned = false;
