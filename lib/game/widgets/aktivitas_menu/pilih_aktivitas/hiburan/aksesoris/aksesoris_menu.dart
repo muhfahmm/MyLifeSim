@@ -1,21 +1,14 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/aksesoris_menu.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'daftar_aksesoris/jam_tangan/jam_tangan_page.dart';
+import 'daftar_aksesoris/kacamata_sunglasses/kacamata_sunglasses_page.dart';
+import 'daftar_aksesoris/tas_branded/tas_branded_page.dart';
+import 'daftar_aksesoris/gelang_kalung/gelang_kalung_page.dart';
+import 'daftar_aksesoris/topi_kekinian/topi_kekinian_page.dart';
 
 class AksesorisMenuHelper {
   static void showAksesorisMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    if (character.age < 12) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 12 tahun untuk membeli aksesoris.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
-      );
-      return;
-    }
-
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -44,11 +37,36 @@ class TokoAksesorisPage extends StatefulWidget {
 
 class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
   final List<Map<String, dynamic>> items = [
-    {'name': 'Jam Tangan ⌚', 'price': 500000, 'happiness': 8, 'desc': 'Jam tangan stylish untuk penampilan'},
-    {'name': 'Kacamata Sunglasses 🕶️', 'price': 300000, 'happiness': 6, 'desc': 'Kacamata hitam keren'},
-    {'name': 'Tas Branded 👜', 'price': 2000000, 'happiness': 15, 'desc': 'Tas mewah bermerek terkenal'},
-    {'name': 'Gelang / Kalung 📿', 'price': 200000, 'happiness': 5, 'desc': 'Perhiasan sederhana namun elegan'},
-    {'name': 'Topi Kekinian 🎩', 'price': 150000, 'happiness': 4, 'desc': 'Topi yang sedang tren'},
+    {
+      'id': 'jam_tangan',
+      'name': 'Jam Tangan ⌚',
+      'happiness': 8,
+      'desc': 'Jam tangan stylish untuk penampilan'
+    },
+    {
+      'id': 'kacamata_sunglasses',
+      'name': 'Kacamata Sunglasses 🕶️',
+      'happiness': 6,
+      'desc': 'Kacamata hitam keren'
+    },
+    {
+      'id': 'tas_branded',
+      'name': 'Tas Branded 👜',
+      'happiness': 15,
+      'desc': 'Tas mewah bermerek terkenal'
+    },
+    {
+      'id': 'gelang_kalung',
+      'name': 'Gelang / Kalung 📿',
+      'happiness': 5,
+      'desc': 'Perhiasan sederhana namun elegan'
+    },
+    {
+      'id': 'topi_kekinian',
+      'name': 'Topi Kekinian 🎩',
+      'happiness': 4,
+      'desc': 'Topi yang sedang tren'
+    },
   ];
 
   static String _formatMoney(int amount) {
@@ -89,57 +107,65 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
                 itemCount: items.length,
                 itemBuilder: (_, i) {
                   final item = items[i];
-                  final bool canAfford = widget.character.money >= (item['price'] as int);
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(color: Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(item['name'], style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14,
-                        color: canAfford ? Colors.black87 : Colors.grey,
-                      )),
+                      title: Text(
+                        item['name'],
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: Colors.black87,
+                        ),
+                      ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${item['desc']}\nHarga: \$${_formatMoney(item['price'] as int)}',
-                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                        child: Text(
+                          item['desc'],
+                          style: const TextStyle(color: Colors.black54),
+                        ),
                       ),
-                      isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.shopping_cart : Icons.lock_outline,
-                          color: canAfford ? Colors.pink : Colors.grey),
-                      onTap: canAfford ? () {
-                        setState(() {
-                          widget.character.money -= (item['price'] as int);
-                          widget.character.happiness = (widget.character.happiness + (item['happiness'] as int)).clamp(0, 100);
-                        });
-                        final msg = '🛍️ Kamu membeli ${item['name']}! (-\$${_formatMoney(item['price'] as int)}, +${item['happiness']}% Kebahagiaan)';
-                        widget.character.inbox.add(msg);
-                        showDialog(
-                          context: context,
-                          builder: (ctx2) => AlertDialog(
-                            title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green),
-                              SizedBox(width: 8),
-                              Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
-                            ]),
-                            content: Text(msg),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx2);
-                                  widget.onComplete();
-                                },
-                                child: const Text('OK'),
-                              )
-                            ],
-                          ),
+                      isThreeLine: false,
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.pink,
+                        size: 16,
+                      ),
+                      onTap: () {
+                        final String itemId = item['id'] as String;
+                        Widget nextPage;
+                        switch (itemId) {
+                          case 'jam_tangan':
+                            nextPage = JamTanganBrandPage(character: widget.character, onComplete: widget.onComplete);
+                            break;
+                          case 'kacamata_sunglasses':
+                            nextPage = KacamataSunglassesBrandPage(character: widget.character, onComplete: widget.onComplete);
+                            break;
+                          case 'tas_branded':
+                            nextPage = TasBrandedBrandPage(character: widget.character, onComplete: widget.onComplete);
+                            break;
+                          case 'gelang_kalung':
+                            nextPage = GelangKalungBrandPage(character: widget.character, onComplete: widget.onComplete);
+                            break;
+                          case 'topi_kekinian':
+                            nextPage = TopiKekinianBrandPage(character: widget.character, onComplete: widget.onComplete);
+                            break;
+                          default:
+                            return;
+                        }
+
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => nextPage),
                         );
-                      } : null,
+                      },
                     ),
                   );
                 },

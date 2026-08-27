@@ -146,8 +146,8 @@ class Character {
   int casinoTotalLoss = 0;
   int casinoSlotJackpot = 0;
 
-  // --- GARASI MOBIL PERSISTEN ---
   Map<String, dynamic>? garasiMobil;
+  List<Map<String, dynamic>> ownedAccessories = [];
 
   // --- INVESTASI PERSISTEN ---
   Map<String, int> saham = {};

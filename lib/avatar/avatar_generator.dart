@@ -164,6 +164,7 @@ class AvatarGenerator {
         'eyes': eyeType,
         'eyebrows': eyebrowType,
         'mouth': mouthType,
+        'backgroundColor': 'transparent',
       },
     );
     return uri.toString();
