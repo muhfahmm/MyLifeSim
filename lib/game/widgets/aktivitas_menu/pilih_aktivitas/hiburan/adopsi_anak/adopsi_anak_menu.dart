@@ -1,28 +1,17 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/adopsi_anak_menu.dart
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'pilih_anak/pilih_anak_page.dart'; // import halaman pilih anak
 
 class AdopsiAnakMenuHelper {
   static void showAdopsiAnakMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    // Validasi umur
     if (character.age < 21) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Akses Dibatasi'),
           content: const Text('Kamu harus berusia minimal 21 tahun untuk mengadopsi anak.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
-      );
-      return;
-    }
-
-    if (character.money < 5000000) {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Dana Tidak Cukup'),
-          content: const Text('Proses adopsi memerlukan biaya minimal \$5.000.000 untuk biaya administrasi dan perawatan.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );
@@ -56,10 +45,29 @@ class AdopsiAnakPage extends StatefulWidget {
 }
 
 class _AdopsiAnakPageState extends State<AdopsiAnakPage> {
-  final List<Map<String, dynamic>> children = [
-    {'name': 'Bayi (0-1 tahun) 👶', 'age': 0, 'cost': 10000000, 'desc': 'Bayi yang membutuhkan kasih sayang penuh'},
-    {'name': 'Balita (2-4 tahun) 🧒', 'age': 3, 'cost': 7000000, 'desc': 'Anak kecil yang aktif dan ceria'},
-    {'name': 'Anak Kecil (5-8 tahun) 🧒', 'age': 6, 'cost': 5000000, 'desc': 'Anak yang sudah bisa mandiri sebagian'},
+  // Kategori umur yang tersedia
+  final List<Map<String, dynamic>> categories = [
+    {
+      'name': 'Bayi & Balita (0-3 tahun) 👶',
+      'minAge': 0,
+      'maxAge': 3,
+      'baseCost': 45000,
+      'desc': 'Bayi dan balita yang membutuhkan kasih sayang penuh',
+    },
+    {
+      'name': 'Anak Kecil (4-7 tahun) 🧒',
+      'minAge': 4,
+      'maxAge': 7,
+      'baseCost': 25000,
+      'desc': 'Anak kecil yang aktif, ceria, dan mulai belajar mandiri',
+    },
+    {
+      'name': 'Anak (8-12 tahun) 👦👧',
+      'minAge': 8,
+      'maxAge': 12,
+      'baseCost': 15000,
+      'desc': 'Anak yang sudah mandiri dan siap menempuh pendidikan dasar',
+    },
   ];
 
   static String _fmt(int amount) {
@@ -97,71 +105,51 @@ class _AdopsiAnakPageState extends State<AdopsiAnakPage> {
             Expanded(
               child: ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                itemCount: children.length,
+                itemCount: categories.length,
                 itemBuilder: (_, i) {
-                  final c = children[i];
-                  final bool canAfford = widget.character.money >= (c['cost'] as int);
+                  final cat = categories[i];
+                  final int cost = cat['baseCost'] as int;
+                  const bool canAfford = true;
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    color: Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(color: Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(c['name'], style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14,
-                        color: canAfford ? Colors.black87 : Colors.grey,
+                      title: Text(cat['name'], style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.black87,
                       )),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${c['desc']}\nBiaya: \$${_fmt(c['cost'] as int)}',
-                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                        child: Text(
+                          '${cat['desc']}\nBiaya: \$${_fmt(cost)}',
+                          style: const TextStyle(color: Colors.black54),
+                        ),
                       ),
                       isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.favorite : Icons.lock_outline,
-                          color: canAfford ? Colors.orange : Colors.grey),
-                      onTap: canAfford ? () {
-                        setState(() {
-                          widget.character.money -= (c['cost'] as int);
-                          widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
-                        });
-                        final r = Random();
-                        final names = ['Budi', 'Siti', 'Reza', 'Ayu', 'Dian', 'Fajar', 'Lina', 'Eko'];
-                        final childName = names[r.nextInt(names.length)];
-                        final childGender = r.nextBool() ? 'Laki-laki' : 'Perempuan';
-                        widget.character.children.add({
-                          'name': childName,
-                          'age': c['age'].toString(),
-                          'gender': childGender,
-                          'relation': 'Anak Adopsi',
-                          'relationship': '80',
-                        });
-                        final msg = '👨‍👩‍👧 Kamu berhasil mengadopsi $childName ($childGender, ${c['age']} tahun)! (+20% Kebahagiaan, -\$${_fmt(c['cost'] as int)})';
-                        widget.character.inbox.add(msg);
-                        showDialog(
-                          context: context,
-                          builder: (ctx2) => AlertDialog(
-                            title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green),
-                              SizedBox(width: 8),
-                              Text('Adopsi Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
-                            ]),
-                            content: Text(msg),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx2);
-                                  widget.onComplete();
-                                },
-                                child: const Text('OK'),
-                              )
-                            ],
+                      trailing: const Icon(
+                        Icons.arrow_forward_ios,
+                        color: Colors.orange,
+                      ),
+                      onTap: () {
+                        // Navigasi ke halaman pilih anak
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PilihAnakPage(
+                              character: widget.character,
+                              category: cat,
+                              onComplete: widget.onComplete,
+                            ),
                           ),
                         );
-                      } : null,
+                      },
                     ),
                   );
                 },
