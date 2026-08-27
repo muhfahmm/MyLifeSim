@@ -569,6 +569,7 @@ class Character {
   bool isFatherPersuadedNotToRemarry = false;
   bool isStepFatherDeceased = false;
   bool isStepMotherDeceased = false;
+  bool motherWillTryForBaby = false;
   bool isMotherImprisoned = false;
   int motherPrisonYears = 0;
   bool isFatherImprisoned = false;
@@ -960,7 +961,9 @@ class Character {
       // Jika orang tua sudah cerai, ibu tidak bisa melahirkan kecuali menikah lagi dengan pria lain (ada ayah tiri)
       final bool cannotHaveChild = isMotherDivorced && (stepFatherName == null || isStepFatherDeceased);
       
-      if (!cannotHaveChild && random.nextInt(100) < 6) {
+      final int birthChance = motherWillTryForBaby ? 80 : 6;
+      if (!cannotHaveChild && random.nextInt(100) < birthChance) {
+        motherWillTryForBaby = false; // reset flag
         final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
         final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
         
@@ -1053,6 +1056,17 @@ class Character {
           // Adik baru saja lahir
           events.add('👶 Adik Baru Lahir! Ibumu melahirkan seorang ${sib['relation']!.contains('Laki') ? 'Adik Laki-laki' : 'Adik Perempuan'} bernama ${sib['name']}.');
         } else {
+          // Increment dating or engagement years if partner exists
+          if (sib['spouseName'] != null) {
+            if (sib['isEngaged'] == 'true') {
+              final int engYears = int.tryParse(sib['engagementYears'] ?? '0') ?? 0;
+              sib['engagementYears'] = (engYears + 1).toString();
+            } else if (sib['isMarried'] == 'false') {
+              final int datYears = int.tryParse(sib['datingYears'] ?? '0') ?? 0;
+              sib['datingYears'] = (datYears + 1).toString();
+            }
+          }
+
           // --- LOGIKA DINAMIS PACARAN, LAMARAN, PERNIKAHAN, & KEHAMILAN SAUDARA (KAKA/ADIK) ---
           // A. Pacaran (Jika usia >= 12, belum bertunangan/menikah dan belum punya pasangan)
           if (nextAge >= 12 && sib['spouseName'] == null) {
@@ -1071,6 +1085,8 @@ class Character {
               sib['spouseAge'] = (nextAge + random.nextInt(5) - 2).clamp(10, 100).toString();
               sib['isEngaged'] = 'false';
               sib['isMarried'] = 'false';
+              sib['datingYears'] = '0';
+              sib['engagementYears'] = '0';
               
               final String sibGender = sib['gender'] ?? 'Laki-laki';
               final String relationshipPrefix = (sibGender == spouseGender) 
@@ -1082,11 +1098,21 @@ class Character {
               inbox.add(notice);
             }
           }
-          // B. Dilamar / Melamar (Jika sudah punya pacar, belum bertunangan/menikah)
-          else if (sib['spouseName'] != null && sib['isEngaged'] == 'false' && sib['isMarried'] == 'false') {
-            // Peluang 15% per tahun untuk bertunangan (Dilamar)
-            if (random.nextInt(100) < 15) {
+          // B. Dilamar / Melamar (Jika sudah punya pacar, belum bertunangan/menikah, dan usia >= 18)
+          else if (sib['spouseName'] != null && sib['isEngaged'] == 'false' && sib['isMarried'] == 'false' && nextAge >= 18) {
+            final int datingYears = int.tryParse(sib['datingYears'] ?? '0') ?? 0;
+            int engageChance = 0;
+            if (datingYears == 2) {
+              engageChance = 25; // 25%
+            } else if (datingYears == 3) {
+              engageChance = 50; // 50%
+            } else if (datingYears >= 4) {
+              engageChance = 75; // 75%
+            }
+
+            if (engageChance > 0 && random.nextInt(100) < engageChance) {
               sib['isEngaged'] = 'true';
+              sib['engagementYears'] = '0'; // reset/start engagement timer
               final bool isSameSex = sib['gender'] == sib['spouseGender'];
               final String notice = isSameSex
                   ? '💍 Kabar Keluarga: Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) bertunangan sesama jenis dengan kekasihnya, ${sib['spouseName']}! 🏳️‍🌈'
@@ -1095,10 +1121,19 @@ class Character {
               inbox.add(notice);
             }
           }
-          // C. Menikah (Jika sudah bertunangan, belum menikah)
-          else if (sib['isEngaged'] == 'true' && sib['isMarried'] == 'false') {
-            // Peluang 20% per tahun untuk menikah
-            if (random.nextInt(100) < 20) {
+          // C. Menikah (Jika sudah bertunangan, belum menikah, dan usia >= 18)
+          else if (sib['isEngaged'] == 'true' && sib['isMarried'] == 'false' && nextAge >= 18) {
+            final int engagementYears = int.tryParse(sib['engagementYears'] ?? '0') ?? 0;
+            int marryChance = 0;
+            if (engagementYears == 1) {
+              marryChance = 30; // 30%
+            } else if (engagementYears == 2) {
+              marryChance = 60; // 60%
+            } else if (engagementYears >= 3) {
+              marryChance = 90; // 90%
+            }
+
+            if (marryChance > 0 && random.nextInt(100) < marryChance) {
               sib['isMarried'] = 'true';
               sib['isEngaged'] = 'false'; // ganti status
               final bool isSameSex = sib['gender'] == sib['spouseGender'];

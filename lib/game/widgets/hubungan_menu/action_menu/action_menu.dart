@@ -1157,6 +1157,100 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         );
       }
     }
+    final String mintaAdikTargetName = widget.targetName.toLowerCase();
+    final bool mintaAdikIsMother = mintaAdikTargetName.contains('ibu') && !mintaAdikTargetName.contains('tiri');
+    if (widget.character.age >= 6 &&
+        widget.character.age <= 12 &&
+        mintaAdikIsMother &&
+        widget.character.motherName != null &&
+        widget.character.isMotherDeceased == false) {
+      final bool hasMintaAdik = actions.any((act) => act.label == 'Minta Adik Baru');
+      if (!hasMintaAdik) {
+        final ActionItem mintaAdikAction = ActionItem(
+          label: 'Minta Adik Baru',
+          icon: Icons.baby_changing_station,
+          color: Colors.pinkAccent,
+          onTap: () {
+            final int motherAge = widget.character.motherAge ?? 0;
+            if (motherAge < 18 || motherAge > 45) {
+              _showResultDialog(
+                'Minta Adik Baru',
+                'Ibumu tersenyum sedih dan berkata, "Ibu sudah tidak bisa melahirkan adik baru lagi untukmu pada usia $motherAge tahun, sayang..."',
+                Icons.baby_changing_station,
+                Colors.grey,
+                () {},
+              );
+            } else {
+              final bool cannotHaveChild = widget.character.isMotherDivorced &&
+                  (widget.character.stepFatherName == null ||
+                      widget.character.isStepFatherDeceased);
+              if (cannotHaveChild) {
+                _showResultDialog(
+                  'Minta Adik Baru',
+                  'Ibumu mengelus rambutmu dan berkata, "Ibu tidak memiliki pasangan saat ini untuk memberimu adik baru, sayang."',
+                  Icons.baby_changing_station,
+                  Colors.grey,
+                  () {},
+                );
+              } else {
+                final int biologicalSiblings = widget.character.siblings.where((sib) {
+                  final String rel = sib['relation'] ?? '';
+                  return !rel.toLowerCase().contains('tiri');
+                }).length;
+                final int totalChildren = 1 + biologicalSiblings;
+                String childrenWord = '$totalChildren anak';
+                if (totalChildren == 1) {
+                  childrenWord = 'satu anak';
+                } else if (totalChildren == 2) {
+                  childrenWord = 'dua anak';
+                } else if (totalChildren == 3) {
+                  childrenWord = 'tiga anak';
+                } else if (totalChildren == 4) {
+                  childrenWord = 'empat anak';
+                } else if (totalChildren == 5) {
+                  childrenWord = 'lima anak';
+                }
+                final String capitalizedChildren = '${childrenWord[0].toUpperCase()}${childrenWord.substring(1)}';
+
+                if (_random.nextBool()) {
+                  _showResultDialog(
+                    'Permintaan Disetujui!',
+                    'Ibumu tersenyum hangat dan berkata, "Wah, ide yang bagus! Ibu akan membicarakannya dengan Ayahmu. Semoga kita segera mendapat adik baru!" Hubunganmu membaik dan kamu merasa senang. (+10% Hubungan, +15% Kebahagiaan)',
+                    Icons.favorite,
+                    Colors.green,
+                    () {
+                      widget.character.motherWillTryForBaby = true;
+                      widget.character.happiness =
+                          (widget.character.happiness + 15).clamp(0, 100);
+                      _updateRelationship(10);
+                      _updateState();
+                    },
+                  );
+                } else {
+                  _showResultDialog(
+                    'Permintaan Ditolak',
+                    'Ibumu tertawa kecil dan berkata, "$capitalizedChildren saja sudah membuat Ibu cukup sibuk saat ini, sayang. Mungkin nanti ya!" Hubunganmu tetap baik. (+2% Hubungan)',
+                    Icons.sentiment_neutral,
+                    Colors.orange,
+                    () {
+                      _updateRelationship(2);
+                      _updateState();
+                    },
+                  );
+                }
+              }
+            }
+          },
+        );
+
+        final int sepedaIndex = actions.indexWhere((act) => act.label == 'Minta Sepeda');
+        if (sepedaIndex != -1) {
+          actions.insert(sepedaIndex + 1, mintaAdikAction);
+        } else {
+          actions.add(mintaAdikAction);
+        }
+      }
+    }
 
     if (isActivePartner) {
       bool hasMenggoda = actions.any((act) => act.label == 'Menggoda');

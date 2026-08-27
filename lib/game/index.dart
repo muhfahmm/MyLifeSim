@@ -2360,30 +2360,18 @@ class _GameScreenState extends State<GameScreen> {
                   ),
                   const SizedBox(height: 10),
 
-                  // Stats - 2 Column Layout to save vertical space
-                  Row(
-                    children: [
-                      Expanded(child: _buildStatRow('Kesehatan', _character.health, Colors.red)),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildStatRow('Kebahagiaan', _character.happiness, Colors.green)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(child: _buildStatRow('Kecerdasan', _character.intelligence, Colors.blue)),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true)),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Expanded(child: _buildStatRow('Disiplin', _character.discipline, Colors.purple)),
-                      const SizedBox(width: 12),
-                      Expanded(child: _buildSexualityRow('Seksualitas', _character.sexuality)),
-                    ],
-                  ),
+                  // Stats - 1 Column Layout (1-1-1-1) to fill vertical space
+                  _buildStatRow('Kesehatan', _character.health, Colors.red),
+                  const SizedBox(height: 10),
+                  _buildStatRow('Kebahagiaan', _character.happiness, Colors.green),
+                  const SizedBox(height: 10),
+                  _buildStatRow('Kecerdasan', _character.intelligence, Colors.blue),
+                  const SizedBox(height: 10),
+                  _buildStatRow('Keuangan', _character.money, Colors.amber, isMoney: true),
+                  const SizedBox(height: 10),
+                  _buildStatRow('Disiplin', _character.discipline, Colors.purple),
+                  const SizedBox(height: 10),
+                  _buildSexualityRow('Seksualitas', _character.sexuality),
 
                   // --- STATUS KEHAMILAN (PERBAIKAN) ---
                   if (_character.isPregnant || _character.partnerIsPregnant) ...[
