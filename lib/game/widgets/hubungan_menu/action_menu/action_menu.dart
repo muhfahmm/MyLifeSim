@@ -1258,8 +1258,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final bool parentIsMother = parentTargetName.startsWith('ibu') && !parentTargetName.contains('tiri');
 
     if (!isActivePartner) {
+      final String myGenderLower = widget.character.gender.trim().toLowerCase();
+
+      // --- AYAH ---
       if (parentIsFather && widget.character.fatherName != null && widget.character.isFatherDeceased == false) {
         final bool hasStepMother = widget.character.stepMotherName != null && widget.character.isStepMotherDeceased == false;
+        final bool isStillMarriedToMother = widget.character.motherName != null &&
+            widget.character.isMotherDeceased == false &&
+            widget.character.isFatherDivorced == false &&
+            widget.character.isMotherDivorced == false;
+
         if (hasStepMother) {
           final String stepMotherName = widget.character.stepMotherName!;
           final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
@@ -1323,8 +1331,75 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               },
             ));
           }
-        } else {
-          // Jika tidak memiliki Ibu Tiri, Ayah berstatus duda. Tampilkan "Minta Tidak Menikah Lagi"
+        } else if (isStillMarriedToMother && myGenderLower == 'perempuan') {
+          // Jika masih bersuami-istri dengan Ibu Kandung dan player adalah Perempuan
+          final String motherName = widget.character.motherName!;
+          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
+          if (!hasMintaCerai) {
+            actions.add(ActionItem(
+              label: 'Minta Cerai dengan $motherName',
+              icon: Icons.heart_broken,
+              color: Colors.redAccent,
+              onTap: () {
+                final screenContext = context;
+                showDialog(
+                  context: screenContext,
+                  builder: (confirmContext) => AlertDialog(
+                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $motherName?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmContext),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmContext);
+                          final bool success = _random.nextInt(100) < 40;
+                          if (success) {
+                            // Hapus ibu kandung karena mereka bercerai
+                            widget.character.motherName = null;
+                            widget.character.motherAge = null;
+                            widget.character.motherRelationship = null;
+                            widget.character.isFatherDivorced = true;
+                            widget.character.isMotherDivorced = true;
+
+                            final String msg = '💔 Ayahmu memutuskan untuk menceraikan $motherName atas permintaanmu!';
+                            widget.character.inbox.add(msg);
+                            _updateRelationship(15);
+                            _updateState();
+
+                            _showResultDialog(
+                              'Sukses 💔',
+                              'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $motherName.',
+                              Icons.done,
+                              Colors.green,
+                              () {
+                                Navigator.pop(screenContext);
+                              }
+                            );
+                          } else {
+                            _updateRelationship(-15);
+                            _updateState();
+                            _showResultDialog(
+                              'Ditolak 🚫',
+                              'Ayahmu menolak untuk menceraikan $motherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
+                              Icons.block,
+                              Colors.red,
+                              () {}
+                            );
+                          }
+                        },
+                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ));
+          }
+        } else if (!hasStepMother && !isStillMarriedToMother) {
+          // Hanya tampilkan Minta Tidak Menikah Lagi jika Ayah benar-benar duda (tidak beristri)
           if (!widget.character.isFatherPersuadedNotToRemarry) {
             final bool hasMintaTidakNikah = actions.any((act) => act.label == 'Minta Tidak Menikah Lagi');
             if (!hasMintaTidakNikah) {
@@ -1381,8 +1456,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             }
           }
         }
-      } else if (parentIsMother && widget.character.motherName != null && widget.character.isMotherDeceased == false) {
+      }
+
+      // --- IBU ---
+      else if (parentIsMother && widget.character.motherName != null && widget.character.isMotherDeceased == false) {
         final bool hasStepFather = widget.character.stepFatherName != null && widget.character.isStepFatherDeceased == false;
+        final bool isStillMarriedToFather = widget.character.fatherName != null &&
+            widget.character.isFatherDeceased == false &&
+            widget.character.isFatherDivorced == false &&
+            widget.character.isMotherDivorced == false;
+
         if (hasStepFather) {
           final String stepFatherName = widget.character.stepFatherName!;
           final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
@@ -1432,6 +1515,73 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             _showResultDialog(
                               'Ditolak 🚫',
                               'Ibumu menolak untuk menceraikan $stepFatherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
+                              Icons.block,
+                              Colors.red,
+                              () {}
+                            );
+                          }
+                        },
+                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ));
+          }
+        } else if (isStillMarriedToFather && myGenderLower == 'laki-laki') {
+          // Jika masih bersuami-istri dengan Ayah Kandung dan player adalah Laki-laki
+          final String fatherName = widget.character.fatherName!;
+          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
+          if (!hasMintaCerai) {
+            actions.add(ActionItem(
+              label: 'Minta Cerai dengan $fatherName',
+              icon: Icons.heart_broken,
+              color: Colors.redAccent,
+              onTap: () {
+                final screenContext = context;
+                showDialog(
+                  context: screenContext,
+                  builder: (confirmContext) => AlertDialog(
+                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin meminta Ibumu untuk menceraikan $fatherName?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmContext),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmContext);
+                          final bool success = _random.nextInt(100) < 40;
+                          if (success) {
+                            // Hapus ayah kandung karena mereka bercerai
+                            widget.character.fatherName = null;
+                            widget.character.fatherAge = null;
+                            widget.character.fatherRelationship = null;
+                            widget.character.isFatherDivorced = true;
+                            widget.character.isMotherDivorced = true;
+
+                            final String msg = '💔 Ibumu memutuskan untuk menceraikan $fatherName atas permintaanmu!';
+                            widget.character.inbox.add(msg);
+                            _updateRelationship(15);
+                            _updateState();
+
+                            _showResultDialog(
+                              'Sukses 💔',
+                              'Ibumu menyetujui permintaanmu dan kini resmi menceraikan $fatherName.',
+                              Icons.done,
+                              Colors.green,
+                              () {
+                                Navigator.pop(screenContext);
+                              }
+                            );
+                          } else {
+                            _updateRelationship(-15);
+                            _updateState();
+                            _showResultDialog(
+                              'Ditolak 🚫',
+                              'Ibumu menolak untuk menceraikan $fatherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
                               Icons.block,
                               Colors.red,
                               () {}
