@@ -770,6 +770,84 @@ class _GameScreenState extends State<GameScreen> {
         ),
       );
     } else {
+      _checkUniversityGraduationOptions();
+    }
+  }
+
+  void _checkUniversityGraduationOptions() {
+    if (_character.justGraduatedStage == 'S1') {
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.school, color: Colors.blue.shade700),
+              const SizedBox(width: 8),
+              Text('Kelulusan Universitas (S1) 🎓', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          content: const Text(
+            'Selamat! Kamu telah resmi lulus dari Universitas jenjang S1. Pilih langkah selanjutnya untuk masa depanmu:',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _character.justGraduatedStage = null;
+                    _checkActiveProposal();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => UnivMenuPage(
+                          character: _character,
+                          onRefresh: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Lanjut S2 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _character.justGraduatedStage = null;
+                    _checkActiveProposal();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => KerjaMenuScreen(
+                          character: _character,
+                          onRefresh: () => setState(() {}),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Pilih Bekerja 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    } else {
       _checkActiveProposal();
     }
   }

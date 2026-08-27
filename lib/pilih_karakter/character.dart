@@ -73,6 +73,8 @@ class Character {
   List<String> graduatedMajors = [];
   Map<String, String> educationHistory = {};
   int currentUnivStudyYears = 0;
+  String? justGraduatedStage; // Menyimpan jenjang pendidikan yang baru saja lulus (misal 'S1')
+  String? justGraduatedMajor; // Menyimpan jurusan kuliah yang baru saja lulus
   List<Map<String, String>> secretPartners = [];
   List<Map<String, String>> sdTeachers = []; // Daftar guru SD
   List<Map<String, String>> smpTeachers = []; // Daftar guru SMP
@@ -677,6 +679,8 @@ class Character {
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
     List<String> events = [];
+    justGraduatedStage = null;
+    justGraduatedMajor = null;
     final random = Random();
     age++;
     health -= 2;
@@ -818,8 +822,12 @@ class Character {
 
       if (currentUnivStudyYears >= targetYears) {
         educationHistory[currentStage] = 'Lulus';
+        justGraduatedStage = currentStage; // Simpan jenjang yang baru lulus
+        justGraduatedMajor = univMajor; // Simpan jurusan kuliah yang baru lulus
         final String notice = '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang $currentStage dengan jurusan $univMajor! 🎉';
-        events.add(notice);
+        if (currentStage != 'S1') {
+          events.add(notice);
+        }
         inbox.add(notice);
         if (univMajor != null) {
           final baseName = univMajor!.split(' (').first;
