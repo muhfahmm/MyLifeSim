@@ -1252,6 +1252,204 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
+    // --- KHUSUS ORANG TUA: Minta Cerai / Minta Tidak Menikah Lagi (Non-Dating / Hubungan Normal) ---
+    final String parentTargetName = widget.targetName.toLowerCase();
+    final bool parentIsFather = parentTargetName.startsWith('ayah') && !parentTargetName.contains('tiri');
+    final bool parentIsMother = parentTargetName.startsWith('ibu') && !parentTargetName.contains('tiri');
+
+    if (!isActivePartner) {
+      if (parentIsFather && widget.character.fatherName != null && widget.character.isFatherDeceased == false) {
+        final bool hasStepMother = widget.character.stepMotherName != null && widget.character.isStepMotherDeceased == false;
+        if (hasStepMother) {
+          final String stepMotherName = widget.character.stepMotherName!;
+          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
+          if (!hasMintaCerai) {
+            actions.add(ActionItem(
+              label: 'Minta Cerai dengan $stepMotherName',
+              icon: Icons.heart_broken,
+              color: Colors.redAccent,
+              onTap: () {
+                final screenContext = context;
+                showDialog(
+                  context: screenContext,
+                  builder: (confirmContext) => AlertDialog(
+                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $stepMotherName?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmContext),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmContext);
+                          final bool success = _random.nextInt(100) < 40;
+                          if (success) {
+                            widget.character.stepMotherName = null;
+                            widget.character.stepMotherAge = null;
+                            widget.character.stepMotherRelationship = null;
+
+                            final String msg = '💔 Ayahmu memutuskan untuk menceraikan $stepMotherName atas permintaanmu!';
+                            widget.character.inbox.add(msg);
+                            _updateRelationship(15);
+                            _updateState();
+
+                            _showResultDialog(
+                              'Sukses 💔',
+                              'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $stepMotherName.',
+                              Icons.done,
+                              Colors.green,
+                              () {
+                                Navigator.pop(screenContext);
+                              }
+                            );
+                          } else {
+                            _updateRelationship(-15);
+                            _updateState();
+                            _showResultDialog(
+                              'Ditolak 🚫',
+                              'Ayahmu menolak untuk menceraikan $stepMotherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
+                              Icons.block,
+                              Colors.red,
+                              () {}
+                            );
+                          }
+                        },
+                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ));
+          }
+        } else {
+          // Jika tidak memiliki Ibu Tiri, Ayah berstatus duda. Tampilkan "Minta Tidak Menikah Lagi"
+          if (!widget.character.isFatherPersuadedNotToRemarry) {
+            final bool hasMintaTidakNikah = actions.any((act) => act.label == 'Minta Tidak Menikah Lagi');
+            if (!hasMintaTidakNikah) {
+              actions.add(ActionItem(
+                label: 'Minta Tidak Menikah Lagi',
+                icon: Icons.block,
+                color: Colors.orange,
+                onTap: () {
+                  final screenContext = context;
+                  showDialog(
+                    context: screenContext,
+                    builder: (confirmContext) => AlertDialog(
+                      title: const Text('Minta Tidak Menikah Lagi 💍', style: TextStyle(fontWeight: FontWeight.bold)),
+                      content: const Text('Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(confirmContext),
+                          child: const Text('Batal'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pop(confirmContext);
+                            final bool success = _random.nextInt(100) < 70;
+                            if (success) {
+                              widget.character.isFatherPersuadedNotToRemarry = true;
+                              _updateRelationship(15);
+                              _updateState();
+                              _showResultDialog(
+                                'Sukses 💍',
+                                'Ayahmu menyetujui permintaanmu. Dia berjanji tidak akan menikah lagi dengan orang lain.',
+                                Icons.done,
+                                Colors.green,
+                                () {}
+                              );
+                            } else {
+                              _updateRelationship(-15);
+                              _updateState();
+                              _showResultDialog(
+                                'Ditolak 🚫',
+                                'Ayahmu menolak permintaanmu. Dia merasa masih membutuhkan pendamping hidup kelak.',
+                                Icons.block,
+                                Colors.red,
+                                () {}
+                              );
+                            }
+                          },
+                          child: const Text('Bujuk Ayah', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ));
+            }
+          }
+        }
+      } else if (parentIsMother && widget.character.motherName != null && widget.character.isMotherDeceased == false) {
+        final bool hasStepFather = widget.character.stepFatherName != null && widget.character.isStepFatherDeceased == false;
+        if (hasStepFather) {
+          final String stepFatherName = widget.character.stepFatherName!;
+          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
+          if (!hasMintaCerai) {
+            actions.add(ActionItem(
+              label: 'Minta Cerai dengan $stepFatherName',
+              icon: Icons.heart_broken,
+              color: Colors.redAccent,
+              onTap: () {
+                final screenContext = context;
+                showDialog(
+                  context: screenContext,
+                  builder: (confirmContext) => AlertDialog(
+                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin meminta Ibumu untuk menceraikan $stepFatherName?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmContext),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmContext);
+                          final bool success = _random.nextInt(100) < 40;
+                          if (success) {
+                            widget.character.stepFatherName = null;
+                            widget.character.stepFatherAge = null;
+                            widget.character.stepFatherRelationship = null;
+
+                            final String msg = '💔 Ibumu memutuskan untuk menceraikan $stepFatherName atas permintaanmu!';
+                            widget.character.inbox.add(msg);
+                            _updateRelationship(15);
+                            _updateState();
+
+                            _showResultDialog(
+                              'Sukses 💔',
+                              'Ibumu menyetujui permintaanmu dan kini resmi menceraikan $stepFatherName.',
+                              Icons.done,
+                              Colors.green,
+                              () {
+                                Navigator.pop(screenContext);
+                              }
+                            );
+                          } else {
+                            _updateRelationship(-15);
+                            _updateState();
+                            _showResultDialog(
+                              'Ditolak 🚫',
+                              'Ibumu menolak untuk menceraikan $stepFatherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
+                              Icons.block,
+                              Colors.red,
+                              () {}
+                            );
+                          }
+                        },
+                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ));
+          }
+        }
+      }
+    }
+
     if (isActivePartner) {
       bool hasMenggoda = actions.any((act) => act.label == 'Menggoda');
       if (!hasMenggoda) {
@@ -1680,8 +1878,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // Putuskan Pacar
       topActions.add(putuskanPacarAction);
 
-      // Minta Tidak Menikah Lagi
-      if (isDatingBiologicalFather && !widget.character.isFatherPersuadedNotToRemarry) {
+      // Minta Tidak Menikah Lagi (hanya jika ayah berstatus duda / tidak memiliki ibu tiri)
+      if (isDatingBiologicalFather &&
+          !widget.character.isFatherPersuadedNotToRemarry &&
+          (widget.character.stepMotherName == null ||
+              widget.character.isStepMotherDeceased == true)) {
         topActions.add(ActionItem(
           label: 'Minta Tidak Menikah Lagi',
           icon: Icons.block,
@@ -1811,7 +2012,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           '${askerTitle} menyetujui permintaanmu dan kini resmi menceraikan $spouseName.',
                           Icons.done,
                           Colors.green,
-                          () {});
+                          () {
+                            Navigator.pop(screenContext); // Langsung tutup halaman agar ter-refresh otomatis di Hubungan & Keluarga
+                          });
                     } else {
                       _updateRelationship(-15);
                       _updateState();
@@ -1860,8 +2063,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // Putuskan Pacar
       topActions.add(putuskanPacarAction);
 
-      // Minta Tidak Menikah Lagi
-      if (isDatingBiologicalFather && !widget.character.isFatherPersuadedNotToRemarry) {
+      // Minta Tidak Menikah Lagi (hanya jika ayah berstatus duda / tidak memiliki ibu tiri)
+      if (isDatingBiologicalFather &&
+          !widget.character.isFatherPersuadedNotToRemarry &&
+          (widget.character.stepMotherName == null ||
+              widget.character.isStepMotherDeceased == true)) {
         topActions.add(ActionItem(
           label: 'Minta Tidak Menikah Lagi',
           icon: Icons.block,
@@ -2032,7 +2238,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           '${targetParentLabel}mu menyetujui permintaanmu dan kini resmi menceraikan $spouseName.',
                           Icons.done,
                           Colors.green,
-                          () {}
+                          () {
+                            Navigator.pop(screenContext); // Langsung tutup halaman agar ter-refresh otomatis di Hubungan & Keluarga
+                          }
                         );
                       } else {
                         _updateRelationship(-15);

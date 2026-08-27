@@ -7,7 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
-class RelationshipButton extends StatelessWidget {
+class RelationshipButton extends StatefulWidget {
   final Character character;
   final bool isAlive;
   final VoidCallback onRefresh;
@@ -20,7 +20,17 @@ class RelationshipButton extends StatelessWidget {
   });
 
   @override
+  State<RelationshipButton> createState() => _RelationshipButtonState();
+}
+
+class _RelationshipButtonState extends State<RelationshipButton> {
+  StateSetter? _dialogSetState;
+
+  @override
   Widget build(BuildContext context) {
+    final Character character = widget.character;
+    final bool isAlive = widget.isAlive;
+    final VoidCallback onRefresh = widget.onRefresh;
     return ElevatedButton(
       onPressed: () {
         if (!isAlive) {
@@ -30,56 +40,59 @@ class RelationshipButton extends StatelessWidget {
           return;
         }
 
-        // Sinkronkan status kematian pasangan/keluarga & rekan kerja/sekolah
-        character.syncNPCsAndPartners();
-        character.syncPartnerDeathStatus();
-        character.syncSocialRelationships();
-
-        // --- BUAT DAFTAR SAUDARA & DIRI SENDIRI ---
-        final List<Map<String, dynamic>> childrenList = [];
-
-        // 1. Masukkan semua saudara kandung yang SUDAH LAHIR (age >= 0)
-        for (var sib in character.siblings) {
-          final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
-          final bool isDeceased = sib['isDeceased'] == 'true';
-          final String expectedLabel = '${sib['name']} (${sib['relation']})';
-
-          // Tampilkan saudara meskipun mereka berpacaran dengan player
-          if (sibAge >= 0) {
-            childrenList.add({
-              'isPlayer': false,
-              'name': sib['name'] ?? 'Saudara',
-              'gender': sib['gender'] ?? 'Laki-laki',
-              'relation': sib['relation'] ?? 'Saudara',
-              'relationship': int.tryParse(sib['relationship'] ?? '50') ?? 50,
-              'age': sibAge,
-              'isDeceased': isDeceased,
-              'skinColor': sib['skinColor'],
-            });
-          }
-        }
-
-        // 2. Masukkan data diri sendiri (Player)
-        childrenList.add({
-          'isPlayer': true,
-          'name': '${character.name} (Anda)',
-          'gender': character.gender,
-          'relation': 'Diri Sendiri',
-          'relationship': 100,
-          'age': character.age,
-          'isDeceased': false,
-        });
-
-        // 3. Urutkan dari yang tertua ke termuda (descending)
-        childrenList.sort((a, b) => b['age'].compareTo(a['age']));
-
         DialogHelper.show(
           context: context,
           title: 'Hubungan & Keluarga',
           isNotification: false,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          content: StatefulBuilder(
+            builder: (context, setDialogState) {
+              _dialogSetState = setDialogState;
+
+              // Sinkronkan status kematian pasangan/keluarga & rekan kerja/sekolah
+              character.syncNPCsAndPartners();
+              character.syncPartnerDeathStatus();
+              character.syncSocialRelationships();
+
+              // --- BUAT DAFTAR SAUDARA & DIRI SENDIRI ---
+              final List<Map<String, dynamic>> childrenList = [];
+
+              // 1. Masukkan semua saudara kandung yang SUDAH LAHIR (age >= 0)
+              for (var sib in character.siblings) {
+                final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+                final bool isDeceased = sib['isDeceased'] == 'true';
+
+                // Tampilkan saudara meskipun mereka berpacaran dengan player
+                if (sibAge >= 0) {
+                  childrenList.add({
+                    'isPlayer': false,
+                    'name': sib['name'] ?? 'Saudara',
+                    'gender': sib['gender'] ?? 'Laki-laki',
+                    'relation': sib['relation'] ?? 'Saudara',
+                    'relationship': int.tryParse(sib['relationship'] ?? '50') ?? 50,
+                    'age': sibAge,
+                    'isDeceased': isDeceased,
+                    'skinColor': sib['skinColor'],
+                  });
+                }
+              }
+
+              // 2. Masukkan data diri sendiri (Player)
+              childrenList.add({
+                'isPlayer': true,
+                'name': '${character.name} (Anda)',
+                'gender': character.gender,
+                'relation': 'Diri Sendiri',
+                'relationship': 100,
+                'age': character.age,
+                'isDeceased': false,
+              });
+
+              // 3. Urutkan dari yang tertua ke termuda (descending)
+              childrenList.sort((a, b) => b['age'].compareTo(a['age']));
+
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               // ============================================
               // 1. BAGIAN ORANGTUA
@@ -758,7 +771,9 @@ class RelationshipButton extends StatelessWidget {
               ],
               const Divider(height: 32),
             ],
-          ),
+            );
+          },
+        ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -812,13 +827,16 @@ class RelationshipButton extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ActionMenuScreen(
-              character: character,
+              character: widget.character,
               targetName: label,
               targetRole: status,
             ),
           ),
         ).then((_) {
-          onRefresh();
+          widget.onRefresh();
+          if (_dialogSetState != null) {
+            _dialogSetState!(() {});
+          }
         });
       },
       borderRadius: BorderRadius.circular(12),
@@ -983,13 +1001,16 @@ class RelationshipButton extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => ActionMenuScreen(
-              character: character,
+              character: widget.character,
               targetName: label,
               targetRole: status,
             ),
           ),
         ).then((_) {
-          onRefresh();
+          widget.onRefresh();
+          if (_dialogSetState != null) {
+            _dialogSetState!(() {});
+          }
         });
       },
       borderRadius: BorderRadius.circular(12),

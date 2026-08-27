@@ -1123,25 +1123,34 @@ class Character {
           }
           // C. Menikah (Jika sudah bertunangan, belum menikah, dan usia >= 18)
           else if (sib['isEngaged'] == 'true' && sib['isMarried'] == 'false' && nextAge >= 18) {
-            final int engagementYears = int.tryParse(sib['engagementYears'] ?? '0') ?? 0;
-            int marryChance = 0;
-            if (engagementYears == 1) {
-              marryChance = 30; // 30%
-            } else if (engagementYears == 2) {
-              marryChance = 60; // 60%
-            } else if (engagementYears >= 3) {
-              marryChance = 90; // 90%
+            int manAge = nextAge;
+            if (sib['gender'] == 'Laki-laki') {
+              manAge = nextAge;
+            } else if (sib['spouseGender'] == 'Laki-laki') {
+              manAge = int.tryParse(sib['spouseAge'] ?? '0') ?? 0;
             }
 
-            if (marryChance > 0 && random.nextInt(100) < marryChance) {
-              sib['isMarried'] = 'true';
-              sib['isEngaged'] = 'false'; // ganti status
-              final bool isSameSex = sib['gender'] == sib['spouseGender'];
-              final String notice = isSameSex
-                  ? '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah sesama jenis dengan ${sib['spouseName']}! 🏳️‍🌈'
-                  : '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah dengan ${sib['spouseName']}!';
-              events.add(notice);
-              inbox.add(notice);
+            if (manAge >= 20 && manAge <= 35) {
+              final int engagementYears = int.tryParse(sib['engagementYears'] ?? '0') ?? 0;
+              int marryChance = 0;
+              if (engagementYears == 1) {
+                marryChance = 30; // 30%
+              } else if (engagementYears == 2) {
+                marryChance = 60; // 60%
+              } else if (engagementYears >= 3) {
+                marryChance = 90; // 90%
+              }
+
+              if (marryChance > 0 && random.nextInt(100) < marryChance) {
+                sib['isMarried'] = 'true';
+                sib['isEngaged'] = 'false'; // ganti status
+                final bool isSameSex = sib['gender'] == sib['spouseGender'];
+                final String notice = isSameSex
+                    ? '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah sesama jenis dengan ${sib['spouseName']}! 🏳️‍🌈'
+                    : '🎉 Kabar Keluarga: Selamat! Saudaramu, ${sib['name']} (${sib['relation']}, $nextAge tahun) resmi menikah dengan ${sib['spouseName']}!';
+                events.add(notice);
+                inbox.add(notice);
+              }
             }
           }
           
