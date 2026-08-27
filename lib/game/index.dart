@@ -776,6 +776,7 @@ class _GameScreenState extends State<GameScreen> {
 
   void _checkUniversityGraduationOptions() {
     if (_character.justGraduatedStage == 'S1') {
+      final String major = _character.justGraduatedMajor ?? '';
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -784,12 +785,13 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Icon(Icons.school, color: Colors.blue.shade700),
               const SizedBox(width: 8),
-              Text('Kelulusan Universitas (S1) 🎓', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              const Text('Kelulusan Kuliah 🎓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             ],
           ),
-          content: const Text(
-            'Selamat! Kamu telah resmi lulus dari Universitas jenjang S1. Pilih langkah selanjutnya untuk masa depanmu:',
-            style: TextStyle(fontSize: 14),
+          content: Text(
+            '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang S1 dengan jurusan $major! 🎉\n\n'
+            'Pilih langkah selanjutnya untuk masa depanmu:',
+            style: const TextStyle(fontSize: 14),
           ),
           actions: [
             Column(
