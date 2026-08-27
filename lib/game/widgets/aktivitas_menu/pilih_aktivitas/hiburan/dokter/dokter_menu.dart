@@ -2,65 +2,53 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
 
 class DokterMenuHelper {
   static void showDokterMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    final List<Map<String, dynamic>> layanan = [
-      {'name': 'Pemeriksaan Umum 🩺', 'cost': 200000, 'desc': 'Cek kondisi kesehatan dasar'},
-      {'name': 'Tes Darah 💉', 'cost': 500000, 'desc': 'Pemeriksaan darah lengkap'},
-      {'name': 'Konsultasi Psikolog 🧠', 'cost': 800000, 'desc': 'Sesi konsultasi kesehatan mental'},
-      {'name': 'Operasi Kecil 🏥', 'cost': 5000000, 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
-      {'name': 'Medical Check Up Lengkap 📋', 'cost': 2000000, 'desc': 'Pemeriksaan menyeluruh tubuh'},
-    ];
-
-    DialogHelper.show(
-      context: context,
-      title: 'Pergi ke Dokter 🏥',
-      content: ListView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: layanan.length,
-        itemBuilder: (_, i) {
-          final l = layanan[i];
-          final bool canAfford = character.money >= (l['cost'] as int);
-          return Card(
-            elevation: 0,
-            margin: const EdgeInsets.only(bottom: 8),
-            color: Colors.grey.shade50,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: Colors.grey.shade200),
-            ),
-            child: ListTile(
-              title: Text(l['name'], style: TextStyle(
-                fontWeight: FontWeight.bold, fontSize: 13,
-                color: canAfford ? Colors.black87 : Colors.grey,
-              )),
-              subtitle: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}'),
-              isThreeLine: true,
-              trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                  size: 14, color: canAfford ? Colors.blue : Colors.grey),
-              onTap: canAfford ? () {
-                Navigator.pop(context);
-                _executeDokter(context, character, l, onComplete);
-              } : null,
-            ),
-          );
-        },
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Tutup'),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => DokterPage(
+          character: character,
+          onComplete: onComplete,
         ),
-      ],
+      ),
     );
   }
+}
 
-  static void _executeDokter(BuildContext context, Character character, Map<String, dynamic> l, VoidCallback onComplete) {
+class DokterPage extends StatefulWidget {
+  final Character character;
+  final VoidCallback onComplete;
+
+  const DokterPage({
+    super.key,
+    required this.character,
+    required this.onComplete,
+  });
+
+  @override
+  State<DokterPage> createState() => _DokterPageState();
+}
+
+class _DokterPageState extends State<DokterPage> {
+  final List<Map<String, dynamic>> layanan = [
+    {'name': 'Pemeriksaan Umum 🩺', 'cost': 200000, 'desc': 'Cek kondisi kesehatan dasar'},
+    {'name': 'Tes Darah 💉', 'cost': 500000, 'desc': 'Pemeriksaan darah lengkap'},
+    {'name': 'Konsultasi Psikolog 🧠', 'cost': 800000, 'desc': 'Sesi konsultasi kesehatan mental'},
+    {'name': 'Operasi Kecil 🏥', 'cost': 5000000, 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
+    {'name': 'Medical Check Up Lengkap 📋', 'cost': 2000000, 'desc': 'Pemeriksaan menyeluruh tubuh'},
+  ];
+
+  static String _fmt(int amount) {
+    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+  }
+
+  void _executeDokter(BuildContext context, Map<String, dynamic> l) {
     final r = Random();
-    character.money -= (l['cost'] as int);
+    setState(() {
+      widget.character.money -= (l['cost'] as int);
+    });
 
     int healthGain = 0;
     int happinessGain = 0;
@@ -87,12 +75,12 @@ class DokterMenuHelper {
       detail = 'Medical check up lengkap selesai. Semua dalam kondisi prima.';
     }
 
-    character.health = (character.health + healthGain).clamp(0, 100);
-    character.happiness = (character.happiness + happinessGain).clamp(0, 100);
-    character.intelligence = (character.intelligence + intelligenceGain).clamp(0, 100);
+    widget.character.health = (widget.character.health + healthGain).clamp(0, 100);
+    widget.character.happiness = (widget.character.happiness + happinessGain).clamp(0, 100);
+    widget.character.intelligence = (widget.character.intelligence + intelligenceGain).clamp(0, 100);
 
     final msg = '🏥 ${l['name']}: $detail (+${healthGain}% Kesehatan${happinessGain > 0 ? ', +${happinessGain}% Kebahagiaan' : ''}) | Biaya: -\$${_fmt(l['cost'] as int)}';
-    character.inbox.add(msg);
+    widget.character.inbox.add(msg);
 
     showDialog(
       context: context,
@@ -103,12 +91,85 @@ class DokterMenuHelper {
           Text('Pemeriksaan Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
         ]),
         content: Text(msg),
-        actions: [TextButton(onPressed: () { Navigator.pop(ctx); onComplete(); }, child: const Text('OK'))],
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              widget.onComplete();
+            },
+            child: const Text('OK'),
+          )
+        ],
       ),
     );
   }
 
-  static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Pergi ke Dokter 🏥', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0.5,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  const Text('💰', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                itemCount: layanan.length,
+                itemBuilder: (_, i) {
+                  final l = layanan[i];
+                  final bool canAfford = widget.character.money >= (l['cost'] as int);
+                  return Card(
+                    elevation: 0,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      title: Text(l['name'], style: TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 14,
+                        color: canAfford ? Colors.black87 : Colors.grey,
+                      )),
+                      subtitle: Padding(
+                        padding: const EdgeInsets.only(top: 4),
+                        child: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}',
+                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                      ),
+                      isThreeLine: true,
+                      trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
+                          size: 14, color: canAfford ? Colors.blue : Colors.grey),
+                      onTap: canAfford ? () => _executeDokter(context, l) : null,
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
