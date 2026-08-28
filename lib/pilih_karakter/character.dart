@@ -689,6 +689,44 @@ class Character {
     }
   }
 
+  /// Memperbarui kesehatan secara dinamis berdasarkan kebahagiaan (menghindari pengurangan tetap 2 per tahun)
+  void updateHealthDynamic({bool isDaily = false}) {
+    final random = Random();
+    
+    // 1. Decay dasar acak (1, 2, atau 3)
+    int decay = 0;
+    if (isDaily) {
+      // Peluang decay harian lebih kecil (15% peluang berkurang 1)
+      if (random.nextInt(100) < 15) {
+        decay = 1;
+      }
+    } else {
+      // Decay tahunan (Weighted: 30% dapat 1, 40% dapat 2, 30% dapat 3)
+      final int roll = random.nextInt(100);
+      decay = roll < 30 ? 1 : (roll < 70 ? 2 : 3);
+    }
+    
+    // 2. Bonus regenerasi atau penalti dari kebahagiaan
+    int regen = 0;
+    if (happiness >= 80) {
+      // Sangat Bahagia: Regenerasi kuat (+2 sampai +4 pertahun, atau 20% peluang +1 perhari)
+      regen = isDaily ? (random.nextInt(100) < 20 ? 1 : 0) : (2 + random.nextInt(3));
+    } else if (happiness >= 65) {
+      // Cukup Bahagia: Regenerasi ringan (+1 sampai +2 pertahun, atau 10% peluang +1 perhari)
+      regen = isDaily ? (random.nextInt(100) < 10 ? 1 : 0) : (1 + random.nextInt(2));
+    } else if (happiness >= 50) {
+      // Biasa saja: 0
+      regen = 0;
+    } else {
+      // Stres/Sedih: Penalti ekstra (-1 sampai -3 pertahun, atau 15% peluang -1 perhari)
+      final int penalty = isDaily ? (random.nextInt(100) < 15 ? 1 : 0) : (1 + random.nextInt(3));
+      regen = -penalty;
+    }
+    
+    // 3. Terapkan perubahan kesehatan
+    health = (health - decay + regen).clamp(0, 100);
+  }
+
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
     List<String> events = [];
@@ -696,7 +734,7 @@ class Character {
     justGraduatedMajor = null;
     final random = Random();
     age++;
-    health -= 2;
+    updateHealthDynamic(isDaily: false);
     accumulateNPCsWealth();
 
     // Tambah tahun pada currentDate jika tidak null

@@ -300,6 +300,8 @@ class _GameScreenState extends State<GameScreen> {
       } else {
         _character.currentDate = DateTime.now().add(const Duration(days: 1));
       }
+      // Pemicu update kesehatan dinamis secara harian
+      _character.updateHealthDynamic(isDaily: true);
     });
 
     final random = Random();
