@@ -24,18 +24,25 @@ class AjakanMasturbasiDialog {
     final bool isGay = (myGender == 'laki-laki' && targetGender == 'Laki-laki');
     final bool isLesbian = (myGender == 'perempuan' && targetGender == 'Perempuan');
 
+    // Parse relation details
+    final parsed = _parseRelation(relationType);
+    final String relationWithMu = _getRelationWithMu(parsed['main']!);
+    final String partnerDesc = parsed['detail']!.isNotEmpty
+        ? '$relationWithMu (${parsed['detail']}), $viewerName'
+        : '$relationWithMu, $viewerName';
+
     String dialogTitle = 'Ajakan Masturbasi Bersama!';
     String dialogBody = '';
 
     if (isGay) {
       dialogTitle = 'Ajakan Gay (Masturbasi Bersama)!';
-      dialogBody = '$relationType ($viewerName)-mu secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
+      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
     } else if (isLesbian) {
       dialogTitle = 'Ajakan Lesbian (Masturbasi Bersama)!';
-      dialogBody = '$relationType ($viewerName)-mu secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
+      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
     } else {
       dialogTitle = 'Ajakan Masturbasi Bersama!';
-      dialogBody = '$relationType ($viewerName)-mu secara terang-terangan mengajakmu untuk melakukan masturbasi bersama secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
+      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
     }
 
     // Tentukan apakah bisa melapor ke orang tua lain
@@ -210,17 +217,24 @@ class AjakanMasturbasiDialog {
   ) {
     _modifyRelativeRelationship(character, relationType, viewerName, -15);
     character.happiness = (character.happiness - 10).clamp(0, 100);
-    character.inbox.add('💔 Penolakan: Kamu menolak ajakan hubungan intim dari $relationType ($viewerName).');
+
+    final parsed = _parseRelation(relationType);
+    final String relationWithMu = _getRelationWithMu(parsed['main']!);
+    final String partnerDesc = parsed['detail']!.isNotEmpty
+        ? '$relationWithMu (${parsed['detail']}), $viewerName'
+        : '$relationWithMu, $viewerName';
+
+    character.inbox.add('💔 Penolakan: Kamu menolak ajakan hubungan intim dari $partnerDesc.');
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Ajakan Ditolak 💔'),
-        content: Text('Kamu dengan tegas menolak ajakan dari $relationType ($viewerName). Hubungan kalian menjadi agak renggang (-10% Kebahagiaan, -15% Hubungan).'),
+        content: Text('Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-10% Kebahagiaan, -15% Hubungan).'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               onComplete?.call();
             },
             child: const Text('OK'),
@@ -289,9 +303,6 @@ class AjakanMasturbasiDialog {
     }
   }
 
-  // ============================================================
-  // LOGIKA AKSI: LAPORAN SAUDARA (Ke Orang Tua)
-  // ============================================================
   static void _executeReportSibling(
     BuildContext context,
     Character character,
@@ -301,17 +312,24 @@ class AjakanMasturbasiDialog {
   ) {
     _modifyRelativeRelationship(character, relationType, viewerName, -100);
     character.karma = (character.karma + 15).clamp(0, 100);
-    character.inbox.add('🚨 SAUDARA DIHUKUM: Kamu melaporkan $relationType ($viewerName) ke orang tua. Dia dihukum dengan sangat keras.');
+
+    final parsed = _parseRelation(relationType);
+    final String relationWithMu = _getRelationWithMu(parsed['main']!);
+    final String partnerDesc = parsed['detail']!.isNotEmpty
+        ? '$relationWithMu (${parsed['detail']}), $viewerName'
+        : '$relationWithMu, $viewerName';
+
+    character.inbox.add('🚨 SAUDARA DIHUKUM: Kamu melaporkan $partnerDesc ke orang tua. Dia dihukum dengan sangat keras.');
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Dilaporkan ke Orang Tua! 📢'),
-        content: Text('Kamu memutuskan untuk melaporkan ajakan cabul saudaramu ($viewerName) ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).'),
+        content: Text('Kamu memutuskan untuk melaporkan ajakan cabul $partnerDesc ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).'),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               onComplete?.call();
             },
             child: const Text('OK'),
@@ -321,21 +339,47 @@ class AjakanMasturbasiDialog {
     );
   }
 
+  // Helper parser relation
+  static Map<String, String> _parseRelation(String relationType) {
+    String mainRelation = relationType;
+    String detailRelation = '';
+    if (relationType.contains('(') && relationType.endsWith(')')) {
+      final int openParen = relationType.indexOf('(');
+      mainRelation = relationType.substring(0, openParen).trim();
+      detailRelation = relationType.substring(openParen + 1, relationType.length - 1).trim();
+    }
+    return {'main': mainRelation, 'detail': detailRelation};
+  }
+
+  static String _getRelationWithMu(String mainRelation) {
+    final String mainRelLower = mainRelation.toLowerCase();
+    if (mainRelLower == 'ayah' || mainRelLower == 'ayah kandung') return 'Ayahmu';
+    if (mainRelLower == 'ibu' || mainRelLower == 'ibu kandung') return 'Ibumu';
+    if (mainRelLower == 'ayah tiri') return 'Ayah Tirimu';
+    if (mainRelLower == 'ibu tiri') return 'Ibu Tirimu';
+    if (mainRelLower == 'kakak laki-laki') return 'Kakak Laki-lakimu';
+    if (mainRelLower == 'kakak perempuan') return 'Kakak Perempuanmu';
+    if (mainRelLower == 'adik laki-laki') return 'Adik Laki-lakimu';
+    if (mainRelLower == 'adik perempuan') return 'Adik Perempuanmu';
+    if (mainRelLower == 'paman') return 'Pamanmu';
+    if (mainRelLower == 'bibi') return 'Bibimu';
+    if (mainRelLower == 'sepupu') return 'Sepupumu';
+    if (mainRelLower == 'kakek') return 'Kakekmu';
+    if (mainRelLower == 'nenek') return 'Nenekmu';
+    return '${mainRelation}mu';
+  }
+
   // Helper Hubungan
   static void _modifyRelativeRelationship(Character character, String relationType, String name, int delta) {
     final String relLower = relationType.toLowerCase();
-    if (relLower == 'ayah' || relLower == 'ayah kandung') {
+    if (relLower.contains('ayah')) {
       character.fatherRelationship = ((character.fatherRelationship ?? 50) + delta).clamp(0, 100);
-    } else if (relLower == 'ibu' || relLower == 'ibu kandung') {
+    } else if (relLower.contains('ibu')) {
       character.motherRelationship = ((character.motherRelationship ?? 50) + delta).clamp(0, 100);
-    } else if (relLower == 'ayah tiri') {
-      character.stepFatherRelationship = ((character.stepFatherRelationship ?? 50) + delta).clamp(0, 100);
-    } else if (relLower == 'ibu tiri') {
-      character.stepMotherRelationship = ((character.stepMotherRelationship ?? 50) + delta).clamp(0, 100);
     }
     
     for (var sib in character.siblings) {
-      if (sib['name'] == name) {
+      if (sib['name'] == name || sib['relation'] == relationType || (sib['relation'] != null && relationType.toLowerCase().contains(sib['relation']!.toLowerCase()))) {
         int cur = int.tryParse(sib['relationship'] ?? '50') ?? 50;
         sib['relationship'] = (cur + delta).clamp(0, 100).toString();
         break;
