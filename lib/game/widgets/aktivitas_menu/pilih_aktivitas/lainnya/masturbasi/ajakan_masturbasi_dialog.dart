@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'efek_samping.dart';
 
 class AjakanMasturbasiDialog {
   static void show({
@@ -188,7 +189,7 @@ class AjakanMasturbasiDialog {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              onComplete?.call();
+              EfekSampingMasturbasi.checkPartnerEffect(context, character, relationType, onComplete);
             },
             child: const Text('OK'),
           )

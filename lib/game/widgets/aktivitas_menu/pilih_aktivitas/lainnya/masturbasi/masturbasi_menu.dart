@@ -5,6 +5,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'risiko_masturbasi.dart'; // Import file risiko
 import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
+import 'efek_samping.dart'; // Import efek samping masturbasi
 
 
 
@@ -202,7 +203,7 @@ class MasturbasiHelper {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              onComplete?.call();
+              EfekSampingMasturbasi.checkSoloEffect(context, character, relation, onComplete);
             },
             child: const Text('OK'),
           ),

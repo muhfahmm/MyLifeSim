@@ -32,12 +32,13 @@ class DokterPage extends StatefulWidget {
 }
 
 class _DokterPageState extends State<DokterPage> {
+  // Ubah cost menjadi 0 agar tidak ada biaya
   final List<Map<String, dynamic>> layanan = [
-    {'name': 'Pemeriksaan Umum 🩺', 'cost': 200000, 'desc': 'Cek kondisi kesehatan dasar'},
-    {'name': 'Tes Darah 💉', 'cost': 500000, 'desc': 'Pemeriksaan darah lengkap'},
-    {'name': 'Konsultasi Psikolog 🧠', 'cost': 800000, 'desc': 'Sesi konsultasi kesehatan mental'},
-    {'name': 'Operasi Kecil 🏥', 'cost': 5000000, 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
-    {'name': 'Medical Check Up Lengkap 📋', 'cost': 2000000, 'desc': 'Pemeriksaan menyeluruh tubuh'},
+    {'name': 'Pemeriksaan Umum 🩺', 'cost': 0, 'desc': 'Cek kondisi kesehatan dasar'},
+    {'name': 'Tes Darah 💉', 'cost': 0, 'desc': 'Pemeriksaan darah lengkap'},
+    {'name': 'Konsultasi Psikolog 🧠', 'cost': 0, 'desc': 'Sesi konsultasi kesehatan mental'},
+    {'name': 'Operasi Kecil 🏥', 'cost': 0, 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
+    {'name': 'Medical Check Up Lengkap 📋', 'cost': 0, 'desc': 'Pemeriksaan menyeluruh tubuh'},
   ];
 
   static String _fmt(int amount) {
@@ -46,9 +47,8 @@ class _DokterPageState extends State<DokterPage> {
 
   void _executeDokter(BuildContext context, Map<String, dynamic> l) {
     final r = Random();
-    setState(() {
-      widget.character.money -= (l['cost'] as int);
-    });
+    // Hapus baris pengurangan uang
+    // widget.character.money -= (l['cost'] as int);
 
     int healthGain = 0;
     int happinessGain = 0;
@@ -79,7 +79,8 @@ class _DokterPageState extends State<DokterPage> {
     widget.character.happiness = (widget.character.happiness + happinessGain).clamp(0, 100);
     widget.character.intelligence = (widget.character.intelligence + intelligenceGain).clamp(0, 100);
 
-    final msg = '🏥 ${l['name']}: $detail (+${healthGain}% Kesehatan${happinessGain > 0 ? ', +${happinessGain}% Kebahagiaan' : ''}) | Biaya: -\$${_fmt(l['cost'] as int)}';
+    // Ubah pesan agar tidak menampilkan biaya
+    final msg = '🏥 ${l['name']}: $detail (+${healthGain}% Kesehatan${happinessGain > 0 ? ', +${happinessGain}% Kebahagiaan' : ''}) | Biaya: Gratis';
     widget.character.inbox.add(msg);
 
     showDialog(
@@ -138,30 +139,31 @@ class _DokterPageState extends State<DokterPage> {
                 itemCount: layanan.length,
                 itemBuilder: (_, i) {
                   final l = layanan[i];
-                  final bool canAfford = widget.character.money >= (l['cost'] as int);
+                  
+                  // Hapus logika canAfford, langsung aktif
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    color: Colors.white, // Selalu putih
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(color: Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(l['name'], style: TextStyle(
+                      title: Text(l['name'], style: const TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 14,
-                        color: canAfford ? Colors.black87 : Colors.grey,
+                        color: Colors.black87,
                       )),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}',
-                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                        child: Text('${l['desc']}\nBiaya: Gratis', // Ubah teks biaya
+                          style: const TextStyle(color: Colors.black54)),
                       ),
                       isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                          size: 14, color: canAfford ? Colors.blue : Colors.grey),
-                      onTap: canAfford ? () => _executeDokter(context, l) : null,
+                      trailing: const Icon(Icons.arrow_forward_ios,
+                          size: 14, color: Colors.blue), // Ikon panah aktif
+                      onTap: () => _executeDokter(context, l), // Langsung bisa diklik
                     ),
                   );
                 },
