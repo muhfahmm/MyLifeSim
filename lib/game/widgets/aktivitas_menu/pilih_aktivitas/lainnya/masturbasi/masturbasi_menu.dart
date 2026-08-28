@@ -3,6 +3,10 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'risiko_masturbasi.dart'; // Import file risiko
+import 'persentase_ajakan.dart'; // Import persentase ajakan
+import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
+
+
 
 class MasturbasiHelper {
   // ============================================================
@@ -716,7 +720,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
     final String relationType = riskEffects['viewerRelation'] ?? 'Lainnya';
     final String viewerName = riskEffects['viewerName'] ?? '';
     final String msg = riskEffects['message'];
-    final bool isMalePlayer = character.gender.toLowerCase() == 'laki-laki';
+    final String relLower = relationType.toLowerCase();
 
     showDialog(
       context: context,
@@ -829,34 +833,24 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                     onPressed: () {
                       Navigator.pop(ctx);
                       // Opsi 3: Ajak (Rayu)
-                      int successChance = 10;
-                      final String relLower = relationType.toLowerCase();
-                      
-                      if (relLower == 'ayah' || relLower == 'ayah tiri') {
-                        successChance = isMalePlayer ? 5 : 40;
-                      } else if (relLower == 'ibu' || relLower == 'ibu tiri') {
-                        successChance = isMalePlayer ? 5 : 15;
-                      } else if (relLower.contains('kakak') && relLower.contains('laki')) {
-                        successChance = isMalePlayer ? 10 : 25;
-                      } else if (relLower.contains('kakak') && relLower.contains('perempuan')) {
-                        successChance = isMalePlayer ? 30 : 20;
-                      } else if (relLower.contains('adik') && relLower.contains('laki')) {
-                        successChance = isMalePlayer ? 25 : 40;
-                      } else if (relLower.contains('adik') && relLower.contains('perempuan')) {
-                        successChance = isMalePlayer ? 45 : 35;
-                      }
+                      int successChance = PersentaseAjakan.getSuccessChance(
+                        character: character,
+                        relationType: relationType,
+                        viewerName: viewerName,
+                      );
 
                       final bool success = random.nextInt(100) < successChance;
+
                       final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
 
                       if (success) {
-                        if (relLower == 'ayah' || relLower == 'ayah tiri') {
-                          _showAyahProposalDialog(context, character, relationType, viewerName, onComplete);
-                        } else if (relLower == 'ibu' || relLower == 'ibu tiri') {
-                          _showIbuProposalDialog(context, character, relationType, viewerName, onComplete);
-                        } else {
-                          _showSiblingProposalDialog(context, character, relationType, viewerName, onComplete);
-                        }
+                        AjakanMasturbasiDialog.show(
+                          context: context,
+                          character: character,
+                          relationType: relationType,
+                          viewerName: viewerName,
+                          onComplete: onComplete,
+                        );
                       } else {
                         // Gagal
                         if (isParent) {
@@ -892,7 +886,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                             context: context,
                             builder: (context) => AlertDialog(
                               title: const Text('Rayuan Gagal (Dilaporkan) 🚨'),
-                              content: Text('Saudaramu berteriak histeris dan langsung melaporkan kelakuanmu ke orang tua! Orang tuamu menghukummu dengan sangat keras (-50% Kebahagiaan, -100% Hubungan saudara, -50% Hubungan orang tua).'),
+                              content: const Text('Saudaramu berteriak histeris dan langsung melaporkan kelakuanmu ke orang tua! Orang tuamu menghukummu dengan sangat keras (-50% Kebahagiaan, -100% Hubungan saudara, -50% Hubungan orang tua).'),
                               actions: [
                                 TextButton(
                                   onPressed: () {
@@ -910,311 +904,6 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                     child: const Text('😈 Ajak (Rayu)'),
                   ),
                 ],
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  static void _showAyahProposalDialog(
-    BuildContext context,
-    Character character,
-    String relationType,
-    String viewerName,
-    VoidCallback? onComplete,
-  ) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ajakan Ayah 😈'),
-        content: Text('Ayahmu ($viewerName) merespons rayuanmu dan secara terbuka mengajakmu untuk melakukan hubungan terlarang. Apa responmu?'),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    character.karma = (character.karma - 50).clamp(0, 100);
-                    character.health = (character.health - 30).clamp(0, 100);
-                    _modifyRelativeRelationship(character, relationType, viewerName, 20);
-                    character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ayah ($viewerName) setelah insiden tersebut.');
-                    
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Ajakan Diterima 😈'),
-                        content: const Text('Kamu menerima ajakannya. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -30% Kesehatan, +20% Hubungan).'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              onComplete?.call();
-                            },
-                            child: const Text('OK'),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('😈 Terima Ajakan'),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _modifyRelativeRelationship(character, relationType, viewerName, -100);
-                    
-                    final Random random = Random();
-                    final bool divorce = random.nextInt(100) < 40;
-                    
-                    if (divorce) {
-                      character.inbox.add('🚨 PERTENGKARAN DAHSYAT: Orang tuamu bertengkar hebat setelah laporanmu dan memutuskan untuk BERCERAI!');
-                      _modifyParentsRelationship(character, -80);
-                      
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Orang Tua Bercerai! 🚨'),
-                          content: const Text('Laporanmu memicu pertengkaran hebat dan keributan dahsyat di rumah. Ibumu tidak tahan dan memutuskan untuk bercerai dari Ayahmu! (-100% Hubungan Ayah, Orang tuamu sekarang BERCERAI).'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                onComplete?.call();
-                              },
-                              child: const Text('OK'),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      _modifyParentsRelationship(character, -30);
-                      character.inbox.add('🚨 PERTENGKARAN HEBAT: Ibumu mengkonfrontasi Ayahmu. Terjadi keributan besar tetapi mereka tetap bertahan bersama.');
-                      
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Pertengkaran Hebat! 🚨'),
-                          content: const Text('Laporanmu memicu keributan besar di antara orang tuamu. Mereka berteriak sepanjang malam tetapi akhirnya tidak bercerai (-30% Hubungan orang tua).'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                onComplete?.call();
-                              },
-                              child: const Text('OK'),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text('📢 Laporkan ke Ibu'),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  static void _showIbuProposalDialog(
-    BuildContext context,
-    Character character,
-    String relationType,
-    String viewerName,
-    VoidCallback? onComplete,
-  ) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ajakan Ibu 😈'),
-        content: Text('Ibumu ($viewerName) merespons rayuanmu dan secara terbuka mengajakmu untuk melakukan hubungan terlarang. Apa responmu?'),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    character.karma = (character.karma - 50).clamp(0, 100);
-                    character.health = (character.health - 30).clamp(0, 100);
-                    _modifyRelativeRelationship(character, relationType, viewerName, 20);
-                    character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ibu ($viewerName) setelah insiden tersebut.');
-                    
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Ajakan Diterima 😈'),
-                        content: const Text('Kamu menerima ajakannya. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -30% Kesehatan, +20% Hubungan).'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              onComplete?.call();
-                            },
-                            child: const Text('OK'),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('😈 Terima Ajakan'),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _modifyRelativeRelationship(character, relationType, viewerName, -100);
-                    
-                    final Random random = Random();
-                    final bool divorce = random.nextInt(100) < 40;
-                    
-                    if (divorce) {
-                      character.inbox.add('🚨 PERTENGKARAN DAHSYAT: Orang tuamu bertengkar hebat setelah laporanmu dan memutuskan untuk BERCERAI!');
-                      _modifyParentsRelationship(character, -80);
-                      
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Orang Tua Bercerai! 🚨'),
-                          content: const Text('Laporanmu memicu pertengkaran hebat dan keributan dahsyat di rumah. Ayahmu tidak tahan dan memutuskan untuk bercerai dari Ibumu! (-100% Hubungan Ibu, Orang tuamu sekarang BERCERAI).'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                onComplete?.call();
-                              },
-                              child: const Text('OK'),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      _modifyParentsRelationship(character, -30);
-                      character.inbox.add('🚨 PERTENGKARAN HEBAT: Ayahmu mengkonfrontasi Ibumu. Terjadi keributan besar tetapi mereka tetap bertahan bersama.');
-                      
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Pertengkaran Hebat! 🚨'),
-                          content: const Text('Laporanmu memicu keributan besar di antara orang tuamu. Mereka berteriak sepanjang malam tetapi akhirnya tidak bercerai (-30% Hubungan orang tua).'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                                onComplete?.call();
-                              },
-                              child: const Text('OK'),
-                            )
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                  child: const Text('📢 Laporkan ke Ayah'),
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  static void _showSiblingProposalDialog(
-    BuildContext context,
-    Character character,
-    String relationType,
-    String viewerName,
-    VoidCallback? onComplete,
-  ) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        title: Text('Ajakan $relationType 😈'),
-        content: Text('$relationType-mu ($viewerName) merespons rayuanmu dan secara terbuka mengajakmu untuk bersenang-senang bersama secara rahasia. Apa responmu?'),
-        actions: [
-          SizedBox(
-            width: double.infinity,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.purple, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _modifyRelativeRelationship(character, relationType, viewerName, 20);
-                    character.happiness = (character.happiness + 10).clamp(0, 100);
-                    character.karma = (character.karma - 30).clamp(0, 100);
-                    character.health = (character.health - 20).clamp(0, 100);
-                    character.inbox.add('🚨 Hubungan Toxic: Hubungan terlarang dan toxic dimulai dengan saudaramu, $viewerName.');
-
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Ajakan Diterima 😈'),
-                        content: const Text('Kamu menerima ajakannya. Hubungan yang toxic dan terlarang telah terjalin (+10% Kebahagiaan, -30% Karma, -20% Kesehatan, +20% Hubungan).'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              onComplete?.call();
-                            },
-                            child: const Text('OK'),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('😈 Terima Ajakan'),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _modifyRelativeRelationship(character, relationType, viewerName, -100);
-                    character.karma = (character.karma + 15).clamp(0, 100);
-                    character.inbox.add('🚨 SAUDARA DIHUKUM: Kamu melaporkan $relationType ($viewerName) ke orang tua. Dia dihukum dengan sangat keras.');
-
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Dilaporkan ke Orang Tua! 📢'),
-                        content: Text('Kamu memutuskan untuk melaporkan ajakan cabul saudaramu ($viewerName) ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              onComplete?.call();
-                            },
-                            child: const Text('OK'),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('📢 Laporkan ke Orang Tua'),
-                ),
               ],
             ),
           )

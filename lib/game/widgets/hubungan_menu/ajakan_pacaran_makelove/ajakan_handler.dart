@@ -525,9 +525,9 @@ class AjakanHandler {
       }
     }
 
-    // Tentukan pool kandidat terpilih (Beri peluang 35% untuk keluarga agar tidak tenggelam)
+    // Tentukan pool kandidat terpilih (Beri peluang 65% untuk keluarga agar lebih sering muncul)
     List<Map<String, dynamic>> selectedPool = [];
-    if (familyCandidates.isNotEmpty && random.nextInt(100) < 35) {
+    if (familyCandidates.isNotEmpty && random.nextInt(100) < 65) {
       selectedPool = familyCandidates;
     } else {
       selectedPool = schoolCandidates;
@@ -624,7 +624,16 @@ class AjakanHandler {
           }
         }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
-        final String proposalType = random.nextInt(100) < 70 ? 'Ajak Pacaran' : 'Bercinta';
+        final String rel = (candidate['relation'] ?? '').toString().toLowerCase();
+        final bool isCloseFamily = rel == 'ayah' || rel == 'ayah kandung' || rel == 'ayah tiri' ||
+            rel == 'ibu' || rel == 'ibu kandung' || rel == 'ibu tiri' ||
+            rel.contains('kakak') || rel.contains('adik') || rel.contains('saudara');
+
+        // Jika keluarga dekat, 75% Masturbasi, 25% Ajak Pacaran
+        // Jika keluarga jauh, 30% Bercinta (Make Love), 70% Ajak Pacaran
+        final int threshold = isCloseFamily ? 25 : 70;
+        final String proposalType = random.nextInt(100) < threshold ? 'Ajak Pacaran' : (isCloseFamily ? 'Masturbasi' : 'Bercinta');
+        
         if (proposalType == 'Ajak Pacaran') {
           if (isGay) {
             character.activeProposal = AjakanPacaranGayKeluarga.check(character, candidate, random);
@@ -633,6 +642,15 @@ class AjakanHandler {
           } else {
             character.activeProposal = AjakanPacaranHeteroKeluarga.check(character, candidate, random);
           }
+        } else if (proposalType == 'Masturbasi') {
+          character.activeProposal = {
+            'name': candidate['name'],
+            'relation': candidate['relation'],
+            'type': 'Masturbasi',
+            'gender': candidate['gender'],
+            'age': candidate['age'],
+            'role': candidate['role'],
+          };
         } else {
           if (isGay) {
             character.activeProposal = AjakanMlGayKeluarga.check(character, candidate, random);

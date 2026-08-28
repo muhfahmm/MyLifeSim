@@ -22,6 +22,7 @@ import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 
@@ -353,6 +354,8 @@ class _GameScreenState extends State<GameScreen> {
         happiness: _character.happiness,
       );
     });
+
+
 
     // Cek kehamilan saat bertambah umur
     if (_character.isPregnant || _character.partnerIsPregnant) {
@@ -1151,6 +1154,23 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     final String relLower = relation.toLowerCase();
+    if (type == 'Masturbasi') {
+      _character.activeProposal = null;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        AjakanMasturbasiDialog.show(
+          context: context,
+          character: _character,
+          relationType: relation,
+          viewerName: cleanName,
+          onComplete: () {
+            setState(() {});
+            _checkGlassesNeed();
+          },
+        );
+      });
+      return;
+    }
+
     if (relLower == 'ayah' || relLower == 'ayah kandung') {
       relationWithMu = 'Ayahmu';
     } else if (relLower == 'ibu' || relLower == 'ibu kandung') {
