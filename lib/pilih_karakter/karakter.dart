@@ -136,8 +136,11 @@ class _KarakterScreenState extends State<KarakterScreen> {
           _allLastNames = {...maleLast, ...femaleLast}.toList();
           _hasJsonData = true;
           _isLoading = false;
-          _generateRandomName();
         });
+        Character.globalMaleFirstNames = maleFirst;
+        Character.globalFemaleFirstNames = femaleFirst;
+        Character.globalLastNames = _allLastNames;
+        _generateRandomName();
         debugPrint('Successfully loaded names from $foundContinent for $countryLower');
       } catch (e) {
         debugPrint('Error decoding JSON names for $countryLower: $e');
@@ -200,11 +203,6 @@ class _KarakterScreenState extends State<KarakterScreen> {
       lastList = _allLastNames ?? [];
     }
 
-    // Fallback names hardcoded jika semuanya kosong
-    List<String> fallbackMaleFirst = ['Budi', 'Andi', 'Rudi', 'Hendra', 'Agus', 'Joko', 'Slamet', 'Tono'];
-    List<String> fallbackFemaleFirst = ['Sari', 'Dewi', 'Rina', 'Maya', 'Lestari', 'Yuni', 'Nina', 'Tina'];
-    List<String> fallbackLast = ['Santoso', 'Wijaya', 'Putra', 'Siregar', 'Hidayat', 'Kusuma', 'Mardani', 'Ginting'];
-
     final random = Random();
     String firstName = '';
     String lastName = '';
@@ -213,14 +211,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
       firstName = firstList[random.nextInt(firstList.length)];
     } else {
       firstName = isMale 
-          ? fallbackMaleFirst[random.nextInt(fallbackMaleFirst.length)]
-          : fallbackFemaleFirst[random.nextInt(fallbackFemaleFirst.length)];
+          ? (Character.globalMaleFirstNames.isNotEmpty ? Character.globalMaleFirstNames[random.nextInt(Character.globalMaleFirstNames.length)] : '')
+          : (Character.globalFemaleFirstNames.isNotEmpty ? Character.globalFemaleFirstNames[random.nextInt(Character.globalFemaleFirstNames.length)] : '');
     }
 
     if (lastList.isNotEmpty) {
       lastName = lastList[random.nextInt(lastList.length)];
     } else {
-      lastName = fallbackLast[random.nextInt(fallbackLast.length)];
+      lastName = Character.globalLastNames.isNotEmpty ? Character.globalLastNames[random.nextInt(Character.globalLastNames.length)] : '';
     }
 
     final randomAvatar = AvatarGenerator.generateRandomAvatar(widget.gender);

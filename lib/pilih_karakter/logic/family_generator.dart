@@ -529,25 +529,20 @@ class FamilyGenerator {
   ) {
     final random = _random;
 
-    // Fallback jika list kosong
-    const fallbackMale = ['Budi', 'Andi', 'Rudi', 'Hendra', 'Agus', 'Joko'];
-    const fallbackFemale = ['Sari', 'Dewi', 'Rina', 'Maya', 'Lestari', 'Yuni'];
-    const fallbackLast = ['Santoso', 'Wijaya', 'Putra', 'Siregar', 'Hidayat'];
-
     String first;
     if (gender == 'male') {
       first = maleFirstNames.isNotEmpty
           ? maleFirstNames[random.nextInt(maleFirstNames.length)]
-          : fallbackMale[random.nextInt(fallbackMale.length)];
+          : (Character.globalMaleFirstNames.isNotEmpty ? Character.globalMaleFirstNames[random.nextInt(Character.globalMaleFirstNames.length)] : '');
     } else {
       first = femaleFirstNames.isNotEmpty
           ? femaleFirstNames[random.nextInt(femaleFirstNames.length)]
-          : fallbackFemale[random.nextInt(fallbackFemale.length)];
+          : (Character.globalFemaleFirstNames.isNotEmpty ? Character.globalFemaleFirstNames[random.nextInt(Character.globalFemaleFirstNames.length)] : '');
     }
 
     String last = lastNames.isNotEmpty
         ? lastNames[random.nextInt(lastNames.length)]
-        : fallbackLast[random.nextInt(fallbackLast.length)];
+        : (Character.globalLastNames.isNotEmpty ? Character.globalLastNames[random.nextInt(Character.globalLastNames.length)] : '');
 
     return '$first $last';
   }

@@ -859,12 +859,16 @@ class _GameScreenState extends State<GameScreen> {
     final Random random = Random();
     final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
     
-    final List<String> boys = ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
-    final List<String> girls = ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
+    final List<String> boys = (_character.maleFirstNames != null && _character.maleFirstNames!.isNotEmpty) 
+        ? _character.maleFirstNames! 
+        : Character.globalMaleFirstNames;
+    final List<String> girls = (_character.femaleFirstNames != null && _character.femaleFirstNames!.isNotEmpty) 
+        ? _character.femaleFirstNames! 
+        : Character.globalFemaleFirstNames;
     
     final String childFirstName = childGender == 'Laki-laki' 
-        ? boys[random.nextInt(boys.length)] 
-        : girls[random.nextInt(girls.length)];
+        ? (boys.isNotEmpty ? boys[random.nextInt(boys.length)] : '')
+        : (girls.isNotEmpty ? girls[random.nextInt(girls.length)] : '');
     
     final List<String> playerParts = _character.name.split(' ');
     final String childLastName = playerParts.length > 1 ? playerParts.last : '';

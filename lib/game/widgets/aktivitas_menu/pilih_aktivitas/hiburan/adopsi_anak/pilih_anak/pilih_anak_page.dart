@@ -35,17 +35,6 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
     );
   }
 
-  static const List<String> _maleNames = [
-    'Budi', 'Reza', 'Fajar', 'Eko', 'Dimas', 'Arif', 'Rizky', 'Andi', 'Yoga', 'Rangga'
-  ];
-  static const List<String> _femaleNames = [
-    'Siti', 'Ayu', 'Dian', 'Lina', 'Dewi', 'Putri', 'Sari', 'Maya', 'Intan', 'Rina'
-  ];
-  static const List<String> _lastNames = [
-    'Pratama', 'Lestari', 'Saputra', 'Wijaya', 'Kusuma', 'Santoso', 'Hidayat', 'Putra',
-    'Putri', 'Sari', 'Utami', 'Wulandari', 'Ardiansyah', 'Budiman', 'Setiawan', 'Nugroho',
-    'Gunawan', 'Susanto', 'Prasetyo', 'Ramadhan'
-  ];
   static const List<String> _descriptions = [
     'Ceria dan suka bermain',
     'Pemalu tapi penyayang',
@@ -71,12 +60,22 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
     // Jumlah anak antara 5-10
     final int count = 5 + _random.nextInt(6); // 5..10
 
+    final List<String> maleFirst = (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty)
+        ? widget.character.maleFirstNames!
+        : Character.globalMaleFirstNames;
+    final List<String> femaleFirst = (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty)
+        ? widget.character.femaleFirstNames!
+        : Character.globalFemaleFirstNames;
+    final List<String> lastList = (widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty)
+        ? widget.character.lastNames!
+        : Character.globalLastNames;
+
     _availableChildren = List.generate(count, (i) {
       final String gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
       final String firstName = gender == 'Laki-laki'
-          ? _maleNames[_random.nextInt(_maleNames.length)]
-          : _femaleNames[_random.nextInt(_femaleNames.length)];
-      final String lastName = _lastNames[_random.nextInt(_lastNames.length)];
+          ? maleFirst[_random.nextInt(maleFirst.length)]
+          : femaleFirst[_random.nextInt(femaleFirst.length)];
+      final String lastName = lastList[_random.nextInt(lastList.length)];
       final String fullName = '$firstName $lastName';
 
       final int age = minAge + _random.nextInt(maxAge - minAge + 1);

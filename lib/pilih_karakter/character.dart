@@ -599,6 +599,11 @@ class Character {
   // --- LOGIKA MASTURBASI ---
   int lastMasturbationAge = -5;
 
+  // --- DATABASE NAMA DARI JSON (GLOBAL CACHE) ---
+  static List<String> globalMaleFirstNames = [];
+  static List<String> globalFemaleFirstNames = [];
+  static List<String> globalLastNames = [];
+
   // --- DATABASE NAMA DARI JSON ---
   List<String>? maleFirstNames;
   List<String>? femaleFirstNames;
@@ -721,9 +726,9 @@ class Character {
         // Generate new supervisor (minimal age 26)
         final supGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
         final firstList = supGender == 'Laki-laki'
-            ? (maleFirstNames ?? ['Andi', 'Budi', 'Joko', 'Fajar', 'Aditya', 'Rafi', 'Daffa', 'Gibran', 'Hendra', 'Indra'])
-            : (femaleFirstNames ?? ['Siti', 'Ani', 'Dewi', 'Aisyah', 'Putri', 'Sari', 'Fitri', 'Mega', 'Rini', 'Wati']);
-        final lastList = lastNames ?? ['Santoso', 'Pratama', 'Hidayat', 'Saputra', 'Wijaya', 'Kurniawan', 'Setiawan', 'Nugroho'];
+            ? ((maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : globalMaleFirstNames)
+            : ((femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : globalFemaleFirstNames);
+        final lastList = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : globalLastNames;
         final newSupName = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
         final newSupAge = 26 + random.nextInt(34); // Minimal 26 to 59
         
@@ -760,9 +765,9 @@ class Character {
         // Generate new coworker (fresh graduate: 22-23 years old)
         final cmGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
         final firstList = cmGender == 'Laki-laki'
-            ? (maleFirstNames ?? ['Andi', 'Budi', 'Joko', 'Fajar', 'Aditya', 'Rafi', 'Daffa', 'Gibran', 'Hendra', 'Indra'])
-            : (femaleFirstNames ?? ['Siti', 'Ani', 'Dewi', 'Aisyah', 'Putri', 'Sari', 'Fitri', 'Mega', 'Rini', 'Wati']);
-        final lastList = lastNames ?? ['Santoso', 'Pratama', 'Hidayat', 'Saputra', 'Wijaya', 'Kurniawan', 'Setiawan', 'Nugroho'];
+            ? ((maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : globalMaleFirstNames)
+            : ((femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : globalFemaleFirstNames);
+        final lastList = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : globalLastNames;
         final newCmName = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
         final newCmAge = 22 + random.nextInt(2); // 22 to 23 (fresh grad)
         
@@ -1079,9 +1084,9 @@ class Character {
             // Peluang 12% per tahun untuk dapat Pacar
             if (random.nextInt(100) < 12) {
               final String spouseGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
-              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
-              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha'];
-              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : Character.globalMaleFirstNames;
+              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : Character.globalFemaleFirstNames;
+              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : Character.globalLastNames;
               final String spouseName = spouseGender == 'Laki-laki' 
                   ? '${boys[random.nextInt(boys.length)]} ${familyNames[random.nextInt(familyNames.length)]}'
                   : '${girls[random.nextInt(girls.length)]} ${familyNames[random.nextInt(familyNames.length)]}';
@@ -1187,9 +1192,9 @@ class Character {
             
             if (random.nextInt(100) < pregChance) {
               final String babyGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
-              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Fajar', 'Aditya', 'Budi', 'Rafi'];
-              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah'];
-              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
+              final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : globalMaleFirstNames;
+              final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : globalFemaleFirstNames;
+              final List<String> familyNames = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : globalLastNames;
               final String babyName = babyGender == 'Laki-laki'
                   ? '${boys[random.nextInt(boys.length)]} ${familyNames[random.nextInt(familyNames.length)]}'
                   : '${girls[random.nextInt(girls.length)]} ${familyNames[random.nextInt(familyNames.length)]}';

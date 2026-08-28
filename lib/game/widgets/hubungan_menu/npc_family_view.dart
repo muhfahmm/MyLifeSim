@@ -30,27 +30,25 @@ class NpcFamilyViewScreen extends StatefulWidget {
 class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
   late List<Map<String, dynamic>> _family;
 
-  static const List<String> _namaLaki = [
-    'Budi', 'Andi', 'Rudi', 'Hendra', 'Dedi', 'Slamet', 'Agus', 'Joko',
-    'Wahyu', 'Eko', 'Fajar', 'Rizky', 'Bayu', 'Doni', 'Arif', 'Imam', 'Yusuf',
-  ];
-  static const List<String> _namaPerempuan = [
-    'Sari', 'Dewi', 'Rina', 'Wati', 'Ani', 'Yuni', 'Lestari', 'Indah',
-    'Fitri', 'Nita', 'Ayu', 'Rini', 'Maya', 'Dian', 'Putri', 'Nurul', 'Laila',
-  ];
-  static const List<String> _namaBelakang = [
-    'Kusuma', 'Santoso', 'Wijaya', 'Hadiyanto', 'Rahayu', 'Setiawan',
-    'Pratama', 'Susanto', 'Nugroho', 'Hartono', 'Iswanto', 'Siregar',
-    'Mayangsari', 'Arifin', 'Lestari', 'Purnomo',
-  ];
-
   String _randomName(String gender, int seed) {
     final rng = Random(seed);
-    final belakang = _namaBelakang[rng.nextInt(_namaBelakang.length)];
+    final char = widget.character;
+    
+    final List<String> maleFirst = (char?.maleFirstNames != null && char!.maleFirstNames!.isNotEmpty) 
+        ? char.maleFirstNames! 
+        : Character.globalMaleFirstNames;
+    final List<String> femaleFirst = (char?.femaleFirstNames != null && char!.femaleFirstNames!.isNotEmpty) 
+        ? char.femaleFirstNames! 
+        : Character.globalFemaleFirstNames;
+    final List<String> lastList = (char?.lastNames != null && char!.lastNames!.isNotEmpty) 
+        ? char.lastNames! 
+        : Character.globalLastNames;
+        
+    final belakang = lastList[rng.nextInt(lastList.length)];
     if (gender == 'Laki-laki') {
-      return '${_namaLaki[rng.nextInt(_namaLaki.length)]} $belakang';
+      return '${maleFirst[rng.nextInt(maleFirst.length)]} $belakang';
     } else {
-      return '${_namaPerempuan[rng.nextInt(_namaPerempuan.length)]} $belakang';
+      return '${femaleFirst[rng.nextInt(femaleFirst.length)]} $belakang';
     }
   }
 

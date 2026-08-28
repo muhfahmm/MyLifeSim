@@ -2783,6 +2783,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       actions.insert(0, lihatKeluargaAct);
     }
 
+    // Pindahkan Minta Cerai / Minta Tidak Menikah Lagi ke posisi dinamis
+    final List<ActionItem> matchingActs = [];
+    for (var act in actions) {
+      if (act.label.contains('Minta Cerai') || act.label.contains('Minta Tidak Menikah Lagi')) {
+        matchingActs.add(act);
+      }
+    }
+    for (var act in matchingActs) {
+      actions.remove(act);
+    }
+    if (matchingActs.isNotEmpty) {
+      int insertIndex = isActivePartner ? 2 : 1;
+      for (var act in matchingActs.reversed) {
+        actions.insert(insertIndex.clamp(0, actions.length), act);
+      }
+    }
+
     final int relationshipVal = _getCurrentRelationshipValue();
 
     return Scaffold(

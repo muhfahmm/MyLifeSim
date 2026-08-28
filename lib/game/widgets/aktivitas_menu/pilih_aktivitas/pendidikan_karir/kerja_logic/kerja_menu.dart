@@ -944,9 +944,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     if (widget.character.supervisor == null) {
       final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
       final firstList = gender == 'Laki-laki'
-          ? (widget.character.maleFirstNames ?? ['Andi', 'Budi', 'Joko'])
-          : (widget.character.femaleFirstNames ?? ['Siti', 'Ani', 'Dewi']);
-      final lastList = widget.character.lastNames ?? ['Santoso', 'Pratama', 'Hidayat'];
+          ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
+              ? widget.character.maleFirstNames!
+              : Character.globalMaleFirstNames)
+          : (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty
+              ? widget.character.femaleFirstNames!
+              : Character.globalFemaleFirstNames);
+      final lastList = widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty
+          ? widget.character.lastNames!
+          : Character.globalLastNames;
       final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
       final ageVal = 30 + random.nextInt(31);
       widget.character.supervisor = {
@@ -965,9 +971,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     for (int i = 0; i < count; i++) {
       final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
       final firstList = gender == 'Laki-laki'
-          ? (widget.character.maleFirstNames ?? ['Andi', 'Budi', 'Joko'])
-          : (widget.character.femaleFirstNames ?? ['Siti', 'Ani', 'Dewi']);
-      final lastList = widget.character.lastNames ?? ['Santoso', 'Pratama', 'Hidayat'];
+          ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
+              ? widget.character.maleFirstNames!
+              : Character.globalMaleFirstNames)
+          : (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty
+              ? widget.character.femaleFirstNames!
+              : Character.globalFemaleFirstNames);
+      final lastList = widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty
+          ? widget.character.lastNames!
+          : Character.globalLastNames;
       final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
       final ageVal = 20 + random.nextInt(41);
       widget.character.coworkers.add({

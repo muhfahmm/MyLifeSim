@@ -12,8 +12,12 @@ class UnivGenerator {
         : (character.femaleFirstNames ?? []);
     List<String> lastList = character.lastNames ?? [];
 
-    if (firstList.isEmpty) firstList = ['Budi', 'Joko', 'Andi', 'Siti', 'Ani', 'Dewi'];
-    if (lastList.isEmpty) lastList = ['Santoso', 'Pratama', 'Hidayat', 'Wijaya', 'Sari'];
+    if (firstList.isEmpty) {
+      firstList = gender == 'Laki-laki' ? Character.globalMaleFirstNames : Character.globalFemaleFirstNames;
+    }
+    if (lastList.isEmpty) {
+      lastList = Character.globalLastNames;
+    }
 
     final first = firstList[_random.nextInt(firstList.length)];
     final last = lastList[_random.nextInt(lastList.length)];

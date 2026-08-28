@@ -9,13 +9,14 @@ class IdolManager {
         : (character.maleFirstNames ?? []);
     final lastList = character.lastNames ?? [];
 
-    if (firstList.isEmpty || lastList.isEmpty) {
-      return gender == 'Perempuan' ? 'Putri Laksani' : 'Budi Saputra';
-    }
+    final resolvedFirstList = firstList.isNotEmpty
+        ? firstList
+        : (gender == 'Perempuan' ? Character.globalFemaleFirstNames : Character.globalMaleFirstNames);
+    final resolvedLastList = lastList.isNotEmpty ? lastList : Character.globalLastNames;
 
-    final first = firstList[rand.nextInt(firstList.length)];
-    final last = lastList[rand.nextInt(lastList.length)];
-    return '$first $last';
+    final first = resolvedFirstList.isNotEmpty ? resolvedFirstList[rand.nextInt(resolvedFirstList.length)] : '';
+    final last = resolvedLastList.isNotEmpty ? resolvedLastList[rand.nextInt(resolvedLastList.length)] : '';
+    return '$first $last'.trim();
   }
 
   static String _generateSkinColor(Random rand) {

@@ -23,10 +23,10 @@ class ParentRemarriage {
       if (shouldRemarry) {
         final List<String> boys = (character.maleFirstNames != null && character.maleFirstNames!.isNotEmpty) 
             ? character.maleFirstNames! 
-            : ['Fajar', 'Aditya', 'Budi', 'Rafi', 'Daffa', 'Gibran'];
+            : Character.globalMaleFirstNames;
         final List<String> familyNames = (character.lastNames != null && character.lastNames!.isNotEmpty) 
             ? character.lastNames! 
-            : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+            : Character.globalLastNames;
         
         character.stepFatherName = '${boys[random.nextInt(boys.length)]} ${familyNames[random.nextInt(familyNames.length)]}';
         character.stepFatherAge = (character.motherAge ?? 40) + random.nextInt(5) - 2;
@@ -61,10 +61,10 @@ class ParentRemarriage {
       if (shouldRemarry) {
         final List<String> girls = (character.femaleFirstNames != null && character.femaleFirstNames!.isNotEmpty) 
             ? character.femaleFirstNames! 
-            : ['Dian', 'Lestari', 'Nadia', 'Sania', 'Zahra', 'Aura'];
+            : Character.globalFemaleFirstNames;
         final List<String> familyNames = (character.lastNames != null && character.lastNames!.isNotEmpty) 
             ? character.lastNames! 
-            : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma', 'Sari', 'Utami'];
+            : Character.globalLastNames;
         
         character.stepMotherName = '${girls[random.nextInt(girls.length)]} ${familyNames[random.nextInt(familyNames.length)]}';
         character.stepMotherAge = (character.fatherAge ?? 40) + random.nextInt(5) - 2;

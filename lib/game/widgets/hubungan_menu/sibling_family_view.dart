@@ -4,7 +4,6 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
-
 /// Screen untuk menampilkan silsilah keluarga dari perspektif anggota keluarga terpilih (Saudara, Paman, Bibi, Sepupu, Kakek, Nenek, dll).
 class SiblingFamilyViewScreen extends StatefulWidget {
   final Character character;
@@ -460,9 +459,15 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
         final Random rng = Random(seed);
         final int parentAge = (tMap['age'] != null ? int.tryParse(tMap['age']!) ?? 40 : 40) + 20 + rng.nextInt(10);
         // Kakek (orang tua dari Ayah/Ibu Tiri)
-        final List<String> maleNames = ['Bambang','Sutrisno','Haryono','Ahmad','Budi','Slamet','Joko','Agus'];
-        final List<String> femaleNames = ['Sutini','Sri','Wati','Sari','Dewi','Yuni','Ningsih','Ratna'];
-        final List<String> lastNames = ['Santoso','Wijaya','Prasetyo','Kusuma','Setiawan','Utama','Nugroho','Wahyu'];
+        final List<String> maleNames = (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty)
+            ? widget.character.maleFirstNames!
+            : Character.globalMaleFirstNames;
+        final List<String> femaleNames = (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty)
+            ? widget.character.femaleFirstNames!
+            : Character.globalFemaleFirstNames;
+        final List<String> lastNames = (widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty)
+            ? widget.character.lastNames!
+            : Character.globalLastNames;
         final String grandpaName = maleNames[rng.nextInt(maleNames.length)] + ' ' + lastNames[rng.nextInt(lastNames.length)];
         final String grandmaName = femaleNames[rng.nextInt(femaleNames.length)] + ' ' + lastNames[rng.nextInt(lastNames.length)];
         _addWithoutDuplicate(parentsList, {
