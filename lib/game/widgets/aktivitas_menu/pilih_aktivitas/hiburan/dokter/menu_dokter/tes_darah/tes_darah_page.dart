@@ -1,9 +1,11 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
 
 class TesDarahPage extends StatefulWidget {
-  const TesDarahPage({super.key});
+  final Character character;
+  const TesDarahPage({super.key, required this.character});
   @override
   State<TesDarahPage> createState() => _TesDarahPageState();
 }
@@ -27,6 +29,10 @@ class _TesDarahPageState extends State<TesDarahPage> {
       healthGain = -5;
       detail = 'Hasil tes menunjukkan kadar ${t['nama']} sedikit tinggi. Dokter menyarankan diet.';
     }
+
+    // Update real stats
+    DokterUtils.updateStats(widget.character, healthGain, 0, intelGain);
+    widget.character.inbox.add('💉 Tes Darah: ${t['nama']} - $detail (+$healthGain% Kesehatan, +$intelGain% Kecerdasan)');
 
     DokterUtils.showResultDialog(
       context, 

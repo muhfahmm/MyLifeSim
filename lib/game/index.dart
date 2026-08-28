@@ -1146,7 +1146,7 @@ class _GameScreenState extends State<GameScreen> {
       final String contentInside = partnerName.substring(openParen + 1, partnerName.length - 1).trim();
       final String prefixPart = partnerName.substring(0, openParen).trim();
       
-      if (prefixPart.toLowerCase() == relation.toLowerCase()) {
+      if (relation.toLowerCase().startsWith(prefixPart.toLowerCase())) {
         cleanName = contentInside;
       } else {
         cleanName = prefixPart;

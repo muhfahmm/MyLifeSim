@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
 
 class OperasiKecilPage extends StatefulWidget {
-  const OperasiKecilPage({super.key});
+  final Character character;
+  const OperasiKecilPage({super.key, required this.character});
   @override
   State<OperasiKecilPage> createState() => _OperasiKecilPageState();
 }
@@ -19,6 +21,10 @@ class _OperasiKecilPageState extends State<OperasiKecilPage> {
     int healthGain = 30;
     int happyPenalty = 5; // Efek samping pusing
     String detail = 'Operasi berjalan lancar. Kesehatanmu meningkat signifikan.';
+
+    // Update real stats
+    DokterUtils.updateStats(widget.character, healthGain, -happyPenalty, 0);
+    widget.character.inbox.add('🏥 Operasi Kecil: ${o['nama']} - $detail (+$healthGain% Kesehatan, -$happyPenalty% Kebahagiaan)');
 
     DokterUtils.showResultDialog(
       context, 

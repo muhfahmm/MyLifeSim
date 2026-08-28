@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'persentase_efek_samping/wanita.dart';
 import 'persentase_efek_samping/pria.dart';
+import 'beritahu_orang_tua.dart';
 
 class EfekSampingMasturbasi {
   /// Memicu risiko efek samping untuk aktivitas masturbasi SOLO.
@@ -116,12 +117,12 @@ class EfekSampingMasturbasi {
 
     // Pilih efek secara acak
     final effect = possibleEffects[random.nextInt(possibleEffects.length)];
-    _applyAndShowEffect(context, character, effect, onComplete);
+    _applyAndShowEffect(context, character, effect, relationType, '', onComplete);
   }
 
   /// Memicu risiko efek samping untuk aktivitas masturbasi BERSAMA (Partner / Rayuan Berhasil).
   /// Peluang terkena efek samping acak (misalnya 25%).
-  static void checkPartnerEffect(BuildContext context, Character character, String relationType, VoidCallback? onComplete) {
+  static void checkPartnerEffect(BuildContext context, Character character, String relationType, String partnerName, VoidCallback? onComplete) {
     final random = Random();
     final bool isMale = character.gender.toLowerCase() == 'laki-laki';
     
@@ -211,13 +212,15 @@ class EfekSampingMasturbasi {
 
     // Pilih efek secara acak
     final effect = possibleEffects[random.nextInt(possibleEffects.length)];
-    _applyAndShowEffect(context, character, effect, onComplete);
+    _applyAndShowEffect(context, character, effect, relationType, partnerName, onComplete);
   }
 
   static void _applyAndShowEffect(
     BuildContext context,
     Character character,
     Map<String, dynamic> effect,
+    String relationType,
+    String partnerName,
     VoidCallback? onComplete,
   ) {
     // Terapkan efek statistik
@@ -274,7 +277,7 @@ class EfekSampingMasturbasi {
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
-                _tellParents(context, character, hDelta, onComplete);
+                BeriTahuOrangTua.show(context, character, relationType, partnerName, hDelta, onComplete);
               },
               child: const Text('Beri tahu orang tua', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
             ),
@@ -285,59 +288,6 @@ class EfekSampingMasturbasi {
             },
             child: const Text('Pergi ke dokter (\$150)', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onComplete?.call();
-            },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  static void _tellParents(
-    BuildContext context,
-    Character character,
-    int originalHealthLoss,
-    VoidCallback? onComplete,
-  ) {
-    final random = Random();
-    final bool parentHelps = random.nextBool(); // 50% chance
-
-    String msg = '';
-    if (parentHelps) {
-      final int healAmount = (originalHealthLoss.abs() ~/ 2).clamp(0, 100);
-      character.health = (character.health + healAmount).clamp(0, 100);
-      if (character.fatherName != null) {
-        character.fatherRelationship = ((character.fatherRelationship ?? 50) + 15).clamp(0, 100);
-      }
-      if (character.motherName != null) {
-        character.motherRelationship = ((character.motherRelationship ?? 50) + 15).clamp(0, 100);
-      }
-      msg = 'Orang tuamu merasa khawatir dan membantumu merawat luka tersebut. Kamu merasa lebih baik (+$healAmount% Kesehatan, +15% Hubungan Orang Tua).';
-      character.inbox.add('🩹 Orang tua merawat: $msg');
-    } else {
-      character.happiness = (character.happiness - 15).clamp(0, 100);
-      if (character.fatherName != null) {
-        character.fatherRelationship = ((character.fatherRelationship ?? 50) - 10).clamp(0, 100);
-      }
-      if (character.motherName != null) {
-        character.motherRelationship = ((character.motherRelationship ?? 50) - 10).clamp(0, 100);
-      }
-      msg = 'Orang tuamu merasa sangat malu dan memarahimu karena melakukan hal aneh-aneh! (-15% Kebahagiaan, -10% Hubungan Orang Tua).';
-      character.inbox.add('🚨 Orang tua marah: $msg');
-    }
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: const Text('Beri Tahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(msg),
-        actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);

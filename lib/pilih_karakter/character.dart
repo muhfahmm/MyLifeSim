@@ -693,17 +693,21 @@ class Character {
   void updateHealthDynamic({bool isDaily = false}) {
     final random = Random();
     
-    // 1. Decay dasar acak (1, 2, atau 3)
+    // 1. Decay dasar acak (1, 2, atau 3 untuk dewasa, 0-1 untuk anak-anak)
     int decay = 0;
     if (isDaily) {
-      // Peluang decay harian lebih kecil (15% peluang berkurang 1)
-      if (random.nextInt(100) < 15) {
+      if (random.nextInt(100) < 10) {
         decay = 1;
       }
     } else {
-      // Decay tahunan (Weighted: 30% dapat 1, 40% dapat 2, 30% dapat 3)
-      final int roll = random.nextInt(100);
-      decay = roll < 30 ? 1 : (roll < 70 ? 2 : 3);
+      if (age < 12) {
+        // Anak-anak: decay lebih kecil (peluang 20% untuk berkurang 1, sisanya 0)
+        decay = random.nextInt(100) < 20 ? 1 : 0;
+      } else {
+        // Dewasa: Decay tahunan (Weighted: 40% dapat 1, 40% dapat 2, 20% dapat 3)
+        final int roll = random.nextInt(100);
+        decay = roll < 40 ? 1 : (roll < 80 ? 2 : 3);
+      }
     }
     
     // 2. Bonus regenerasi atau penalti dari kebahagiaan
@@ -718,8 +722,19 @@ class Character {
       // Biasa saja: 0
       regen = 0;
     } else {
-      // Stres/Sedih: Penalti ekstra (-1 sampai -3 pertahun, atau 15% peluang -1 perhari)
-      final int penalty = isDaily ? (random.nextInt(100) < 15 ? 1 : 0) : (1 + random.nextInt(3));
+      // Stres/Sedih: Penalti ekstra
+      int penalty = 0;
+      if (isDaily) {
+        penalty = random.nextInt(100) < 10 ? 1 : 0;
+      } else {
+        if (age < 12) {
+          // Penalti anak-anak sangat kecil (peluang 20% untuk berkurang 1, sisanya 0)
+          penalty = random.nextInt(100) < 20 ? 1 : 0;
+        } else {
+          // Dewasa: berkurang 1 sampai 3
+          penalty = 1 + random.nextInt(3);
+        }
+      }
       regen = -penalty;
     }
     

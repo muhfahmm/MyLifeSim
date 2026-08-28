@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
 
 class MedicalCheckupPage extends StatefulWidget {
-  const MedicalCheckupPage({super.key});
+  final Character character;
+  const MedicalCheckupPage({super.key, required this.character});
   @override
   State<MedicalCheckupPage> createState() => _MedicalCheckupPageState();
 }
@@ -19,6 +21,10 @@ class _MedicalCheckupPageState extends State<MedicalCheckupPage> {
     int happyGain = 5;
     int intelGain = 2;
     String detail = 'Medical check up lengkap selesai. Semua dalam kondisi prima.';
+
+    // Update real stats
+    DokterUtils.updateStats(widget.character, healthGain, happyGain, intelGain);
+    widget.character.inbox.add('📋 Medical Check Up: Paket ${p['nama']} - $detail (+$healthGain% Kesehatan, +$happyGain% Kebahagiaan, +$intelGain% Kecerdasan)');
 
     DokterUtils.showResultDialog(
       context, 

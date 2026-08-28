@@ -34,11 +34,11 @@ class DokterPage extends StatefulWidget {
 
 class _DokterPageState extends State<DokterPage> {
   final List<Map<String, dynamic>> layanan = [
-    {'name': 'Pemeriksaan Umum 🩺', 'desc': 'Cek kondisi kesehatan dasar', 'page': PemeriksaanUmumPage()},
-    {'name': 'Tes Darah 💉', 'desc': 'Pemeriksaan darah lengkap', 'page': TesDarahPage()},
-    {'name': 'Konsultasi Psikolog 🧠', 'desc': 'Sesi konsultasi kesehatan mental', 'page': KonsultasiPsikologPage()},
-    {'name': 'Operasi Kecil 🏥', 'desc': 'Operasi untuk mengatasi masalah kesehatan', 'page': OperasiKecilPage()},
-    {'name': 'Medical Check Up Lengkap 📋', 'desc': 'Pemeriksaan menyeluruh tubuh', 'page': MedicalCheckupPage()},
+    {'name': 'Pemeriksaan Umum 🩺', 'desc': 'Cek kondisi kesehatan dasar'},
+    {'name': 'Tes Darah 💉', 'desc': 'Pemeriksaan darah lengkap'},
+    {'name': 'Konsultasi Psikolog 🧠', 'desc': 'Sesi konsultasi kesehatan mental'},
+    {'name': 'Operasi Kecil 🏥', 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
+    {'name': 'Medical Check Up Lengkap 📋', 'desc': 'Pemeriksaan menyeluruh tubuh'},
   ];
 
   @override
@@ -94,12 +94,28 @@ class _DokterPageState extends State<DokterPage> {
                       isThreeLine: true,
                       trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.blue),
                       onTap: () {
+                        Widget page;
+                        if (l['name'].toString().contains('Umum')) {
+                          page = PemeriksaanUmumPage(character: widget.character);
+                        } else if (l['name'].toString().contains('Darah')) {
+                          page = TesDarahPage(character: widget.character);
+                        } else if (l['name'].toString().contains('Psikolog')) {
+                          page = KonsultasiPsikologPage(character: widget.character);
+                        } else if (l['name'].toString().contains('Operasi')) {
+                          page = OperasiKecilPage(character: widget.character);
+                        } else {
+                          page = MedicalCheckupPage(character: widget.character);
+                        }
+                        
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => l['page'],
+                            builder: (context) => page,
                           ),
-                        ).then((_) => widget.onComplete()); // Memanggil onComplete setelah kembali
+                        ).then((_) {
+                          setState(() {});
+                          widget.onComplete();
+                        });
                       },
                     ),
                   );

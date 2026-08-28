@@ -1,97 +1,80 @@
-A. RISIKO SAAT MELAKUKAN SENDIRI (SOLO)
-Lecet pada Jaringan Kulit Luar (Pria & Wanita)
-
-Deskripsi Aman: Gesekan berlebihan tanpa pelumas menyebabkan kulit di area bawah tubuh terasa perih, merah, dan mengelupas ringan.
-
-Efek Statistik: Kesehatan -10, Kebahagiaan -5.
-
-Robekan Kecil pada Jaringan Tipis (Pria)
-
-Deskripsi Aman: Gerakan mendadak yang terlalu kasar menyebabkan robekan kecil pada jaringan tipis di area bawah, terasa perih saat terkena air.
-
-Efek Statistik: Kesehatan -10.
-
-Kram Otot Pinggang dan Punggung Bawah (Pria & Wanita)
-
-Deskripsi Aman: Posisi duduk atau membungkuk terlalu lama membuat otot pinggang menegang dan terasa nyeri saat bergerak.
-
-Efek Statistik: Kesehatan -5, Kecerdasan -5.
-
-Kram pada Tangan dan Pergelangan (Pria & Wanita)
-
-Deskripsi Aman: Gerakan repetitif dan genggaman terlalu erat menyebabkan otot tangan kejang dan pergelangan terasa kaku.
-
-Efek Statistik: Kesehatan -3.
-
-Iritasi Akibat Overstimulasi (Wanita)
-
-Deskripsi Aman: Area luar yang sangat sensitif menerima tekanan terlalu lama, menyebabkan bengkak ringan dan nyeri saat disentuh.
-
-Efek Statistik: Kesehatan -10, Kebahagiaan -10.
-
-Luka Mikro pada Jaringan Dalam (Wanita)
-
-Deskripsi Aman: Tekanan atau gesekan internal yang berlebihan menyebabkan iritasi pada lapisan jaringan lunak di bagian dalam.
-
-Efek Statistik: Kesehatan -5 (meningkatkan kerentanan infeksi).
-
-Kram pada Otot Paha dan Perut Bawah (Wanita)
-
-Deskripsi Aman: Menahan kontraksi otot terlalu lama membuat paha dan perut bawah terasa kejang dan tegang.
-
-Efek Statistik: Kesehatan -5.
-
-Dehidrasi Ringan dan Pusing (Pria & Wanita)
-
-Deskripsi Aman: Napas tersengal dan kurang minum setelah sesi panjang membuat kepala terasa ringan dan pandangan berkunang-kunang.
-
-Efek Statistik: Kesehatan -5, Kecerdasan -3.
-
-Reaksi Alergi / Iritasi Kulit (Pria & Wanita)
-
-Deskripsi Aman: Penggunaan sabun, lotion, atau minyak yang tidak cocok menyebabkan ruam merah dan gatal di area bawah tubuh.
-
-Efek Statistik: Kesehatan -8, Kebahagiaan -10.
-
-B. RISIKO SAAT BERSAMA ORANG LAIN (PARTNER / RAYUAN BERHASIL)
-Cedera Jaringan Keras Akibat Tekukan (Pria – Kasus Langka)
-
-Deskripsi Aman: Gerakan yang tidak sinkron menyebabkan bagian bawah tubuh terbentur tulang pinggul pasangan, mengakibatkan bengkak besar dan memar berwarna kebiruan.
-
-Efek Statistik: Kesehatan -30, Kebahagiaan -40 (butuh perawatan serius).
-
-Terkilir Otot Pinggang Akibat Gerakan Hentakan (Pria)
-
-Deskripsi Aman: Gerakan menghentak terlalu agresif membuat otot pinggang bawah tertarik parah hingga sulit berdiri tegak.
-
-Efek Statistik: Kesehatan -15.
-
-Infeksi Ringan Akibat Kontak (Pria & Wanita)
-
-Deskripsi Aman: Kebersihan pasangan kurang terjaga, beberapa hari kemudian muncul rasa gatal, panas, atau keluarnya cairan tidak normal dari area bawah tubuh.
-
-Efek Statistik: Kesehatan -20, Karma -10.
-
-Laserasi / Robekan Jaringan Dalam (Wanita)
-
-Deskripsi Aman: Tekanan atau penetrasi yang terlalu kasar menyebabkan robekan pada jaringan lunak bagian dalam, disertai pendarahan ringan.
-
-Efek Statistik: Kesehatan -25, Kebahagiaan -20.
-
-Kaku pada Otot Leher dan Rahang (Pria & Wanita)
-
-Deskripsi Aman: Posisi kepala menengadah atau tertunduk terlalu lama menyebabkan otot leher dan rahang kejang dan sulit digerakkan.
-
-Efek Statistik: Kesehatan -5, Kecerdasan -5.
-
-Iritasi atau Infeksi Jamur (Wanita)
-
-Deskripsi Aman: Kebersihan tangan atau alat bantu yang kurang steril menyebabkan iritasi, gatal berlebihan, dan bau tidak sedap pada area bawah.
-
-Efek Statistik: Kesehatan -15, Kebahagiaan -15.
-
-Benturan Kepala atau Memar Tulang Rusuk (Pria & Wanita)
-
-Deskripsi Aman: Terbawa suasana hingga jatuh dari tempat tidur atau terbentur dinding/kepala ranjang, mengakibatkan benjolan di kepala atau memar di dada.
-
-Efek Statistik: Kesehatan -10, Kecerdasan -10 (pusing).
+------------------------
+   1    #version 300 es
+   2
+   3    uniform highp vec2 u_skRTFlip;
+   4    precision mediump float;
+   5    precision mediump sampler2D;       
+   6    out mediump vec4 sk_FragColor;     
+   7    uniform highp vec4 uinnerRect_S1;  
+   8    uniform mediump vec2
+   uradiusPlusHalf_S1;
+   9    in highp vec4 vinCircleEdge_S0;    
+  10    in mediump vec4 vinColor_S0;       
+  11    void main() {
+  12    highp     vec4 sk_FragCoord =      
+  vec4(gl_FragCoord.x, u_skRTFlip.x +      
+  u_skRTFlip.y * gl_FragCoord.y,
+  gl_FragCoord.z, gl_FragCoord.w);
+  13    highp vec4 circleEdge =
+  vinCircleEdge_S0;
+  14    mediump vec4 outputColor_S0 =      
+  vinColor_S0;
+  15    highp float d = length(circleEdge.xy);
+  16    mediump float distanceToOuterEdge =
+  circleEdge.z * (1.0 - d);
+  17    mediump float edgeAlpha =
+  clamp(distanceToOuterEdge, 0.0, 1.0);    
+  18    mediump vec4 outputCoverage_S0 =   
+  vec4(edgeAlpha);
+  19    highp vec2 _0_dxy0 = uinnerRect_S1.xy
+  - sk_FragCoord.xy;
+  20    highp vec2 _1_dxy1 = sk_FragCoord.xy -
+  uinnerRect_S1.zw;
+  21    highp vec2 _2_dxy = max(max(_0_dxy0,
+  _1_dxy1), 0.0);
+  22    mediump float _3_alpha =
+  clamp(uradiusPlusHalf_S1.x -
+  length(_2_dxy), 0.0, 1.0);
+  23    _3_alpha = 1.0 - _3_alpha;
+  24    mediump vec4 output_S1 =
+  outputCoverage_S0 * _3_alpha;
+  25    {
+  26    sk_FragColor = outputColor_S0 *    
+  output_S1;
+  27    }
+  28    }
+  29
+Errors:
+(unknown error)
+Shader compilation error
+------------------------
+   1    #version 300 es
+   2
+   3    precision mediump float;
+   4    precision mediump sampler2D;       
+   5    out mediump vec4 sk_FragColor;     
+   6    uniform sampler2D
+   uTextureSampler_0_S0;
+   7    in highp vec2 vTextureCoords_S0;   
+   8    in highp float vTexIndex_S0;       
+   9    in mediump vec4 vinColor_S0;       
+  10    void main() {
+  11    mediump vec4 outputColor_S0 =      
+  vinColor_S0;
+  12    mediump vec4 texColor =
+  texture(uTextureSampler_0_S0,
+  vTextureCoords_S0, -0.475).xxxx;
+  13    mediump vec4 outputCoverage_S0 =   
+  texColor;
+  14    {
+  15    sk_FragColor = outputColor_S0 *    
+  outputCoverage_S0;
+  16    }
+  17    }
+  18
+Errors:
+(unknown error)
+Attempting to load countries.json...
+Successfully loaded 207 countries.
+Successfully loaded names from asia for
+indonesia

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
 
 class KonsultasiPsikologPage extends StatefulWidget {
-  const KonsultasiPsikologPage({super.key});
+  final Character character;
+  const KonsultasiPsikologPage({super.key, required this.character});
   @override
   State<KonsultasiPsikologPage> createState() => _KonsultasiPsikologPageState();
 }
@@ -16,9 +18,12 @@ class _KonsultasiPsikologPageState extends State<KonsultasiPsikologPage> {
   ];
 
   void _pilihTopik(Map<String, dynamic> t) {
-    // (Dalam implementasi nyata, Anda akan menambahkan logika untuk sesi 15 menit vs 1 jam)
     int happyGain = 20;
     String detail = 'Sesi konsultasi sangat membantu. Pikiranmu terasa lebih ringan.';
+
+    // Update real stats
+    DokterUtils.updateStats(widget.character, 0, happyGain, 0);
+    widget.character.inbox.add('🧠 Konsultasi Psikolog: Topik ${t['nama']} - $detail (+$happyGain% Kebahagiaan)');
 
     DokterUtils.showResultDialog(
       context, 

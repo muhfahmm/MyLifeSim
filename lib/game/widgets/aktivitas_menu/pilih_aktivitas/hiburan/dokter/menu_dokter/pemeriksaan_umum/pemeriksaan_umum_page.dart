@@ -4,7 +4,8 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
 
 class PemeriksaanUmumPage extends StatefulWidget {
-  const PemeriksaanUmumPage({super.key});
+  final Character character;
+  const PemeriksaanUmumPage({super.key, required this.character});
   @override
   State<PemeriksaanUmumPage> createState() => _PemeriksaanUmumPageState();
 }
@@ -18,18 +19,13 @@ class _PemeriksaanUmumPageState extends State<PemeriksaanUmumPage> {
   ];
 
   void _pilihGejala(Map<String, dynamic> g) {
-    // Mengambil karakter dari root menggunakan context (perlu di-passing, atau gunakan GlobalKey)
-    // Dalam konteks nyata, Anda perlu mengakses widget.character dari parent. 
-    // Karena parent DokterPage memanggil page baru, kita gunakan cara sederhana dengan menyimpan karakter di root saja, atau menggunakan callback.
-    // **SOLUSI**: Untuk mempermudah, saya asumsikan karakter diambil dari context atau `onComplete` dipanggil untuk memberi sinyal ke parent.
-    // Di halaman sub, kita hanya perlu memanggil `onComplete` setelah dialog. 
-    // (Catatan: Logika eksekusi karakter sebaiknya tetap di root agar state terjaga).
-    
-    // Untuk demo visual (tanpa perlu mengubah root terlalu rumit), saya akan menganggap ada parameter Character, tapi sesuai permintaan, 
-    // kita langsung tampilkan dialog hasil.
     final r = Random();
     int healthGain = 10 + r.nextInt(10);
     String detail = 'Dokter menyatakan kondisimu cukup baik.';
+    
+    // Update real stats
+    DokterUtils.updateStats(widget.character, healthGain, 0, 0);
+    widget.character.inbox.add('🏥 Pemeriksaan Umum: Gejala ${g['nama']} - $detail (+$healthGain% Kesehatan)');
     
     DokterUtils.showResultDialog(
       context, 

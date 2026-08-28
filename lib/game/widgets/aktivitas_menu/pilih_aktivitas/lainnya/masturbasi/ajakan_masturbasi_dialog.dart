@@ -182,14 +182,14 @@ class AjakanMasturbasiDialog {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Text('Ajakan Diterima 😈'),
         content: Text(msg),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              EfekSampingMasturbasi.checkPartnerEffect(context, character, relationType, onComplete);
+              Navigator.pop(ctx);
+              EfekSampingMasturbasi.checkPartnerEffect(context, character, relationType, viewerName, onComplete);
             },
             child: const Text('OK'),
           )

@@ -190,7 +190,7 @@ class MasturbasiHelper {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (ctx) => AlertDialog(
         title: const Row(
           children: [
             Icon(Icons.check_circle, color: Colors.green),
@@ -202,7 +202,7 @@ class MasturbasiHelper {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.pop(ctx);
               EfekSampingMasturbasi.checkSoloEffect(context, character, relation, onComplete);
             },
             child: const Text('OK'),
