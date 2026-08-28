@@ -1367,19 +1367,6 @@ class Character {
 
     // --- LOGIKA MELAHIRKAN ---
     if (isPregnant || partnerIsPregnant) {
-      final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
-      
-      final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
-      final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
-      
-      final String childFirstName = childGender == 'Laki-laki' 
-          ? boys[random.nextInt(boys.length)] 
-          : girls[random.nextInt(girls.length)];
-      
-      final List<String> playerParts = name.split(' ');
-      final String childLastName = playerParts.length > 1 ? playerParts.last : '';
-      final String childName = childLastName.isNotEmpty ? '$childFirstName $childLastName' : childFirstName;
-
       // --- LOGIKA PENYAKIT & PENGAMATAN PENGAMAN ---
       // Tampilkan notifikasi di inbox jika user atau pasangan mengidap penyakit menular seksual aktif
       if (hasHIV || hasSifilis || hasHPV) {
@@ -1391,64 +1378,104 @@ class Character {
         inbox.add('🚨 Kondisi Medis: Kamu saat ini mengidap penyakit $diseases. Segera lakukan pengobatan jika memungkinkan!');
       }
 
-      final String partnerNameClean = pregnantByPartnerName ?? (partner != null ? (partner!['name'] ?? 'Pasangan') : 'Pasangan');
-      
-      // Jalankan logika konsekuensi kehamilan inses
-      final incestRes = handleIncestPregnancyEffect(this, random);
+      void _handleSingleBirth(String? partnerName) {
+        final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+        
+        final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
+        final List<String> girls = (femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri'];
+        
+        final String childFirstName = childGender == 'Laki-laki' 
+            ? boys[random.nextInt(boys.length)] 
+            : girls[random.nextInt(girls.length)];
+        
+        final List<String> playerParts = name.split(' ');
+        final String childLastName = playerParts.length > 1 ? playerParts.last : '';
+        final String childName = childLastName.isNotEmpty ? '$childFirstName $childLastName' : childFirstName;
 
-      if (incestRes['keguguran'] == true) {
-        events.add(incestRes['pesan']);
-        isPregnant = false;
-        partnerIsPregnant = false;
-        pregnantByPartnerName = null;
-        pregnantByPartnerRole = null;
-      } else {
-        final bool hasGeneticDefect = incestRes['kelainanGenetik'] == true;
-        if (hasGeneticDefect) {
+        final String partnerNameClean = partnerName ?? (partner != null ? (partner!['name'] ?? 'Pasangan') : 'Pasangan');
+        
+        // Jalankan logika konsekuensi kehamilan inses
+        final incestRes = handleIncestPregnancyEffect(this, random);
+
+        if (incestRes['keguguran'] == true) {
           events.add(incestRes['pesan']);
-        }
-
-        String father = 'Tidak diketahui';
-        String mother = 'Tidak diketahui';
-
-        if (gender == 'Laki-laki' || gender == 'laki-laki') {
-          father = name;
-          mother = partnerNameClean;
         } else {
-          father = partnerNameClean;
-          mother = name;
+          final bool hasGeneticDefect = incestRes['kelainanGenetik'] == true;
+          if (hasGeneticDefect) {
+            events.add(incestRes['pesan']);
+          }
+
+          String father = 'Tidak diketahui';
+          String mother = 'Tidak diketahui';
+
+          if (gender == 'Laki-laki' || gender == 'laki-laki') {
+            father = name;
+            mother = partnerNameClean;
+          } else {
+            father = partnerNameClean;
+            mother = name;
+          }
+
+          // Dapatkan warna kulit partner
+          String? partnerSkinColor;
+          if (partner != null && partner!['name'] == partnerNameClean) {
+            partnerSkinColor = partner!['skinColor'];
+          } else if (secondPartner != null && secondPartner!['name'] == partnerNameClean) {
+            partnerSkinColor = secondPartner!['skinColor'];
+          } else if (thirdPartner != null && thirdPartner!['name'] == partnerNameClean) {
+            partnerSkinColor = thirdPartner!['skinColor'];
+          } else if (fourthPartner != null && fourthPartner!['name'] == partnerNameClean) {
+            partnerSkinColor = fourthPartner!['skinColor'];
+          } else if (fifthPartner != null && fifthPartner!['name'] == partnerNameClean) {
+            partnerSkinColor = fifthPartner!['skinColor'];
+          }
+
+          // Warna kulit anak = campuran warna kulit user dan pasangan
+          final String childSkinColor = SkinColorInheritance.blendChildSkin(
+            avatarSkinColor,
+            partnerSkinColor,
+          );
+
+          children.add({
+            'name': childName,
+            'gender': childGender,
+            'relationship': '80',
+            'age': '0',
+            'father': father,
+            'mother': mother,
+            'isDeceased': 'false',
+            'trait': hasGeneticDefect ? 'Mengidap Kelainan Genetik' : 'Sehat',
+            'skinColor': childSkinColor,
+          });
+
+          String birthMsg = '👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia (Ibu: $partnerNameClean).';
+          if (hasGeneticDefect) {
+            birthMsg += ' (⚠️ Anak lahir cacat akibat kelainan genetik dari hubungan sedarah)';
+          }
+          events.add(birthMsg);
+          inbox.add(birthMsg);
         }
-
-        // Warna kulit anak = campuran warna kulit user dan pasangan
-        final String childSkinColor = SkinColorInheritance.blendChildSkin(
-          avatarSkinColor,
-          partnerSkinColor,
-        );
-
-        children.add({
-          'name': childName,
-          'gender': childGender,
-          'relationship': '80',
-          'age': '0',
-          'father': father,
-          'mother': mother,
-          'isDeceased': 'false',
-          'trait': hasGeneticDefect ? 'Mengidap Kelainan Genetik' : 'Sehat',
-          'skinColor': childSkinColor,
-        });
-
-        String birthMsg = '👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia.';
-        if (hasGeneticDefect) {
-          birthMsg += ' (⚠️ Anak lahir cacat akibat kelainan genetik dari hubungan sedarah)';
-        }
-        events.add(birthMsg);
-        inbox.add(birthMsg);
-
-        isPregnant = false;
-        partnerIsPregnant = false;
-        pregnantByPartnerName = null;
-        pregnantByPartnerRole = null;
       }
+
+      if (isPregnant) {
+        _handleSingleBirth(null);
+      }
+
+      if (partnerIsPregnant) {
+        if (pregnantByPartnerName != null && pregnantByPartnerName!.isNotEmpty) {
+          final List<String> pregnantPartners = pregnantByPartnerName!.split(', ');
+          for (var pName in pregnantPartners) {
+            _handleSingleBirth(pName.trim());
+          }
+        } else {
+          _handleSingleBirth(partner != null ? partner!['name'] : 'Pasangan');
+        }
+      }
+
+      isPregnant = false;
+      partnerIsPregnant = false;
+      pregnantByPartnerName = null;
+      pregnantByPartnerRole = null;
     }
 
     // --- LOGIKA AJAKAN INCEST DARI KELUARGA ATAU ROMANTIKA SEKOLAH ---

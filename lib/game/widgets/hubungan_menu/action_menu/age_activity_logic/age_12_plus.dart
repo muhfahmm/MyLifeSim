@@ -146,58 +146,60 @@ List<ActionItem> getAge12PlusActions(
     ));
 
     // 3. Ajak Pacaran (Anak) - 60% success rate
-    actions.add(ActionItem(
-      label: 'Ajak Pacaran',
-      icon: Icons.favorite_border,
-      color: Colors.redAccent,
-      onTap: () {
-        final bool success = random.nextInt(100) < 60;
-        if (success) {
-          showDialogCallback(
-            'Ajakan Diterima! 💖',
-            '$targetName tersipu malu dan menerima ajakanmu untuk berpacaran! Sekarang hubungan kalian adalah Pacar.',
-            Icons.favorite,
-            Colors.pink,
-            () {
-              String? skinCol;
-              for (var child in character.children) {
-                if (child['name'] == targetName) {
-                  skinCol = child['skinColor'];
-                  break;
+    if (!isActivePartner) {
+      actions.add(ActionItem(
+        label: 'Ajak Pacaran',
+        icon: Icons.favorite_border,
+        color: Colors.redAccent,
+        onTap: () {
+          final bool success = random.nextInt(100) < 60;
+          if (success) {
+            showDialogCallback(
+              'Ajakan Diterima! 💖',
+              '$targetName tersipu malu dan menerima ajakanmu untuk berpacaran! Sekarang hubungan kalian adalah Pacar.',
+              Icons.favorite,
+              Colors.pink,
+              () {
+                String? skinCol;
+                for (var child in character.children) {
+                  if (child['name'] == targetName) {
+                    skinCol = child['skinColor'];
+                    break;
+                  }
                 }
-              }
-              final newPartner = {
-                'name': targetName,
-                'gender': targetRole,
-                'age': '${AjakanResolver.getTargetAge(character, targetName, targetRole)}',
-                'relationship': '80',
-                'relation': 'Pacar',
-                if (skinCol != null) 'skinColor': skinCol,
-              };
-              if (character.partner == null) {
-                character.partner = newPartner;
-              } else {
-                character.secondPartner = newPartner;
-              }
-              character.happiness = (character.happiness + 20).clamp(0, 100);
-              updateState();
-            },
-          );
-        } else {
-          showDialogCallback(
-            'Ajakan Ditolak 💔',
-            '$targetName merasa canggung dan menolak ajakanmu untuk berpacaran.',
-            Icons.heart_broken,
-            Colors.red,
-            () {
-              character.happiness = (character.happiness - 10).clamp(0, 100);
-              updateRelationship(-10);
-              updateState();
-            },
-          );
-        }
-      },
-    ));
+                final newPartner = {
+                  'name': targetName,
+                  'gender': targetRole,
+                  'age': '${AjakanResolver.getTargetAge(character, targetName, targetRole)}',
+                  'relationship': '80',
+                  'relation': 'Pacar',
+                  if (skinCol != null) 'skinColor': skinCol,
+                };
+                if (character.partner == null) {
+                  character.partner = newPartner;
+                } else {
+                  character.secondPartner = newPartner;
+                }
+                character.happiness = (character.happiness + 20).clamp(0, 100);
+                updateState();
+              },
+            );
+          } else {
+            showDialogCallback(
+              'Ajakan Ditolak 💔',
+              '$targetName merasa canggung dan menolak ajakanmu untuk berpacaran.',
+              Icons.heart_broken,
+              Colors.red,
+              () {
+                character.happiness = (character.happiness - 10).clamp(0, 100);
+                updateRelationship(-10);
+                updateState();
+              },
+            );
+          }
+        },
+      ));
+    }
 
     // 4. Beri Uang Jajan
     actions.add(ActionItem(

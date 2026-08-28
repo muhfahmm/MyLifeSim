@@ -285,13 +285,31 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               // ============================================
               if (character.partner != null) ...[
                 const Divider(height: 32),
-                Text(
-                  (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
-                      ? '💖 Pacar'
-                      : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
-                          ? '💍 Tunangan'
-                          : '👩❤️👨 Pasangan Hidup',
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
+                Row(
+                  children: [
+                    Text(
+                      (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
+                          ? '💖 Pacar'
+                          : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
+                              ? '💍 Tunangan'
+                              : '👩❤️👨 Pasangan Hidup',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
+                    ),
+                    if ((character.partner!['relation'] ?? 'Pacar') == 'Pacar') ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.redAccent,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Text(
+                          'Pacar Resmi',
+                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 8),
                 _buildFamilyItem(
@@ -318,23 +336,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ),
                 if (character.secondPartner != null && !character.isHavingAffair) ...[
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Text('❤️ Pacar Kedua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'Pacar Resmi',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('❤️ Pacar Kedua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   _buildFamilyItem(
                     context,
@@ -357,23 +359,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ],
                 if (character.thirdPartner != null) ...[
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Text('❤️ Pacar Ketiga', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'Pacar Resmi',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('❤️ Pacar Ketiga', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   _buildFamilyItem(
                     context,
@@ -396,23 +382,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ],
                 if (character.fourthPartner != null) ...[
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Text('❤️ Pacar Keempat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'Pacar Resmi',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('❤️ Pacar Keempat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   _buildFamilyItem(
                     context,
@@ -435,23 +405,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ],
                 if (character.fifthPartner != null) ...[
                   const SizedBox(height: 12),
-                  Row(
-                    children: [
-                      const Text('❤️ Pacar Kelima', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.redAccent,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'Pacar Resmi',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ],
-                  ),
+                  const Text('❤️ Pacar Kelima', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   _buildFamilyItem(
                     context,

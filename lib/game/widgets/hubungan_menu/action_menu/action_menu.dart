@@ -3023,20 +3023,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     // --- BADGE HAMIL (di bawah tingkat kesuburan) ---
                     Builder(
                       builder: (context) {
-                        final bool targetIsPregnant = widget
-                                .character.partnerIsPregnant &&
-                            (widget.character.pregnantByPartnerName ==
-                                    widget.targetName ||
-                                (widget.character.partner != null &&
-                                    widget.character.partner!['name'] ==
-                                        widget.targetName) ||
-                                (widget.character.secondPartner != null &&
-                                    widget.character.secondPartner!['name'] ==
-                                        widget.targetName));
-                        final bool playerIsPregnant =
-                            widget.character.isPregnant &&
-                                (widget.character.pregnantByPartnerName ==
-                                    widget.targetName);
+                        final bool targetIsPregnant = widget.character.partnerIsPregnant &&
+                            widget.character.pregnantByPartnerName == widget.targetName;
+                        final bool playerIsPregnant = widget.character.isPregnant &&
+                            widget.character.pregnantByPartnerName == widget.targetName;
 
                         if (!targetIsPregnant && !playerIsPregnant)
                           return const SizedBox.shrink();

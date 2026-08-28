@@ -101,7 +101,59 @@ class ThreesomeHelper {
               final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
               if (time == null) return;
 
-              _executeThreesome(context, character, partnerNamesText, someName, loc, time, updateState);
+              final List<Map<String, dynamic>> femalePartners = [];
+              if (character.partner != null && character.partner!['isDeceased'] != 'true' && (character.partner!['gender'] ?? 'Perempuan') == 'Perempuan') {
+                femalePartners.add(character.partner!);
+              }
+              if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true' && (character.secondPartner!['gender'] ?? 'Perempuan') == 'Perempuan') {
+                femalePartners.add(character.secondPartner!);
+              }
+              if (character.thirdPartner != null && character.thirdPartner!['isDeceased'] != 'true' && (character.thirdPartner!['gender'] ?? 'Perempuan') == 'Perempuan') {
+                femalePartners.add(character.thirdPartner!);
+              }
+              if (character.fourthPartner != null && character.fourthPartner!['isDeceased'] != 'true' && (character.fourthPartner!['gender'] ?? 'Perempuan') == 'Perempuan') {
+                femalePartners.add(character.fourthPartner!);
+              }
+              if (character.fifthPartner != null && character.fifthPartner!['isDeceased'] != 'true' && (character.fifthPartner!['gender'] ?? 'Perempuan') == 'Perempuan') {
+                femalePartners.add(character.fifthPartner!);
+              }
+
+              bool useCondom = false;
+              if ((character.gender.toLowerCase() == 'laki-laki' || character.gender.toLowerCase() == 'male') && femalePartners.isNotEmpty && context.mounted) {
+                final bool? chooseCondom = await showDialog<bool>(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.security, color: Colors.blue),
+                        SizedBox(width: 10),
+                        Text('Gunakan Pengaman?', style: TextStyle(fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    content: const Text(
+                      'Apakah kamu ingin menggunakan pengaman (kondom) saat melakukan threesome untuk mencegah kehamilan?',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, true),
+                        child: const Text('Ya, pakai', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.pop(context, false),
+                        child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+                if (chooseCondom == null) return;
+                useCondom = chooseCondom;
+              }
+
+              if (!context.mounted) return;
+              _executeThreesome(context, character, partnerNamesText, someName, loc, time, useCondom, femalePartners, updateState);
             },
             child: const Text('Ya, Lakukan!', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
           ),
@@ -121,6 +173,8 @@ class ThreesomeHelper {
     String someName,
     String loc,
     String time,
+    bool useCondom,
+    List<Map<String, dynamic>> femalePartners,
     VoidCallback updateState,
   ) {
     final Random random = Random();
@@ -177,7 +231,31 @@ class ThreesomeHelper {
       }
 
       character.happiness = (character.happiness + 30).clamp(0, 100);
-      character.inbox.add('🔥 Sukses $someName: Kamu berhasil melakukan $someName yang luar biasa memuaskan bersama $partnerNamesText $loc pada waktu $time!');
+
+      // Logika Kehamilan Threesome (Masing-masing wanita 50% peluang hamil mandiri jika tidak pakai kondom)
+      List<String> newlyPregnantNames = [];
+      if (!useCondom && femalePartners.length >= 2) {
+        final bool female1Pregnant = random.nextInt(100) < 50;
+        final bool female2Pregnant = random.nextInt(100) < 50;
+        if (female1Pregnant) newlyPregnantNames.add(femalePartners[0]['name'] ?? 'Pacar 1');
+        if (female2Pregnant) newlyPregnantNames.add(femalePartners[1]['name'] ?? 'Pacar 2');
+      }
+
+      String detailsText = '';
+      if (newlyPregnantNames.isNotEmpty) {
+        character.partnerIsPregnant = true;
+        final String existingPreg = character.pregnantByPartnerName ?? '';
+        final List<String> currentList = existingPreg.isEmpty ? [] : existingPreg.split(', ');
+        for (var pName in newlyPregnantNames) {
+          if (!currentList.contains(pName)) {
+            currentList.add(pName);
+          }
+        }
+        character.pregnantByPartnerName = currentList.join(', ');
+        detailsText = '\n\n🤰 Kehamilan: ${newlyPregnantNames.join(" dan ")} telah hamil hasil dari threesome ini!';
+      }
+
+      character.inbox.add('🔥 Sukses $someName: Kamu berhasil melakukan $someName yang luar biasa memuaskan bersama $partnerNamesText $loc pada waktu $time!$detailsText');
 
       showDialog(
         context: context,
@@ -190,7 +268,7 @@ class ThreesomeHelper {
             ],
           ),
           content: Text(
-            'Luar biasa! $partnerNamesText menerima ajakanmu dengan gairah yang membara. Pengalaman $someName kalian $loc pada waktu $time berjalan sangat memuaskan!',
+            'Luar biasa! $partnerNamesText menerima ajakanmu dengan gairah yang membara. Pengalaman $someName kalian $loc pada waktu $time berjalan sangat memuaskan!$detailsText',
             style: const TextStyle(fontSize: 14),
           ),
           actions: [
