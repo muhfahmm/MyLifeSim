@@ -1404,7 +1404,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           }
         } else if (!hasStepMother && !isStillMarriedToMother) {
           // Hanya tampilkan Minta Tidak Menikah Lagi jika Ayah benar-benar duda (tidak beristri)
-          if (!widget.character.isFatherPersuadedNotToRemarry) {
+          if (!widget.character.isFatherPersuadedNotToRemarry && widget.character.age >= 10) {
             final bool hasMintaTidakNikah = actions.any((act) => act.label == 'Minta Tidak Menikah Lagi');
             if (!hasMintaTidakNikah) {
               actions.add(ActionItem(
@@ -2035,6 +2035,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // Minta Tidak Menikah Lagi (hanya jika ayah berstatus duda / tidak memiliki ibu tiri)
       if (isDatingBiologicalFather &&
           !widget.character.isFatherPersuadedNotToRemarry &&
+          widget.character.age >= 10 &&
           (widget.character.stepMotherName == null ||
               widget.character.isStepMotherDeceased == true)) {
         topActions.add(ActionItem(
@@ -2220,6 +2221,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // Minta Tidak Menikah Lagi (hanya jika ayah berstatus duda / tidak memiliki ibu tiri)
       if (isDatingBiologicalFather &&
           !widget.character.isFatherPersuadedNotToRemarry &&
+          widget.character.age >= 10 &&
           (widget.character.stepMotherName == null ||
               widget.character.isStepMotherDeceased == true)) {
         topActions.add(ActionItem(

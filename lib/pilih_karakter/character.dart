@@ -598,6 +598,7 @@ class Character {
 
   // --- LOGIKA MASTURBASI ---
   int lastMasturbationAge = -5;
+  int addictionLevel = 0;
 
   // --- DATABASE NAMA DARI JSON (GLOBAL CACHE) ---
   static List<String> globalMaleFirstNames = [];
