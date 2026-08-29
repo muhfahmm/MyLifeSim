@@ -22,8 +22,12 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
   final Random _random = Random();
 
   void _lakukanBelajar(String tipe, int intGain, int stressCost) {
+    int finalIntGain = intGain;
+    if (widget.character.discipline > 70) {
+      finalIntGain = (intGain * 1.5).round();
+    }
     setState(() {
-      widget.character.intelligence = (widget.character.intelligence + intGain).clamp(0, 100);
+      widget.character.intelligence = (widget.character.intelligence + finalIntGain).clamp(0, 100);
       widget.character.happiness = (widget.character.happiness - stressCost).clamp(0, 100);
     });
     widget.onRefresh();

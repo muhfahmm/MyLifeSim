@@ -787,11 +787,13 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
     if (success) {
       character.happiness = (character.happiness + 15).clamp(0, 100);
       character.intelligence = (character.intelligence - 8).clamp(0, 100);
+      character.discipline = (character.discipline - 2).clamp(0, 100);
       character.karma = (character.karma - 4).clamp(0, 100);
       widget.onRefresh();
-      _showOutcomeDialog(context, 'Berhasil Membolos! 🎮☕', 'Kamu memutuskan bolos kuliah dan bersantai di kafe dekat kampus bersama mahasiswa lain. Rasanya sangat rileks! (Kebahagiaan +15, Kecerdasan -8)');
+      _showOutcomeDialog(context, 'Berhasil Membolos! 🎮☕', 'Kamu memutuskan bolos kuliah dan bersantai di kafe dekat kampus bersama mahasiswa lain. Rasanya sangat rileks! (Kebahagiaan +15, Kecerdasan -8, Disiplin -2)');
     } else {
       character.happiness = (character.happiness - 12).clamp(0, 100);
+      character.discipline = (character.discipline - 2).clamp(0, 100);
       character.karma = (character.karma - 3).clamp(0, 100);
       
       for (var doc in character.univLecturers) {
@@ -800,7 +802,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
       }
 
       widget.onRefresh();
-      _showOutcomeDialog(context, 'Ketahuan Titip Absen! 🚨', 'Dosen melakukan presensi manual mendadak. Kamu ketahuan menitipkan absen (titip absen/TA). Dosen menandaimu dan reputasimu di kampus anjlok! (Kebahagiaan -12, Hubungan Dosen Berkurang)');
+      _showOutcomeDialog(context, 'Ketahuan Titip Absen! 🚨', 'Dosen melakukan presensi manual mendadak. Kamu ketahuan menitipkan absen (titip absen/TA). Dosen menandaimu dan reputasimu di kampus anjlok! (Kebahagiaan -12, Disiplin -2, Hubungan Dosen Berkurang)');
     }
   }
 

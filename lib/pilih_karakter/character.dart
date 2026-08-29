@@ -722,6 +722,8 @@ class Character {
     final random = Random();
     age++;
     updateHealthDynamic(isDaily: false);
+    updateIntelligenceDynamic();
+    updateDisciplineDynamic();
     accumulateNPCsWealth();
 
     // Tambah tahun pada currentDate jika tidak null

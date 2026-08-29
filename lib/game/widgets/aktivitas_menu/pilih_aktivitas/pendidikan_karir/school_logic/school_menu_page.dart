@@ -55,11 +55,13 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
     if (success) {
       character.happiness = (character.happiness + 15).clamp(0, 100);
       character.intelligence = (character.intelligence - 8).clamp(0, 100);
+      character.discipline = (character.discipline - 2).clamp(0, 100);
       character.karma = (character.karma - 5).clamp(0, 100);
       widget.onRefresh();
-      _showOutcomeDialog(context, 'Berhasil Membolos! 🎉', 'Kamu membolos sekolah seharian dan bermain game di rental internet. Rasanya sangat bebas dan menyenangkan! (Kebahagiaan +15, Kecerdasan -8)');
+      _showOutcomeDialog(context, 'Berhasil Membolos! 🎉', 'Kamu membolos sekolah seharian dan bermain game di rental internet. Rasanya sangat bebas dan menyenangkan! (Kebahagiaan +15, Kecerdasan -8, Disiplin -2)');
     } else {
       character.happiness = (character.happiness - 15).clamp(0, 100);
+      character.discipline = (character.discipline - 2).clamp(0, 100);
       character.karma = (character.karma - 5).clamp(0, 100);
       
       if (character.fatherRelationship != null) {
@@ -70,7 +72,7 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
       }
 
       widget.onRefresh();
-      _showOutcomeDialog(context, 'Ketahuan Membolos! 🚨', 'Kamu tertangkap basah oleh gurumu saat hendak melompati pagar sekolah. Sekolah melaporkannya ke orang tuamu, dan kamu dihukum berat di rumah! (Kebahagiaan -15, Hubungan Orang Tua Berkurang)');
+      _showOutcomeDialog(context, 'Ketahuan Membolos! 🚨', 'Kamu tertangkap basah oleh gurumu saat hendak melompati pagar sekolah. Sekolah melaporkannya ke orang tuamu, dan kamu dihukum berat di rumah! (Kebahagiaan -15, Disiplin -2, Hubungan Orang Tua Berkurang)');
     }
   }
 
