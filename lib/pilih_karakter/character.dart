@@ -747,6 +747,7 @@ class Character {
     PenyakitManager.checkAnnualDisease(this, events);
     updateIntelligenceDynamic();
     updateDisciplineDynamic();
+    updateHappinessDynamic();
     accumulateNPCsWealth();
 
     // --- PROSES KONSEKUENSI RAHASIA / TABU ---

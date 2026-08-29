@@ -55,15 +55,16 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
     // 3. Setup Shimmer Teks (Gradient bergerak)
     _shimmerController = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
 
-    // 4. Setup Urutan Scene (Total 5 detik - terasa cukup santai karena bg hidup)
-    _introController = AnimationController(vsync: this, duration: const Duration(milliseconds: 5000));
+    // 4. Setup Urutan Scene (Total 7.5 detik agar sedikit lebih lama 2-3 detik)
+    _introController = AnimationController(vsync: this, duration: const Duration(milliseconds: 7500));
     
-    _titleOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.2, 0.4, curve: Curves.easeOut));
-    _titleSlide = CurvedAnimation(parent: _introController, curve: const Interval(0.2, 0.4, curve: Curves.easeOut))
+    // Mulai animasi lebih awal (Interval dipercepat mulainya agar tidak lama putih di awal)
+    _titleOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.05, 0.25, curve: Curves.easeOut));
+    _titleSlide = CurvedAnimation(parent: _introController, curve: const Interval(0.05, 0.25, curve: Curves.easeOut))
         .drive(Tween(begin: const Offset(0, 0.2), end: Offset.zero));
-    _taglineOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.4, 0.6, curve: Curves.easeIn));
-    _progressOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.5, 0.7, curve: Curves.easeIn));
-    _exitOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.85, 1.0, curve: Curves.easeOut));
+    _taglineOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.2, 0.45, curve: Curves.easeIn));
+    _progressOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.3, 0.65, curve: Curves.easeIn));
+    _exitOpacity = CurvedAnimation(parent: _introController, curve: const Interval(0.9, 1.0, curve: Curves.easeOut));
 
     // Mulai urutan intro
     _introController.forward();
