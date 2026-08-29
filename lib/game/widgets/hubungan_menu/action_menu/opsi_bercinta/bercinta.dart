@@ -418,7 +418,8 @@ class _BercintaScreenState extends State<BercintaScreen> {
           additionalMessage = 'Kamu sudah dalam kondisi hamil.';
         } else {
           if (myFertility > 0) {
-            if (_random.nextDouble() < myFertility) {
+            double finalChance = widget.character.birthControlActive ? 0.05 : myFertility;
+            if (_random.nextDouble() < finalChance) {
               isPregnant = true;
               widget.character.isPregnant = true;
               widget.character.pregnantByPartnerName = widget.targetName;
@@ -428,7 +429,9 @@ class _BercintaScreenState extends State<BercintaScreen> {
                 '🍼 Kabar Kehamilan: Kamu hamil dari hasil hubungan intim dengan $relation!'
               );
             } else {
-              additionalMessage = 'Kali ini belum berhasil hamil. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
+              additionalMessage = widget.character.birthControlActive
+                  ? 'Kontrol kehamilan (KB) aktif melindungimu dari kehamilan.'
+                  : 'Kali ini belum berhasil hamil. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
             }
           } else {
             additionalMessage = 'Usia kamu ${widget.character.age} tahun. Kamu sudah melewati masa subur (8-45 tahun).';

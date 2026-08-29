@@ -37,7 +37,6 @@ class _DokterPageState extends State<DokterPage> {
   final List<Map<String, dynamic>> layanan = [
     {'name': 'Pemeriksaan Umum 🩺', 'desc': 'Cek kondisi kesehatan dasar'},
     {'name': 'Tes Darah 💉', 'desc': 'Pemeriksaan darah lengkap'},
-    {'name': 'Konsultasi Psikolog 🧠', 'desc': 'Sesi konsultasi kesehatan mental'},
     {'name': 'Operasi Kecil 🏥', 'desc': 'Operasi untuk mengatasi masalah kesehatan'},
     {'name': 'Medical Check Up Lengkap 📋', 'desc': 'Pemeriksaan menyeluruh tubuh'},
   ];
@@ -122,8 +121,6 @@ class _DokterPageState extends State<DokterPage> {
                           page = PemeriksaanUmumPage(character: widget.character);
                         } else if (l['name'].toString().contains('Darah')) {
                           page = TesDarahPage(character: widget.character);
-                        } else if (l['name'].toString().contains('Psikolog')) {
-                          page = KonsultasiPsikologPage(character: widget.character);
                         } else if (l['name'].toString().contains('Operasi')) {
                           page = OperasiKecilPage(character: widget.character);
                         } else {

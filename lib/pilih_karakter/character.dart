@@ -57,6 +57,9 @@ class Character {
   int willpower;
   String specialTalent;
 
+  // --- KONTROL KEHAMILAN (KB) ---
+  bool birthControlActive = false;
+
   // --- PARAMETER AVATAR DARI KUSTOMISASI ---
   String? avatarTopType;
   String? avatarAccessoriesType;
@@ -194,6 +197,9 @@ class Character {
 
   // --- DAFTAR ANAK ---
   List<Map<String, String>> children = []; // [{name: '...', gender: 'Laki-laki', relationship: '80', age: '0', father: '...', mother: '...', isDeceased: 'false'}]
+
+  // --- DAFTAR PENERIMA DONOR SPERMA ---
+  List<Map<String, String>> donorRecipients = []; // [{name: '...', age: '...', relationship: '50', childName: '...'}]
 
   // --- KEJADIAN AJAKAN (PROPOSAL) ---
   Map<String, dynamic>? activeProposal; // {'name': '...', 'relation': '...', 'type': 'Pacaran' / 'Bercinta', 'gender': '...', 'age': '...'}
@@ -1493,6 +1499,12 @@ class Character {
     ageUpPartnerMap(fifthPartner, 'Pacar');
     for (var sp in secretPartners) {
       ageUpPartnerMap(sp, 'Pacar (Rahasia)');
+    }
+
+    // 4.b. Donor Recipients Aging
+    for (var recipient in donorRecipients) {
+      int rAge = int.tryParse(recipient['age'] ?? '25') ?? 25;
+      recipient['age'] = (rAge + 1).toString();
     }
 
     // --- LOGIKA MELAHIRKAN ---

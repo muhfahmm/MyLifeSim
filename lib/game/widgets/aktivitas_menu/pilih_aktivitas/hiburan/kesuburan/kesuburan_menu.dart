@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'page_donor_sperma.dart';
 
 class KesuburanMenuHelper {
   static void showKesuburanMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -44,14 +45,45 @@ class KesuburanPage extends StatefulWidget {
 }
 
 class _KesuburanPageState extends State<KesuburanPage> {
-  final List<Map<String, dynamic>> layanan = [
-    {'name': 'Cek Kesuburan 🔬', 'cost': 1000000, 'desc': 'Periksa tingkat kesuburan saat ini'},
-    {'name': 'Terapi Hormon 💊', 'cost': 3000000, 'desc': 'Meningkatkan kesuburan dengan terapi hormon'},
-    {'name': 'Bayi Tabung (IVF) 🧪', 'cost': 30000000, 'desc': 'Program bayi tabung untuk kehamilan'},
-  ];
+
+  List<Map<String, dynamic>> layanan = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _updateLayananList();
+  }
+
+  void _updateLayananList() {
+    layanan = [
+      {'name': 'Cek Kesuburan 🔬', 'cost': 15000, 'desc': 'Periksa tingkat kesuburan saat ini'},
+      {'name': 'Terapi Hormon 💊', 'cost': 35000, 'desc': 'Meningkatkan kesuburan dengan terapi hormon'},
+      {'name': 'Bayi Tabung (IVF) 🧪', 'cost': 30000, 'desc': 'Program bayi tabung untuk kehamilan'},
+    ];
+
+    final String genderClean = widget.character.gender.trim().toLowerCase();
+    final isMale = genderClean == 'laki-laki' || genderClean == 'male' || genderClean == 'l';
+    if (isMale) {
+      layanan.add({
+        'name': 'Donor Sperma 🧬',
+        'cost': 0,
+        'desc': 'Donorkan sperma Anda ke bank sperma untuk membantu orang lain (Dapat uang \$5.000)',
+      });
+    } else {
+      layanan.add({
+        'name': widget.character.birthControlActive ? 'Matikan Kontrol Kehamilan (KB) ❌' : 'Aktifkan Kontrol Kehamilan (KB) 🛡️',
+        'cost': 1000,
+        'desc': widget.character.birthControlActive 
+            ? 'Nonaktifkan perlindungan KB' 
+            : 'Aktifkan perlindungan KB untuk mengurangi risiko hamil menjadi 5%',
+      });
+    }
+  }
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    // Menghindari minus uang saat donor sperma (cost: 0)
+    final absVal = amount.abs();
+    return absVal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
   }
 
   void _executeLayanan(BuildContext context, Map<String, dynamic> l, int kesuburan) {
@@ -66,6 +98,44 @@ class _KesuburanPageState extends State<KesuburanPage> {
     } else if (l['name'].toString().contains('Hormon')) {
       widget.character.health = (widget.character.health + 5).clamp(0, 100);
       msg = '💊 Terapi hormon berhasil! Kesuburanmu meningkat (+5% Kesehatan).';
+    } else if (l['name'].toString().contains('Donor')) {
+      // Dapatkan uang $5.000
+      setState(() {
+        widget.character.money += 5000;
+      });
+      final bool berhasil = r.nextInt(100) < (kesuburan + 20).clamp(0, 100);
+      if (berhasil) {
+        final List<String> girls = (Character.globalFemaleFirstNames.isNotEmpty) ? Character.globalFemaleFirstNames : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra'];
+        final List<String> boys = (Character.globalMaleFirstNames.isNotEmpty) ? Character.globalMaleFirstNames : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi'];
+        final List<String> lastNamesList = (Character.globalLastNames.isNotEmpty) ? Character.globalLastNames : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
+        
+        final String ibuNama = '${girls[r.nextInt(girls.length)]} ${lastNamesList[r.nextInt(lastNamesList.length)]}';
+        final String anakGender = r.nextBool() ? 'Laki-laki' : 'Perempuan';
+        final String anakNamaDepan = anakGender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
+        final String anakNama = '$anakNamaDepan ${lastNamesList[r.nextInt(lastNamesList.length)]}';
+
+        widget.character.children.add({
+          'name': anakNama,
+          'gender': anakGender,
+          'relationship': '50',
+          'age': '0',
+          'father': widget.character.name,
+          'mother': ibuNama,
+          'isDeceased': 'false',
+        });
+
+        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan \$5.000 untuk kontribusi ini!';
+      } else {
+        msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan \$5.000 untuk donor ini!';
+      }
+    } else if (l['name'].toString().contains('Kontrol Kehamilan') || l['name'].toString().contains('KB')) {
+      setState(() {
+        widget.character.birthControlActive = !widget.character.birthControlActive;
+        _updateLayananList();
+      });
+      msg = widget.character.birthControlActive
+          ? '🛡️ Kontrol Kehamilan (KB) telah diaktifkan! Risiko kehamilan tidak sengaja kini ditekan hingga 5%.'
+          : '❌ Kontrol Kehamilan (KB) dinonaktifkan. Risiko kehamilan kembali normal.';
     } else {
       final berhasil = r.nextInt(100) < kesuburan;
       msg = berhasil
@@ -98,6 +168,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
 
   @override
   Widget build(BuildContext context) {
+    _updateLayananList();
     // Hitung tingkat kesuburan berdasarkan kesehatan dan usia
     int kesuburan = widget.character.health;
     if (widget.character.age > 35) kesuburan = (kesuburan * 0.7).round();
@@ -174,7 +245,24 @@ class _KesuburanPageState extends State<KesuburanPage> {
                       isThreeLine: true,
                       trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                           size: 14, color: canAfford ? Colors.purple : Colors.grey),
-                      onTap: canAfford ? () => _executeLayanan(context, l, kesuburan) : null,
+                      onTap: canAfford ? () {
+                        if (l['name'].toString().contains('Donor')) {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => PageDonorSperma(
+                                character: widget.character,
+                                onComplete: () {
+                                  setState(() {});
+                                  widget.onComplete();
+                                },
+                              ),
+                            ),
+                          );
+                        } else {
+                          _executeLayanan(context, l, kesuburan);
+                        }
+                      } : null,
                     ),
                   );
                 },

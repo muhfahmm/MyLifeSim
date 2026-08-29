@@ -2409,7 +2409,8 @@ class _GameScreenState extends State<GameScreen> {
       if (!useCondom && myGender != partnerGender) {
         double myFertility = _getIncomingFertilityRate(_character.age, myGender);
         if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
-          if (!_character.isPregnant && myFertility > 0 && random.nextDouble() < myFertility) {
+          double finalChance = _character.birthControlActive ? 0.05 : myFertility;
+          if (!_character.isPregnant && myFertility > 0 && random.nextDouble() < finalChance) {
             _character.isPregnant = true;
             _character.pregnantByPartnerName = partnerName;
             _character.pregnantByPartnerRole = proposal['role'] ?? relation;
