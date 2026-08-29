@@ -170,21 +170,22 @@ class AjakanMasturbasiDialog {
     String viewerName,
     VoidCallback? onComplete,
   ) {
+    final int healthLoss = 1 + Random().nextInt(10);
     character.karma = (character.karma - 50).clamp(0, 100);
-    character.health = (character.health - 25).clamp(0, 100);
+    character.health = (character.health - healthLoss).clamp(0, 100);
     _modifyRelativeRelationship(character, relationType, viewerName, 20);
 
     String msg = '';
     if (relationType.toLowerCase().contains('ayah')) {
       character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ayah ($viewerName) setelah insiden tersebut.');
-      msg = 'Kamu menerima ajakan Ayahmu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -25% Kesehatan, +20% Hubungan).';
+      msg = 'Kamu menerima ajakan Ayahmu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
     } else if (relationType.toLowerCase().contains('ibu')) {
       character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ibu ($viewerName) setelah insiden tersebut.');
-      msg = 'Kamu menerima ajakan Ibumu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -25% Kesehatan, +20% Hubungan).';
+      msg = 'Kamu menerima ajakan Ibumu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
     } else {
       character.happiness = (character.happiness + 10).clamp(0, 100);
       character.inbox.add('🚨 Hubungan Toxic: Hubungan terlarang dan toxic dimulai dengan saudaramu, $viewerName.');
-      msg = 'Kamu menerima ajakan saudaramu. Hubungan yang toxic dan terlarang telah terjalin (+10% Kebahagiaan, -30% Karma, -20% Kesehatan, +20% Hubungan).';
+      msg = 'Kamu menerima ajakan saudaramu. Hubungan yang toxic dan terlarang telah terjalin (+10% Kebahagiaan, -30% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
     }
 
     showDialog(
