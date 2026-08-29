@@ -62,10 +62,14 @@ class _DokterPageState extends State<DokterPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => RiwayatPenyakitPage(character: widget.character),
+                    builder: (context) => RiwayatPenyakitPage(
+                      character: widget.character,
+                      onComplete: widget.onComplete,
+                    ),
                   ),
                 ).then((_) {
                   setState(() {});
+                  widget.onComplete();
                 });
               },
             ),
@@ -118,13 +122,13 @@ class _DokterPageState extends State<DokterPage> {
                       onTap: () {
                         Widget page;
                         if (l['name'].toString().contains('Umum')) {
-                          page = PemeriksaanUmumPage(character: widget.character);
+                          page = PemeriksaanUmumPage(character: widget.character, onComplete: widget.onComplete);
                         } else if (l['name'].toString().contains('Darah')) {
-                          page = TesDarahPage(character: widget.character);
+                          page = TesDarahPage(character: widget.character, onComplete: widget.onComplete);
                         } else if (l['name'].toString().contains('Operasi')) {
-                          page = OperasiKecilPage(character: widget.character);
+                          page = OperasiKecilPage(character: widget.character, onComplete: widget.onComplete);
                         } else {
-                          page = MedicalCheckupPage(character: widget.character);
+                          page = MedicalCheckupPage(character: widget.character, onComplete: widget.onComplete);
                         }
                         
                         Navigator.push(

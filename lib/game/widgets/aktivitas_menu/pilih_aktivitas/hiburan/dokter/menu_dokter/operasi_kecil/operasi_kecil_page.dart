@@ -4,7 +4,8 @@ import '../dokter_utils.dart';
 
 class OperasiKecilPage extends StatefulWidget {
   final Character character;
-  const OperasiKecilPage({super.key, required this.character});
+  final VoidCallback? onComplete;
+  const OperasiKecilPage({super.key, required this.character, this.onComplete});
   @override
   State<OperasiKecilPage> createState() => _OperasiKecilPageState();
 }
@@ -25,6 +26,7 @@ class _OperasiKecilPageState extends State<OperasiKecilPage> {
     // Update real stats
     DokterUtils.updateStats(widget.character, healthGain, -happyPenalty, 0);
     widget.character.inbox.add('🏥 Operasi Kecil: ${o['nama']} - $detail (+$healthGain% Kesehatan, -$happyPenalty% Kebahagiaan)');
+    widget.onComplete?.call();
 
     DokterUtils.showResultDialog(
       context, 

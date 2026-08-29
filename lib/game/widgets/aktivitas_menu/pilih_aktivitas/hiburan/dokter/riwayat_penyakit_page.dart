@@ -8,7 +8,8 @@ import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
 
 class RiwayatPenyakitPage extends StatefulWidget {
   final Character character;
-  const RiwayatPenyakitPage({super.key, required this.character});
+  final VoidCallback? onComplete;
+  const RiwayatPenyakitPage({super.key, required this.character, this.onComplete});
 
   @override
   State<RiwayatPenyakitPage> createState() => _RiwayatPenyakitPageState();
@@ -84,6 +85,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
         // Tambah kesehatan
         widget.character.health = (widget.character.health + 25).clamp(0, 100);
         widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan)');
+        widget.onComplete?.call();
       });
 
       showDialog(

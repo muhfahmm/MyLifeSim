@@ -4,7 +4,8 @@ import '../dokter_utils.dart';
 
 class TesDarahPage extends StatefulWidget {
   final Character character;
-  const TesDarahPage({super.key, required this.character});
+  final VoidCallback? onComplete;
+  const TesDarahPage({super.key, required this.character, this.onComplete});
 
   @override
   State<TesDarahPage> createState() => _TesDarahPageState();
@@ -14,6 +15,7 @@ class _TesDarahPageState extends State<TesDarahPage> {
   void _treat(String disease) async {
     // Gunakan helper pengobatan dari DokterUtils
     await DokterUtils.handleDiseaseTreatment(context, widget.character, 'Tes Darah');
+    widget.onComplete?.call();
     setState(() {});
   }
 
