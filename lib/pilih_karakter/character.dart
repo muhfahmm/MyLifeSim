@@ -6,6 +6,7 @@ import 'package:bitlife/avatar/skin_color_inheritance.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 
 // Import Atribut Karakter yang Dipisah
 import 'package:bitlife/pilih_karakter/atribut_karakter/disiplin.dart';
@@ -814,8 +815,11 @@ class Character {
 
     // Tambah gaji dari pekerjaan jika ada
     if (jobName != null && jobSalary != null) {
+      final double raisePercent = 0.03 + (random.nextDouble() * 0.03);
+      final int raiseAmount = (jobSalary! * raisePercent).round();
+      jobSalary = jobSalary! + raiseAmount;
       money += jobSalary!;
-      final String notice = '💼 Gajian: Kamu menerima gaji sebesar \$${jobSalary} dari pekerjaanmu sebagai $jobName.';
+      final String notice = '💼 Gajian: Kamu menerima gaji sebesar \$$jobSalary (naik \$$raiseAmount) dari pekerjaanmu sebagai $jobName.';
       inbox.add(notice);
     }
 
@@ -1724,37 +1728,30 @@ class Character {
   Map<String, dynamic> _generateRandomJob() {
     final random = Random();
     final int roll = random.nextInt(100);
-    String category = 'Medium';
+    List<String> categories;
     if (roll < 20) {
-      category = 'Low';
+      categories = ['Dasar', 'Layanan'];
     } else if (roll < 60) {
-      category = 'Medium';
+      categories = ['Terampil', 'Kreatif'];
     } else if (roll < 90) {
-      category = 'High';
+      categories = ['Profesional'];
     } else {
-      category = 'Very High';
+      categories = ['Prestise'];
     }
 
-    String jobNameVal = '';
-    int salaryVal = 0;
+    final candidateJobs = KerjaMenuScreen.availableJobs.where((j) {
+      final String cat = j['category'] as String? ?? '';
+      return categories.contains(cat);
+    }).toList();
 
-    if (category == 'Low') {
-      final jobs = ['Buruh Pabrik', 'Petani', 'Kuli Bangunan', 'Satpam', 'Kasir Minimarket', 'Penjual Sayur', 'Ojek Online', 'Cleaning Service'];
-      jobNameVal = jobs[random.nextInt(jobs.length)];
-      salaryVal = random.nextInt(1001) + 500;
-    } else if (category == 'Medium') {
-      final jobs = ['Karyawan Swasta', 'Staff Admin', 'HRD', 'Marketing', 'Guru SD', 'Guru SMP', 'Perawat', 'Polisi', 'Montir', 'Teknisi Listrik', 'Pemilik Warung'];
-      jobNameVal = jobs[random.nextInt(jobs.length)];
-      salaryVal = random.nextInt(3001) + 2000;
-    } else if (category == 'High') {
-      final jobs = ['Dokter Umum', 'Pengacara', 'Manajer Perusahaan', 'Dosen', 'Pilot', 'Arsitek', 'Software Engineer', 'Pemilik Restoran'];
-      jobNameVal = jobs[random.nextInt(jobs.length)];
-      salaryVal = random.nextInt(9001) + 6000;
-    } else {
-      final jobs = ['Artis', 'CEO', 'Pebisnis Sukses', 'Atlet Profesional', 'Dokter Bedah', 'Pemilik Konglomerat'];
-      jobNameVal = jobs[random.nextInt(jobs.length)];
-      salaryVal = random.nextInt(80001) + 20000;
-    }
+    final jobsList = candidateJobs.isNotEmpty ? candidateJobs : KerjaMenuScreen.availableJobs;
+    final chosenJob = jobsList[random.nextInt(jobsList.length)];
+    final String jobNameVal = chosenJob['title'] as String? ?? 'Karyawan';
+    final int baseSalary = chosenJob['salary'] as int? ?? 1000;
+    
+    // Tambahkan sedikit variasi acak pada gaji awal (+/- 10%)
+    final double variation = 0.9 + (random.nextDouble() * 0.2);
+    final int salaryVal = (baseSalary * variation).round();
 
     return {'job': jobNameVal, 'salary': salaryVal};
   }
@@ -1930,46 +1927,72 @@ class Character {
   }
 
   void accumulateNPCsWealth() {
+    final rand = Random();
+
     if (fatherName != null && !isFatherDeceased && fatherAge != null && fatherAge! >= 19) {
+      if (fatherJob != null && fatherSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        fatherSalary = (fatherSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(fatherName!, 'Kandung');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getFatherWealth();
-        fatherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        fatherWealth = currentW + ((fatherSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
     if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 19) {
+      if (motherJob != null && motherSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        motherSalary = (motherSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(motherName!, 'Kandung');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getMotherWealth();
-        motherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        motherWealth = currentW + ((motherSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
     if (stepFatherName != null && !isStepFatherDeceased && stepFatherAge != null && stepFatherAge! >= 19) {
+      if (stepFatherJob != null && stepFatherSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        stepFatherSalary = (stepFatherSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(stepFatherName!, 'Tiri');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getStepFatherWealth();
-        stepFatherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        stepFatherWealth = currentW + ((stepFatherSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
     if (stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null && stepMotherAge! >= 19) {
+      if (stepMotherJob != null && stepMotherSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        stepMotherSalary = (stepMotherSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(stepMotherName!, 'Tiri');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getStepMotherWealth();
-        stepMotherWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        stepMotherWealth = currentW + ((stepMotherSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
     if (fatherInLawName != null && !isFatherInLawDeceased && fatherInLawAge != null && fatherInLawAge! >= 19) {
+      if (fatherInLawJob != null && fatherInLawSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        fatherInLawSalary = (fatherInLawSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(fatherInLawName!, 'Mertua');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getFatherInLawWealth();
-        fatherInLawWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        fatherInLawWealth = currentW + ((fatherInLawSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
     if (motherInLawName != null && !isMotherInLawDeceased && motherInLawAge != null && motherInLawAge! >= 19) {
+      if (motherInLawJob != null && motherInLawSalary != null) {
+        final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+        motherInLawSalary = (motherInLawSalary! * (1 + raisePercent)).round();
+      }
       final jobInfo = getNPCJobInfo(motherInLawName!, 'Mertua');
       if (jobInfo['status'] == 'Bekerja') {
         int currentW = getMotherInLawWealth();
-        motherInLawWealth = currentW + ((jobInfo['salary'] as int) * 1.2).toInt();
+        motherInLawWealth = currentW + ((motherInLawSalary ?? jobInfo['salary'] as int) * 1.2).toInt();
       }
     }
 
@@ -1979,6 +2002,11 @@ class Character {
         final int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
         final bool isDeceased = item['isDeceased'] == 'true';
         if (name.isNotEmpty && !isDeceased && targetAge >= 19) {
+          if (item['salary'] != null && item['salary'] != '0') {
+            final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+            final int currentSalary = int.tryParse(item['salary']!) ?? 0;
+            item['salary'] = (currentSalary * (1 + raisePercent)).round().toString();
+          }
           final jobInfo = getNPCJobInfo(name, role);
           if (jobInfo['status'] == 'Bekerja') {
             int currentW = getTargetWealth(name, role);
@@ -2000,6 +2028,11 @@ class Character {
       final name = supervisor!['name']!;
       final int targetAge = int.tryParse(supervisor!['age'] ?? '18') ?? 18;
       if (targetAge >= 19) {
+        if (supervisor!['salary'] != null && supervisor!['salary'] != '0') {
+          final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+          final int currentSalary = int.tryParse(supervisor!['salary']!) ?? 0;
+          supervisor!['salary'] = (currentSalary * (1 + raisePercent)).round().toString();
+        }
         final jobInfo = getNPCJobInfo(name, 'Supervisor');
         if (jobInfo['status'] == 'Bekerja') {
           int currentW = getTargetWealth(name, 'Supervisor');
@@ -2013,6 +2046,11 @@ class Character {
       final name = partner!['name']!;
       final int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
       if (targetAge >= 19) {
+        if (partner!['salary'] != null && partner!['salary'] != '0') {
+          final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+          final int currentSalary = int.tryParse(partner!['salary']!) ?? 0;
+          partner!['salary'] = (currentSalary * (1 + raisePercent)).round().toString();
+        }
         final jobInfo = getNPCJobInfo(name, 'Partner');
         if (jobInfo['status'] == 'Bekerja') {
           int currentW = getTargetWealth(name, 'Partner');
@@ -2025,6 +2063,11 @@ class Character {
       final name = secondPartner!['name']!;
       final int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
       if (targetAge >= 19) {
+        if (secondPartner!['salary'] != null && secondPartner!['salary'] != '0') {
+          final double raisePercent = 0.03 + (rand.nextDouble() * 0.03);
+          final int currentSalary = int.tryParse(secondPartner!['salary']!) ?? 0;
+          secondPartner!['salary'] = (currentSalary * (1 + raisePercent)).round().toString();
+        }
         final jobInfo = getNPCJobInfo(name, 'Partner');
         if (jobInfo['status'] == 'Bekerja') {
           int currentW = getTargetWealth(name, 'Partner');

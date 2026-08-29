@@ -36,15 +36,10 @@ class KerjaMenuScreen extends StatefulWidget {
     required this.onRefresh,
   });
 
-  @override
-  State<KerjaMenuScreen> createState() => _KerjaMenuScreenState();
-}
-
-class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   // ============================================================
   // DAFTAR PEKERJAAN (LENGKAP DENGAN KATEGORI & SYARAT)
   // ============================================================
-  final List<Map<String, dynamic>> _availableJobs = [
+  static final List<Map<String, dynamic>> availableJobs = [
     // ---- DASAR & ENTRY-LEVEL ----
     {
       'title': 'Kasir',
@@ -673,6 +668,13 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       'color': Colors.indigo,
     },
   ];
+
+  @override
+  State<KerjaMenuScreen> createState() => _KerjaMenuScreenState();
+}
+
+class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
+  List<Map<String, dynamic>> get _availableJobs => KerjaMenuScreen.availableJobs;
 
   // ============================================================
   // FUNGSI UTAMA
