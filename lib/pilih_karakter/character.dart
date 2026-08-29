@@ -7,6 +7,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
 
 // Import Atribut Karakter yang Dipisah
 import 'package:bitlife/pilih_karakter/atribut_karakter/disiplin.dart';
@@ -722,6 +723,7 @@ class Character {
     final random = Random();
     age++;
     updateHealthDynamic(isDaily: false);
+    PenyakitManager.checkAnnualDisease(this, events);
     updateIntelligenceDynamic();
     updateDisciplineDynamic();
     accumulateNPCsWealth();
