@@ -9,6 +9,24 @@ extension KesehatanExtension on Character {
   void updateHealthDynamic({bool isDaily = false}) {
     final random = Random();
     
+    // Ketika kebahagiaan 70++, maka kesehatan harus tetap naik dan turun secara fluktuatif
+    // dengan (naik 2, turun 1, atau turun 2-3) bukan langsung naik terus.
+    if (happiness >= 70 && !isDaily) {
+      final int roll = random.nextInt(100);
+      int delta;
+      if (roll < 40) {
+        delta = 2; // naik 2
+      } else if (roll < 70) {
+        delta = -1; // turun 1
+      } else if (roll < 85) {
+        delta = -2; // turun 2
+      } else {
+        delta = -3; // turun 3
+      }
+      health = (health + delta).clamp(0, 100);
+      return;
+    }
+    
     // 1. Decay dasar acak (1, 2, atau 3 untuk dewasa, 0-1 untuk anak-anak)
     int decay = 0;
     if (isDaily) {
