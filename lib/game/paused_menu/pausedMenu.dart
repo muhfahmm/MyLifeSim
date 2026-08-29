@@ -1,13 +1,18 @@
-// lib/game/paused_menu/pausedMenu.dart
 import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/store_page/store_page.dart';
 
 class PausedMenu extends StatelessWidget {
+  final Character? character;
+  final VoidCallback? onPurchaseCompleted;
   final VoidCallback? onRestart;
   final VoidCallback? onSaveProgress;
   final VoidCallback? onNewGame;
 
   const PausedMenu({
     super.key,
+    this.character,
+    this.onPurchaseCompleted,
     this.onRestart,
     this.onSaveProgress,
     this.onNewGame,
@@ -157,7 +162,39 @@ class PausedMenu extends StatelessWidget {
 
                 const Divider(height: 32, indent: 20, endIndent: 20),
 
-                // SECTION 3: NAVIGASI
+                // SECTION 3: TOKO
+                const Padding(
+                  padding: EdgeInsets.only(left: 20, bottom: 8),
+                  child: Text(
+                    'TOKO',
+                    style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                    ),
+                  ),
+                ),
+                _buildMenuItem(
+                  icon: Icons.storefront_rounded,
+                  title: 'Toko',
+                  iconColor: Colors.amber.shade800,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => StorePage(
+                          character: character,
+                          onPurchaseCompleted: onPurchaseCompleted,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+
+                const Divider(height: 32, indent: 20, endIndent: 20),
+
+                // SECTION 4: NAVIGASI
                 _buildMenuItem(
                   icon: Icons.home_rounded,
                   title: 'Kembali ke Menu Utama',

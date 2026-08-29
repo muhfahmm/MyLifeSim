@@ -73,7 +73,7 @@ List<ActionItem> getAge6to11Actions(
           int relBonus = random.nextInt(6) + 5;
           showDialogCallback(
             'Dapat Uang Saku!',
-            '$relation memberimu uang saku sebesar \$$gotMoney! (+$relBonus% hubungan).',
+            '$relation memberimu uang saku sebesar \$$gotMoney! (+$relBonus% hubungan, +10% kebahagiaan).',
             Icons.monetization_on, Colors.green, () {
               character.money += gotMoney;
               character.happiness = (character.happiness + 10).clamp(0, 100);
@@ -106,9 +106,9 @@ List<ActionItem> getAge6to11Actions(
           int relBonus = random.nextInt(6) + 10;
           showDialogCallback(
             'Minta Sepeda Sukses!',
-            '$relation membelikanmu sepeda baru! Hubunganmu membaik (+$relBonus%).',
+            '$relation membelikanmu sepeda baru! Hubunganmu membaik (+$relBonus%, +20% kebahagiaan).',
             Icons.directions_bike, Colors.green, () {
-              character.happiness = (character.happiness + 25).clamp(0, 100);
+              character.happiness = (character.happiness + 20).clamp(0, 100);
               updateRelationship(relBonus);
               updateState();
             }
@@ -176,7 +176,7 @@ List<ActionItem> getAge6to11Actions(
         int relBonus = random.nextInt(8) + 5;
         showDialogCallback(
           'Memberi Hadiah',
-          'Kamu memberikan hadiah kecil buatan sendiri. $relation sangat tersentuh! (+$relBonus% hubungan)',
+          'Kamu memberikan hadiah kecil buatan sendiri. $relation sangat tersentuh! (+$relBonus% hubungan, +15% kebahagiaan)',
           Icons.card_giftcard, Colors.pink, () {
             character.happiness = (character.happiness + 15).clamp(0, 100);
             updateRelationship(relBonus);
@@ -221,9 +221,9 @@ List<ActionItem> getAge6to11Actions(
           int relBonus = random.nextInt(6) + 10;
           showDialogCallback(
             'Menonton Bioskop',
-            'Kamu pergi menonton film bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan)',
+            'Kamu pergi menonton film bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan, +18% kebahagiaan)',
             Icons.movie, Colors.green, () {
-              character.happiness = (character.happiness + 20).clamp(0, 100);
+              character.happiness = (character.happiness + 18).clamp(0, 100);
               updateRelationship(relBonus);
               updateState();
             }
@@ -258,7 +258,7 @@ List<ActionItem> getAge6to11Actions(
           int relBonus = random.nextInt(5) + 8;
           showDialogCallback(
             'Bermain Bersama',
-            'Kamu bermain board game di ruang tamu bersama $relation (+$relBonus% hubungan).',
+            'Kamu bermain board game di ruang tamu bersama $relation (+$relBonus% hubungan, +12% kebahagiaan).',
             Icons.family_restroom, Colors.orange, () {
               character.happiness = (character.happiness + 12).clamp(0, 100);
               updateRelationship(relBonus);

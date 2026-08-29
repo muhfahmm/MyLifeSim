@@ -109,9 +109,9 @@ List<ActionItem> getAge3to6Actions(
         int relBonus = random.nextInt(6) + 10;
         showDialog(
           'Pergi ke Bioskop',
-          'Kamu pergi ke bioskop menonton film anak-anak bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan)',
+          'Kamu pergi ke bioskop menonton film anak-anak bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan, +18% kebahagiaan)',
           Icons.movie, Colors.deepPurple, () {
-            character.happiness = (character.happiness + 15).clamp(0, 100);
+            character.happiness = (character.happiness + 18).clamp(0, 100);
             updateRelationship(relBonus);
             updateState();
           }
@@ -128,7 +128,7 @@ List<ActionItem> getAge3to6Actions(
         int relBonus = random.nextInt(5) + 8;
         showDialog(
           'Habiskan Waktu',
-          'Kamu menghabiskan waktu bermain bersama $relation sepanjang hari! (+$relBonus% hubungan)',
+          'Kamu menghabiskan waktu bermain bersama $relation sepanjang hari! (+$relBonus% hubungan, +12% kebahagiaan)',
           Icons.people, Colors.blueAccent, () {
             character.happiness = (character.happiness + 12).clamp(0, 100);
             updateRelationship(relBonus);

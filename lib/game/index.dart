@@ -2558,6 +2558,10 @@ class _GameScreenState extends State<GameScreen> {
         leadingWidth: 200, // Beri space yang cukup untuk hamburger + tanggal
       ),
       drawer: PausedMenu(
+        character: _character,
+        onPurchaseCompleted: () {
+          setState(() {});
+        },
         onRestart: _resetGame,
         onSaveProgress: _saveProgress,
         onNewGame: _startNewGame,
