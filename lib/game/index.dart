@@ -1357,6 +1357,29 @@ class _GameScreenState extends State<GameScreen> {
       return;
     }
 
+  // --- WIDGET BADGE UNTUK LOKASI & WAKTU INTIM ---
+  Widget _buildIntimBadge(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withOpacity(0.5)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500),
+          ),
+        ],
+      ),
+    );
+  }
+  
     if (relLower == 'ayah' || relLower == 'ayah kandung') {
       relationWithMu = 'Ayahmu';
     } else if (relLower == 'ibu' || relLower == 'ibu kandung') {
@@ -1487,6 +1510,41 @@ class _GameScreenState extends State<GameScreen> {
     final bool showReportToTeacher = (role == 'Kepala Sekolah' || relCheck.contains('kepala sekolah')) &&
         (type == 'Ajak Pacaran' || type == 'Bercinta');
 
+    // Pre-generate lokasi & waktu secara acak untuk ajakan bercinta (partner sudah memilih)
+    const List<Map<String, dynamic>> _lokasiListIntim = [
+      {'name': 'Di Kamar Tidur', 'icon': 0xe283},   // Icons.bed
+      {'name': 'Di Kamar Mandi', 'icon': 0xe1c0},   // Icons.bathtub
+      {'name': 'Di Ruang Tamu', 'icon': 0xe54f},    // Icons.chair
+      {'name': 'Di Mobil', 'icon': 0xe1b9},         // Icons.directions_car
+      {'name': 'Di Hotel', 'icon': 0xe3b8},         // Icons.hotel
+    ];
+    const List<Map<String, dynamic>> _waktuListIntim = [
+      {'name': 'Pagi', 'icon': 0xef50},    // Icons.light_mode
+      {'name': 'Siang', 'icon': 0xef3d},   // Icons.wb_sunny
+      {'name': 'Sore', 'icon': 0xef3f},    // Icons.wb_twilight
+      {'name': 'Malam', 'icon': 0xef4a},   // Icons.nightlight_round
+    ];
+    final _randIntim = Random();
+    final String preGeneratedLokasiIntim = type == 'Bercinta'
+        ? (_lokasiListIntim[_randIntim.nextInt(_lokasiListIntim.length)]['name'] as String)
+        : '';
+    final String preGeneratedWaktuIntim = type == 'Bercinta'
+        ? (_waktuListIntim[_randIntim.nextInt(_waktuListIntim.length)]['name'] as String)
+        : '';
+    final Map<String, IconData> _lokasiIkonMap = {
+      'Di Kamar Tidur': Icons.bed,
+      'Di Kamar Mandi': Icons.bathtub,
+      'Di Ruang Tamu': Icons.chair,
+      'Di Mobil': Icons.directions_car,
+      'Di Hotel': Icons.hotel,
+    };
+    final Map<String, IconData> _waktuIkonMap = {
+      'Pagi': Icons.light_mode,
+      'Siang': Icons.wb_sunny,
+      'Sore': Icons.wb_twilight,
+      'Malam': Icons.nightlight_round,
+    };
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -1502,10 +1560,31 @@ class _GameScreenState extends State<GameScreen> {
               Text(dialogTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             ],
           ),
-        content: Text(
-          dialogBody,
-          style: const TextStyle(fontSize: 14),
-        ),
+        content: (type == 'Bercinta' || type == 'Bersetubuh') && preGeneratedLokasiIntim.isNotEmpty
+            ? Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(dialogBody, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      _buildIntimBadge(
+                        _lokasiIkonMap[preGeneratedLokasiIntim] ?? Icons.location_on,
+                        preGeneratedLokasiIntim,
+                        const Color(0xFF6A1B9A),
+                      ),
+                      const SizedBox(width: 8),
+                      _buildIntimBadge(
+                        _waktuIkonMap[preGeneratedWaktuIntim] ?? Icons.access_time,
+                        preGeneratedWaktuIntim,
+                        const Color(0xFF283593),
+                      ),
+                    ],
+                  ),
+                ],
+              )
+            : Text(dialogBody, style: const TextStyle(fontSize: 14)),
         actions: [
           if (showReportToMother)
             TextButton(
