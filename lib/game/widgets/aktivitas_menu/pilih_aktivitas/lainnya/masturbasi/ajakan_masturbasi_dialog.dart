@@ -197,7 +197,14 @@ class AjakanMasturbasiDialog {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              EfekSampingMasturbasi.checkPartnerEffect(context, character, relationType, viewerName, onComplete);
+              EfekSampingMasturbasi.checkPartnerEffect(
+                context,
+                character,
+                relationType,
+                viewerName,
+                onComplete,
+                acceptanceHealthLoss: healthLoss,
+              );
             },
             child: const Text('OK'),
           )

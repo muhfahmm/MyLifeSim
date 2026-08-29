@@ -117,7 +117,7 @@ class EfekSampingMasturbasi {
   }
 
   /// Memicu risiko efek samping untuk aktivitas masturbasi BERSAMA (Partner / Rayuan Berhasil).
-  static void checkPartnerEffect(BuildContext context, Character character, String relationType, String partnerName, VoidCallback? onComplete) {
+  static void checkPartnerEffect(BuildContext context, Character character, String relationType, String partnerName, VoidCallback? onComplete, {int acceptanceHealthLoss = 0}) {
     final random = Random();
     final bool isMale = character.gender.toLowerCase() == 'laki-laki';
     
@@ -197,7 +197,15 @@ class EfekSampingMasturbasi {
     
     // Pilih efek secara acak dari daftar yang tersisa
     final effect = possibleEffects[random.nextInt(possibleEffects.length)];
-    _applyAndShowEffect(context, character, effect, relationType, partnerName, onComplete);
+    _applyAndShowEffect(
+      context,
+      character,
+      effect,
+      relationType,
+      partnerName,
+      onComplete,
+      acceptanceHealthLoss: acceptanceHealthLoss,
+    );
   }
 
   static void _applyAndShowEffect(
@@ -206,8 +214,9 @@ class EfekSampingMasturbasi {
     Map<String, dynamic> effect,
     String relationType,
     String partnerName,
-    VoidCallback? onComplete,
-  ) {
+    VoidCallback? onComplete, {
+    int acceptanceHealthLoss = 0,
+  }) {
     // Terapkan efek statistik
     final int hDelta = effect['health'] ?? 0;
     final int hapDelta = effect['happiness'] ?? 0;
@@ -262,6 +271,25 @@ class EfekSampingMasturbasi {
           ],
         ),
         actions: [
+          if (partnerName != null && partnerName.trim().isNotEmpty)
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                _tellPartnerToHeal(
+                  context,
+                  character,
+                  partnerName,
+                  relationType,
+                  hDelta,
+                  acceptanceHealthLoss,
+                  onComplete,
+                );
+              },
+              child: Text(
+                'Beri tahu $relationType ($partnerName)',
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
           if ((character.fatherName != null && !character.isFatherDeceased) ||
               (character.motherName != null && !character.isMotherDeceased))
             TextButton(
@@ -325,6 +353,53 @@ class EfekSampingMasturbasi {
               onComplete?.call();
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  static void _tellPartnerToHeal(
+    BuildContext context,
+    Character character,
+    String partnerName,
+    String relationType,
+    int originalHealthLoss,
+    int acceptanceHealthLoss,
+    VoidCallback? onComplete,
+  ) {
+    // Sembuhkan cedera (tambahkan kembali health yang hilang dari event penerimaan + efek samping)
+    final int healAmount = originalHealthLoss.abs() + acceptanceHealthLoss.abs();
+    character.health = (character.health + healAmount).clamp(0, 100);
+    
+    // Hapus penyakit dari riwayat penyakit
+    // Cari penyakit / cedera yang barusan terjadi (efek samping masturbasi)
+    character.riwayatPenyakit.removeWhere((disease) => 
+        disease.contains('Lecet') || 
+        disease.contains('Robekan') || 
+        disease.contains('Kram') || 
+        disease.contains('Iritasi') || 
+        disease.contains('Luka Mikro') || 
+        disease.contains('Infeksi'));
+
+    final String msg = '🤫 Rahasia Medis: Kamu memberitahu $relationType ($partnerName) tentang cederamu. '
+        'Dengan rasa bersalah dan khawatir, dia membawamu ke klinik secara diam-diam tanpa sepengetahuan orang tua dan menanggung semua biaya pengobatan. Kesehatanmu pulih sepenuhnya (+$healAmount% Kesehatan).';
+    character.inbox.add(msg);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text('Bantuan dari $partnerName', style: const TextStyle(fontWeight: FontWeight.bold)),
+        content: Text(msg),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              onComplete?.call();
+            },
+            child: const Text('Terima Kasih', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

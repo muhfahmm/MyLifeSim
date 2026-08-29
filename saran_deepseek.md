@@ -1,54 +1,64 @@
-Menambahkan Faktor Usia ke Sistem Penyakit Tahunan
-Sistem penyakit saat ini hanya mengandalkan health untuk menentukan peluang sakit dan tingkat keparahan. Untuk membuatnya lebih realistis, kita bisa menambahkan usia sebagai faktor pengali (ageFactor) yang meningkatkan peluang sakit dan kecenderungan penyakit berat seiring bertambahnya usia.
+## Saran Nama Menu
 
-1. Konsep Dasar
-Usia muda (0–17 tahun): Sistem imun masih berkembang, risiko sedang, tetapi penyakit berat jarang.
+Beberapa opsi nama yang sesuai dengan konteks pembuatan karakter:
 
-Usia dewasa (18–39 tahun): Risiko normal (baseline).
+1. **“Latar Belakang Keluarga”** – paling deskriptif dan mudah dipahami.  
+2. **“Silsilah Keluarga”** – memberi kesan pohon keluarga.  
+3. **“Asal Usul Karakter”** – lebih naratif.  
+4. **“Data Orang Tua & Saudara”** – langsung ke inti.  
 
-Usia paruh baya (40–59 tahun): Risiko meningkat, lebih rentan penyakit kronis.
+Saya pribadi menyarankan **“Latar Belakang Keluarga”** karena netral, jelas, dan cocok untuk semua umur.
 
-Lansia (≥60 tahun): Risiko sangat tinggi, penyakit berat lebih mungkin terjadi.
+---
 
-2. Modifikasi pada PenyakitManager.checkAnnualDisease()
-Kita akan menambahkan langkah-langkah berikut:
+## Desain Antarmuka yang Disarankan
 
-Hitung ageFactor berdasarkan usia karakter.
+Menu ini bisa terdiri dari **3 bagian utama** (bisa dibuat dalam satu halaman atau bertahap). Karena Anda minta “buton menu ketika diklik maka akan di-redirect”, artinya ini adalah halaman terpisah. Berikut usulan layoutnya:
 
-Modifikasi sicknessChance dengan mengalikan faktor usia (kemudian di-clamp ke 0–100).
+---
 
-Modifikasi distribusi keparahan – pada usia lanjut, kemungkinan penyakit berat naik, penyakit ringan turun.
+### 1. Rentang Usia Ayah dan Ibu
+- Gunakan **dua slider** (range slider) atau **dua input angka** (min–maks) untuk masing‑masing orang tua.
+- Contoh:
+  - **Ayah:** dari ____ tahun sampai ____ tahun  
+  - **Ibu:** dari ____ tahun sampai ____ tahun  
+- Beri nilai default yang masuk akal (misal ayah 30–50, ibu 25–45) agar pengguna tinggal geser.
+- Jika ingin lebih simpel, bisa pakai **dropdown** dengan rentang (misal 20‑an, 30‑an, 40‑an, 50‑an) tetapi kurang presisi.
 
-4. Penjelasan Perubahan
-Komponen	Sebelumnya	Setelah Modifikasi
-Peluang Sakit	Hanya berdasarkan health	Dikalikan dengan ageFactor (0.7–2.0) lalu di-clamp ke 0–100
-Distribusi Keparahan	Tetap berdasarkan health saja (kode lama)	Sekarang berdasarkan age + health (usia tua cenderung berat)
-Threshold Keparahan	Health ≥70: 70% ringan, 30% sedang; Health <30: 40% sedang, 60% berat	Threshold berubah sesuai kelompok usia: anak-anak lebih banyak ringan, lansia lebih banyak berat
-Penyesuaian Kesehatan Rendah	(tidak ada)	Jika health < 40, threshold ringan dan sedang diturunkan (berat naik)
-5. Contoh Skenario
-Karakter usia 10 tahun, health 80:
+---
 
-ageFactor = 0.7, sicknessChance dari health 80 = 15 → finalChance = 10.5 ≈ 11%.
+### 2. Anak Keberapa?
+- Gunakan **dropdown** atau **tombol angka** (1, 2, 3, 4, 5+).
+- Beri label “Saya adalah anak ke‑…”.
+- Jika pengguna memilih 1, maka otomatis tidak ada kakak (tapi tetap bisa punya adik).
 
-Threshold: ringan 60, sedang 90 → hanya 10% berat.
+---
 
-Karakter usia 65 tahun, health 80:
+### 3. Kakak / Adik (gender dan jumlah)
+Bagian ini bisa dibuat fleksibel:
 
-ageFactor = 2.0, sicknessChance = 15 → finalChance = 30%.
+- **Pertanyaan:** “Apakah kamu punya saudara kandung?”  
+  - Pilihan: **Tidak punya** / **Punya kakak** / **Punya adik** / **Punya kakak dan adik**.
+- Setelah memilih, munculkan **input jumlah** untuk masing‑masing (misal: jumlah kakak laki‑laki, jumlah kakak perempuan, jumlah adik laki‑laki, jumlah adik perempuan).
+- Atau lebih sederhana: sediakan **tabel** dengan kolom:
+  - **Hubungan** (Kakak laki‑laki, Kakak perempuan, Adik laki‑laki, Adik perempuan)
+  - **Jumlah** (input angka, default 0)
+- Pastikan total saudara + posisi anak tidak bertentangan (misal jika anak ke‑1, maka tidak boleh ada kakak).
 
-Threshold: ringan 15, sedang 50 → 50% berat (karena usia tua).
+---
 
-Karakter usia 30 tahun, health 30:
+## Alur Navigasi
 
-ageFactor = 1.0, sicknessChance = 30 + (50-30)=50 → finalChance = 50%.
+1. Pengguna selesai mengisi data awal (nama, negara, penampilan, talenta).  
+2. Tekan tombol **“LAHIRKAN!”** → tetapi alih‑alih langsung selesai, tampilkan **halaman “Latar Belakang Keluarga”** ini.  
+3. Setelah semua diisi, baru ada tombol **“Selesai & Lahirkan”** yang menyimpan semua data dan menampilkan hasil akhir karakter.
 
-Threshold: ringan 50, sedang 85, tapi karena health <40, dikurangi setengah: ringan 25, sedang 60 → 40% berat.
+Jika Anda ingin tetap mempertahankan tombol “LAHIRKAN!” sebagai aksi akhir, maka ganti nama tombol di halaman pertama menjadi **“Lanjut ke Keluarga”**, dan tombol di halaman kedua menjadi **“LAHIRKAN!”**.
 
-6. Saran Tambahan (Opsional)
-Faktor Gaya Hidup (misal: merokok, alkohol, olahraga) – bisa ditambahkan sebagai pengali tambahan.
+---
 
-Faktor Genetik – jika karakter memiliki riwayat penyakit tertentu, peluang kambuh meningkat.
+## Tips Tambahan
 
-Variasi Musiman – beberapa penyakit lebih umum di musim hujan (bisa ditambahkan acak).
-
-Dengan modifikasi di atas, sistem penyakit menjadi lebih dinamis, realistis, dan menantang seiring bertambahnya usia karakter, memberikan efek jangka panjang yang lebih bermakna dalam gameplay.
+- Beri **tooltip** atau **info singkat** di setiap bagian agar pengguna mengerti maksudnya.  
+- Untuk validasi: pastikan usia orang tua masuk akal (misal ibu tidak boleh lebih muda dari 15 tahun, ayah tidak boleh terlalu tua).  
+- Jika pengguna memilih “tidak punya saudara”, otomatis sembunyikan input jumlah saudara.

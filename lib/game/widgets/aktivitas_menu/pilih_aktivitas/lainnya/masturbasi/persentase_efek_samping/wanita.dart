@@ -10,11 +10,19 @@ class PersentaseEfekSampingWanita {
     if (r == 'biasa' || r.isEmpty) {
       return 12; // Solo Masturbation
     } else if (r == 'ayah' || r == 'ayah kandung' || r == 'ayah tiri') {
-      return 28; // Bersama Ayah
+      return 38; // Bersama Ayah (+10% dari 28)
+    } else if (r == 'kakek') {
+      return 28; // Bersama Kakek (+10% dari 18 baseline)
     } else if (r == 'ibu' || r == 'ibu kandung' || r == 'ibu tiri') {
       return 20; // Bersama Ibu
+    } else if (r.contains('paman')) {
+      return 28; // Bersama Paman (+10% dari 18 baseline)
     } else if (r.contains('kakak') || r.contains('adik') || r.contains('saudara')) {
-      return 22; // Bersama Keluarga Lain
+      // Jika itu saudara laki-laki
+      if (r.contains('laki')) {
+        return 32; // Bersama Saudara Laki-laki (+10% dari 22)
+      }
+      return 22; // Bersama Saudara Perempuan / lainnya
     } else {
       return 18; // Bersama Orang selain keluarga (Pacar, Teman, dll)
     }
