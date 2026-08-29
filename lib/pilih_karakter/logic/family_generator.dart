@@ -6,6 +6,124 @@ import 'package:bitlife/avatar/skin_color_inheritance.dart';
 class FamilyGenerator {
   static final Random _random = Random();
 
+  /// Menghasilkan data keluarga yang dikustomisasi secara spesifik.
+  static void generateCustomFamily({
+    required Character character,
+    required List<String> maleFirstNames,
+    required List<String> femaleFirstNames,
+    required List<String> lastNames,
+    required int fatherMinAge,
+    required int fatherMaxAge,
+    required int motherMinAge,
+    required int motherMaxAge,
+    required int birthOrder,
+    required int kakakLakiCount,
+    required int kakakPerempuanCount,
+    required int adikLakiCount,
+    required int adikPerempuanCount,
+  }) {
+    // 1. Urutan Kelahiran
+    character.birthOrder = birthOrder;
+
+    // 2. Generate Orang Tua dengan rentang khusus
+    character.fatherName = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+    character.motherName = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+    
+    character.motherAge = motherMinAge + _random.nextInt(max(1, motherMaxAge - motherMinAge + 1));
+    character.fatherAge = fatherMinAge + _random.nextInt(max(1, fatherMaxAge - fatherMinAge + 1));
+    
+    character.fatherSkinColor = SkinColorInheritance.randomSkin();
+    character.motherSkinColor = SkinColorInheritance.randomSkin();
+    if (character.avatarSkinColor == null || character.avatarSkinColor!.isEmpty) {
+      character.avatarSkinColor = SkinColorInheritance.blendChildSkin(
+        character.fatherSkinColor,
+        character.motherSkinColor,
+      );
+    } else {
+      character.fatherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: 1);
+      character.motherSkinColor = SkinColorInheritance.parentSkinFromChild(character.avatarSkinColor, shift: -1);
+    }
+
+    // 3. Generate Saudara sesuai jumlah yang dikustomisasi
+    List<Map<String, String>> siblingsList = [];
+
+    // Kakak Laki-laki
+    for (int i = 0; i < kakakLakiCount; i++) {
+      String name = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+      int age = 1 + _random.nextInt(4) + i * 2;
+      siblingsList.add({
+        'id': 'sib_${_random.nextInt(1000000)}',
+        'name': name,
+        'gender': 'Laki-laki',
+        'relation': 'Kakak Laki-laki',
+        'relationship': (50 + _random.nextInt(31)).toString(),
+        'age': '$age',
+        'isDeceased': 'false',
+        'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
+      });
+    }
+
+    // Kakak Perempuan
+    for (int i = 0; i < kakakPerempuanCount; i++) {
+      String name = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+      int age = 1 + _random.nextInt(4) + (kakakLakiCount + i) * 2;
+      siblingsList.add({
+        'id': 'sib_${_random.nextInt(1000000)}',
+        'name': name,
+        'gender': 'Perempuan',
+        'relation': 'Kakak Perempuan',
+        'relationship': (50 + _random.nextInt(31)).toString(),
+        'age': '$age',
+        'isDeceased': 'false',
+        'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
+      });
+    }
+
+    // Adik Laki-laki (usia negatif)
+    for (int i = 0; i < adikLakiCount; i++) {
+      String name = _generateRandomName('male', maleFirstNames, femaleFirstNames, lastNames);
+      int age = -(1 + _random.nextInt(4) + i * 2);
+      siblingsList.add({
+        'id': 'sib_${_random.nextInt(1000000)}',
+        'name': name,
+        'gender': 'Laki-laki',
+        'relation': 'Adik Laki-laki',
+        'relationship': (50 + _random.nextInt(31)).toString(),
+        'age': '$age',
+        'isDeceased': 'false',
+        'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
+      });
+    }
+
+    // Adik Perempuan (usia negatif)
+    for (int i = 0; i < adikPerempuanCount; i++) {
+      String name = _generateRandomName('female', maleFirstNames, femaleFirstNames, lastNames);
+      int age = -(1 + _random.nextInt(4) + (adikLakiCount + i) * 2);
+      siblingsList.add({
+        'id': 'sib_${_random.nextInt(1000000)}',
+        'name': name,
+        'gender': 'Perempuan',
+        'relation': 'Adik Perempuan',
+        'relationship': (50 + _random.nextInt(31)).toString(),
+        'age': '$age',
+        'isDeceased': 'false',
+        'skinColor': SkinColorInheritance.blendChildSkin(character.fatherSkinColor, character.motherSkinColor),
+      });
+    }
+
+    character.siblings = siblingsList;
+
+    // 4. Generate Extended Family (Kakek-Nenek dari Ayah/Ibu, Paman/Bibi, Sepupu)
+    _generateExtendedFamily(character, maleFirstNames, femaleFirstNames, lastNames);
+
+    // 5. Tambahkan log kelahiran ke inbox karakter
+    final birthLabel = character.birthOrderLabel;
+    String orderSuffix = character.birthOrder == 1 ? 'pertama' : 'ke-${character.birthOrder}';
+    character.inbox.add(
+      '👶 Kelahiran: Kamu lahir di ${character.location} sebagai anak $orderSuffix ($birthLabel).'
+    );
+  }
+
   /// Menghasilkan data keluarga untuk karakter baru menggunakan dataset nama asli dari negara terpilih.
   static void generateFamily({
     required Character character,

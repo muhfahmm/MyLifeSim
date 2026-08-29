@@ -265,23 +265,30 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   Widget build(BuildContext context) {
     final options = MasturbasiHelper._buildOptions(widget.character);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Pilih Fantasi Masturbasi'),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () => Navigator.pop(context),
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        widget.onComplete();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: const Text('Pilih Fantasi Masturbasi'),
+          leading: IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () {
+              widget.onComplete();
+              Navigator.pop(context);
+            },
+          ),
         ),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ---- Bar Kecanduan ----
-            _buildAddictionBar(),
-            const SizedBox(height: 16),
-            // ---- Daftar Fantasi ----
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildAddictionBar(),
+              const SizedBox(height: 16),
+              // ---- Daftar Fantasi ----
             Expanded(
               child: ListView.builder(
                 itemCount: options.length,
@@ -311,8 +318,9 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   // Widget Bar Kecanduan
   Widget _buildAddictionBar() {

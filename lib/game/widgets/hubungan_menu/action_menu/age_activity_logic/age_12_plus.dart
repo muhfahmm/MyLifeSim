@@ -10,6 +10,8 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/inter
 import 'age_base.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 
 /// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {
@@ -23,6 +25,58 @@ String _getPartnerGender(String targetName) {
     if (relationText.contains('laki-laki')) return 'Laki-laki';
   }
   return 'Laki-laki';
+}
+
+String _getNPCGender(Character character, String name, String role) {
+  final String nameLower = name.toLowerCase().trim();
+  final String roleLower = role.toLowerCase().trim();
+
+  if (character.partner != null && character.partner!['name']?.toLowerCase().trim() == nameLower) {
+    return character.partner!['gender'] ?? 'Laki-laki';
+  }
+  if (character.secondPartner != null && character.secondPartner!['name']?.toLowerCase().trim() == nameLower) {
+    return character.secondPartner!['gender'] ?? 'Laki-laki';
+  }
+
+  if (character.fatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
+  if (character.stepFatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
+  if (character.motherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
+  if (character.stepMotherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
+
+  if (roleLower.contains('ayah') || roleLower.contains('paman') || roleLower.contains('kakek') || roleLower.contains('suami')) {
+    return 'Laki-laki';
+  }
+  if (roleLower.contains('ibu') || roleLower.contains('bibi') || roleLower.contains('nenek') || roleLower.contains('istri')) {
+    return 'Perempuan';
+  }
+
+  for (var list in [
+    character.siblings,
+    character.extendedFamily,
+    character.classmates,
+    character.univClassmates,
+    character.coworkers,
+    character.sdTeachers,
+    character.smpTeachers,
+    character.smaTeachers,
+    character.univLecturers,
+    character.children,
+  ]) {
+    for (var npc in list) {
+      if (npc['name']?.toLowerCase().trim() == nameLower) {
+        return npc['gender'] ?? 'Laki-laki';
+      }
+    }
+  }
+
+  if (roleLower.contains('perempuan') || roleLower.contains('binti') || roleLower.contains('bibi') || roleLower.contains('nenek')) {
+    return 'Perempuan';
+  }
+  if (roleLower.contains('laki') || roleLower.contains('bin') || roleLower.contains('paman') || roleLower.contains('kakek')) {
+    return 'Laki-laki';
+  }
+
+  return _getPartnerGender(name);
 }
 
 /// Menghasilkan daftar ActionItem untuk karakter berusia 12 tahun ke atas.
@@ -1024,6 +1078,131 @@ List<ActionItem> getAge12PlusActions(
       );
     },
   ));
+
+  if (!isChild) {
+    final ActionItem ajakMasturbasiAction = ActionItem(
+      label: 'Ajak Masturbasi Bersama',
+      icon: Icons.flash_on,
+      color: Colors.purple,
+      onTap: () {
+        if (character.age < 12) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Terlalu Muda 👶'),
+              content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        final String myGender = character.gender.trim().toLowerCase();
+        final String targetGender = _getNPCGender(character, targetName, targetRole).trim().toLowerCase();
+        
+        final bool isGay = (myGender == 'laki-laki' && targetGender == 'laki-laki');
+        final bool isLesbian = (myGender == 'perempuan' && targetGender == 'perempuan');
+
+        if (character.disableSameSexProposals && (isGay || isLesbian)) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Aksi Diblokir 🚫'),
+              content: Text(isGay 
+                ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
+                : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        int successChance = PersentaseAjakan.getSuccessChance(
+          character: character,
+          relationType: targetRole,
+          viewerName: targetName,
+        );
+
+        final bool success = random.nextInt(100) < successChance;
+        final String relLower = targetRole.toLowerCase();
+        final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
+
+        if (success) {
+          AjakanMasturbasiDialog.show(
+            context: context,
+            character: character,
+            relationType: targetRole,
+            viewerName: targetName,
+            targetGender: _getNPCGender(character, targetName, targetRole),
+            isUserInitiated: true,
+            onComplete: () {
+              updateState();
+            },
+          );
+        } else {
+          if (isParent) {
+            character.happiness = (character.happiness - 50).clamp(0, 100);
+            character.money = (character.money * 0.5).round();
+            updateRelationship(-100);
+            character.inbox.add('🚨 DIUSIR & DIPENJARA: Kamu diusir dari rumah dan polisi memenjarakanmu selama 3 tahun atas tindakan asusila!');
+            
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
+                content: Text('$targetRole marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      updateState();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            updateRelationship(-20);
+            character.happiness = (character.happiness - 15).clamp(0, 100);
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Ajakan Ditolak ❌'),
+                content: Text('$targetName menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-20% Hubungan, -15% Kebahagiaan).'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      updateState();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      },
+    );
+
+    final int bercintaIndex = actions.indexWhere((act) => act.label == 'Bercinta / Make Love');
+    if (bercintaIndex != -1) {
+      actions.insert(bercintaIndex + 1, ajakMasturbasiAction);
+    } else {
+      actions.add(ajakMasturbasiAction);
+    }
+  }
 
   return actions;
 }

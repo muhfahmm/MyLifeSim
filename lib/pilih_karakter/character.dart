@@ -69,6 +69,7 @@ class Character {
   int eyeTestsCountOld = 0;
   int idolStaffDatingFailures = 0;
   int idolSalaryRaiseCount = 0;
+  bool disableSameSexProposals = false;
 
   // --- WARNA KULIT ORANG TUA (untuk warisan) ---
   String? fatherSkinColor;  // hex warna kulit ayah
@@ -196,6 +197,7 @@ class Character {
 
   // --- KEJADIAN AJAKAN (PROPOSAL) ---
   Map<String, dynamic>? activeProposal; // {'name': '...', 'relation': '...', 'type': 'Pacaran' / 'Bercinta', 'gender': '...', 'age': '...'}
+  List<Map<String, dynamic>> activeTabooSecrets = [];
 
   // --- DATA PACAR / PASANGAN ---
   Map<String, String>? _partner;
@@ -684,6 +686,7 @@ class Character {
     this.avatarClotheColor,
     this.avatarSkinColor,
     this.avatarFacialHairType,
+    this.disableSameSexProposals = false,
   }) : inbox = [] {
     birthCountry = location;
     if (partner != null) {
@@ -692,6 +695,23 @@ class Character {
     // Default game date to real life DateTime
     birthDate ??= DateTime.now();
     currentDate ??= birthDate;
+  }
+
+  /// Menambahkan rahasia/hubungan terlarang yang memicu konsekuensi psikologis dan sosial.
+  void addTabooSecret(String name, String relation, String type) {
+    final int index = activeTabooSecrets.indexWhere((sec) => sec['partnerName'] == name);
+    if (index != -1) {
+      activeTabooSecrets[index]['count'] = (activeTabooSecrets[index]['count'] ?? 1) + 1;
+      activeTabooSecrets[index]['turnsLeft'] = 3;
+    } else {
+      activeTabooSecrets.add({
+        'partnerName': name,
+        'relationType': relation,
+        'type': type,
+        'turnsLeft': 3,
+        'count': 1,
+      });
+    }
   }
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
@@ -728,6 +748,76 @@ class Character {
     updateIntelligenceDynamic();
     updateDisciplineDynamic();
     accumulateNPCsWealth();
+
+    // --- PROSES KONSEKUENSI RAHASIA / TABU ---
+    final List<Map<String, dynamic>> remainingSecrets = [];
+    for (var sec in activeTabooSecrets) {
+      final String partnerName = sec['partnerName'] ?? 'Seseorang';
+      final String relation = sec['relationType'] ?? 'Lainnya';
+      final String type = sec['type'] ?? 'Masturbasi';
+      int count = sec['count'] ?? 1;
+      int turnsLeft = sec['turnsLeft'] ?? 3;
+
+      // 1. Inbox: Rasa bersalah (Guilt Debuff) -> Kebahagiaan -5
+      happiness = (happiness - 5).clamp(0, 100);
+      
+      String relationLabel = relation.toLowerCase();
+      String category = 'Orang Terdekat';
+      if (relationLabel.contains('ayah') || relationLabel.contains('ibu') || relationLabel.contains('kakek') || relationLabel.contains('paman') || relationLabel.contains('kakak') || relationLabel.contains('adik') || relationLabel.contains('bibi')) {
+        category = 'Keluarga';
+      } else if (relationLabel.contains('teman') || relationLabel.contains('sekelas')) {
+        category = 'Teman Kelas';
+      } else if (relationLabel.contains('guru') || relationLabel.contains('dosen') || relationLabel.contains('rektor')) {
+        category = 'Guru';
+      } else if (relationLabel.contains('rekan') || relationLabel.contains('kerja') || relationLabel.contains('atasan') || relationLabel.contains('supervisor')) {
+        category = 'Rekan Kerja';
+      }
+
+      String guiltMsg = '';
+      if (category == 'Keluarga') {
+        guiltMsg = '😔 Rasa Bersalah: Kamu tidak bisa tidur nyenyak. Bayangan $relation-mu ($partnerName) terus menghantuimu akibat aktivitas terlarang kalian. Apakah ini awal dari kehancuran keluarga? (-5% Kebahagiaan)';
+      } else if (category == 'Teman Kelas') {
+        guiltMsg = '😔 Rasa Bersalah: Pikiranmu kacau di kelas. Kamu merasa bersalah dan canggung setiap kali berpapasan dengan teman kelasmu, $partnerName. (-5% Kebahagiaan)';
+      } else if (category == 'Guru') {
+        guiltMsg = '😔 Rasa Bersalah: Kamu merasa bersalah dan cemas memikirkan status hubungan terlarang kalian antara murid dan $relation-mu, $partnerName. (-5% Kebahagiaan)';
+      } else if (category == 'Rekan Kerja') {
+        guiltMsg = '😔 Rasa Bersalah: Kamu terus merasa tidak nyaman dan bersalah akibat hubungan tidak profesional kalian di tempat kerja dengan $relation-mu, $partnerName. (-5% Kebahagiaan)';
+      } else {
+        guiltMsg = '😔 Rasa Bersalah: Bayangan $partnerName terus menghantuimu. Kamu merasa bersalah atas hubungan rahasia kalian. (-5% Kebahagiaan)';
+      }
+      events.add(guiltMsg);
+      inbox.add(guiltMsg);
+
+      // 2. Inbox (Jika terjadi berulang kali - count >= 2): Kecurigaan / Gosip
+      if (count >= 2) {
+        String suspicionMsg = '';
+        if (category == 'Keluarga') {
+          suspicionMsg = '👪 Kecurigaan Keluarga: Hubungan gelapmu mulai dicurigai. Beberapa kali $relation-mu ($partnerName) terlihat terlalu akrab denganmu di depan umum. Anggota keluarga bertanya-tanya ada apa (Risiko skandal meningkat!).';
+        } else if (category == 'Teman Kelas') {
+          suspicionMsg = '🏫 Gosip Kelas: Teman-teman sekelas mulai curiga dan bergosip. Mereka sering melihatmu berduaan secara mencurigakan dengan $partnerName di toilet atau sudut sepi sekolah.';
+        } else if (category == 'Guru') {
+          suspicionMsg = '🎓 Rumor Sekolah: Murid-murid lain mulai mencium bau tidak sedap. Timbul desas-desus bahwa kamu mendapatkan perlakuan khusus atau memiliki hubungan gelap dengan $relation-mu, $partnerName.';
+        } else if (category == 'Rekan Kerja') {
+          suspicionMsg = '💼 Gosip Kantor: Rumor tak sedap menyebar di divisi kantor. Rekan-rekan kerja mencurigai hubungan terlalu dekat antara dirimu dan $relation-mu ($partnerName) di luar jam kerja.';
+        } else {
+          suspicionMsg = '📢 Desas-desus: Orang-orang di sekitarmu mulai memperhatikan kebersamaan kalian yang terlalu sering dan mencurigakan dengan $partnerName.';
+        }
+        events.add(suspicionMsg);
+        inbox.add(suspicionMsg);
+      }
+
+      turnsLeft--;
+      if (turnsLeft > 0) {
+        remainingSecrets.add({
+          'partnerName': partnerName,
+          'relationType': relation,
+          'type': type,
+          'turnsLeft': turnsLeft,
+          'count': count,
+        });
+      }
+    }
+    activeTabooSecrets = remainingSecrets;
 
     // Tambah tahun pada currentDate jika tidak null
     if (currentDate != null) {

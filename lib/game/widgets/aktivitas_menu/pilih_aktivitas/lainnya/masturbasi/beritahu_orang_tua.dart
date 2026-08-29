@@ -41,6 +41,7 @@ class BeriTahuOrangTua {
         {
           'text': 'Jujur menyebutkan nama pasangan',
           'action': () {
+            character.health = 100;
             character.karma = (character.karma + 20).clamp(0, 100);
             _modifyRelativeRelationship(character, relationType, partnerName, -30);
             _modifyParentRelationships(character, -10);
@@ -49,7 +50,7 @@ class BeriTahuOrangTua {
             _showOutcomeDialog(
               context, 
               'Berkata Jujur 🗣️', 
-              'Kamu jujur menyebutkan bahwa $relationType ($partnerName) adalah orang yang terlibat. Orang tuamu merasa sangat kecewa dan langsung menghubungi pihak keluarganya (+20% Karma, -30% Hubungan Pasangan, -10% Hubungan Orang Tua, Status: Stigma Keluarga).', 
+              'Kamu jujur menyebutkan bahwa $relationType ($partnerName) adalah orang yang terlibat. Orang tuamu membawamu ke dokter untuk diobati hingga sembuh total, namun merasa sangat kecewa dan langsung menghubungi pihak keluarganya (Kesehatan Sembuh Total, +20% Karma, -30% Hubungan Pasangan, -10% Hubungan Orang Tua, Status: Stigma Keluarga).', 
               onComplete
             );
           }
@@ -57,6 +58,7 @@ class BeriTahuOrangTua {
         {
           'text': 'Berbohong menyebut nama orang lain',
           'action': () {
+            character.health = 100;
             character.karma = (character.karma - 30).clamp(0, 100);
             _modifyParentRelationships(character, -50);
             _addLongTermDebuff(character, 'Stigma Keluarga');
@@ -65,7 +67,7 @@ class BeriTahuOrangTua {
             _showOutcomeDialog(
               context, 
               'Menuduh Orang Lain 🤥', 
-              'Kamu menuduh orang lain yang tidak bersalah untuk melindungi $relationType ($partnerName). Namun, orang tuamu mencium kebohongan tersebut! (-30% Karma, -50% Hubungan Orang Tua, Status: Stigma Keluarga & Pengawasan Ketat).', 
+              'Kamu menuduh orang lain yang tidak bersalah untuk melindungi $relationType ($partnerName). Orang tuamu tetap membawamu berobat hingga sembuh total, namun mencium kebohongan tersebut! (Kesehatan Sembuh Total, -30% Karma, -50% Hubungan Orang Tua, Status: Stigma Keluarga & Pengawasan Ketat).', 
               onComplete
             );
           }
@@ -73,6 +75,7 @@ class BeriTahuOrangTua {
         {
           'text': 'Menolak menyebutkan nama',
           'action': () {
+            character.health = 100;
             character.karma = (character.karma + 5).clamp(0, 100);
             _modifyParentRelationships(character, -15);
             _modifyRelativeRelationship(character, relationType, partnerName, 15);
@@ -80,7 +83,7 @@ class BeriTahuOrangTua {
             _showOutcomeDialog(
               context, 
               'Merahasiakan Nama 🤐', 
-              'Kamu bersikeras merahasiakan identitas $relationType ($partnerName). Orang tuamu kesal karena kamu menutup-nutupi hal ini, namun $relationType ($partnerName) sangat menghargaimu (+5% Karma, -15% Hubungan Orang Tua, +15% Hubungan Pasangan).', 
+              'Kamu bersikeras merahasiakan identitas $relationType ($partnerName). Orang tuamu membawamu berobat hingga sembuh total meskipun kesal karena kamu menutup-nutupi hal ini, dan $relationType ($partnerName) sangat menghargaimu (Kesehatan Sembuh Total, +5% Karma, -15% Hubungan Orang Tua, +15% Hubungan Pasangan).', 
               onComplete
             );
           }
@@ -194,13 +197,14 @@ class BeriTahuOrangTua {
           {
             'text': 'Menangis dan meminta maaf',
             'action': () {
+              character.health = 100;
               character.happiness = (character.happiness - 20).clamp(0, 100);
               _modifyParentRelationships(character, 5);
 
               _showOutcomeDialog(
                 context,
                 'Meminta Maaf 😭',
-                'Kamu menangis tersedu-sedu dan berjanji tidak akan mengulanginya. Orang tuamu luluh dan iba, lalu setuju mengantarmu ke dokter besok gratis (-20% Kebahagiaan, +5% Hubungan Orang Tua).',
+                'Kamu menangis tersedu-sedu dan berjanji tidak akan mengulanginya. Orang tuamu luluh dan iba, lalu setuju mengantarmu ke dokter hingga sembuh total secara gratis (Kesehatan Sembuh Total, -20% Kebahagiaan, +5% Hubungan Orang Tua).',
                 onComplete
               );
             }

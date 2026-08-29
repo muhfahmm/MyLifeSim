@@ -17,6 +17,8 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -660,75 +662,87 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   }
 
   String _getTargetGender() {
-    final String role = widget.targetRole;
     final String name = widget.targetName;
+    final String role = widget.targetRole;
+    final String nameLower = name.toLowerCase().trim();
+    final String roleLower = role.toLowerCase().trim();
 
-    if (role == 'Mantan Pacar') {
-      for (var ex in widget.character.exPartners) {
-        if (ex['name'] == name) {
-          return ex['gender'] ?? 'Perempuan';
+    // 1. Cek partner utama & selingkuhan
+    if (widget.character.partner != null &&
+        (widget.character.partner!['name']?.toLowerCase().trim() == nameLower ||
+         nameLower.contains(widget.character.partner!['name']?.toLowerCase().trim() ?? '___') ||
+         (widget.character.partner!['name']?.toLowerCase().trim() ?? '').contains(nameLower))) {
+      return widget.character.partner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.secondPartner != null &&
+        (widget.character.secondPartner!['name']?.toLowerCase().trim() == nameLower ||
+         nameLower.contains(widget.character.secondPartner!['name']?.toLowerCase().trim() ?? '___') ||
+         (widget.character.secondPartner!['name']?.toLowerCase().trim() ?? '').contains(nameLower))) {
+      return widget.character.secondPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.thirdPartner != null &&
+        (widget.character.thirdPartner!['name']?.toLowerCase().trim() == nameLower ||
+         nameLower.contains(widget.character.thirdPartner!['name']?.toLowerCase().trim() ?? '___') ||
+         (widget.character.thirdPartner!['name']?.toLowerCase().trim() ?? '').contains(nameLower))) {
+      return widget.character.thirdPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.fourthPartner != null &&
+        (widget.character.fourthPartner!['name']?.toLowerCase().trim() == nameLower ||
+         nameLower.contains(widget.character.fourthPartner!['name']?.toLowerCase().trim() ?? '___') ||
+         (widget.character.fourthPartner!['name']?.toLowerCase().trim() ?? '').contains(nameLower))) {
+      return widget.character.fourthPartner!['gender'] ?? 'Perempuan';
+    }
+    if (widget.character.fifthPartner != null &&
+        (widget.character.fifthPartner!['name']?.toLowerCase().trim() == nameLower ||
+         nameLower.contains(widget.character.fifthPartner!['name']?.toLowerCase().trim() ?? '___') ||
+         (widget.character.fifthPartner!['name']?.toLowerCase().trim() ?? '').contains(nameLower))) {
+      return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
+    }
+
+    // 2. Cek Ayah/Ibu kandung & tiri
+    if (widget.character.fatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
+    if (widget.character.stepFatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
+    if (widget.character.motherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
+    if (widget.character.stepMotherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
+
+    // 3. Cek peran-peran spesifik keluarga
+    if (roleLower.contains('ayah') || roleLower.contains('paman') || roleLower.contains('kakek') || roleLower.contains('suami')) {
+      return 'Laki-laki';
+    }
+    if (roleLower.contains('ibu') || roleLower.contains('bibi') || roleLower.contains('nenek') || roleLower.contains('istri')) {
+      return 'Perempuan';
+    }
+
+    // 4. Cari di semua list NPC
+    for (var list in [
+      widget.character.siblings,
+      widget.character.extendedFamily,
+      widget.character.classmates,
+      widget.character.univClassmates,
+      widget.character.coworkers,
+      widget.character.sdTeachers,
+      widget.character.smpTeachers,
+      widget.character.smaTeachers,
+      widget.character.univLecturers,
+      widget.character.children,
+    ]) {
+      for (var npc in list) {
+        final String? npcName = npc['name']?.toLowerCase().trim();
+        if (npcName == nameLower || nameLower.contains(npcName ?? '___') || (npcName ?? '').contains(nameLower)) {
+          return npc['gender'] ?? 'Laki-laki';
         }
       }
     }
 
-    if (role == 'Pacar' ||
-        role == 'Tunangan' ||
-        role == 'Suami' ||
-        role == 'Istri' ||
-        role.startsWith('Pacar')) {
-      if (widget.character.partner != null &&
-          name.contains(widget.character.partner!['name'] ?? '')) {
-        return widget.character.partner!['gender'] ?? 'Perempuan';
-      }
-      if (widget.character.secondPartner != null &&
-          name.contains(widget.character.secondPartner!['name'] ?? '')) {
-        return widget.character.secondPartner!['gender'] ?? 'Perempuan';
-      }
-      if (widget.character.thirdPartner != null &&
-          name.contains(widget.character.thirdPartner!['name'] ?? '')) {
-        return widget.character.thirdPartner!['gender'] ?? 'Perempuan';
-      }
-      if (widget.character.fourthPartner != null &&
-          name.contains(widget.character.fourthPartner!['name'] ?? '')) {
-        return widget.character.fourthPartner!['gender'] ?? 'Perempuan';
-      }
-      if (widget.character.fifthPartner != null &&
-          name.contains(widget.character.fifthPartner!['name'] ?? '')) {
-        return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
-      }
-      return widget.character.partner != null
-          ? widget.character.partner!['gender'] ?? 'Perempuan'
-          : 'Perempuan';
-    }
-
-    if (role == 'Mertua') {
-      if (name.startsWith('Ayah Mertua')) return 'Laki-laki';
+    // 5. Fallback ke role gender jika ada
+    if (roleLower.contains('perempuan') || roleLower.contains('binti') || roleLower.contains('bibi') || roleLower.contains('nenek')) {
       return 'Perempuan';
     }
-
-    if (name.startsWith('Ayah')) return 'Laki-laki';
-    if (name.startsWith('Ibu')) return 'Perempuan';
-
-    if (role == 'Laki-laki' || role == 'Perempuan') {
-      return role;
+    if (roleLower.contains('laki') || roleLower.contains('bin') || roleLower.contains('paman') || roleLower.contains('kakek')) {
+      return 'Laki-laki';
     }
 
-    // Cek di siblings
-    for (var sib in widget.character.siblings) {
-      final String expectedLabel = '${sib['name']} (${sib['relation']})';
-      if (expectedLabel == name) {
-        return sib['gender'] ?? 'Laki-laki';
-      }
-    }
-
-    // Cek di extended family
-    for (var ext in widget.character.extendedFamily) {
-      if (ext['name'] == name) {
-        return ext['gender'] ?? 'Laki-laki';
-      }
-    }
-
-    return 'Laki-laki'; // fallback
+    return 'Laki-laki'; // Fallback terakhir
   }
 
   int _getFertilityRate(int age, String gender) {
@@ -863,6 +877,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
+
+      actions.add(_buildAjakMasturbasiAction());
     }
 
     // Define partner-specific actions
@@ -1669,6 +1685,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 );
               },
             ));
+            actions.add(_buildAjakMasturbasiAction());
           }
 
           bool isAlreadyPartner = widget.character.partner != null &&
@@ -2029,6 +2046,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         },
       ));
 
+      topActions.add(_buildAjakMasturbasiAction());
+
       // Putuskan Pacar
       topActions.add(putuskanPacarAction);
 
@@ -2215,6 +2234,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         },
       ));
 
+      topActions.add(_buildAjakMasturbasiAction());
+
       // Putuskan Pacar
       topActions.add(putuskanPacarAction);
 
@@ -2299,6 +2320,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           );
         },
       ));
+
+      topActions.add(_buildAjakMasturbasiAction());
 
       // 2. Putuskan Pacar
       topActions.add(putuskanPacarAction);
@@ -3137,6 +3160,124 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           ],
         ),
       ),
+    );
+  }
+
+  ActionItem _buildAjakMasturbasiAction() {
+    return ActionItem(
+      label: 'Ajak Masturbasi Bersama',
+      icon: Icons.flash_on,
+      color: Colors.purple,
+      onTap: () {
+        if (widget.character.age < 12) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Terlalu Muda 👶'),
+              content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        final String myGender = widget.character.gender.trim().toLowerCase();
+        final String targetGender = _getTargetGender().trim().toLowerCase();
+        
+        final bool isGay = (myGender == 'laki-laki' && targetGender == 'laki-laki');
+        final bool isLesbian = (myGender == 'perempuan' && targetGender == 'perempuan');
+
+        if (widget.character.disableSameSexProposals && (isGay || isLesbian)) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Aksi Diblokir 🚫'),
+              content: Text(isGay 
+                ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
+                : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+
+        int successChance = PersentaseAjakan.getSuccessChance(
+          character: widget.character,
+          relationType: widget.targetRole,
+          viewerName: widget.targetName,
+        );
+
+        final bool success = _random.nextInt(100) < successChance;
+        final String relLower = widget.targetRole.toLowerCase();
+        final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
+
+        if (success) {
+          AjakanMasturbasiDialog.show(
+            context: context,
+            character: widget.character,
+            relationType: widget.targetRole,
+            viewerName: widget.targetName,
+            targetGender: _getTargetGender(),
+            isUserInitiated: true,
+            onComplete: () {
+              _updateState();
+            },
+          );
+        } else {
+          if (isParent) {
+            widget.character.happiness = (widget.character.happiness - 50).clamp(0, 100);
+            widget.character.money = (widget.character.money * 0.5).round();
+            _updateRelationship(-100);
+            widget.character.inbox.add('🚨 DIUSIR & DIPENJARA: Kamu diusir dari rumah dan polisi memenjarakanmu selama 3 tahun atas tindakan asusila!');
+            
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
+                content: Text('${widget.targetRole} marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _updateState();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          } else {
+            _updateRelationship(-20);
+            widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+            showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('Ajakan Ditolak ❌'),
+                content: Text('${widget.targetName} menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-20% Hubungan, -15% Kebahagiaan).'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _updateState();
+                    },
+                    child: const Text('OK'),
+                  ),
+                ],
+              ),
+            );
+          }
+        }
+      },
     );
   }
 }

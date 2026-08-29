@@ -271,7 +271,7 @@ class EfekSampingMasturbasi {
           ],
         ),
         actions: [
-          if (partnerName != null && partnerName.trim().isNotEmpty)
+          if (partnerName.trim().isNotEmpty)
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);

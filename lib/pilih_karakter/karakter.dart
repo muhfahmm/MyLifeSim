@@ -11,6 +11,7 @@ import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/pilih_karakter/customization/appearance_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
+import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
 
 class KarakterScreen extends StatefulWidget {
   final String gender;
@@ -54,6 +55,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
   int _smarts = 50;
   int _willpower = 50;
   String _specialTalent = 'Tidak Ada';
+  bool _disableSameSexProposals = false;
 
   String _countryCodeToEmoji(String countryCode) {
     if (countryCode.length != 2) return '🌍';
@@ -272,6 +274,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
     });
   }
 
+  Map<String, dynamic>? _customFamilyData;
+
   void _createCharacterAndStartGame() {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
@@ -306,18 +310,42 @@ class _KarakterScreenState extends State<KarakterScreen> {
       avatarClotheColor: _selectedClotheColor,
       avatarSkinColor: _selectedSkinColor,
       avatarFacialHairType: 'blank',
+      disableSameSexProposals: _disableSameSexProposals,
     );
 
-    // --- 2. GENERATE KELUARGA (PENTING!) ---
-    FamilyGenerator.generateFamily(
-      character: newCharacter,
-      maleFirstNames: _maleFirstNames,
-      femaleFirstNames: _femaleFirstNames,
-      lastNames: _allLastNames,
-    );
+    if (_customFamilyData != null) {
+      // Generate silsilah keluarga menggunakan input kustomisasi
+      FamilyGenerator.generateCustomFamily(
+        character: newCharacter,
+        maleFirstNames: _maleFirstNames,
+        femaleFirstNames: _femaleFirstNames,
+        lastNames: _allLastNames,
+        fatherMinAge: _customFamilyData!['fatherMinAge'],
+        fatherMaxAge: _customFamilyData!['fatherMaxAge'],
+        motherMinAge: _customFamilyData!['motherMinAge'],
+        motherMaxAge: _customFamilyData!['motherMaxAge'],
+        birthOrder: _customFamilyData!['birthOrder'],
+        kakakLakiCount: _customFamilyData!['kakakLakiCount'],
+        kakakPerempuanCount: _customFamilyData!['kakakPerempuanCount'],
+        adikLakiCount: _customFamilyData!['adikLakiCount'],
+        adikPerempuanCount: _customFamilyData!['adikPerempuanCount'],
+      );
+    } else {
+      // Generate silsilah keluarga default (acak)
+      FamilyGenerator.generateFamily(
+        character: newCharacter,
+        maleFirstNames: _maleFirstNames,
+        femaleFirstNames: _femaleFirstNames,
+        lastNames: _allLastNames,
+      );
+    }
 
-    // --- 3. MASUK KE GAME ---
-    Navigator.push(context, MaterialPageRoute(builder: (context) => GameScreen(character: newCharacter)));
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => GameScreen(character: newCharacter),
+      ),
+    );
   }
 
 
@@ -735,6 +763,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
                             _sexuality = res['sexuality'] as String;
                             _smarts = res['smarts'] as int;
                             _willpower = res['willpower'] as int;
+                            if (_sexuality != 'Heteroseksual') {
+                              _disableSameSexProposals = false;
+                            }
                           });
                         }
                       },
@@ -772,6 +803,86 @@ class _KarakterScreenState extends State<KarakterScreen> {
                           });
                         }
                       },
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.family_restroom, color: Colors.blue),
+                      title: const Text('👨‍👩‍👧‍👦 Latar Belakang Keluarga', style: TextStyle(fontWeight: FontWeight.bold)),
+                      subtitle: Text(
+                        _customFamilyData == null 
+                            ? 'Latar Belakang: Acak/Default'
+                            : 'Anak ke-${_customFamilyData!['birthOrder']} (Kustom)',
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => FamilyCustomizationScreen(
+                              maleFirstNames: _maleFirstNames,
+                              femaleFirstNames: _femaleFirstNames,
+                              lastNames: _allLastNames,
+                              gender: widget.gender,
+                              onConfirm: (data) {
+                                setState(() {
+                                  _customFamilyData = data;
+                                });
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: Colors.grey.shade300),
+                    ),
+                    child: SwitchListTile(
+                      activeThumbColor: Colors.redAccent,
+                      secondary: const Icon(
+                        Icons.no_accounts,
+                        color: Colors.purple,
+                      ),
+                      title: Text(
+                        (widget.gender.toLowerCase() == 'male' || widget.gender.toLowerCase() == 'laki-laki')
+                            ? '🚫 Nonaktifkan Ajakan Gay'
+                            : '🚫 Nonaktifkan Ajakan Lesbian',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _sexuality == 'Heteroseksual' ? Colors.black87 : Colors.grey,
+                        ),
+                      ),
+                      subtitle: Text(
+                        _sexuality == 'Heteroseksual'
+                            ? (_disableSameSexProposals ? 'Ajakan Dinonaktifkan' : 'Ajakan Aktif')
+                            : 'Terkunci (Hanya untuk Seksualitas Heteroseksual)',
+                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                      ),
+                      value: _disableSameSexProposals,
+                      onChanged: _sexuality == 'Heteroseksual'
+                          ? (bool value) {
+                              setState(() {
+                                _disableSameSexProposals = value;
+                              });
+                            }
+                          : null,
                     ),
                   ),
 

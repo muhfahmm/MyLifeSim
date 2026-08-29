@@ -4,6 +4,38 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'efek_samping.dart';
 
+// ============================================================
+// MODEL DATA LOKASI & WAKTU
+// ============================================================
+class _LokasiOption {
+  final String name;
+  final String description;
+  final IconData icon;
+  const _LokasiOption({required this.name, required this.description, required this.icon});
+}
+
+class _WaktuOption {
+  final String name;
+  final String description;
+  final IconData icon;
+  const _WaktuOption({required this.name, required this.description, required this.icon});
+}
+
+const List<_LokasiOption> _lokasiOptions = [
+  _LokasiOption(name: 'Di Kamar Tidur', description: 'Privat dan nyaman di atas kasur.', icon: Icons.bed),
+  _LokasiOption(name: 'Di Kamar Mandi', description: 'Sensasi segar di balik pintu terkunci.', icon: Icons.bathtub),
+  _LokasiOption(name: 'Di Ruang Tamu', description: 'Diam-diam saat suasana rumah sedang sepi.', icon: Icons.chair),
+  _LokasiOption(name: 'Di Mobil', description: 'Tersembunyi di dalam mobil yang terparkir.', icon: Icons.directions_car),
+  _LokasiOption(name: 'Di Hotel', description: 'Kamar hotel mewah tanpa gangguan.', icon: Icons.hotel),
+];
+
+const List<_WaktuOption> _waktuOptions = [
+  _WaktuOption(name: 'Pagi', description: 'Di pagi hari yang cerah dan segar.', icon: Icons.light_mode),
+  _WaktuOption(name: 'Siang', description: 'Mencuri waktu di siang hari yang terik.', icon: Icons.wb_sunny),
+  _WaktuOption(name: 'Sore', description: 'Suasana syahdu menjelang senja.', icon: Icons.wb_twilight),
+  _WaktuOption(name: 'Malam', description: 'Kegelapan malam menyimpan rahasia.', icon: Icons.nightlight_round),
+];
+
 class AjakanMasturbasiDialog {
   static void show({
     required BuildContext context,
@@ -11,56 +43,84 @@ class AjakanMasturbasiDialog {
     required String relationType,
     required String viewerName,
     required VoidCallback? onComplete,
+    String? targetGender,
+    bool isUserInitiated = false,  // true = user mengajak, false = partner mengajak
   }) {
     final String myGender = character.gender.trim().toLowerCase();
     final String relLower = relationType.toLowerCase();
+    final String viewerLower = viewerName.toLowerCase();
     
-    // Tentukan gender target berdasarkan tipe relasi
-    String targetGender = 'Perempuan';
-    if (relLower.contains('ayah') || relLower.contains('paman') || relLower.contains('kakek') || (relLower.contains('saudara') && relLower.contains('laki')) || (relLower.contains('adik') && relLower.contains('laki')) || (relLower.contains('kakak') && relLower.contains('laki'))) {
-      targetGender = 'Laki-laki';
+    // Tentukan gender target: prioritaskan parameter dari pemanggil
+    String resolvedTargetGender = targetGender ?? 'Perempuan';
+    if (targetGender == null) {
+      if (viewerLower.startsWith('ayah') || viewerLower.startsWith('paman') || viewerLower.startsWith('kakek') || viewerLower.startsWith('kakak laki') || viewerLower.startsWith('adik laki')) {
+        resolvedTargetGender = 'Laki-laki';
+      } else if (viewerLower.startsWith('ibu') || viewerLower.startsWith('bibi') || viewerLower.startsWith('nenek') || viewerLower.startsWith('kakak per') || viewerLower.startsWith('adik per')) {
+        resolvedTargetGender = 'Perempuan';
+      } else if (relLower.contains('ayah') || relLower.contains('paman') || relLower.contains('kakek') || (relLower.contains('saudara') && relLower.contains('laki')) || (relLower.contains('adik') && relLower.contains('laki')) || (relLower.contains('kakak') && relLower.contains('laki')) || relLower.contains('suami')) {
+        resolvedTargetGender = 'Laki-laki';
+      } else if (relLower.contains('ibu') || relLower.contains('bibi') || relLower.contains('nenek') || relLower.contains('istri') || (relLower.contains('kakak') && relLower.contains('per')) || (relLower.contains('adik') && relLower.contains('per'))) {
+        resolvedTargetGender = 'Perempuan';
+      }
     }
 
-    final bool isGay = (myGender == 'laki-laki' && targetGender == 'Laki-laki');
-    final bool isLesbian = (myGender == 'perempuan' && targetGender == 'Perempuan');
+    final bool isGay = (myGender == 'laki-laki' && resolvedTargetGender.toLowerCase() == 'laki-laki');
+    final bool isLesbian = (myGender == 'perempuan' && resolvedTargetGender.toLowerCase() == 'perempuan');
 
-    // Parse relation details
+    // Parse relasi
     final parsed = _parseRelation(relationType);
     final String relationWithMu = _getRelationWithMu(parsed['main']!);
     final String partnerDesc = parsed['detail']!.isNotEmpty
         ? '$relationWithMu (${parsed['detail']}), $viewerName'
         : '$relationWithMu, $viewerName';
+    // Nama pendek tanpa 'mu' untuk framing user-initiated
+    final String partnerDescPlain = parsed['detail']!.isNotEmpty
+        ? '${parsed['main']} (${parsed['detail']}), $viewerName'
+        : '$viewerName';
 
-    String dialogTitle = 'Ajakan Masturbasi Bersama!';
-    String dialogBody = '';
-
-    if (isGay) {
-      dialogTitle = 'Ajakan Gay (Masturbasi Bersama)!';
-      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
-    } else if (isLesbian) {
-      dialogTitle = 'Ajakan Lesbian (Masturbasi Bersama)!';
-      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan masturbasi tersebut?';
+    String dialogTitle;
+    String dialogBody;
+    if (isUserInitiated) {
+      // USER yang mengajak
+      if (isGay) {
+        dialogTitle = 'Ajak Masturbasi Bersama (Gay)?';
+        dialogBody = 'Kamu ingin mengajak $partnerDescPlain untuk melakukan masturbasi bersama sesama jenis (Gay) secara rahasia. Apakah kamu yakin ingin melanjutkan?';
+      } else if (isLesbian) {
+        dialogTitle = 'Ajak Masturbasi Bersama (Lesbian)?';
+        dialogBody = 'Kamu ingin mengajak $partnerDescPlain untuk melakukan masturbasi bersama sesama jenis (Lesbian) secara rahasia. Apakah kamu yakin ingin melanjutkan?';
+      } else {
+        dialogTitle = 'Ajak Masturbasi Bersama?';
+        dialogBody = 'Kamu ingin mengajak $partnerDescPlain untuk melakukan masturbasi bersama secara rahasia. Apakah kamu yakin ingin melanjutkan?';
+      }
     } else {
-      dialogTitle = 'Ajakan Masturbasi Bersama!';
-      dialogBody = '$partnerDesc secara terang-terangan mengajakmu untuk melakukan masturbasi bersama secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
+      // PARTNER yang mengajak
+      if (isGay) {
+        dialogTitle = 'Ajakan Gay (Masturbasi Bersama)!';
+        dialogBody = '$partnerDesc secara terang-terangan mengajakmu melakukan masturbasi bersama sesama jenis (Gay) secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
+      } else if (isLesbian) {
+        dialogTitle = 'Ajakan Lesbian (Masturbasi Bersama)!';
+        dialogBody = '$partnerDesc secara terang-terangan mengajakmu melakukan masturbasi bersama sesama jenis (Lesbian) secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
+      } else {
+        dialogTitle = 'Ajakan Masturbasi Bersama!';
+        dialogBody = '$partnerDesc secara terang-terangan mengajakmu melakukan masturbasi bersama secara rahasia. Apakah kamu mau menerima ajakan tersebut?';
+      }
     }
 
-    // Tentukan apakah bisa melapor ke orang tua lain
-    bool showReportToMother = (relLower == 'ayah' || relLower == 'ayah tiri') &&
+    // Opsi lapor hanya muncul ketika PARTNER yang mengajak (incoming)
+    final bool showReportToMother = !isUserInitiated && (relLower == 'ayah' || relLower == 'ayah tiri') &&
         (character.motherName != null && !character.isMotherDeceased);
-    bool showReportToFather = (relLower == 'ibu' || relLower == 'ibu tiri') &&
+    final bool showReportToFather = !isUserInitiated && (relLower == 'ibu' || relLower == 'ibu tiri') &&
         (character.fatherName != null && !character.isFatherDeceased);
-    bool showReportToParents = !showReportToMother && !showReportToFather && 
+    final bool showReportToParents = !isUserInitiated && !showReportToMother && !showReportToFather &&
         (relLower.contains('kakak') || relLower.contains('adik') || relLower.contains('saudara'));
 
+    // ======================== MODAL 1: KONFIRMASI AJAKAN ========================
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           backgroundColor: const Color(0xFFEEF2F5),
           title: Row(
             children: [
@@ -72,86 +132,61 @@ class AjakanMasturbasiDialog {
               Expanded(
                 child: Text(
                   dialogTitle,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: Colors.black87,
-                  ),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
                 ),
               ),
             ],
           ),
-          content: Text(
-            dialogBody,
-            style: const TextStyle(fontSize: 14, color: Colors.black87),
-          ),
+          content: Text(dialogBody, style: const TextStyle(fontSize: 14, color: Colors.black87)),
           actionsAlignment: MainAxisAlignment.end,
           actions: [
-            // Opsi Lapor 1
             if (showReportToMother)
               TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _executeReport(context, character, relationType, viewerName, 'Ibu', onComplete);
                 },
-                child: const Text(
-                  'Laporkan ke Ibu',
-                  style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Laporkan ke Ibu', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
-            // Opsi Lapor 2
             if (showReportToFather)
               TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _executeReport(context, character, relationType, viewerName, 'Ayah', onComplete);
                 },
-                child: const Text(
-                  'Laporkan ke Ayah',
-                  style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Laporkan ke Ayah', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
-            // Opsi Lapor 3 (Saudara)
             if (showReportToParents)
               TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _executeReportSibling(context, character, relationType, viewerName, onComplete);
                 },
-                child: const Text(
-                  'Laporkan ke Orang Tua',
-                  style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
-                ),
+                child: const Text('Laporkan ke Orang Tua', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
-            
-            // Tombol Terima (Styled with background pill/light green)
+            // Konfirmasi → lanjut ke Pilih Tempat
             Container(
-              decoration: BoxDecoration(
-                color: const Color(0xFFD4EDDA),
-                borderRadius: BorderRadius.circular(20),
-              ),
+              decoration: BoxDecoration(color: const Color(0xFFD4EDDA), borderRadius: BorderRadius.circular(20)),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
-                  _executeAccept(context, character, relationType, viewerName, onComplete);
+                  _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
                 },
-                child: const Text(
-                  'Terima ajakan masturbasi',
-                  style: TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold),
+                child: Text(
+                  isUserInitiated ? 'Lanjutkan ➜' : 'Terima ajakan masturbasi',
+                  style: const TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold),
                 ),
               ),
             ),
-
-            // Tombol Tolak
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
                 _executeReject(context, character, relationType, viewerName, onComplete);
               },
-              child: const Text(
-                'Tolak',
-                style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+              child: Text(
+                isUserInitiated ? 'Batal' : 'Tolak',
+                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -161,57 +196,230 @@ class AjakanMasturbasiDialog {
   }
 
   // ============================================================
-  // LOGIKA AKSI: TERIMA
+  // MODAL 2: PILIH TEMPAT
+  // ============================================================
+  static void _showPilihTempat(
+    BuildContext context,
+    Character character,
+    String relationType,
+    String viewerName,
+    String partnerDesc,
+    VoidCallback? onComplete,
+  ) {
+    showDialog<_LokasiOption>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.location_on, color: Colors.deepPurple),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Pilih Tempat Bersama $viewerName',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: _lokasiOptions.map((loc) {
+              return Card(
+                elevation: 0,
+                color: Colors.grey.shade50,
+                margin: const EdgeInsets.only(bottom: 8),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: Colors.grey.shade200),
+                ),
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundColor: Colors.purple.shade50,
+                    child: Icon(loc.icon, color: Colors.deepPurple),
+                  ),
+                  title: Text(loc.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  subtitle: Text(loc.description, style: const TextStyle(fontSize: 12)),
+                  onTap: () => Navigator.pop(ctx, loc),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, null),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    ).then((selectedLoc) {
+      if (selectedLoc == null) return;
+      _showPilihWaktu(context, character, relationType, viewerName, partnerDesc, selectedLoc.name, onComplete);
+    });
+  }
+
+  // ============================================================
+  // MODAL 3: PILIH WAKTU
+  // ============================================================
+  static void _showPilihWaktu(
+    BuildContext context,
+    Character character,
+    String relationType,
+    String viewerName,
+    String partnerDesc,
+    String lokasiTerpilih,
+    VoidCallback? onComplete,
+  ) {
+    showDialog<_WaktuOption>(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.access_time, color: Colors.indigo),
+            const SizedBox(width: 8),
+            const Expanded(
+              child: Text('Pilih Waktu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Lokasi terpilih: $lokasiTerpilih',
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+              ),
+              const SizedBox(height: 8),
+              ..._waktuOptions.map((time) {
+                return Card(
+                  elevation: 0,
+                  color: Colors.grey.shade50,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: Colors.grey.shade200),
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.indigo.shade50,
+                      child: Icon(time.icon, color: Colors.indigoAccent),
+                    ),
+                    title: Text(time.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    subtitle: Text(time.description, style: const TextStyle(fontSize: 12)),
+                    onTap: () => Navigator.pop(ctx, time),
+                  ),
+                );
+              }),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, null),
+            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    ).then((selectedTime) {
+      if (selectedTime == null) return;
+      _executeAccept(context, character, relationType, viewerName, partnerDesc, lokasiTerpilih, selectedTime.name, onComplete);
+    });
+  }
+
+  // ============================================================
+  // MODAL 4 (AKHIR): HASIL SETELAH TEMPAT & WAKTU DIPILIH
   // ============================================================
   static void _executeAccept(
     BuildContext context,
     Character character,
     String relationType,
     String viewerName,
+    String partnerDesc,
+    String lokasi,
+    String waktu,
     VoidCallback? onComplete,
   ) {
     final int healthLoss = 1 + Random().nextInt(10);
     character.karma = (character.karma - 50).clamp(0, 100);
     character.health = (character.health - healthLoss).clamp(0, 100);
+    character.happiness = (character.happiness + 15).clamp(0, 100);
     _modifyRelativeRelationship(character, relationType, viewerName, 20);
+    character.addTabooSecret(viewerName, relationType, 'Masturbasi');
 
-    String msg = '';
-    if (relationType.toLowerCase().contains('ayah')) {
-      character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ayah ($viewerName) setelah insiden tersebut.');
-      msg = 'Kamu menerima ajakan Ayahmu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
-    } else if (relationType.toLowerCase().contains('ibu')) {
-      character.inbox.add('🚨 Rahasia Gelap: Hubungan tabu yang aneh terjalin dengan Ibu ($viewerName) setelah insiden tersebut.');
-      msg = 'Kamu menerima ajakan Ibumu. Hubungan rahasia gelap yang tabu telah terjalin (-50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+    final String relLower = relationType.toLowerCase();
+    String inboxMsg;
+    String resultMsg;
+
+    if (relLower.contains('ayah')) {
+      inboxMsg = '🚨 Rahasia Gelap: Hubungan tabu terjalin dengan Ayah ($viewerName) — $waktu, $lokasi.';
+      resultMsg = 'Kamu dan Ayahmu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua (+15% Kebahagiaan, -50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+    } else if (relLower.contains('ibu')) {
+      inboxMsg = '🚨 Rahasia Gelap: Hubungan tabu terjalin dengan Ibu ($viewerName) — $waktu, $lokasi.';
+      resultMsg = 'Kamu dan Ibumu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua (+15% Kebahagiaan, -50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
     } else {
-      character.happiness = (character.happiness + 10).clamp(0, 100);
-      character.inbox.add('🚨 Hubungan Toxic: Hubungan terlarang dan toxic dimulai dengan saudaramu, $viewerName.');
-      msg = 'Kamu menerima ajakan saudaramu. Hubungan yang toxic dan terlarang telah terjalin (+10% Kebahagiaan, -30% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+      inboxMsg = '🚨 Rahasia Gelap: Hubungan terlarang terjalin dengan $viewerName — $waktu, $lokasi.';
+      resultMsg = 'Kamu dan $partnerDesc melakukannya bersama $waktu hari ini $lokasi. Kalian sepakat menjaga rahasia ini rapat-rapat (+15% Kebahagiaan, -30% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
     }
+
+    character.inbox.add(inboxMsg);
 
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Ajakan Diterima 😈'),
-        content: Text(msg),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFFEEF2F5),
+        title: const Row(
+          children: [
+            Icon(Icons.flash_on, color: Colors.deepPurple, size: 28),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text('Ajakan Diterima 😈', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87)),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(children: [
+              const Icon(Icons.location_on, size: 16, color: Colors.deepPurple),
+              const SizedBox(width: 4),
+              Text(lokasi, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.deepPurple)),
+              const SizedBox(width: 12),
+              const Icon(Icons.access_time, size: 16, color: Colors.indigo),
+              const SizedBox(width: 4),
+              Text(waktu, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.indigo)),
+            ]),
+            const SizedBox(height: 10),
+            Text(resultMsg, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               EfekSampingMasturbasi.checkPartnerEffect(
-                context,
-                character,
-                relationType,
-                viewerName,
-                onComplete,
+                context, character, relationType, viewerName, onComplete,
                 acceptanceHealthLoss: healthLoss,
               );
             },
             child: const Text('OK'),
-          )
+          ),
         ],
       ),
     );
   }
+
+
 
   // ============================================================
   // LOGIKA AKSI: TOLAK BIASA

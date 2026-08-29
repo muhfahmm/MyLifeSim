@@ -599,6 +599,10 @@ class AjakanHandler {
       final bool isGay = (myGenderLower == 'laki-laki' && candGender == 'laki-laki');
       final bool isLesbian = (myGenderLower == 'perempuan' && candGender == 'perempuan');
 
+      if (character.disableSameSexProposals && (isGay || isLesbian)) {
+        return;
+      }
+
       if (candRole == 'Rekan Kerja') {
         if (isGay) {
           final int roll = random.nextInt(100);

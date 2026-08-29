@@ -599,6 +599,7 @@ class _GameScreenState extends State<GameScreen> {
       if (_character.fatherRelationship != null) {
         _character.fatherRelationship = (_character.fatherRelationship! + 10).clamp(0, 100);
       }
+      setState(() {});
       
       showDialog(
         context: context,
@@ -618,6 +619,8 @@ class _GameScreenState extends State<GameScreen> {
       );
     } else {
       _character.health = (_character.health + 5).clamp(0, 100);
+      setState(() {});
+      
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
@@ -2319,8 +2322,9 @@ class _GameScreenState extends State<GameScreen> {
     final Random random = Random();
 
     setState(() {
-      // _character.happiness = (_character.happiness + 20).clamp(0, 100);
-      // _updateFamilyRelationship(partnerName, 15);
+      _character.happiness = (_character.happiness + 20).clamp(0, 100);
+      _updateFamilyRelationship(partnerName, 15);
+      _character.addTabooSecret(partnerName, relation, 'Bercinta');
 
       String additionalMsg = '';
       if (!useCondom && myGender != partnerGender) {
