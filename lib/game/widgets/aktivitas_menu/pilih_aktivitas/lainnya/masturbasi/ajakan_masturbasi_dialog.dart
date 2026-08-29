@@ -114,7 +114,11 @@ class AjakanMasturbasiDialog {
     final bool showReportToParents = !isUserInitiated && !showReportToMother && !showReportToFather &&
         (relLower.contains('kakak') || relLower.contains('adik') || relLower.contains('saudara'));
 
-    // ======================== MODAL 1: KONFIRMASI AJAKAN ========================
+    // Untuk INCOMING: pre-generate lokasi & waktu secara acak (partner sudah memilih)
+    final _random = Random();
+    final String? preGeneratedLokasi = isUserInitiated ? null : _lokasiOptions[_random.nextInt(_lokasiOptions.length)].name;
+    final String? preGeneratedWaktu = isUserInitiated ? null : _waktuOptions[_random.nextInt(_waktuOptions.length)].name;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -137,7 +141,24 @@ class AjakanMasturbasiDialog {
               ),
             ],
           ),
-          content: Text(dialogBody, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(dialogBody, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+              // Badge lokasi & waktu hanya muncul untuk incoming (partner sudah memilih)
+              if (!isUserInitiated && preGeneratedLokasi != null && preGeneratedWaktu != null) ...[
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    _buildBadge(Icons.location_on, preGeneratedLokasi, Colors.deepPurple),
+                    const SizedBox(width: 8),
+                    _buildBadge(Icons.access_time, preGeneratedWaktu, Colors.indigo),
+                  ],
+                ),
+              ],
+            ],
+          ),
           actionsAlignment: MainAxisAlignment.end,
           actions: [
             if (showReportToMother)
@@ -164,17 +185,24 @@ class AjakanMasturbasiDialog {
                 },
                 child: const Text('Laporkan ke Orang Tua', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
               ),
-            // Konfirmasi → lanjut ke Pilih Tempat
+            // Konfirmasi → untuk user-initiated lanjut ke picker, untuk incoming langsung ke result
             Container(
               decoration: BoxDecoration(color: const Color(0xFFD4EDDA), borderRadius: BorderRadius.circular(20)),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: TextButton(
                 onPressed: () {
                   Navigator.pop(dialogContext);
-                  _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
+                  if (isUserInitiated) {
+                    // User mengajak → picker tempat → picker waktu → result
+                    _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
+                  } else {
+                    // Partner mengajak → langsung ke result dengan lokasi & waktu pre-generated
+                    _executeAccept(context, character, relationType, viewerName, partnerDesc,
+                        preGeneratedLokasi!, preGeneratedWaktu!, onComplete);
+                  }
                 },
                 child: Text(
-                  isUserInitiated ? 'Lanjutkan ➜' : 'Terima ajakan masturbasi',
+                  isUserInitiated ? 'Lanjutkan \u27A1' : 'Terima ajakan masturbasi',
                   style: const TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold),
                 ),
               ),
@@ -610,5 +638,27 @@ class AjakanMasturbasiDialog {
     if (character.motherName != null) {
       character.motherRelationship = ((character.motherRelationship ?? 50) + delta).clamp(0, 100);
     }
+  }
+
+  // ============================================================
+  // HELPER: BADGE CHIP UNTUK LOKASI/WAKTU
+  // ============================================================
+  static Widget _buildBadge(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(label, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+        ],
+      ),
+    );
   }
 }

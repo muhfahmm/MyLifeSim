@@ -3217,6 +3217,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           viewerName: widget.targetName,
         );
 
+        // Aturan khusus untuk user perempuan: auto-accept berdasarkan happiness
+        final String myGenderLower = widget.character.gender.trim().toLowerCase();
+        final String relLower2 = widget.targetRole.toLowerCase();
+        if (myGenderLower == 'perempuan') {
+          if (relLower2.contains('ayah') && widget.character.happiness > 70) {
+            successChance = 100; // Ayah selalu menerima jika happiness > 70
+          } else if (!relLower2.contains('ayah') && widget.character.happiness > 60) {
+            successChance = 100; // Selain ayah selalu menerima jika happiness > 60
+          }
+        }
+
         final bool success = _random.nextInt(100) < successChance;
         final String relLower = widget.targetRole.toLowerCase();
         final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';

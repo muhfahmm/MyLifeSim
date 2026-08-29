@@ -1133,6 +1133,17 @@ List<ActionItem> getAge12PlusActions(
           viewerName: targetName,
         );
 
+        // Aturan khusus untuk user perempuan: auto-accept berdasarkan happiness
+        final String myGenderLow = character.gender.trim().toLowerCase();
+        final String relLow2 = targetRole.toLowerCase();
+        if (myGenderLow == 'perempuan') {
+          if (relLow2.contains('ayah') && character.happiness > 70) {
+            successChance = 100; // Ayah selalu menerima jika happiness > 70
+          } else if (!relLow2.contains('ayah') && character.happiness > 60) {
+            successChance = 100; // Selain ayah selalu menerima jika happiness > 60
+          }
+        }
+
         final bool success = random.nextInt(100) < successChance;
         final String relLower = targetRole.toLowerCase();
         final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
