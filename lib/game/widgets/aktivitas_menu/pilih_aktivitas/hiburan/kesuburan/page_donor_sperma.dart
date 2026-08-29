@@ -5,6 +5,7 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 
 class PageDonorSperma extends StatefulWidget {
   final Character character;
@@ -447,6 +448,26 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
             ),
             const SizedBox(height: 12),
 
+            _buildActionTile(
+              icon: Icons.people,
+              color: Colors.blueGrey,
+              title: 'Lihat Keluarga',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => NpcFamilyViewScreen(
+                      npcName: name,
+                      npcGender: 'Perempuan',
+                      npcAge: age,
+                      npcRole: 'Penerima Donor',
+                      character: widget.character,
+                    ),
+                  ),
+                );
+              },
+            ),
+
             if (isPartner) ...[
               _buildActionTile(
                 icon: Icons.favorite,
@@ -510,6 +531,30 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                   }
                 },
               ),
+              if (widget.character.age >= 18)
+                _buildActionTile(
+                  icon: Icons.diamond,
+                  color: Colors.amber,
+                  title: 'Lamar',
+                  onTap: () {
+                    bool accepted = relationship >= 60 ? (_random.nextInt(100) < 80) : (_random.nextInt(100) < 30);
+                    if (accepted) {
+                      setState(() {
+                        if (widget.character.partner != null && widget.character.partner!['name'] == name) {
+                          widget.character.partner!['relation'] = 'Tunangan';
+                        } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
+                          widget.character.secondPartner!['relation'] = 'Tunangan';
+                        }
+                      });
+                      _updateRelationship(15);
+                      widget.character.happiness = (widget.character.happiness + 30).clamp(0, 100);
+                      _showOutcome('Lamaran Diterima! 💍', '$name menerima lamaran pernikahanmu dengan air mata bahagia! Status hubungan kalian kini adalah Tunangan.');
+                    } else {
+                      _updateRelationship(-10);
+                      _showOutcome('Lamaran Ditolak 💔', '$name menolak lamaranmu karena merasa hubungan kalian belum cukup matang.');
+                    }
+                  },
+                ),
               _buildActionTile(
                 icon: Icons.heart_broken,
                 color: Colors.red,

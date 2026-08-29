@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import 'dart:math';
 
 /// Screen untuk menampilkan keluarga NPC (Guru / Siswa / Anak)
@@ -73,6 +74,24 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     int motherRelVal = 45 + rng.nextInt(50);
     bool motherDeceasedVal = motherAgeVal >= 78;
 
+    // Cari apakah dia adalah anak hasil donor sperma
+    String donorMotherName = '';
+    int donorMotherAge = age + 25;
+    if (char != null) {
+      final String npcClean = widget.npcName.replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+      for (var r in char.donorRecipients) {
+        final String rCleanChild = (r['childName'] ?? '').replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        if (rCleanChild == npcClean) {
+          donorMotherName = (r['name'] ?? '').replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+          donorMotherAge = int.tryParse(r['age'] ?? '') ?? donorMotherAge;
+          break;
+        }
+      }
+    }
+
+    String? fatherSkinColor;
+    String? motherSkinColor;
+
     if (isChildOfPlayer) {
       int childRel = 80;
       for (var c in char.children) {
@@ -83,36 +102,57 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
       }
       
       final bool playerIsMale = char.gender.toLowerCase() == 'laki-laki';
-      if (playerIsMale) {
+      if (donorMotherName.isNotEmpty) {
         fatherNameVal = char.name;
         fatherAgeVal = char.age;
         fatherRelVal = childRel;
         fatherDeceasedVal = false;
+        fatherSkinColor = char.avatarSkinColor;
+        
+        motherNameVal = donorMotherName;
+        motherAgeVal = donorMotherAge;
+        motherRelVal = childRel;
+        motherDeceasedVal = false;
+        for (var r in char.donorRecipients) {
+          if (r['name'] == donorMotherName) {
+            motherSkinColor = r['skinColor'];
+            break;
+          }
+        }
+      } else if (playerIsMale) {
+        fatherNameVal = char.name;
+        fatherAgeVal = char.age;
+        fatherRelVal = childRel;
+        fatherDeceasedVal = false;
+        fatherSkinColor = char.avatarSkinColor;
         
         if (char.partner != null) {
           motherNameVal = char.partner!['name'] ?? motherNameVal;
           motherAgeVal = int.tryParse(char.partner!['age'] ?? '') ?? motherAgeVal;
           motherRelVal = childRel;
           motherDeceasedVal = char.partner!['isDeceased'] == 'true';
+          motherSkinColor = char.partner!['skinColor'];
         }
       } else {
         motherNameVal = char.name;
         motherAgeVal = char.age;
         motherRelVal = childRel;
         motherDeceasedVal = false;
+        motherSkinColor = char.avatarSkinColor;
         
         if (char.partner != null) {
           fatherNameVal = char.partner!['name'] ?? fatherNameVal;
           fatherAgeVal = int.tryParse(char.partner!['age'] ?? '') ?? fatherAgeVal;
           fatherRelVal = childRel;
           fatherDeceasedVal = char.partner!['isDeceased'] == 'true';
+          fatherSkinColor = char.partner!['skinColor'];
         }
       }
     }
 
     final bool playerIsMale = char != null && char.gender.toLowerCase() == 'laki-laki';
-    final bool includeFather = !isChildOfPlayer || playerIsMale || char.partner != null;
-    final bool includeMother = !isChildOfPlayer || !playerIsMale || char.partner != null;
+    final bool includeFather = !isChildOfPlayer || playerIsMale || char.partner != null || donorMotherName.isNotEmpty;
+    final bool includeMother = !isChildOfPlayer || !playerIsMale || char.partner != null || donorMotherName.isNotEmpty;
 
     if (includeFather) {
       family.add({
@@ -125,6 +165,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'isDeceased': fatherDeceasedVal,
         'rel': fatherRelVal,
         'color': Colors.blue,
+        if (fatherSkinColor != null) 'skinColor': fatherSkinColor,
       });
     }
 
@@ -139,16 +180,42 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'isDeceased': motherDeceasedVal,
         'rel': motherRelVal,
         'color': Colors.pink,
+        if (motherSkinColor != null) 'skinColor': motherSkinColor,
       });
     }
 
     // === PASANGAN ===
-    if (age >= 18 && rng.nextBool()) {
-      final String spouseGender = isMale ? 'Perempuan' : 'Laki-laki';
+    bool hasOfficialSpouse = false;
+    final String spouseGender = isMale ? 'Perempuan' : 'Laki-laki';
+    String spouseNameVal = _randomName(spouseGender, seed + 20);
+    
+    if (char != null) {
+      for (var r in char.donorRecipients) {
+        final String recipientName = (r['name'] ?? '').replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        if (recipientName.isEmpty) continue;
+        
+        final int rSeed = recipientName.codeUnits.fold(0, (a, b) => a + b);
+        final String rFather = _randomName('Laki-laki', rSeed + 1).replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        final String rMother = _randomName('Perempuan', rSeed + 2).replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        
+        if (widget.npcName == rFather) {
+          spouseNameVal = rMother;
+          hasOfficialSpouse = true;
+          break;
+        } else if (widget.npcName == rMother) {
+          spouseNameVal = rFather;
+          hasOfficialSpouse = true;
+          break;
+        }
+      }
+    }
+
+    if (age >= 18 && (hasOfficialSpouse || rng.nextBool())) {
+      hasOfficialSpouse = true;
       final int spouseAge = (age - 3 + rng.nextInt(7)).clamp(17, 80);
       family.add({
         'section': 'pasangan',
-        'name': _randomName(spouseGender, seed + 20),
+        'name': spouseNameVal,
         'relation': isMale ? 'Istri' : 'Suami',
         'relLabel': isMale ? 'Istri' : 'Suami',
         'gender': spouseGender,
@@ -159,23 +226,48 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
       });
     }
 
+    final bool isDatingUser = char != null && char.isAnyPartnerNameMatching(widget.npcName);
+    if (isDatingUser && hasOfficialSpouse) {
+      family.add({
+        'section': 'pasangan',
+        'name': char.name,
+        'relation': 'Selingkuhan',
+        'relLabel': 'Selingkuhan',
+        'gender': char.gender,
+        'age': char.age,
+        'isDeceased': false,
+        'rel': 80,
+        'color': Colors.pinkAccent,
+      });
+    }
+
     // === SAUDARA KANDUNG ===
-    final int siblingCount = rng.nextInt(4);
+    final int siblingSeed = (isChildOfPlayer && donorMotherName.isNotEmpty) 
+        ? donorMotherName.codeUnits.fold(0, (a, b) => a + b) 
+        : seed;
+    final siblingRng = Random(siblingSeed);
+    final int siblingCount = siblingRng.nextInt(4);
+    
     for (int i = 0; i < siblingCount; i++) {
-      final bool brotherOrSister = rng.nextBool();
+      final bool brotherOrSister = siblingRng.nextBool();
       final String sGender = brotherOrSister ? 'Laki-laki' : 'Perempuan';
-      final int ageDiff = -4 + rng.nextInt(9);
+      final int ageDiff = -4 + siblingRng.nextInt(9);
       final int sAge = (age + ageDiff).clamp(5, 90);
-      final String relLabel = brotherOrSister ? 'Kakak Laki-laki' : 'Kakak Perempuan';
+      
+      final bool isOlder = sAge > age;
+      final String relLabel = brotherOrSister 
+          ? (isOlder ? 'Kakak Laki-laki' : 'Adik Laki-laki') 
+          : (isOlder ? 'Kakak Perempuan' : 'Adik Perempuan');
+          
       family.add({
         'section': 'saudara',
-        'name': _randomName(sGender, seed + 10 + i),
+        'name': _randomName(sGender, siblingSeed + 10 + i),
         'relation': relLabel,
-        'relLabel': 'Kandung',
+        'relLabel': isChildOfPlayer ? 'Seibu' : 'Kandung',
         'gender': sGender,
         'age': sAge,
         'isDeceased': false,
-        'rel': 30 + rng.nextInt(60),
+        'rel': 30 + siblingRng.nextInt(60),
         'color': brotherOrSister ? Colors.indigo : Colors.purple,
       });
     }
@@ -201,6 +293,100 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
       }
     }
 
+    // === ANAK DONOR SPERMA ===
+    if (char != null) {
+      Map<String, String>? matchingRecipient;
+      final String npcClean = widget.npcName.replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+      for (var r in char.donorRecipients) {
+        final String rCleanName = (r['name'] ?? '').replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        if (rCleanName == npcClean) {
+          matchingRecipient = r;
+          break;
+        }
+      }
+      if (matchingRecipient != null && matchingRecipient['childName'] != null) {
+        final String expectedChildName = matchingRecipient['childName']!;
+        Map<String, String>? childData;
+        for (var c in char.children) {
+          if (c['name'] == expectedChildName) {
+            childData = c;
+            break;
+          }
+        }
+        if (childData != null) {
+          final String cGender = childData['gender'] ?? 'Laki-laki';
+          final String cAgeStr = childData['age'] ?? '0';
+          final int cAge = int.tryParse(cAgeStr) ?? 0;
+          final int cRel = int.tryParse(childData['relationship'] ?? '80') ?? 80;
+          
+          family.add({
+            'section': 'anak',
+            'name': expectedChildName,
+            'relation': 'Anak',
+            'relLabel': 'Anak Anda (Donor)',
+            'gender': cGender,
+            'age': cAge,
+            'isDeceased': childData['isDeceased'] == 'true',
+            'rel': cRel,
+            'color': Colors.teal,
+          });
+        }
+      }
+    }
+
+
+
+    // Cari apakah widget.npcName adalah orang tua dari salah satu penerima donor sperma player
+    if (char != null) {
+      final String npcClean = widget.npcName.replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+      for (var r in char.donorRecipients) {
+        final String recipientName = (r['name'] ?? '').replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        if (recipientName.isEmpty) continue;
+        
+        final int rSeed = recipientName.codeUnits.fold(0, (a, b) => a + b);
+        final rRng = Random(rSeed);
+        final String rFather = _randomName('Laki-laki', rSeed + 1).replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        final String rMother = _randomName('Perempuan', rSeed + 2).replaceAll('Ibu ', '').replaceAll('Ibu', '').trim();
+        
+        if (npcClean == rFather || npcClean == rMother) {
+          int recipientAge = int.tryParse(r['age'] ?? '25') ?? 25;
+          
+          family.add({
+            'section': 'anak',
+            'name': recipientName,
+            'relation': 'Anak',
+            'relLabel': 'Anak',
+            'gender': 'Perempuan',
+            'age': recipientAge,
+            'isDeceased': false,
+            'rel': int.tryParse(r['relationship'] ?? '50') ?? 50,
+            'color': Colors.teal,
+            'skinColor': r['skinColor'],
+          });
+          
+          final int sibCount = rRng.nextInt(4);
+          for (int i = 0; i < sibCount; i++) {
+            final bool broOrSis = rRng.nextBool();
+            final String sGender = broOrSis ? 'Laki-laki' : 'Perempuan';
+            final int ageDiff = -4 + rRng.nextInt(9);
+            final int sAge = (recipientAge + ageDiff).clamp(5, 90);
+            
+            family.add({
+              'section': 'anak',
+              'name': _randomName(sGender, rSeed + 10 + i),
+              'relation': 'Anak',
+              'relLabel': 'Anak',
+              'gender': sGender,
+              'age': sAge,
+              'isDeceased': false,
+              'rel': 30 + rRng.nextInt(60),
+              'color': Colors.teal,
+            });
+          }
+        }
+      }
+    }
+
     if (isChildOfPlayer) {
       int childRel = 80;
       for (var c in char.children) {
@@ -209,16 +395,27 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
           break;
         }
       }
+      final bool isDonor = char.donorRecipients.any((r) => r['childName'] == widget.npcName);
+      // Ambil skinColor milik anak itu sendiri dari char.children
+      String? childSkinColor;
+      for (var c in char.children) {
+        if (c['name'] == widget.npcName) {
+          childSkinColor = c['skinColor'];
+          break;
+        }
+      }
+
       family.add({
         'section': 'anak',
         'name': widget.npcName,
         'relation': 'Anak',
-        'relLabel': 'Anak Anda',
+        'relLabel': isDonor ? 'Anak Anda (Donor)' : 'Anak Anda',
         'gender': widget.npcGender,
         'age': widget.npcAge,
         'isDeceased': false,
         'rel': childRel,
         'color': Colors.teal,
+        if (childSkinColor != null) 'skinColor': childSkinColor,
       });
     }
 
@@ -327,12 +524,24 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     final bool isDeceased = member['isDeceased'] as bool;
     final bool isMale = member['gender'] == 'Laki-laki';
     final Color color = isDeceased ? Colors.grey : (member['color'] as Color);
+    final String section = member['section'] as String;
+    bool canClick = false;
+    final char = widget.character;
+    if (char != null) {
+      for (var c in char.children) {
+        if (c['name'] == name) {
+          canClick = true;
+          break;
+        }
+      }
+    }
 
     final String avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
       name: name,
       gender: isMale ? 'Laki-laki' : 'Perempuan',
       age: age,
       happiness: rel,
+      forcedSkinColor: member['skinColor'],
     );
 
     final Color barColor = rel > 65
@@ -342,7 +551,112 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
             : Colors.red;
 
     return InkWell(
-      onTap: null, // NPC keluarga tidak bisa di-navigate (tidak ada actionMenu untuk mereka)
+      onTap: (isDeceased || !canClick) ? null : () {
+        final char = widget.character;
+        if (char != null) {
+          // 1. Cek apakah dia adalah anak player
+          bool isPlayerChild = false;
+          for (var c in char.children) {
+            if (c['name'] == name) {
+              isPlayerChild = true;
+              break;
+            }
+          }
+          if (isPlayerChild) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ActionMenuScreen(
+                  targetName: name,
+                  targetRole: isMale ? 'Laki-laki' : 'Perempuan',
+                  character: char,
+                ),
+              ),
+            );
+            return;
+          }
+
+          // 2. Cek apakah dia adalah pasangan player
+          if (char.isAnyPartnerNameMatching(name)) {
+            String pRole = 'Pacar';
+            if (char.partner != null && char.partner!['name'] == name) {
+              pRole = char.partner!['relation'] ?? 'Pacar';
+            } else if (char.secondPartner != null && char.secondPartner!['name'] == name) {
+              pRole = char.secondPartner!['relation'] ?? 'Pacar';
+            }
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ActionMenuScreen(
+                  targetName: name,
+                  targetRole: pRole,
+                  character: char,
+                ),
+              ),
+            );
+            return;
+          }
+
+          // 3. Cek apakah dia adalah orang tua player
+          if (name == char.fatherName) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ActionMenuScreen(
+                  targetName: name,
+                  targetRole: 'Ayah Kandung',
+                  character: char,
+                ),
+              ),
+            );
+            return;
+          }
+          if (name == char.motherName) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ActionMenuScreen(
+                  targetName: name,
+                  targetRole: 'Ibu Kandung',
+                  character: char,
+                ),
+              ),
+            );
+            return;
+          }
+
+          // 4. Cek apakah dia adalah saudara player
+          for (var s in char.siblings) {
+            if (s['name'] == name) {
+              final String sRelation = s['relation'] ?? 'Saudara';
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ActionMenuScreen(
+                    targetName: '$name ($sRelation)',
+                    targetRole: sRelation,
+                    character: char,
+                  ),
+                ),
+              );
+              return;
+            }
+          }
+        }
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NpcFamilyViewScreen(
+              npcName: name,
+              npcGender: member['gender'] as String,
+              npcAge: age,
+              npcRole: relation,
+              character: widget.character,
+            ),
+          ),
+        );
+      },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 8),
@@ -422,8 +736,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
                   ),
                 ),
 
-                // Chevron (hanya jika tidak meninggal)
-                if (!isDeceased) ...[
+                if (!isDeceased && canClick) ...[
                   const SizedBox(width: 6),
                   const Icon(Icons.arrow_forward_ios, size: 13, color: Colors.grey),
                 ],

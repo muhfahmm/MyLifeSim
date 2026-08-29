@@ -12,6 +12,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hub
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/extended_family_view.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/sibling_family_view.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 
 import 'package:bitlife/game/widgets/dialog_helper.dart';
@@ -967,6 +968,25 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // - Ajak Jalan-jalan / Bermain
       // - Disiplinkan (jika nakal)
       actions = [
+        ActionItem(
+          label: 'Lihat Keluarga',
+          icon: Icons.people,
+          color: Colors.blueGrey,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => NpcFamilyViewScreen(
+                  npcName: widget.targetName,
+                  npcGender: widget.targetRole == 'Laki-laki' ? 'Laki-laki' : 'Perempuan',
+                  npcAge: targetAge,
+                  npcRole: widget.targetRole,
+                  character: widget.character,
+                ),
+              ),
+            );
+          },
+        ),
         ActionItem(
           label: 'Beri Pelukan',
           icon: Icons.face,
@@ -2634,8 +2654,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     if (topActions.isNotEmpty) {
-      // Hapus duplikasi tombol bercinta dari list bawah
-      actions.removeWhere((act) => act.label == 'Bercinta / Make Love');
+      // Hapus duplikasi tombol bercinta dan ajak masturbasi dari list bawah
+      actions.removeWhere((act) => act.label == 'Bercinta / Make Love' || act.label == 'Ajak Masturbasi Bersama');
       actions.insertAll(0, topActions);
     }
     // -------------------------------------------------------------

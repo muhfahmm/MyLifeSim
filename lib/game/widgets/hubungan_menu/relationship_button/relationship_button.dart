@@ -48,6 +48,23 @@ class _RelationshipButtonState extends State<RelationshipButton> {
             builder: (context, setDialogState) {
               _dialogSetState = setDialogState;
 
+              // Bersihkan partner yang secara tidak sengaja bentrok dengan nama anak
+              if (character.partner != null && character.children.any((c) => c['name'] == character.partner!['name'])) {
+                character.partner = null;
+              }
+              if (character.secondPartner != null && character.children.any((c) => c['name'] == character.secondPartner!['name'])) {
+                character.secondPartner = null;
+              }
+              if (character.thirdPartner != null && character.children.any((c) => c['name'] == character.thirdPartner!['name'])) {
+                character.thirdPartner = null;
+              }
+              if (character.fourthPartner != null && character.children.any((c) => c['name'] == character.fourthPartner!['name'])) {
+                character.fourthPartner = null;
+              }
+              if (character.fifthPartner != null && character.children.any((c) => c['name'] == character.fifthPartner!['name'])) {
+                character.fifthPartner = null;
+              }
+
               // Sinkronkan status kematian pasangan/keluarga & rekan kerja/sekolah
               character.syncNPCsAndPartners();
               character.syncPartnerDeathStatus();
@@ -694,34 +711,78 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               // ============================================
               if (character.children.isNotEmpty) ...[
                 const Divider(height: 32),
-                const Text('👶 Anak Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
-                const SizedBox(height: 8),
-                ...character.children.map((child) {
-                  final String name = child['name'] ?? 'Anak';
-                  final String gender = child['gender'] ?? 'Laki-laki';
-                  final int relVal = int.tryParse(child['relationship'] ?? '80') ?? 80;
-                  final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
-                  final bool isDeceased = child['isDeceased'] == 'true';
-                  final bool isMale = gender == 'Laki-laki';
+                (() {
+                  final normalChildren = character.children.where((child) => !character.donorRecipients.any((r) => r['childName'] == child['name'])).toList();
+                  final donorChildren = character.children.where((child) => character.donorRecipients.any((r) => r['childName'] == child['name'])).toList();
+                  
+                  final List<Widget> widgets = [];
+                  if (normalChildren.isNotEmpty) {
+                    widgets.add(const Text('👶 Anak Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)));
+                    widgets.add(const SizedBox(height: 8));
+                    widgets.addAll(normalChildren.map((child) {
+                      final String name = child['name'] ?? 'Anak';
+                      final String gender = child['gender'] ?? 'Laki-laki';
+                      final int relVal = int.tryParse(child['relationship'] ?? '80') ?? 80;
+                      final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+                      final bool isDeceased = child['isDeceased'] == 'true';
+                      final bool isMale = gender == 'Laki-laki';
 
-                  return _buildChildItem(
-                    context,
-                    icon: isMale ? Icons.boy : Icons.girl,
-                    label: isDeceased ? '$name (Wafat)' : name,
-                    status: gender,
-                    color: isDeceased ? Colors.grey : Colors.teal,
-                    relationshipValue: relVal,
-                    ageText: '$childAge tahun',
-                    isDeceased: isDeceased,
-                    avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                      name: name,
-                      gender: gender,
-                      age: childAge,
-                      happiness: relVal,
-                      forcedSkinColor: child['skinColor'],
-                    ),
+                      return _buildChildItem(
+                        context,
+                        icon: isMale ? Icons.boy : Icons.girl,
+                        label: isDeceased ? '$name (Wafat)' : name,
+                        status: gender,
+                        color: isDeceased ? Colors.grey : Colors.teal,
+                        relationshipValue: relVal,
+                        ageText: '$childAge tahun',
+                        isDeceased: isDeceased,
+                        avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                          name: name,
+                          gender: gender,
+                          age: childAge,
+                          happiness: relVal,
+                          forcedSkinColor: child['skinColor'],
+                        ),
+                      );
+                    }).toList());
+                  }
+
+                  if (donorChildren.isNotEmpty) {
+                    if (widgets.isNotEmpty) widgets.add(const SizedBox(height: 16));
+                    widgets.add(const Text('🧬 Anak Hasil Donor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)));
+                    widgets.add(const SizedBox(height: 8));
+                    widgets.addAll(donorChildren.map((child) {
+                      final String name = child['name'] ?? 'Anak';
+                      final String gender = child['gender'] ?? 'Laki-laki';
+                      final int relVal = int.tryParse(child['relationship'] ?? '80') ?? 80;
+                      final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+                      final bool isDeceased = child['isDeceased'] == 'true';
+                      final bool isMale = gender == 'Laki-laki';
+
+                      return _buildChildItem(
+                        context,
+                        icon: isMale ? Icons.boy : Icons.girl,
+                        label: isDeceased ? '$name (Wafat)' : name,
+                        status: '$gender (Donor)',
+                        color: isDeceased ? Colors.grey : Colors.teal,
+                        relationshipValue: relVal,
+                        ageText: '$childAge tahun',
+                        isDeceased: isDeceased,
+                        avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                          name: name,
+                          gender: gender,
+                          age: childAge,
+                          happiness: relVal,
+                          forcedSkinColor: child['skinColor'],
+                        ),
+                      );
+                    }).toList());
+                  }
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: widgets,
                   );
-                }).toList(),
+                })(),
               ],
               const Divider(height: 32),
             ],
@@ -951,13 +1012,14 @@ class _RelationshipButtonState extends State<RelationshipButton> {
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
+        final String cleanRole = status.replaceAll('(Donor)', '').trim();
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => ActionMenuScreen(
               character: widget.character,
               targetName: label,
-              targetRole: status,
+              targetRole: cleanRole,
             ),
           ),
         ).then((_) {
