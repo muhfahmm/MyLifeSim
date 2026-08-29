@@ -2,6 +2,9 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'menu_dokter/dokter_utils.dart';
+import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
+import 'menu_dokter/tes_darah/tes_darah_page.dart';
+import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
 
 class RiwayatPenyakitPage extends StatefulWidget {
   final Character character;
@@ -154,17 +157,10 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
             Expanded(
               child: activeDiseases.isEmpty
                   ? const Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
-                          SizedBox(height: 12),
-                          Text(
-                            'Tubuhmu sangat sehat!\nTidak ada penyakit aktif saat ini.',
-                            textAlign: CenterTextAlignment,
-                            style: TextStyle(color: Colors.black54, fontSize: 15, fontWeight: FontWeight.w500),
-                          )
-                        ],
+                      child: Text(
+                        'kamu sehat',
+                        textAlign: CenterTextAlignment,
+                        style: TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                     )
                   : ListView.builder(
@@ -172,6 +168,8 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                       itemCount: activeDiseases.length,
                       itemBuilder: (context, index) {
                         final disease = activeDiseases[index];
+                        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+                        final int cost = costData['cost'] ?? 150;
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.only(bottom: 8),
@@ -186,9 +184,9 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                               disease,
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
                             ),
-                            subtitle: const Text(
-                              'Membutuhkan pengobatan medis.',
-                              style: TextStyle(color: Colors.black54),
+                            subtitle: Text(
+                              'Harus diobati via: ${DokterUtils.getRequiredMenu(disease)}',
+                              style: const TextStyle(color: Colors.black54),
                             ),
                             trailing: ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -196,8 +194,26 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                              onPressed: () => _treatDisease(disease),
-                              child: const Text('Obati (\$150)'),
+                              onPressed: () {
+                                final menu = DokterUtils.getRequiredMenu(disease);
+                                if (menu == 'Pemeriksaan Umum') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (ctx) => PemeriksaanUmumPage(character: widget.character)),
+                                  ).then((_) => setState(() {}));
+                                } else if (menu == 'Tes Darah') {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (ctx) => TesDarahPage(character: widget.character)),
+                                  ).then((_) => setState(() {}));
+                                } else {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (ctx) => MedicalCheckupPage(character: widget.character)),
+                                  ).then((_) => setState(() {}));
+                                }
+                              },
+                              child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
                             ),
                           ),
                         );

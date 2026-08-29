@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import '../dokter_utils.dart';
@@ -6,60 +5,101 @@ import '../dokter_utils.dart';
 class TesDarahPage extends StatefulWidget {
   final Character character;
   const TesDarahPage({super.key, required this.character});
+
   @override
   State<TesDarahPage> createState() => _TesDarahPageState();
 }
 
 class _TesDarahPageState extends State<TesDarahPage> {
-  final List<Map<String, dynamic>> tes = [
-    {'nama': 'Cek Gula Darah', 'desc': 'Mendeteksi diabetes'},
-    {'nama': 'Cek Kolesterol', 'desc': 'Mendeteksi lemak darah'},
-    {'nama': 'Cek Hemoglobin (HB)', 'desc': 'Mendeteksi anemia'},
-    {'nama': 'Tes Lengkap', 'desc': 'Semua parameter darah'},
-  ];
-
-  void _pilihTes(Map<String, dynamic> t) {
-    final r = Random();
-    int healthGain = 5;
-    int intelGain = 3;
-    String detail = 'Hasil tes darahmu normal. Dokter memberikan beberapa saran gizi.';
-    
-    // 20% kemungkinan abnormal untuk efek realistis
-    if (r.nextInt(10) < 2) {
-      healthGain = -5;
-      detail = 'Hasil tes menunjukkan kadar ${t['nama']} sedikit tinggi. Dokter menyarankan diet.';
-    }
-
-    // Update real stats
-    DokterUtils.updateStats(widget.character, healthGain, 0, intelGain);
-    widget.character.inbox.add('💉 Tes Darah: ${t['nama']} - $detail (+$healthGain% Kesehatan, +$intelGain% Kecerdasan)');
-
-    DokterUtils.showResultDialog(
-      context, 
-      'Tes Selesai', 
-      '💉 ${t['nama']}: $detail (+$healthGain% Kesehatan, +$intelGain% Kecerdasan)', 
-      () => Navigator.pop(context)
-    );
+  void _treat(String disease) async {
+    // Gunakan helper pengobatan dari DokterUtils
+    await DokterUtils.handleDiseaseTreatment(context, widget.character, 'Tes Darah');
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    // Filter penyakit yang harus ditangani di Tes Darah
+    final activeDiseases = widget.character.riwayatPenyakit
+        .where((d) => DokterUtils.getRequiredMenu(d) == 'Tes Darah')
+        .toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Tes Darah 💉'), backgroundColor: Colors.white, foregroundColor: Colors.black87),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: tes.length,
-        itemBuilder: (_, i) {
-          final t = tes[i];
-          return Card(
-            child: ListTile(
-              title: Text(t['nama']),
-              subtitle: Text(t['desc']),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-              onTap: () => _pilihTes(t),
+      appBar: AppBar(
+        title: const Text('Tes Darah 💉', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0.5,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  const Text('💰', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 8),
+            Expanded(
+              child: activeDiseases.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'kamu sehat',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: activeDiseases.length,
+                      itemBuilder: (context, index) {
+                        final disease = activeDiseases[index];
+                        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+                        final int cost = costData['cost'] ?? 250;
+                        return Card(
+                          elevation: 0,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            title: Text(
+                              disease,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                            ),
+                            subtitle: const Text(
+                              'Membutuhkan tindakan tes darah.',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue.shade600,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () => _treat(disease),
+                              child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }

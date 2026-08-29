@@ -5,53 +5,101 @@ import '../dokter_utils.dart';
 class MedicalCheckupPage extends StatefulWidget {
   final Character character;
   const MedicalCheckupPage({super.key, required this.character});
+
   @override
   State<MedicalCheckupPage> createState() => _MedicalCheckupPageState();
 }
 
 class _MedicalCheckupPageState extends State<MedicalCheckupPage> {
-  final List<Map<String, dynamic>> paket = [
-    {'nama': 'Basic', 'desc': 'Cek jantung & paru-paru'},
-    {'nama': 'Standard', 'desc': 'Tambah cek mata & gigi'},
-    {'nama': 'Premium', 'desc': 'Semua organ + konsultasi gizi'},
-  ];
-
-  void _pilihPaket(Map<String, dynamic> p) {
-    int healthGain = 15;
-    int happyGain = 5;
-    int intelGain = 2;
-    String detail = 'Medical check up lengkap selesai. Semua dalam kondisi prima.';
-
-    // Update real stats
-    DokterUtils.updateStats(widget.character, healthGain, happyGain, intelGain);
-    widget.character.inbox.add('📋 Medical Check Up: Paket ${p['nama']} - $detail (+$healthGain% Kesehatan, +$happyGain% Kebahagiaan, +$intelGain% Kecerdasan)');
-
-    DokterUtils.showResultDialog(
-      context, 
-      'Check Up Selesai', 
-      '📋 Paket ${p['nama']}: $detail (+$healthGain% Kesehatan, +$happyGain% Kebahagiaan, +$intelGain% Kecerdasan)', 
-      () => Navigator.pop(context)
-    );
+  void _treat(String disease) async {
+    // Gunakan helper pengobatan dari DokterUtils
+    await DokterUtils.handleDiseaseTreatment(context, widget.character, 'Medical Check Up');
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    // Filter penyakit yang harus ditangani di Medical Check Up
+    final activeDiseases = widget.character.riwayatPenyakit
+        .where((d) => DokterUtils.getRequiredMenu(d) == 'Medical Check Up')
+        .toList();
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Medical Check Up 📋'), backgroundColor: Colors.white, foregroundColor: Colors.black87),
-      body: ListView.builder(
-        padding: const EdgeInsets.all(16),
-        itemCount: paket.length,
-        itemBuilder: (_, i) {
-          final p = paket[i];
-          return Card(
-            child: ListTile(
-              title: Text(p['nama']),
-              subtitle: Text(p['desc']),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-              onTap: () => _pilihPaket(p),
+      appBar: AppBar(
+        title: const Text('Medical Check Up 📋', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0.5,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  const Text('💰', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
             ),
-          );
-        },
+            const SizedBox(height: 8),
+            Expanded(
+              child: activeDiseases.isEmpty
+                  ? const Center(
+                      child: Text(
+                        'kamu sehat',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: activeDiseases.length,
+                      itemBuilder: (context, index) {
+                        final disease = activeDiseases[index];
+                        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+                        final int cost = costData['cost'] ?? 800;
+                        return Card(
+                          elevation: 0,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            title: Text(
+                              disease,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                            ),
+                            subtitle: const Text(
+                              'Membutuhkan pemeriksaan organ dalam lengkap.',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue.shade600,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () => _treat(disease),
+                              child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
       ),
     );
   }
