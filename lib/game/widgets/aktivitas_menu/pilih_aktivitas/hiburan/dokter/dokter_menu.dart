@@ -7,6 +7,7 @@ import 'menu_dokter/operasi_kecil/operasi_kecil_page.dart';
 import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
 // TAMBAHKAN BARIS INI DI BAWAHNYA:
 import 'menu_dokter/dokter_utils.dart'; 
+import 'riwayat_penyakit_page.dart';
 
 class DokterMenuHelper {
   static void showDokterMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -49,6 +50,28 @@ class _DokterPageState extends State<DokterPage> {
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0.5,
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: TextButton.icon(
+              icon: const Icon(Icons.sick_outlined, size: 18, color: Colors.red),
+              label: Text(
+                'Penyakit (${widget.character.riwayatPenyakit.length})', 
+                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red, fontSize: 13),
+              ),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => RiwayatPenyakitPage(character: widget.character),
+                  ),
+                ).then((_) {
+                  setState(() {});
+                });
+              },
+            ),
+          )
+        ],
       ),
       body: Container(
         color: Colors.grey.shade100,

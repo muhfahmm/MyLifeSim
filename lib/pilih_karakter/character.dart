@@ -696,6 +696,7 @@ class Character {
 
   // --- KOTAK MASUK / INBOX NOTIFIKASI ---
   List<String> inbox;
+  List<String> riwayatPenyakit = [];
 
   // --- LABEL URUTAN KELAHIRAN (ANAK PERTAMA/TENGAH/TERAKHIR/TUNGGAL) ---
   String get birthOrderLabel {

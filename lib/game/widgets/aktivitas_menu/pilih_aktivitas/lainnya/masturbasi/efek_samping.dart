@@ -242,6 +242,11 @@ class EfekSampingMasturbasi {
 
     character.inbox.add('🚨 Efek Samping Masturbasi: ${effect['title']} ($detailStat)');
 
+    final String diseaseName = effect['title'] ?? 'Efek Samping';
+    if (!character.riwayatPenyakit.contains(diseaseName)) {
+      character.riwayatPenyakit.add(diseaseName);
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,

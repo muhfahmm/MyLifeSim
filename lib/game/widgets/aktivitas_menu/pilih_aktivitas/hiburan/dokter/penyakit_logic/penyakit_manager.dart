@@ -90,6 +90,11 @@ class PenyakitManager {
       final String logMessage = '🤒 Penyakit Instan: Kamu terdiagnosis mengidap $name $emoji. Kesehatanmu turun sebesar -$damage%.';
       events.add(logMessage);
       character.inbox.add(logMessage);
+      
+      // Tambahkan ke riwayat penyakit aktif
+      if (!character.riwayatPenyakit.contains(name)) {
+        character.riwayatPenyakit.add(name);
+      }
     }
   }
 }

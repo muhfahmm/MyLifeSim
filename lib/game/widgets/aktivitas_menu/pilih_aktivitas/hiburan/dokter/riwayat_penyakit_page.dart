@@ -1,0 +1,159 @@
+import 'package:flutter/material.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
+import 'menu_dokter/dokter_utils.dart';
+
+class RiwayatPenyakitPage extends StatefulWidget {
+  final Character character;
+  const RiwayatPenyakitPage({super.key, required this.character});
+
+  @override
+  State<RiwayatPenyakitPage> createState() => _RiwayatPenyakitPageState();
+}
+
+class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
+  static const int costPerTreatment = 150;
+
+  void _treatDisease(String diseaseName) {
+    if (widget.character.money < costPerTreatment) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Saldo Kurang 💸'),
+          content: const Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar $costPerTreatment.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Mengerti'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      widget.character.money -= costPerTreatment;
+      // Hapus dari daftar riwayat penyakit aktif
+      widget.character.riwayatPenyakit.remove(diseaseName);
+      
+      // Sembuhkan flag spesifik jika ada
+      if (diseaseName.contains('HIV')) {
+        widget.character.hasHIV = false;
+      } else if (diseaseName.contains('Sifilis')) {
+        widget.character.hasSifilis = false;
+      } else if (diseaseName.contains('HPV')) {
+        widget.character.hasHPV = false;
+      }
+
+      // Tambah kesehatan
+      widget.character.health = (widget.character.health + 25).clamp(0, 100);
+      widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan)');
+    });
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Pengobatan Berhasil 🎉'),
+        content: Text('Kamu telah berhasil diobati dari $diseaseName.\nKesehatanmu meningkat +25%.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+            },
+            child: const Text('Bagus'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final activeDiseases = widget.character.riwayatPenyakit;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Daftar Penyakit Anda', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black87,
+        elevation: 0.5,
+      ),
+      body: Container(
+        color: Colors.grey.shade100,
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              color: Colors.white,
+              child: Row(
+                children: [
+                  const Text('💰', style: TextStyle(fontSize: 18)),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: activeDiseases.isEmpty
+                  ? const Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_outline, size: 64, color: Colors.green),
+                          SizedBox(height: 12),
+                          Text(
+                            'Tubuhmu sangat sehat!\nTidak ada penyakit aktif saat ini.',
+                            textAlign: CenterTextAlignment,
+                            style: TextStyle(color: Colors.black54, fontSize: 15, fontWeight: FontWeight.w500),
+                          )
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      itemCount: activeDiseases.length,
+                      itemBuilder: (context, index) {
+                        final disease = activeDiseases[index];
+                        return Card(
+                          elevation: 0,
+                          margin: const EdgeInsets.only(bottom: 8),
+                          color: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            side: BorderSide(color: Colors.grey.shade200),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            title: Text(
+                              disease,
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                            ),
+                            subtitle: const Text(
+                              'Membutuhkan pengobatan medis.',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                            trailing: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue.shade600,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                              ),
+                              onPressed: () => _treatDisease(disease),
+                              child: const Text('Obati (\$150)'),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+const CenterTextAlignment = TextAlign.center;

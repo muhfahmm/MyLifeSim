@@ -25,6 +25,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -355,8 +356,6 @@ class _GameScreenState extends State<GameScreen> {
       );
     });
 
-
-
     // Cek kehamilan saat bertambah umur
     if (_character.isPregnant || _character.partnerIsPregnant) {
       // Hitung roll kelahiran (80% berhasil, 20% keguguran)
@@ -393,64 +392,248 @@ class _GameScreenState extends State<GameScreen> {
       );
     } else if (events.isNotEmpty) {
       if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: const Row(
-              children: [
-                Icon(Icons.notifications_active, color: Colors.orange, size: 28),
-                const SizedBox(width: 8),
-                Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            ),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: events.map((e) {
-                // Determine if this specific event line contains gay/lesbian
-                final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
-                String displayText = e;
-                if (isSameSexEvent) {
-                  // Replace the starting emoji or icon (e.g. 💬, 💍, 🎉) with 🏳️‍🌈 if possible
-                  if (displayText.startsWith('💬')) {
-                    displayText = '🏳️‍🌈' + displayText.substring(1);
-                  } else if (displayText.startsWith('💍')) {
-                    displayText = '🏳️‍🌈' + displayText.substring(1);
-                  } else if (displayText.startsWith('🎉')) {
-                    displayText = '🏳️‍🌈' + displayText.substring(1);
-                  } else if (!displayText.startsWith('🏳️‍🌈')) {
-                    displayText = '🏳️‍🌈 ' + displayText;
+      
+      final List<String> sicknessEvents = events.where((e) => e.contains('Penyakit Instan')).toList();
+      final List<String> otherEvents = events.where((e) => !e.contains('Penyakit Instan')).toList();
+      
+      if (otherEvents.isNotEmpty) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.notifications_active, color: Colors.orange, size: 28),
+                  const SizedBox(width: 8),
+                  Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: otherEvents.map((e) {
+                  // Determine if this specific event line contains gay/lesbian
+                  final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
+                  String displayText = e;
+                  if (isSameSexEvent) {
+                    // Replace the starting emoji or icon (e.g. 💬, 💍, 🎉) with 🏳️‍🌈 if possible
+                    if (displayText.startsWith('💬')) {
+                      displayText = '🏳️‍🌈' + displayText.substring(1);
+                    } else if (displayText.startsWith('💍')) {
+                      displayText = '🏳️‍🌈' + displayText.substring(1);
+                    } else if (displayText.startsWith('🎉')) {
+                      displayText = '🏳️‍🌈' + displayText.substring(1);
+                    } else if (!displayText.startsWith('🏳️‍🌈')) {
+                      displayText = '🏳️‍🌈 ' + displayText;
+                    }
                   }
-                }
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                );
-              }).toList(),
-            ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _checkAdikRequestMoney(() {
-                  _checkSchoolEnrollmentOptions(() {
-                    _checkGraduationOptions();
-                  });
-                });
-              },
-              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 8.0),
+                    child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                  );
+                }).toList(),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _handleSicknessSequence(sicknessEvents, () {
+                      _checkAdikRequestMoney(() {
+                        _checkSchoolEnrollmentOptions(() {
+                          _checkGraduationOptions();
+                        });
+                      });
+                    });
+                  },
+                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
         );
-      },
-    );
+      } else {
+        _handleSicknessSequence(sicknessEvents, () {
+          _checkAdikRequestMoney(() {
+            _checkSchoolEnrollmentOptions(() {
+              _checkGraduationOptions();
+            });
+          });
+        });
+      }
     } else {
       _checkAdikRequestMoney(() {
         _checkSchoolEnrollmentOptions(() {
           _checkGraduationOptions();
         });
       });
+    }
+  }
+
+  void _handleSicknessSequence(List<String> sicknessList, VoidCallback onDone) {
+    if (sicknessList.isEmpty) {
+      onDone();
+      return;
+    }
+    final String firstSickness = sicknessList.first;
+    _showSicknessModal(firstSickness, () {
+      _handleSicknessSequence(sicknessList.sublist(1), onDone);
+    });
+  }
+
+  void _showSicknessModal(String sicknessEvent, VoidCallback onDone) {
+    if (!mounted) return;
+    
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: const Row(
+            children: [
+              Icon(Icons.healing, color: Colors.red, size: 28),
+              SizedBox(width: 10),
+              Text('Terkena Penyakit 🤒', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch, // Membuat semua button lebar seragam
+            children: [
+              Text(
+                sicknessEvent.contains(': ') ? sicknessEvent.substring(sicknessEvent.indexOf(': ') + 2) : sicknessEvent,
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Apa yang ingin kamu lakukan?',
+                style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey),
+              ),
+              const SizedBox(height: 16),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade400,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _handleTellParents(sicknessEvent, onDone);
+                },
+                child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  // Buka DokterPage
+                  DokterMenuHelper.showDokterMenu(context, _character, () {
+                    setState(() {});
+                    onDone();
+                  });
+                },
+                child: const Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              ),
+              const SizedBox(height: 8),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.grey.shade500,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  onDone();
+                },
+                child: const Text('Biarkan saja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _handleTellParents(String sicknessEvent, VoidCallback onDone) {
+    bool hasParents = (!_character.isMotherDeceased && _character.motherName != null) ||
+                      (!_character.isFatherDeceased && _character.fatherName != null);
+                      
+    if (!hasParents) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Tidak Ada Orang Tua 😔'),
+          content: const Text('Kamu tidak memiliki orang tua yang bisa dihubungi saat ini.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                // Karena gagal beritahu ortu, tanya lagi apakah mau ke dokter
+                _showSicknessModal(sicknessEvent, onDone);
+              },
+              child: const Text('Kembali'),
+            )
+          ],
+        ),
+      );
+      return;
+    }
+    
+    // Logika respon orang tua
+    final random = Random();
+    final bool isCare = random.nextDouble() < 0.7; // 70% dirawat/dibawa ke dokter
+    
+    if (isCare) {
+      _character.health = (_character.health + 30).clamp(0, 100);
+      if (_character.motherRelationship != null) {
+        _character.motherRelationship = (_character.motherRelationship! + 10).clamp(0, 100);
+      }
+      if (_character.fatherRelationship != null) {
+        _character.fatherRelationship = (_character.fatherRelationship! + 10).clamp(0, 100);
+      }
+      
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Respons Orang Tua ❤️'),
+          content: const Text('Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +10% Hubungan Orang Tua).'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                onDone();
+              },
+              child: const Text('Mengerti'),
+            )
+          ],
+        ),
+      );
+    } else {
+      _character.health = (_character.health + 5).clamp(0, 100);
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Respons Orang Tua 🏠'),
+          content: const Text('Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan).'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                onDone();
+              },
+              child: const Text('Mengerti'),
+            )
+          ],
+        ),
+      );
     }
   }
 

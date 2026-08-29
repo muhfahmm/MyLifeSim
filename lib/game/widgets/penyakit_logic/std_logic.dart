@@ -163,6 +163,9 @@ Future<void> handleSTDCheck(
   if (roll < hivChance) {
     if (!character.hasHIV) {
       character.hasHIV = true;
+      if (!character.riwayatPenyakit.contains('HIV/AIDS')) {
+        character.riwayatPenyakit.add('HIV/AIDS');
+      }
       character.health = (character.health - 10).clamp(0, 100);
       final String msg =
           '🚨 Diagnosis HIV/AIDS: Setelah berhubungan intim $sexTypeLabel dengan $partnerName tanpa pengaman, '
@@ -183,6 +186,9 @@ Future<void> handleSTDCheck(
   } else if (roll < hivChance + sFilisChance) {
     if (!character.hasSifilis) {
       character.hasSifilis = true;
+      if (!character.riwayatPenyakit.contains('Sifilis & Gonore')) {
+        character.riwayatPenyakit.add('Sifilis & Gonore');
+      }
       character.health = (character.health - 20).clamp(0, 100);
       final String msg =
           '🚨 Terjangkit Sifilis & Gonore: Kamu tertular penyakit kelamin menular dari $partnerName '
@@ -204,6 +210,9 @@ Future<void> handleSTDCheck(
   } else if (roll < hivChance + sFilisChance + hpvChance) {
     if (!character.hasHPV) {
       character.hasHPV = true;
+      if (!character.riwayatPenyakit.contains('HPV (Human Papillomavirus)')) {
+        character.riwayatPenyakit.add('HPV (Human Papillomavirus)');
+      }
       character.happiness = (character.happiness - 15).clamp(0, 100);
       character.happiness = (character.happiness - 10).clamp(0, 100); // HPV menurunkan kualitas hidup
       final String msg =
@@ -255,14 +264,23 @@ void handleSTDCheckNoContext(
   final int roll = random.nextInt(100);
   if (roll < hivChance && !character.hasHIV) {
     character.hasHIV = true;
+    if (!character.riwayatPenyakit.contains('HIV/AIDS')) {
+      character.riwayatPenyakit.add('HIV/AIDS');
+    }
     character.health = (character.health - 10).clamp(0, 100);
     character.inbox.add('🚨 Diagnosis HIV/AIDS: Setelah berhubungan intim $sexTypeLabel dengan $partnerName, kamu terdiagnosis HIV/AIDS!');
   } else if (roll < hivChance + sFilisChance && !character.hasSifilis) {
     character.hasSifilis = true;
+    if (!character.riwayatPenyakit.contains('Sifilis & Gonore')) {
+      character.riwayatPenyakit.add('Sifilis & Gonore');
+    }
     character.health = (character.health - 20).clamp(0, 100);
     character.inbox.add('🚨 Terjangkit Sifilis & Gonore dari $partnerName. Kesehatan -20%!');
   } else if (roll < hivChance + sFilisChance + hpvChance && !character.hasHPV) {
     character.hasHPV = true;
+    if (!character.riwayatPenyakit.contains('HPV (Human Papillomavirus)')) {
+      character.riwayatPenyakit.add('HPV (Human Papillomavirus)');
+    }
     character.happiness = (character.happiness - 15).clamp(0, 100);
     character.appearance = (character.appearance - 15).clamp(0, 100);
     character.inbox.add('🚨 Terjangkit HPV dari $partnerName. Penampilan & kebahagiaan -15%!');
