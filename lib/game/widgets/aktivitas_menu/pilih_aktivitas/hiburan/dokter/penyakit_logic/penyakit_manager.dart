@@ -40,6 +40,7 @@ class PenyakitManager {
       // Terkena penyakit! Tentukan tingkat keparahan berdasarkan kesehatan saat ini
       Map<String, dynamic> penyakit;
       final int severityRoll = random.nextInt(100);
+      bool isBerat = false;
       
       if (currentHealth >= 70) {
         // 70% ringan, 30% sedang
@@ -56,6 +57,7 @@ class PenyakitManager {
           penyakit = PenyakitRinganHelper.getRandomSedang();
         } else {
           penyakit = PenyakitBeratHelper.getRandomBerat();
+          isBerat = true;
         }
       } else if (currentHealth >= 30) {
         // 30% s/d 39%: 10% ringan, 50% sedang, 40% berat
@@ -65,6 +67,7 @@ class PenyakitManager {
           penyakit = PenyakitRinganHelper.getRandomSedang();
         } else {
           penyakit = PenyakitBeratHelper.getRandomBerat();
+          isBerat = true;
         }
       } else {
         // Kurang dari 30%: penyakit berat sebesar 60%, sisanya 40% sedang
@@ -72,6 +75,7 @@ class PenyakitManager {
           penyakit = PenyakitRinganHelper.getRandomSedang();
         } else {
           penyakit = PenyakitBeratHelper.getRandomBerat();
+          isBerat = true;
         }
       }
       
@@ -86,8 +90,19 @@ class PenyakitManager {
       // Kurangi kesehatan
       character.health = (character.health - damage).clamp(0, 100);
       
+      // Kurangi kebahagiaan berdasarkan tingkat keparahan penyakit
+      int happinessDeduction = 0;
+      if (isBerat) {
+        // jika berat 10-30
+        happinessDeduction = 10 + random.nextInt(21);
+      } else {
+        // jika ringan/sedang 1-10
+        happinessDeduction = 1 + random.nextInt(10);
+      }
+      character.happiness = (character.happiness - happinessDeduction).clamp(0, 100);
+      
       // Tambahkan kejadian ke events dan inbox
-      final String logMessage = '🤒 Penyakit Instan: Kamu terdiagnosis mengidap $name $emoji. Kesehatanmu turun sebesar -$damage%.';
+      final String logMessage = '🤒 Penyakit Instan: Kamu terdiagnosis mengidap $name $emoji. Kesehatanmu turun sebesar -$damage% dan Kebahagiaanmu turun sebesar -$happinessDeduction%.';
       events.add(logMessage);
       character.inbox.add(logMessage);
       

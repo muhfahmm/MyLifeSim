@@ -8,13 +8,10 @@ import 'beritahu_orang_tua.dart';
 
 class EfekSampingMasturbasi {
   /// Memicu risiko efek samping untuk aktivitas masturbasi SOLO.
-  /// Dipanggil setelah sesi masturbasi solo selesai.
-  /// Peluang terkena efek samping acak (misalnya 15%).
   static void checkSoloEffect(BuildContext context, Character character, String relationType, VoidCallback? onComplete) {
     final random = Random();
     final bool isMale = character.gender.toLowerCase() == 'laki-laki';
     
-    // Dapatkan persentase peluang efek samping berdasarkan gender
     final int chance = isMale 
         ? PersentaseEfekSampingPria.getChance(relationType)
         : PersentaseEfekSampingWanita.getChance(relationType);
@@ -26,7 +23,7 @@ class EfekSampingMasturbasi {
 
     final List<Map<String, dynamic>> possibleEffects = [];
 
-    // 1. Lecet pada Jaringan Kulit Luar (Pria & Wanita)
+    // 1. Lecet pada Jaringan Kulit Luar
     possibleEffects.add({
       'title': 'Lecet pada Jaringan Kulit Luar 🩹',
       'desc': 'Gesekan berlebihan tanpa pelumas menyebabkan kulit di area bawah tubuh terasa perih, merah, dan mengelupas ringan.',
@@ -35,7 +32,7 @@ class EfekSampingMasturbasi {
       'intelligence': 0,
     });
 
-    // 2. Robekan Kecil pada Jaringan Tipis (Khusus Pria)
+    // 2. Robekan Kecil pada Jaringan Tipis (khusus pria)
     if (isMale) {
       possibleEffects.add({
         'title': 'Robekan Kecil Jaringan Tipis 🩹',
@@ -46,7 +43,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 3. Kram Otot Pinggang dan Punggung Bawah (Pria & Wanita)
+    // 3. Kram Otot Pinggang dan Punggung Bawah
     possibleEffects.add({
       'title': 'Kram Otot Pinggang 🤕',
       'desc': 'Posisi duduk atau membungkuk terlalu lama membuat otot pinggang menegang dan terasa nyeri saat bergerak.',
@@ -55,7 +52,7 @@ class EfekSampingMasturbasi {
       'intelligence': -5,
     });
 
-    // 4. Kram pada Tangan dan Pergelangan (Pria & Wanita)
+    // 4. Kram pada Tangan dan Pergelangan
     possibleEffects.add({
       'title': 'Kram Tangan & Pergelangan ✊',
       'desc': 'Gerakan repetitif dan genggaman terlalu erat menyebabkan otot tangan kejang dan pergelangan terasa kaku.',
@@ -64,7 +61,7 @@ class EfekSampingMasturbasi {
       'intelligence': 0,
     });
 
-    // 5. Iritasi Akibat Overstimulasi (Khusus Wanita)
+    // 5. Iritasi Akibat Overstimulasi (khusus wanita)
     if (!isMale) {
       possibleEffects.add({
         'title': 'Iritasi Overstimulasi 🔴',
@@ -75,7 +72,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 6. Luka Mikro pada Jaringan Dalam (Khusus Wanita)
+    // 6. Luka Mikro pada Jaringan Dalam (khusus wanita)
     if (!isMale) {
       possibleEffects.add({
         'title': 'Luka Mikro Jaringan Dalam 🩸',
@@ -86,7 +83,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 7. Kram pada Otot Paha dan Perut Bawah (Khusus Wanita)
+    // 7. Kram pada Otot Paha dan Perut Bawah (khusus wanita)
     if (!isMale) {
       possibleEffects.add({
         'title': 'Kram Paha & Perut Bawah ⚡',
@@ -97,7 +94,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 8. Dehidrasi Ringan dan Pusing (Pria & Wanita)
+    // 8. Dehidrasi Ringan dan Pusing
     possibleEffects.add({
       'title': 'Dehidrasi Ringan & Pusing 🌀',
       'desc': 'Napas tersengal dan kurang minum setelah sesi panjang membuat kepala terasa ringan dan pandangan berkunang-kunang.',
@@ -106,7 +103,7 @@ class EfekSampingMasturbasi {
       'intelligence': -3,
     });
 
-    // 9. Reaksi Alergi / Iritasi Kulit (Pria & Wanita)
+    // 9. Reaksi Alergi / Iritasi Kulit
     possibleEffects.add({
       'title': 'Reaksi Alergi Sabun/Lotion 🧴',
       'desc': 'Penggunaan sabun, lotion, atau minyak yang tidak cocok menyebabkan ruam merah dan gatal di area bawah tubuh.',
@@ -115,18 +112,15 @@ class EfekSampingMasturbasi {
       'intelligence': 0,
     });
 
-    // Pilih efek secara acak
     final effect = possibleEffects[random.nextInt(possibleEffects.length)];
     _applyAndShowEffect(context, character, effect, relationType, '', onComplete);
   }
 
   /// Memicu risiko efek samping untuk aktivitas masturbasi BERSAMA (Partner / Rayuan Berhasil).
-  /// Peluang terkena efek samping acak (misalnya 25%).
   static void checkPartnerEffect(BuildContext context, Character character, String relationType, String partnerName, VoidCallback? onComplete) {
     final random = Random();
     final bool isMale = character.gender.toLowerCase() == 'laki-laki';
     
-    // Dapatkan persentase peluang efek samping berdasarkan gender
     final int chance = isMale 
         ? PersentaseEfekSampingPria.getChance(relationType)
         : PersentaseEfekSampingWanita.getChance(relationType);
@@ -138,7 +132,7 @@ class EfekSampingMasturbasi {
 
     final List<Map<String, dynamic>> possibleEffects = [];
 
-    // 1. Cedera Jaringan Keras Akibat Tekukan (Pria - Kasus Langka)
+    // 1. Cedera Jaringan Keras Akibat Tekukan (khusus pria)
     if (isMale) {
       possibleEffects.add({
         'title': 'Cedera Jaringan Akibat Tekukan ⚠️',
@@ -149,7 +143,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 2. Terkilir Otot Pinggang Akibat Gerakan Hentakan (Pria)
+    // 2. Terkilir Otot Pinggang Akibat Gerakan Hentakan (khusus pria)
     if (isMale) {
       possibleEffects.add({
         'title': 'Terkilir Otot Pinggang ⚡',
@@ -160,7 +154,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 3. Infeksi Ringan Akibat Kontak (Pria & Wanita)
+    // 3. Infeksi Ringan Akibat Kontak (semua)
     possibleEffects.add({
       'title': 'Infeksi Ringan Kontak 🦠',
       'desc': 'Kebersihan pasangan kurang terjaga, beberapa hari kemudian muncul rasa gatal, panas, atau keluarnya cairan tidak normal dari area bawah tubuh.',
@@ -170,7 +164,7 @@ class EfekSampingMasturbasi {
       'karma': -10,
     });
 
-    // 4. Laserasi / Robekan Jaringan Dalam (Khusus Wanita)
+    // 4. Laserasi / Robekan Jaringan Dalam (khusus wanita)
     if (!isMale) {
       possibleEffects.add({
         'title': 'Laserasi Jaringan Dalam 🩸',
@@ -181,7 +175,7 @@ class EfekSampingMasturbasi {
       });
     }
 
-    // 5. Kaku pada Otot Leher dan Rahang (Pria & Wanita)
+    // 5. Kaku pada Otot Leher dan Rahang (semua)
     possibleEffects.add({
       'title': 'Kaku Otot Leher & Rahang 🤯',
       'desc': 'Posisi kepala menengadah atau tertunduk terlalu lama menyebabkan otot leher dan rahang kejang dan sulit digerakkan.',
@@ -190,7 +184,7 @@ class EfekSampingMasturbasi {
       'intelligence': -5,
     });
 
-    // 6. Iritasi atau Infeksi Jamur (Khusus Wanita)
+    // 6. Iritasi atau Infeksi Jamur (khusus wanita)
     if (!isMale) {
       possibleEffects.add({
         'title': 'Iritasi Infeksi Jamur 🦠',
@@ -200,17 +194,8 @@ class EfekSampingMasturbasi {
         'intelligence': 0,
       });
     }
-
-    // 7. Benturan Kepala atau Memar Tulang Rusuk (Pria & Wanita)
-    possibleEffects.add({
-      'title': 'Benturan Kepala / Memar 🤕',
-      'desc': 'Terbawa suasana hingga jatuh dari tempat tidur atau terbentur dinding/kepala ranjang, mengakibatkan benjolan di kepala atau memar di dada.',
-      'health': -10,
-      'happiness': 0,
-      'intelligence': -10,
-    });
-
-    // Pilih efek secara acak
+    
+    // Pilih efek secara acak dari daftar yang tersisa
     final effect = possibleEffects[random.nextInt(possibleEffects.length)];
     _applyAndShowEffect(context, character, effect, relationType, partnerName, onComplete);
   }

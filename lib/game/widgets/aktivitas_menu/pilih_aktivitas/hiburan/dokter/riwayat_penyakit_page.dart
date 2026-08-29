@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'menu_dokter/dokter_utils.dart';
@@ -31,40 +32,93 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
       return;
     }
 
+    // Tentukan kategori keparahan penyakit untuk menentukan tingkat keberhasilan pengobatan
+    int successRate = 75; // Default Sedang: 75%
+    String categoryName = 'Sedang';
+
+    // Penyakit Ringan (Peluang Sembuh: 90%)
+    final List<String> ringanList = [
+      'flu', 'sakit kepala', 'batuk', 'alergi', 'sakit gigi', 'pusing', 'diare', 
+      'lecet', 'robekan kecil', 'kram', 'iritasi overstimulasi', 'luka mikro', 'dehidrasi'
+    ];
+    // Penyakit Berat (Peluang Sembuh: 45%)
+    final List<String> beratList = [
+      'pneumonia berat', 'stroke', 'serangan jantung', 'ginjal', 'kanker', 
+      'meningitis', 'tuberkulosis', 'tbc', 'pankreatitis', 'hiv', 'aids', 'cedera jaringan', 'laserasi'
+    ];
+
+    final String nameLower = diseaseName.toLowerCase();
+    if (ringanList.any((key) => nameLower.contains(key))) {
+      successRate = 90;
+      categoryName = 'Ringan';
+    } else if (beratList.any((key) => nameLower.contains(key))) {
+      successRate = 45;
+      categoryName = 'Berat';
+    }
+
+    final random = Random();
+    final bool isSuccess = random.nextInt(100) < successRate;
+
+    // Potong biaya pengobatan terlebih dahulu
     setState(() {
       widget.character.money -= costPerTreatment;
-      // Hapus dari daftar riwayat penyakit aktif
-      widget.character.riwayatPenyakit.remove(diseaseName);
-      
-      // Sembuhkan flag spesifik jika ada
-      if (diseaseName.contains('HIV')) {
-        widget.character.hasHIV = false;
-      } else if (diseaseName.contains('Sifilis')) {
-        widget.character.hasSifilis = false;
-      } else if (diseaseName.contains('HPV')) {
-        widget.character.hasHPV = false;
-      }
-
-      // Tambah kesehatan
-      widget.character.health = (widget.character.health + 25).clamp(0, 100);
-      widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan)');
     });
 
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Pengobatan Berhasil 🎉'),
-        content: Text('Kamu telah berhasil diobati dari $diseaseName.\nKesehatanmu meningkat +25%.'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-            },
-            child: const Text('Bagus'),
-          ),
-        ],
-      ),
-    );
+    if (isSuccess) {
+      setState(() {
+        // Hapus dari daftar riwayat penyakit aktif
+        widget.character.riwayatPenyakit.remove(diseaseName);
+        
+        // Sembuhkan flag spesifik jika ada
+        if (diseaseName.contains('HIV')) {
+          widget.character.hasHIV = false;
+        } else if (diseaseName.contains('Sifilis')) {
+          widget.character.hasSifilis = false;
+        } else if (diseaseName.contains('HPV')) {
+          widget.character.hasHPV = false;
+        }
+
+        // Tambah kesehatan
+        widget.character.health = (widget.character.health + 25).clamp(0, 100);
+        widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan)');
+      });
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Pengobatan Berhasil 🎉'),
+          content: Text('Dokter berhasil mengobati penyakitmu ($diseaseName).\nKesehatanmu meningkat +25% (\$150 uang berkurang).'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Bagus'),
+            ),
+          ],
+        ),
+      );
+    } else {
+      setState(() {
+        widget.character.inbox.add('🏥 Pengobatan Gagal: Upaya mengobati $diseaseName gagal (-$costPerTreatment uang)');
+      });
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Pengobatan Gagal 😔'),
+          content: Text('Dokter telah berusaha semaksimal mungkin, namun penyakitmu ($diseaseName) belum berhasil disembuhkan.\nBiaya pengobatan sebesar \$150 tetap ditagihkan.'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              child: const Text('Mengerti'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 
   @override
