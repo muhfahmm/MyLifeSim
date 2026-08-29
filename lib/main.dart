@@ -1,6 +1,7 @@
-// lib/gender.dart
+// lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_gender/gender.dart'; // Path diperbaiki sesuai folder kamu
+import 'package:bitlife/pilih_gender/gender.dart';
+import 'package:bitlife/intro_animation.dart';
 
 void main() {
   runApp(const MyApp());
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: const HomePage(),
+      home: const IntroAnimationScreen(nextScreen: HomePage()),
     );
   }
 }
