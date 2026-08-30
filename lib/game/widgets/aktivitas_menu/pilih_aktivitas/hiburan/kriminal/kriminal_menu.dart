@@ -118,33 +118,38 @@ class _KriminalPageState extends State<KriminalPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aksi Kriminal ⚠️', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.red.shade50,
+                color: isDark ? Colors.red.shade900 : Colors.red.shade50,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.red.shade200),
+                border: Border.all(color: isDark ? Colors.red.shade700 : Colors.red.shade200),
               ),
               child: Row(
                 children: [
                   const Icon(Icons.warning_amber_rounded, color: Colors.red),
                   const SizedBox(width: 8),
-                  const Expanded(
+                  Expanded(
                     child: Text(
                       'Tindakan kriminal berisiko dipenjara! Pilih dengan bijak.',
-                      style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 12, 
+                        color: isDark ? Colors.redAccent : Colors.red, 
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ],
@@ -159,22 +164,38 @@ class _KriminalPageState extends State<KriminalPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.white,
+                    color: isDark ? Colors.grey.shade800 : Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(crime['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      title: Text(
+                        crime['name'], 
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn'),
+                        child: Text(
+                          '${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn',
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
                       ),
                       isThreeLine: true,
                       trailing: Text(
                         '+\$${_fmt(crime['gain'] as int)}',
-                        style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 14),
+                        style: TextStyle(
+                          color: isDark ? Colors.greenAccent : Colors.green, 
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 14,
+                        ),
                       ),
                       onTap: () => _executeCrime(context, crime),
                     ),

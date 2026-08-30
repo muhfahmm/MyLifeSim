@@ -1,7 +1,7 @@
 part of '../garasi_motor.dart';
 
 class ShowroomMotorPage extends StatefulWidget {
-  final _GarasiMotorPageState state;
+  final GarasiMotorPageState state;
   const ShowroomMotorPage({super.key, required this.state});
 
   @override
@@ -11,6 +11,7 @@ class ShowroomMotorPage extends StatefulWidget {
 class _ShowroomMotorPageState extends State<ShowroomMotorPage> {
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final state = widget.state;
     return Scaffold(
       appBar: AppBar(
@@ -31,41 +32,41 @@ class _ShowroomMotorPageState extends State<ShowroomMotorPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: Colors.teal.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.teal.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Statistik Showroom', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    Text('Statistik Showroom', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
                     const SizedBox(height: 8),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Motor Dipamerkan:'),
-                        Text('${state.showroomMotor.length}'),
+                        Text('Motor Dipamerkan:', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                        Text('${state.showroomMotor.length}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Pendapatan:'),
-                        Text('USD ${formatRupiah(state.totalPendapatanShowroom)}'),
+                        Text('Total Pendapatan:', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                        Text('USD ${formatRupiah(state.totalPendapatanShowroom)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Pengunjung:'),
-                        Text('${state.totalPengunjungShowroom} orang'),
+                        Text('Total Pengunjung:', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                        Text('${state.totalPengunjungShowroom} orang', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 20),
-            const Text('Motor yang Dipamerkan:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Motor yang Dipamerkan:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 8),
             if (state.showroomMotor.isEmpty)
-              const Center(
+              Center(
                 child: Padding(
-                  padding: EdgeInsets.all(32),
-                  child: Text('Belum ada motor di showroom. Pamerkan motor dari koleksi!'),
+                  padding: const EdgeInsets.all(32),
+                  child: Text('Belum ada motor di showroom. Pamerkan motor dari koleksi!', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                 ),
               )
             else
@@ -77,14 +78,14 @@ class _ShowroomMotorPageState extends State<ShowroomMotorPage> {
                     return Card(
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
-                        leading: const Icon(Icons.storefront, color: Colors.teal),
-                        title: Text('${motor['nama']} (${motor['tahun']})', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        leading: Icon(Icons.storefront, color: Colors.teal),
+                        title: Text('${motor['nama']} (${motor['tahun']})', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('${motor['merek']} | ${motor['tipe']}'),
-                            Text('Dipamerkan sejak ${motor['tahunPamer']}'),
-                            Text('Pendapatan/tahun: USD ${formatRupiah(2500000)}', style: const TextStyle(color: Colors.teal)), // motor generates 2.5 Million
+                            Text('${motor['merek']} | ${motor['tipe']}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                            Text('Dipamerkan sejak ${motor['tahunPamer']}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                            Text('Pendapatan/tahun: USD ${formatRupiah(2500000)}', style: const TextStyle(color: Colors.teal)),
                           ],
                         ),
                         trailing: IconButton(

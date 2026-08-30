@@ -191,6 +191,8 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
 
     widget.onComplete();
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -200,17 +202,17 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
           ],
         ),
-        content: Text(content, style: const TextStyle(fontSize: 14, height: 1.4)),
+        content: Text(content, style: TextStyle(fontSize: 14, height: 1.4, color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx); // Tutup dialog hasil
               Navigator.pop(context, passed); // Kembali ke menu lisensi
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white70 : Colors.black87)),
           ),
         ],
       ),
@@ -219,18 +221,19 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final currentQ = _questions[_currentQuestionIndex];
     final progress = (_currentQuestionIndex + 1) / _questions.length;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ujian: ${widget.license['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text('Ujian: ${widget.license['name']}', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade50,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -241,26 +244,34 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 8,
-                backgroundColor: Colors.grey.shade200,
+                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                 valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
               ),
             ),
             const SizedBox(height: 10),
             Text(
               'Pertanyaan ${_currentQuestionIndex + 1} dari ${_questions.length}',
-              style: const TextStyle(color: Colors.black54, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                color: isDark ? Colors.white70 : Colors.black54,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 30),
             // Card pertanyaan
             Card(
               elevation: 1,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               child: Padding(
                 padding: const EdgeInsets.all(20),
                 child: Text(
                   currentQ['q'],
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, height: 1.4, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    height: 1.4,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ),
             ),
@@ -282,10 +293,12 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isSelected ? Colors.blue.shade50 : Colors.white,
+                          color: isSelected
+                              ? (isDark ? Colors.blue.shade900 : Colors.blue.shade50)
+                              : (isDark ? Colors.grey.shade800 : Colors.white),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: isSelected ? Colors.blue.shade600 : Colors.grey.shade200,
+                            color: isSelected ? Colors.blue.shade600 : (isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                             width: 1.5,
                           ),
                         ),
@@ -293,7 +306,9 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
                           children: [
                             Icon(
                               isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                              color: isSelected ? Colors.blue.shade600 : Colors.grey.shade400,
+                              color: isSelected
+                                  ? Colors.blue.shade600
+                                  : (isDark ? Colors.white54 : Colors.grey.shade400),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
@@ -302,7 +317,7 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                                  color: Colors.black87,
+                                  color: isDark ? Colors.white : Colors.black87,
                                 ),
                               ),
                             ),
@@ -317,7 +332,7 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
             // Next button
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade600,
+                backgroundColor: isDark ? Colors.blue.shade700 : Colors.blue.shade600,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

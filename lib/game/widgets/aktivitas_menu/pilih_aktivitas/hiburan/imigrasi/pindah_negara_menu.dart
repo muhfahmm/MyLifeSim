@@ -28,7 +28,6 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
       setState(() {
-        // Reset query saat ganti tab
         _searchController.clear();
         searchQuery = '';
       });
@@ -49,7 +48,6 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
     );
   }
 
-  // Helper kapitalisasi nama negara
   String _capitalizeName(String rawName) {
     return rawName.split(' ').map((word) {
       if (word.isEmpty) return '';
@@ -59,6 +57,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final List<Map<String, dynamic>> filteredList = negaraList.where((n) {
       final String name = n['name'].toString().toLowerCase();
       return name.contains(searchQuery.toLowerCase());
@@ -70,14 +69,14 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
           'Imigrasi & Kebangsaan ✈️🛂',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: Colors.blue,
-          unselectedLabelColor: Colors.grey,
-          indicatorColor: Colors.blue,
+          labelColor: isDark ? Colors.lightBlueAccent : Colors.blue,
+          unselectedLabelColor: isDark ? Colors.white70 : Colors.grey,
+          indicatorColor: isDark ? Colors.lightBlueAccent : Colors.blue,
           tabs: const [
             Tab(text: 'Pindah Negara ✈️'),
             Tab(text: 'Ganti Kebangsaan 🛂'),
@@ -85,23 +84,23 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
         ),
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
-            // Search Bar
             Container(
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               padding: const EdgeInsets.all(12.0),
               child: TextField(
                 controller: _searchController,
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                 decoration: InputDecoration(
                   hintText: _tabController.index == 0
                       ? 'Cari negara tujuan imigrasi...'
                       : 'Cari negara untuk naturalisasi...',
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Icon(Icons.search, color: isDark ? Colors.white70 : Colors.black54),
                   suffixIcon: searchQuery.isNotEmpty
                       ? IconButton(
-                          icon: const Icon(Icons.clear),
+                          icon: Icon(Icons.clear, color: isDark ? Colors.white70 : Colors.black54),
                           onPressed: () {
                             setState(() {
                               _searchController.clear();
@@ -112,10 +111,10 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                       : null,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: Colors.grey.shade300),
+                    borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                   ),
                   filled: true,
-                  fillColor: Colors.grey.shade50,
+                  fillColor: isDark ? Colors.grey.shade700 : Colors.grey.shade50,
                   contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 onChanged: (val) {
@@ -126,15 +125,11 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
               ),
             ),
             
-            // Tab View Content
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
-                  // TAB 1: PINDAH NEGARA
                   _buildPindahNegaraTab(filteredList),
-                  
-                  // TAB 2: GANTI KEBANGSAAN
                   _buildGantiKebangsaanTab(filteredList),
                 ],
               ),
@@ -146,8 +141,14 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
   }
 
   Widget _buildPindahNegaraTab(List<Map<String, dynamic>> list) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     if (list.isEmpty) {
-      return const Center(child: Text('Negara tidak ditemukan', style: TextStyle(color: Colors.grey)));
+      return Center(
+        child: Text(
+          'Negara tidak ditemukan',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -165,19 +166,17 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
           margin: const EdgeInsets.only(bottom: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade200),
+            side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
           ),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),
             onTap: (isCurrentLocation || !canAfford)
                 ? null
                 : () {
-                    // Logika imigrasi
                     widget.character.money -= (n['cost'] as int);
                     widget.character.location = capitalizedName;
                     widget.character.happiness = (widget.character.happiness + (n['happiness'] as int)).clamp(0, 100);
                     
-                    // Resign dari pekerjaan
                     widget.character.jobName = null;
                     widget.character.jobSalary = null;
                     widget.character.idolTrainees.clear();
@@ -225,7 +224,9 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: (isCurrentLocation || !canAfford) ? Colors.grey.shade500 : Colors.black87,
+                                color: (isCurrentLocation || !canAfford)
+                                    ? (isDark ? Colors.white54 : Colors.grey.shade500)
+                                    : (isDark ? Colors.white : Colors.black87),
                               ),
                             ),
                             if (isCurrentLocation) ...[
@@ -233,13 +234,17 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
-                                  color: Colors.green.shade50,
+                                  color: isDark ? Colors.green.shade900 : Colors.green.shade50,
                                   borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.green.shade200),
+                                  border: Border.all(color: isDark ? Colors.green.shade700 : Colors.green.shade200),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   '🏠 Tinggal di Sini',
-                                  style: TextStyle(color: Colors.green, fontSize: 10, fontWeight: FontWeight.bold),
+                                  style: TextStyle(
+                                    color: isDark ? Colors.greenAccent : Colors.green,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
                               ),
                             ],
@@ -250,7 +255,9 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                           n['desc'] as String,
                           style: TextStyle(
                             fontSize: 13,
-                            color: (isCurrentLocation || !canAfford) ? Colors.grey.shade400 : Colors.grey.shade600,
+                            color: (isCurrentLocation || !canAfford)
+                                ? (isDark ? Colors.white54 : Colors.grey.shade400)
+                                : (isDark ? Colors.white70 : Colors.grey.shade600),
                           ),
                         ),
                         if (!isCurrentLocation) ...[
@@ -260,7 +267,9 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              color: canAfford ? Colors.teal : Colors.red.shade400,
+                              color: canAfford
+                                  ? (isDark ? Colors.tealAccent : Colors.teal)
+                                  : (isDark ? Colors.redAccent : Colors.red.shade400),
                             ),
                           ),
                         ],
@@ -271,7 +280,9 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                     Icon(
                       canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
                       size: 16,
-                      color: canAfford ? Colors.teal : Colors.grey.shade400,
+                      color: canAfford
+                          ? (isDark ? Colors.tealAccent : Colors.teal)
+                          : (isDark ? Colors.white54 : Colors.grey.shade400),
                     ),
                 ],
               ),
@@ -283,8 +294,14 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
   }
 
   Widget _buildGantiKebangsaanTab(List<Map<String, dynamic>> list) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     if (list.isEmpty) {
-      return const Center(child: Text('Negara tidak ditemukan', style: TextStyle(color: Colors.grey)));
+      return Center(
+        child: Text(
+          'Negara tidak ditemukan',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+        ),
+      );
     }
 
     return ListView.builder(
@@ -297,12 +314,11 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
         final String birthCountry = widget.character.birthCountry ?? widget.character.location;
         final bool isAlreadyCitizen = birthCountry.toLowerCase() == capitalizedName.toLowerCase();
         
-        // Requirements check
         final bool livesHere = widget.character.location.toLowerCase() == capitalizedName.toLowerCase();
-        const int processingFee = 100000; // Biaya administrasi naturalisasi
+        const int processingFee = 100000;
         final bool canAfford = widget.character.money >= processingFee;
-        final bool hasIntelligence = widget.character.intelligence >= 70; // Lolos ujian wawasan kebangsaan
-        final bool hasKarma = widget.character.karma >= 50; // Berkelakuan baik (tidak ada catatan kriminal)
+        final bool hasIntelligence = widget.character.intelligence >= 70;
+        final bool hasKarma = widget.character.karma >= 50;
         
         final bool meetsAllRequirements = livesHere && canAfford && hasIntelligence && hasKarma;
 
@@ -311,7 +327,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
           margin: const EdgeInsets.only(bottom: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            side: BorderSide(color: Colors.grey.shade200),
+            side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
           ),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -322,20 +338,28 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                   children: [
                     Text(
                       capitalizedName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.black87),
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                     if (isAlreadyCitizen) ...[
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade50,
+                          color: isDark ? Colors.blue.shade900 : Colors.blue.shade50,
                           borderRadius: BorderRadius.circular(6),
-                          border: Border.all(color: Colors.blue.shade200),
+                          border: Border.all(color: isDark ? Colors.blue.shade700 : Colors.blue.shade200),
                         ),
-                        child: const Text(
+                        child: Text(
                           '🛂 Warga Negara',
-                          style: TextStyle(color: Colors.blue, fontSize: 10, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ],
@@ -344,15 +368,21 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                 const SizedBox(height: 6),
                 Text(
                   'Ajukan permohonan naturalisasi dan dapatkan kewarganegaraan baru.',
-                  style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
                 ),
                 const Divider(height: 20),
                 
-                // Tampilkan daftar persyaratan jika bukan warga negara
                 if (!isAlreadyCitizen) ...[
-                  const Text(
+                  Text(
                     'Persyaratan Naturalisasi:',
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                   ),
                   const SizedBox(height: 6),
                   _buildReqRow(label: 'Tinggal di negara ini saat ini', passed: livesHere),
@@ -365,8 +395,12 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: meetsAllRequirements ? Colors.blue : Colors.grey.shade300,
-                        foregroundColor: meetsAllRequirements ? Colors.white : Colors.grey.shade500,
+                        backgroundColor: meetsAllRequirements
+                            ? (isDark ? Colors.blue.shade700 : Colors.blue)
+                            : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                        foregroundColor: meetsAllRequirements
+                            ? Colors.white
+                            : (isDark ? Colors.white54 : Colors.grey.shade500),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                         elevation: 0,
                       ),
@@ -410,13 +444,16 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
   }
 
   Widget _buildReqRow({required String label, required bool passed}) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
       child: Row(
         children: [
           Icon(
             passed ? Icons.check_circle : Icons.cancel,
-            color: passed ? Colors.green : Colors.red,
+            color: passed
+                ? (isDark ? Colors.greenAccent : Colors.green)
+                : (isDark ? Colors.redAccent : Colors.red),
             size: 16,
           ),
           const SizedBox(width: 8),
@@ -425,7 +462,9 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
               label,
               style: TextStyle(
                 fontSize: 11,
-                color: passed ? Colors.black87 : Colors.red.shade700,
+                color: passed
+                    ? (isDark ? Colors.white70 : Colors.black87)
+                    : (isDark ? Colors.redAccent : Colors.red.shade700),
                 fontWeight: passed ? FontWeight.normal : FontWeight.w500,
               ),
             ),

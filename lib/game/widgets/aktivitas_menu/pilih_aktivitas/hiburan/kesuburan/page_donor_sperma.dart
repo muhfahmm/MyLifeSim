@@ -52,7 +52,6 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
       final String anakNamaDepan = anakGender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
       final String anakNama = '$anakNamaDepan ${lastNamesList[r.nextInt(lastNamesList.length)]}';
 
-      // 1. Tambah anak ke list children
       widget.character.children.add({
         'name': anakNama,
         'gender': anakGender,
@@ -63,10 +62,9 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
         'isDeceased': 'false',
       });
 
-      // 2. Tambah penerima ke list donorRecipients
       widget.character.donorRecipients.add({
         'name': ibuNama,
-        'age': (20 + r.nextInt(16)).toString(), // Umur acak 20-35 tahun
+        'age': (20 + r.nextInt(16)).toString(),
         'relationship': '50',
         'childName': anakNama,
       });
@@ -107,34 +105,41 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       appBar: AppBar(
         title: const Text('Donor Sperma 🧬', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Column(
         children: [
-          // Banner Status
           Container(
             width: double.infinity,
-            color: Colors.blue.shade50,
+            color: isDark ? Colors.blue.shade900 : Colors.blue.shade50,
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                const Icon(Icons.biotech, size: 48, color: Colors.blue),
+                Icon(Icons.biotech, size: 48, color: isDark ? Colors.lightBlueAccent : Colors.blue),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Bantu Pasangan Lain Mendapatkan Anak',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.blue),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                const Text(
+                Text(
                   'Setiap kali mendonorkan sperma yang layak, Anda akan menerima imbalan \$5.000.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 12, color: Colors.black54),
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
                 ),
                 const SizedBox(height: 12),
                 ElevatedButton.icon(
@@ -152,25 +157,31 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
             ),
           ),
           
-          // Daftar Penerima & Anak
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16, bottom: 8),
+                Padding(
+                  padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
                   child: Text(
                     'Riwayat Penerima & Hasil Donor',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black54),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                   ),
                 ),
                 Expanded(
                   child: widget.character.donorRecipients.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                             'Belum ada riwayat penerima yang melahirkan dari sperma Anda.',
                             textAlign: TextAlign.center,
-                            style: TextStyle(color: Colors.grey, fontSize: 13),
+                            style: TextStyle(
+                              color: isDark ? Colors.white54 : Colors.grey,
+                              fontSize: 13,
+                            ),
                           ),
                         )
                       : ListView.builder(
@@ -181,7 +192,6 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                             final int rAge = int.tryParse(item['age'] ?? '25') ?? 25;
                             final int rRel = int.tryParse(item['relationship'] ?? '50') ?? 50;
 
-                            // Temukan data anak yang bersesuaian di children list
                             Map<String, String>? childData;
                             for (var c in widget.character.children) {
                               if (c['name'] == item['childName']) {
@@ -192,7 +202,6 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                             final String cGender = childData?['gender'] ?? 'Laki-laki';
                             final String cAge = childData?['age'] ?? '0';
 
-                            // Generate avatar penerima donor (perempuan)
                             final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                               name: item['name'] ?? 'Penerima',
                               gender: 'Perempuan',
@@ -203,11 +212,11 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
 
                             return Card(
                               elevation: 0,
-                              color: Colors.white,
+                              color: isDark ? Colors.grey.shade800 : Colors.white,
                               margin: const EdgeInsets.only(bottom: 8),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: Colors.grey.shade200),
+                                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                               ),
                               child: ListTile(
                                 leading: CircleAvatar(
@@ -223,13 +232,24 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                                 ),
                                 title: Text(
                                   'Penerima: Ibu ${item['name']}',
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
                                 ),
                                 subtitle: Text(
                                   'Anak: ${item['childName']} ($cGender, Usia: $cAge thn)',
-                                  style: const TextStyle(fontSize: 12, color: Colors.black54),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white70 : Colors.black54,
+                                  ),
                                 ),
-                                trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                                trailing: Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 14,
+                                  color: isDark ? Colors.white54 : Colors.grey,
+                                ),
                                 onTap: () {
                                   Navigator.push(
                                     context,
@@ -327,6 +347,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
       name: name,
       gender: gender,
@@ -338,11 +359,11 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
     final bool isPartner = widget.character.isAnyPartnerNameMatching(name);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       appBar: AppBar(
         title: Text(name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: SingleChildScrollView(
@@ -352,10 +373,10 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
           children: [
             Card(
               elevation: 0,
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -379,20 +400,28 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                       children: [
                         Text(
                           name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                         ),
                         if (isPartner) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.pink.shade50,
+                              color: isDark ? Colors.pink.shade900 : Colors.pink.shade50,
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: Colors.pink.shade200, width: 0.5),
+                              border: Border.all(color: isDark ? Colors.pink.shade700 : Colors.pink.shade200, width: 0.5),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Pacar ❤️',
-                              style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: isDark ? Colors.pinkAccent : Colors.pink,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ],
@@ -401,23 +430,37 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                     const SizedBox(height: 4),
                     Text(
                       'Penerima Donor Sperma • Umur: $age tahun • Hubungan: $relationship%',
-                      style: const TextStyle(fontSize: 13, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'Melahirkan anak Anda: $childName 👶',
-                      style: const TextStyle(fontSize: 13, color: Colors.blue, fontWeight: FontWeight.w600),
+                      style: TextStyle(
+                        fontSize: 13,
+                        color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text('Tingkat Hubungan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Tingkat Hubungan: ',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: relationship / 100.0,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
                               ),
@@ -442,15 +485,20 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'PILIH AKSI INTERAKSI',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.grey,
+                letterSpacing: 1.0,
+              ),
             ),
             const SizedBox(height: 12),
 
             _buildActionTile(
               icon: Icons.people,
-              color: Colors.blueGrey,
+              color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
               title: 'Lihat Keluarga',
               onTap: () {
                 Navigator.push(
@@ -795,17 +843,28 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
     required String title,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade100),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade100),
       ),
       child: ListTile(
         leading: Icon(icon, color: color),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: onTap,
       ),
     );

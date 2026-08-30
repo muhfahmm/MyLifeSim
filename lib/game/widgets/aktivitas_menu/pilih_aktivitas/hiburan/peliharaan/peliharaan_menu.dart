@@ -90,27 +90,32 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adopsi Peliharaan 🐾', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
                     'Saldo Anda: \$${_fmt(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.greenAccent : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -126,25 +131,35 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    color: canAfford ? (isDark ? Colors.grey.shade800 : Colors.white) : (isDark ? Colors.grey.shade700 : Colors.grey.shade50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(h['name'], style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14,
-                        color: canAfford ? Colors.black87 : Colors.grey,
-                      )),
+                      title: Text(
+                        h['name'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: canAfford ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.grey),
+                        ),
+                      ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${h['desc']}\nHarga: \$${_fmt(h['cost'] as int)}',
-                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                        child: Text(
+                          '${h['desc']}\nHarga: \$${_fmt(h['cost'] as int)}',
+                          style: TextStyle(
+                            color: canAfford ? (isDark ? Colors.white70 : Colors.black54) : (isDark ? Colors.white38 : Colors.grey),
+                          ),
+                        ),
                       ),
                       isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.favorite : Icons.lock_outline,
-                          color: canAfford ? Colors.green : Colors.grey),
+                      trailing: Icon(
+                        canAfford ? Icons.favorite : Icons.lock_outline,
+                        color: canAfford ? (isDark ? Colors.greenAccent : Colors.green) : (isDark ? Colors.white54 : Colors.grey),
+                      ),
                       onTap: canAfford ? () => _executeAdopsi(context, h) : null,
                     ),
                   );

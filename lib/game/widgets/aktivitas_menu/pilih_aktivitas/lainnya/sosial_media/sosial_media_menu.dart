@@ -66,10 +66,11 @@ class _SocialMediaMenuPageState extends State<SocialMediaMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sosial Media 📱'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: isDark ? Colors.blueGrey.shade900 : Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
       body: SingleChildScrollView(
@@ -82,17 +83,21 @@ class _SocialMediaMenuPageState extends State<SocialMediaMenuPage> {
               padding: const EdgeInsets.all(12),
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: isDark ? Colors.blue.shade900.withValues(alpha: 0.3) : Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.blue.shade200),
+                border: Border.all(color: isDark ? Colors.blue.shade700 : Colors.blue.shade200),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.people, color: Colors.blueAccent),
+                  Icon(Icons.people, color: isDark ? Colors.lightBlueAccent : Colors.blueAccent),
                   const SizedBox(width: 8),
                   Text(
                     'Total Pengikut (Followers): ${_fmt(_getTotalFollowers())}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blueAccent, fontSize: 13),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.lightBlueAccent : Colors.blueAccent,
+                      fontSize: 13,
+                    ),
                   ),
                 ],
               ),
@@ -104,19 +109,42 @@ class _SocialMediaMenuPageState extends State<SocialMediaMenuPage> {
               Color color = platform['color'];
               int followers = character.platformFollowers[name] ?? 0;
 
+              // Untuk dark mode, warna hitam di Twitter harus diganti
+              Color platformColor = color;
+              if (isDark && name == 'X (Twitter)') {
+                platformColor = Colors.white;
+              }
+
               return Card(
                 elevation: 0,
                 margin: const EdgeInsets.only(bottom: 8),
-                color: Colors.grey.shade50,
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
+                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                 ),
                 child: ListTile(
-                  leading: Icon(icon, color: color, size: 32),
-                  title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  subtitle: Text('Pengikut: ${_fmt(followers)}', style: const TextStyle(fontSize: 12)),
-                  trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  leading: Icon(icon, color: platformColor, size: 32),
+                  title: Text(
+                    name,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Pengikut: ${_fmt(followers)}',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
+                  ),
+                  trailing: Icon(
+                    Icons.arrow_forward_ios,
+                    size: 14,
+                    color: isDark ? Colors.white54 : Colors.grey,
+                  ),
                   onTap: () async {
                     // Redirect ke dashboard platform
                     await Navigator.push(

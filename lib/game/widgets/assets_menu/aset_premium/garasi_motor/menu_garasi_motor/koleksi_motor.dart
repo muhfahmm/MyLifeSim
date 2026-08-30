@@ -1,7 +1,7 @@
 part of '../garasi_motor.dart';
 
 class KoleksiMotorPage extends StatefulWidget {
-  final _GarasiMotorPageState state;
+  final GarasiMotorPageState state;
   const KoleksiMotorPage({super.key, required this.state});
 
   @override
@@ -29,6 +29,7 @@ class _KoleksiMotorPageState extends State<KoleksiMotorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final state = widget.state;
     return Scaffold(
       appBar: AppBar(
@@ -43,14 +44,14 @@ class _KoleksiMotorPageState extends State<KoleksiMotorPage> {
         ],
       ),
       body: filteredMotor.isEmpty
-          ? const Center(
+          ? Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.motorcycle, size: 80, color: Colors.grey),
-                  SizedBox(height: 16),
-                  Text('Belum ada motor di koleksi.', style: TextStyle(fontSize: 16, color: Colors.grey)),
-                  Text('Belilah motor di menu Jual & Beli.', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                  Icon(Icons.motorcycle, size: 80, color: isDark ? Colors.white54 : Colors.grey),
+                  const SizedBox(height: 16),
+                  Text('Belum ada motor di koleksi.', style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.grey)),
+                  Text('Belilah motor di menu Jual & Beli.', style: TextStyle(fontSize: 14, color: isDark ? Colors.white54 : Colors.grey)),
                 ],
               ),
             )
@@ -62,14 +63,14 @@ class _KoleksiMotorPageState extends State<KoleksiMotorPage> {
                 return Card(
                   margin: const EdgeInsets.only(bottom: 8),
                   child: ListTile(
-                    leading: const Icon(Icons.motorcycle, color: Colors.orange),
-                    title: Text('${motor['nama']} (${motor['tahun']})', style: const TextStyle(fontWeight: FontWeight.bold)),
+                    leading: Icon(Icons.motorcycle, color: Colors.orange),
+                    title: Text('${motor['nama']} (${motor['tahun']})', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('${motor['merek']} | ${motor['tipe']} | ${motor['kondisi']}'),
-                        Text('HP: ${motor['hp']} | Top Speed: ${motor['topSpeed']} km/h'),
-                        Text('Harga: USD ${formatRupiah(motor['harga'])}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                        Text('${motor['merek']} | ${motor['tipe']} | ${motor['kondisi']}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                        Text('HP: ${motor['hp']} | Top Speed: ${motor['topSpeed']} km/h', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                        Text('Harga: USD ${formatRupiah(motor['harga'])}', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
                       ],
                     ),
                     trailing: PopupMenuButton<String>(
@@ -84,8 +85,8 @@ class _KoleksiMotorPageState extends State<KoleksiMotorPage> {
                         }
                       },
                       itemBuilder: (ctx) => [
-                        const PopupMenuItem(value: 'pamer', child: Row(children: [Icon(Icons.storefront), SizedBox(width: 8), Text('Pamerkan di Showroom')])),
-                        const PopupMenuItem(value: 'jual', child: Row(children: [Icon(Icons.sell, color: Colors.red), SizedBox(width: 8), Text('Jual Motor')])),
+                        PopupMenuItem(value: 'pamer', child: Row(children: [Icon(Icons.storefront, color: isDark ? Colors.white70 : Colors.black87), const SizedBox(width: 8), Text('Pamerkan di Showroom', style: TextStyle(color: isDark ? Colors.white : Colors.black87))])),
+                        PopupMenuItem(value: 'jual', child: Row(children: [Icon(Icons.sell, color: Colors.red), const SizedBox(width: 8), Text('Jual Motor', style: TextStyle(color: isDark ? Colors.white : Colors.black87))])),
                       ],
                     ),
                   ),
@@ -96,29 +97,32 @@ class _KoleksiMotorPageState extends State<KoleksiMotorPage> {
   }
 
   void _showFilterDialog(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Filter & Urutkan'),
+        title: Text('Filter & Urutkan', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Tipe Motor:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Tipe Motor:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             DropdownButton<String>(
               value: filterTipe,
+              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
               items: ['Semua', 'Matic', 'Sport', 'Adventure', 'Hyperbike', 'Cruiser', 'Classic']
-                  .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+                  .map((t) => DropdownMenuItem(value: t, child: Text(t, style: TextStyle(color: isDark ? Colors.white : Colors.black87))))
                   .toList(),
               onChanged: (val) => setState(() => filterTipe = val!),
             ),
             const SizedBox(height: 16),
-            const Text('Urutkan:', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Urutkan:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             DropdownButton<String>(
               value: sortBy,
-              items: const [
-                DropdownMenuItem(value: 'nama', child: Text('Nama (A-Z)')),
-                DropdownMenuItem(value: 'harga', child: Text('Harga (Tertinggi)')),
-                DropdownMenuItem(value: 'tahun', child: Text('Tahun (Terbaru)')),
+              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+              items: [
+                DropdownMenuItem(value: 'nama', child: Text('Nama (A-Z)', style: TextStyle(color: isDark ? Colors.white : Colors.black87))),
+                DropdownMenuItem(value: 'harga', child: Text('Harga (Tertinggi)', style: TextStyle(color: isDark ? Colors.white : Colors.black87))),
+                DropdownMenuItem(value: 'tahun', child: Text('Tahun (Terbaru)', style: TextStyle(color: isDark ? Colors.white : Colors.black87))),
               ],
               onChanged: (val) => setState(() => sortBy = val!),
             ),

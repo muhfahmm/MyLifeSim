@@ -75,27 +75,32 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
                     'Saldo Anda: \$${_formatMoney(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.greenAccent : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -110,26 +115,28 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.white,
+                    color: isDark ? Colors.grey.shade800 : Colors.white,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       title: Text(
                         item['name'],
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           item['desc'],
-                          style: const TextStyle(color: Colors.black54),
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
                         ),
                       ),
                       isThreeLine: false,

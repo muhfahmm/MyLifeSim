@@ -58,27 +58,32 @@ class _LisensiPageState extends State<LisensiPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Urus Lisensi 📋', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
                     'Saldo Anda: \$${_fmt(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.greenAccent : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -98,24 +103,33 @@ class _LisensiPageState extends State<LisensiPage> {
                   final bool isPilotLocked = name.contains('Pilot') && (widget.character.intelligence < 80 || widget.character.age < 21);
                   
                   Widget trailingWidget;
-                  Color titleColor = Colors.black87;
-                  Color subtitleColor = Colors.black54;
-                  Color cardBg = Colors.white;
+                  Color titleColor;
+                  Color subtitleColor;
+                  Color cardBg;
+                  Color borderColor;
+
+                  // Inisialisasi default untuk mencegah error
+                  titleColor = isDark ? Colors.white : Colors.black87;
+                  subtitleColor = isDark ? Colors.white70 : Colors.black54;
+                  cardBg = isDark ? Colors.grey.shade800 : Colors.white;
+                  borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
 
                   if (owned) {
-                    trailingWidget = const Text(
+                    trailingWidget = Text(
                       'Sudah Dimiliki',
-                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+                      style: TextStyle(color: isDark ? Colors.greenAccent : Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
                     );
-                    titleColor = Colors.green.shade800;
-                    cardBg = Colors.green.shade50.withOpacity(0.3);
+                    titleColor = isDark ? Colors.greenAccent : Colors.green.shade800;
+                    cardBg = isDark ? Colors.green.shade900.withValues(alpha: 0.3) : Colors.green.shade50.withValues(alpha: 0.3);
+                    borderColor = isDark ? Colors.green.shade700 : Colors.green.shade200;
                   } else if (isPilotLocked) {
-                    trailingWidget = const Icon(Icons.lock, size: 16, color: Colors.grey);
-                    titleColor = Colors.grey;
-                    subtitleColor = Colors.grey;
-                    cardBg = Colors.grey.shade50;
+                    trailingWidget = Icon(Icons.lock, size: 16, color: isDark ? Colors.white54 : Colors.grey);
+                    titleColor = isDark ? Colors.white54 : Colors.grey;
+                    subtitleColor = isDark ? Colors.white38 : Colors.grey;
+                    cardBg = isDark ? Colors.grey.shade700 : Colors.grey.shade50;
+                    borderColor = isDark ? Colors.grey.shade600 : Colors.grey.shade200;
                   } else {
-                    trailingWidget = const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.brown);
+                    trailingWidget = Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.brown.shade300 : Colors.brown);
                   }
 
                   return Card(
@@ -124,14 +138,18 @@ class _LisensiPageState extends State<LisensiPage> {
                     color: cardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: owned ? Colors.green.shade200 : Colors.grey.shade200),
+                      side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(name, style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14,
-                        color: titleColor,
-                      )),
+                      title: Text(
+                        name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: titleColor,
+                        ),
+                      ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
@@ -150,12 +168,12 @@ class _LisensiPageState extends State<LisensiPage> {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text('Lisensi Dimiliki ✅', style: TextStyle(fontWeight: FontWeight.bold)),
-                              content: Text('Kamu sudah memiliki lisensi $name.'),
+                              title: Text('Lisensi Dimiliki ✅', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                              content: Text('Kamu sudah memiliki lisensi $name.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -169,12 +187,12 @@ class _LisensiPageState extends State<LisensiPage> {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text('Lisensi Terkunci 🔒', style: TextStyle(fontWeight: FontWeight.bold)),
-                              content: const Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.'),
+                              title: Text('Lisensi Terkunci 🔒', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -188,12 +206,12 @@ class _LisensiPageState extends State<LisensiPage> {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text('Belum Cukup Umur 🔞', style: TextStyle(fontWeight: FontWeight.bold)),
-                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.'),
+                              title: Text('Belum Cukup Umur 🔞', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -207,12 +225,12 @@ class _LisensiPageState extends State<LisensiPage> {
                             context: context,
                             builder: (ctx) => AlertDialog(
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: const Text('Saldo Kurang 💸', style: TextStyle(fontWeight: FontWeight.bold)),
-                              content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.'),
+                              title: Text('Saldo Kurang 💸', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                              content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -228,13 +246,15 @@ class _LisensiPageState extends State<LisensiPage> {
                               character: widget.character,
                               license: l,
                               onComplete: () {
-                                setState(() {});
-                                widget.onComplete();
+                                if (mounted) {
+                                  setState(() {});
+                                  widget.onComplete();
+                                }
                               },
                             ),
                           ),
                         ).then((passed) {
-                          if (passed == true) {
+                          if (passed == true && mounted) {
                             _checkParentGiftOffer(context, l);
                           }
                         });
@@ -308,6 +328,8 @@ class _LisensiPageState extends State<LisensiPage> {
     final giftCar = matchingCars[random.nextInt(matchingCars.length)];
     final int carPrice = (giftCar['harga'] as num).toInt();
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -317,7 +339,7 @@ class _LisensiPageState extends State<LisensiPage> {
           children: [
             const Icon(Icons.card_giftcard, color: Colors.pink, size: 28),
             const SizedBox(width: 8),
-            Text('Hadiah dari $parentRole! 🎁', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Text('Hadiah dari $parentRole! 🎁', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
           ],
         ),
         content: Text(
@@ -325,18 +347,18 @@ class _LisensiPageState extends State<LisensiPage> {
           '🚗 Kendaraan: ${giftCar['nama']} (${giftCar['merek']})\n'
           '💰 Nilai: \$${_fmt(giftCar['harga'] as int)}\n\n'
           'Apakah kamu mau menerima hadiah ini?',
-          style: const TextStyle(fontSize: 14, height: 1.4),
+          style: TextStyle(fontSize: 14, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(giftCtx);
             },
-            child: const Text('Tolak', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            child: Text('Tolak', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.pink.shade600,
+              backgroundColor: isDark ? Colors.pink.shade700 : Colors.pink.shade600,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
@@ -347,8 +369,10 @@ class _LisensiPageState extends State<LisensiPage> {
               widget.character.inbox.add('🎁 Hadiah Kendaraan: Menerima ${giftCar['nama']} dari $parentRole ($parentName)! (+30% Kebahagiaan)');
               
               Navigator.pop(giftCtx);
-              setState(() {});
-              widget.onComplete();
+              if (mounted) {
+                setState(() {});
+                widget.onComplete();
+              }
             },
             child: const Text('Terima', style: TextStyle(fontWeight: FontWeight.bold)),
           ),

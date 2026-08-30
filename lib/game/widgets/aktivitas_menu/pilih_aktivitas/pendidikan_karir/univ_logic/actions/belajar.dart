@@ -54,6 +54,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Belajar Lebih Giat (Kuliah)'),
@@ -65,10 +66,10 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
         children: [
           Card(
             elevation: 0,
-            color: Colors.indigo.shade50,
+            color: isDark ? Colors.grey.shade800 : Colors.indigo.shade50,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.indigo.shade100),
+              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.indigo.shade100),
             ),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -83,13 +84,20 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
                   const SizedBox(height: 8),
                   Text(
                     'Kecerdasan saat ini: ${widget.character.intelligence}%',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Belajar giat di kampus akan membantumu mendapatkan IPK tinggi dan mempermudah karir profesional setelah lulus.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white70 : Colors.black54,
+                    ),
                   ),
                 ],
               ),
@@ -97,9 +105,14 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
           ),
           const SizedBox(height: 24),
 
-          const Text(
+          Text(
             'PILIH METODE BELAJAR KULIAH',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white70 : Colors.grey,
+              letterSpacing: 1.0,
+            ),
           ),
           const SizedBox(height: 12),
 
@@ -151,19 +164,35 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
     required String gain,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
       ),
       child: ListTile(
         leading: Icon(icon, color: color, size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('$subtitle\n($gain)'),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          '$subtitle\n($gain)',
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
         isThreeLine: true,
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: onTap,
       ),
     );

@@ -167,12 +167,22 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
   }
 
   void _showAdmissionPathways(BuildContext context, String major) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: Text('Pendaftaran: $major 🎓', style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text('Pilih jalur pendaftaran universitas yang ingin kamu ambil:'),
+        title: Text(
+          'Pendaftaran: $major 🎓',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
+          'Pilih jalur pendaftaran universitas yang ingin kamu ambil:',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+        ),
         actions: [
           Padding(
             padding: const EdgeInsets.only(bottom: 8.0),
@@ -233,7 +243,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey)),
           ),
         ],
       ),
@@ -339,6 +349,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pilih Jurusan Universitas 🎓'),
@@ -353,9 +364,13 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           children: [
             _buildCategoryFilter(),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Pilih salah satu program studi yang ingin kamu tekuni:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
             ),
             const SizedBox(height: 16),
             Expanded(
@@ -376,9 +391,12 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                       ),
                       title: Text(
                         major,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.black54),
                       onTap: () {
                         _showAdmissionPathways(context, major);
                       },
@@ -454,17 +472,22 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     required bool isSelected,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return FilterChip(
-      label: Text(label),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected
+              ? (isDark ? Colors.white : Colors.indigo)
+              : (isDark ? Colors.white70 : Colors.grey.shade700),
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
       selected: isSelected,
       onSelected: (_) => onTap(),
-      backgroundColor: Colors.white,
-      selectedColor: Colors.indigo.shade100,
-      checkmarkColor: Colors.indigo,
-      labelStyle: TextStyle(
-        color: isSelected ? Colors.indigo : Colors.grey.shade700,
-        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-      ),
+      backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+      selectedColor: isDark ? Colors.indigo.shade700 : Colors.indigo.shade100,
+      checkmarkColor: isDark ? Colors.white : Colors.indigo,
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
     );
   }
@@ -498,6 +521,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final character = widget.character;
     final onRefresh = widget.onRefresh;
     final String level = _determineCurrentRegisterLevel();
@@ -517,21 +541,35 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               children: [
                 const Icon(Icons.verified, size: 80, color: Colors.amber),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'Pendidikan Selesai! 🎉',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Kamu telah berhasil menyelesaikan semua jenjang pendidikan tinggi hingga S3 Doktoral. Tidak ada lagi jenjang pendidikan formal lanjutan untuk diambil.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14, color: Colors.grey),
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.white70 : Colors.grey,
+                  ),
                 ),
                 const SizedBox(height: 32),
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Kembali', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: Text(
+                    'Kembali',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
                 ),
               ],
             ),
@@ -555,13 +593,20 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               Text(
                 'Belum Terdaftar di Universitas ($level)',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
                 'Kamu saat ini belum menempuh pendidikan tinggi jenjang $level. Silakan pilih jurusan dan mendaftar kuliah untuk memulai aktivitas akademik.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.grey,
+                ),
               ),
               const SizedBox(height: 32),
               ElevatedButton.icon(
@@ -594,7 +639,12 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: const Text('Kembali'),
+                child: Text(
+                  'Kembali',
+                  style: TextStyle(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
               ),
             ],
           ),
@@ -631,15 +681,16 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                     const SizedBox(height: 12),
                     Text(
                       character.name,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
                     Text(
                       'Mahasiswa • Usia: ${character.age} tahun',
                       style: TextStyle(
-                        color: Colors.grey.shade600,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
                         fontSize: 14,
                       ),
                     ),
@@ -647,9 +698,12 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                     Chip(
                       label: Text(
                         character.univMajor!,
-                        style: const TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                       ),
-                      backgroundColor: Colors.indigo.shade50,
+                      backgroundColor: isDark ? Colors.indigo.shade900 : Colors.indigo.shade50,
                       avatar: const Icon(
                         Icons.verified,
                         size: 16,
@@ -664,11 +718,13 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                           'Kecerdasan',
                           '${character.intelligence}%',
                           Colors.blue,
+                          isDark,
                         ),
                         _buildHeaderStat(
                           'Kebahagiaan',
                           '${character.happiness}%',
                           Colors.green,
+                          isDark,
                         ),
                       ],
                     ),
@@ -677,12 +733,12 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
               ),
             ),
             const SizedBox(height: 24),
-            const Text(
+            Text(
               'Aktivitas Perkuliahan',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.blueGrey,
+                color: isDark ? Colors.white70 : Colors.blueGrey,
               ),
             ),
             const SizedBox(height: 12),
@@ -753,19 +809,30 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showBolosDialog(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Rencana Bolos Kuliah 🏃‍♂️', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text(
+        title: Text(
+          'Rencana Bolos Kuliah 🏃‍♂️',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
           'Apakah kamu yakin ingin membolos kuliah hari ini? '
           'Tindakan ini berisiko ketahuan dosen dan merusak reputasi absensimu.',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
+            child: Text(
+              'Batal',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+            ),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
@@ -807,21 +874,31 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showKeluarDialog(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Peringatan Drop Out 🚪', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text(
+        title: Text(
+          'Peringatan Drop Out 🚪',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
           'Meninggalkan perkuliahan secara sepihak berarti merelakan gelar akademikmu dan menutup peluang kerja profesional berstandar ijazah sarjana. '
           'Apakah kamu yakin ingin drop out kuliah sekarang?',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
+            child: Text(
+              'Batal',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+            ),
           ),
-          // ========= PERBAIKAN: TOMBOL DROP OUT MENJADI MERAH =========
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
             onPressed: () {
@@ -856,27 +933,43 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showOutcomeDialog(BuildContext context, String title, String content) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (c) => AlertDialog(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(content),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        content: Text(
+          content,
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c),
-            child: const Text('OK'),
+            child: Text(
+              'OK',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildHeaderStat(String label, String value, Color color) {
+  Widget _buildHeaderStat(String label, String value, Color color, bool isDark) {
     return Column(
       children: [
         Text(
           label,
-          style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.grey.shade500,
+            fontSize: 12,
+          ),
         ),
         const SizedBox(height: 4),
         Text(
@@ -900,6 +993,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
     Widget? page,
     VoidCallback? onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 1,
       margin: const EdgeInsets.only(bottom: 12),
@@ -908,9 +1002,24 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
       ),
       child: ListTile(
         leading: Icon(icon, color: color, size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
-        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
+        trailing: Icon(
+          Icons.chevron_right,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: () async {
           if (onTap != null) {
             onTap();

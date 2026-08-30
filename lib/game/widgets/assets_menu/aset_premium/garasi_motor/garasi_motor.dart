@@ -94,10 +94,10 @@ class GarasiMotorPage extends StatefulWidget {
   const GarasiMotorPage({super.key, required this.character});
 
   @override
-  State<GarasiMotorPage> createState() => _GarasiMotorPageState();
+  State<GarasiMotorPage> createState() => GarasiMotorPageState();
 }
 
-class _GarasiMotorPageState extends State<GarasiMotorPage> {
+class GarasiMotorPageState extends State<GarasiMotorPage> {
   late Character character;
 
   List<Map<String, dynamic>> koleksiMotor = [];
@@ -288,6 +288,7 @@ class _GarasiMotorPageState extends State<GarasiMotorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Garasi Motor'),
@@ -307,28 +308,28 @@ class _GarasiMotorPageState extends State<GarasiMotorPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: Colors.orange.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.orange.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Ringkasan Garasi', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text('Ringkasan Garasi', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey)),
                     const SizedBox(height: 8),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Motor:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('${koleksiMotor.length} (Showroom: ${showroomMotor.length})'),
+                        Text('Total Motor:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                        Text('${koleksiMotor.length} (Showroom: ${showroomMotor.length})', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Nilai:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('USD ${formatRupiah(totalNilaiKoleksi)}'),
+                        Text('Total Nilai:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                        Text('USD ${formatRupiah(totalNilaiKoleksi)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Pendapatan Showroom:', style: TextStyle(fontWeight: FontWeight.bold)),
-                        Text('USD ${formatRupiah(totalPendapatanShowroom)}'),
+                        Text('Pendapatan Showroom:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                        Text('USD ${formatRupiah(totalPendapatanShowroom)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                       ]),
                   ],
                 ),
@@ -374,6 +375,7 @@ class _GarasiMotorPageState extends State<GarasiMotorPage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -395,11 +397,11 @@ class _GarasiMotorPageState extends State<GarasiMotorPage> {
                   children: [
                     Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: color)),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
             ],
           ),
         ),

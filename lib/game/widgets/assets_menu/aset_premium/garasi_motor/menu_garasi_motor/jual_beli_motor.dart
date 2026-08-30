@@ -1,7 +1,7 @@
 part of '../garasi_motor.dart';
 
 class JualBeliMotorPage extends StatefulWidget {
-  final _GarasiMotorPageState state;
+  final GarasiMotorPageState state;
   const JualBeliMotorPage({super.key, required this.state});
 
   @override
@@ -18,16 +18,17 @@ class _JualBeliMotorPageState extends State<JualBeliMotorPage> {
     return all.where((m) => m['tipe'] == type).toList();
   }
 
-  Widget _buildBeliTab(BuildContext context, _GarasiMotorPageState state, int index) {
+  Widget _buildBeliTab(BuildContext context, GarasiMotorPageState state, int index) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final list = _filteredMotor(index);
     if (list.isEmpty) {
-      return const Center(
+      return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.motorcycle, size: 80, color: Colors.grey),
-            SizedBox(height: 16),
-            Text('Tidak ada motor di kategori ini.', style: TextStyle(fontSize: 16, color: Colors.grey)),
+            Icon(Icons.motorcycle, size: 80, color: isDark ? Colors.white54 : Colors.grey),
+            const SizedBox(height: 16),
+            Text('Tidak ada motor di kategori ini.', style: TextStyle(fontSize: 16, color: isDark ? Colors.white70 : Colors.grey)),
           ],
         ),
       );
@@ -41,18 +42,18 @@ class _JualBeliMotorPageState extends State<JualBeliMotorPage> {
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           child: ListTile(
-            leading: const Icon(Icons.motorcycle, color: Colors.green),
-            title: Text('${motor['nama']} (${motor['tahun']})', style: const TextStyle(fontWeight: FontWeight.bold)),
+            leading: Icon(Icons.motorcycle, color: Colors.green),
+            title: Text('${motor['nama']} (${motor['tahun']})', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('${motor['merek']} | ${motor['tipe']} | ${motor['kondisi']}'),
-                Text('HP: ${motor['hp']} | Top Speed: ${motor['topSpeed']} km/h'),
-                Text('Harga: \$${formatRupiah(motor['harga'])}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                Text('${motor['merek']} | ${motor['tipe']} | ${motor['kondisi']}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                Text('HP: ${motor['hp']} | Top Speed: ${motor['topSpeed']} km/h', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                Text('Harga: \$${formatRupiah(motor['harga'])}', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
               ],
             ),
             trailing: owned
-                ? const Icon(Icons.check_circle, color: Colors.green)
+                ? Icon(Icons.check_circle, color: Colors.green)
                 : ElevatedButton(
                     onPressed: () {
                       state.beliMotor(motor);
@@ -99,14 +100,15 @@ class _JualBeliMotorPageState extends State<JualBeliMotorPage> {
     );
   }
 
-  void _showJualDialog(BuildContext context, _GarasiMotorPageState state) {
+  void _showJualDialog(BuildContext context, GarasiMotorPageState state) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) {
         return AlertDialog(
-          title: const Text('Jual Koleksi'),
+          title: Text('Jual Koleksi', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
           content: state.koleksiMotor.isEmpty
-              ? const Text('Tidak ada motor untuk dijual.')
+              ? Text('Tidak ada motor untuk dijual.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54))
               : SizedBox(
                   width: double.maxFinite,
                   height: 300,
@@ -118,8 +120,8 @@ class _JualBeliMotorPageState extends State<JualBeliMotorPage> {
                       if (motor['kondisi'] == 'Baik') hargaJual = (hargaJual * 1.1).round();
                       if (motor['kondisi'] == 'Sangat Baik') hargaJual = (hargaJual * 1.2).round();
                       return ListTile(
-                        title: Text(motor['nama']),
-                        subtitle: Text('Harga Jual: \$${formatRupiah(hargaJual)}'),
+                        title: Text(motor['nama'], style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                        subtitle: Text('Harga Jual: \$${formatRupiah(hargaJual)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                         trailing: ElevatedButton(
                           onPressed: () {
                             state.jualMotor(i);
