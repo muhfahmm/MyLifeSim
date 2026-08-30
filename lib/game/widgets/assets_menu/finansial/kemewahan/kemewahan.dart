@@ -97,41 +97,63 @@ class KemewahanItem extends StatelessWidget {
     );
   }
 
-  void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.lock_outline, color: Colors.grey, size: 28),
-            SizedBox(width: 8),
-            Text('Fitur Terkunci', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
+  final bool isDark = Theme.of(context).brightness == Brightness.dark;
+  
+  showDialog(
+    context: context,
+    builder: (dialogContext) => AlertDialog(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
+      title: Row(
+        children: [
+          Icon(Icons.lock_outline, color: isDark ? Colors.white70 : Colors.grey, size: 28),
+          const SizedBox(width: 8),
+          Text(
+            'Fitur Terkunci',
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Usia saat ini: ${character.age} tahun',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Mengerti'),
           ),
         ],
       ),
-    );
-  }
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
+            style: TextStyle(
+              fontSize: 14,
+              color: isDark ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Usia saat ini: ${character.age} tahun',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white54 : Colors.grey,
+            ),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: Text(
+            'Mengerti',
+            style: TextStyle(
+              color: isDark ? Colors.blueAccent : Colors.blue,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
 }
 
 // ============================================================

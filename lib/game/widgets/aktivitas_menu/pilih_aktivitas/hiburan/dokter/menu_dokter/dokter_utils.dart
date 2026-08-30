@@ -85,6 +85,28 @@ class DokterUtils {
     }
   }
 
+  static int getHappinessGainOnCured(String diseaseName) {
+    final String nameLower = diseaseName.toLowerCase();
+    final List<String> ringanList = [
+      'flu', 'sakit kepala', 'batuk', 'alergi', 'sakit gigi', 'pusing', 'diare', 
+      'lecet', 'robekan kecil', 'kram', 'iritasi overstimulasi', 'luka mikro', 'dehidrasi'
+    ];
+    final List<String> beratList = [
+      'pneumonia berat', 'stroke', 'serangan jantung', 'ginjal', 'kanker', 
+      'meningitis', 'tubaberculosis', 'tbc', 'pankreatitis', 'hiv', 'aids', 'cedera jaringan', 'laserasi'
+    ];
+
+    final random = Random();
+    if (ringanList.any((key) => nameLower.contains(key))) {
+      return 10 + random.nextInt(6); // 10-15
+    } else if (beratList.any((key) => nameLower.contains(key))) {
+      return 25 + random.nextInt(6); // 25-30
+    } else {
+      // Sedang
+      return 15 + random.nextInt(11); // 15-25
+    }
+  }
+
   static Future<bool> handleDiseaseTreatment(BuildContext context, Character character, String menuType, {String? specificDisease}) async {
     String? targetDisease = specificDisease;
     if (targetDisease == null) {
@@ -238,13 +260,15 @@ class DokterUtils {
         character.hasHPV = false;
       }
       character.health = (character.health + 25).clamp(0, 100);
-      character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $targetDisease via $menuType (-\$$cost uang, +25% Kesehatan)');
+      final int hapGain = getHappinessGainOnCured(targetDisease);
+      character.happiness = (character.happiness + hapGain).clamp(0, 100);
+      character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $targetDisease via $menuType (-\$$cost uang, +25% Kesehatan, +$hapGain% Kebahagiaan)');
 
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Pengobatan Berhasil 🎉'),
-          content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% (\$${fmt(cost)} uang berkurang).'),
+          content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% dan Kebahagiaanmu meningkat +$hapGain% (\$${fmt(cost)} uang berkurang).'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),

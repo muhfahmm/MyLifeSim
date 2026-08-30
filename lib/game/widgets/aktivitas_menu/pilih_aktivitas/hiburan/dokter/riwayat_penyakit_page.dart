@@ -263,6 +263,8 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           widget.character.riwayatPenyakit.remove(disease);
           curedDiseases.add(disease);
           curedCount++;
+          final int hapGain = DokterUtils.getHappinessGainOnCured(disease);
+          widget.character.happiness = (widget.character.happiness + hapGain).clamp(0, 100);
 
           if (disease.contains('HIV')) {
             widget.character.hasHIV = false;
@@ -279,7 +281,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
       // Add stats health increment
       if (curedCount > 0) {
         widget.character.health = (widget.character.health + (25 * curedCount)).clamp(0, 100);
-        final successMsg = '🏥 Obati Semua: Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (-$totalCost uang, kesehatan meningkat!)';
+        final successMsg = '🏥 Obati Semua: Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (-$totalCost uang, kesehatan & kebahagiaan meningkat!)';
         widget.character.inbox.add(successMsg);
       }
       if (failedCount > 0) {
@@ -364,6 +366,8 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           widget.character.riwayatPenyakit.remove(disease);
           curedDiseases.add(disease);
           curedCount++;
+          final int hapGain = DokterUtils.getHappinessGainOnCured(disease);
+          widget.character.happiness = (widget.character.happiness + hapGain).clamp(0, 100);
 
           if (disease.contains('HIV')) {
             widget.character.hasHIV = false;
@@ -380,7 +384,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
       // Tambah kesehatan
       if (curedCount > 0) {
         widget.character.health = (widget.character.health + (25 * curedCount)).clamp(0, 100);
-        final successMsg = '🏥 Minta Pengobatan: $parentRelation membayar \$${DokterUtils.fmt(totalCost)} untuk mengobati penyakitmu. Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (kesehatan meningkat!)';
+        final successMsg = '🏥 Minta Pengobatan: $parentRelation membayar \$${DokterUtils.fmt(totalCost)} untuk mengobati penyakitmu. Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (kesehatan & kebahagiaan meningkat!)';
         widget.character.inbox.add(successMsg);
       }
       if (failedCount > 0) {

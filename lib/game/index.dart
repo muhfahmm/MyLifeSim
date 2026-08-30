@@ -2863,28 +2863,170 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
+  void _showStatGuide(String label) {
+    String title = '';
+    IconData icon = Icons.info;
+    Color iconColor = Colors.grey;
+    List<Map<String, String>> tips = [];
+
+    if (label == 'Kesehatan') {
+      title = 'Panduan Kesehatan 🩺';
+      icon = Icons.favorite;
+      iconColor = Colors.red;
+      tips = [
+        {'emoji': '🏋️‍♂️', 'title': 'Gym & Olahraga', 'desc': 'Lakukan olahraga rutin untuk menjaga kebugaran tubuh.'},
+        {'emoji': '🏥', 'title': 'Berobat ke Dokter', 'desc': 'Segera obati penyakitmu melalui menu Dokter jika terserang penyakit.'},
+        {'emoji': '🧘‍♂️', 'title': 'Meditasi', 'desc': 'Lakukan meditasi di menu Pikiran & Tubuh untuk menjaga kesehatan mental.'},
+        {'emoji': '🥗', 'title': 'Pola Hidup Sehat', 'desc': 'Hindari alkohol, narkoba, dan aktivitas ekstrem yang membahayakan tubuh.'},
+      ];
+    } else if (label == 'Kebahagiaan') {
+      title = 'Panduan Kebahagiaan 💚';
+      icon = Icons.emoji_emotions;
+      iconColor = Colors.green;
+      tips = [
+        {'emoji': '✈️', 'title': 'Liburan & Jalan-jalan', 'desc': 'Pergi berlibur atau jalan-jalan bersama keluarga & pasangan.'},
+        {'emoji': '🎬', 'title': 'Hiburan & Nonton', 'desc': 'Kunjungi bioskop atau nikmati aktivitas hiburan lainnya.'},
+        {'emoji': '🎁', 'title': 'Hubungan Sosial', 'desc': 'Habiskan waktu bersama keluarga/pasangan dan beri mereka hadiah.'},
+        {'emoji': '🧘‍♂️', 'title': 'Meditasi', 'desc': 'Kurangi tingkat stres dengan bermeditasi secara berkala.'},
+      ];
+    } else if (label == 'Kecerdasan') {
+      title = 'Panduan Kecerdasan 🧠';
+      icon = Icons.lightbulb;
+      iconColor = Colors.blue;
+      tips = [
+        {'emoji': '📚', 'title': 'Membaca Buku', 'desc': 'Baca buku bermanfaat secara rutin melalui menu Aktivitas.'},
+        {'emoji': '🏛️', 'title': 'Mengunjungi Perpustakaan', 'desc': 'Pergi ke perpustakaan umum untuk memperluas wawasan.'},
+        {'emoji': '🎓', 'title': 'Belajar Lebih Giat', 'desc': 'Pilih opsi belajar ekstra di sekolah atau perkuliahan.'},
+        {'emoji': '🧩', 'title': 'Minigame', 'desc': 'Latih otak dengan memenangkan minigame memori atau tes kacamata.'},
+      ];
+    } else if (label == 'Disiplin') {
+      title = 'Panduan Disiplin 💜';
+      icon = Icons.psychology;
+      iconColor = Colors.purple;
+      tips = [
+        {'emoji': '💼', 'title': 'Belajar & Kerja Giat', 'desc': 'Kerjakan tugas sekolah atau pekerjaan dengan sungguh-sungguh.'},
+        {'emoji': '🥋', 'title': 'Latihan Bela Diri', 'desc': 'Ikuti kelas bela diri untuk melatih fokus dan kontrol diri.'},
+        {'emoji': '🧘‍♂️', 'title': 'Meditasi Fokus', 'desc': 'Lakukan meditasi untuk memperkuat konsentrasi.'},
+        {'emoji': '⚠️', 'title': 'Hindari Bolos', 'desc': 'Jangan pernah membolos sekolah atau kerja agar disiplin tidak merosot.'},
+      ];
+    }
+
+    if (tips.isEmpty) return;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Row(
+            children: [
+              Icon(icon, color: iconColor, size: 24),
+              const SizedBox(width: 8),
+              Text(
+                title, 
+                style: TextStyle(
+                  fontWeight: FontWeight.bold, 
+                  fontSize: 16,
+                  color: isDark ? Colors.white : Colors.black87
+                )
+              ),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: tips.map((tip) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(tip['emoji']!, style: const TextStyle(fontSize: 20)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tip['title']!, 
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                fontSize: 13,
+                                color: isDark ? Colors.white : Colors.black87
+                              )
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              tip['desc']!, 
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white70 : Colors.black54
+                              )
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: iconColor,
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   // --- WIDGET STAT BAR ---
   Widget _buildStatRow(String label, int value, Color color, {bool isMoney = false}) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool hasGuide = label == 'Kesehatan' || label == 'Kebahagiaan' || label == 'Kecerdasan' || label == 'Disiplin';
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+            Row(
+              children: [
+                if (hasGuide) ...[
+                  GestureDetector(
+                    onTap: () => _showStatGuide(label),
+                    child: Icon(
+                      Icons.info_outline,
+                      size: 15,
+                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    ),
+                  ),
+                  const SizedBox(width: 4),
+                ],
+                Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              ],
+            ),
             Text(isMoney ? '\$$value' : '$value%', style: const TextStyle(fontSize: 12)),
           ],
         ),
         const SizedBox(height: 4),
         if (!isMoney)
           ClipRRect(
-            borderRadius: BorderRadius.circular(6),
+            borderRadius: BorderRadius.circular(8),
             child: LinearProgressIndicator(
               value: (value.clamp(0, 100)) / 100.0,
               backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
               color: color,
-              minHeight: 8,
+              minHeight: 12,
             ),
           ),
       ],
