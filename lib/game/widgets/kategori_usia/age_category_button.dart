@@ -174,45 +174,51 @@ class AgeCategoryButton extends StatelessWidget {
           context: context,
           title: '📊 Kategori & Status',
           isNotification: false,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // --- HEADER: IKON USIA ---
-              Center(
-                child: Column(
-                  children: [
-                    Icon(ageData['icon'], size: 56, color: color),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${ageData['label']}',
-                      style: TextStyle(
-                        fontSize: 20, 
-                        fontWeight: FontWeight.bold,
-                        color: color,
+          content: Builder(builder: (context) {
+            final theme = Theme.of(context);
+            final isDark = theme.brightness == Brightness.dark;
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // --- HEADER: IKON USIA ---
+                Center(
+                  child: Column(
+                    children: [
+                      Icon(ageData['icon'], size: 56, color: color),
+                      const SizedBox(height: 8),
+                      Text(
+                        '${ageData['label']}',
+                        style: TextStyle(
+                          fontSize: 20, 
+                          fontWeight: FontWeight.bold,
+                          color: color,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // --- INFO DASAR (Gender, Usia, Lokasi) ---
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade50,
-                  borderRadius: BorderRadius.circular(12),
+                // --- INFO DASAR (Gender, Usia, Lokasi) ---
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildInfoItem(context, Icons.wc, 'Gender', gender, Colors.purple),
+                      _buildInfoItem(context, Icons.cake, 'Usia', '$age Tahun', Colors.blue),
+                      _buildInfoItem(context, Icons.location_on, 'Lokasi', location, Colors.orange),
+                    ],
+                  ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildInfoItem(Icons.wc, 'Gender', gender, Colors.purple),
-                    _buildInfoItem(Icons.cake, 'Usia', '$age Tahun', Colors.blue),
-                    _buildInfoItem(Icons.location_on, 'Lokasi', location, Colors.orange),
-                  ],
-                ),
-              ),
               const SizedBox(height: 16),
 
               // --- STATISTIK KARAKTER ---
@@ -222,11 +228,11 @@ class AgeCategoryButton extends StatelessWidget {
                 spacing: 8.0,
                 runSpacing: 8.0,
                 children: [
-                  _buildStatChip(Icons.favorite, 'Kesehatan', health, Colors.red),
-                  _buildStatChip(Icons.sentiment_satisfied, 'Kebahagiaan', happiness, Colors.green),
-                  _buildStatChip(Icons.psychology, 'Kecerdasan', intelligence, Colors.blue),
-                  _buildStatChip(Icons.monetization_on, 'Uang', money, Colors.amber, isMoney: true),
-                  _buildStatChip(Icons.face, 'Penampilan', appearance, Colors.pink),
+                  _buildStatChip(context, Icons.favorite, 'Kesehatan', health, Colors.red),
+                  _buildStatChip(context, Icons.sentiment_satisfied, 'Kebahagiaan', happiness, Colors.green),
+                  _buildStatChip(context, Icons.psychology, 'Kecerdasan', intelligence, Colors.blue),
+                  _buildStatChip(context, Icons.monetization_on, 'Uang', money, Colors.amber, isMoney: true),
+                  _buildStatChip(context, Icons.face, 'Penampilan', appearance, Colors.pink),
                 ],
               ),
               const SizedBox(height: 16),
@@ -236,7 +242,8 @@ class AgeCategoryButton extends StatelessWidget {
               const SizedBox(height: 8),
               _buildEducationHistorySection(),
             ],
-          ),
+            );
+          }),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -271,24 +278,37 @@ class AgeCategoryButton extends StatelessWidget {
   }
 
   // --- WIDGET PEMBANTU UNTUK INFO DASAR ---
-  Widget _buildInfoItem(IconData icon, String label, String value, Color color) {
+  Widget _buildInfoItem(BuildContext context, IconData icon, String label, String value, Color color) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       children: [
         Icon(icon, color: color, size: 24),
         const SizedBox(height: 4),
         Text(label, style: const TextStyle(fontSize: 10, color: Colors.grey)),
-        Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        Text(
+          value, 
+          style: TextStyle(
+            fontSize: 14, 
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
       ],
     );
   }
 
   // --- WIDGET PEMBANTU UNTUK CHIP STATISTIK ---
-  Widget _buildStatChip(IconData icon, String label, int value, Color color, {bool isMoney = false}) {
+  Widget _buildStatChip(BuildContext context, IconData icon, String label, int value, Color color, {bool isMoney = false}) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Chip(
       avatar: Icon(icon, size: 16, color: color),
       label: Text(
         isMoney ? '\$$value' : '$value%',
-        style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black87),
+        style: TextStyle(
+          fontSize: 12, 
+          fontWeight: FontWeight.bold, 
+          color: isDark ? Colors.white : Colors.black87,
+        ),
       ),
       backgroundColor: color.withOpacity(0.1),
       side: BorderSide(color: color.withOpacity(0.3)),

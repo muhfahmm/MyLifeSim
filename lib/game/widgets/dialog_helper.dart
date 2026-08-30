@@ -13,6 +13,9 @@ class DialogHelper {
     final double screenHeight = MediaQuery.of(context).size.height;
     final bool isMobile = screenWidth < 600;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     if (isNotification) {
       // Centered scale-animated modal card popup
       final double dialogWidth = (screenWidth * 0.88).clamp(280, 480);
@@ -38,11 +41,11 @@ class DialogHelper {
               width: dialogWidth,
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? Colors.grey.shade900 : Colors.white,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withAlpha(38),
+                    color: isDark ? Colors.black54 : Colors.black.withAlpha(38),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   )
@@ -57,10 +60,10 @@ class DialogHelper {
                       Expanded(
                         child: Text(
                           title,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 18, 
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
                       ),
@@ -77,9 +80,9 @@ class DialogHelper {
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: DefaultTextStyle(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
-                          color: Colors.black87,
+                          color: isDark ? Colors.white70 : Colors.black87,
                           height: 1.4,
                         ),
                         child: content,
@@ -126,9 +129,9 @@ class DialogHelper {
               height: dialogHeight,
               padding: isMobile ? const EdgeInsets.fromLTRB(16, 8, 16, 8) : const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? Colors.grey.shade900 : Colors.white,
                 borderRadius: isMobile ? BorderRadius.zero : BorderRadius.circular(16),
-                boxShadow: isMobile ? null : [const BoxShadow(color: Colors.black26, blurRadius: 10)],
+                boxShadow: isMobile ? null : [BoxShadow(color: isDark ? Colors.black54 : Colors.black26, blurRadius: 10)],
               ),
               child: SafeArea(
                 child: Column(
@@ -140,11 +143,15 @@ class DialogHelper {
                         Expanded(
                           child: Text(
                             title,
-                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                            style: TextStyle(
+                              fontSize: 18, 
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
                           ),
                         ),
                         IconButton(
-                          icon: const Icon(Icons.close),
+                          icon: Icon(Icons.close, color: isDark ? Colors.white70 : Colors.black54),
                           onPressed: () => Navigator.pop(context),
                         ),
                       ],
@@ -153,7 +160,13 @@ class DialogHelper {
                     Expanded(
                       child: SingleChildScrollView(
                         physics: const ClampingScrollPhysics(),
-                        child: content,
+                        child: DefaultTextStyle(
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                          child: content,
+                        ),
                       ),
                     ),
                     if (actions != null) ...[

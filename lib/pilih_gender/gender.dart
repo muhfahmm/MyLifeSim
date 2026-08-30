@@ -7,8 +7,22 @@ class GenderScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Pilih Gender'), backgroundColor: Colors.white, foregroundColor: Colors.black87, elevation: 0, actions: [IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context))]),
+      appBar: AppBar(
+        title: const Text('Pilih Gender'),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
+        elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.close),
+            onPressed: () => Navigator.pop(context),
+          )
+        ],
+      ),
       body: Center(
         child: SingleChildScrollView(
           child: Container(
@@ -17,7 +31,15 @@ class GenderScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('Apa jenis kelamin karaktermu?', textAlign: TextAlign.center, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87)),
+                Text(
+                  'Apa jenis kelamin karaktermu?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
                 const SizedBox(height: 32),
                 _buildGenderOption(context, gender: 'Laki-laki', icon: Icons.male, iconColor: Colors.blue),
                 const SizedBox(height: 16),
@@ -31,19 +53,44 @@ class GenderScreen extends StatelessWidget {
   }
 
   Widget _buildGenderOption(BuildContext context, {required String gender, required IconData icon, required Color iconColor}) {
-    return MouseRegion(cursor: SystemMouseCursors.click, child: InkWell(
-      onTap: () {
-        // Pindah ke halaman Karakter (Input Nama) sambil membawa data gender
-        // Konversi gender ke format lowercase untuk sesuai dengan folder assets
-        String genderKey = gender.toLowerCase();
-        Navigator.push(context, MaterialPageRoute(builder: (context) => KarakterScreen(gender: genderKey)));
-      },
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24),
-        decoration: BoxDecoration(color: Colors.grey.shade50, borderRadius: BorderRadius.circular(16), border: Border.all(color: Colors.grey.shade300, width: 1.5)),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(icon, size: 40, color: iconColor), const SizedBox(width: 16), Text(gender, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87))]),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: InkWell(
+        onTap: () {
+          // Pindah ke halaman Karakter (Input Nama) sambil membawa data gender
+          // Konversi gender ke format lowercase untuk sesuai dengan folder assets
+          String genderKey = gender.toLowerCase();
+          Navigator.push(context, MaterialPageRoute(builder: (context) => KarakterScreen(gender: genderKey)));
+        },
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24),
+          decoration: BoxDecoration(
+            color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade300,
+              width: 1.5,
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 40, color: iconColor),
+              const SizedBox(width: 16),
+              Text(
+                gender,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
-    ));
+    );
   }
 }

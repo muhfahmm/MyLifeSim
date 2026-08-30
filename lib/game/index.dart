@@ -2520,12 +2520,14 @@ class _GameScreenState extends State<GameScreen> {
   @override
   Widget build(BuildContext context) {
     final ageData = _getAgeData(_character.age);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('BitLife'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
         leading: Builder(
           builder: (context) {
@@ -2545,10 +2547,10 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 Text(
                   formattedDate,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13,
                     fontWeight: FontWeight.bold,
-                    color: Colors.blueGrey,
+                    color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
                   ),
                 ),
               ],
@@ -2723,16 +2725,16 @@ class _GameScreenState extends State<GameScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: theme.scaffoldBackgroundColor,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
+                  color: isDark ? Colors.black38 : Colors.black.withOpacity(0.06),
                   blurRadius: 10,
                   offset: const Offset(0, -4),
                 ),
               ],
               border: Border(
-                top: BorderSide(color: Colors.grey.shade200, width: 1),
+                top: BorderSide(color: theme.dividerColor, width: 1),
               ),
             ),
             child: SafeArea(
@@ -2854,6 +2856,7 @@ class _GameScreenState extends State<GameScreen> {
 
   // --- WIDGET STAT BAR ---
   Widget _buildStatRow(String label, int value, Color color, {bool isMoney = false}) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -2870,7 +2873,7 @@ class _GameScreenState extends State<GameScreen> {
             borderRadius: BorderRadius.circular(6),
             child: LinearProgressIndicator(
               value: (value.clamp(0, 100)) / 100.0,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
               color: color,
               minHeight: 8,
             ),

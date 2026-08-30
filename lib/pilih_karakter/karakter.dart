@@ -494,11 +494,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
     final IconData genderIcon = isMale ? Icons.male : Icons.female;
     final Color genderColor = isMale ? Colors.blue : Colors.pink;
 
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Siapa Namamu?'),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
         actions: [
           IconButton(
@@ -518,7 +521,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
               children: [
                 CircleAvatar(
                   radius: 40,
-                  backgroundColor: Colors.blue.shade50,
+                  backgroundColor: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
                   child: Image.network(
                     AvatarGenerator.buildCustomAvatarUrl(
                       topType: _selectedTopType,
@@ -544,10 +547,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Masukkan nama karaktermu',
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 8),
 
