@@ -9,4 +9,4 @@ Setelah menampilkan modal, kamu juga bisa menambahkan pesan inbox tambahan yang 
 2. Inbox (Jika Terjadi Berulang Kali):
 
 "Keluarga mulai curiga. Beberapa kali Pamanmu terlihat terlalu akrab denganmu di depan umum. Ibu bertanya-tanya ada apa."
-(Jika ketahuan, risiko skandal +40%)
+(Jika ketahuan, risiko skandal +40%)    

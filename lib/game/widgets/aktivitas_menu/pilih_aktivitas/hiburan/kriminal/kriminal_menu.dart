@@ -62,15 +62,31 @@ class _KriminalPageState extends State<KriminalPage> {
     String msg;
     if (tertangkap) {
       final jailYears = crime['jail'] as int;
+      final confiscatedAmount = widget.character.lastCrimeLoot;
       setState(() {
+        widget.character.isImprisoned = true;
+        widget.character.remainingJailYears = jailYears;
+        if (confiscatedAmount > 0) {
+          widget.character.money = (widget.character.money - confiscatedAmount).clamp(0, 999999999999);
+        }
         widget.character.happiness = (widget.character.happiness - 40).clamp(0, 100);
         widget.character.health = (widget.character.health - 10).clamp(0, 100);
+        
+        final List<String> breakups = [];
+        widget.character.handlePartnerBreakupOnArrest(breakups);
+        
+        // Reset last crime loot
+        widget.character.lastCrimeLoot = 0;
       });
-      // TODO: implementasi logika penjara lengkap
       msg = '🚔 TERTANGKAP! Kamu ditangkap polisi saat ${crime['name']} dan dihukum $jailYears tahun penjara! (-40% Kebahagiaan, -10% Kesehatan)';
+      if (confiscatedAmount > 0) {
+        msg += '\n👮 Polisi menyita uang hasil kriminal terakhirmu sebesar \$${_fmt(confiscatedAmount)}!';
+      }
     } else {
       setState(() {
-        widget.character.money += (crime['gain'] as int);
+        final gain = crime['gain'] as int;
+        widget.character.money += gain;
+        widget.character.lastCrimeLoot = gain;
         widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
       });
       msg = '😈 BERHASIL! Kamu berhasil melakukan ${crime['name']} dan mendapatkan \$${_fmt(crime['gain'] as int)}! (+10% Kebahagiaan)';

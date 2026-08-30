@@ -20,8 +20,36 @@ class AssetsButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isImprisoned = character.isImprisoned;
     return ElevatedButton(
+      style: isImprisoned
+          ? ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey.shade300,
+              foregroundColor: Colors.grey.shade600,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+              ),
+            )
+          : ElevatedButton.styleFrom(
+              backgroundColor: Colors.amber.withOpacity(0.2),
+              foregroundColor: Colors.amber,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Colors.amber, width: 1.5),
+              ),
+            ),
       onPressed: () {
+        if (isImprisoned) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Akses ditolak! Kamu sedang berada di dalam penjara.')),
+          );
+          return;
+        }
         DialogHelper.show(
           context: context,
           title: 'Dashboard Aset & Kekayaan',
@@ -64,16 +92,6 @@ class AssetsButton extends StatelessWidget {
           ],
         ).then((_) => onRefresh?.call());
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.amber.withOpacity(0.2),
-        foregroundColor: Colors.amber,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Colors.amber, width: 1.5),
-        ),
-      ),
       child: const Column(
         mainAxisSize: MainAxisSize.min,
         children: [

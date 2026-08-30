@@ -43,6 +43,9 @@ class Character {
   int money;
   int appearance;
   bool isAlive;
+  bool isImprisoned = false;
+  int remainingJailYears = 0;
+  int lastCrimeLoot = 0;
   int followers = 0;
 
   // --- WAKTU PERMAINAN (TANGGAL DINAMIS) ---
@@ -742,6 +745,55 @@ class Character {
 
   // updateHealthDynamic dipindahkan ke lib/pilih_karakter/atribut_karakter/kesehatan.dart sebagai extension method.
 
+  void handlePartnerBreakupOnArrest(List<String> eventsList) {
+    final random = Random();
+    
+    void checkBreakup(String key) {
+      Map<String, String>? pMap;
+      if (key == 'partner') {
+        pMap = partner;
+      } else if (key == 'secondPartner') {
+        pMap = secondPartner;
+      } else if (key == 'thirdPartner') {
+        pMap = thirdPartner;
+      } else if (key == 'fourthPartner') {
+        pMap = fourthPartner;
+      } else if (key == 'fifthPartner') {
+        pMap = fifthPartner;
+      }
+
+      if (pMap != null) {
+        if (random.nextInt(100) < 70) {
+          final pName = pMap['name'] ?? 'Pasanganmu';
+          final relation = pMap['relation'] ?? 'Pacar';
+          final isSpouse = relation == 'Suami' || relation == 'Istri' || relation == 'Tunangan';
+          final actionWord = isSpouse ? 'menceraikanmu' : 'memutuskan hubungan denganmu';
+          final msg = '💔 Hubungan Berakhir: $pName $actionWord setelah mendengar kamu ditangkap polisi dan dipenjara!';
+          eventsList.add(msg);
+          inbox.add(msg);
+          
+          if (key == 'partner') {
+            partner = null;
+          } else if (key == 'secondPartner') {
+            secondPartner = null;
+          } else if (key == 'thirdPartner') {
+            thirdPartner = null;
+          } else if (key == 'fourthPartner') {
+            fourthPartner = null;
+          } else if (key == 'fifthPartner') {
+            fifthPartner = null;
+          }
+        }
+      }
+    }
+
+    checkBreakup('partner');
+    checkBreakup('secondPartner');
+    checkBreakup('thirdPartner');
+    checkBreakup('fourthPartner');
+    checkBreakup('fifthPartner');
+  }
+
   // Method untuk bertambah umur (mengembalikan list log kejadian)
   List<String> ageUp() {
     List<String> events = [];
@@ -749,6 +801,22 @@ class Character {
     justGraduatedMajor = null;
     final random = Random();
     age++;
+
+    if (isImprisoned) {
+      remainingJailYears--;
+      if (remainingJailYears <= 0) {
+        isImprisoned = false;
+        remainingJailYears = 0;
+        final releaseMsg = '📢 BEBAS: Kamu telah menyelesaikan masa hukumanmu dan dibebaskan dari penjara!';
+        events.add(releaseMsg);
+        inbox.add(releaseMsg);
+      } else {
+        final prisonMsg = '⛓️ PENJARA: Kamu masih mendekam di penjara (Sisa hukuman: $remainingJailYears tahun).';
+        events.add(prisonMsg);
+        inbox.add(prisonMsg);
+      }
+    }
+
     updateHealthDynamic(isDaily: false);
     PenyakitManager.checkAnnualDisease(this, events);
     updateIntelligenceDynamic();
@@ -916,7 +984,7 @@ class Character {
     }
 
     // Tambah gaji dari pekerjaan jika ada
-    if (jobName != null && jobSalary != null) {
+    if (!isImprisoned && jobName != null && jobSalary != null) {
       final double raisePercent = 0.03 + (random.nextDouble() * 0.03);
       final int raiseAmount = (jobSalary! * raisePercent).round();
       jobSalary = jobSalary! + raiseAmount;
@@ -926,7 +994,9 @@ class Character {
     }
 
     // Update karir Idol jika ada
-    IdolManager.ageUpIdol(this, events, inbox);
+    if (!isImprisoned) {
+      IdolManager.ageUpIdol(this, events, inbox);
+    }
 
     if (age == 12) {
       if (educationHistory['SD'] == 'Belum Lulus') {

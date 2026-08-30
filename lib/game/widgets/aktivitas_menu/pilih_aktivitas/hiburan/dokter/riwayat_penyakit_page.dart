@@ -126,6 +126,110 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
     }
   }
 
+  void _treatAllDiseases() {
+    final activeDiseases = List<String>.from(widget.character.riwayatPenyakit);
+    if (activeDiseases.isEmpty) return;
+
+    int totalCost = 0;
+    for (var disease in activeDiseases) {
+      final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+      totalCost += (costData['cost'] as int? ?? 150);
+    }
+
+    if (widget.character.money < totalCost) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Saldo Kurang 💸'),
+          content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: \$${DokterUtils.fmt(totalCost)}\nSaldo Kamu: \$${DokterUtils.fmt(widget.character.money)}'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Mengerti'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
+    // Process all treatments
+    int curedCount = 0;
+    int failedCount = 0;
+    final random = Random();
+
+    setState(() {
+      widget.character.money -= totalCost;
+      
+      final List<String> curedDiseases = [];
+      for (var disease in activeDiseases) {
+        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+        final int successRate = costData['successRate'] ?? 75;
+
+        // Determine rate
+        int rate = successRate;
+        final String nameLower = disease.toLowerCase();
+        final List<String> ringanList = [
+          'flu', 'sakit kepala', 'batuk', 'alergi', 'sakit gigi', 'pusing', 'diare', 
+          'lecet', 'robekan kecil', 'kram', 'iritasi overstimulasi', 'luka mikro', 'dehidrasi'
+        ];
+        final List<String> beratList = [
+          'pneumonia berat', 'stroke', 'serangan jantung', 'ginjal', 'kanker', 
+          'meningitis', 'tuberkulosis', 'tbc', 'pankreatitis', 'hiv', 'aids', 'cedera jaringan', 'laserasi'
+        ];
+        if (ringanList.any((key) => nameLower.contains(key))) {
+          rate = 90;
+        } else if (beratList.any((key) => nameLower.contains(key))) {
+          rate = 45;
+        }
+
+        final bool isSuccess = random.nextInt(100) < rate;
+        if (isSuccess) {
+          widget.character.riwayatPenyakit.remove(disease);
+          curedDiseases.add(disease);
+          curedCount++;
+
+          if (disease.contains('HIV')) {
+            widget.character.hasHIV = false;
+          } else if (disease.contains('Sifilis')) {
+            widget.character.hasSifilis = false;
+          } else if (disease.contains('HPV')) {
+            widget.character.hasHPV = false;
+          }
+        } else {
+          failedCount++;
+        }
+      }
+
+      // Add stats health increment
+      if (curedCount > 0) {
+        widget.character.health = (widget.character.health + (25 * curedCount)).clamp(0, 100);
+        final successMsg = '🏥 Obati Semua: Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (-$totalCost uang, kesehatan meningkat!)';
+        widget.character.inbox.add(successMsg);
+      }
+      if (failedCount > 0) {
+        final failMsg = '🏥 Obati Semua: Gagal menyembuhkan $failedCount penyakit.';
+        widget.character.inbox.add(failMsg);
+      }
+      
+      widget.onComplete?.call();
+    });
+
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Hasil Pengobatan Massal 🏥'),
+        content: Text('Pengobatan selesai!\n\n🎉 Berhasil Sembuh: $curedCount penyakit\n😔 Gagal Sembuh: $failedCount penyakit\n💸 Total Biaya: \$${DokterUtils.fmt(totalCost)}'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('Selesai'),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final activeDiseases = widget.character.riwayatPenyakit;
@@ -145,13 +249,29 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
               padding: const EdgeInsets.all(16),
               color: Colors.white,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text('💰', style: TextStyle(fontSize: 18)),
-                  const SizedBox(width: 8),
-                  Text(
-                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                  Row(
+                    children: [
+                      const Text('💰', style: TextStyle(fontSize: 18)),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                      ),
+                    ],
                   ),
+                  if (activeDiseases.isNotEmpty)
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red.shade600,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      ),
+                      onPressed: _treatAllDiseases,
+                      child: const Text('Obati Semua 🏥', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ),
                 ],
               ),
             ),

@@ -31,8 +31,36 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     final Character character = widget.character;
     final bool isAlive = widget.isAlive;
     final VoidCallback onRefresh = widget.onRefresh;
+    final bool isImprisoned = character.isImprisoned;
     return ElevatedButton(
+      style: isImprisoned
+          ? ElevatedButton.styleFrom(
+              backgroundColor: Colors.grey.shade300,
+              foregroundColor: Colors.grey.shade600,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: BorderSide(color: Colors.grey.shade400, width: 1.5),
+              ),
+            )
+          : ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.withOpacity(0.2),
+              foregroundColor: Colors.pink,
+              elevation: 0,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+                side: const BorderSide(color: Colors.pink, width: 1.5),
+              ),
+            ),
       onPressed: () {
+        if (isImprisoned) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Akses ditolak! Kamu sedang berada di dalam penjara.')),
+          );
+          return;
+        }
         if (!isAlive) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Karakter sudah meninggal!')),
@@ -797,16 +825,6 @@ class _RelationshipButtonState extends State<RelationshipButton> {
           ],
         );
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.pink.withOpacity(0.2),
-        foregroundColor: Colors.pink,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Colors.pink, width: 1.5),
-        ),
-      ),
       child: const Column(
         mainAxisSize: MainAxisSize.min,
         children: [
