@@ -63,7 +63,7 @@ String formatRupiah(num value) {
   return value < 0 ? '-$formatted' : formatted;
 }
 
-Widget _buildCashHeader(_InvestasiPageState state, {String? assetType}) {
+Widget _buildCashHeader(BuildContext context, _InvestasiPageState state, {String? assetType}) {
   double returnVal = 0.0;
   bool showReturn = false;
 
@@ -90,17 +90,19 @@ Widget _buildCashHeader(_InvestasiPageState state, {String? assetType}) {
     showReturn = true;
   }
 
+  final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-    color: Colors.green.shade50,
+    color: isDark ? Colors.green.shade900 : Colors.green.shade50,
     child: Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Uang Tunai:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-            Text('\$${formatRupiah(state.character.money)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+            Text('Uang Tunai:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            Text('\$${formatRupiah(state.character.money)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
           ],
         ),
         if (showReturn) ...[
@@ -480,6 +482,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
   // ---- UI ROOT (Tampilan daftar / Column) ----
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Investasi'),
@@ -499,19 +502,19 @@ class _InvestasiPageState extends State<InvestasiPage> {
           children: [
             // Ringkasan kekayaan (seperti halaman lain)
             Card(
-              color: Colors.blue.shade50,
+              color: isDark ? Colors.blue.shade900 : Colors.blue.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey)),
                     Text(
                       '\$${formatRupiah(totalKekayaan)}',
                       style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                     const SizedBox(height: 8),
-                    Text('Uang Tunai: \$${formatRupiah(character.money)}'),
+                    Text('Uang Tunai: \$${formatRupiah(character.money)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                   ],
                 ),
               ),
@@ -564,6 +567,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
     required Color color,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -594,14 +598,14 @@ class _InvestasiPageState extends State<InvestasiPage> {
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: const TextStyle(fontSize: 12, color: Colors.grey),
+                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
             ],
           ),
         ),

@@ -29,7 +29,7 @@ class AgeCategoryButton extends StatelessWidget {
     required this.money,
     required this.appearance,
   });
-  Widget _buildEducationHistorySection() {
+  Widget _buildEducationHistorySection(BuildContext context) {
     final history = character.educationHistory;
     final int age = character.age;
 
@@ -84,6 +84,12 @@ class AgeCategoryButton extends StatelessWidget {
       }
     }
 
+    // Ambil tema untuk menyesuaikan warna
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? Colors.grey.shade800 : Colors.grey.shade50;
+    final cardBorderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final textColor = isDark ? Colors.white : Colors.black87;
+
     return Column(
       children: displayStages.map((stage) {
         final status = history[stage] ?? 'Belum Lulus';
@@ -124,11 +130,11 @@ class AgeCategoryButton extends StatelessWidget {
 
         return Card(
           elevation: 0,
-          color: Colors.grey.shade50,
+          color: cardBgColor, // Sesuaikan warna background dengan tema
           margin: const EdgeInsets.only(bottom: 6),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8),
-            side: BorderSide(color: Colors.grey.shade200),
+            side: BorderSide(color: cardBorderColor), // Sesuaikan warna border dengan tema
           ),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -138,7 +144,11 @@ class AgeCategoryButton extends StatelessWidget {
                 Expanded(
                   child: Text(
                     stageLabel,
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                      color: textColor, // Tambahkan warna teks yang sesuai tema
+                    ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -240,7 +250,7 @@ class AgeCategoryButton extends StatelessWidget {
               // --- RIWAYAT PENDIDIKAN ---
               const Text('🎓 Riwayat Pendidikan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
               const SizedBox(height: 8),
-              _buildEducationHistorySection(),
+              _buildEducationHistorySection(context),
             ],
             );
           }),

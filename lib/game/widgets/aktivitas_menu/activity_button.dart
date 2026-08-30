@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/activity_button.dart
+﻿// lib/game/widgets/aktivitas_menu/activity_button.dart
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
@@ -90,7 +90,7 @@ class ActivityButton extends StatelessWidget {
           title: 'Pilih Aktivitas',
           isNotification: false,
           content: StatefulBuilder(
-            builder: (dialogContext, setStateDialog) {
+            builder: (context, setStateDialog) {  // 'context' shadows outer = dialog context
               final VoidCallback localRefresh = () {
                 onRefresh();
                 setStateDialog(() {});
@@ -102,14 +102,17 @@ class ActivityButton extends StatelessWidget {
                   // ============================================
                   // 1. PENDIDIKAN & KARIR
                   // ============================================
-                  const Text(
-                    'Pendidikan & Karir',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
+                  Builder(builder: (ctx) {
+                    final textColor = DefaultTextStyle.of(ctx).style.color;
+                    return Text(
+                      'Pendidikan & Karir',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor?.withOpacity(0.6),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 8),
 
                   // Item Sekolah
@@ -194,14 +197,17 @@ class ActivityButton extends StatelessWidget {
                   // ============================================
                   // 2. KESEHATAN & KEBUGARAN
                   // ============================================
-                  const Text(
-                    'Kesehatan & Kebugaran',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
+                  Builder(builder: (ctx) {
+                    final textColor = DefaultTextStyle.of(ctx).style.color;
+                    return Text(
+                      'Kesehatan & Kebugaran',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor?.withOpacity(0.6),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 8),
 
                   // Item Olahraga
@@ -223,14 +229,17 @@ class ActivityButton extends StatelessWidget {
                   // ============================================
                   // 3. HIBURAN & GAYA HIDUP
                   // ============================================
-                  const Text(
-                    'Hiburan & Gaya Hidup',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
+                  Builder(builder: (ctx) {
+                    final textColor = DefaultTextStyle.of(ctx).style.color;
+                    return Text(
+                      'Hiburan & Gaya Hidup',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor?.withOpacity(0.6),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 8),
 
                   // Aksesoris
@@ -291,7 +300,7 @@ class ActivityButton extends StatelessWidget {
 
                   // Imigrasi
                   Builder(builder: (context) {
-                    final bool hasPassport = character.ownedLicenses.contains('Paspor 🛂');
+                    final bool hasPassport = character.ownedLicenses.contains('Paspor ðŸ›‚');
                     return _buildActivityTile(
                       context: context,
                       label: 'Imigrasi',
@@ -301,7 +310,7 @@ class ActivityButton extends StatelessWidget {
                       minAge: 18,
                       currentAge: hasPassport ? age : 0,
                       customLockMessage: hasPassport ? null : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi.',
-                      lockActionLabel: hasPassport ? null : 'Pergi ke Lisensi 📋',
+                      lockActionLabel: hasPassport ? null : 'Pergi ke Lisensi ðŸ“‹',
                       onLockAction: hasPassport
                           ? null
                           : () {
@@ -431,14 +440,17 @@ class ActivityButton extends StatelessWidget {
                   // ============================================
                   // 4. LAINNYA (di bagian paling bawah)
                   // ============================================
-                  const Text(
-                    'Lainnya',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.blueGrey,
-                    ),
-                  ),
+                  Builder(builder: (ctx) {
+                    final textColor = DefaultTextStyle.of(ctx).style.color;
+                    return Text(
+                      'Lainnya',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: textColor?.withOpacity(0.6),
+                      ),
+                    );
+                  }),
                   const SizedBox(height: 8),
 
                   // Sosial Media (usia minimal 12)
@@ -455,26 +467,58 @@ class ActivityButton extends StatelessWidget {
                     }),
                   ),
 
-                  // Masturbasi (hanya jika usia ≥ 9)
+                  // Masturbasi (hanya jika usia >= 9)
                   if (age >= 9)
-                    Card(
-                      elevation: 0,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade200),
-                      ),
-                      color: Colors.grey.shade50,
-                      child: ListTile(
-                        leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
-                        title: const Text('Masturbasi (Fantasi)', style: TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: const Text('Mengeksplorasi fantasi pribadimu'),
-                        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                    Builder(builder: (ctx) {
+                      final inheritedColor = DefaultTextStyle.of(ctx).style.color;
+                      return GestureDetector(
                         onTap: () => _executeAction(context, () {
                           MasturbasiHelper.showMasturbationMenu(context, character, localRefresh);
                         }),
-                      ),
-                    ),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.pinkAccent.withOpacity(0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.pinkAccent.withOpacity(0.3)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.favorite_border, color: Colors.pinkAccent, size: 22),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Masturbasi (Fantasi)',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 14,
+                                        color: inheritedColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      'Mengeksplorasi fantasi pribadimu',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: inheritedColor?.withOpacity(0.6),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14,
+                                color: inheritedColor?.withOpacity(0.4),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }),
 
                   // Love (aktivitas romantis, usia minimal 16)
                   _buildActivityTile(
@@ -515,7 +559,7 @@ class ActivityButton extends StatelessWidget {
     );
   }
 
-  // --- Helper untuk membuat item aktivitas dengan batas usia ---
+  // --- Helper untuk membuat item aktivitas bergaya Hubungan Keluarga ---
   Widget _buildActivityTile({
     required BuildContext context,
     required String label,
@@ -530,85 +574,123 @@ class ActivityButton extends StatelessWidget {
     String? lockActionLabel,
   }) {
     final bool isUnlocked = currentAge >= minAge;
-    final Color itemColor = isUnlocked ? color : Colors.grey.shade400;
-    final Color textColor = isUnlocked ? Colors.black87 : Colors.grey.shade400;
+    // Pakai context dialog (bukan outer context) â€” SAMA seperti _buildFamilyItem di relationship_button
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isUnlocked ? Colors.grey.shade200 : Colors.grey.shade100),
-      ),
-      color: isUnlocked ? Colors.grey.shade50 : Colors.grey.shade50.withOpacity(0.5),
-      child: ListTile(
-        leading: Icon(icon, color: itemColor),
-        title: Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: textColor)),
-        subtitle: Text(subtitle, style: TextStyle(fontSize: 12, color: isUnlocked ? Colors.black54 : Colors.grey.shade400)),
-        trailing: isUnlocked
-            ? const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey)
-            : const Icon(Icons.lock_outline, size: 16, color: Colors.grey),
-        onTap: isUnlocked
-            ? onTap
-            : () {
-                DialogHelper.show(
-                  context: context,
-                  title: 'Akses Dibatasi',
-                  content: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          const Text('🔒', style: TextStyle(fontSize: 20)),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
-                              style: const TextStyle(fontSize: 14, color: Colors.black87),
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (customLockMessage == null) ...[
-                        const SizedBox(height: 12),
-                        Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFFFF3E0),
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: const Color(0xFFFFB74D)),
-                          ),
-                          child: Row(
-                            children: [
-                              const Text('⚠️', style: TextStyle(fontSize: 14)),
-                              const SizedBox(width: 8),
-                              Text(
-                                'Usia saat ini: $currentAge tahun',
-                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
-                              ),
-                            ],
+    final Color itemColor = isUnlocked ? color : Colors.grey.shade500;
+    final Color bgColor = isUnlocked
+        ? color.withOpacity(0.05)
+        : (isDark ? Colors.grey.shade800.withOpacity(0.3) : Colors.grey.shade100);
+    final Color borderColor = isUnlocked
+        ? color.withOpacity(0.3)
+        : (isDark ? Colors.grey.shade700 : Colors.grey.shade300);
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color subtitleColor = isDark ? Colors.white60 : Colors.black54;
+    final Color arrowColor = isDark ? Colors.white38 : Colors.grey;
+
+    return GestureDetector(
+      onTap: isUnlocked
+          ? onTap
+          : () {
+              DialogHelper.show(
+                context: context,
+                title: 'Akses Dibatasi',
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Text('ðŸ”’', style: TextStyle(fontSize: 20)),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
+                            style: const TextStyle(fontSize: 14),
                           ),
                         ),
                       ],
-                    ],
-                  ),
-                  actions: [
-                    if (onLockAction != null && lockActionLabel != null)
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                          onLockAction();
-                        },
-                        child: Text(lockActionLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
+                    if (customLockMessage == null) ...[
+                      const SizedBox(height: 12),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFF3E0),
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: const Color(0xFFFFB74D)),
+                        ),
+                        child: Row(
+                          children: [
+                            const Text('âš ï¸', style: TextStyle(fontSize: 14)),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Usia saat ini: $currentAge tahun',
+                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
                   ],
-                );
-              },
+                ),
+                actions: [
+                  if (onLockAction != null && lockActionLabel != null)
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        onLockAction();
+                      },
+                      child: Text(lockActionLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              );
+            },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: itemColor, size: 22),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isUnlocked ? textColor : Colors.grey.shade500,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isUnlocked ? subtitleColor : Colors.grey.shade400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              isUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline,
+              size: isUnlocked ? 14 : 16,
+              color: isUnlocked ? arrowColor : Colors.grey.shade400,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -634,7 +634,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             children: [
                               Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal)),
                               const SizedBox(height: 2),
-                              Text('Umur: $age tahun', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                              Text('Umur: $age tahun', style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.black54)),
                             ],
                           ),
                         ),
@@ -911,16 +911,21 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDeceased ? Colors.grey.shade600 : Colors.black87,
-                          decoration: isDeceased ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
+  label,
+  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: isDeceased ? Colors.grey.shade600 : null, // null → ikut tema
+  ),
+),
                       const SizedBox(height: 2),
-                      Text('Umur: $ageText', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+Text('Umur: $ageText',
+    style: TextStyle(
+      fontSize: 11,
+      color: Theme.of(context).brightness == Brightness.dark
+          ? Colors.white54
+          : Colors.black54,
+    )),
                     ],
                   ),
                 ),
@@ -1090,12 +1095,20 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDeceased ? Colors.grey.shade600 : Colors.black87,
+                          color: isDeceased
+                              ? Colors.grey.shade600
+                              : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
                       ),
                       const SizedBox(height: 2),
-                      Text('Umur: $ageText', style: const TextStyle(fontSize: 11, color: Colors.black54)),
+                      Text('Umur: $ageText',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Theme.of(context).brightness == Brightness.dark
+                                ? Colors.white54
+                                : Colors.black54,
+                          )),
                     ],
                   ),
                 ),

@@ -6,6 +6,7 @@ class StatistikPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Statistik & Riwayat'), backgroundColor: Colors.teal),
       body: Padding(
@@ -14,7 +15,7 @@ class StatistikPage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: Colors.teal.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.teal.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -22,7 +23,7 @@ class StatistikPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Menang:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Total Menang:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Text('USD ${formatRupiah(state.totalWin)}', style: const TextStyle(color: Colors.green)),
                       ],
                     ),
@@ -30,7 +31,7 @@ class StatistikPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Total Kalah:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Total Kalah:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Text('USD ${formatRupiah(state.totalLoss)}', style: const TextStyle(color: Colors.red)),
                       ],
                     ),
@@ -38,7 +39,7 @@ class StatistikPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Net:', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Net:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Text(
                           'USD ${formatRupiah(state.totalWin - state.totalLoss)}',
                           style: TextStyle(
@@ -53,10 +54,10 @@ class StatistikPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const Text('Riwayat Transaksi:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            Text('Riwayat Transaksi:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 8),
             if (state.history.isEmpty)
-              const Text('Belum ada riwayat.')
+              Text('Belum ada riwayat.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54))
             else
               Expanded(
                 child: ListView.builder(
@@ -68,8 +69,8 @@ class StatistikPage extends StatelessWidget {
                       child: ListTile(
                         leading: Icon(record['isWin'] ? Icons.arrow_upward : Icons.arrow_downward,
                             color: record['isWin'] ? Colors.green : Colors.red),
-                        title: Text(record['game']),
-                        subtitle: Text('USD ${formatRupiah(record['amount'])}'),
+                        title: Text(record['game'], style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                        subtitle: Text('USD ${formatRupiah(record['amount'])}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
                         trailing: Text(
                           record['isWin'] ? 'Menang' : 'Kalah',
                           style: TextStyle(color: record['isWin'] ? Colors.green : Colors.red),

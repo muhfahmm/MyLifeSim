@@ -88,6 +88,7 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Slot Machine'), backgroundColor: Colors.deepPurple),
       body: Padding(
@@ -95,21 +96,21 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Saldo: \$${formatRupiah(widget.state.character.money)}', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Saldo: \$${formatRupiah(widget.state.character.money)}', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 8),
             Text('Jackpot: \$${formatRupiah(jackpot)}', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.red)),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.center,
                 children: currentSymbols.map((s) => Container(
                   width: 70, height: 70, margin: const EdgeInsets.symmetric(horizontal: 4),
-                  decoration: BoxDecoration(color: Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber, width: 2)),
-                  child: Center(child: Text(s, style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold))),
+                  decoration: BoxDecoration(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200, borderRadius: BorderRadius.circular(12), border: Border.all(color: Colors.amber, width: 2)),
+                  child: Center(child: Text(s, style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87))),
                 )).toList()
             ),
             const SizedBox(height: 20),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-              Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+              Text('\$${formatRupiah(bet)}', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
               IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
             ]),
             const SizedBox(height: 20),

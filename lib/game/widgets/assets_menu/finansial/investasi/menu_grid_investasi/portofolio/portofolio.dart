@@ -10,6 +10,7 @@ class PortofolioPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     // 1. Saham
     double sahamVal = 0;
     double sahamCost = 0;
@@ -44,7 +45,7 @@ class PortofolioPage extends StatelessWidget {
       ),
       body: Column(
         children: [
-          _buildCashHeader(state),
+          _buildCashHeader(context, state),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -70,7 +71,7 @@ class PortofolioPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(' • $nama ($jumlah lembar @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                          Text(' • $nama ($jumlah lembar @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.grey.shade700)),
                           Text(
                             '\$${formatRupiah(val.round())} (${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())})',
                             style: TextStyle(fontSize: 13, color: ret >= 0 ? Colors.green.shade700 : Colors.red, fontWeight: FontWeight.w600),
@@ -101,7 +102,7 @@ class PortofolioPage extends StatelessWidget {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(' • $nama (${jumlah.toStringAsFixed(4)} @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: Colors.grey.shade700)),
+                          Text(' • $nama (${jumlah.toStringAsFixed(4)} @ \$${formatRupiah(buyPrice.round())})', style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.grey.shade700)),
                           Text(
                             '\$${formatRupiah(val.round())} (${ret >= 0 ? '+' : ''}\$${formatRupiah(ret.round())})',
                             style: TextStyle(fontSize: 13, color: ret >= 0 ? Colors.green.shade700 : Colors.red, fontWeight: FontWeight.w600),

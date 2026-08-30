@@ -33,7 +33,7 @@ class _KriptoPageState extends State<KriptoPage> {
       ),
       body: Column(
         children: [
-          _buildCashHeader(state, assetType: 'kripto'),
+          _buildCashHeader(context, state, assetType: 'kripto'),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),

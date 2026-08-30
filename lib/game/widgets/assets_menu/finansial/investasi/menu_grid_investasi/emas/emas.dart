@@ -16,6 +16,7 @@ class _EmasPageState extends State<EmasPage> {
   @override
   Widget build(BuildContext context) {
     final state = widget.state;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Emas'),
@@ -33,7 +34,7 @@ class _EmasPageState extends State<EmasPage> {
       ),
       body: Column(
         children: [
-          _buildCashHeader(state, assetType: 'emas'),
+          _buildCashHeader(context, state, assetType: 'emas'),
           Expanded(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(16),
@@ -41,24 +42,25 @@ class _EmasPageState extends State<EmasPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Card(
-                    color: Colors.yellow.shade50,
+                    color: isDark ? Colors.yellow.shade900 : Colors.yellow.shade50,
                     child: Padding(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Harga Emas Saat Ini: \$${formatRupiah(state.hargaEmasPerGram)}/gram'),
+                          Text('Harga Emas Saat Ini: \$${formatRupiah(state.hargaEmasPerGram)}/gram', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                           if (state.emasGram > 0) ...[
-                            Text('Harga Beli Rata-Rata: \$${formatRupiah(state.averageEmasBuyPrice.round())}/gram'),
+                            Text('Harga Beli Rata-Rata: \$${formatRupiah(state.averageEmasBuyPrice.round())}/gram', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                           ],
                           const SizedBox(height: 8),
                           Builder(builder: (context) {
                             double modal = state.emasGram * state.averageEmasBuyPrice;
                             return Text(
                               'Emas dimiliki: ${state.emasGram.toStringAsFixed(2)} gram ${state.emasGram > 0 ? '(Modal: \$${formatRupiah(modal.round())})' : ''}',
+                              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                             );
                           }),
-                          Text('Nilai: \$${formatRupiah(state.emasGram * state.hargaEmasPerGram)}'),
+                          Text('Nilai: \$${formatRupiah(state.emasGram * state.hargaEmasPerGram)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                           if (state.emasGram > 0) ...[
                             const SizedBox(height: 8),
                             Builder(builder: (context) {

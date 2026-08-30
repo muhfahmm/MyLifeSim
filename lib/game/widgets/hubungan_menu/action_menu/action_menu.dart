@@ -2846,14 +2846,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     final int relationshipVal = _getCurrentRelationshipValue();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.targetName),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -2862,10 +2864,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             // Target Card Info
             Card(
               elevation: 0,
-              color: Colors.grey.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -2929,14 +2931,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(widget.targetName,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                       fontSize: 18,
-                                      fontWeight: FontWeight.bold)),
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white : Colors.black87)),
                               const SizedBox(height: 4),
                               Text(
                                 'Hubungan: ${_getDetailedRelationLabel()} | Umur: ${_getCurrentAgeValue()}',
-                                style: const TextStyle(
-                                    fontSize: 14, color: Colors.black54),
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? Colors.white60 : Colors.black54),
                               ),
                             ],
                           ),
@@ -2946,9 +2950,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text('Tingkat Kepuasan: ',
+                        Text('Tingkat Kepuasan: ',
                             style: TextStyle(
-                                fontSize: 12, fontWeight: FontWeight.bold)),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white70 : Colors.black87)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
@@ -2988,9 +2994,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           _getFertilityRate(targetAge, targetGender);
                       return Row(
                         children: [
-                          const Text('Tingkat Kesuburan: ',
+                          Text('Tingkat Kesuburan: ',
                               style: TextStyle(
-                                  fontSize: 12, fontWeight: FontWeight.bold)),
+                                  fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                           Expanded(
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(4),
@@ -3045,9 +3051,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         children: [
                           Row(
                             children: [
-                              const Text('Nilai Kekayaan: ',
+                              Text('Nilai Kekayaan: ',
                                   style: TextStyle(
-                                      fontSize: 12, fontWeight: FontWeight.bold)),
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: isDark ? Colors.white70 : Colors.black87)),
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(4),
@@ -3076,7 +3084,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white70 : Colors.black87,
                             ),
                           ),
                         ],

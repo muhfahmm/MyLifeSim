@@ -49,6 +49,7 @@ class _LoterePageState extends State<LoterePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Lotere'), backgroundColor: Colors.orange),
       body: Padding(
@@ -57,11 +58,11 @@ class _LoterePageState extends State<LoterePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text('Saldo: USD ${formatRupiah(widget.state.character.money)}',
-                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 20),
-            const Text('Beli tiket undian dengan peluang jackpot 5%!'),
+            Text('Beli tiket undian dengan peluang jackpot 5%!', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 10),
-            const Text('Menang dapat 50x lipat taruhan.'),
+            Text('Menang dapat 50x lipat taruhan.', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
             const SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -70,7 +71,7 @@ class _LoterePageState extends State<LoterePage> {
                   icon: const Icon(Icons.remove),
                   onPressed: () => setState(() { if (bet > 10000) bet -= 10000; }),
                 ),
-                Text('USD ${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                Text('USD ${formatRupiah(bet)}', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
                 IconButton(
                   icon: const Icon(Icons.add),
                   onPressed: () => setState(() { if (bet < 10000000) bet += 10000; }),

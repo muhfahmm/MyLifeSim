@@ -434,19 +434,21 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     final pasangan = _family.where((m) => m['section'] == 'pasangan').toList();
     final saudara = _family.where((m) => m['section'] == 'saudara').toList();
     final anak = _family.where((m) => m['section'] == 'anak').toList();
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: Text('Keluarga ${widget.npcName}'),
-        backgroundColor: Colors.blueGrey,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueGrey,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: _family.isEmpty
-          ? const Center(
+          ? Center(
               child: Text(
                 'Tidak ada data keluarga.',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: TextStyle(fontSize: 16, color: isDark ? Colors.white54 : Colors.grey),
               ),
             )
           : ListView(
@@ -454,33 +456,33 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
               children: [
                 // === ORANGTUA ===
                 if (orangTua.isNotEmpty) ...[
-                  _buildSectionHeader('Orang Tua', Icons.family_restroom),
+                  _buildSectionHeader('Orang Tua', Icons.family_restroom, isDark),
                   const SizedBox(height: 8),
-                  ...orangTua.map(_buildFamilyCard),
+                  ...orangTua.map((m) => _buildFamilyCard(m, isDark)),
                 ],
 
                 // === PASANGAN ===
                 if (pasangan.isNotEmpty) ...[
                   const Divider(height: 32),
-                  _buildSectionHeader('Pasangan Hidup', Icons.favorite),
+                  _buildSectionHeader('Suami / Istri', Icons.favorite, isDark),
                   const SizedBox(height: 8),
-                  ...pasangan.map(_buildFamilyCard),
+                  ...pasangan.map((m) => _buildFamilyCard(m, isDark)),
                 ],
 
                 // === SAUDARA ===
                 if (saudara.isNotEmpty) ...[
                   const Divider(height: 32),
-                  _buildSectionHeader('Saudara Kandung', Icons.people),
+                  _buildSectionHeader('Saudara', Icons.people, isDark),
                   const SizedBox(height: 8),
-                  ...saudara.map(_buildFamilyCard),
+                  ...saudara.map((m) => _buildFamilyCard(m, isDark)),
                 ],
 
                 // === ANAK ===
                 if (anak.isNotEmpty) ...[
                   const Divider(height: 32),
-                  _buildSectionHeader('Anak', Icons.child_care),
+                  _buildSectionHeader('Anak-anak', Icons.child_care, isDark),
                   const SizedBox(height: 8),
-                  ...anak.map(_buildFamilyCard),
+                  ...anak.map((m) => _buildFamilyCard(m, isDark)),
                 ],
 
                 const SizedBox(height: 24),
@@ -489,33 +491,34 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon) {
+  Widget _buildSectionHeader(String title, IconData icon, bool isDark) {
+    final Color headerColor = isDark ? Colors.blueGrey.shade200 : Colors.blueGrey;
     return Row(
       children: [
         Container(
           width: 4,
           height: 20,
           decoration: BoxDecoration(
-            color: Colors.blueGrey,
+            color: headerColor,
             borderRadius: BorderRadius.circular(2),
           ),
         ),
         const SizedBox(width: 8),
-        Icon(icon, size: 18, color: Colors.blueGrey),
+        Icon(icon, size: 18, color: headerColor),
         const SizedBox(width: 6),
         Text(
           title,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
-            color: Colors.blueGrey,
+            color: headerColor,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildFamilyCard(Map<String, dynamic> member) {
+  Widget _buildFamilyCard(Map<String, dynamic> member, bool isDark) {
     final String name = member['name'] as String;
     final String relation = member['relation'] as String;
     final String relLabel = member['relLabel'] as String;
@@ -705,14 +708,19 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: isDeceased ? Colors.grey.shade600 : Colors.black87,
+                          color: isDeceased
+                              ? Colors.grey.shade600
+                              : (isDark ? Colors.white : Colors.black87),
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'Umur: $age tahun',
-                        style: const TextStyle(fontSize: 11, color: Colors.black54),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? Colors.white54 : Colors.black54,
+                        ),
                       ),
                     ],
                   ),

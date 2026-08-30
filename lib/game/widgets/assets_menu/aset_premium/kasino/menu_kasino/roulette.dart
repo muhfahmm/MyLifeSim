@@ -79,6 +79,7 @@ class _RoulettePageState extends State<RoulettePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Roulette'), backgroundColor: Colors.green),
       body: Center(
@@ -89,10 +90,11 @@ class _RoulettePageState extends State<RoulettePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 16),
               DropdownButton<String>(
                 value: betType,
+                dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
                 items: const [
                   DropdownMenuItem(value: 'number', child: Text('Angka Tunggal (35x)')),
                   DropdownMenuItem(value: 'color', child: Text('Warna (Merah/Hitam) 2x')),
@@ -103,7 +105,7 @@ class _RoulettePageState extends State<RoulettePage> {
               ),
               const SizedBox(height: 16),
               if (betType == 'number') ...[
-                const Text('Pilih angka 0-36:', style: TextStyle(fontSize: 16)),
+                Text('Pilih angka 0-36:', style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
                 SizedBox(
                   height: 100,
                   child: ListView.builder(
@@ -115,10 +117,10 @@ class _RoulettePageState extends State<RoulettePage> {
                         width: 50,
                         margin: const EdgeInsets.symmetric(horizontal: 4),
                         decoration: BoxDecoration(
-                          color: selectedNumber == i ? Colors.amber : Colors.grey.shade200,
+                          color: selectedNumber == i ? Colors.amber : (isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: Center(child: Text('$i', style: const TextStyle(fontSize: 18))),
+                        child: Center(child: Text('$i', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87))),
                       ),
                     ),
                   ),
@@ -145,13 +147,13 @@ class _RoulettePageState extends State<RoulettePage> {
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                Text('\$${formatRupiah(bet)}', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
                 IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
               ]),
               const SizedBox(height: 16),
               ElevatedButton(onPressed: isSpinning ? null : spin, style: ElevatedButton.styleFrom(backgroundColor: Colors.green), child: Text(isSpinning ? 'Memutar...' : 'Spin')),
               const SizedBox(height: 16),
-              Text(result, style: const TextStyle(fontSize: 16)),
+              Text(result, style: TextStyle(fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
             ],
           ),
         ),

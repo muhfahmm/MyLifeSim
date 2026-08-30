@@ -2614,15 +2614,15 @@ class _GameScreenState extends State<GameScreen> {
                               padding: const EdgeInsets.only(bottom: 2.0),
                               child: Text(
                                 'Tanggal Lahir: $formattedBirth',
-                                style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey),
                               ),
                             );
                           })(),
-                          Text(_character.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: const TextStyle(fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
+                          Text(_character.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                          Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 2),
-                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: const TextStyle(fontSize: 12, color: Colors.blueGrey, fontWeight: FontWeight.w500)),
-                          Text('Umur: ${_character.age} Tahun', style: const TextStyle(fontSize: 14, color: Colors.grey)),
+                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
+                          Text('Umur: ${_character.age} Tahun', style: TextStyle(fontSize: 14, color: isDark ? Colors.white54 : Colors.grey)),
                           const SizedBox(height: 2),
                           (() {
                             if (_character.jobName != null) {
@@ -2644,9 +2644,9 @@ class _GameScreenState extends State<GameScreen> {
                                 style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
                               );
                             } else if (_character.age >= 18) {
-                              return const Text(
+                              return Text(
                                 'Status: Pengangguran',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey),
+                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isDark ? Colors.white54 : Colors.grey),
                               );
                             }
                             return const SizedBox.shrink();

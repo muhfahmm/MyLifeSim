@@ -12,6 +12,7 @@ import 'package:bitlife/pilih_karakter/customization/appearance_customization.da
 import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
+import 'package:bitlife/main.dart';
 
 class KarakterScreen extends StatefulWidget {
   final String gender;
@@ -505,6 +506,12 @@ class _KarakterScreenState extends State<KarakterScreen> {
         elevation: 0,
         actions: [
           IconButton(
+            icon: Icon(isDark ? Icons.light_mode : Icons.dark_mode, color: isDark ? Colors.yellow.shade700 : Colors.grey.shade700),
+            onPressed: () {
+              themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.close),
             onPressed: () => Navigator.pop(context),
           ),
@@ -587,9 +594,13 @@ class _KarakterScreenState extends State<KarakterScreen> {
                 
                 const SizedBox(height: 16),
 
-                const Text(
+                Text(
                   'Negara Asal:',
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                  style: TextStyle(
+                    fontSize: 14, 
+                    fontWeight: FontWeight.bold, 
+                    color: isDark ? Colors.white70 : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 6),
                 InkWell(
@@ -598,9 +609,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey.shade300),
+                      border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
                       borderRadius: BorderRadius.circular(12),
-                      color: Colors.grey.shade50,
+                      color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
                     ),
                     child: Row(
                       children: [
@@ -612,10 +623,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
                         Expanded(
                           child: Text(
                             _currentCountry,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: Colors.black87),
+                            style: TextStyle(
+                              fontSize: 16, 
+                              fontWeight: FontWeight.w600, 
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
                           ),
                         ),
-                        const Icon(Icons.arrow_drop_down, color: Colors.black54),
+                        Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
                       ],
                     ),
                   ),
@@ -644,11 +659,13 @@ class _KarakterScreenState extends State<KarakterScreen> {
                       Expanded(
                         child: TextField(
                           controller: _firstNameController,
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                           decoration: InputDecoration(
                             labelText: 'Nama Depan',
+                            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.black54),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             filled: true,
-                            fillColor: Colors.grey.shade50,
+                            fillColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
                           ),
                         ),
                       ),
@@ -656,11 +673,13 @@ class _KarakterScreenState extends State<KarakterScreen> {
                       Expanded(
                         child: TextField(
                           controller: _lastNameController,
+                          style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                           decoration: InputDecoration(
                             labelText: 'Nama Belakang',
+                            labelStyle: TextStyle(color: isDark ? Colors.grey.shade400 : Colors.black54),
                             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
                             filled: true,
-                            fillColor: Colors.grey.shade50,
+                            fillColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
                           ),
                         ),
                       ),
@@ -670,8 +689,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
                         child: ElevatedButton(
                           onPressed: _hasJsonData ? _generateRandomName : null,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade200,
-                            foregroundColor: Colors.black87,
+                            backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                            foregroundColor: isDark ? Colors.white70 : Colors.black87,
                             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -687,12 +706,12 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: ListTile(
                       leading: const Icon(Icons.palette, color: Colors.blue),
-                      title: const Text('🎨 Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold)),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      title: Text('🎨 Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
                       onTap: () async {
                         final res = await Navigator.push<Map<String, String>>(
                           context,
@@ -730,16 +749,16 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: ListTile(
                       leading: const Icon(Icons.flash_on, color: Colors.amber),
-                      title: const Text('⚡ Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text('⚡ Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                       subtitle: Text(
                         'Penampilan: $_looks% | Kecerdasan: $_smarts% | Kesehatan: $_health%',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
                       onTap: () async {
                         final res = await Navigator.push<Map<String, dynamic>>(
                           context,
@@ -785,16 +804,16 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: ListTile(
                       leading: const Icon(Icons.star, color: Colors.orange),
-                      title: const Text('⭐ Talenta Spesial', style: TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text('⭐ Talenta Spesial', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                       subtitle: Text(
                         'Talenta: $_specialTalent',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
                       onTap: () async {
                         final res = await Navigator.push<String>(
                           context,
@@ -819,18 +838,18 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: ListTile(
                       leading: const Icon(Icons.family_restroom, color: Colors.blue),
-                      title: const Text('👨‍👩‍👧‍👦 Latar Belakang Keluarga', style: TextStyle(fontWeight: FontWeight.bold)),
+                      title: Text('👨‍👩‍👧‍👦 Latar Belakang Keluarga', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                       subtitle: Text(
                         _customFamilyData == null 
                             ? 'Latar Belakang: Acak/Default'
                             : 'Anak ke-${_customFamilyData!['birthOrder']} (Kustom)',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -859,7 +878,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade300),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: SwitchListTile(
                       activeThumbColor: Colors.redAccent,
@@ -873,14 +892,16 @@ class _KarakterScreenState extends State<KarakterScreen> {
                             : '🚫 Nonaktifkan Ajakan Lesbian',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: _sexuality == 'Heteroseksual' ? Colors.black87 : Colors.grey,
+                          color: _sexuality == 'Heteroseksual'
+                              ? (isDark ? Colors.white : Colors.black87)
+                              : Colors.grey,
                         ),
                       ),
                       subtitle: Text(
                         _sexuality == 'Heteroseksual'
                             ? (_disableSameSexProposals ? 'Ajakan Dinonaktifkan' : 'Ajakan Aktif')
                             : 'Terkunci (Hanya untuk Seksualitas Heteroseksual)',
-                        style: const TextStyle(fontSize: 12, color: Colors.black54),
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
                       value: _disableSameSexProposals,
                       onChanged: _sexuality == 'Heteroseksual'

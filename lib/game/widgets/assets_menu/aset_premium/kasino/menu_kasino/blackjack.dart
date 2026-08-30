@@ -111,6 +111,7 @@ class _BlackjackPageState extends State<BlackjackPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Blackjack'), backgroundColor: Colors.red),
       body: Center(
@@ -121,12 +122,12 @@ class _BlackjackPageState extends State<BlackjackPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 16),
               if (!gameOver) ...[
-                Text('Dealer: ${dealerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(dealerCards)})'),
+                Text('Dealer: ${dealerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(dealerCards)})', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                 const Divider(),
-                Text('Anda: ${playerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(playerCards)})'),
+                Text('Anda: ${playerCards.map((c) => c == 1 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}  (${_handValue(playerCards)})', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                 const SizedBox(height: 20),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   ElevatedButton(onPressed: hit, child: const Text('Hit')),
@@ -136,14 +137,14 @@ class _BlackjackPageState extends State<BlackjackPage> {
                 const SizedBox(height: 16),
                 ElevatedButton(onPressed: startGame, child: const Text('Mulai')),
               ] else ...[
-                Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                Text(result, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                 const SizedBox(height: 16),
                 ElevatedButton(onPressed: startGame, child: const Text('Main Lagi')),
               ],
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                Text('\$${formatRupiah(bet)}', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
                 IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
               ]),
             ],

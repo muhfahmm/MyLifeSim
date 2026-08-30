@@ -149,6 +149,7 @@ class _KasinoPageState extends State<KasinoPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Casino'),
@@ -162,13 +163,13 @@ class _KasinoPageState extends State<KasinoPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
-              color: Colors.amber.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.amber.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('Saldo Anda', style: TextStyle(fontSize: 14, color: Colors.grey)),
+                    Text('Saldo Anda', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey)),
                     Text('USD ${formatRupiah(character.money)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)),
                     const SizedBox(height: 8),
                     Row(
@@ -210,6 +211,7 @@ class _KasinoPageState extends State<KasinoPage> {
   }
 
   Widget _buildMenuTile(IconData icon, String label, String subtitle, Color color, VoidCallback onTap) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: color.withOpacity(0.3))),
@@ -228,11 +230,11 @@ class _KasinoPageState extends State<KasinoPage> {
                   children: [
                     Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: color)),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
                   ],
                 ),
               ),
-              const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+              Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
             ],
           ),
         ),

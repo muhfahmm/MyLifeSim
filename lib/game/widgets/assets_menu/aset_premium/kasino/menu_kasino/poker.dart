@@ -54,6 +54,7 @@ class _PokerPageState extends State<PokerPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(title: const Text('Poker'), backgroundColor: Colors.blue),
       body: Center(
@@ -64,11 +65,11 @@ class _PokerPageState extends State<PokerPage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text('Saldo: \$${formatRupiah(widget.state.character.money)}',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 16),
               if (!gameOver && playerHand.isNotEmpty) ...[
-                Text('Kartu Anda: ${playerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
-                Text('Kartu Dealer: ${dealerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}'),
+                Text('Kartu Anda: ${playerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                Text('Kartu Dealer: ${dealerHand.map((c) => c == 14 ? 'A' : c > 10 ? 'JQK'[c-11] : c.toString()).join(' ')}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                 const SizedBox(height: 16),
                 ElevatedButton(onPressed: compareHands, child: const Text('Bandingkan')),
               ],
@@ -78,11 +79,11 @@ class _PokerPageState extends State<PokerPage> {
                 child: Text(playerHand.isEmpty ? 'Mulai Game' : 'Main Lagi'),
               ),
               const SizedBox(height: 16),
-              if (result.isNotEmpty) Text(result, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              if (result.isNotEmpty) Text(result, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 16),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 IconButton(icon: const Icon(Icons.remove), onPressed: () => setState(() { if (bet > 10000) bet -= 10000; })),
-                Text('\$${formatRupiah(bet)}', style: const TextStyle(fontSize: 18)),
+                Text('\$${formatRupiah(bet)}', style: TextStyle(fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
                 IconButton(icon: const Icon(Icons.add), onPressed: () => setState(() { if (bet < 10000000) bet += 10000; })),
               ]),
             ],

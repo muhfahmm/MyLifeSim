@@ -33,7 +33,7 @@ class _SahamPageState extends State<SahamPage> {
       ),
       body: Column(
         children: [
-          _buildCashHeader(state, assetType: 'saham'),
+          _buildCashHeader(context, state, assetType: 'saham'),
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(16),
