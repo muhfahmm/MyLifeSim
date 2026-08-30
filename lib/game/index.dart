@@ -2628,6 +2628,46 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                             );
                           })(),
                           Text(_character.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                          (() {
+                            final String talent = _character.specialTalent;
+                            if (talent == 'None' || talent == 'Tidak Ada' || talent.isEmpty) {
+                              return const SizedBox.shrink();
+                            }
+                            String emoji = '✨';
+                            if (talent.contains('Akting')) emoji = '🎭';
+                            else if (talent.contains('Kriminalitas')) emoji = '🔫';
+                            else if (talent.contains('Pengedar')) emoji = '🌿';
+                            else if (talent.contains('Modeling')) emoji = '📸';
+                            else if (talent.contains('Musik')) emoji = '🎵';
+                            else if (talent.contains('Olahraga')) emoji = '🏀';
+
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.orange.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(color: Colors.orange.withOpacity(0.35)),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(emoji, style: const TextStyle(fontSize: 12)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Talenta: $talent',
+                                      style: const TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.orange,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          })(),
                           Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 2),
                           Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),

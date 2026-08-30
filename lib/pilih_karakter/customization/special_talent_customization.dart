@@ -115,27 +115,82 @@ class _SpecialTalentCustomizationScreenState extends State<SpecialTalentCustomiz
                       ),
                     ),
                     color: cardColor,
-                    child: ListTile(
-                      leading: Text(
-                        talent['emoji']!,
-                        style: const TextStyle(fontSize: 24),
-                      ),
-                      title: Text(
-                        talent['name']!,
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: titleColor,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          leading: Text(
+                            talent['emoji']!,
+                            style: const TextStyle(fontSize: 24),
+                          ),
+                          title: Text(
+                            talent['name']!,
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: titleColor,
+                            ),
+                          ),
+                          trailing: isSelected
+                              ? const Icon(Icons.check_circle, color: Colors.orange)
+                              : Icon(Icons.circle_outlined, color: trailingColor),
+                          onTap: () {
+                            setState(() {
+                              _selectedTalent = talent['name']!;
+                            });
+                          },
                         ),
-                      ),
-                      trailing: isSelected
-                          ? const Icon(Icons.check_circle, color: Colors.orange)
-                          : Icon(Icons.circle_outlined, color: trailingColor),
-                      onTap: () {
-                        setState(() {
-                          _selectedTalent = talent['name']!;
-                        });
-                      },
+                        if (isSelected)
+                          Padding(
+                            padding: const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Divider(height: 12, color: Colors.orange),
+                                const SizedBox(height: 6),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(fontSize: 12, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
+                                    children: [
+                                      const TextSpan(text: '✨ Pengaruh Utama: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: _getTalentEffect(talent['name']!)),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(fontSize: 12, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
+                                    children: [
+                                      const TextSpan(text: '🌟 Sinergi Atribut: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: _getTalentSynergy(talent['name']!)),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(fontSize: 12, height: 1.4, color: isDark ? Colors.white70 : Colors.black87),
+                                    children: [
+                                      const TextSpan(text: '💼 Rekomendasi Karier: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: _getTalentCareer(talent['name']!)),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                RichText(
+                                  text: TextSpan(
+                                    style: TextStyle(fontSize: 12, height: 1.4, color: isDark ? Colors.red.shade300 : Colors.red.shade700),
+                                    children: [
+                                      const TextSpan(text: '⚠️ Risiko: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                                      TextSpan(text: _getTalentRisk(talent['name']!)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                      ],
                     ),
                   );
                 },
@@ -175,5 +230,57 @@ class _SpecialTalentCustomizationScreenState extends State<SpecialTalentCustomiz
         ),
       ),
     );
+  }
+
+  String _getTalentSynergy(String name) {
+    switch (name) {
+      case 'Tidak Ada': return '-';
+      case 'Akting': return 'Penampilan (tinggi), Kecerdasan (sedang), Kebahagiaan';
+      case 'Kriminalitas': return 'Kecerdasan (tinggi), Disiplin (sedang)';
+      case 'Pengedar': return 'Tekad (sangat tinggi), Disiplin (tinggi), Kesehatan (turun)';
+      case 'Modeling': return 'Penampilan (sangat ekstrem), Kesehatan (tinggi)';
+      case 'Musik': return 'Kecerdasan (kreativitas), Kebahagiaan, Disiplin';
+      case 'Olahraga': return 'Kesehatan (sangat tinggi), Tekad (sangat tinggi), Disiplin (tinggi)';
+      default: return '-';
+    }
+  }
+
+  String _getTalentEffect(String name) {
+    switch (name) {
+      case 'Tidak Ada': return 'Tidak ada buff atau debuff. Semua event berjalan normal sesuai atribut dasar.';
+      case 'Akting': return 'Kemampuan berbohong, berpura-pura, dan memanipulasi jauh lebih berhasil (peluang sukses +30%). Lebih mudah meyakinkan orang saat wawancara kerja.';
+      case 'Kriminalitas': return 'Peluang sukses saat mencuri, merampok, menipu, atau meretas sangat tinggi. Saat tertangkap, kamu lebih pintar menghilangkan barang bukti atau lolos dari hukuman.';
+      case 'Pengedar': return 'Sangat ahli dalam jaringan bisnis gelap. Kamu akan lebih sering mendapat tawaran menguntungkan dari orang asing dan lebih cepat membangun "kerajaan" ilegal.';
+      case 'Modeling': return 'Kamu mendapatkan bonus Penampilan pasif (misalnya +10 di atas nilai slider). Setiap kali ada kontes kecantikan, casting iklan, atau event sosial, kamu hampir selalu menang.';
+      case 'Musik': return 'Kamu sangat cepat belajar alat musik. Saat ada event "Ikut band sekolah", peluang suksesmu sangat tinggi. Lagu yang kamu ciptakan lebih sering menjadi hits.';
+      case 'Olahraga': return 'Stamina dan kemampuan fisik kamu berada di atas rata-rata. Kamu sangat jarang cedera saat berolahraga, dan selalu menang dalam kompetisi fisik.';
+      default: return '-';
+    }
+  }
+
+  String _getTalentCareer(String name) {
+    switch (name) {
+      case 'Tidak Ada': return 'Semua lowongan pekerjaan dasar hingga profesional terbuka normal tanpa bonus.';
+      case 'Akting': return 'Content Creator, Sutradara Film, Marketing Specialist, Pengacara, dan Penerjemah.';
+      case 'Kriminalitas': return 'Junior Software Engineer (hacker), Network Engineer, Pengacara (celah hukum), Jaksa, dan Manajer Keuangan (penggelapan).';
+      case 'Pengedar': return 'Manajer Hotel, CEO Startup, PNS (jalur suap), dan Pengacara.';
+      case 'Modeling': return 'Fotografer, Content Creator, Desainer Mode, Marketing Specialist, Dokter Umum/Spesialis, dan Pilot.';
+      case 'Musik': return 'Musisi Jalanan, Produser Musik, Content Creator, Guru (seni musik), Sutradara Film (soundtrack), dan CEO Startup.';
+      case 'Olahraga': return 'Satpam, Kurir, Buruh Pabrik, Tukang Las, dan Pilot.';
+      default: return '-';
+    }
+  }
+
+  String _getTalentRisk(String name) {
+    switch (name) {
+      case 'Tidak Ada': return 'Cocok untuk hardcore mode tanpa bantuan.';
+      case 'Akting': return 'Jika sering dipakai untuk menipu, hubungan pertemanan/keluarga bisa hancur.';
+      case 'Kriminalitas': return 'Hukuman penjara cenderung lebih berat dan sering diincar polisi.';
+      case 'Pengedar': return 'Risiko dipenjara sangat tinggi, sering diserang musuh, dan kesehatan bisa rusak permanen jika ikut mengonsumsi.';
+      case 'Modeling': return 'Sangat sensitif terhadap penuaan, karier langsung hancur dan gaji turun drastis.';
+      case 'Musik': return 'Butuh waktu lama untuk tenar, dan seringkali harus mengalami fase "miskin" sebelum kontrak rekaman besar.';
+      case 'Olahraga': return 'Umur karier pendek. Setelah pensiun (usia 35-40 tahun), harus memiliki rencana cadangan agar tidak jatuh miskin.';
+      default: return '-';
+    }
   }
 }

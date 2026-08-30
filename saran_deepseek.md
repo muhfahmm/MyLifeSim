@@ -30,7 +30,7 @@ Baik, mohon maaf sebelumnya. Berikut adalah **list data murni** (tanpa kode atau
 *   **Atribut Sinergi:** Penampilan (sangat ekstrem), Kesehatan (tinggi).
 *   **Pengaruh Utama:** Kamu mendapatkan bonus Penampilan pasif (misalnya +10 di atas nilai slider). Setiap kali ada kontes kecantikan, casting iklan, atau event sosial, kamu hampir selalu menang.
 *   **Karier (Sesuai kerja_menu):** Mendapatkan pekerjaan **Fotografer** (karena jadi modelnya), **Content Creator**, **Desainer Mode**, **Marketing Specialist** (brand ambassador), **Dokter Umum / Dokter Spesialis** (pasien lebih percaya pada dokter yang menarik), dan **Pilot**.
-*   **Risiko:** Sangat sensitif terhadap penuaan. Begitu mencapai umur 40-an atau berat badan naik, karier langsung hancur dan gaji turun drastis.
+*   **Risiko:** Sangat sensitif terhadap penuaan, karier langsung hancur dan gaji turun drastis.
 
 **6. Musik**
 *   **Atribut Sinergi:** Kecerdasan (kreativitas), Kebahagiaan, Disiplin (untuk latihan).
@@ -43,3 +43,5 @@ Baik, mohon maaf sebelumnya. Berikut adalah **list data murni** (tanpa kode atau
 *   **Pengaruh Utama:** Stamina dan kemampuan fisik kamu berada di atas rata-rata. Kamu sangat jarang cedera saat berolahraga, dan selalu menang dalam kompetisi fisik.
 *   **Karier (Sesuai kerja_menu):** Lebih kuat untuk pekerjaan fisik seperti **Satpam**, **Kurir**, **Buruh Pabrik**, **Tukang Las**, dan **Pilot** (karena fisik yang prima). Juga memudahkan promosi jabatan di pekerjaan yang membutuhkan ketahanan fisik.
 *   **Risiko:** Umur karier sangat pendek. Setelah pensiun (biasanya umur 35-40 tahun), kamu harus punya rencana kedua (seperti buka usaha), jika tidak, bisa jatuh miskin.
+
+setiap pekerjaan tetap juga harus membutuhkan lulus dari universitas atau gelar sarjana
