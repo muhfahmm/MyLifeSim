@@ -149,6 +149,57 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
     }
 
     if (widget.character.money < totalCost) {
+      // Cari orang tua yang bisa dimintai uang
+      final character = widget.character;
+      bool isFatherAvailable = character.fatherName != null && !character.isFatherDeceased && !character.isFatherImprisoned;
+      bool isMotherAvailable = character.motherName != null && !character.isMotherDeceased && !character.isMotherImprisoned;
+      bool areParentsTogether = isFatherAvailable && isMotherAvailable && !character.isFatherDivorced && !character.isMotherDivorced;
+
+      String parentRelation = 'Orang Tua';
+      int parentRelationship = 50;
+      bool hasParent = false;
+
+      if (areParentsTogether) {
+        hasParent = true;
+        parentRelation = 'Orang Tua';
+        parentRelationship = (((character.fatherRelationship ?? 50) + (character.motherRelationship ?? 50)) / 2).round();
+      } else {
+        String? chosenName;
+        if (isFatherAvailable) {
+          chosenName = character.fatherName;
+          parentRelation = 'Ayah';
+          parentRelationship = character.fatherRelationship ?? 50;
+          hasParent = true;
+        }
+        if (isMotherAvailable) {
+          final int motherRel = character.motherRelationship ?? 50;
+          if (chosenName == null || motherRel > parentRelationship) {
+            chosenName = character.motherName;
+            parentRelation = 'Ibu';
+            parentRelationship = motherRel;
+            hasParent = true;
+          }
+        }
+        if (character.stepFatherName != null && !character.isStepFatherDeceased) {
+          final int stepFatherRel = character.stepFatherRelationship ?? 50;
+          if (chosenName == null || stepFatherRel > parentRelationship) {
+            chosenName = character.stepFatherName;
+            parentRelation = 'Ayah Tiri';
+            parentRelationship = stepFatherRel;
+            hasParent = true;
+          }
+        }
+        if (character.stepMotherName != null && !character.isStepMotherDeceased) {
+          final int stepMotherRel = character.stepMotherRelationship ?? 50;
+          if (chosenName == null || stepMotherRel > parentRelationship) {
+            chosenName = character.stepMotherName;
+            parentRelation = 'Ibu Tiri';
+            parentRelationship = stepMotherRel;
+            hasParent = true;
+          }
+        }
+      }
+
       showDialog(
         context: context,
         builder: (ctx) {
@@ -158,6 +209,14 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
             title: Text('Saldo Kurang 💸', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
             content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: \$${DokterUtils.fmt(totalCost)}\nSaldo Kamu: \$${DokterUtils.fmt(widget.character.money)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
             actions: [
+              if (hasParent)
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _askParentsToPay(parentRelation, parentRelationship, totalCost);
+                  },
+                  child: Text('Minta ke $parentRelation 👨‍👩‍👧', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                ),
               TextButton(
                 onPressed: () => Navigator.pop(ctx),
                 child: Text('Mengerti', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
@@ -248,6 +307,152 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
         );
       },
     );
+  }
+
+  void _askParentsToPay(String parentRelation, int relationship, int totalCost) {
+    final Random random = Random();
+    // Peluang disetujui: Hubungan + 20% bonus karena ini kesehatan/medis
+    final int chance = (relationship + 20).clamp(0, 100);
+    final bool success = random.nextInt(100) < chance;
+
+    if (success) {
+      // Hubungan membaik
+      setState(() {
+        if (parentRelation == 'Orang Tua') {
+          widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) + 10).clamp(0, 100);
+          widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + 10).clamp(0, 100);
+        } else if (parentRelation == 'Ayah') {
+          widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) + 10).clamp(0, 100);
+        } else if (parentRelation == 'Ibu') {
+          widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) + 10).clamp(0, 100);
+        } else if (parentRelation == 'Ayah Tiri') {
+          widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) + 10).clamp(0, 100);
+        } else if (parentRelation == 'Ibu Tiri') {
+          widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) + 10).clamp(0, 100);
+        }
+        widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+      });
+
+      // Proses semua pengobatan secara gratis (karena dibayari orang tua)
+      final activeDiseases = List<String>.from(widget.character.riwayatPenyakit);
+      int curedCount = 0;
+      int failedCount = 0;
+      final List<String> curedDiseases = [];
+
+      for (var disease in activeDiseases) {
+        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+        final int successRate = costData['successRate'] ?? 75;
+
+        int rate = successRate;
+        final String nameLower = disease.toLowerCase();
+        final List<String> ringanList = [
+          'flu', 'sakit kepala', 'batuk', 'alergi', 'sakit gigi', 'pusing', 'diare', 
+          'lecet', 'robekan kecil', 'kram', 'iritasi overstimulasi', 'luka mikro', 'dehidrasi'
+        ];
+        final List<String> beratList = [
+          'pneumonia berat', 'stroke', 'serangan jantung', 'ginjal', 'kanker', 
+          'meningitis', 'tubaberculosis', 'tbc', 'pankreatitis', 'hiv', 'aids', 'cedera jaringan', 'laserasi'
+        ];
+        if (ringanList.any((key) => nameLower.contains(key))) {
+          rate = 90;
+        } else if (beratList.any((key) => nameLower.contains(key))) {
+          rate = 45;
+        }
+
+        final bool isSuccess = random.nextInt(100) < rate;
+        if (isSuccess) {
+          widget.character.riwayatPenyakit.remove(disease);
+          curedDiseases.add(disease);
+          curedCount++;
+
+          if (disease.contains('HIV')) {
+            widget.character.hasHIV = false;
+          } else if (disease.contains('Sifilis')) {
+            widget.character.hasSifilis = false;
+          } else if (disease.contains('HPV')) {
+            widget.character.hasHPV = false;
+          }
+        } else {
+          failedCount++;
+        }
+      }
+
+      // Tambah kesehatan
+      if (curedCount > 0) {
+        widget.character.health = (widget.character.health + (25 * curedCount)).clamp(0, 100);
+        final successMsg = '🏥 Minta Pengobatan: $parentRelation membayar \$${DokterUtils.fmt(totalCost)} untuk mengobati penyakitmu. Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (kesehatan meningkat!)';
+        widget.character.inbox.add(successMsg);
+      }
+      if (failedCount > 0) {
+        final failMsg = '🏥 Minta Pengobatan: $parentRelation membiayai pengobatan namun gagal menyembuhkan $failedCount penyakit.';
+        widget.character.inbox.add(failMsg);
+      }
+
+      setState(() {});
+      widget.onComplete?.call();
+
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Minta Pengobatan Sukses! 🏥', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text(
+              '$parentRelation berbaik hati membayarkan seluruh biaya pengobatan sebesar \$${DokterUtils.fmt(totalCost)} untukmu.\n\n'
+              '🎉 Berhasil Sembuh: $curedCount penyakit\n'
+              '😔 Gagal Sembuh: $failedCount penyakit\n'
+              '(Hubungan dengan $parentRelation meningkat!)',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Selesai', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Gagal, hubungan memburuk
+      setState(() {
+        if (parentRelation == 'Orang Tua') {
+          widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) - 5).clamp(0, 100);
+          widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) - 5).clamp(0, 100);
+        } else if (parentRelation == 'Ayah') {
+          widget.character.fatherRelationship = ((widget.character.fatherRelationship ?? 50) - 5).clamp(0, 100);
+        } else if (parentRelation == 'Ibu') {
+          widget.character.motherRelationship = ((widget.character.motherRelationship ?? 50) - 5).clamp(0, 100);
+        } else if (parentRelation == 'Ayah Tiri') {
+          widget.character.stepFatherRelationship = ((widget.character.stepFatherRelationship ?? 50) - 5).clamp(0, 100);
+        } else if (parentRelation == 'Ibu Tiri') {
+          widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) - 5).clamp(0, 100);
+        }
+        widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+      });
+
+      showDialog(
+        context: context,
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Minta Pengobatan Ditolak ❌', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text(
+              '$parentRelation menolak membayarkan biaya pengobatan sebesar \$${DokterUtils.fmt(totalCost)} karena hubungan kalian yang kurang dekat atau keterbatasan dana.',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Mengerti', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
@@ -351,24 +556,16 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                                 foregroundColor: Colors.white,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
-                              onPressed: () {
+                              onPressed: () async {
                                 final menu = DokterUtils.getRequiredMenu(disease);
-                                if (menu == 'Pemeriksaan Umum') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (ctx) => PemeriksaanUmumPage(character: widget.character)),
-                                  ).then((_) => setState(() {}));
-                                } else if (menu == 'Tes Darah') {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (ctx) => TesDarahPage(character: widget.character)),
-                                  ).then((_) => setState(() {}));
-                                } else {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (ctx) => MedicalCheckupPage(character: widget.character)),
-                                  ).then((_) => setState(() {}));
-                                }
+                                await DokterUtils.handleDiseaseTreatment(
+                                  context, 
+                                  widget.character, 
+                                  menu, 
+                                  specificDisease: disease
+                                );
+                                setState(() {});
+                                widget.onComplete?.call();
                               },
                               child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
                             ),

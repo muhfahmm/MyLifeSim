@@ -96,6 +96,18 @@ class _GameScreenState extends State<GameScreen> {
   ];
 
   void _checkGlassesNeed() {
+    // Cek apakah perlu memilih hak asuh setelah orang tua bercerai di tengah game
+    if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
+        _character.custodyParent == null &&
+        _character.age < 18 &&
+        _character.fatherName != null &&
+        _character.motherName != null &&
+        !_character.isFatherDeceased &&
+        !_character.isMotherDeceased) {
+      _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!);
+      return;
+    }
+
     if (_character.avatarAccessoriesType != 'blank' && _character.avatarAccessoriesType != null) {
       return; // Sudah pakai kacamata
     }

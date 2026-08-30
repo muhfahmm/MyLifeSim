@@ -1242,6 +1242,27 @@ class Character {
       }
     }
 
+    // --- LOGIKA CERAI TENGAH GAME (MID-GAME DIVORCE) ---
+    if (fatherName != null && !isFatherDeceased && fatherAge != null &&
+        motherName != null && !isMotherDeceased && motherAge != null &&
+        !isFatherDivorced && !isMotherDivorced) {
+      if (fatherAge! >= 30 && fatherAge! <= 50 && motherAge! >= 30 && motherAge! <= 50) {
+        bool isUserAgeEligible = (age >= 5 && age <= 10) || 
+                                 (age >= 11 && age <= 20) || 
+                                 (age >= 25 && age <= 35);
+        if (isUserAgeEligible) {
+          // Peluang tahunan 1.0% menghasilkan peluang akumulatif ~24% (dalam rentang 10-25%)
+          // selama total 27 tahun usia yang memenuhi syarat.
+          if (random.nextDouble() < 0.01) {
+            isFatherDivorced = true;
+            isMotherDivorced = true;
+            custodyParent = null; // Reset agar memicu dialog hak asuh jika masih di bawah 18 tahun
+            events.add('💔 Perceraian: Kedua orang tuamu memutuskan untuk bercerai setelah sekian lama bersama.');
+          }
+        }
+      }
+    }
+
     // --- LOGIKA REMARRY: DELEGASI KE PARENT_REMARRIAGE ---
     ParentRemarriage.checkAndApplyRemarriage(this, random, events);
 

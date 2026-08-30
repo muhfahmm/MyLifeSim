@@ -85,12 +85,14 @@ class DokterUtils {
     }
   }
 
-  static Future<bool> handleDiseaseTreatment(BuildContext context, Character character, String menuType) async {
-    String? targetDisease;
-    for (var disease in character.riwayatPenyakit) {
-      if (getRequiredMenu(disease) == menuType) {
-        targetDisease = disease;
-        break; 
+  static Future<bool> handleDiseaseTreatment(BuildContext context, Character character, String menuType, {String? specificDisease}) async {
+    String? targetDisease = specificDisease;
+    if (targetDisease == null) {
+      for (var disease in character.riwayatPenyakit) {
+        if (getRequiredMenu(disease) == menuType) {
+          targetDisease = disease;
+          break; 
+        }
       }
     }
 
