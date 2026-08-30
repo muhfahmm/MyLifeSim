@@ -1,6 +1,8 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lisensi/lisensi_menu.dart
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'ujian_lisensi_page.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 
 class LisensiMenuHelper {
   static void showLisensiMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -55,35 +57,6 @@ class _LisensiPageState extends State<LisensiPage> {
     return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
   }
 
-  void _executeUrus(BuildContext context, Map<String, dynamic> l) {
-    setState(() {
-      widget.character.money -= (l['cost'] as int);
-    });
-    widget.character.intelligence = (widget.character.intelligence + 3).clamp(0, 100);
-    final msg = '📋 Kamu berhasil mendapatkan ${l['name']}! (+3% Kecerdasan, -\$${_fmt(l['cost'] as int)})';
-    widget.character.inbox.add(msg);
-    showDialog(
-      context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Lisensi Diperoleh!', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,32 +91,155 @@ class _LisensiPageState extends State<LisensiPage> {
                 itemCount: lisensi.length,
                 itemBuilder: (_, i) {
                   final l = lisensi[i];
-                  final bool ageOk = widget.character.age >= (l['minAge'] as int);
-                  final bool canAfford = widget.character.money >= (l['cost'] as int);
-                  final bool available = ageOk && canAfford;
+                  final String name = l['name'];
+                  final int minAge = l['minAge'] as int;
+                  final int cost = l['cost'] as int;
+                  
+                  final bool owned = widget.character.ownedLicenses.contains(name);
+                  final bool isPilotLocked = name.contains('Pilot') && (widget.character.intelligence < 80 || widget.character.age < 21);
+                  
+                  Widget trailingWidget;
+                  Color titleColor = Colors.black87;
+                  Color subtitleColor = Colors.black54;
+                  Color cardBg = Colors.white;
+
+                  if (owned) {
+                    trailingWidget = const Text(
+                      'Sudah Dimiliki',
+                      style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 12),
+                    );
+                    titleColor = Colors.green.shade800;
+                    cardBg = Colors.green.shade50.withOpacity(0.3);
+                  } else if (isPilotLocked) {
+                    trailingWidget = const Icon(Icons.lock, size: 16, color: Colors.grey);
+                    titleColor = Colors.grey;
+                    subtitleColor = Colors.grey;
+                    cardBg = Colors.grey.shade50;
+                  } else {
+                    trailingWidget = const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.brown);
+                  }
+
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: available ? Colors.white : Colors.grey.shade50,
+                    color: cardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: owned ? Colors.green.shade200 : Colors.grey.shade200),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(l['name'], style: TextStyle(
+                      title: Text(name, style: TextStyle(
                         fontWeight: FontWeight.bold, fontSize: 14,
-                        color: available ? Colors.black87 : Colors.grey,
+                        color: titleColor,
                       )),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)} | Min. usia: ${l['minAge']} thn',
-                          style: TextStyle(color: available ? Colors.black54 : Colors.grey)),
+                        child: Text(
+                          isPilotLocked 
+                              ? '${l['desc']}\nLisensi Terkunci 🔒 Butuh [Kecerdasan 80+] & Umur 21 thn.'
+                              : '${l['desc']}\nBiaya: \$${_fmt(cost)} | Min. usia: $minAge thn',
+                          style: TextStyle(color: subtitleColor),
+                        ),
                       ),
                       isThreeLine: true,
-                      trailing: Icon(available ? Icons.arrow_forward_ios : Icons.lock_outline,
-                          size: 14, color: available ? Colors.brown : Colors.grey),
-                      onTap: available ? () => _executeUrus(context, l) : null,
+                      trailing: trailingWidget,
+                      onTap: () {
+                        // 1. Check if already owned
+                        if (owned) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: const Text('Lisensi Dimiliki ✅', style: TextStyle(fontWeight: FontWeight.bold)),
+                              content: Text('Kamu sudah memiliki lisensi $name.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // 2. Check Pilot Lock
+                        if (isPilotLocked) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: const Text('Lisensi Terkunci 🔒', style: TextStyle(fontWeight: FontWeight.bold)),
+                              content: const Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // 3. Check Age
+                        if (widget.character.age < minAge) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: const Text('Belum Cukup Umur 🔞', style: TextStyle(fontWeight: FontWeight.bold)),
+                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // 4. Check Money
+                        if (widget.character.money < cost) {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                              title: const Text('Saldo Kurang 💸', style: TextStyle(fontWeight: FontWeight.bold)),
+                              content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(ctx),
+                                  child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                          );
+                          return;
+                        }
+
+                        // Proceed to Ujian Teori
+                        Navigator.push<bool>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => UjianLisensiPage(
+                              character: widget.character,
+                              license: l,
+                              onComplete: () {
+                                setState(() {});
+                                widget.onComplete();
+                              },
+                            ),
+                          ),
+                        ).then((passed) {
+                          if (passed == true) {
+                            _checkParentGiftOffer(context, l);
+                          }
+                        });
+                      },
                     ),
                   );
                 },
@@ -151,6 +247,113 @@ class _LisensiPageState extends State<LisensiPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _checkParentGiftOffer(BuildContext context, Map<String, dynamic> license) {
+    final String licenseName = license['name'];
+    if (!licenseName.contains('SIM')) return;
+
+    final random = Random();
+    // 50% kesempatan ditawari mobil oleh orang tua
+    if (random.nextInt(100) >= 50) return;
+
+    String? parentName;
+    String? parentRole;
+    int parentWealth = 0;
+
+    if (widget.character.fatherName != null && !widget.character.isFatherDeceased) {
+      final w = widget.character.getFatherWealth();
+      if (w > parentWealth) {
+        parentWealth = w;
+        parentName = widget.character.fatherName;
+        parentRole = 'Ayah';
+      }
+    }
+    if (widget.character.motherName != null && !widget.character.isMotherDeceased) {
+      final w = widget.character.getMotherWealth();
+      if (w > parentWealth) {
+        parentWealth = w;
+        parentName = widget.character.motherName;
+        parentRole = 'Ibu';
+      }
+    }
+
+    if (parentName == null || parentRole == null || parentWealth <= 0) return;
+
+    // Filter mobil yang sesuai lisensi & harganya mampu dibeli orang tua
+    List<Map<String, dynamic>> matchingCars = [];
+    for (var car in mobilTersediaList) {
+      final int price = (car['harga'] as num).toInt();
+      if (price <= parentWealth) {
+        final String typeLower = car['tipe'].toString().toLowerCase();
+        if (licenseName.contains('SIM C')) {
+          if (typeLower.contains('motor') || typeLower.contains('dua roda') || typeLower.contains('sport')) {
+            matchingCars.add(car);
+          }
+        } else if (licenseName.contains('SIM B')) {
+          if (typeLower.contains('truk') || typeLower.contains('heavy') || typeLower.contains('pickup')) {
+            matchingCars.add(car);
+          }
+        } else if (licenseName.contains('SIM A')) {
+          if (!typeLower.contains('truk') && !typeLower.contains('motor')) {
+            matchingCars.add(car);
+          }
+        }
+      }
+    }
+
+    if (matchingCars.isEmpty) return;
+
+    final giftCar = matchingCars[random.nextInt(matchingCars.length)];
+    final int carPrice = (giftCar['harga'] as num).toInt();
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (giftCtx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.card_giftcard, color: Colors.pink, size: 28),
+            const SizedBox(width: 8),
+            Text('Hadiah dari $parentRole! 🎁', style: const TextStyle(fontWeight: FontWeight.bold)),
+          ],
+        ),
+        content: Text(
+          'Karena kamu baru saja mendapatkan $licenseName, $parentRole-mu ($parentName) menawarkan untuk membelikanmu kendaraan sebagai hadiah!\n\n'
+          '🚗 Kendaraan: ${giftCar['nama']} (${giftCar['merek']})\n'
+          '💰 Nilai: \$${_fmt(giftCar['harga'] as int)}\n\n'
+          'Apakah kamu mau menerima hadiah ini?',
+          style: const TextStyle(fontSize: 14, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(giftCtx);
+            },
+            child: const Text('Tolak', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.pink.shade600,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              widget.character.addCarToGarage(giftCar, widget.character.age);
+              widget.character.setTargetWealth(parentName!, parentRole!, parentWealth - carPrice);
+              widget.character.happiness = (widget.character.happiness + 30).clamp(0, 100);
+              widget.character.inbox.add('🎁 Hadiah Kendaraan: Menerima ${giftCar['nama']} dari $parentRole ($parentName)! (+30% Kebahagiaan)');
+              
+              Navigator.pop(giftCtx);
+              setState(() {});
+              widget.onComplete();
+            },
+            child: const Text('Terima', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       ),
     );
   }

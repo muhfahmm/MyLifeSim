@@ -207,6 +207,7 @@ class Character {
   // --- KEJADIAN AJAKAN (PROPOSAL) ---
   Map<String, dynamic>? activeProposal; // {'name': '...', 'relation': '...', 'type': 'Pacaran' / 'Bercinta', 'gender': '...', 'age': '...'}
   List<Map<String, dynamic>> activeTabooSecrets = [];
+  List<String> ownedLicenses = [];
 
   // --- DATA PACAR / PASANGAN ---
   Map<String, String>? _partner;
@@ -743,7 +744,45 @@ class Character {
     }
   }
 
-  // updateHealthDynamic dipindahkan ke lib/pilih_karakter/atribut_karakter/kesehatan.dart sebagai extension method.
+  void addCarToGarage(Map<String, dynamic> car, int buyAge) {
+    if (garasiMobil == null) {
+      garasiMobil = {
+        'koleksi': [],
+        'showroom': [],
+        'riwayat': [],
+        'statistik': {
+          'totalMobil': 0,
+          'totalNilai': 0,
+          'pendapatanShowroom': 0,
+          'pengunjung': 0,
+        },
+      };
+    }
+    
+    final List koleksi = garasiMobil!['koleksi'] ?? [];
+    final List riwayat = garasiMobil!['riwayat'] ?? [];
+    
+    Map<String, dynamic> newCar = Map.from(car);
+    newCar['tahunBeli'] = buyAge;
+    newCar['kondisi'] = 'Baik';
+    koleksi.add(newCar);
+    
+    riwayat.insert(0, {
+      'type': 'Beli',
+      'nama': car['nama'],
+      'cost': car['harga'], // make sure both key names are supported
+      'harga': car['harga'],
+      'tahun': buyAge,
+    });
+    
+    final int totalMobil = koleksi.length;
+    final int totalNilai = koleksi.fold<int>(0, (sum, m) => sum + (m['harga'] as num).toInt());
+    
+    garasiMobil!['koleksi'] = koleksi;
+    garasiMobil!['riwayat'] = riwayat;
+    garasiMobil!['statistik']['totalMobil'] = totalMobil;
+    garasiMobil!['statistik']['totalNilai'] = totalNilai;
+  }
 
   void handlePartnerBreakupOnArrest(List<String> eventsList) {
     final random = Random();

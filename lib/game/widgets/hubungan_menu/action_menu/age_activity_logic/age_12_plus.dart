@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
@@ -794,6 +795,113 @@ List<ActionItem> getAge12PlusActions(
       }
     },
   ));
+
+  // Minta Kendaraan
+  final String cleanName = targetName.toLowerCase();
+  final String cleanRole = targetRole.toLowerCase();
+  final bool isParent = cleanName.startsWith('ayah') ||
+                        cleanName.startsWith('ibu') ||
+                        cleanRole.contains('kandung') ||
+                        cleanRole.contains('tiri') ||
+                        cleanRole.contains('cerai') ||
+                        (character.fatherName != null && cleanName.contains(character.fatherName!.toLowerCase())) ||
+                        (character.motherName != null && cleanName.contains(character.motherName!.toLowerCase())) ||
+                        (character.stepFatherName != null && cleanName.contains(character.stepFatherName!.toLowerCase())) ||
+                        (character.stepMotherName != null && cleanName.contains(character.stepMotherName!.toLowerCase()));
+
+  if (isParent) {
+    actions.add(ActionItem(
+      label: 'Minta Kendaraan',
+      icon: Icons.directions_car,
+      color: Colors.redAccent,
+      onTap: () {
+        // 1. Cek apakah user punya setidaknya 1 lisensi
+        if (character.ownedLicenses.isEmpty) {
+          showDialogCallback(
+            'Urus Lisensi Dulu',
+            'Kamu belum memiliki lisensi mengemudi apapun! Urus lisensi mengemudi (SIM A/B/C) terlebih dahulu di menu Aktivitas.',
+            Icons.lock_outline, Colors.grey, () {}
+          );
+          return;
+        }
+
+        // 2. Cek uang orang tua
+        final int parentWealth = character.getTargetWealth(targetName, targetRole);
+        
+        List<Map<String, dynamic>> affordableCars = [];
+        for (var car in mobilTersediaList) {
+          final int price = (car['harga'] as num).toInt();
+          if (price <= parentWealth) {
+            final String typeLower = car['tipe'].toString().toLowerCase();
+            bool licenseMatch = false;
+            for (var license in character.ownedLicenses) {
+              if (license.contains('SIM C') && (typeLower.contains('motor') || typeLower.contains('dua roda') || typeLower.contains('sport'))) {
+                licenseMatch = true;
+              } else if (license.contains('SIM B') && (typeLower.contains('truk') || typeLower.contains('heavy') || typeLower.contains('pickup'))) {
+                licenseMatch = true;
+              } else if (license.contains('SIM A') && !typeLower.contains('truk') && !typeLower.contains('motor')) {
+                licenseMatch = true;
+              }
+            }
+            if (licenseMatch) {
+              affordableCars.add(car);
+            }
+          }
+        }
+
+        if (affordableCars.isEmpty) {
+          showDialogCallback(
+            'Permintaan Ditolak',
+            'Uang $relation tidak cukup untuk membeli kendaraan saat ini! (Saldo Kekayaan mereka: \$${parentWealth.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")})',
+            Icons.block, Colors.red, () {
+              character.happiness = (character.happiness - 5).clamp(0, 100);
+              updateRelationship(-random.nextInt(6) - 5);
+              updateState();
+            }
+          );
+          return;
+        }
+
+        // Pilih kendaraan acak
+        final chosenCar = affordableCars[random.nextInt(affordableCars.length)];
+        final int carPrice = (chosenCar['harga'] as num).toInt();
+
+        // Tentukan kelulusan berdasarkan relasi
+        final int relVal = character.fatherName != null && cleanName.contains(character.fatherName!.toLowerCase())
+            ? (character.fatherRelationship ?? 50)
+            : (character.motherName != null && cleanName.contains(character.motherName!.toLowerCase())
+                ? (character.motherRelationship ?? 50)
+                : 50);
+
+        final bool accepted = random.nextInt(100) < (relVal * 0.8 + 10).toInt();
+
+        if (accepted) {
+          showDialogCallback(
+            'Minta Kendaraan Sukses! 🚗',
+            'Hebat! $relation mengabulkan permintaanmu dan membelikanmu kendaraan ${chosenCar['nama']} seharga \$${chosenCar['harga'].toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}!',
+            Icons.check_circle, Colors.green, () {
+              character.addCarToGarage(chosenCar, character.age);
+              character.setTargetWealth(targetName, targetRole, parentWealth - carPrice);
+              character.happiness = (character.happiness + 20).clamp(0, 100);
+              character.inbox.add('🚗 Minta Kendaraan Sukses: Dibelikan ${chosenCar['nama']} oleh $relation (Kekayaan mereka berkurang). (+20% Kebahagiaan)');
+              updateRelationship(random.nextInt(6) + 10);
+              updateState();
+            }
+          );
+        } else {
+          showDialogCallback(
+            'Permintaan Ditolak',
+            '$relation menolak membelikan kendaraan untukmu. Mereka bilang kamu harus menabung sendiri.',
+            Icons.block, Colors.red, () {
+              character.happiness = (character.happiness - 10).clamp(0, 100);
+              updateRelationship(-random.nextInt(6) - 5);
+              updateState();
+            }
+          );
+        }
+      },
+    ));
+  }
 
   // 6. Pujian
   actions.add(ActionItem(
