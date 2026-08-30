@@ -488,13 +488,13 @@ class AjakanMasturbasiDialog {
 
     if (relLower.contains('ayah')) {
       inboxMsg = '🚨 Rahasia Gelap: Hubungan tabu terjalin dengan Ayah ($viewerName) — $waktu, $lokasi.';
-      resultMsg = 'Kamu dan Ayahmu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua (+15% Kebahagiaan, -50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+      resultMsg = 'Kamu dan Ayahmu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua.';
     } else if (relLower.contains('ibu')) {
       inboxMsg = '🚨 Rahasia Gelap: Hubungan tabu terjalin dengan Ibu ($viewerName) — $waktu, $lokasi.';
-      resultMsg = 'Kamu dan Ibumu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua (+15% Kebahagiaan, -50% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+      resultMsg = 'Kamu dan Ibumu ($viewerName) melakukannya bersama $waktu hari ini $lokasi. Rahasia ini hanya milik kalian berdua.';
     } else {
       inboxMsg = '🚨 Rahasia Gelap: Hubungan terlarang terjalin dengan $viewerName — $waktu, $lokasi.';
-      resultMsg = 'Kamu dan $partnerDesc melakukannya bersama $waktu hari ini $lokasi. Kalian sepakat menjaga rahasia ini rapat-rapat (+15% Kebahagiaan, -30% Karma, -$healthLoss% Kesehatan, +20% Hubungan).';
+      resultMsg = 'Kamu dan $partnerDesc melakukannya bersama $waktu hari ini $lokasi. Kalian sepakat menjaga rahasia ini rapat-rapat.';
     }
 
     character.inbox.add(inboxMsg);
@@ -556,6 +556,17 @@ class AjakanMasturbasiDialog {
                   fontSize: 14,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
+              ),
+              const SizedBox(height: 12),
+              // BADGE EFEK STATISTIK
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  _buildBadge(Icons.sentiment_satisfied, '+15% Kebahagiaan', isDark ? Colors.greenAccent : Colors.green),
+                  _buildBadge(Icons.favorite, '-$healthLoss% Kesehatan', isDark ? Colors.orangeAccent : Colors.orange),
+                  _buildBadge(Icons.people, '+20% Hubungan', isDark ? Colors.lightBlueAccent : Colors.blue),
+                ],
               ),
             ],
           ),
@@ -812,10 +823,10 @@ class AjakanMasturbasiDialog {
   }
 
   // ============================================================
-  // HELPER: BADGE CHIP UNTUK LOKASI/WAKTU
+  // HELPER: BADGE CHIP UNTUK LOKASI/WAKTU/EFEK
   // ============================================================
-  static Widget _buildBadge(IconData icon, String label, Color color) {
-    return Container(
+  
+   static Widget _buildBadge(IconData icon, String label, Color color) { return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.10),
