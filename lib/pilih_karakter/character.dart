@@ -31,6 +31,10 @@ export 'package:bitlife/pilih_karakter/atribut_karakter/seksualitas.dart';
 export 'package:bitlife/pilih_karakter/atribut_karakter/kecerdasan.dart';
 export 'package:bitlife/pilih_karakter/atribut_karakter/tekad.dart';
 
+int fatherWealth = 1000000;
+int motherWealth = 1000000;
+int familyWealth = 2000000;
+
 class Character {
   String name;
   String gender;

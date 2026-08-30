@@ -22,16 +22,20 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
     if (widget.character.money < costPerTreatment) {
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Saldo Kurang 💸'),
-          content: const Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar $costPerTreatment.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Mengerti'),
-            ),
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Saldo Kurang 💸', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar $costPerTreatment.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Mengerti', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
@@ -90,18 +94,22 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
 
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Pengobatan Berhasil 🎉'),
-          content: Text('Dokter berhasil mengobati penyakitmu ($diseaseName).\nKesehatanmu meningkat +25% (\$150 uang berkurang).'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-              },
-              child: const Text('Bagus'),
-            ),
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Pengobatan Berhasil 🎉', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text('Dokter berhasil mengobati penyakitmu ($diseaseName).\nKesehatanmu meningkat +25% (\$150 uang berkurang).', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: Text('Bagus', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
       );
     } else {
       setState(() {
@@ -110,18 +118,22 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
 
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Pengobatan Gagal 😔'),
-          content: Text('Dokter telah berusaha semaksimal mungkin, namun penyakitmu ($diseaseName) belum berhasil disembuhkan.\nBiaya pengobatan sebesar \$150 tetap ditagihkan.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-              },
-              child: const Text('Mengerti'),
-            ),
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Pengobatan Gagal 😔', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text('Dokter telah berusaha semaksimal mungkin, namun penyakitmu ($diseaseName) belum berhasil disembuhkan.\nBiaya pengobatan sebesar \$150 tetap ditagihkan.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: Text('Mengerti', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
       );
     }
   }
@@ -139,16 +151,20 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
     if (widget.character.money < totalCost) {
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Saldo Kurang 💸'),
-          content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: \$${DokterUtils.fmt(totalCost)}\nSaldo Kamu: \$${DokterUtils.fmt(widget.character.money)}'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Mengerti'),
-            ),
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Text('Saldo Kurang 💸', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: \$${DokterUtils.fmt(totalCost)}\nSaldo Kamu: \$${DokterUtils.fmt(widget.character.money)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(ctx),
+                child: Text('Mengerti', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
@@ -217,37 +233,42 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Hasil Pengobatan Massal 🏥'),
-        content: Text('Pengobatan selesai!\n\n🎉 Berhasil Sembuh: $curedCount penyakit\n😔 Gagal Sembuh: $failedCount penyakit\n💸 Total Biaya: \$${DokterUtils.fmt(totalCost)}'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Selesai'),
-          ),
-        ],
-      ),
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Text('Hasil Pengobatan Massal 🏥', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+          content: Text('Pengobatan selesai!\n\n🎉 Berhasil Sembuh: $curedCount penyakit\n😔 Gagal Sembuh: $failedCount penyakit\n💸 Total Biaya: \$${DokterUtils.fmt(totalCost)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: Text('Selesai', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final activeDiseases = widget.character.riwayatPenyakit;
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Daftar Penyakit Anda', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -257,7 +278,11 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                       const SizedBox(width: 8),
                       Text(
                         'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold, 
+                          fontSize: 16, 
+                          color: isDark ? Colors.greenAccent : Colors.green,
+                        ),
                       ),
                     ],
                   ),
@@ -278,11 +303,15 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
             const SizedBox(height: 8),
             Expanded(
               child: activeDiseases.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
                         'kamu sehat',
-                        textAlign: CenterTextAlignment,
-                        style: TextStyle(color: Colors.black54, fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black54, 
+                          fontSize: 18, 
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     )
                   : ListView.builder(
@@ -295,20 +324,26 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.only(bottom: 8),
-                          color: Colors.white,
+                          color: isDark ? Colors.grey.shade800 : Colors.white,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey.shade200),
+                            side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             title: Text(
                               disease,
-                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                fontSize: 14, 
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
                             ),
                             subtitle: Text(
                               'Harus diobati via: ${DokterUtils.getRequiredMenu(disease)}',
-                              style: const TextStyle(color: Colors.black54),
+                              style: TextStyle(
+                                color: isDark ? Colors.white70 : Colors.black54,
+                              ),
                             ),
                             trailing: ElevatedButton(
                               style: ElevatedButton.styleFrom(
@@ -348,4 +383,3 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
     );
   }
 }
-const CenterTextAlignment = TextAlign.center;

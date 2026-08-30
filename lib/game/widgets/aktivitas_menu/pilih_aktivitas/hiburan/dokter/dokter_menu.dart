@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
 import 'menu_dokter/tes_darah/tes_darah_page.dart';
-import 'menu_dokter/konsultasi_psikolog/konsultasi_psikolog_page.dart';
 import 'menu_dokter/operasi_kecil/operasi_kecil_page.dart';
 import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
 // TAMBAHKAN BARIS INI DI BAWAHNYA:

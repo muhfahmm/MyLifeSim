@@ -41,59 +41,90 @@ class PilihWaktuHelper {
     TimeOption? selectedTime = await showDialog<TimeOption>(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            const Icon(Icons.access_time, color: Colors.indigoAccent),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                'Pilih Waktu Bercinta',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (dialogContext) {
+        final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Row(
             children: [
-              Text(
-                'Lokasi terpilih: $locationText',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigoAccent),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pilih Waktu Bercinta',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
               ),
-              ...timeOptions.map((time) {
-                return Card(
-                  elevation: 0,
-                  color: Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.indigo.shade50,
-                      child: Icon(time.icon, color: Colors.indigoAccent),
-                    ),
-                    title: Text(time.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: Text(time.description, style: const TextStyle(fontSize: 12)),
-                    onTap: () => Navigator.pop(context, time),
-                  ),
-                );
-              }),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, null),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-          )
-        ],
-      ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Lokasi terpilih: $locationText',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                ...timeOptions.map((time) {
+                  return Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isDark ? Colors.indigo.shade900 : Colors.indigo.shade50,
+                        child: Icon(time.icon, color: isDark ? Colors.indigoAccent : Colors.indigoAccent),
+                      ),
+                      title: Text(
+                        time.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      subtitle: Text(
+                        time.description,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                      onTap: () => Navigator.pop(dialogContext, time),
+                    ),
+                  );
+                }),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, null),
+              child: Text(
+                'Batal',
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          ],
+        );
+      },
     );
 
     return selectedTime?.name;

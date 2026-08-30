@@ -38,18 +38,30 @@ class _OperasiKecilPageState extends State<OperasiKecilPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      appBar: AppBar(title: const Text('Operasi Kecil 🏥'), backgroundColor: Colors.white, foregroundColor: Colors.black87),
+      appBar: AppBar(
+        title: const Text('Operasi Kecil 🏥'),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
+      ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: ListView.builder(
         padding: const EdgeInsets.all(16),
         itemCount: operasi.length,
         itemBuilder: (_, i) {
           final o = operasi[i];
           return Card(
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+            ),
             child: ListTile(
-              title: Text(o['nama']),
-              subtitle: Text(o['desc']),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+              leading: Icon(Icons.medical_services, color: Colors.blue, size: 28),
+              title: Text(o['nama'], style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
+              subtitle: Text(o['desc'], style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+              trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
               onTap: () => _pilihOperasi(o),
             ),
           );

@@ -7,6 +7,35 @@ import 'persentase_efek_samping/pria.dart';
 import 'beritahu_orang_tua.dart';
 
 class EfekSampingMasturbasi {
+  // ============================================================
+  // HELPER BADGE (sama dengan gaya di ajakan_masturbasi_dialog)
+  // ============================================================
+  static Widget _buildEffectBadge(IconData icon, String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withOpacity(0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Memicu risiko efek samping untuk aktivitas masturbasi SOLO.
   static void checkSoloEffect(BuildContext context, Character character, String relationType, VoidCallback? onComplete) {
     final random = Random();
@@ -241,6 +270,41 @@ class EfekSampingMasturbasi {
       character.riwayatPenyakit.add(diseaseName);
     }
 
+    // Kumpulkan badge efek
+    final List<Widget> effectBadges = [];
+    if (hDelta != 0) {
+      final color = hDelta > 0 ? Colors.green : Colors.red;
+      effectBadges.add(_buildEffectBadge(
+        Icons.favorite,
+        '${hDelta > 0 ? '+' : ''}$hDelta% Kesehatan',
+        color,
+      ));
+    }
+    if (hapDelta != 0) {
+      final color = hapDelta > 0 ? Colors.green : Colors.red;
+      effectBadges.add(_buildEffectBadge(
+        Icons.sentiment_satisfied,
+        '${hapDelta > 0 ? '+' : ''}$hapDelta% Kebahagiaan',
+        color,
+      ));
+    }
+    if (iDelta != 0) {
+      final color = iDelta > 0 ? Colors.blue : Colors.red;
+      effectBadges.add(_buildEffectBadge(
+        Icons.psychology,
+        '${iDelta > 0 ? '+' : ''}$iDelta% Kecerdasan',
+        color,
+      ));
+    }
+    if (kDelta != 0) {
+      final color = kDelta > 0 ? Colors.green : Colors.red;
+      effectBadges.add(_buildEffectBadge(
+        Icons.balance,
+        '${kDelta > 0 ? '+' : ''}$kDelta% Karma',
+        color,
+      ));
+    }
+
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -264,9 +328,10 @@ class EfekSampingMasturbasi {
           children: [
             Text(effect['desc'], style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 12),
-            Text(
-              'Efek: $detailStat',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent, fontSize: 13),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: effectBadges,
             ),
           ],
         ),
@@ -373,7 +438,6 @@ class EfekSampingMasturbasi {
     character.health = (character.health + healAmount).clamp(0, 100);
     
     // Hapus penyakit dari riwayat penyakit
-    // Cari penyakit / cedera yang barusan terjadi (efek samping masturbasi)
     character.riwayatPenyakit.removeWhere((disease) => 
         disease.contains('Lecet') || 
         disease.contains('Robekan') || 
@@ -386,13 +450,31 @@ class EfekSampingMasturbasi {
         'Dengan rasa bersalah dan khawatir, dia membawamu ke klinik secara diam-diam tanpa sepengetahuan orang tua dan menanggung semua biaya pengobatan. Kesehatanmu pulih sepenuhnya (+$healAmount% Kesehatan).';
     character.inbox.add(msg);
 
+    // Badge efek kesehatan pulih
+    final badge = _buildEffectBadge(
+      Icons.favorite,
+      '+$healAmount% Kesehatan',
+      Colors.green,
+    );
+
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text('Bantuan dari $partnerName', style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(msg),
+        title: Text(
+          'Bantuan dari $partnerName',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(msg, style: const TextStyle(fontSize: 14)),
+            const SizedBox(height: 12),
+            badge,
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () {
