@@ -56,15 +56,19 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
       appBar: AppBar(
-        title: const Text('Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text(
+          'Atribut Kepribadian',
+          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+        ),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,38 +81,46 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Center(
+                    Center(
                       child: Text(
                         'Pilih tingkat atribut karaktermu!',
-                        style: TextStyle(fontSize: 16, color: Colors.black54, fontWeight: FontWeight.w500),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
                     _buildAttributeSlider(
+                      context: context,
                       label: 'Kesehatan',
                       value: _health,
                       emoji: '❤️',
                       onChanged: (val) => setState(() => _health = val),
                     ),
                     _buildAttributeSlider(
+                      context: context,
                       label: 'Kebahagiaan',
                       value: _happiness,
                       emoji: '😀',
                       onChanged: (val) => setState(() => _happiness = val),
                     ),
                     _buildAttributeSlider(
+                      context: context,
                       label: 'Kecerdasan',
                       value: _smarts,
                       emoji: '🧠',
                       onChanged: (val) => setState(() => _smarts = val),
                     ),
                     _buildAttributeSlider(
+                      context: context,
                       label: 'Disiplin',
                       value: _discipline,
                       emoji: '🥋',
                       onChanged: (val) => setState(() => _discipline = val),
                     ),
-                    _buildSexualitySlider(),
+                    _buildSexualitySlider(context),
                   ],
                 ),
               ),
@@ -159,11 +171,13 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
   }
 
   Widget _buildAttributeSlider({
+    required BuildContext context,
     required String label,
     required double value,
     required String emoji,
     required ValueChanged<double> onChanged,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -174,11 +188,19 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
             children: [
               Text(
                 '$emoji $label',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               Text(
                 '${value.toInt()}%',
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
               ),
             ],
           ),
@@ -187,9 +209,9 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
             data: SliderThemeData(
               trackHeight: 6,
               activeTrackColor: Colors.blue.shade100,
-              inactiveTrackColor: Colors.grey.shade200,
+              inactiveTrackColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
               thumbColor: Colors.blue,
-              overlayColor: Colors.blue.withOpacity(0.2),
+              overlayColor: Colors.blue.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
             ),
             child: Slider(
@@ -204,7 +226,8 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
     );
   }
 
-  Widget _buildSexualitySlider() {
+  Widget _buildSexualitySlider(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: Column(
@@ -213,13 +236,21 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 '🌈 Seksualitas',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               Text(
                 _getSexualityLabel(_sexualityVal),
-                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.blue),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.blue,
+                ),
               ),
             ],
           ),
@@ -228,9 +259,9 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
             data: SliderThemeData(
               trackHeight: 6,
               activeTrackColor: Colors.blue.shade100,
-              inactiveTrackColor: Colors.grey.shade200,
+              inactiveTrackColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
               thumbColor: Colors.blue,
-              overlayColor: Colors.blue.withOpacity(0.2),
+              overlayColor: Colors.blue.withValues(alpha: 0.2),
               thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
             ),
             child: Slider(

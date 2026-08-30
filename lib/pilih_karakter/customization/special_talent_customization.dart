@@ -53,26 +53,34 @@ class _SpecialTalentCustomizationScreenState extends State<SpecialTalentCustomiz
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
       appBar: AppBar(
-        title: const Text('Talenta Spesial', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text(
+          'Talenta Spesial',
+          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+        ),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: SafeArea(
         child: Column(
           children: [
-            const Padding(
-              padding: EdgeInsets.only(top: 16.0, bottom: 8.0),
+            Padding(
+              padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
               child: Text(
                 'Pilih talenta spesial karaktermu',
-                style: TextStyle(fontSize: 16, color: Colors.black54, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 16,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Expanded(
@@ -83,17 +91,30 @@ class _SpecialTalentCustomizationScreenState extends State<SpecialTalentCustomiz
                   final talent = _talents[index];
                   final isSelected = _selectedTalent == talent['name'];
                   
+                  final Color borderColor = isSelected
+                      ? Colors.orange
+                      : (isDark ? Colors.grey.shade700 : Colors.grey.shade200);
+                  final Color cardColor = isSelected
+                      ? Colors.orange.withValues(alpha: 0.08)
+                      : (isDark ? Colors.grey.shade800 : Colors.grey.shade50);
+                  final Color titleColor = isSelected
+                      ? Colors.orange.shade800
+                      : (isDark ? Colors.white : Colors.black87);
+                  final Color trailingColor = isSelected
+                      ? Colors.orange
+                      : (isDark ? Colors.white54 : Colors.grey.shade400);
+
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                       side: BorderSide(
-                        color: isSelected ? Colors.orange : Colors.grey.shade200,
+                        color: borderColor,
                         width: isSelected ? 1.5 : 1.0,
                       ),
                     ),
-                    color: isSelected ? Colors.orange.withOpacity(0.08) : Colors.grey.shade50,
+                    color: cardColor,
                     child: ListTile(
                       leading: Text(
                         talent['emoji']!,
@@ -104,12 +125,12 @@ class _SpecialTalentCustomizationScreenState extends State<SpecialTalentCustomiz
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
-                          color: isSelected ? Colors.orange.shade800 : Colors.black87,
+                          color: titleColor,
                         ),
                       ),
                       trailing: isSelected
                           ? const Icon(Icons.check_circle, color: Colors.orange)
-                          : Icon(Icons.circle_outlined, color: Colors.grey.shade400),
+                          : Icon(Icons.circle_outlined, color: trailingColor),
                       onTap: () {
                         setState(() {
                           _selectedTalent = talent['name']!;

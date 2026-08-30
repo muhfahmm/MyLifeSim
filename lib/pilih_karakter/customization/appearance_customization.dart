@@ -49,17 +49,21 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isMale = widget.gender == 'male' || widget.gender == 'laki-laki';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
       appBar: AppBar(
-        title: const Text('Kustomisasi Penampilan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        title: Text(
+          'Kustomisasi Penampilan',
+          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+        ),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black87),
+          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -77,12 +81,15 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
                         padding: const EdgeInsets.all(8),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Colors.grey.shade50,
-                          border: Border.all(color: Colors.blue.shade100, width: 2),
+                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                          border: Border.all(
+                            color: isDark ? Colors.blue.shade700 : Colors.blue.shade100,
+                            width: 2,
+                          ),
                         ),
                         child: CircleAvatar(
                           radius: 60,
-                          backgroundColor: Colors.blue.shade50,
+                          backgroundColor: isDark ? Colors.blue.shade900 : Colors.blue.shade50,
                           child: Image.network(
                             AvatarGenerator.buildCustomAvatarUrl(
                               topType: _selectedTopType,
@@ -113,12 +120,14 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
 
                     // Customizers list
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Gaya Rambut',
                       value: _selectedTopType,
                       items: isMale ? AvatarGenerator.topsMale : AvatarGenerator.topsFemale,
                       onChanged: (val) => setState(() => _selectedTopType = val!),
                     ),
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Warna Rambut',
                       value: _selectedHairColor,
                       items: AvatarGenerator.hairColors,
@@ -126,6 +135,7 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
                       isColorDropdown: true,
                     ),
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Warna Kulit',
                       value: _selectedSkinColor,
                       items: AvatarGenerator.skinColors,
@@ -133,18 +143,21 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
                       isColorDropdown: true,
                     ),
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Aksesoris / Kacamata',
                       value: _selectedAccessoriesType,
                       items: AvatarGenerator.accessories,
                       onChanged: (val) => setState(() => _selectedAccessoriesType = val!),
                     ),
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Pakaian',
                       value: _selectedClotheType,
                       items: AvatarGenerator.clothes,
                       onChanged: (val) => setState(() => _selectedClotheType = val!),
                     ),
                     _buildCustomizerDropdown(
+                      context: context,
                       label: 'Warna Pakaian',
                       value: _selectedClotheColor,
                       items: AvatarGenerator.clotheColors,
@@ -199,12 +212,14 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
   }
 
   Widget _buildCustomizerDropdown({
+    required BuildContext context,
     required String label,
     required String value,
     required Map<String, String> items,
     required ValueChanged<String?> onChanged,
     bool isColorDropdown = false,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final finalValue = items.values.contains(value) ? value : items.values.first;
 
     return Padding(
@@ -212,24 +227,34 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(label, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54)),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white70 : Colors.black54,
+            ),
+          ),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
             value: finalValue,
-            dropdownColor: Colors.white,
-            style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w500),
+            dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+            style: TextStyle(
+              color: isDark ? Colors.white : Colors.black87,
+              fontWeight: FontWeight.w500,
+            ),
             decoration: InputDecoration(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: Colors.grey.shade300),
+                borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
               ),
               filled: true,
-              fillColor: Colors.grey.shade50,
+              fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
             ),
             items: items.entries.map((entry) {
               Widget leading = const SizedBox.shrink();
@@ -246,7 +271,10 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
                   decoration: BoxDecoration(
                     color: swatchColor,
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.black12, width: 1),
+                    border: Border.all(
+                      color: isDark ? Colors.white30 : Colors.black12,
+                      width: 1,
+                    ),
                   ),
                 );
               }
@@ -257,7 +285,10 @@ class _AppearanceCustomizationScreenState extends State<AppearanceCustomizationS
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     leading,
-                    Text(entry.key, style: const TextStyle(color: Colors.black87)),
+                    Text(
+                      entry.key,
+                      style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    ),
                   ],
                 ),
               );
