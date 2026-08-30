@@ -123,9 +123,10 @@ class AjakanMasturbasiDialog {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
+        final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: const Color(0xFFEEF2F5),
+          backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFEEF2F5),
           title: Row(
             children: [
               if (isGay || isLesbian)
@@ -136,7 +137,11 @@ class AjakanMasturbasiDialog {
               Expanded(
                 child: Text(
                   dialogTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87),
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ),
             ],
@@ -145,15 +150,21 @@ class AjakanMasturbasiDialog {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(dialogBody, style: const TextStyle(fontSize: 14, color: Colors.black87)),
+              Text(
+                dialogBody,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
               // Badge lokasi & waktu hanya muncul untuk incoming (partner sudah memilih)
               if (!isUserInitiated && preGeneratedLokasi != null && preGeneratedWaktu != null) ...[
                 const SizedBox(height: 12),
                 Row(
                   children: [
-                    _buildBadge(Icons.location_on, preGeneratedLokasi, Colors.deepPurple),
+                    _buildBadge(Icons.location_on, preGeneratedLokasi, isDark ? Colors.purpleAccent : Colors.deepPurple),
                     const SizedBox(width: 8),
-                    _buildBadge(Icons.access_time, preGeneratedWaktu, Colors.indigo),
+                    _buildBadge(Icons.access_time, preGeneratedWaktu, isDark ? Colors.indigoAccent : Colors.indigo),
                   ],
                 ),
               ],
@@ -167,7 +178,13 @@ class AjakanMasturbasiDialog {
                   Navigator.pop(dialogContext);
                   _executeReport(context, character, relationType, viewerName, 'Ibu', onComplete);
                 },
-                child: const Text('Laporkan ke Ibu', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Laporkan ke Ibu',
+                  style: TextStyle(
+                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             if (showReportToFather)
               TextButton(
@@ -175,7 +192,13 @@ class AjakanMasturbasiDialog {
                   Navigator.pop(dialogContext);
                   _executeReport(context, character, relationType, viewerName, 'Ayah', onComplete);
                 },
-                child: const Text('Laporkan ke Ayah', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Laporkan ke Ayah',
+                  style: TextStyle(
+                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             if (showReportToParents)
               TextButton(
@@ -183,11 +206,20 @@ class AjakanMasturbasiDialog {
                   Navigator.pop(dialogContext);
                   _executeReportSibling(context, character, relationType, viewerName, onComplete);
                 },
-                child: const Text('Laporkan ke Orang Tua', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Laporkan ke Orang Tua',
+                  style: TextStyle(
+                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
             // Konfirmasi → untuk user-initiated lanjut ke picker, untuk incoming langsung ke result
             Container(
-              decoration: BoxDecoration(color: const Color(0xFFD4EDDA), borderRadius: BorderRadius.circular(20)),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.green.shade900 : const Color(0xFFD4EDDA),
+                borderRadius: BorderRadius.circular(20),
+              ),
               padding: const EdgeInsets.symmetric(horizontal: 4),
               child: TextButton(
                 onPressed: () {
@@ -203,7 +235,10 @@ class AjakanMasturbasiDialog {
                 },
                 child: Text(
                   isUserInitiated ? 'Lanjutkan \u27A1' : 'Terima ajakan masturbasi',
-                  style: const TextStyle(color: Color(0xFF28A745), fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    color: isDark ? Colors.greenAccent : const Color(0xFF28A745),
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
@@ -214,7 +249,10 @@ class AjakanMasturbasiDialog {
               },
               child: Text(
                 isUserInitiated ? 'Batal' : 'Tolak',
-                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: isDark ? Colors.redAccent : Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
@@ -237,53 +275,80 @@ class AjakanMasturbasiDialog {
     showDialog<_LokasiOption>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.location_on, color: Colors.deepPurple),
-            const SizedBox(width: 8),
-            Expanded(
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Row(
+            children: [
+              Icon(Icons.location_on, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pilih Tempat Bersama $viewerName',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: _lokasiOptions.map((loc) {
+                return Card(
+                  elevation: 0,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                  ),
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: isDark ? Colors.purple.shade900 : Colors.purple.shade50,
+                      child: Icon(loc.icon, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
+                    ),
+                    title: Text(
+                      loc.name,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: Text(
+                      loc.description,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    onTap: () => Navigator.pop(ctx, loc),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, null),
               child: Text(
-                'Pilih Tempat Bersama $viewerName',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                'Batal',
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: _lokasiOptions.map((loc) {
-              return Card(
-                elevation: 0,
-                color: Colors.grey.shade50,
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.purple.shade50,
-                    child: Icon(loc.icon, color: Colors.deepPurple),
-                  ),
-                  title: Text(loc.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  subtitle: Text(loc.description, style: const TextStyle(fontSize: 12)),
-                  onTap: () => Navigator.pop(ctx, loc),
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, null),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+        );
+      },
     ).then((selectedLoc) {
       if (selectedLoc == null) return;
       _showPilihWaktu(context, character, relationType, viewerName, partnerDesc, selectedLoc.name, onComplete);
@@ -305,58 +370,92 @@ class AjakanMasturbasiDialog {
     showDialog<_WaktuOption>(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            const Icon(Icons.access_time, color: Colors.indigo),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text('Pilih Waktu', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Row(
             children: [
-              Text(
-                'Lokasi terpilih: $lokasiTerpilih',
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.black54),
+              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigo),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pilih Waktu',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
               ),
-              const SizedBox(height: 8),
-              ..._waktuOptions.map((time) {
-                return Card(
-                  elevation: 0,
-                  color: Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.indigo.shade50,
-                      child: Icon(time.icon, color: Colors.indigoAccent),
-                    ),
-                    title: Text(time.name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                    subtitle: Text(time.description, style: const TextStyle(fontSize: 12)),
-                    onTap: () => Navigator.pop(ctx, time),
-                  ),
-                );
-              }),
             ],
           ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, null),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+          content: SizedBox(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Lokasi terpilih: $lokasiTerpilih',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ..._waktuOptions.map((time) {
+                  return Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isDark ? Colors.indigo.shade900 : Colors.indigo.shade50,
+                        child: Icon(time.icon, color: isDark ? Colors.indigoAccent : Colors.indigoAccent),
+                      ),
+                      title: Text(
+                        time.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      subtitle: Text(
+                        time.description,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                      onTap: () => Navigator.pop(ctx, time),
+                    ),
+                  );
+                }),
+              ],
+            ),
           ),
-        ],
-      ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx, null),
+              child: Text(
+                'Batal',
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     ).then((selectedTime) {
       if (selectedTime == null) return;
       _executeAccept(context, character, relationType, viewerName, partnerDesc, lokasiTerpilih, selectedTime.name, onComplete);
@@ -402,52 +501,85 @@ class AjakanMasturbasiDialog {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: const Color(0xFFEEF2F5),
-        title: const Row(
-          children: [
-            Icon(Icons.flash_on, color: Colors.deepPurple, size: 28),
-            SizedBox(width: 8),
-            Expanded(
-              child: Text('Ajakan Diterima 😈', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black87)),
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFEEF2F5),
+          title: Row(
+            children: [
+              Icon(Icons.flash_on, color: isDark ? Colors.deepPurpleAccent : Colors.deepPurple, size: 28),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Ajakan Diterima 😈',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(children: [
+                Icon(Icons.location_on, size: 16, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
+                const SizedBox(width: 4),
+                Text(
+                  lokasi,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.purpleAccent : Colors.deepPurple,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Icon(Icons.access_time, size: 16, color: isDark ? Colors.indigoAccent : Colors.indigo),
+                const SizedBox(width: 4),
+                Text(
+                  waktu,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: isDark ? Colors.indigoAccent : Colors.indigo,
+                  ),
+                ),
+              ]),
+              const SizedBox(height: 10),
+              Text(
+                resultMsg,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                EfekSampingMasturbasi.checkPartnerEffect(
+                  context, character, relationType, viewerName, onComplete,
+                  acceptanceHealthLoss: healthLoss,
+                );
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
             ),
           ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(children: [
-              const Icon(Icons.location_on, size: 16, color: Colors.deepPurple),
-              const SizedBox(width: 4),
-              Text(lokasi, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.deepPurple)),
-              const SizedBox(width: 12),
-              const Icon(Icons.access_time, size: 16, color: Colors.indigo),
-              const SizedBox(width: 4),
-              Text(waktu, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.indigo)),
-            ]),
-            const SizedBox(height: 10),
-            Text(resultMsg, style: const TextStyle(fontSize: 14, color: Colors.black87)),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              EfekSampingMasturbasi.checkPartnerEffect(
-                context, character, relationType, viewerName, onComplete,
-                acceptanceHealthLoss: healthLoss,
-              );
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
-
-
 
   // ============================================================
   // LOGIKA AKSI: TOLAK BIASA
@@ -472,19 +604,31 @@ class AjakanMasturbasiDialog {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Ajakan Ditolak 💔'),
-        content: Text('Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-10% Kebahagiaan, -15% Hubungan).'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onComplete?.call();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          title: Text(
+            'Ajakan Ditolak 💔',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          ),
+          content: Text(
+            'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-10% Kebahagiaan, -15% Hubungan).',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                onComplete?.call();
+              },
+              child: Text(
+                'OK',
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              ),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -510,19 +654,28 @@ class AjakanMasturbasiDialog {
       
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Orang Tua Bercerai! 🚨'),
-          content: Text('Laporanmu memicu pertengkaran hebat dan keributan dahsyat di rumah. $reportTarget tidak tahan dan memutuskan untuk bercerai! (-100% Hubungan dengan pelaku, Orang tuamu sekarang BERCERAI).'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onComplete?.call();
-              },
-              child: const Text('OK'),
-            )
-          ],
-        ),
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            title: Text(
+              'Orang Tua Bercerai! 🚨',
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            ),
+            content: Text(
+              'Laporanmu memicu pertengkaran hebat dan keributan dahsyat di rumah. $reportTarget tidak tahan dan memutuskan untuk bercerai! (-100% Hubungan dengan pelaku, Orang tuamu sekarang BERCERAI).',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onComplete?.call();
+                },
+                child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              )
+            ],
+          );
+        },
       );
     } else {
       _modifyParentsRelationship(character, -30);
@@ -530,19 +683,28 @@ class AjakanMasturbasiDialog {
       
       showDialog(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Pertengkaran Hebat! 🚨'),
-          content: const Text('Laporanmu memicu keributan besar di antara orang tuamu. Mereka berteriak sepanjang malam tetapi akhirnya tidak bercerai (-30% Hubungan orang tua).'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                onComplete?.call();
-              },
-              child: const Text('OK'),
-            )
-          ],
-        ),
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            title: Text(
+              'Pertengkaran Hebat! 🚨',
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            ),
+            content: Text(
+              'Laporanmu memicu keributan besar di antara orang tuamu. Mereka berteriak sepanjang malam tetapi akhirnya tidak bercerai (-30% Hubungan orang tua).',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onComplete?.call();
+                },
+                child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              )
+            ],
+          );
+        },
       );
     }
   }
@@ -567,19 +729,28 @@ class AjakanMasturbasiDialog {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Dilaporkan ke Orang Tua! 📢'),
-        content: Text('Kamu memutuskan untuk melaporkan ajakan cabul $partnerDesc ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onComplete?.call();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          title: Text(
+            'Dilaporkan ke Orang Tua! 📢',
+            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+          ),
+          content: Text(
+            'Kamu memutuskan untuk melaporkan ajakan cabul $partnerDesc ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                onComplete?.call();
+              },
+              child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+            )
+          ],
+        );
+      },
     );
   }
 
@@ -647,9 +818,9 @@ class AjakanMasturbasiDialog {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.10),
+        color: color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withOpacity(0.35)),
+        border: Border.all(color: color.withValues(alpha: 0.35)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
