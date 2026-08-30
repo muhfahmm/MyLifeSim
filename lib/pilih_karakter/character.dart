@@ -178,6 +178,7 @@ class Character {
   int casinoSlotJackpot = 0;
 
   Map<String, dynamic>? garasiMobil;
+  Map<String, dynamic>? garasiMotor;
   List<Map<String, dynamic>> ownedAccessories = [];
 
   // --- INVESTASI PERSISTEN ---
@@ -782,6 +783,46 @@ class Character {
     garasiMobil!['riwayat'] = riwayat;
     garasiMobil!['statistik']['totalMobil'] = totalMobil;
     garasiMobil!['statistik']['totalNilai'] = totalNilai;
+  }
+
+  void addMotorToGarage(Map<String, dynamic> motor, int buyAge) {
+    if (garasiMotor == null) {
+      garasiMotor = {
+        'koleksi': [],
+        'showroom': [],
+        'riwayat': [],
+        'statistik': {
+          'totalMotor': 0,
+          'totalNilai': 0,
+          'pendapatanShowroom': 0,
+          'pengunjung': 0,
+        },
+      };
+    }
+    
+    final List koleksi = garasiMotor!['koleksi'] ?? [];
+    final List riwayat = garasiMotor!['riwayat'] ?? [];
+    
+    Map<String, dynamic> newMotor = Map.from(motor);
+    newMotor['tahunBeli'] = buyAge;
+    newMotor['kondisi'] = 'Baik';
+    koleksi.add(newMotor);
+    
+    riwayat.insert(0, {
+      'type': 'Beli',
+      'nama': motor['nama'],
+      'cost': motor['harga'],
+      'harga': motor['harga'],
+      'tahun': buyAge,
+    });
+    
+    final int totalMotor = koleksi.length;
+    final int totalNilai = koleksi.fold<int>(0, (sum, m) => sum + (m['harga'] as num).toInt());
+    
+    garasiMotor!['koleksi'] = koleksi;
+    garasiMotor!['riwayat'] = riwayat;
+    garasiMotor!['statistik']['totalMotor'] = totalMotor;
+    garasiMotor!['statistik']['totalNilai'] = totalNilai;
   }
 
   void handlePartnerBreakupOnArrest(List<String> eventsList) {

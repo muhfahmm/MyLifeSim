@@ -48,7 +48,6 @@ class _LisensiPageState extends State<LisensiPage> {
   final List<Map<String, dynamic>> lisensi = [
     {'name': 'SIM A (Mobil) 🚗', 'cost': 500000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda empat'},
     {'name': 'SIM C (Motor) 🏍️', 'cost': 300000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda dua'},
-    {'name': 'SIM B (Truk) 🚛', 'cost': 800000, 'minAge': 21, 'desc': 'SIM untuk kendaraan berat'},
     {'name': 'Paspor 🛂', 'cost': 700000, 'minAge': 17, 'desc': 'Dokumen perjalanan internasional'},
     {'name': 'Lisensi Pilot ✈️', 'cost': 50000000, 'minAge': 21, 'desc': 'Lisensi untuk menerbangkan pesawat'},
   ];

@@ -7,6 +7,7 @@ import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.d
 import 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/kasino/kasino.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/garasi_mobil.dart';
+import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_motor/garasi_motor.dart';
 
 class AssetsButton extends StatelessWidget {
   final Character character;
@@ -80,6 +81,7 @@ class AssetsButton extends StatelessWidget {
                   KasinoItem(character: character, onPop: () => setStateDialog(() {})),
                   // MuseumItem telah dihapus
                   GarasiMobilItem(character: character, onPop: () => setStateDialog(() {})),
+                  GarasiMotorItem(character: character, onPop: () => setStateDialog(() {})),
                 ],
               );
             },

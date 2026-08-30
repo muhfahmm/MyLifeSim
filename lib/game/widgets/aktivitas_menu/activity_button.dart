@@ -285,18 +285,22 @@ class ActivityButton extends StatelessWidget {
               ),
 
               // Imigrasi
-              _buildActivityTile(
-                context: context,
-                label: 'Imigrasi',
-                subtitle: 'Pindah ke negara lain',
-                icon: Icons.flight_takeoff,
-                color: Colors.teal,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  ImigrasimMenuHelper.showImigrasimMenu(context, character, onRefresh);
-                }),
-              ),
+              Builder(builder: (context) {
+                final bool hasPassport = character.ownedLicenses.contains('Paspor 🛂');
+                return _buildActivityTile(
+                  context: context,
+                  label: 'Imigrasi',
+                  subtitle: hasPassport ? 'Pindah ke negara lain' : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi',
+                  icon: Icons.flight_takeoff,
+                  color: Colors.teal,
+                  minAge: 18,
+                  currentAge: hasPassport ? age : 0,
+                  customLockMessage: hasPassport ? null : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi.',
+                  onTap: () => _executeAction(context, () {
+                    ImigrasimMenuHelper.showImigrasimMenu(context, character, onRefresh);
+                  }),
+                );
+              }),
 
               // Kesuburan
               _buildActivityTile(
@@ -521,6 +525,7 @@ class ActivityButton extends StatelessWidget {
     required int minAge,
     required int currentAge,
     required VoidCallback onTap,
+    String? customLockMessage,
   }) {
     final bool isUnlocked = currentAge >= minAge;
     final Color itemColor = isUnlocked ? color : Colors.grey.shade400;
@@ -557,31 +562,33 @@ class ActivityButton extends StatelessWidget {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
+                              customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
                               style: const TextStyle(fontSize: 14, color: Colors.black87),
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF3E0),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: const Color(0xFFFFB74D)),
+                      if (customLockMessage == null) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFFF3E0),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: const Color(0xFFFFB74D)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Text('⚠️', style: TextStyle(fontSize: 14)),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Usia saat ini: $currentAge tahun',
+                                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
+                              ),
+                            ],
+                          ),
                         ),
-                        child: Row(
-                          children: [
-                            const Text('⚠️', style: TextStyle(fontSize: 14)),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Usia saat ini: $currentAge tahun',
-                              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange),
-                            ),
-                          ],
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                   actions: [

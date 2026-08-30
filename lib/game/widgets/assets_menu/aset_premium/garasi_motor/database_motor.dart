@@ -1,0 +1,136 @@
+// lib/game/widgets/assets_menu/aset_premium/garasi_motor/database_motor.dart
+
+final List<Map<String, dynamic>> motorTersediaList = [
+  // =============================================
+  // TIER 1 - MATIC & BEBEK
+  // =============================================
+  {
+    'id': 'm1',
+    'nama': 'Honda Beat',
+    'merek': 'Honda',
+    'tahun': 2023,
+    'harga': 150000,
+    'tipe': 'Matic',
+    'kondisi': 'Baru',
+    'hp': 9,
+    'topSpeed': 105,
+  },
+  {
+    'id': 'm2',
+    'nama': 'Yamaha Mio M3',
+    'merek': 'Yamaha',
+    'tahun': 2022,
+    'harga': 140000,
+    'tipe': 'Matic',
+    'kondisi': 'Baru',
+    'hp': 9,
+    'topSpeed': 100,
+  },
+  {
+    'id': 'm3',
+    'nama': 'Honda Vario 160',
+    'merek': 'Honda',
+    'tahun': 2023,
+    'harga': 280000,
+    'tipe': 'Matic',
+    'kondisi': 'Baru',
+    'hp': 15,
+    'topSpeed': 120,
+  },
+  {
+    'id': 'm4',
+    'nama': 'Yamaha NMAX 155',
+    'merek': 'Yamaha',
+    'tahun': 2023,
+    'harga': 320000,
+    'tipe': 'Matic',
+    'kondisi': 'Baru',
+    'hp': 15,
+    'topSpeed': 125,
+  },
+  {
+    'id': 'm5',
+    'nama': 'Vespa Sprint 150',
+    'merek': 'Vespa',
+    'tahun': 2023,
+    'harga': 550000,
+    'tipe': 'Classic',
+    'kondisi': 'Baru',
+    'hp': 12,
+    'topSpeed': 110,
+  },
+
+  // =============================================
+  // TIER 2 - SPORT & ADVENTURE
+  // =============================================
+  {
+    'id': 'm6',
+    'nama': 'Honda CBR250RR',
+    'merek': 'Honda',
+    'tahun': 2023,
+    'harga': 750000,
+    'tipe': 'Sport',
+    'kondisi': 'Baru',
+    'hp': 38,
+    'topSpeed': 175,
+  },
+  {
+    'id': 'm7',
+    'nama': 'Kawasaki Ninja ZX-25R',
+    'merek': 'Kawasaki',
+    'tahun': 2023,
+    'harga': 1100000,
+    'tipe': 'Sport',
+    'kondisi': 'Baru',
+    'hp': 50,
+    'topSpeed': 190,
+  },
+  {
+    'id': 'm8',
+    'nama': 'Honda CRF250 Rally',
+    'merek': 'Honda',
+    'tahun': 2022,
+    'harga': 920000,
+    'tipe': 'Adventure',
+    'kondisi': 'Baru',
+    'hp': 25,
+    'topSpeed': 140,
+  },
+
+  // =============================================
+  // TIER 3 - BIG BIKES / HYPERBIKES
+  // =============================================
+  {
+    'id': 'm9',
+    'nama': 'Kawasaki Ninja H2',
+    'merek': 'Kawasaki',
+    'tahun': 2023,
+    'harga': 8200000,
+    'tipe': 'Hyperbike',
+    'kondisi': 'Baru',
+    'hp': 200,
+    'topSpeed': 320,
+  },
+  {
+    'id': 'm10',
+    'nama': 'Ducati Panigale V4',
+    'merek': 'Ducati',
+    'tahun': 2023,
+    'harga': 9500000,
+    'tipe': 'Sport',
+    'kondisi': 'Baru',
+    'hp': 214,
+    'topSpeed': 300,
+  },
+  {
+    'id': 'm11',
+    'nama': 'Harley Davidson Fat Boy',
+    'merek': 'Harley Davidson',
+    'tahun': 2022,
+    'harga': 6800000,
+    'tipe': 'Cruiser',
+    'kondisi': 'Baru',
+    'hp': 94,
+    'topSpeed': 180,
+  },
+];
