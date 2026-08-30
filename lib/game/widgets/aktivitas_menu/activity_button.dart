@@ -14,7 +14,6 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokt
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/kesuburan/kesuburan_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lisensi/lisensi_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lotre/lotre_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/pikiran_tubuh/pikiran_tubuh_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/peliharaan_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/operasi_plastik/operasi_plastik_menu.dart';
@@ -342,19 +341,6 @@ class ActivityButton extends StatelessWidget {
                     }),
                   ),
 
-                  // Main Lotre
-                  _buildActivityTile(
-                    context: context,
-                    label: 'Main Lotre',
-                    subtitle: 'Coba keberuntungan',
-                    icon: Icons.casino,
-                    color: Colors.amber,
-                    minAge: 18,
-                    currentAge: age,
-                    onTap: () => _executeAction(context, () {
-                      LotreMenuHelper.showLotreMenu(context, character, localRefresh);
-                    }),
-                  ),
 
                   // Pikiran dan Tubuh -> usia minimal 12
                   _buildActivityTile(
