@@ -2960,7 +2960,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: relationshipVal / 100,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 relationshipVal > 65
                                     ? Colors.green
@@ -3002,7 +3002,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
                                 value: fertilityVal / 100,
-                                backgroundColor: Colors.grey.shade200,
+                                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   fertilityVal > 60
                                       ? Colors.pink
@@ -3061,7 +3061,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                   borderRadius: BorderRadius.circular(4),
                                   child: LinearProgressIndicator(
                                     value: progressVal,
-                                    backgroundColor: Colors.grey.shade200,
+                                    backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                     valueColor: AlwaysStoppedAnimation<Color>(barColor),
                                     minHeight: 10,
                                   ),
@@ -3140,12 +3140,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'PILIH AKSI INTERAKSI',
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: Colors.grey,
+                  color: isDark ? Colors.white54 : Colors.grey,
                   letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
@@ -3167,18 +3167,22 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         final action = actions[index];
                         return Card(
                           elevation: 0,
+                          color: isDark ? Colors.grey.shade800 : Colors.white,
                           margin: const EdgeInsets.only(bottom: 8),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey.shade100),
+                            side: BorderSide(
+                              color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                            ),
                           ),
                           child: ListTile(
                             leading: Icon(action.icon, color: action.color),
                             title: Text(action.label,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600)),
-                            trailing: const Icon(Icons.arrow_forward_ios,
-                                size: 14, color: Colors.grey),
+                                style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.white : Colors.black87)),
+                            trailing: Icon(Icons.arrow_forward_ios,
+                                size: 14, color: isDark ? Colors.white54 : Colors.grey),
                             onTap: action.onTap,
                           ),
                         );

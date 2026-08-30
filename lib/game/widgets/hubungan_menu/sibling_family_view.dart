@@ -44,6 +44,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
     required bool isDeceased,
     required bool isDivorced,
     required Color borderColor,
+    required bool isDark,
     bool isUser = false,
     String? badge,
     Map<String, String>? rawMemberData,
@@ -69,7 +70,9 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
 
     return Card(
       elevation: 2,
-      color: isDeceased ? Colors.grey.shade100 : Colors.white,
+      color: isDeceased
+          ? (isDark ? Colors.grey.shade800 : Colors.grey.shade100)
+          : (isDark ? Colors.grey.shade800 : Colors.white),
       margin: const EdgeInsets.only(bottom: 10),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(14),
@@ -156,7 +159,9 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
-                              color: isDeceased ? Colors.grey : Colors.black87,
+                              color: isDeceased
+                                  ? (isDark ? Colors.white38 : Colors.grey)
+                                  : (isDark ? Colors.white : Colors.black87),
                               decoration: isDeceased ? TextDecoration.lineThrough : null,
                             ),
                           ),
@@ -183,7 +188,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                     ),
                     if (age > 0) ...[
                       const SizedBox(height: 2),
-                      Text('$age tahun', style: TextStyle(fontSize: 12, color: Colors.grey.shade600)),
+                      Text('$age tahun', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey.shade600)),
                     ],
                   ],
                 ),
@@ -195,14 +200,14 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
     );
   }
 
-  Widget _buildSectionHeader(String title, IconData icon, Color color) {
+  Widget _buildSectionHeader(String title, IconData icon, Color color, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(top: 20, bottom: 10),
       child: Row(
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(width: 8),
-          Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: color)),
+          Text(title, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : color)),
           const SizedBox(width: 8),
           Expanded(child: Divider(color: color.withOpacity(0.3))),
         ],
@@ -212,6 +217,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Character c = widget.character;
     final String searchName = widget.siblingName ?? '';
     final String cleanSearch = searchName.toLowerCase();
@@ -704,12 +710,12 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5FA),
+      backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF5F5FA),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         elevation: 1,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          icon: Icon(Icons.arrow_back, color: isDark ? Colors.white : Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -719,7 +725,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
             Expanded(
               child: Text(
                 'Keluarga $name',
-                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 17),
+                style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontWeight: FontWeight.bold, fontSize: 17),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -734,7 +740,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: isDark ? Colors.grey.shade800 : Colors.white,
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: Colors.purple.withOpacity(0.2)),
               ),
@@ -751,14 +757,16 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: isDeceased ? Colors.grey : Colors.black87,
+                            color: isDeceased
+                                ? (isDark ? Colors.white38 : Colors.grey)
+                                : (isDark ? Colors.white : Colors.black87),
                             decoration: isDeceased ? TextDecoration.lineThrough : null,
                           ),
                         ),
                         const SizedBox(height: 3),
                         Text(
                           '$relation | $age tahun',
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                          style: TextStyle(fontSize: 13, color: isDark ? Colors.white60 : Colors.black54),
                         ),
                       ],
                     ),
@@ -769,7 +777,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
 
             // === ORANG TUA ===
             if (parentsList.isNotEmpty) ...[
-              _buildSectionHeader('Orang Tua', Icons.supervisor_account, Colors.indigo),
+              _buildSectionHeader('Orang Tua', Icons.supervisor_account, Colors.indigo, isDark),
               ...parentsList.map((p) => _buildPersonCard(
                 name: p['name'] ?? 'Orang Tua',
                 roleLabel: p['relation'] ?? 'Orang Tua',
@@ -778,17 +786,18 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                 isDeceased: p['isDeceased'] == 'true',
                 isDivorced: p['isDivorced'] == 'true',
                 borderColor: Colors.blue,
+                isDark: isDark,
                 rawMemberData: p,
               )),
             ],
 
             // === PASANGAN ===
             if (spouseList.isNotEmpty) ...[
-              // Tentukan header berdasarkan relasi pasangan pertama
               _buildSectionHeader(
                 _getSpouseHeaderTitle(spouseList.first['relation'] ?? ''),
                 _getSpouseHeaderIcon(spouseList.first['relation'] ?? ''),
                 _getSpouseHeaderColor(spouseList.first['relation'] ?? ''),
+                isDark,
               ),
               ...spouseList.map((sp) => _buildPersonCard(
                 name: sp['name'] ?? 'Pasangan',
@@ -798,13 +807,14 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                 isDeceased: sp['isDeceased'] == 'true',
                 isDivorced: false,
                 borderColor: _getSpouseHeaderColor(sp['relation'] ?? ''),
+                isDark: isDark,
                 rawMemberData: sp,
               )),
             ],
 
             // === SAUDARA ===
             if (siblingsList.isNotEmpty) ...[
-              _buildSectionHeader('Saudara', Icons.people, Colors.teal),
+              _buildSectionHeader('Saudara', Icons.people, Colors.teal, isDark),
               ...siblingsList.map((sib) => _buildPersonCard(
                 name: sib['name'] ?? 'Saudara',
                 roleLabel: sib['relation'] ?? 'Saudara',
@@ -813,13 +823,14 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                 isDeceased: sib['isDeceased'] == 'true',
                 isDivorced: false,
                 borderColor: Colors.teal,
+                isDark: isDark,
                 rawMemberData: sib,
               )),
             ],
 
             // === ANAK-ANAK ===
             if (childrenList.isNotEmpty) ...[
-              _buildSectionHeader('Anak-anak', Icons.child_care, Colors.green),
+              _buildSectionHeader('Anak-anak', Icons.child_care, Colors.green, isDark),
               ...childrenList.map((child) => _buildPersonCard(
                 name: child['name'] ?? 'Anak',
                 roleLabel: child['relation'] ?? 'Anak',
@@ -828,6 +839,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
                 isDeceased: child['isDeceased'] == 'true',
                 isDivorced: false,
                 borderColor: Colors.green,
+                isDark: isDark,
                 rawMemberData: child,
               )),
             ],

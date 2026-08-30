@@ -709,7 +709,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: isDeceased
-                              ? Colors.grey.shade600
+                              ? (isDark ? Colors.white38 : Colors.grey.shade600)
                               : (isDark ? Colors.white : Colors.black87),
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
@@ -756,16 +756,16 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'Hubungan: ',
-                    style: TextStyle(fontSize: 10, color: Colors.grey),
+                    style: TextStyle(fontSize: 10, color: isDark ? Colors.white54 : Colors.grey),
                   ),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
                       child: LinearProgressIndicator(
                         value: rel / 100,
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                         valueColor: AlwaysStoppedAnimation<Color>(barColor),
                         minHeight: 6,
                       ),
