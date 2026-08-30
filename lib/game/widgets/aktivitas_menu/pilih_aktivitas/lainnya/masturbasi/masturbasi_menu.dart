@@ -7,8 +7,6 @@ import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
 import 'efek_samping.dart'; // Import efek samping masturbasi
 
-
-
 class MasturbasiHelper {
   // ============================================================
   // KONSTANTA & FUNGSI KECANDUAN
@@ -263,6 +261,7 @@ class MasturbasiMenuPage extends StatefulWidget {
 class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final options = MasturbasiHelper._buildOptions(widget.character);
 
     return PopScope(
@@ -280,6 +279,8 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               Navigator.pop(context);
             },
           ),
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          foregroundColor: isDark ? Colors.white : null,
         ),
         body: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -289,41 +290,55 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               _buildAddictionBar(),
               const SizedBox(height: 16),
               // ---- Daftar Fantasi ----
-            Expanded(
-              child: ListView.builder(
-                itemCount: options.length,
-                itemBuilder: (context, index) {
-                  final opt = options[index];
-                  return Card(
-                    elevation: 2,
-                    color: Colors.grey.shade50,
-                    margin: const EdgeInsets.only(bottom: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: ListTile(
-                      leading: const Icon(Icons.psychology, color: Colors.pinkAccent),
-                      title: Text(opt['name']!, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                      subtitle: Text('Bayangkan: ${opt['relation']}', style: const TextStyle(fontSize: 11)),
-                      onTap: () {
-                        // Tampilkan dialog pilihan tempat (tanpa metode)
-                        _showLocationDialog(context, opt['name']!, opt['relation']!);
-                      },
-                    ),
-                  );
-                },
+              Expanded(
+                child: ListView.builder(
+                  itemCount: options.length,
+                  itemBuilder: (context, index) {
+                    final opt = options[index];
+                    return Card(
+                      elevation: 2,
+                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                      ),
+                      child: ListTile(
+                        leading: const Icon(Icons.psychology, color: Colors.pinkAccent),
+                        title: Text(
+                          opt['name']!,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: Text(
+                          'Bayangkan: ${opt['relation']}',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                        onTap: () {
+                          // Tampilkan dialog pilihan tempat (tanpa metode)
+                          _showLocationDialog(context, opt['name']!, opt['relation']!);
+                        },
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   // Widget Bar Kecanduan
   Widget _buildAddictionBar() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     int level = widget.character.addictionLevel;
     Color color = MasturbasiHelper.getAddictionColor(level);
     String label = MasturbasiHelper.getAddictionLabel(level);
@@ -331,9 +346,9 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark ? Colors.grey.shade800 : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
+        border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -344,7 +359,10 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               const SizedBox(width: 8),
               Text(
                 'Tingkat Kecanduan: $label',
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const Spacer(),
               Text('$level%', style: TextStyle(color: color, fontWeight: FontWeight.bold)),
@@ -356,7 +374,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
             child: LinearProgressIndicator(
               value: level / 100,
               minHeight: 10,
-              backgroundColor: Colors.grey.shade200,
+              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
               valueColor: AlwaysStoppedAnimation<Color>(color),
             ),
           ),
@@ -369,9 +387,10 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   // DIALOG PILIH TEMPAT UTAMA
   // ============================================================
   void _showLocationDialog(BuildContext context, String targetName, String relation) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -385,9 +404,13 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Pilih Tempat',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -447,12 +470,13 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   // DIALOG PILIH RUANGAN SPESIFIK (Rumah & Kantor)
   // ============================================================
   void _showRoomDialog(BuildContext context, String location, String targetName, String relation) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     // Dapatkan daftar ruangan dari RisikoMasturbasi
     List<String> rooms = RisikoMasturbasi.getRoomsForLocation(location, widget.character);
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -466,7 +490,11 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               children: [
                 Text(
                   'Pilih Ruangan di $location',
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ListView.builder(
@@ -476,16 +504,22 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                     final room = rooms[index];
                     return Card(
                       elevation: 0,
-                      color: Colors.white,
+                      color: isDark ? Colors.grey.shade800 : Colors.white,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                       ),
                       margin: const EdgeInsets.only(bottom: 8),
                       child: ListTile(
                         leading: const Icon(Icons.room, color: Colors.pinkAccent),
-                        title: Text(room, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        trailing: const Icon(Icons.chevron_right),
+                        title: Text(
+                          room,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        trailing: Icon(Icons.chevron_right, color: isDark ? Colors.white70 : Colors.black54),
                         onTap: () {
                           Navigator.pop(ctx); // Tutup modal ruangan
                           if (room == 'Kamar Tidur') {
@@ -510,6 +544,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   // DIALOG PILIH KAMAR TIDUR SPESIFIK (Keluarga)
   // ============================================================
   void _showBedroomDialog(BuildContext context, String targetName, String relation) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final List<String> bedrooms = [];
 
     // 1. Kamar Orang Tua (Ayah & Ibu)
@@ -550,7 +585,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
 
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -562,9 +597,13 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Pilih Kamar Tidur Siapa',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Flexible(
@@ -575,16 +614,22 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                       final room = bedrooms[index];
                       return Card(
                         elevation: 0,
-                        color: Colors.white,
+                        color: isDark ? Colors.grey.shade800 : Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: Colors.grey.shade300),
+                          side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                         ),
                         margin: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
                           leading: const Icon(Icons.bed, color: Colors.pinkAccent),
-                          title: Text(room, style: const TextStyle(fontWeight: FontWeight.bold)),
-                          trailing: const Icon(Icons.chevron_right),
+                          title: Text(
+                            room,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          trailing: Icon(Icons.chevron_right, color: isDark ? Colors.white70 : Colors.black54),
                           onTap: () {
                             Navigator.pop(ctx); // Tutup modal kamar tidur
                             _showTimeDialog(context, 'Di Rumah', room, targetName, relation);
@@ -606,9 +651,10 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
   // DIALOG PILIH WAKTU
   // ============================================================
   void _showTimeDialog(BuildContext context, String location, String subLocation, String targetName, String relation) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
@@ -620,9 +666,13 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Pilih Waktu Aktivitas',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -697,19 +747,31 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
     required String subtitle,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      color: Colors.white,
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade300),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
       ),
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(icon, color: Colors.pinkAccent),
-        title: Text(label, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle),
-        trailing: const Icon(Icons.chevron_right),
+        title: Text(
+          label,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
+        trailing: Icon(Icons.chevron_right, color: isDark ? Colors.white70 : Colors.black54),
         onTap: onTap,
       ),
     );
@@ -725,6 +787,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
     String timeOfDay,
     VoidCallback? onComplete,
   ) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Random random = Random();
     final String relationType = riskEffects['viewerRelation'] ?? 'Lainnya';
     final String viewerName = riskEffects['viewerName'] ?? '';
@@ -735,22 +798,32 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
-        title: const Row(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
+        title: Row(
           children: [
-            Icon(Icons.warning, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Momen Memalukan!', style: TextStyle(fontWeight: FontWeight.bold)),
+            const Icon(Icons.warning, color: Colors.red),
+            const SizedBox(width: 8),
+            Text(
+              'Momen Memalukan!',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(msg),
+            Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Apa yang akan kamu lakukan?',
-              style: TextStyle(fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
             ),
           ],
         ),
@@ -772,6 +845,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
+                        backgroundColor: isDark ? Colors.grey.shade900 : null,
                         title: const Text('Minta Maaf 🙏'),
                         content: Text('Kamu segera menutupi dirimu dan meminta maaf dengan panik. $relationType kecewa (-30% Kebahagiaan, -10% Hubungan).'),
                         actions: [
@@ -799,6 +873,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
+                          backgroundColor: isDark ? Colors.grey.shade900 : null,
                           title: const Text('Kabur Berhasil 🏃'),
                           content: const Text('Kamu dengan gesit merapikan pakaianmu, melompat keluar, dan bersembunyi! Kamu berhasil menghindari kecanggungan tanpa terluka.'),
                           actions: [
@@ -818,6 +893,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                       showDialog(
                         context: context,
                         builder: (context) => AlertDialog(
+                          backgroundColor: isDark ? Colors.grey.shade900 : null,
                           title: const Text('Kabur Gagal 🤕'),
                           content: const Text('Kamu panik, terpeleset saat mencoba kabur, dan membentur lantai dengan keras! (-20% Kesehatan, -30% Kebahagiaan).'),
                           actions: [
@@ -871,6 +947,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
+                              backgroundColor: isDark ? Colors.grey.shade900 : null,
                               title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
                               content: Text('$relationType marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
                               actions: [
@@ -894,6 +971,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                           showDialog(
                             context: context,
                             builder: (context) => AlertDialog(
+                              backgroundColor: isDark ? Colors.grey.shade900 : null,
                               title: const Text('Rayuan Gagal (Dilaporkan) 🚨'),
                               content: const Text('Saudaramu berteriak histeris dan langsung melaporkan kelakuanmu ke orang tua! Orang tuamu menghukummu dengan sangat keras (-50% Kebahagiaan, -100% Hubungan saudara, -50% Hubungan orang tua).'),
                               actions: [
