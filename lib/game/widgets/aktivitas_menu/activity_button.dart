@@ -90,408 +90,422 @@ class ActivityButton extends StatelessWidget {
           context: context,
           title: 'Pilih Aktivitas',
           isNotification: false,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ============================================
-              // 1. PENDIDIKAN & KARIR
-              // ============================================
-              const Text(
-                'Pendidikan & Karir',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Item Sekolah
-              () {
-                final String label;
-                final String subtitle;
-                final Color color;
-                final int minAge;
-                if (age <= 11) {
-                  label = 'Sekolah Dasar (SD)';
-                  subtitle = 'Belajar dan bermain di Sekolah Dasar';
-                  color = Colors.blue;
-                  minAge = 6;
-                } else if (age <= 14) {
-                  label = 'Sekolah Menengah Pertama (SMP)';
-                  subtitle = 'Lanjutkan pendidikan tingkat pertama';
-                  color = Colors.blueAccent;
-                  minAge = 12;
-                } else if (age <= 17) {
-                  label = 'Sekolah Menengah Atas (SMA)';
-                  subtitle = 'Pendidikan tingkat atas persiapan karir';
-                  color = Colors.purple;
-                  minAge = 15;
-                } else {
-                  label = 'Universitas (Kuliah)';
-                  subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
-                  color = Colors.indigo;
-                  minAge = 18;
-                }
-
-                return _buildActivityTile(
-                  context: context,
-                  label: label,
-                  subtitle: subtitle,
-                  icon: Icons.school,
-                  color: color,
-                  minAge: minAge,
-                  currentAge: age,
-                  onTap: () => _executeAction(context, () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => age <= 17
-                            ? SchoolMenuPage(
-                                character: character,
-                                onRefresh: onRefresh,
-                              )
-                            : UnivMenuPage(
-                                character: character,
-                                onRefresh: onRefresh,
-                              ),
-                      ),
-                    );
-                  }),
-                );
-              }(),
-
-              // Item Bekerja
-              _buildActivityTile(
-                context: context,
-                label: 'Bekerja',
-                subtitle: 'Mulai bekerja untuk menghasilkan uang tunai',
-                icon: Icons.work,
-                color: Colors.green,
-                minAge: (character.gender == 'Perempuan' && age >= 12) ? age : 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => KerjaMenuScreen(
-                        character: character,
-                        onRefresh: onRefresh,
-                      ),
+          content: StatefulBuilder(
+            builder: (dialogContext, setStateDialog) {
+              final VoidCallback localRefresh = () {
+                onRefresh();
+                setStateDialog(() {});
+              };
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // ============================================
+                  // 1. PENDIDIKAN & KARIR
+                  // ============================================
+                  const Text(
+                    'Pendidikan & Karir',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueGrey,
                     ),
-                  );
-                }),
-              ),
-
-              const Divider(height: 32),
-
-              // ============================================
-              // 2. KESEHATAN & KEBUGARAN
-              // ============================================
-              const Text(
-                'Kesehatan & Kebugaran',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Item Olahraga
-              _buildActivityTile(
-                context: context,
-                label: 'Olahraga',
-                subtitle: 'Latih fisikmu agar tetap sehat dan bugar',
-                icon: Icons.fitness_center,
-                color: Colors.orange,
-                minAge: 7,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  OlahragaMenuHelper.showOlahragaMenu(context, character, onRefresh);
-                }),
-              ),
-
-              const Divider(height: 32),
-
-              // ============================================
-              // 3. HIBURAN & GAYA HIDUP
-              // ============================================
-              const Text(
-                'Hiburan & Gaya Hidup',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Aksesoris
-              _buildActivityTile(
-                context: context,
-                label: 'Aksesoris',
-                subtitle: 'Tambahkan aksesoris untuk gaya',
-                icon: Icons.style,
-                color: Colors.pink,
-                minAge: 12,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  AksesorisMenuHelper.showAksesorisMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Adopsi Anak
-              _buildActivityTile(
-                context: context,
-                label: 'Adopsi Anak',
-                subtitle: 'Berikan kasih sayang pada anak',
-                icon: Icons.child_care,
-                color: Colors.orange,
-                minAge: 21,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  AdopsiAnakMenuHelper.showAdopsiAnakMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Buat Kriminal
-              _buildActivityTile(
-                context: context,
-                label: 'Buat Kriminal',
-                subtitle: 'Melakukan aksi kriminal',
-                icon: Icons.gavel,
-                color: Colors.red,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  KriminalMenuHelper.showKriminalMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Pergi ke Dokter
-              _buildActivityTile(
-                context: context,
-                label: 'Pergi ke Dokter',
-                subtitle: 'Periksa kesehatan',
-                icon: Icons.local_hospital,
-                color: Colors.blue,
-                minAge: 6,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  DokterMenuHelper.showDokterMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Imigrasi
-              Builder(builder: (context) {
-                final bool hasPassport = character.ownedLicenses.contains('Paspor 🛂');
-                return _buildActivityTile(
-                  context: context,
-                  label: 'Imigrasi',
-                  subtitle: hasPassport ? 'Pindah ke negara lain' : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi',
-                  icon: Icons.flight_takeoff,
-                  color: Colors.teal,
-                  minAge: 18,
-                  currentAge: hasPassport ? age : 0,
-                  customLockMessage: hasPassport ? null : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi.',
-                  onTap: () => _executeAction(context, () {
-                    ImigrasimMenuHelper.showImigrasimMenu(context, character, onRefresh);
-                  }),
-                );
-              }),
-
-              // Kesuburan
-              _buildActivityTile(
-                context: context,
-                label: 'Kesuburan',
-                subtitle: 'Cek atau tingkatkan kesuburan',
-                icon: Icons.egg,
-                color: Colors.purple,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  KesuburanMenuHelper.showKesuburanMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Lisensi
-              _buildActivityTile(
-                context: context,
-                label: 'Lisensi',
-                subtitle: 'Dapatkan lisensi (SIM, dll)',
-                icon: Icons.assignment_ind,
-                color: Colors.brown,
-                minAge: 17,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  LisensiMenuHelper.showLisensiMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Main Lotre
-              _buildActivityTile(
-                context: context,
-                label: 'Main Lotre',
-                subtitle: 'Coba keberuntungan',
-                icon: Icons.casino,
-                color: Colors.amber,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  LotreMenuHelper.showLotreMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Pikiran dan Tubuh -> usia minimal 12
-              _buildActivityTile(
-                context: context,
-                label: 'Pikiran dan Tubuh',
-                subtitle: 'Meditasi, yoga, atau terapi',
-                icon: Icons.self_improvement,
-                color: Colors.indigo,
-                minAge: 12,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  PikiranTubuhMenuHelper.showPikiranTubuhMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Peliharaan
-              _buildActivityTile(
-                context: context,
-                label: 'Peliharaan',
-                subtitle: 'Adopsi hewan peliharaan',
-                icon: Icons.pets,
-                color: Colors.green,
-                minAge: 10,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  PeliharaanMenuHelper.showPeliharaanMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Operasi Plastik
-              _buildActivityTile(
-                context: context,
-                label: 'Operasi Plastik',
-                subtitle: 'Ubah penampilan',
-                icon: Icons.face,
-                color: Colors.cyan,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  OperasiPlastikMenuHelper.showOperasiPlastikMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Rehabilitasi
-              _buildActivityTile(
-                context: context,
-                label: 'Rehabilitasi',
-                subtitle: 'Pulihkan diri dari kecanduan',
-                icon: Icons.healing,
-                color: Colors.deepPurple,
-                minAge: 18,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  RehabilitasiMenuHelper.showRehabilitasiMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Salon & Spa -> usia minimal 15
-              _buildActivityTile(
-                context: context,
-                label: 'Salon & Spa',
-                subtitle: 'Rawat diri dan kecantikan',
-                icon: Icons.spa,
-                color: Colors.pink,
-                minAge: 15,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  SalonSpaMenuHelper.showSalonSpaMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Berbelanja
-              _buildActivityTile(
-                context: context,
-                label: 'Berbelanja',
-                subtitle: 'Beli barang kebutuhan',
-                icon: Icons.shopping_cart,
-                color: Colors.orangeAccent,
-                minAge: 12,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  BerbelanjaMenuHelper.showBerbelanjaMenu(context, character, onRefresh);
-                }),
-              ),
-
-              const Divider(height: 32),
-
-              // ============================================
-              // 4. LAINNYA (di bagian paling bawah)
-              // ============================================
-              const Text(
-                'Lainnya',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: Colors.blueGrey,
-                ),
-              ),
-              const SizedBox(height: 8),
-
-              // Sosial Media (usia minimal 12)
-              _buildActivityTile(
-                context: context,
-                label: 'Sosial Media',
-                subtitle: 'Kelola akun sosial mediamu',
-                icon: Icons.phone_iphone,
-                color: Colors.blueAccent,
-                minAge: 12,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  SocialMediaMenuHelper.showSocialMediaMenu(context, character, onRefresh);
-                }),
-              ),
-
-              // Masturbasi (hanya jika usia ≥ 9)
-              if (age >= 9)
-                Card(
-                  elevation: 0,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: Colors.grey.shade200),
                   ),
-                  color: Colors.grey.shade50,
-                  child: ListTile(
-                    leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
-                    title: const Text('Masturbasi (Fantasi)', style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: const Text('Mengeksplorasi fantasi pribadimu'),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  const SizedBox(height: 8),
+
+                  // Item Sekolah
+                  () {
+                    final String label;
+                    final String subtitle;
+                    final Color color;
+                    final int minAge;
+                    if (age <= 11) {
+                      label = 'Sekolah Dasar (SD)';
+                      subtitle = 'Belajar dan bermain di Sekolah Dasar';
+                      color = Colors.blue;
+                      minAge = 6;
+                    } else if (age <= 14) {
+                      label = 'Sekolah Menengah Pertama (SMP)';
+                      subtitle = 'Lanjutkan pendidikan tingkat pertama';
+                      color = Colors.blueAccent;
+                      minAge = 12;
+                    } else if (age <= 17) {
+                      label = 'Sekolah Menengah Atas (SMA)';
+                      subtitle = 'Pendidikan tingkat atas persiapan karir';
+                      color = Colors.purple;
+                      minAge = 15;
+                    } else {
+                      label = 'Universitas (Kuliah)';
+                      subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
+                      color = Colors.indigo;
+                      minAge = 18;
+                    }
+
+                    return _buildActivityTile(
+                      context: context,
+                      label: label,
+                      subtitle: subtitle,
+                      icon: Icons.school,
+                      color: color,
+                      minAge: minAge,
+                      currentAge: age,
+                      onTap: () => _executeAction(context, () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => age <= 17
+                                ? SchoolMenuPage(
+                                    character: character,
+                                    onRefresh: localRefresh,
+                                  )
+                                : UnivMenuPage(
+                                    character: character,
+                                    onRefresh: localRefresh,
+                                  ),
+                          ),
+                        );
+                      }),
+                    );
+                  }(),
+
+                  // Item Bekerja
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Bekerja',
+                    subtitle: 'Mulai bekerja untuk menghasilkan uang tunai',
+                    icon: Icons.work,
+                    color: Colors.green,
+                    minAge: (character.gender == 'Perempuan' && age >= 12) ? age : 18,
+                    currentAge: age,
                     onTap: () => _executeAction(context, () {
-                      MasturbasiHelper.showMasturbationMenu(context, character, onRefresh);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => KerjaMenuScreen(
+                            character: character,
+                            onRefresh: localRefresh,
+                          ),
+                        ),
+                      );
                     }),
                   ),
-                ),
 
-              // Love (aktivitas romantis, usia minimal 16)
-              _buildActivityTile(
-                context: context,
-                label: 'Love (Cinta)',
-                subtitle: 'Ekspresikan perasaan cintamu',
-                icon: Icons.favorite,
-                color: Colors.redAccent,
-                minAge: 16,
-                currentAge: age,
-                onTap: () => _executeAction(context, () {
-                  LoveMenuHelper.showLoveMenu(context, character, onRefresh);
-                }),
-              ),
-            ],
+                  const Divider(height: 32),
+
+                  // ============================================
+                  // 2. KESEHATAN & KEBUGARAN
+                  // ============================================
+                  const Text(
+                    'Kesehatan & Kebugaran',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Item Olahraga
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Olahraga',
+                    subtitle: 'Latih fisikmu agar tetap sehat dan bugar',
+                    icon: Icons.fitness_center,
+                    color: Colors.orange,
+                    minAge: 7,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      OlahragaMenuHelper.showOlahragaMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  const Divider(height: 32),
+
+                  // ============================================
+                  // 3. HIBURAN & GAYA HIDUP
+                  // ============================================
+                  const Text(
+                    'Hiburan & Gaya Hidup',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Aksesoris
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Aksesoris',
+                    subtitle: 'Tambahkan aksesoris untuk gaya',
+                    icon: Icons.style,
+                    color: Colors.pink,
+                    minAge: 12,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      AksesorisMenuHelper.showAksesorisMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Adopsi Anak
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Adopsi Anak',
+                    subtitle: 'Berikan kasih sayang pada anak',
+                    icon: Icons.child_care,
+                    color: Colors.orange,
+                    minAge: 21,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      AdopsiAnakMenuHelper.showAdopsiAnakMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Buat Kriminal
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Buat Kriminal',
+                    subtitle: 'Melakukan aksi kriminal',
+                    icon: Icons.gavel,
+                    color: Colors.red,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      KriminalMenuHelper.showKriminalMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Pergi ke Dokter
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Pergi ke Dokter',
+                    subtitle: 'Periksa kesehatan',
+                    icon: Icons.local_hospital,
+                    color: Colors.blue,
+                    minAge: 6,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      DokterMenuHelper.showDokterMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Imigrasi
+                  Builder(builder: (context) {
+                    final bool hasPassport = character.ownedLicenses.contains('Paspor 🛂');
+                    return _buildActivityTile(
+                      context: context,
+                      label: 'Imigrasi',
+                      subtitle: hasPassport ? 'Pindah ke negara lain' : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi',
+                      icon: Icons.flight_takeoff,
+                      color: Colors.teal,
+                      minAge: 18,
+                      currentAge: hasPassport ? age : 0,
+                      customLockMessage: hasPassport ? null : 'Belum memiliki paspor yang bisa didapatkan dari urus lisensi.',
+                      lockActionLabel: hasPassport ? null : 'Pergi ke Lisensi 📋',
+                      onLockAction: hasPassport
+                          ? null
+                          : () {
+                              LisensiMenuHelper.showLisensiMenu(context, character, localRefresh);
+                            },
+                      onTap: () => _executeAction(context, () {
+                        ImigrasimMenuHelper.showImigrasimMenu(context, character, localRefresh);
+                      }),
+                    );
+                  }),
+
+                  // Kesuburan
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Kesuburan',
+                    subtitle: 'Cek atau tingkatkan kesuburan',
+                    icon: Icons.egg,
+                    color: Colors.purple,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      KesuburanMenuHelper.showKesuburanMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Lisensi
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Lisensi',
+                    subtitle: 'Dapatkan lisensi (SIM, dll)',
+                    icon: Icons.assignment_ind,
+                    color: Colors.brown,
+                    minAge: 17,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      LisensiMenuHelper.showLisensiMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Main Lotre
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Main Lotre',
+                    subtitle: 'Coba keberuntungan',
+                    icon: Icons.casino,
+                    color: Colors.amber,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      LotreMenuHelper.showLotreMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Pikiran dan Tubuh -> usia minimal 12
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Pikiran dan Tubuh',
+                    subtitle: 'Meditasi, yoga, atau terapi',
+                    icon: Icons.self_improvement,
+                    color: Colors.indigo,
+                    minAge: 12,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      PikiranTubuhMenuHelper.showPikiranTubuhMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Peliharaan
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Peliharaan',
+                    subtitle: 'Adopsi hewan peliharaan',
+                    icon: Icons.pets,
+                    color: Colors.green,
+                    minAge: 10,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      PeliharaanMenuHelper.showPeliharaanMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Operasi Plastik
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Operasi Plastik',
+                    subtitle: 'Ubah penampilan',
+                    icon: Icons.face,
+                    color: Colors.cyan,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      OperasiPlastikMenuHelper.showOperasiPlastikMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Rehabilitasi
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Rehabilitasi',
+                    subtitle: 'Pulihkan diri dari kecanduan',
+                    icon: Icons.healing,
+                    color: Colors.deepPurple,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      RehabilitasiMenuHelper.showRehabilitasiMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Salon & Spa -> usia minimal 15
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Salon & Spa',
+                    subtitle: 'Rawat diri dan kecantikan',
+                    icon: Icons.spa,
+                    color: Colors.pink,
+                    minAge: 15,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      SalonSpaMenuHelper.showSalonSpaMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Berbelanja
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Berbelanja',
+                    subtitle: 'Beli barang kebutuhan',
+                    icon: Icons.shopping_cart,
+                    color: Colors.orangeAccent,
+                    minAge: 12,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      BerbelanjaMenuHelper.showBerbelanjaMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  const Divider(height: 32),
+
+                  // ============================================
+                  // 4. LAINNYA (di bagian paling bawah)
+                  // ============================================
+                  const Text(
+                    'Lainnya',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+
+                  // Sosial Media (usia minimal 12)
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Sosial Media',
+                    subtitle: 'Kelola akun sosial mediamu',
+                    icon: Icons.phone_iphone,
+                    color: Colors.blueAccent,
+                    minAge: 12,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      SocialMediaMenuHelper.showSocialMediaMenu(context, character, localRefresh);
+                    }),
+                  ),
+
+                  // Masturbasi (hanya jika usia ≥ 9)
+                  if (age >= 9)
+                    Card(
+                      elevation: 0,
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: Colors.grey.shade200),
+                      ),
+                      color: Colors.grey.shade50,
+                      child: ListTile(
+                        leading: const Icon(Icons.favorite_border, color: Colors.pinkAccent),
+                        title: const Text('Masturbasi (Fantasi)', style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: const Text('Mengeksplorasi fantasi pribadimu'),
+                        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                        onTap: () => _executeAction(context, () {
+                          MasturbasiHelper.showMasturbationMenu(context, character, localRefresh);
+                        }),
+                      ),
+                    ),
+
+                  // Love (aktivitas romantis, usia minimal 16)
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Love (Cinta)',
+                    subtitle: 'Ekspresikan perasaan cintamu',
+                    icon: Icons.favorite,
+                    color: Colors.redAccent,
+                    minAge: 16,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      LoveMenuHelper.showLoveMenu(context, character, localRefresh);
+                    }),
+                  ),
+                ],
+              );
+            },
           ),
           actions: [
             TextButton(
@@ -526,6 +540,8 @@ class ActivityButton extends StatelessWidget {
     required int currentAge,
     required VoidCallback onTap,
     String? customLockMessage,
+    VoidCallback? onLockAction,
+    String? lockActionLabel,
   }) {
     final bool isUnlocked = currentAge >= minAge;
     final Color itemColor = isUnlocked ? color : Colors.grey.shade400;
@@ -592,6 +608,14 @@ class ActivityButton extends StatelessWidget {
                     ],
                   ),
                   actions: [
+                    if (onLockAction != null && lockActionLabel != null)
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          onLockAction();
+                        },
+                        child: Text(lockActionLabel, style: const TextStyle(fontWeight: FontWeight.bold)),
+                      ),
                     TextButton(
                       onPressed: () => Navigator.pop(context),
                       child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
