@@ -44,6 +44,12 @@ import 'ajakan_makelove/hetero/ajakan_ml_hetero_dosen.dart';
 import 'ajakan_makelove/hetero/ajakan_ml_hetero_coworker.dart';
 import 'ajakan_makelove/hetero/ajakan_ml_hetero_keluarga.dart';
 
+// Imports for ajakan masturbasi
+import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_teman_sekolah.dart';
+import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_guru_sekolah.dart';
+import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_dosen.dart';
+import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_coworker.dart';
+
 // Idol sub-handlers
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_staf_idol.dart';
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_rekan_idol.dart';
@@ -748,16 +754,23 @@ class AjakanHandler {
           }
         }
 
-        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi
-        if (character.activeProposal == null && random.nextInt(100) < 15) {
-          character.activeProposal = {
-            'name': candidate['name'],
-            'relation': candidate['relation'],
-            'type': 'Masturbasi',
-            'gender': candidate['gender'],
-            'age': candidate['age'],
-            'role': candidate['role'],
-          };
+        // Jika tidak mendapat ajakan pacaran/ML, evaluasi menggunakan sub-handler persentase khusus
+        if (character.activeProposal == null) {
+          if (!isGay && !isLesbian) {
+            character.activeProposal = AjakanMasturbateHeteroCoworker.check(character, candidate, random);
+          }
+          
+          // Fallback umum jika sub-handler tidak memicu proposal
+          if (character.activeProposal == null && random.nextInt(100) < 15) {
+            character.activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': 'Masturbasi',
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candidate['role'],
+            };
+          }
         }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
         final String rel = (candidate['relation'] ?? '').toString().toLowerCase();
@@ -866,17 +879,30 @@ class AjakanHandler {
             character.activeProposal = ml ?? pacaran;
           }
         }
-
-        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi
-        if (character.activeProposal == null && random.nextInt(100) < 15) {
-          character.activeProposal = {
-            'name': candidate['name'],
-            'relation': candidate['relation'],
-            'type': 'Masturbasi',
-            'gender': candidate['gender'],
-            'age': candidate['age'],
-            'role': candidate['role'],
-          };
+ 
+        // Jika tidak mendapat ajakan pacaran/ML, evaluasi menggunakan sub-handler persentase khusus
+        if (character.activeProposal == null) {
+          if (!isGay && !isLesbian) {
+            if (candRole == 'Guru') {
+              character.activeProposal = AjakanMasturbateHeteroGuruSekolah.check(character, candidate, random);
+            } else if (candRole == 'Dosen') {
+              character.activeProposal = AjakanMasturbateHeteroDosen.check(character, candidate, random);
+            } else if (candRole == 'Teman Sekelas' || candRole == 'Teman Kuliah') {
+              character.activeProposal = AjakanMasturbateHeteroTemanSekolah.check(character, candidate, random);
+            }
+          }
+          
+          // Fallback umum jika sub-handler tidak memicu proposal
+          if (character.activeProposal == null && random.nextInt(100) < 15) {
+            character.activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': 'Masturbasi',
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candidate['role'],
+            };
+          }
         }
       }
     }
