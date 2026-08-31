@@ -251,21 +251,23 @@ class BeriTahuOrangTua {
     }
 
     // Tampilkan dialog pilihan scenario
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text(scenarioTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(scenarioTitle, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(scenarioDesc, style: const TextStyle(fontSize: 14)),
+            Text(scenarioDesc, style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87)),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               'Tindakanmu:',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.black54),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black54),
             ),
             const SizedBox(height: 8),
             ...options.map((opt) => Padding(
@@ -274,9 +276,9 @@ class BeriTahuOrangTua {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.blueAccent,
-                    side: const BorderSide(color: Colors.blueAccent),
+                    backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+                    foregroundColor: isDark ? Colors.lightBlueAccent : Colors.blueAccent,
+                    side: BorderSide(color: isDark ? Colors.lightBlueAccent : Colors.blueAccent),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                     padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
                   ),
@@ -339,20 +341,22 @@ class BeriTahuOrangTua {
     String content,
     VoidCallback? onComplete,
   ) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(content),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        content: Text(content, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               onComplete?.call();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: Text('OK', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
           ),
         ],
       ),

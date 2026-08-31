@@ -1,29 +1,19 @@
-Ini bukan masalah di `3d_view_page.dart` — layout Transform-nya sudah jauh lebih baik dari sebelumnya (kepala, badan, lengan, kaki sudah punya depth sorting sendiri, hasilnya lebih solid). Masalah lingkaran background di kepala itu **bukan dari Flutter widget-nya, tapi dari gambar `avatarUrl` itu sendiri.**
+1. 🎮 Latihan Scrim / Latihan Tim (Intensive Training)
+Efek: Menambah Kecerdasan (game sense) dan Disiplin (rutinitas). Namun, mengurangi Kebahagiaan sedikit karena melelahkan.
 
-## Root cause
+Gameplay: Kamu bisa menambah sistem cooldown (hanya bisa 1x sehari) agar tidak spam.
 
-```dart
-Container(
-  decoration: BoxDecoration(
-    shape: BoxShape.circle,
-    color: skinColor,   // <- ini warna Container, TIDAK PERNAH terlihat
-    ...
-  ),
-  child: ClipOval(
-    child: Image.network(
-      avatarUrl,
-      fit: BoxFit.cover,   // <- gambar network menutupi 100% area, termasuk background bawaannya
-    ),
-  ),
-)
-```
+2. 🏆 Ikut Turnamen / Kompetisi
+Efek: Ini adalah menu High Risk, High Reward. Hasilnya ditentukan oleh Kecerdasan (strategi) dan Kesehatan (refleks/stamina). Jika menang, kamu mendapat Uang sangat besar dan Kebahagiaan naik drastis. Jika kalah, Kebahagiaan turun.
 
-`ClipOval` hanya memotong bentuk gambar jadi lingkaran — dia **tidak menghapus isi piksel di dalam gambar**. Kalau gambar hasil `avatarUrl` sendiri sudah punya background (warna biru muda/putih pucat yang terlihat di Image 2), background itu ikut ter-render karena `BoxFit.cover` membuat gambar menutupi seluruh area termasuk `color: skinColor` yang kamu set di `Container`. Jadi `skinColor` di situ percuma — tidak akan pernah kelihatan selama gambar network punya background sendiri.
+3. 🏋️ Latihan Fisik & Rehabilitasi (Gym/Fisioterapi)
+Efek: Menambah Kesehatan dan Penampilan (karena pro player dituntut fit). Kesehatan yang tinggi akan mencegah event cedera (carpa tunnel / sakit punggung) yang sangat sering terjadi di dunia esport.
 
-Ini biasanya terjadi karena `AvatarGenerator.getCharacterAvatarUrl` memanggil API avatar (kayak DiceBear, Multiavatar, dll) yang **secara default menyisipkan warna latar ke dalam gambar**, kecuali diminta transparan lewat parameter URL.
+4. 🧠 Analisa VOD / Menonton Replay Musuh
+Efek: Menambah Kecerdasan dan Tekad secara signifikan, tapi menurunkan sedikit Kebahagiaan karena membosankan. Menu ini meningkatkan persentase kemenangan di menu turnamen.
 
-## Yang perlu dicek/diperbaiki
+5. 🧘 Konsultasi Mental Coach / Psikolog Olahraga
+Efek: Menambah Kebahagiaan dan Disiplin. Sangat berguna untuk mencegah burnout (kelelahan mental) dan mencegah karakter melakukan tilt (marah) yang berujung pada penurunan performa
 
-Saya belum punya isi `avatar_generator.dart`, jadi saya tidak bisa kasih fix pasti — tapi kemungkinan besar perbaikannya di situ, bukan di `3d_view_page.dart`. Bisa share isi file `lib/avatar/avatar_generator.dart`?
-
-Sambil menunggu, ini pola umum tergantung API yang dipakai:Opsi pertama hampir pasti fix yang paling murah dan tepat, tapi saya perlu lihat isi `getCharacterAvatarUrl` di `avatar_generator.dart` untuk tahu API mana yang dipakai dan parameter apa yang harus ditambahkan. Bisa kirim isi filenya?
+7. 📱 Interaksi Fans / Live Streaming Pribadi
+Efek: Menambah Kebahagiaan (senang dilihat fans) dan Uang (donasi), serta menambah Followers.

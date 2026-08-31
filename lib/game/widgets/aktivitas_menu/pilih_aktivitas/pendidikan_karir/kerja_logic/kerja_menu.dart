@@ -1,7 +1,5 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 import 'actions/rekan_kerja.dart';
@@ -9,6 +7,13 @@ import 'actions/bekerja_keras.dart';
 import 'idol_logic/idol_manager.dart';
 import 'idol_logic/idol_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'database_nama_pekerjaan.dart';
+import 'esport_logic/tim_esport.dart';
+import 'esport_logic/ba_esport_percentage.dart';
+import 'esport_logic/pro_player_percentage.dart';
+import 'esport_logic/talent_esport_percentage.dart';
+import 'esport_logic/esport_roster_page.dart';
+import 'esport_logic/esport_activities_page.dart';
 // ============================================================
 // EXTENSION untuk menambahkan isUnivGraduated ke Character
 // ============================================================
@@ -39,635 +44,7 @@ class KerjaMenuScreen extends StatefulWidget {
   // ============================================================
   // DAFTAR PEKERJAAN (LENGKAP DENGAN KATEGORI & SYARAT)
   // ============================================================
-  static final List<Map<String, dynamic>> availableJobs = [
-    // ---- DASAR & ENTRY-LEVEL ----
-    {
-      'title': 'Kasir',
-      'salary': 400,
-      'minIntel': 10,
-      'category': 'Dasar',
-      'desc': 'Melayani transaksi pembayaran',
-      'icon': Icons.point_of_sale,
-      'color': Colors.blueGrey,
-    },
-    {
-      'title': 'Supir Ojek Online',
-      'salary': 400,
-      'minIntel': 10,
-      'category': 'Dasar',
-      'desc': 'Mengantarkan penumpang dengan kendaraan',
-      'icon': Icons.motorcycle,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Karyawan Toko',
-      'salary': 500,
-      'minIntel': 20,
-      'category': 'Dasar',
-      'desc': 'Melayani pelanggan dan mengelola toko',
-      'icon': Icons.store,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Buruh Pabrik',
-      'salary': 600,
-      'minIntel': 15,
-      'category': 'Dasar',
-      'desc': 'Bekerja di lini produksi pabrik',
-      'icon': Icons.precision_manufacturing,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'Cleaning Service',
-      'salary': 350,
-      'minIntel': 10,
-      'category': 'Dasar',
-      'desc': 'Membersihkan dan merawat gedung',
-      'icon': Icons.cleaning_services,
-      'color': Colors.grey,
-    },
-    {
-      'title': 'Satpam',
-      'salary': 400,
-      'minIntel': 15,
-      'category': 'Dasar',
-      'desc': 'Menjaga keamanan dan ketertiban',
-      'icon': Icons.security,
-      'color': Colors.indigo,
-    },
-    {
-      'title': 'Kurir',
-      'salary': 450,
-      'minIntel': 15,
-      'category': 'Dasar',
-      'desc': 'Mengantar paket dan barang',
-      'icon': Icons.local_shipping,
-      'color': Colors.amber,
-    },
-
-    // ---- TERAMPIL (TANPA GELAR) ----
-    {
-      'title': 'Montir',
-      'salary': 800,
-      'minIntel': 30,
-      'category': 'Terampil',
-      'desc': 'Memperbaiki kendaraan dan mesin',
-      'icon': Icons.build,
-      'color': Colors.brown,
-    },
-    {
-      'title': 'Tukang Listrik',
-      'salary': 900,
-      'minIntel': 35,
-      'category': 'Terampil',
-      'desc': 'Memasang dan memperbaiki instalasi listrik',
-      'icon': Icons.electrical_services,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'Tukang Kayu',
-      'salary': 850,
-      'minIntel': 30,
-      'category': 'Terampil',
-      'desc': 'Membuat dan memperbaiki furnitur kayu',
-      'icon': Icons.handyman,
-      'color': Colors.brown,
-    },
-    {
-      'title': 'Tukang Las',
-      'salary': 900,
-      'minIntel': 30,
-      'category': 'Terampil',
-      'desc': 'Mengelas logam dan struktur besi',
-      'icon': Icons.fire_extinguisher,
-      'color': Colors.grey,
-    },
-    {
-      'title': 'Nelayan',
-      'salary': 700,
-      'minIntel': 20,
-      'category': 'Terampil',
-      'desc': 'Menangkap ikan di laut dan sungai',
-      'icon': Icons.directions_boat,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Petani',
-      'salary': 600,
-      'minIntel': 20,
-      'category': 'Terampil',
-      'desc': 'Mengelola lahan pertanian dan ternak',
-      'icon': Icons.agriculture,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Koki',
-      'salary': 800,
-      'minIntel': 30,
-      'category': 'Terampil',
-      'desc': 'Memasak dan menyiapkan makanan',
-      'icon': Icons.restaurant,
-      'color': Colors.red,
-    },
-    {
-      'title': 'Pelayan Restoran',
-      'salary': 500,
-      'minIntel': 20,
-      'category': 'Terampil',
-      'desc': 'Melayani pelanggan di restoran',
-      'icon': Icons.restaurant_menu,
-      'color': Colors.pink,
-    },
-
-    // ---- KREATIF & FREELANCE ----
-    {
-      'title': 'Fotografer',
-      'salary': 1200,
-      'minIntel': 40,
-      'category': 'Kreatif',
-      'desc': 'Mengambil foto untuk berbagai keperluan',
-      'icon': Icons.photo_camera,
-      'color': Colors.purple,
-    },
-    {
-      'title': 'Videografer',
-      'salary': 1500,
-      'minIntel': 45,
-      'category': 'Kreatif',
-      'desc': 'Membuat konten video profesional',
-      'icon': Icons.videocam,
-      'color': Colors.deepPurple,
-    },
-    {
-      'title': 'Content Creator',
-      'salary': 1800,
-      'minIntel': 50,
-      'category': 'Kreatif',
-      'desc': 'Membuat konten digital (YouTube, TikTok, dll)',
-      'icon': Icons.video_library,
-      'color': Colors.red,
-    },
-    {
-      'title': 'Musisi Jalanan',
-      'salary': 600,
-      'minIntel': 20,
-      'category': 'Kreatif',
-      'desc': 'Bermain musik di tempat umum',
-      'icon': Icons.music_note,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'Pelukis',
-      'salary': 700,
-      'minIntel': 25,
-      'category': 'Kreatif',
-      'desc': 'Melukis dan menjual karya seni',
-      'icon': Icons.brush,
-      'color': Colors.cyan,
-    },
-
-    // ---- LAYANAN & SOSIAL ----
-    {
-      'title': 'Driver Pribadi',
-      'salary': 700,
-      'minIntel': 25,
-      'category': 'Layanan',
-      'desc': 'Mengantar majikan ke berbagai tempat',
-      'icon': Icons.car_rental,
-      'color': Colors.teal,
-    },
-    {
-      'title': 'Asisten Rumah Tangga',
-      'salary': 500,
-      'minIntel': 15,
-      'category': 'Layanan',
-      'desc': 'Membantu pekerjaan rumah tangga',
-      'icon': Icons.home,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Baby Sitter',
-      'salary': 450,
-      'minIntel': 20,
-      'category': 'Layanan',
-      'desc': 'Merawat dan mengawasi anak-anak',
-      'icon': Icons.child_care,
-      'color': Colors.pink,
-    },
-    {
-      'title': 'Pengasuh Lansia',
-      'salary': 500,
-      'minIntel': 20,
-      'category': 'Layanan',
-      'desc': 'Merawat dan mendampingi lansia',
-      'icon': Icons.elderly,
-      'color': Colors.grey,
-    },
-
-    // ---- PROFESIONAL (BUTUH GELAR) ----
-    // STEM & TEKNIK
-    {
-      'title': 'Junior Software Engineer',
-      'salary': 3500,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Mengembangkan aplikasi dan sistem',
-      'icon': Icons.computer,
-      'color': Colors.indigo,
-    },
-    {
-      'title': 'Data Analyst',
-      'salary': 3000,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Menganalisis data untuk keputusan bisnis',
-      'icon': Icons.analytics,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Network Engineer',
-      'salary': 3200,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Mengelola infrastruktur jaringan',
-      'icon': Icons.wifi,
-      'color': Colors.cyan,
-    },
-    {
-      'title': 'Civil Engineer',
-      'salary': 3000,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Merancang dan mengawasi proyek konstruksi',
-      'icon': Icons.architecture,
-      'color': Colors.brown,
-    },
-    {
-      'title': 'Mechanical Engineer',
-      'salary': 3200,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Merancang sistem mekanik dan mesin',
-      'icon': Icons.settings,
-      'color': Colors.grey,
-    },
-    {
-      'title': 'Electrical Engineer',
-      'salary': 3300,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Merancang sistem kelistrikan dan elektronik',
-      'icon': Icons.flash_on,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'Chemical Engineer',
-      'salary': 3500,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Mengembangkan proses produksi kimia',
-      'icon': Icons.science,
-      'color': Colors.deepOrange,
-    },
-    {
-      'title': 'Architect',
-      'salary': 3800,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Merancang bangunan dan struktur',
-      'icon': Icons.home_work,
-      'color': Colors.amber,
-    },
-
-    // KESEHATAN
-    {
-      'title': 'Dokter Umum',
-      'salary': 5000,
-      'minIntel': 80,
-      'category': 'Profesional',
-      'desc': 'Mendiagnosis dan mengobati pasien',
-      'icon': Icons.medical_services,
-      'color': Colors.red,
-    },
-    {
-      'title': 'Dokter Spesialis',
-      'salary': 8000,
-      'minIntel': 85,
-      'category': 'Profesional',
-      'desc': 'Spesialisasi di bidang tertentu (bedah, anak, dll)',
-      'icon': Icons.local_hospital,
-      'color': Colors.red.shade900, // deepRed diganti
-    },
-    {
-      'title': 'Dokter Gigi',
-      'salary': 4500,
-      'minIntel': 75,
-      'category': 'Profesional',
-      'desc': 'Merawat kesehatan gigi dan mulut',
-      'icon': Icons.medical_information,
-      'color': Colors.teal,
-    },
-    {
-      'title': 'Apoteker',
-      'salary': 3500,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Menyediakan dan mengelola obat-obatan',
-      'icon': Icons.medication,
-      'color': Colors.purple,
-    },
-    {
-      'title': 'Perawat',
-      'salary': 2800,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Memberikan perawatan medis langsung',
-      'icon': Icons.health_and_safety,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Ahli Gizi',
-      'salary': 2500,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Memberikan konsultasi gizi dan diet',
-      'icon': Icons.restaurant,
-      'color': Colors.green,
-    },
-
-    // BISNIS & EKONOMI
-    {
-      'title': 'Manajer Keuangan',
-      'salary': 4000,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Mengelola keuangan dan investasi perusahaan',
-      'icon': Icons.attach_money,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Akuntan',
-      'salary': 3200,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Mengelola laporan keuangan dan pajak',
-      'icon': Icons.calculate,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Analis Ekonomi',
-      'salary': 3500,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Menganalisis tren ekonomi dan pasar',
-      'icon': Icons.timeline,
-      'color': Colors.cyan,
-    },
-    {
-      'title': 'Bankir',
-      'salary': 3800,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Mengelola dana dan memberikan pinjaman',
-      'icon': Icons.account_balance,
-      'color': Colors.indigo,
-    },
-    {
-      'title': 'Marketing Specialist',
-      'salary': 3000,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Merancang strategi pemasaran produk',
-      'icon': Icons.trending_up,
-      'color': Colors.purple,
-    },
-
-    // HUKUM & SOSIAL
-    {
-      'title': 'Pengacara',
-      'salary': 5000,
-      'minIntel': 75,
-      'category': 'Profesional',
-      'desc': 'Memberikan bantuan hukum dan pembelaan',
-      'icon': Icons.gavel,
-      'color': Colors.deepPurple,
-    },
-    {
-      'title': 'Jaksa',
-      'salary': 4500,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Menuntut perkara pidana di pengadilan',
-      'icon': Icons.account_balance, // court_house diganti
-      'color': Colors.blueGrey,
-    },
-    {
-      'title': 'Diplomat',
-      'salary': 4000,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Mewakili negara dalam hubungan internasional',
-      'icon': Icons.public,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Jurnalis',
-      'salary': 2500,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Mengumpulkan dan menyajikan berita',
-      'icon': Icons.newspaper,
-      'color': Colors.grey,
-    },
-    {
-      'title': 'Psikolog',
-      'salary': 3500,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Memberikan konseling dan terapi psikologis',
-      'icon': Icons.psychology,
-      'color': Colors.pink,
-    },
-    {
-      'title': 'Pegawai Negeri Sipil (PNS)',
-      'salary': 1500,
-      'minIntel': 50,
-      'category': 'Profesional',
-      'desc': 'Bekerja di instansi pemerintah',
-      'icon': Icons.account_balance,
-      'color': Colors.teal,
-    },
-
-    // PENDIDIKAN & BAHASA
-    {
-      'title': 'Guru SD',
-      'salary': 1200,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Mengajar siswa kelas 1-6 SD',
-      'icon': Icons.school,
-      'color': Colors.purple,
-    },
-    {
-      'title': 'Guru SMP',
-      'salary': 1400,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Mengajar siswa kelas 7-9 SMP',
-      'icon': Icons.school,
-      'color': Colors.deepPurple,
-    },
-    {
-      'title': 'Guru SMA',
-      'salary': 1800,
-      'minIntel': 70,
-      'category': 'Profesional',
-      'desc': 'Mengajar siswa kelas 10-12 SMA',
-      'icon': Icons.school,
-      'color': Colors.indigo,
-    },
-    {
-      'title': 'Dosen',
-      'salary': 3000,
-      'minIntel': 75,
-      'category': 'Profesional',
-      'desc': 'Mengajar dan meneliti di perguruan tinggi',
-      'icon': Icons.menu_book,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Penerjemah',
-      'salary': 2500,
-      'minIntel': 65,
-      'category': 'Profesional',
-      'desc': 'Menerjemahkan teks dalam berbagai bahasa',
-      'icon': Icons.translate,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Penulis',
-      'salary': 2000,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Menulis buku, artikel, atau konten kreatif',
-      'icon': Icons.edit,
-      'color': Colors.amber,
-    },
-
-    // KREATIF & SENI
-    {
-      'title': 'Desainer Grafis',
-      'salary': 2500,
-      'minIntel': 55,
-      'category': 'Profesional',
-      'desc': 'Merancang visual untuk media dan produk',
-      'icon': Icons.design_services,
-      'color': Colors.pink,
-    },
-    {
-      'title': 'Desainer Mode',
-      'salary': 2800,
-      'minIntel': 55,
-      'category': 'Profesional',
-      'desc': 'Merancang pakaian dan aksesoris',
-      'icon': Icons.style,
-      'color': Colors.purple,
-    },
-    {
-      'title': 'Sutradara Film',
-      'salary': 4000,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Mengarahkan produksi film dan televisi',
-      'icon': Icons.movie,
-      'color': Colors.red,
-    },
-    {
-      'title': 'Produser Musik',
-      'salary': 3500,
-      'minIntel': 55,
-      'category': 'Profesional',
-      'desc': 'Memproduksi dan mengelola rekaman musik',
-      'icon': Icons.music_video,
-      'color': Colors.orange,
-    },
-    {
-      'title': 'Seniman',
-      'salary': 2000,
-      'minIntel': 50,
-      'category': 'Profesional',
-      'desc': 'Menciptakan karya seni (lukis, patung, dll)',
-      'icon': Icons.palette,
-      'color': Colors.cyan,
-    },
-
-    // PERTANIAN & LAINNYA
-    {
-      'title': 'Agronom',
-      'salary': 2800,
-      'minIntel': 55,
-      'category': 'Profesional',
-      'desc': 'Mengelola produksi tanaman dan pertanian',
-      'icon': Icons.agriculture,
-      'color': Colors.green,
-    },
-    {
-      'title': 'Manajer Hotel',
-      'salary': 3000,
-      'minIntel': 60,
-      'category': 'Profesional',
-      'desc': 'Mengelola operasional hotel dan akomodasi',
-      'icon': Icons.hotel,
-      'color': Colors.teal,
-    },
-
-    // PRESTISE TINGGI
-    {
-      'title': 'CEO Startup',
-      'salary': 10000,
-      'minIntel': 80,
-      'category': 'Prestise',
-      'desc': 'Memimpin perusahaan rintisan',
-      'icon': Icons.rocket,
-      'color': Colors.amber, // gold diganti
-    },
-    {
-      'title': 'Pilot',
-      'salary': 6000,
-      'minIntel': 70,
-      'category': 'Prestise',
-      'desc': 'Mengemudikan pesawat terbang',
-      'icon': Icons.flight,
-      'color': Colors.blue,
-    },
-    {
-      'title': 'Arsitek Senior',
-      'salary': 6000,
-      'minIntel': 75,
-      'category': 'Prestise',
-      'desc': 'Merancang bangunan bertingkat tinggi',
-      'icon': Icons.architecture,
-      'color': Colors.brown,
-    },
-    {
-      'title': 'Pengacara Senior',
-      'salary': 8000,
-      'minIntel': 80,
-      'category': 'Prestise',
-      'desc': 'Menangani kasus-kasus besar',
-      'icon': Icons.gavel,
-      'color': Colors.deepPurple,
-    },
-    {
-      'title': 'Konsultan Manajemen',
-      'salary': 7000,
-      'minIntel': 75,
-      'category': 'Prestise',
-      'desc': 'Memberikan saran strategis untuk perusahaan',
-      'icon': Icons.business_center,
-      'color': Colors.indigo,
-    },
-  ];
+  static final List<Map<String, dynamic>> availableJobs = JobDatabase.availableJobs;
 
   @override
   State<KerjaMenuScreen> createState() => _KerjaMenuScreenState();
@@ -675,6 +52,7 @@ class KerjaMenuScreen extends StatefulWidget {
 
 class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   List<Map<String, dynamic>> get _availableJobs => KerjaMenuScreen.availableJobs;
+  String _searchQuery = '';
 
   // ============================================================
   // FUNGSI UTAMA
@@ -907,8 +285,85 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
     }
 
+    // Cek persentase khusus untuk BA Esport
+    if (job['title'] == 'Brand Ambassador Esport') {
+      final double chance = BaEsportPercentage.getApplyChance(widget.character.gender);
+      if (Random().nextDouble() > chance) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Lamaran Ditolak 🚫'),
+            content: const Text(
+              'Tim E-Sport merasa profilmu kurang cocok untuk menjadi Brand Ambassador mereka saat ini. Coba lamar pekerjaan lain!',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+
+    // Cek persentase khusus untuk Pro Player Esport
+    if (job['title'] == 'Pro Player Esport') {
+      final double chance = ProPlayerPercentage.getApplyChance(widget.character.gender, widget.character.specialTalent);
+      if (Random().nextDouble() > chance) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Lamaran Ditolak 🚫'),
+            content: const Text(
+              'Tim E-Sport merasa kemampuan gaming kamu belum memenuhi standar untuk masuk ke roster utama Pro Player saat ini.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+
+    // Cek persentase khusus untuk Talent Esports
+    if (job['title'] == 'Talent Esports') {
+      final double chance = TalentEsportPercentage.getApplyChance(widget.character.gender);
+      if (Random().nextDouble() > chance) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Lamaran Ditolak 🚫'),
+            content: const Text(
+              'Tim E-Sport merasa profilmu kurang cocok untuk menjadi Talent konten mereka saat ini. Coba lamar pekerjaan lain!',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('OK'),
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+    }
+
     final isGraduatedRedirect = (job['title'] == 'Idol (Trainee)' && widget.character.hasGraduatedIdol);
-    final String finalTitle = isGraduatedRedirect ? 'Staf Operasional Idol' : job['title'];
+    String finalTitle = isGraduatedRedirect ? 'Staf Operasional Idol' : job['title'];
+    
+    String teamText = '';
+    if (job['title'] == 'Brand Ambassador Esport' || job['title'] == 'Pro Player Esport' || job['title'] == 'Talent Esports') {
+      final String randomTeam = EsportsTeams.list[Random().nextInt(EsportsTeams.list.length)];
+      finalTitle = '${job['title']} ($randomTeam)';
+      teamText = ' untuk tim $randomTeam';
+    }
+
     final int baseSalary = isGraduatedRedirect ? 500 : job['salary'];
     final double salaryMult = getCountrySalaryMultiplier(widget.character.location);
     final int finalSalary = (baseSalary * salaryMult).round();
@@ -929,7 +384,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         content: Text(
           isGraduatedRedirect
               ? 'Karena kamu sudah pernah melangsungkan kelulusan (graduation) sebagai Idol, manajemen memutuskan untuk merekrutmu sebagai Staf Operasional Idol dengan gaji \$500/tahun!'
-              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle dengan gaji \$$finalSalary/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
+              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle$teamText dengan gaji \$$finalSalary/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
         ),
         actions: [
           TextButton(
@@ -969,9 +424,24 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
 
     if (widget.character.coworkers.isNotEmpty) return;
-    final count = 5 + random.nextInt(6);
+
+    final String job = widget.character.jobName ?? '';
+    final bool isProPlayer = job.startsWith('Pro Player Esport');
+    final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
+
+    int count = 5 + random.nextInt(6);
+    if (isProPlayer) {
+      count = 3 + random.nextInt(3); // 3-5 pro player coworkers
+    } else if (isBAOrTalent) {
+      count = 10 + random.nextInt(6); // 10-15 BA/Talent coworkers
+    }
+
     for (int i = 0; i < count; i++) {
-      final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      if (isBAOrTalent) {
+        gender = random.nextDouble() < 0.85 ? 'Perempuan' : 'Laki-laki'; // Mostly female for BA/Talent
+      }
+
       final firstList = gender == 'Laki-laki'
           ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
               ? widget.character.maleFirstNames!
@@ -1029,10 +499,12 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     final age = character.age;
     final gender = character.gender;
 
-    // Female age 12-17: ONLY show "Idol (Trainee)"
-    if (gender == 'Perempuan' && age >= 12 && age < 18) {
-      return [
-        {
+    List<Map<String, dynamic>> jobs = [];
+
+    if (age < 18) {
+      // Under 18: Hanya tampilkan pekerjaan anak muda/remaja yang sesuai kriteria usia
+      if (gender == 'Perempuan' && age >= 12) {
+        jobs.add({
           'title': 'Idol (Trainee)',
           // 10M - 20M IDR -> $667 to $1,333 USD
           'salary': 667 + Random().nextInt(667),
@@ -1041,15 +513,26 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           'desc': 'Bergabunglah dengan grup trainee Idol baru',
           'icon': Icons.music_note,
           'color': Colors.pink,
+        });
+      }
+
+      // Ambil pekerjaan E-Sport dari database jika usia mencukupi
+      for (final job in _availableJobs) {
+        if (job['title'] == 'Pro Player Esport' && age >= 13) {
+          jobs.add(job);
         }
-      ];
-    }
+        if (job['title'] == 'Brand Ambassador Esport' && age >= 15) {
+          jobs.add(job);
+        }
+        if (job['title'] == 'Talent Esports' && age >= 13) {
+          jobs.add(job);
+        }
+      }
+    } else {
+      // Lainnya (Usia >= 18): Mulai dengan semua pekerjaan standar
+      jobs = List.from(_availableJobs);
 
-    // Other cases: start with standard jobs
-    List<Map<String, dynamic>> jobs = List.from(_availableJobs);
-
-    // If male (or anyone >= 18), they see staff positions
-    if (age >= 18) {
+      // Tambahkan posisi staf manajemen Idol
       jobs.addAll([
         {
           'title': 'General Manager Idol',
@@ -1079,6 +562,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           'color': Colors.blueGrey,
         }
       ]);
+    }
+
+    if (_searchQuery.isNotEmpty) {
+      final query = _searchQuery.toLowerCase();
+      jobs = jobs.where((j) {
+        final title = (j['title'] as String).toLowerCase();
+        final desc = (j['desc'] as String).toLowerCase();
+        return title.contains(query) || desc.contains(query);
+      }).toList();
     }
 
     return jobs;
@@ -1225,7 +717,101 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   },
                 ),
               ),
+              (() {
+                final String jName = character.jobName ?? '';
+                final bool isBA = jName.startsWith('Brand Ambassador Esport');
+                final bool isTalent = jName.startsWith('Talent Esports');
+                final bool isPro = jName.startsWith('Pro Player Esport');
+                String team = '';
+                if (jName.contains('(') && jName.contains(')')) {
+                  team = jName.substring(jName.indexOf('(') + 1, jName.indexOf(')'));
+                }
+
+                final List<Widget> extraTiles = [];
+
+                if (isBA || isPro || isTalent) {
+                  extraTiles.add(
+                    _buildMenuTile(
+                      context: context,
+                      icon: Icons.sports_esports,
+                      color: Colors.indigo,
+                      title: 'Aktivitas Esports 🎮',
+                      subtitle: 'Latihan, turnamen, sponsor, dan interaksi karir esport',
+                      page: EsportActivitiesPage(
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
+                      ),
+                    ),
+                  );
+                }
+
+                if (isBA) {
+                  extraTiles.add(
+                    _buildMenuTile(
+                      context: context,
+                      icon: Icons.view_carousel,
+                      color: Colors.blue,
+                      title: 'Lihat Divisi',
+                      subtitle: 'Melihat divisi & roster pro player tim E-Sport',
+                      page: EsportRosterPage(
+                        teamName: team,
+                        isViewingBA: false,
+                      ),
+                    ),
+                  );
+                } else if (isPro) {
+                  extraTiles.add(
+                    _buildMenuTile(
+                      context: context,
+                      icon: Icons.star,
+                      color: Colors.pinkAccent,
+                      title: 'Lihat Brand Ambassador',
+                      subtitle: 'Melihat daftar Brand Ambassador tim E-Sport',
+                      page: EsportRosterPage(
+                        teamName: team,
+                        isViewingBA: true,
+                      ),
+                    ),
+                  );
+                }
+
+                if (extraTiles.isEmpty) return const SizedBox.shrink();
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: extraTiles,
+                );
+              }()),
             ] else ...[
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: TextField(
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val;
+                    });
+                  },
+                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'Cari Lowongan Pekerjaan...',
+                    hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.grey),
+                    prefixIcon: const Icon(Icons.search, color: Colors.green),
+                    filled: true,
+                    fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade900 : Colors.grey.shade100,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.green, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ),
               const Text(
                 'Lowongan Pekerjaan Tersedia',
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),

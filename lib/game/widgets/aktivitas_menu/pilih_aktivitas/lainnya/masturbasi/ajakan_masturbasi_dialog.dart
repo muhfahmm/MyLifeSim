@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'efek_samping.dart';
+import 'masturbate_enjoyment.dart';
 
 // ============================================================
 // MODEL DATA LOKASI & WAKTU
@@ -499,94 +500,21 @@ class AjakanMasturbasiDialog {
 
     character.inbox.add(inboxMsg);
 
-    showDialog(
+    final String parsedRel = _parseRelation(relationType)['main']!;
+    final String partnerRelation = _getRelationWithMu(parsedRel);
+
+    MasturbateEnjoymentModal.show(
       context: context,
-      builder: (ctx) {
-        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFEEF2F5),
-          title: Row(
-            children: [
-              Icon(Icons.flash_on, color: isDark ? Colors.deepPurpleAccent : Colors.deepPurple, size: 28),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Ajakan Diterima 😈',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(children: [
-                Icon(Icons.location_on, size: 16, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
-                const SizedBox(width: 4),
-                Text(
-                  lokasi,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.purpleAccent : Colors.deepPurple,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Icon(Icons.access_time, size: 16, color: isDark ? Colors.indigoAccent : Colors.indigo),
-                const SizedBox(width: 4),
-                Text(
-                  waktu,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark ? Colors.indigoAccent : Colors.indigo,
-                  ),
-                ),
-              ]),
-              const SizedBox(height: 10),
-              Text(
-                resultMsg,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white70 : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 12),
-              // BADGE EFEK STATISTIK
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: [
-                  _buildBadge(Icons.sentiment_satisfied, '+15% Kebahagiaan', isDark ? Colors.greenAccent : Colors.green),
-                  _buildBadge(Icons.favorite, '-$healthLoss% Kesehatan', isDark ? Colors.orangeAccent : Colors.orange),
-                  _buildBadge(Icons.people, '+20% Hubungan', isDark ? Colors.lightBlueAccent : Colors.blue),
-                ],
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                EfekSampingMasturbasi.checkPartnerEffect(
-                  context, character, relationType, viewerName, onComplete,
-                  acceptanceHealthLoss: healthLoss,
-                );
-              },
-              child: Text(
-                'OK',
-                style: TextStyle(
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-            ),
-          ],
+      character: character,
+      fantasyPartner: viewerName,
+      isMutual: true,
+      partnerName: viewerName,
+      partnerRelation: partnerRelation,
+      additionalText: resultMsg + '\n\n📈 Efek: +15% Kebahagiaan, -$healthLoss% Kesehatan, +20% Hubungan',
+      onComplete: () {
+        EfekSampingMasturbasi.checkPartnerEffect(
+          context, character, relationType, viewerName, onComplete,
+          acceptanceHealthLoss: healthLoss,
         );
       },
     );
@@ -603,7 +531,6 @@ class AjakanMasturbasiDialog {
     VoidCallback? onComplete,
   ) {
     _modifyRelativeRelationship(character, relationType, viewerName, -15);
-    character.happiness = (character.happiness - 10).clamp(0, 100);
 
     final parsed = _parseRelation(relationType);
     final String relationWithMu = _getRelationWithMu(parsed['main']!);
@@ -623,7 +550,7 @@ class AjakanMasturbasiDialog {
             style: TextStyle(color: isDark ? Colors.white : Colors.black87),
           ),
           content: Text(
-            'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-10% Kebahagiaan, -15% Hubungan).',
+            'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-15% Hubungan).',
             style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
           ),
           actions: [

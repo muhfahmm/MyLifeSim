@@ -6,6 +6,7 @@ import 'risiko_masturbasi.dart'; // Import file risiko
 import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
 import 'efek_samping.dart'; // Import efek samping masturbasi
+import 'masturbate_enjoyment.dart';
 
 class MasturbasiHelper {
   // ============================================================
@@ -186,27 +187,15 @@ class MasturbasiHelper {
 
     character.inbox.add(resultMsg);
 
-    showDialog(
+    MasturbateEnjoymentModal.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green),
-            SizedBox(width: 8),
-            Text('Aktivitas Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Text(resultMsg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              EfekSampingMasturbasi.checkSoloEffect(context, character, relation, onComplete);
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      character: character,
+      fantasyPartner: targetName,
+      isMutual: false,
+      additionalText: resultMsg,
+      onComplete: () {
+        EfekSampingMasturbasi.checkSoloEffect(context, character, relation, onComplete);
+      },
     );
   }
 

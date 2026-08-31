@@ -723,7 +723,7 @@ class Character {
         'partnerName': name,
         'relationType': relation,
         'type': type,
-        'turnsLeft': 3,
+        'turnsLeft': 1,
         'count': 1,
       });
     }

@@ -480,127 +480,97 @@ class _BercintaScreenState extends State<BercintaScreen> {
     }
 
     if (!mounted) return;
-    showDialog(
+    String addText = '';
+    if (additionalMessage.isNotEmpty) {
+      addText += additionalMessage;
+    }
+    if (isPregnant) {
+      if (addText.isNotEmpty) addText += '\n';
+      addText += 'Kamu hamil! 🍼';
+    }
+    if (isPartnerPregnant) {
+      if (addText.isNotEmpty) addText += '\n';
+      addText += '$relation hamil! 👶';
+    }
+
+    final int relationshipValue = _getTargetRelationship();
+
+    MLEnjoymentModal.show(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogCtx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(message, style: const TextStyle(fontSize: 14)),
-            
-            if (additionalMessage.isNotEmpty) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.withOpacity(0.3)),
-                ),
-                child: Text(additionalMessage, style: const TextStyle(fontWeight: FontWeight.w500, color: Colors.blue)),
-              ),
-            ],
-
-            if (isPregnant) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.pink.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.pink.withOpacity(0.3)),
-                ),
-                child: const Row(
-                  children: [
-                    Icon(Icons.pregnant_woman, color: Colors.pink, size: 20),
-                    SizedBox(width: 8),
-                    Text('Kamu hamil! 🍼', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
-                  ],
-                ),
-              ),
-            ],
-
-             if (isPartnerPregnant) ...[
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: Colors.orange.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.orange.withOpacity(0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.wc, color: Colors.orange, size: 20),
-                    const SizedBox(width: 8),
-                    Text('$relation hamil! 👶', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
-                  ],
-                ),
-              ),
-            ],
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () async {
-              // 1. Tutup dialog hasil bercinta
-              Navigator.of(dialogCtx).pop();
-              // 2. Terapkan perubahan state (happiness dll)
-              applyStateChange();
-              if (isPregnant || isPartnerPregnant) {
-                // 3a. Tampilkan dialog kehamilan, baru setelah selesai
-                //     tutup BercintaScreen dan panggil onActionComplete
-                BeritahuKehamilanHelper.showTellOrNotDialog(
-                  context: context,
-                  character: widget.character,
-                  partnerName: widget.targetName,
-                  partnerRole: widget.targetRole,
-                  onComplete: () async {
-                    if (_useCondom == false) {
-                      final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
-                      if (rel != null && rel.geneticRisk > 0 && context.mounted) {
-                        await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
-                      }
-                    }
-
-                    // 4a. Pengecekan penyakit menular seksual (STD) di akhir dialog kehamilan
-                    if (success && _useCondom == false && context.mounted) {
-                      await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
-                    }
-
-                    // Pastikan context masih valid sebelum pop
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                    widget.onActionComplete.call();
-                  },
-                );
-              } else {
-                // 3b. Tidak ada kehamilan – lakukan pengecekan penyakit dan selesai
-                if (success && _useCondom == false && context.mounted) {
-                  await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+      character: widget.character,
+      partnerName: widget.targetName,
+      partnerRelation: widget.targetRole,
+      relationshipValue: relationshipValue,
+      additionalText: addText.isNotEmpty ? addText : null,
+      onComplete: () async {
+        applyStateChange();
+        if (isPregnant || isPartnerPregnant) {
+          BeritahuKehamilanHelper.showTellOrNotDialog(
+            context: context,
+            character: widget.character,
+            partnerName: widget.targetName,
+            partnerRole: widget.targetRole,
+            onComplete: () async {
+              if (_useCondom == false) {
+                final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
+                if (rel != null && rel.geneticRisk > 0 && context.mounted) {
+                  await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
                 }
-
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-                widget.onActionComplete.call();
               }
+
+              if (success && _useCondom == false && context.mounted) {
+                await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+              }
+
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+              widget.onActionComplete.call();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+          );
+        } else {
+          if (success && _useCondom == false && context.mounted) {
+            await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+          }
+
+          if (context.mounted) {
+            Navigator.of(context).pop();
+          }
+          widget.onActionComplete.call();
+        }
+      },
     );
+  }
+
+  int _getTargetRelationship() {
+    int currentSatisfaction = 50; // default fallback
+    final String cleanTargetName = widget.targetName;
+    if (widget.character.partner != null && widget.character.partner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.secondPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.thirdPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.fourthPartner!['relationship'] ?? '50') ?? 50;
+    } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == cleanTargetName) {
+      currentSatisfaction = int.tryParse(widget.character.fifthPartner!['relationship'] ?? '50') ?? 50;
+    } else {
+      for (var sib in widget.character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})';
+        if (expectedLabel == cleanTargetName) {
+          currentSatisfaction = int.tryParse(sib['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
+      for (var ext in widget.character.extendedFamily) {
+        if (ext['name'] == cleanTargetName) {
+          currentSatisfaction = int.tryParse(ext['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
+    }
+    return currentSatisfaction;
   }
 
   String _chosenLocation = 'Rumah';

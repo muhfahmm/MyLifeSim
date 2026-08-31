@@ -1,4 +1,4 @@
-﻿// lib/game/widgets/aktivitas_menu/activity_button.dart
+// lib/game/widgets/aktivitas_menu/activity_button.dart
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
@@ -177,7 +177,7 @@ class ActivityButton extends StatelessWidget {
                     subtitle: 'Mulai bekerja untuk menghasilkan uang tunai',
                     icon: Icons.work,
                     color: Colors.green,
-                    minAge: (character.gender == 'Perempuan' && age >= 12) ? age : 18,
+                    minAge: (character.gender == 'Perempuan' && age >= 12) ? age : (age >= 13 ? age : 18),
                     currentAge: age,
                     onTap: () => _executeAction(context, () {
                       Navigator.push(

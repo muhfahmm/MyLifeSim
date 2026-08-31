@@ -26,6 +26,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/mast
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -887,89 +888,108 @@ class _GameScreenState extends State<GameScreen> {
   void _checkGraduationOptions() {
     if (_character.age == 18 && _character.univMajor == null && _character.jobName == null) {
       showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.school, color: Colors.indigo),
-              const SizedBox(width: 8),
-              Text('Pilihan Masa Depan 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
+  context: context,
+  barrierDismissible: false,
+  builder: (dialogContext) {
+    final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+    return AlertDialog(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
+      title: Row(
+        children: [
+          Icon(Icons.school, color: Colors.indigo),
+          const SizedBox(width: 8),
+          Text(
+            'Pilihan Masa Depan 🎓',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: isDark ? Colors.white : Colors.black87,
+            ),
           ),
-          content: const Text(
-            'Selamat! Kamu telah resmi lulus dari SMA pada usia 18 tahun. Apa rencana hidupmu selanjutnya?',
-            style: TextStyle(fontSize: 14),
-          ),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        ],
+      ),
+      content: Text(
+        'Selamat! Kamu telah resmi lulus dari SMA pada usia 18 tahun. Apa rencana hidupmu selanjutnya?',
+        style: TextStyle(
+          fontSize: 14,
+          color: isDark ? Colors.white70 : Colors.black87,
+        ),
+      ),
+      actions: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.indigo,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _checkActiveProposal();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UnivMenuPage(
+                      character: _character,
+                      onRefresh: () => setState(() {}),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _checkActiveProposal();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UnivMenuPage(
-                          character: _character,
-                          onRefresh: () => setState(() {}),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('Mendaftar Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                );
+              },
+              child: const Text('Mendaftar Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _checkActiveProposal();
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => KerjaMenuScreen(
+                      character: _character,
+                      onRefresh: () => setState(() {}),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _checkActiveProposal();
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => KerjaMenuScreen(
-                          character: _character,
-                          onRefresh: () => setState(() {}),
-                        ),
-                      ),
-                    );
-                  },
-                  child: const Text('Mencari Pekerjaan 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+                );
+              },
+              child: const Text('Mencari Pekerjaan 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(height: 8),
+            TextButton(
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                foregroundColor: isDark ? Colors.white70 : Colors.grey.shade700,
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
+                );
+                _checkActiveProposal();
+              },
+              child: Text(
+                'Tidak Memilih Apapun (Menganggur)',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : Colors.grey.shade700,
                 ),
-                const SizedBox(height: 8),
-                TextButton(
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    foregroundColor: Colors.grey.shade700,
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
-                    );
-                    _checkActiveProposal();
-                  },
-                  child: const Text('Tidak Memilih Apapun (Menganggur)', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
+              ),
             ),
           ],
         ),
-      );
+      ],
+    );
+  },
+);
     } else {
       _checkUniversityGraduationOptions();
     }
@@ -2414,7 +2434,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       _updateFamilyRelationship(partnerName, 15);
       _character.addTabooSecret(partnerName, relation, 'Bercinta');
 
-      String additionalMsg = '';
       if (!useCondom && myGender != partnerGender) {
         double myFertility = _getIncomingFertilityRate(_character.age, myGender);
         if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
@@ -2451,13 +2470,45 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       _character.activeProposal = null;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('💋 Kamu menerima ajakan bercinta dari $partnerName!'),
-        backgroundColor: Colors.pink,
-      ),
+    int relValue = 50;
+    if (partnerName.startsWith('Ayah')) {
+      if (partnerName.contains('Tiri')) {
+        relValue = _character.stepFatherRelationship ?? 50;
+      } else {
+        relValue = _character.fatherRelationship ?? 50;
+      }
+    } else if (partnerName.startsWith('Ibu')) {
+      relValue = _character.motherRelationship ?? 50;
+    } else {
+      for (var sib in _character.siblings) {
+        final String expectedLabel = '${sib['name']} (${sib['relation']})';
+        if (expectedLabel == partnerName) {
+          relValue = int.tryParse(sib['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
+    }
+
+    String addText = '';
+    if (_character.pregnantByPartnerName == partnerName) {
+      if (_character.isPregnant) {
+        addText = 'Kamu hamil! 🍼';
+      } else if (_character.partnerIsPregnant) {
+        addText = '$relation hamil! 👶';
+      }
+    }
+
+    MLEnjoymentModal.show(
+      context: context,
+      character: _character,
+      partnerName: partnerName,
+      partnerRelation: relation,
+      relationshipValue: relValue,
+      additionalText: addText.isNotEmpty ? addText : null,
+      onComplete: () {
+        _checkGlassesNeed();
+      },
     );
-    _checkGlassesNeed();
   }
 
   void importPenyakitSTDCheck(Map<String, dynamic> proposal) {
