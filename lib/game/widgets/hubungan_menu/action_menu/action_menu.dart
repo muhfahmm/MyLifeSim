@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
 
 // Import logic per usia
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_base.dart';
@@ -1720,7 +1721,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               !isActivePartner &&
               !isAlreadyPartner &&
               !isAlreadySecondPartner &&
-              !isPartnerRole) {
+              !isPartnerRole &&
+              AdultFeatures.canProposeDating(widget.targetRole, widget.targetRole, userAge: widget.character.age)) {
             final bool hasExistingPartner = widget.character.partner != null;
             actions.add(ActionItem(
               label: hasExistingPartner
@@ -1940,8 +1942,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             (widget.character.fatherName == null ||
                 widget.character.isFatherDeceased);
 
+    final String plainTarget = widget.targetName;
+    final String cleanRoleLower = widget.targetRole.toLowerCase();
+    
+    final bool isSpouse = cleanRoleLower == 'istri' || cleanRoleLower == 'suami' || cleanRoleLower == 'pasangan';
+    final String breakLabel = isSpouse 
+        ? (cleanRoleLower == 'istri' ? 'Ceraikan Istri' : (cleanRoleLower == 'suami' ? 'Ceraikan Suami' : 'Ceraikan Pasangan'))
+        : 'Putuskan Pacar';
+    final String breakTitle = isSpouse ? 'Ceraikan Pasangan 💔' : 'Putuskan Hubungan';
+    final String breakBody = isSpouse 
+        ? 'Apakah kamu yakin ingin menceraikan ${widget.targetName}?'
+        : 'Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?';
+    final String breakButtonText = isSpouse ? 'Ya, Ceraikan' : 'Ya, Putuskan';
+
     final ActionItem putuskanPacarAction = ActionItem(
-      label: 'Putuskan Pacar',
+      label: breakLabel,
       icon: Icons.heart_broken,
       color: Colors.red,
       onTap: () {
@@ -1949,10 +1964,9 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         showDialog(
           context: screenContext,
           builder: (confirmDialogContext) => AlertDialog(
-            title: const Text('Putuskan Hubungan',
-                style: TextStyle(fontWeight: FontWeight.bold)),
-            content: Text(
-                'Apakah kamu yakin ingin memutuskan hubungan dengan ${widget.targetName}?'),
+            title: Text(breakTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
+            content: Text(breakBody),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(confirmDialogContext),
@@ -1991,13 +2005,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     widget.character.isHavingAffair = false;
                   }
 
-                  // 2. Tambahkan ke exPartners (mantan pacar)
+                  // 2. Tambahkan ke exPartners (mantan pacar / mantan pasangan)
                   widget.character.exPartners.add({
                     'name': widget.targetName,
                     'gender': _getTargetGender(),
                     'age': targetAge.toString(),
                     'relationship': '20',
-                    'relation': 'Mantan Pacar',
+                    'relation': isSpouse 
+                        ? (cleanRoleLower == 'istri' ? 'Mantan Istri' : 'Mantan Suami')
+                        : 'Mantan Pacar',
                     'isDeceased': 'false',
                     'breakInitiator': widget.character.gender,
                     'breakReason': 'putus biasa',
@@ -2010,11 +2026,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   _updateState();
 
                   // 5. Tampilkan dialog hasil putus menggunakan screenContext
+                  final String resultTitle = isSpouse ? 'Perceraian Selesai 💔' : 'Putus Hubungan 💔';
+                  final String resultContent = isSpouse 
+                      ? 'Kamu telah resmi bercerai dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'
+                      : 'Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.';
+
                   DialogHelper.show(
                     context: screenContext,
-                    title: 'Putus Hubungan 💔',
-                    content: Text(
-                        'Kamu telah memutuskan hubungan dengan ${widget.targetName}. Hubungan kalian sekarang berakhir.'),
+                    title: resultTitle,
+                    content: Text(resultContent),
                     actions: [
                       Builder(
                         builder: (resultDialogContext) => TextButton(
@@ -2028,8 +2048,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     ],
                   );
                 },
-                child: const Text('Ya, Putuskan',
-                    style: TextStyle(color: Colors.red)),
+                child: Text(breakButtonText,
+                    style: const TextStyle(color: Colors.red)),
               ),
             ],
           ),
@@ -2655,6 +2675,533 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       actions.removeWhere((act) => act.label == 'Bercinta / Make Love' || act.label == 'Ajak Masturbasi Bersama');
       actions.insertAll(0, topActions);
     }
+
+    // --- TAMBAHAN TOMBOL SEKOLAHKAN ANAK ---
+    final bool isChildTarget = isChild || widget.targetRole == 'Anak' || cleanRoleLower == 'anak' || cleanRoleLower == 'laki-laki' || cleanRoleLower == 'perempuan';
+    if (isChildTarget) {
+      Map<String, String>? childData;
+      final String cleanSearchTarget = getCleanName(widget.targetName).replaceAll(' (Wafat)', '').trim().toLowerCase();
+      for (var c in widget.character.children) {
+        final String cleanCName = getCleanName(c['name'] ?? '').replaceAll(' (Wafat)', '').trim().toLowerCase();
+        if (cleanCName == cleanSearchTarget || cleanSearchTarget.contains(cleanCName) || cleanCName.contains(cleanSearchTarget)) {
+          childData = c;
+          break;
+        }
+      }
+      if (childData != null) {
+        final int childAge = int.tryParse(childData['age'] ?? '0') ?? 0;
+        final String schoolStatusSD = childData['schoolSD'] ?? 'Belum Sekolah';
+        final String schoolStatusSMP = childData['schoolSMP'] ?? 'Belum Sekolah';
+        final String schoolStatusSMA = childData['schoolSMA'] ?? 'Belum Sekolah';
+
+        bool canEnroll = false;
+        String schoolLevel = '';
+        if (childAge >= 6 && childAge < 12 && schoolStatusSD != 'Sekolah Negeri' && schoolStatusSD != 'Sekolah Swasta') {
+          canEnroll = true;
+          schoolLevel = 'SD';
+        } else if (childAge >= 12 && childAge < 15 && schoolStatusSMP != 'Sekolah Negeri' && schoolStatusSMP != 'Sekolah Swasta') {
+          canEnroll = true;
+          schoolLevel = 'SMP';
+        } else if (childAge >= 15 && childAge < 18 && schoolStatusSMA != 'Sekolah Negeri' && schoolStatusSMA != 'Sekolah Swasta') {
+          canEnroll = true;
+          schoolLevel = 'SMA';
+        }
+
+        if (canEnroll) {
+          actions.add(ActionItem(
+            label: 'Sekolahkan Anak 🏫',
+            icon: Icons.school,
+            color: Colors.indigo,
+            onTap: () {
+              final screenContext = context;
+              final isDark = Theme.of(screenContext).brightness == Brightness.dark;
+              showDialog(
+                context: screenContext,
+                barrierDismissible: true,
+                builder: (dialogContext) => AlertDialog(
+                  backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+                  title: Row(
+                    children: [
+                      Icon(Icons.school, color: Colors.blue.shade700),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Pendaftaran Sekolah $schoolLevel',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                      ),
+                      // X BUTTON
+                      IconButton(
+                        icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black45, size: 20),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        onPressed: () => Navigator.pop(dialogContext),
+                      ),
+                    ],
+                  ),
+                  content: Text(
+                    'Anakmu, ${widget.targetName}, telah memasuki usia $childAge tahun dan siap untuk masuk ke Sekolah $schoolLevel. Pilih jenis sekolah:',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                  actions: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade700,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                            childData!['school$schoolLevel'] = 'Sekolah Negeri';
+                            _updateRelationship(15);
+                            _updateState();
+                            _showResultDialog(
+                              'Pendaftaran Sukses 🎓',
+                              'Kamu berhasil menyekolahkan ${widget.targetName} ke Sekolah Negeri ($schoolLevel) secara gratis. Anakmu senang sekali!',
+                              Icons.done,
+                              Colors.green,
+                              () {}
+                            );
+                          },
+                          child: const Text('🏫 Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(height: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.purple.shade600,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: () {
+                            Navigator.pop(dialogContext);
+                            if (widget.character.money < 1500) {
+                              _showResultDialog(
+                                'Uang Tidak Cukup 💸',
+                                'Kamu tidak memiliki cukup uang untuk menyekolahkan anakmu ke Sekolah Swasta (\$1,500).',
+                                Icons.block,
+                                Colors.red,
+                                () {}
+                              );
+                            } else {
+                              widget.character.money -= 1500;
+                              childData!['school$schoolLevel'] = 'Sekolah Swasta';
+                              _updateRelationship(25);
+                              _updateState();
+                              _showResultDialog(
+                                'Pendaftaran Sukses 🎓',
+                                'Kamu membayar \$1,500 untuk menyekolahkan ${widget.targetName} ke Sekolah Swasta Unggulan ($schoolLevel). Kecerdasan anakmu bertambah! (+25% hubungan)',
+                                Icons.done,
+                                Colors.purple,
+                                () {}
+                              );
+                            }
+                          },
+                          child: const Text('🏛️ Sekolah Swasta (\$1,500)', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                        const SizedBox(height: 8),
+                        TextButton(
+                          onPressed: () => Navigator.pop(dialogContext),
+                          child: const Text('Batal'),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+          ));
+        }
+
+        // --- TOMBOL GAYA PENGASUHAN ---
+        final String currentStyle = widget.character.parentingStyles[widget.targetName] ?? 'Balanced';
+        final Map<String, Map<String, dynamic>> stylesData = {
+          'Strict': {
+            'emoji': '🗡️',
+            'color': Colors.red.shade700,
+            'desc': 'Keras & Disiplin — Kecerdasan naik, Kebahagiaan turun. Risiko anak kabur tinggi.',
+          },
+          'Balanced': {
+            'emoji': '⚖️',
+            'color': Colors.blue.shade600,
+            'desc': 'Seimbang & Otoritatif — Semua statistik berkembang merata.',
+          },
+          'Loose': {
+            'emoji': '🕊️',
+            'color': Colors.green.shade600,
+            'desc': 'Bebas & Permisif — Kebahagiaan sangat tinggi, Disiplin rendah.',
+          },
+          'Neglectful': {
+            'emoji': '👻',
+            'color': Colors.grey.shade600,
+            'desc': 'Abai — Anak lebih mandiri tapi rentan kenakalan.',
+          },
+        };
+
+        actions.add(ActionItem(
+          label: 'Gaya Pengasuhan: $currentStyle ${stylesData[currentStyle]?['emoji'] ?? ''}',
+          icon: Icons.family_restroom,
+          color: (stylesData[currentStyle]?['color'] as Color?) ?? Colors.blue,
+          onTap: () {
+            final screenContext = context;
+            final isDark = Theme.of(screenContext).brightness == Brightness.dark;
+            showDialog(
+              context: screenContext,
+              barrierDismissible: true,
+              builder: (dialogContext) {
+                String selectedStyle = currentStyle;
+                return StatefulBuilder(
+                  builder: (ctx, setModalState) => AlertDialog(
+                    backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+                    title: Row(
+                      children: [
+                        const Icon(Icons.family_restroom, color: Colors.teal),
+                        const SizedBox(width: 8),
+                        const Expanded(
+                          child: Text('Terapkan Gaya Pengasuhan',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                        ),
+                        // X BUTTON
+                        IconButton(
+                          icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black45, size: 20),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => Navigator.pop(dialogContext),
+                        ),
+                      ],
+                    ),
+                    content: SizedBox(
+                      width: double.maxFinite,
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: stylesData.entries.map((entry) {
+                          final String styleKey = entry.key;
+                          final String emoji = entry.value['emoji'] as String;
+                          final Color styleColor = entry.value['color'] as Color;
+                          final String desc = entry.value['desc'] as String;
+                          final bool isSelected = selectedStyle == styleKey;
+                          return GestureDetector(
+                            onTap: () => setModalState(() => selectedStyle = styleKey),
+                            child: AnimatedContainer(
+                              duration: const Duration(milliseconds: 200),
+                              margin: const EdgeInsets.only(bottom: 8),
+                              padding: const EdgeInsets.all(12),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? styleColor.withOpacity(0.15)
+                                    : (isDark ? Colors.grey.shade800 : Colors.grey.shade50),
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: isSelected ? styleColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                                  width: isSelected ? 2 : 1,
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(emoji, style: const TextStyle(fontSize: 22)),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          styleKey,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.bold,
+                                            color: isSelected ? styleColor : (isDark ? Colors.white : Colors.black87),
+                                          ),
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          desc,
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: isDark ? Colors.white54 : Colors.black54,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  if (isSelected)
+                                    Icon(Icons.check_circle, color: styleColor, size: 20),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    actions: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(dialogContext),
+                            child: const Text('Batal'),
+                          ),
+                          const SizedBox(width: 8),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (stylesData[selectedStyle]?['color'] as Color?) ?? Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                            onPressed: () {
+                              Navigator.pop(dialogContext);
+                              widget.character.parentingStyles[widget.targetName] = selectedStyle;
+
+                              // Efek gaya asuh pada statistik anak
+                              if (childData != null) {
+                                switch (selectedStyle) {
+                                  case 'Strict':
+                                    final int rel = int.tryParse(childData['relationship'] ?? '80') ?? 80;
+                                    childData['relationship'] = (rel - 10).clamp(0, 100).toString();
+                                    break;
+                                  case 'Balanced':
+                                    break;
+                                  case 'Loose':
+                                    final int relL = int.tryParse(childData['relationship'] ?? '80') ?? 80;
+                                    childData['relationship'] = (relL + 10).clamp(0, 100).toString();
+                                    break;
+                                  case 'Neglectful':
+                                    final int relN = int.tryParse(childData['relationship'] ?? '80') ?? 80;
+                                    childData['relationship'] = (relN - 15).clamp(0, 100).toString();
+                                    break;
+                                }
+                              }
+
+                              _updateState();
+                              final String newEmoji = stylesData[selectedStyle]?['emoji'] as String? ?? '';
+                              _showResultDialog(
+                                'Gaya Asuh Diterapkan $newEmoji',
+                                'Kamu menerapkan gaya pengasuhan $selectedStyle untuk ${widget.targetName}. Efeknya akan terasa seiring berjalannya waktu.',
+                                Icons.check_circle,
+                                (stylesData[selectedStyle]?['color'] as Color?) ?? Colors.blue,
+                                () {},
+                              );
+                            },
+                            child: const Text('Terapkan', style: TextStyle(fontWeight: FontWeight.bold)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
+        ));
+
+        // --- AKSI PENGASUHAN KHUSUS ---
+        if (childAge >= 3) {
+          // Marahi Anak (Strict)
+          actions.add(ActionItem(
+            label: 'Marahi Anak 😠',
+            icon: Icons.record_voice_over,
+            color: Colors.red.shade700,
+            onTap: () {
+              final int relChange = -(_random.nextInt(10) + 5);
+              final String result;
+              if (currentStyle == 'Strict') {
+                result = '${widget.targetName} menundukkan kepala, patuh walaupun tampak ketakutan. Disiplin meningkat tapi hubungan menurun ($relChange%).';  
+              } else if (currentStyle == 'Loose') {
+                result = '${widget.targetName} justru menangis dan marah balik! Hubungan menurun lebih drastis (${relChange * 2}%).';
+              } else {
+                result = '${widget.targetName} terdiam dan menuruti kemauanmu. Hubungan sedikit menurun ($relChange%).';
+              }
+              _showResultDialog(
+                'Marahi Anak 😠',
+                result,
+                Icons.record_voice_over,
+                Colors.red.shade700,
+                () {
+                  final int actualChange = currentStyle == 'Loose' ? relChange * 2 : relChange;
+                  _updateRelationship(actualChange);
+                  _updateState();
+                },
+              );
+            },
+          ));
+
+          // Beri Hadiah (Loose)
+          actions.add(ActionItem(
+            label: 'Beri Hadiah 🎁',
+            icon: Icons.card_giftcard,
+            color: Colors.orange.shade700,
+            onTap: () {
+              if (widget.character.money < 50) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk membeli hadiah (\$50).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+                return;
+              }
+              final int relGain = _random.nextInt(10) + 10;
+              final String result;
+              if (currentStyle == 'Loose') {
+                result = '${widget.targetName} sangat gembira menerima hadiahmu! Hubungan naik drastis (+${relGain + 5}%).';
+              } else if (currentStyle == 'Strict') {
+                result = '${widget.targetName} menerima hadiah dengan sopan, tapi tidak terlalu ekspresif. Hubungan naik sedikit (+${relGain ~/ 2}%).';
+              } else {
+                result = '${widget.targetName} langsung memelukmu karena senang! Hubungan naik (+$relGain%).';
+              }
+              _showResultDialog(
+                'Beri Hadiah 🎁',
+                result,
+                Icons.card_giftcard,
+                Colors.orange.shade700,
+                () {
+                  widget.character.money -= 50;
+                  final int actual = currentStyle == 'Loose' ? relGain + 5 : currentStyle == 'Strict' ? relGain ~/ 2 : relGain;
+                  _updateRelationship(actual);
+                  _updateState();
+                },
+              );
+            },
+          ));
+
+          // Ajak Diskusi (Balanced)
+          actions.add(ActionItem(
+            label: 'Ajak Diskusi 💬',
+            icon: Icons.forum,
+            color: Colors.blue.shade600,
+            onTap: () {
+              final int relGain = _random.nextInt(5) + 5;
+              final String result;
+              if (currentStyle == 'Balanced') {
+                result = '${widget.targetName} terbuka dan menikmati diskusi bersamamu. Hubungan dan kecerdasan meningkat (+$relGain%).';
+              } else if (currentStyle == 'Strict') {
+                result = '${widget.targetName} mendengarkan dengan serius, tapi tidak banyak berbicara. Hubungan sedikit naik (+${relGain ~/ 2}%).';
+              } else {
+                result = '${widget.targetName} malah mengajakmu bermain daripada berdiskusi serius, tapi tetap menyenangkan! Hubungan naik (+$relGain%).';
+              }
+              _showResultDialog(
+                'Ajak Diskusi 💬',
+                result,
+                Icons.forum,
+                Colors.blue.shade600,
+                () {
+                  final int actual = currentStyle == 'Strict' ? relGain ~/ 2 : relGain;
+                  _updateRelationship(actual);
+                  widget.character.intelligence = (widget.character.intelligence + 2).clamp(0, 100);
+                  _updateState();
+                },
+              );
+            },
+          ));
+        }
+
+        // Tampilkan Opsi Arah Hidup jika anak berusia >= 18 tahun dan berstatus Pengangguran
+        final String choice18 = childData['choice18'] ?? 'Belum';
+        if (childAge >= 18 && (choice18 == 'Biarkan' || choice18 == 'Belum' || choice18 == 'Suruh Nikah')) {
+          actions.add(ActionItem(
+            label: 'Suruh Kuliah 🎓',
+            icon: Icons.school,
+            color: Colors.blue.shade700,
+            onTap: () {
+              final List<String> allMajors = [
+                'Teknik Informatika', 'Sistem Informasi', 'Teknik Sipil', 'Teknik Elektro', 'Teknik Mesin', 'Arsitektur',
+                'Kedokteran', 'Farmasi', 'Keperawatan',
+                'Manajemen', 'Akuntansi', 'Perbankan & Keuangan',
+                'Hukum', 'Hubungan Internasional', 'Ilmu Komunikasi', 'Psikologi'
+              ];
+              final String randomMajor = allMajors[Random().nextInt(allMajors.length)];
+
+              childData!['choice18'] = 'Suruh Kuliah';
+              childData['schoolSD'] = 'Kuliah';
+              childData['schoolSMP'] = 'Kuliah';
+              childData['schoolSMA'] = 'Kuliah';
+              childData['univMajor'] = randomMajor;
+              widget.character.inbox.add('🎓 Arah Hidup: Kamu menyuruh ${widget.targetName} untuk melanjutkan pendidikan ke jenjang Kuliah (Jurusan $randomMajor).');
+              _updateRelationship(15);
+              _updateState();
+              _showResultDialog(
+                'Keputusan Kuliah 🎓',
+                '${widget.targetName} menuruti saranmu dan mendaftarkan diri ke Universitas mengambil jurusan $randomMajor! Hubungan meningkat (+15% hubungan).',
+                Icons.done,
+                Colors.blue.shade700,
+                () {}
+              );
+            },
+          ));
+
+          actions.add(ActionItem(
+            label: 'Suruh Kerja 💼',
+            icon: Icons.work,
+            color: Colors.green.shade700,
+            onTap: () {
+              childData!['choice18'] = 'Suruh Kerja';
+              childData['schoolSD'] = 'Bekerja';
+              childData['schoolSMP'] = 'Bekerja';
+              childData['schoolSMA'] = 'Bekerja';
+              widget.character.inbox.add('💼 Arah Hidup: Kamu menyuruh ${widget.targetName} untuk mulai bekerja mencari nafkah.');
+              _updateRelationship(10);
+              _updateState();
+              _showResultDialog(
+                'Keputusan Kerja 💼',
+                '${widget.targetName} mulai menyusun curriculum vitae (CV) dan mencari pekerjaan lowongan terdekat. Hubungan meningkat (+10% hubungan).',
+                Icons.done,
+                Colors.green.shade700,
+                () {}
+              );
+            },
+          ));
+
+          actions.add(ActionItem(
+            label: 'Suruh Nikah 💍',
+            icon: Icons.favorite,
+            color: Colors.pink.shade600,
+            onTap: () {
+              childData!['choice18'] = 'Suruh Nikah';
+              widget.character.inbox.add('💍 Arah Hidup: Kamu menyuruh ${widget.targetName} untuk segera mencari pasangan hidup dan menikah.');
+              _updateRelationship(-5);
+              _updateState();
+              _showResultDialog(
+                'Suruh Nikah 💍',
+                '${widget.targetName} merasa tertekan atas permintaan menikah muda ini, namun setuju untuk mulai menjalin asmara. Hubungan sedikit menurun (-5% hubungan).',
+                Icons.done,
+                Colors.pink.shade600,
+                () {}
+              );
+            },
+          ));
+        }
+      }
+    }
+
+    actions.removeWhere((act) {
+      if (act.label == 'Ajak Masturbasi Bersama' && !AdultFeatures.canMasturbateTogether()) {
+        return true;
+      }
+      if (act.label == 'Bercinta / Make Love') {
+        final String roleLower = widget.targetRole.toLowerCase();
+        if (roleLower == 'istri' || roleLower == 'suami' || roleLower == 'pasangan') {
+          return false; // Selalu boleh bercinta dengan pasangan sah (tidak dihapus)
+        }
+        if (!AdultFeatures.canMakeLove(
+          userAge: widget.character.age,
+          role: widget.targetRole,
+          relation: widget.targetRole,
+        )) {
+          return true;
+        }
+      }
+      return false;
+    });
     // -------------------------------------------------------------
 
     // --- TAMBAHAN: TOMBOL AJAK BALIKAN UNTUK MANTAN PACAR (BISA LEWAT MENU HUBUNGAN) ---
@@ -3039,9 +3586,73 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                       }
 
                       final jobInfo = widget.character.getNPCJobInfo(widget.targetName, widget.targetRole);
+                      
+                      // Dapatkan detail level sekolah anak jika target adalah anak kandung
+                      String detailSchool = 'Sekolah/Kuliah';
+                      final String cleanRoleLower = widget.targetRole.toLowerCase();
+                      final bool isChildTarget = cleanRoleLower == 'laki-laki' || cleanRoleLower == 'perempuan' || widget.targetRole == 'Anak';
+                      if (isChildTarget) {
+                        Map<String, String>? childData;
+                        for (var c in widget.character.children) {
+                          if (c['name'] == widget.targetName || widget.targetName.startsWith(c['name'] ?? '___')) {
+                            childData = c;
+                            break;
+                          }
+                        }
+                        if (childData != null) {
+                          final int childAge = int.tryParse(childData['age'] ?? '0') ?? 0;
+                          final String schoolSD = childData['schoolSD'] ?? 'Belum Sekolah';
+                          final String schoolSMP = childData['schoolSMP'] ?? 'Belum Sekolah';
+                          final String schoolSMA = childData['schoolSMA'] ?? 'Belum Sekolah';
+                          final String choice18 = childData['choice18'] ?? 'Belum';
+                          
+                          if (schoolSD != 'Belum Sekolah' && schoolSD != '') {
+                            detailSchool = 'Sekolah Dasar ($schoolSD)';
+                          }
+                          if (schoolSMP != 'Belum Sekolah' && schoolSMP != '') {
+                            detailSchool = 'SMP ($schoolSMP)';
+                          }
+                          if (schoolSMA != 'Belum Sekolah' && schoolSMA != '') {
+                            detailSchool = 'SMA ($schoolSMA)';
+                          }
+                           if (childAge >= 18) {
+                            if (choice18 == 'Biarkan' || choice18 == 'Belum' || choice18 == 'Suruh Nikah') {
+                              detailSchool = 'Pengangguran';
+                            } else if (choice18 == 'Suruh Kuliah') {
+                              final String major = childData['univMajor'] ?? 'Umum';
+                              detailSchool = 'Kuliah ($major)';
+                            } else if (choice18 == 'Suruh Kerja') {
+                              detailSchool = 'Bekerja';
+                            } else {
+                              final String major = childData['univMajor'] ?? 'Umum';
+                              detailSchool = 'Kuliah/Lulus ($major)';
+                            }
+                          } else if (schoolSD == 'Belum Sekolah' && schoolSMP == 'Belum Sekolah' && schoolSMA == 'Belum Sekolah') {
+                            detailSchool = 'Belum Sekolah';
+                          }
+                        }
+                      }
+
                       final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
-                          ? 'Status: Sekolah/Kuliah'
+                          ? 'Status Pendidikan: $detailSchool'
                           : 'Pekerjaan: ${jobInfo['job']} (Gaji: \$${jobInfo['salary']}/bln)';
+
+                      // --- Status Hubungan Anak ---
+                      String? childPartnerName;
+                      String? childPartnerGender;
+                      if (isChildTarget) {
+                        Map<String, String>? cData;
+                        for (var c in widget.character.children) {
+                          if (c['name'] == widget.targetName || widget.targetName.startsWith(c['name'] ?? '___')) {
+                            cData = c;
+                            break;
+                          }
+                        }
+                        if (cData != null) {
+                          childPartnerName = cData['partnerName'];
+                          childPartnerGender = cData['partnerGender'];
+                        }
+                      }
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3084,6 +3695,64 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               color: isDark ? Colors.white70 : Colors.black87,
                             ),
                           ),
+                          if (isChildTarget) ...[ 
+                            const SizedBox(height: 4),
+                            childPartnerName != null && childPartnerName.isNotEmpty
+                                ? GestureDetector(
+                                    onTap: () {
+                                      // Navigasi ke ActionMenuScreen pasangan anak
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (ctx) => ActionMenuScreen(
+                                            character: widget.character,
+                                            targetName: childPartnerName!,
+                                            targetRole: childPartnerGender ?? 'Pacar',
+                                          ),
+                                        ),
+                                      ).then((_) => _updateState());
+                                    },
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.favorite, size: 13, color: Colors.pink.shade400),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          'Status Hubungan: Berpacaran dengan ',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                            color: isDark ? Colors.white60 : Colors.black54,
+                                          ),
+                                        ),
+                                        Text(
+                                          childPartnerName,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.pink.shade400,
+                                            decoration: TextDecoration.underline,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Icon(Icons.open_in_new, size: 11, color: Colors.pink.shade400),
+                                      ],
+                                    ),
+                                  )
+                                : Row(
+                                    children: [
+                                      Icon(Icons.person_outline, size: 13, color: isDark ? Colors.white54 : Colors.black45),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Status Hubungan: Single',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                          color: isDark ? Colors.white60 : Colors.black54,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ],
                         ],
                       );
                     }),
@@ -3193,6 +3862,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   }
 
   ActionItem _buildAjakMasturbasiAction() {
+    if (!AdultFeatures.canMasturbateTogether()) {
+      // Mengembalikan placeholder ActionItem dengan label kosong yang akan di-filter keluar atau tidak tampil.
+      // Kita bisa buat visibility guard, atau melempar ActionItem khusus.
+      // Tetapi cara paling aman adalah memeriksa AdultFeatures.canMasturbateTogether() saat tombol ditambahkan ke list.
+    }
     return ActionItem(
       label: 'Ajak Masturbasi Bersama',
       icon: Icons.flash_on,

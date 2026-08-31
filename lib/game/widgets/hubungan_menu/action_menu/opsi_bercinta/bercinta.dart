@@ -289,20 +289,25 @@ class _BercintaScreenState extends State<BercintaScreen> {
     // Di Hotel: 20%
     if (success) {
       int caughtChance = 0;
-      if (_chosenLocation.contains('Rumah')) {
-        final String t = _chosenTime.toLowerCase();
-        if (t.contains('pagi')) {
-          caughtChance = 50;
-        } else if (t.contains('siang') || t.contains('sore')) {
-          caughtChance = 55;
-        } else if (t.contains('malam')) {
-          caughtChance = 15;
+      final String trLower = widget.targetRole.toLowerCase();
+      final bool isSpouse = trLower == 'istri' || trLower == 'suami' || trLower == 'pasangan';
+
+      if (!isSpouse) {
+        if (_chosenLocation.contains('Rumah')) {
+          final String t = _chosenTime.toLowerCase();
+          if (t.contains('pagi')) {
+            caughtChance = 50;
+          } else if (t.contains('siang') || t.contains('sore')) {
+            caughtChance = 55;
+          } else if (t.contains('malam')) {
+            caughtChance = 15;
+          }
+        } else if (_chosenLocation.contains('Hotel')) {
+          caughtChance = 20;
         }
-      } else if (_chosenLocation.contains('Hotel')) {
-        caughtChance = 20;
       }
 
-      if (_random.nextInt(100) < caughtChance) {
+      if (caughtChance > 0 && _random.nextInt(100) < caughtChance) {
         // Gagal karena ketahuan!
         success = false;
         // Pinalti hubungan dengan target

@@ -754,6 +754,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
                       final bool isDeceased = child['isDeceased'] == 'true';
                       final bool isMale = gender == 'Laki-laki';
+                      final String parentingStyle = character.parentingStyles[name] ?? 'Balanced';
 
                       return _buildChildItem(
                         context,
@@ -764,6 +765,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: relVal,
                         ageText: '$childAge tahun',
                         isDeceased: isDeceased,
+                        parentingStyle: parentingStyle,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: name,
                           gender: gender,
@@ -1032,6 +1034,7 @@ Text('Umur: $ageText',
     required String ageText,
     bool isDeceased = false,
     String? avatarUrl,
+    String parentingStyle = 'Balanced',
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
@@ -1125,7 +1128,32 @@ Text('Umur: $ageText',
                   ),
                 ),
                 if (!isDeceased) ...[
-                  const SizedBox(width: 8),
+                  const SizedBox(width: 4),
+                  // Badge Gaya Asuh
+                  Builder(builder: (context) {
+                    final Map<String, dynamic> styleInfo = {
+                      'Strict':     {'emoji': '🗡️', 'color': Colors.red.shade700},
+                      'Balanced':   {'emoji': '⚖️', 'color': Colors.blue.shade600},
+                      'Loose':      {'emoji': '🕊️', 'color': Colors.green.shade600},
+                      'Neglectful': {'emoji': '👻', 'color': Colors.grey.shade600},
+                    };
+                    final info = styleInfo[parentingStyle] ?? styleInfo['Balanced']!;
+                    final Color badgeColor = info['color'] as Color;
+                    final String emoji = info['emoji'] as String;
+                    return Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: badgeColor.withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(6),
+                        border: Border.all(color: badgeColor.withOpacity(0.4)),
+                      ),
+                      child: Text(
+                        '$emoji $parentingStyle',
+                        style: TextStyle(fontSize: 9, fontWeight: FontWeight.bold, color: badgeColor),
+                      ),
+                    );
+                  }),
+                  const SizedBox(width: 4),
                   const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                 ],
               ],

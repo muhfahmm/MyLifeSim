@@ -360,6 +360,19 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
+  void _runAgeUpSequence(List<String> sicknessEvents) {
+    _handleSicknessSequence(sicknessEvents, () {
+      _checkAdikRequestMoney(() {
+        _checkSchoolEnrollmentOptions(() {
+          _checkChildrenEvents(() {
+            _checkGraduationOptions();
+            _checkEsportPromotion();
+          });
+        });
+      });
+    });
+  }
+
   void _ageUp() {
     List<String> events = [];
     setState(() {
@@ -451,14 +464,7 @@ class _GameScreenState extends State<GameScreen> {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(context);
-                    _handleSicknessSequence(sicknessEvents, () {
-                      _checkAdikRequestMoney(() {
-                        _checkSchoolEnrollmentOptions(() {
-                          _checkGraduationOptions();
-                          _checkEsportPromotion();
-                        });
-                      });
-                    });
+                    _runAgeUpSequence(sicknessEvents);
                   },
                   child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -467,22 +473,10 @@ class _GameScreenState extends State<GameScreen> {
           },
         );
       } else {
-        _handleSicknessSequence(sicknessEvents, () {
-          _checkAdikRequestMoney(() {
-            _checkSchoolEnrollmentOptions(() {
-              _checkGraduationOptions();
-              _checkEsportPromotion();
-            });
-          });
-        });
+        _runAgeUpSequence(sicknessEvents);
       }
     } else {
-      _checkAdikRequestMoney(() {
-        _checkSchoolEnrollmentOptions(() {
-          _checkGraduationOptions();
-          _checkEsportPromotion();
-        });
-      });
+      _runAgeUpSequence([]);
     }
   }
 
@@ -798,7 +792,908 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _checkChildrenEvents(VoidCallback onDone) {
+    if (!_character.isAlive || _character.children.isEmpty) {
+      onDone();
+      return;
+    }
+
+    final rand = Random();
+    final List<Map<String, String>> aliveKids = _character.children.where((c) => c['isDeceased'] != 'true').toList();
+
+    if (aliveKids.isEmpty) {
+      onDone();
+      return;
+    }
+
+    // Ambil satu anak secara acak untuk memicu event agar tidak menumpuk terlalu banyak modal sekaligus
+    final child = aliveKids[rand.nextInt(aliveKids.length)];
+    final String kidName = child['name'] ?? 'Anak';
+    final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+    final int childIndex = _character.children.indexOf(child);
+
+    // Roll peluang event acak (30% peluang muncul kejadian)
+    if (rand.nextInt(100) >= 30) {
+      onDone();
+      return;
+    }
+
+    final int eventRoll = rand.nextInt(5); // 0: Sakit, 1: Minta Uang Jajan/HP, 2: Pacaran, 3: Restu Nikah, 4: Kabar Hamil
+
+    // 1. Logika Anak Sakit (Semua Umur)
+    if (eventRoll == 0) {
+      final List<String> sicknessTypes = ['Flu Berat 🤒', 'Demam Tinggi 🌡️', 'Demam Berdarah (DBD) 🦟', 'Radang Tenggorokan 🗣️', 'Diare Akut 🚽'];
+      final String sickness = sicknessTypes[rand.nextInt(sicknessTypes.length)];
+      final int cost = 200 + rand.nextInt(300);
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (ctx) => AlertDialog(
+          title: Row(
+            children: [
+              const Icon(Icons.healing, color: Colors.red),
+              const SizedBox(width: 8),
+              Text('Anak Sakit: $kidName 🤒', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          content: Text(
+            'Anakmu, $kidName (Umur: $childAge tahun), didiagnosis menderita penyakit $sickness.\n\n'
+            'Biaya perawatan medis yang dibutuhkan adalah sebesar \$$cost.',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (_character.money < cost) {
+                      _character.updateRelationshipValue(kidName, -15);
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('Uang Tidak Cukup 💸', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: const Text('Uangmu tidak mencukupi untuk membiayai pengobatan anakmu. Kondisinya semakin memburuk dan ia merasa kecewa.'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
+                          ],
+                        ),
+                      );
+                    } else {
+                      _character.money -= cost;
+                      _character.updateRelationshipValue(kidName, 20);
+                      _character.inbox.add('🏥 Medis Anak: Kamu membayar \$$cost untuk mengobati penyakit $sickness dari $kidName.');
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('Pengobatan Sukses 🩺', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('Kamu membiayai pengobatan $kidName. Kesehatannya berangsur pulih dan hubungannya denganmu membaik! (+20% hubungan)'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  child: Text('Biayai Pengobatan (\$$cost)', style: const TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _character.updateRelationshipValue(kidName, -25);
+                    _character.inbox.add('💔 Medis Anak: Kamu mengabaikan penyakit $sickness dari $kidName.');
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Abaikan Sakit 😔', style: TextStyle(fontWeight: FontWeight.bold)),
+                        content: Text('Kamu mengabaikan rasa sakit $kidName. Hubungan kalian memburuk drastis (-25% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
+                        ],
+                      ),
+                    );
+                  },
+                  child: const Text('Biarkan Saja (Abaikan)', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    }
+    // 2. Logika Minta Uang / Minta Gadget / HP (Usia 6-12 dan Remaja)
+    else if (eventRoll == 1) {
+      if (childAge >= 6 && childAge <= 12) {
+        // Minta uang jajan biasa
+        final int amount = 10 + rand.nextInt(20);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.monetization_on, color: Colors.amber),
+                const SizedBox(width: 8),
+                Text('Minta Uang Jajan: $kidName 💵', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            content: Text(
+              'Anakmu, $kidName (Umur: $childAge tahun), merengek meminta uang jajan tambahan sebesar \$$amount untuk membeli camilan di sekolah.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _character.updateRelationshipValue(kidName, -10);
+                  setState(() {});
+                  showDialog(
+                    context: this.context,
+                    builder: (resCtx) => AlertDialog(
+                      title: const Text('Tolak Permintaan 🚫'),
+                      content: Text('Kamu menolak memberikan uang jajan. $kidName merengut kesal (-10% hubungan).'),
+                      actions: [
+                        TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  if (_character.money < amount) {
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Uang Tidak Cukup 💸'),
+                        content: const Text('Uangmu tidak cukup untuk memenuhi permintaan anakmu.'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  } else {
+                    _character.money -= amount;
+                    _character.updateRelationshipValue(kidName, 12);
+                    _character.inbox.add('💵 Uang Jajan: Kamu memberikan uang jajan \$$amount kepada $kidName.');
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Permintaan Dipenuhi 💖'),
+                        content: Text('Kamu memberikan uang jajan kepada $kidName. Dia melompat kegirangan! (+12% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Beri Uang', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      } else if (childAge >= 13 && childAge <= 17) {
+        // Remaja: Minta Uang Nongkrong / HP Baru
+        final bool askForHP = rand.nextBool();
+        if (askForHP) {
+          final int hpCost = 400 + rand.nextInt(300);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: Row(
+                children: [
+                  const Icon(Icons.phone_android, color: Colors.purple),
+                  const SizedBox(width: 8),
+                  Text('Minta Gadget: $kidName 📱', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              content: Text(
+                'Anakmu yang sedang beranjak remaja, $kidName (Umur: $childAge tahun), meminta dibelikan smartphone baru seharga \$$hpCost karena HP lamanya sudah lambat dan rusak.',
+                style: const TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _character.updateRelationshipValue(kidName, -15);
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Tolak Permintaan 🚫'),
+                        content: Text('Kamu menolak membelikannya HP baru. $kidName mengurung diri di kamarnya karena malu (-15% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  },
+                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (_character.money < hpCost) {
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('Uang Tidak Cukup 💸'),
+                          content: const Text('Kamu tidak memiliki cukup uang untuk membelikan smartphone tersebut.'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                          ],
+                        ),
+                      );
+                    } else {
+                      _character.money -= hpCost;
+                      _character.updateRelationshipValue(kidName, 25);
+                      _character.inbox.add('📱 Gadget Anak: Kamu membelikan smartphone baru seharga \$$hpCost untuk $kidName.');
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('HP Baru Dibeli 📱'),
+                          content: Text('Kamu membelikan smartphone baru untuk $kidName. Hubungan kalian meningkat pesat! (+25% hubungan).'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Beli HP', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+        } else {
+          // Minta Uang Nongkrong
+          final int hangoutCost = 50 + rand.nextInt(50);
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: Row(
+                children: [
+                  const Icon(Icons.people, color: Colors.blue),
+                  const SizedBox(width: 8),
+                  Text('Minta Uang Nongkrong ☕', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              content: Text(
+                'Anak remajamu, $kidName (Umur: $childAge tahun), meminta uang sebesar \$$hangoutCost agar bisa nongkrong dan jalan-jalan bersama teman-temannya di mall sore ini.',
+                style: const TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _character.updateRelationshipValue(kidName, -8);
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Tolak Permintaan 🚫'),
+                        content: Text('Kamu tidak memberi uang jajan nongkrong. Anakmu merengut kesal (-8% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  },
+                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    if (_character.money < hangoutCost) {
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('Uang Tidak Cukup 💸'),
+                          content: const Text('Uangmu tidak cukup untuk memberi jajan nongkrong.'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                          ],
+                        ),
+                      );
+                    } else {
+                      _character.money -= hangoutCost;
+                      _character.updateRelationshipValue(kidName, 12);
+                      _character.inbox.add('☕ Nongkrong Anak: Kamu memberi \$$hangoutCost kepada $kidName untuk nongkrong.');
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (resCtx) => AlertDialog(
+                          title: const Text('Uang Nongkrong Diberikan ☕'),
+                          content: Text('Kamu memberikan uang jajan nongkrong kepada $kidName. Dia berterima kasih sebelum pergi! (+12% hubungan).'),
+                          actions: [
+                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Beri Uang', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            ),
+          );
+        }
+      } else {
+        onDone();
+      }
+    }
+    // 3. Logika Pacaran Pertama (Remaja 16+)
+    else if (eventRoll == 2) {
+      if (childAge >= 16 && (child['hasPartner'] ?? 'false') != 'true') {
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.favorite, color: Colors.pinkAccent),
+                const SizedBox(width: 8),
+                Text('Pacaran Pertama: $kidName ❤️', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            content: Text(
+              'Anakmu, $kidName (Umur: $childAge tahun), mengaku tersipu malu bahwa ia sekarang sudah memiliki pacar pertama.\n\n'
+              'Dia meminta restu/persetujuan darimu mengenai pacarnya.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _character.updateRelationshipValue(kidName, -30);
+                  child['hasPartner'] = 'false';
+                  
+                  // Efek anak kabur dari rumah (25% peluang)
+                  final bool runAway = rand.nextInt(100) < 25;
+                  if (runAway) {
+                    child['isDeceased'] = 'true'; // Anggap hilang/pergi dari keluarga
+                    _character.inbox.add('🚨 Kabur: Karena dilarang pacaran, $kidName kabur dari rumah dan memutus semua hubungan!');
+                    _character.happiness = (_character.happiness - 35).clamp(0, 100);
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Anak Kabur dari Rumah! 🚨', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                        content: Text('Karena kamu melarang keras hubungan asmaranya, $kidName marah besar, mengemasi barang-barangnya, dan kabur dari rumah! Kamu kehilangan kontak dengannya (-35% kebahagiaan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  } else {
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Melarang Hubungan 🚫'),
+                        content: Text('Kamu melarang keras hubungan tersebut. $kidName menangis dan merasa sangat benci padamu (-30% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: const Text('Larang Keras / Marahi', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  child['hasPartner'] = 'true';
+                  _character.updateRelationshipValue(kidName, 30);
+                  _character.inbox.add('❤️ Restu Pacaran: Kamu merestui hubungan asmara pertama dari $kidName.');
+                  setState(() {});
+                  showDialog(
+                    context: this.context,
+                    builder: (resCtx) => AlertDialog(
+                      title: const Text('Restu Diberikan ❤️'),
+                      content: Text('Kamu memberi restu hangat untuk hubungan asmaranya. Hubunganmu dengannya meningkat drastis! (+30% hubungan).'),
+                      actions: [
+                        TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Beri Restu Warmly', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      } else {
+        onDone();
+      }
+    }
+    // 4. Logika Minta Restu Menikah (Usia 20+)
+    else if (eventRoll == 3) {
+      if (childAge >= 20 && (child['isMarried'] ?? 'false') != 'true') {
+        final int weddingCost = 5000 + rand.nextInt(10000);
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            title: Row(
+              children: [
+                const Icon(Icons.favorite, color: Colors.red),
+                const SizedBox(width: 8),
+                Text('Minta Restu Menikah: $kidName 💍', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            content: Text(
+              'Anakmu, $kidName (Umur: $childAge tahun), membawa pasangannya ke rumah untuk meminta restu pernikahan dari kamu.\n\n'
+              'Pernikahan direncanakan mewah dan membutuhkan biaya sebesar \$$weddingCost dari pihakmu.',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _character.updateRelationshipValue(kidName, -20);
+                  setState(() {});
+                  showDialog(
+                    context: this.context,
+                    builder: (resCtx) => AlertDialog(
+                      title: const Text('Restu Ditolak 🚫'),
+                      content: Text('Kamu menolak memberikan restu pernikahan. $kidName merasa sangat terpukul dan menjauhimu (-20% hubungan).'),
+                      actions: [
+                        TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Tolak Restu', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  if (_character.money < weddingCost) {
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Uang Tidak Cukup 💸'),
+                        content: const Text('Uangmu tidak cukup untuk membiayai resepsi pesta pernikahan anakmu.'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  } else {
+                    _character.money -= weddingCost;
+                    child['isMarried'] = 'true';
+                    _character.updateRelationshipValue(kidName, 35);
+                    _character.inbox.add('💍 Pernikahan Anak: Kamu membiayai pernikahan $kidName sebesar \$$weddingCost.');
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resCtx) => AlertDialog(
+                        title: const Text('Pernikahan Sukses! 🎉'),
+                        content: Text('Kamu merestui dan membiayai resepsi pernikahan $kidName dengan meriah! Hubungan kalian meningkat pesat (+35% hubungan).'),
+                        actions: [
+                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('OK'))
+                        ],
+                      ),
+                    );
+                  }
+                },
+                child: Text('Biayai Pernikahan (\$$weddingCost)', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          ),
+        );
+      } else {
+        onDone();
+      }
+    }
+    // 5. Kabar Kehamilan Anak (Usia 18-35)
+    else if (eventRoll == 4) {
+      if (childAge >= 18 && childAge <= 35 && (child['pregnantAnnounced'] ?? 'false') != 'true') {
+        final bool isMarried = child['isMarried'] == 'true';
+        final String relationText = child['gender'] == 'Perempuan' ? 'mengumumkan kehamilannya' : 'mengabarkan bahwa istrinya sedang hamil';
+        
+        child['pregnantAnnounced'] = 'true';
+        _character.inbox.add('🍼 Kabar Cucu: Anakmu, $kidName, $relationText!');
+        
+        if (!isMarried) {
+          // Melahirkan diluar nikah -> Kebahagiaan user turun
+          _character.happiness = (_character.happiness - 15).clamp(0, 100);
+          setState(() {});
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.child_care, color: Colors.orange),
+                  SizedBox(width: 8),
+                  Text('Kehamilan di Luar Nikah 🍼', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              content: Text(
+                'Anakmu, $kidName, $relationText!\n\n'
+                'Namun, karena mereka belum menikah secara sah, kabar kehamilan ini memicu gosip keluarga besar. Kebahagiaanmu menurun (-15% Kebahagiaan).',
+                style: const TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(onPressed: () { Navigator.pop(ctx); onDone(); }, child: const Text('Mengerti'))
+              ],
+            ),
+          );
+        } else {
+          _character.happiness = (_character.happiness + 20).clamp(0, 100);
+          setState(() {});
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              title: const Row(
+                children: [
+                  Icon(Icons.child_care, color: Colors.green),
+                  SizedBox(width: 8),
+                  Text('Kabar Cucu Baru! 👶', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ],
+              ),
+              content: Text(
+                'Kabar gembira! Anakmu, $kidName, $relationText!\n\n'
+                'Kamu akan segera menimang cucu baru dalam keluarga besar. Kebahagiaanmu melonjak drastis (+20% Kebahagiaan).',
+                style: const TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(onPressed: () { Navigator.pop(ctx); onDone(); }, child: const Text('Selamat! 🎉'))
+              ],
+            ),
+          );
+        }
+      } else {
+        onDone();
+      }
+    } else {
+      onDone();
+    }
+  }
+
   void _checkSchoolEnrollmentOptions(VoidCallback onDone) {
+    final List<Map<String, String>> kidsToEnroll = [];
+    final List<Map<String, String>> kidsGraduated18 = [];
+
+    for (var child in _character.children) {
+      final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+      final String schoolStatusSD = child['schoolSD'] ?? 'Belum Sekolah';
+      final String schoolStatusSMP = child['schoolSMP'] ?? 'Belum Sekolah';
+      final String schoolStatusSMA = child['schoolSMA'] ?? 'Belum Sekolah';
+      final String choice18 = child['choice18'] ?? 'Belum';
+
+      if (childAge == 6 && schoolStatusSD != 'Sekolah Negeri' && schoolStatusSD != 'Sekolah Swasta') {
+        kidsToEnroll.add({'name': child['name'] ?? 'Anak', 'age': '6', 'level': 'SD', 'childIndex': _character.children.indexOf(child).toString()});
+      } else if (childAge == 12 && schoolStatusSMP != 'Sekolah Negeri' && schoolStatusSMP != 'Sekolah Swasta') {
+        kidsToEnroll.add({'name': child['name'] ?? 'Anak', 'age': '12', 'level': 'SMP', 'childIndex': _character.children.indexOf(child).toString()});
+      } else if (childAge == 15 && schoolStatusSMA != 'Sekolah Negeri' && schoolStatusSMA != 'Sekolah Swasta') {
+        kidsToEnroll.add({'name': child['name'] ?? 'Anak', 'age': '15', 'level': 'SMA', 'childIndex': _character.children.indexOf(child).toString()});
+      } else if (childAge == 18 && choice18 == 'Belum') {
+        kidsGraduated18.add({'name': child['name'] ?? 'Anak', 'childIndex': _character.children.indexOf(child).toString()});
+      }
+    }
+
+    void processGraduation18(int idx, VoidCallback finishCallback) {
+      if (idx >= kidsGraduated18.length) {
+        finishCallback();
+        return;
+      }
+      final kid = kidsGraduated18[idx];
+      final String kidName = kid['name']!;
+      final int childIndex = int.parse(kid['childIndex']!);
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Row(
+              children: [
+                Icon(Icons.school, color: Colors.indigo.shade600),
+                const SizedBox(width: 8),
+                Text('Kelulusan Anak: $kidName 🎓', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ],
+            ),
+            content: Text(
+              'Anakmu, $kidName, telah resmi berusia 18 tahun dan menyelesaikan sekolahnya. Apa yang ingin kamu arahkan untuk masa depannya?',
+              style: const TextStyle(fontSize: 14),
+            ),
+            actions: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      final List<String> allMajors = [
+                        'Teknik Informatika', 'Sistem Informasi', 'Teknik Sipil', 'Teknik Elektro', 'Teknik Mesin', 'Arsitektur',
+                        'Kedokteran', 'Farmasi', 'Keperawatan',
+                        'Manajemen', 'Akuntansi', 'Perbankan & Keuangan',
+                        'Hukum', 'Hubungan Internasional', 'Ilmu Komunikasi', 'Psikologi'
+                      ];
+                      final String randomMajor = allMajors[Random().nextInt(allMajors.length)];
+                      
+                      _character.children[childIndex]['choice18'] = 'Suruh Kuliah';
+                      _character.children[childIndex]['schoolSD'] = 'Kuliah'; // Penanda status kuliah
+                      _character.children[childIndex]['schoolSMP'] = 'Kuliah';
+                      _character.children[childIndex]['schoolSMA'] = 'Kuliah';
+                      _character.children[childIndex]['univMajor'] = randomMajor;
+                      _character.inbox.add('🎓 Arah Hidup: Kamu menyuruh $kidName untuk melanjutkan pendidikan ke jenjang Kuliah (Jurusan $randomMajor).');
+                      _character.updateRelationshipValue(kidName, 15);
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Keputusan Kuliah 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('$kidName menuruti saranmu dan mendaftarkan diri ke Universitas mengambil jurusan $randomMajor! Hubungan meningkat (+15% hubungan).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                processGraduation18(idx + 1, finishCallback);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Text('Suruh Kuliah / Sekolah Tinggi', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.children[childIndex]['choice18'] = 'Suruh Kerja';
+                      _character.children[childIndex]['schoolSD'] = 'Bekerja'; // Penanda status bekerja
+                      _character.children[childIndex]['schoolSMP'] = 'Bekerja';
+                      _character.children[childIndex]['schoolSMA'] = 'Bekerja';
+                      _character.inbox.add('💼 Arah Hidup: Kamu menyuruh $kidName untuk mulai bekerja mencari nafkah.');
+                      _character.updateRelationshipValue(kidName, 10);
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Keputusan Kerja 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('$kidName mulai menyusun curriculum vitae (CV) dan mencari pekerjaan lowongan terdekat. Hubungan meningkat (+10% hubungan).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                processGraduation18(idx + 1, finishCallback);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Text('Suruh Kerja 💼', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.pink.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.children[childIndex]['choice18'] = 'Suruh Nikah';
+                      _character.inbox.add('💍 Arah Hidup: Kamu menyuruh $kidName untuk segera mencari pasangan hidup dan menikah.');
+                      _character.updateRelationshipValue(kidName, -5);
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Suruh Nikah 💍', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('$kidName merasa tertekan atas permintaan menikah muda ini, namun setuju untuk mulai menjalin asmara. Hubungan sedikit menurun (-5% hubungan).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                processGraduation18(idx + 1, finishCallback);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Text('Suruh Nikah 💍', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.children[childIndex]['choice18'] = 'Biarkan';
+                      _character.inbox.add('🍃 Arah Hidup: Kamu membebaskan $kidName untuk memilih jalannya sendiri.');
+                      _character.updateRelationshipValue(kidName, 20);
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (ctx) => AlertDialog(
+                          title: const Text('Bebaskan Pilihan 🍃', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('$kidName sangat berterima kasih atas kebebasan dan rasa percaya yang kamu berikan! Hubungan meningkat pesat (+20% hubungan).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(ctx);
+                                processGraduation18(idx + 1, finishCallback);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                    child: const Text('Biarkan Saja (Bebaskan Pilihan)', style: TextStyle(fontWeight: FontWeight.w600)),
+                  ),
+                ],
+              )
+            ],
+          );
+        },
+      );
+    }
+
+    void processKidsEnrollment(int index, VoidCallback next) {
+      if (index >= kidsToEnroll.length) {
+        processGraduation18(0, next);
+        return;
+      }
+      final kid = kidsToEnroll[index];
+      final String kidName = kid['name']!;
+      final String schoolLevel = kid['level']!;
+      final int childIndex = int.parse(kid['childIndex']!);
+      final int childAge = int.parse(kid['age']!);
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => AlertDialog(
+          title: Row(
+            children: [
+              Icon(Icons.school, color: Colors.blue.shade700),
+              const SizedBox(width: 8),
+              Text('Sekolahkan Anak: $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ],
+          ),
+          content: Text(
+            'Anakmu, $kidName, telah memasuki usia $childAge tahun dan siap untuk masuk ke Sekolah $schoolLevel. Pilih jenis sekolah yang ingin kamu daftarkan:',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Negeri';
+                    _character.inbox.add('🏫 Sekolah Anak: $kidName resmi masuk Sekolah Negeri ($schoolLevel) secara gratis.');
+                    setState(() {});
+                    showDialog(
+                      context: this.context,
+                      builder: (resContext) => AlertDialog(
+                        title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+                        content: Text('Kamu berhasil menyekolahkan $kidName ke Sekolah Negeri ($schoolLevel) secara gratis. Anakmu senang sekali!'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(resContext);
+                              processKidsEnrollment(index + 1, next);
+                            },
+                            child: const Text('Lanjutkan'),
+                          )
+                        ],
+                      ),
+                    );
+                  },
+                  child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.purple.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    if (_character.money < 1500) {
+                      showDialog(
+                        context: this.context,
+                        builder: (resContext) => AlertDialog(
+                          title: const Text('Uang Tidak Cukup 💸', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: const Text('Kamu tidak memiliki cukup uang untuk menyekolahkan anakmu ke Sekolah Swasta (\$1,500).'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(resContext);
+                                processKidsEnrollment(index + 1, next);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    } else {
+                      _character.money -= 1500;
+                      _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Swasta';
+                      _character.inbox.add('🏫 Sekolah Anak: Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta ($schoolLevel).');
+                      setState(() {});
+                      showDialog(
+                        context: this.context,
+                        builder: (resContext) => AlertDialog(
+                          title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
+                          content: Text('Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta Unggulan ($schoolLevel). Kecerdasan anakmu bertambah!'),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(resContext);
+                                processKidsEnrollment(index + 1, next);
+                              },
+                              child: const Text('Lanjutkan'),
+                            )
+                          ],
+                        ),
+                      );
+                    }
+                  },
+                  child: const Text('Sekolah Swasta (Berbayar/Premium)', style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+              ],
+            )
+          ],
+        ),
+      );
+    }
+
     final int age = _character.age;
     if (age == 6 || age == 12 || age == 15) {
       String schoolLevel = '';
@@ -848,7 +1743,7 @@ class _GameScreenState extends State<GameScreen> {
                     SchoolGenerator.generateClassmatesIfEmpty(_character);
                     SchoolGenerator.generateTeachersIfEmpty(_character);
                     setState(() {});
-                    onDone();
+                    processKidsEnrollment(0, onDone);
                   },
                   child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -875,7 +1770,7 @@ class _GameScreenState extends State<GameScreen> {
                     SchoolGenerator.generateClassmatesIfEmpty(_character);
                     SchoolGenerator.generateTeachersIfEmpty(_character);
                     setState(() {});
-                    onDone();
+                    processKidsEnrollment(0, onDone);
                   },
                   child: const Text('Sekolah Swasta (Berbayar/Premium)', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
@@ -885,7 +1780,7 @@ class _GameScreenState extends State<GameScreen> {
         ),
       );
     } else {
-      onDone();
+      processKidsEnrollment(0, onDone);
     }
   }
 
@@ -1316,7 +2211,7 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Row(
+                title: const Row(
           children: [
             Icon(Icons.warning, color: Colors.red, size: 28),
             SizedBox(width: 8),

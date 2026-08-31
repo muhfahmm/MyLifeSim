@@ -7,6 +7,9 @@ import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_siswa/
 import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_siswi/siswi_siswi_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'dart:math';
 
 class ClassmateInteractionPage extends StatefulWidget {
@@ -314,76 +317,136 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
               userAge: widget.character.age,
               classmateAge: age,
             )) ...[
-              // Aksi 1: Bercinta / Make Love
-              _buildActionTile(
-                icon: Icons.favorite,
-                color: Colors.pink,
-                title: 'Bercinta / Make Love',
-                onTap: () {
-                  final userGen = widget.character.gender;
-                  final mateGen = gender;
-                  if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
-                    SiswaSiswaLogic.bercinta(
-                      context: context,
+              // Aksi 1: Bercinta / Make Love (PREMIUM GATED)
+              if (AdultFeatures.canMakeLove(
+                userAge: widget.character.age,
+                role: () {
+                  if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                  if (widget.character.coworkers.any((e) => e['name'] == name)) return 'Rekan Kerja';
+                  return 'Teman Sekelas';
+                }(),
+                relation: () {
+                  if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                  return 'Teman Sekolah';
+                }(),
+              ))
+                _buildActionTile(
+                  icon: Icons.favorite,
+                  color: Colors.pink,
+                  title: 'Bercinta / Make Love',
+                  onTap: () {
+                    final userGen = widget.character.gender;
+                    final mateGen = gender;
+                    if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
+                      SiswaSiswaLogic.bercinta(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
+                      SiswiSiswiLogic.bercinta(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    } else {
+                      StudentRomanceLogic.bercinta(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    }
+                  },
+                ),
+              // Aksi 1b: Ajak Masturbasi Bersama (Premium)
+              if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
+                _buildActionTile(
+                  icon: Icons.flash_on,
+                  color: Colors.purple,
+                  title: 'Ajak Masturbasi Bersama',
+                  onTap: () {
+                    final int relVal = int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
+                    int successChance = PersentaseAjakan.getSuccessChance(
                       character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
+                      relationType: 'Teman Sekelas',
+                      viewerName: name,
                     );
-                  } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
-                    SiswiSiswiLogic.bercinta(
-                      context: context,
-                      character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
-                    );
-                  } else {
-                    StudentRomanceLogic.bercinta(
-                      context: context,
-                      character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
-                    );
-                  }
-                },
-              ),
-              // Aksi 2: Ajak Pacaran
-              _buildActionTile(
-                icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
-                color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
-                title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
-                onTap: () {
-                  final userGen = widget.character.gender;
-                  final mateGen = gender;
-                  if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
-                    SiswaSiswaLogic.ajakPacaran(
-                      context: context,
-                      character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
-                    );
-                  } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
-                    SiswiSiswiLogic.ajakPacaran(
-                      context: context,
-                      character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
-                    );
-                  } else {
-                    StudentRomanceLogic.ajakPacaran(
-                      context: context,
-                      character: widget.character,
-                      classmate: widget.classmate,
-                      onRefresh: widget.onRefresh,
-                      showOutcome: (title, desc) => _showOutcome(title, desc),
-                    );
-                  }
-                },
-              ),
+                    final bool success = Random().nextInt(100) < successChance;
+                    if (success) {
+                      AjakanMasturbasiDialog.show(
+                        context: context,
+                        character: widget.character,
+                        relationType: 'Teman Sekelas',
+                        viewerName: name,
+                        targetGender: gender,
+                        isUserInitiated: true,
+                        onComplete: () {
+                          setState(() {});
+                          widget.onRefresh();
+                        },
+                      );
+                    } else {
+                      final change = 10 + Random().nextInt(11);
+                      widget.classmate['relationship'] = (relVal - change).clamp(0, 100).toString();
+                      widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+                      widget.onRefresh();
+                      _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu secara mentah-mentah! (-$change% Hubungan, -15% Kebahagiaan).');
+                    }
+                  },
+                ),
+              // Aksi 2: Ajak Pacaran (PREMIUM GATED)
+              if (AdultFeatures.canProposeDating(
+                () {
+                  if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                  if (widget.character.coworkers.any((e) => e['name'] == name)) return 'Rekan Kerja';
+                  return 'Teman Sekelas';
+                }(),
+                () {
+                  if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                  return 'Teman Sekolah';
+                }(),
+                userAge: widget.character.age,
+              ))
+                _buildActionTile(
+                  icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
+                  color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
+                  title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+                  onTap: () {
+                    final userGen = widget.character.gender;
+                    final mateGen = gender;
+                    if (userGen == 'Laki-laki' && mateGen == 'Laki-laki') {
+                      SiswaSiswaLogic.ajakPacaran(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    } else if (userGen == 'Perempuan' && mateGen == 'Perempuan') {
+                      SiswiSiswiLogic.ajakPacaran(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    } else {
+                      StudentRomanceLogic.ajakPacaran(
+                        context: context,
+                        character: widget.character,
+                        classmate: widget.classmate,
+                        onRefresh: widget.onRefresh,
+                        showOutcome: (title, desc) => _showOutcome(title, desc),
+                      );
+                    }
+                  },
+                ),
             ],
 
             // Aksi 3: Berteman
@@ -485,27 +548,39 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
               },
             ),
 
-            // Aksi Cium
-            _buildActionTile(
-              icon: Icons.favorite,
-              color: Colors.pinkAccent,
-              title: 'Cium',
-              onTap: () {
-                if (rel >= 60) {
-                  final change = 10 + Random().nextInt(11); // 10-20
-                  widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
-                  widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                  widget.onRefresh();
-                  _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa senang! Hubungan kalian semakin dekat.');
-                } else {
-                  final change = 10 + Random().nextInt(11); // 10-20 penurunan
-                  widget.classmate['relationship'] = (rel - change).clamp(0, 100).toString();
-                  widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-                  widget.onRefresh();
-                  _showOutcome('Ciuman Ditolak', 'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
-                }
-              },
-            ),
+            // Aksi Cium (PREMIUM GATED - butuh canMakeLove karena ini aksi fisik romantis)
+            if (AdultFeatures.canMakeLove(
+              userAge: widget.character.age,
+              role: () {
+                if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                if (widget.character.coworkers.any((e) => e['name'] == name)) return 'Rekan Kerja';
+                return 'Teman Sekelas';
+              }(),
+              relation: () {
+                if (widget.character.univClassmates.any((e) => e['name'] == name)) return 'Teman Kuliah';
+                return 'Teman Sekolah';
+              }(),
+            ))
+              _buildActionTile(
+                icon: Icons.favorite,
+                color: Colors.pinkAccent,
+                title: 'Cium',
+                onTap: () {
+                  if (rel >= 60) {
+                    final change = 10 + Random().nextInt(11); // 10-20
+                    widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
+                    widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+                    widget.onRefresh();
+                    _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa senang! Hubungan kalian semakin dekat.');
+                  } else {
+                    final change = 10 + Random().nextInt(11); // 10-20 penurunan
+                    widget.classmate['relationship'] = (rel - change).clamp(0, 100).toString();
+                    widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+                    widget.onRefresh();
+                    _showOutcome('Ciuman Ditolak', 'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
+                  }
+                },
+              ),
 
             // Aksi 6: Hina
             _buildActionTile(

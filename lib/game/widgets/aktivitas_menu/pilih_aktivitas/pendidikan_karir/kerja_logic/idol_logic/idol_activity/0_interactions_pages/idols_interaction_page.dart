@@ -5,6 +5,9 @@ import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 
 class IdolsInteractionPage extends StatefulWidget {
   final Map<String, String> person;
@@ -293,6 +296,40 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   }
                 },
               ),
+              // Aksi 1b: Ajak Masturbasi Bersama (Premium)
+              if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
+                _buildActionTile(
+                  icon: Icons.flash_on,
+                  color: Colors.purple,
+                  title: 'Ajak Masturbasi Bersama',
+                  onTap: () {
+                    int successChance = PersentaseAjakan.getSuccessChance(
+                      character: widget.character,
+                      relationType: role, // 'Rekan Kerja', 'Atasan', 'Anggota Trainee', dll
+                      viewerName: name,
+                    );
+                    final bool success = _random.nextInt(100) < successChance;
+                    if (success) {
+                      AjakanMasturbasiDialog.show(
+                        context: context,
+                        character: widget.character,
+                        relationType: role,
+                        viewerName: name,
+                        targetGender: gender,
+                        isUserInitiated: true,
+                        onComplete: () {
+                          setState(() {});
+                          widget.onRefresh();
+                        },
+                      );
+                    } else {
+                      final change = 10 + _random.nextInt(11);
+                      _updateRelationship(-change);
+                      widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+                      _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu secara mentah-mentah! (-$change% Hubungan, -15% Kebahagiaan).');
+                    }
+                  },
+                ),
               _buildActionTile(
                 icon: Icons.heart_broken,
                 color: Colors.red,

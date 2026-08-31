@@ -208,6 +208,10 @@ class Character {
   // --- DAFTAR ANAK ---
   List<Map<String, String>> children = []; // [{name: '...', gender: 'Laki-laki', relationship: '80', age: '0', father: '...', mother: '...', isDeceased: 'false'}]
 
+  // --- GAYA PENGASUHAN ANAK ---
+  // Key: nama anak, Value: 'Strict' | 'Balanced' | 'Loose' | 'Neglectful'
+  Map<String, String> parentingStyles = {};
+
   // --- DAFTAR PENERIMA DONOR SPERMA ---
   List<Map<String, String>> donorRecipients = []; // [{name: '...', age: '...', relationship: '50', childName: '...'}]
 
@@ -947,6 +951,24 @@ class Character {
       final String type = sec['type'] ?? 'Masturbasi';
       int count = sec['count'] ?? 1;
       int turnsLeft = sec['turnsLeft'] ?? 3;
+
+      // Jika user sudah menikah dengan target (target menjadi Istri/Suami/Pasangan sah),
+      // maka rasa bersalah hubungan rahasia ini sudah tidak relevan dan harus dilewati (dihapus).
+      bool isMarriedToTarget = false;
+      for (var p in [partner, secondPartner, thirdPartner, fourthPartner, fifthPartner]) {
+        if (p != null && (p['name'] == partnerName || (p['name'] ?? '').contains(partnerName))) {
+          final String pRel = (p['relation'] ?? '').toLowerCase();
+          if (pRel == 'istri' || pRel == 'suami' || pRel == 'pasangan') {
+            isMarriedToTarget = true;
+            break;
+          }
+        }
+      }
+
+      if (isMarriedToTarget) {
+        // Jangan tambahkan ke remainingSecrets, langsung skip agar rahasia ini terhapus
+        continue;
+      }
 
       // 1. Inbox: Rasa bersalah (Guilt Debuff) -> Kebahagiaan -5
       happiness = (happiness - 5).clamp(0, 100);
@@ -2164,7 +2186,9 @@ class Character {
       return null;
     }
 
-    var val = getFromList(siblings, 'Saudara');
+    var val = getFromList(children, 'Anak');
+    if (val != null) return val;
+    val = getFromList(siblings, 'Saudara');
     if (val != null) return val;
     val = getFromList(extendedFamily, 'Keluarga');
     if (val != null) return val;

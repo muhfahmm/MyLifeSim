@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
@@ -373,26 +374,28 @@ List<ActionItem> getAge12PlusActions(
 
   // Menu untuk target umum (bukan anak)
   // 1. Bercinta / Make Love (logika kondom sudah ada di dalam BercintaScreen)
-  actions.add(ActionItem(
-    label: 'Bercinta / Make Love',
-    icon: Icons.favorite,
-    color: Colors.pink,
-    onTap: () {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => BercintaScreen(
-            character: character,
-            targetName: targetName,
-            targetRole: targetRole,
-            onActionComplete: () {
-              updateState();
-            },
+  if (AdultFeatures.canMakeLove(userAge: character.age, role: targetRole, relation: targetRole)) {
+    actions.add(ActionItem(
+      label: 'Bercinta / Make Love',
+      icon: Icons.favorite,
+      color: Colors.pink,
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => BercintaScreen(
+              character: character,
+              targetName: targetName,
+              targetRole: targetRole,
+              onActionComplete: () {
+                updateState();
+              },
+            ),
           ),
-        ),
-      );
-    },
-  ));
+        );
+      },
+    ));
+  }
 
   // --- AJAK 3SOME (jika memiliki dua pasangan) ---
   final bool targetIsEitherPartner = (character.partner != null && character.partner!['name'] == targetName) ||
@@ -415,7 +418,7 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 2. Ajak Pacaran / Ajak Balikan (dengan logika khusus mantan pacar)
-  if (!isActivePartner && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole) {
+  if (!isActivePartner && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole && AdultFeatures.canProposeDating(targetRole, targetRole, userAge: character.age)) {
     final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
     final String actionLabel = isExPartner 
         ? 'Ajak Balikan' 
@@ -1109,7 +1112,7 @@ List<ActionItem> getAge12PlusActions(
     },
   ));
 
-  if (!isChild) {
+  if (!isChild && AdultFeatures.canMasturbateTogether()) {
     final ActionItem ajakMasturbasiAction = ActionItem(
       label: 'Ajak Masturbasi Bersama',
       icon: Icons.flash_on,

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
 
 // Imports for gay dating
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
@@ -1010,16 +1011,36 @@ class AjakanHandler {
         } else if (!isFamily && GlobalSettings.disableMasturbationNonFamily.value) {
           character.activeProposal = null;
         }
+        
+        // Filter Premium: Ajak Masturbasi dilarang total bagi non-premium
+        if (character.activeProposal != null && !AdultFeatures.canMasturbateTogether()) {
+          character.activeProposal = null;
+        }
       } else if (type == 'Bercinta' || type == 'Bercinta (Make Love)' || type == 'Bersetubuh') {
         if (isFamily && GlobalSettings.disableMakeLoveFamily.value) {
           character.activeProposal = null;
         } else if (!isFamily && GlobalSettings.disableMakeLoveNonFamily.value) {
           character.activeProposal = null;
         }
+        
+        // Filter Premium: Make Love dilarang jika tidak memenuhi syarat (usia < 18 atau dengan non-teman)
+        if (character.activeProposal != null) {
+          final String pRole = proposal['role'] ?? '';
+          final String pRelation = proposal['relation'] ?? '';
+          if (!AdultFeatures.canMakeLove(userAge: character.age, role: pRole, relation: pRelation)) {
+            character.activeProposal = null;
+          }
+        }
       } else if (type == 'Ajak Pacaran' || type == 'Pacaran') {
         if (isFamily && GlobalSettings.disablePacaranFamily.value) {
           character.activeProposal = null;
         } else if (!isFamily && GlobalSettings.disablePacaranNonFamily.value) {
+          character.activeProposal = null;
+        }
+        
+        // Filter Premium: Ajakan pacaran dari Keluarga (seperti Adik, Kakak, Sepupu, dll.) 
+        // hanya diperbolehkan jika user sudah premium.
+        if (character.activeProposal != null && isFamily && !AdultFeatures.isPremiumUnlocked) {
           character.activeProposal = null;
         }
       }

@@ -6,6 +6,7 @@ import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:bitlife/game/premium_features/adult_features.dart';
 
 class PageDonorSperma extends StatefulWidget {
   final Character character;
@@ -532,53 +533,54 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                   }
                 },
               ),
-              _buildActionTile(
-                icon: Icons.flash_on,
-                color: Colors.purple,
-                title: 'Ajak Masturbasi Bersama',
-                onTap: () {
-                  if (widget.character.age < 12) {
-                    showDialog(
-                      context: context,
-                      builder: (context) => AlertDialog(
-                        title: const Text('Terlalu Muda 👶'),
-                        content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.pop(context),
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      ),
-                    );
-                    return;
-                  }
+              if (AdultFeatures.canMasturbateTogether())
+                _buildActionTile(
+                  icon: Icons.flash_on,
+                  color: Colors.purple,
+                  title: 'Ajak Masturbasi Bersama',
+                  onTap: () {
+                    if (widget.character.age < 12) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Terlalu Muda 👶'),
+                          content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            ),
+                          ],
+                        ),
+                      );
+                      return;
+                    }
 
-                  int successChance = 50;
-                  if (widget.character.happiness > 60) {
-                    successChance = 100;
-                  }
+                    int successChance = 50;
+                    if (widget.character.happiness > 60) {
+                      successChance = 100;
+                    }
 
-                  final bool success = _random.nextInt(100) < successChance;
-                  if (success) {
-                    AjakanMasturbasiDialog.show(
-                      context: context,
-                      character: widget.character,
-                      relationType: 'Pacar',
-                      viewerName: name,
-                      targetGender: 'Perempuan',
-                      isUserInitiated: true,
-                      onComplete: () {
-                        setState(() {});
-                        widget.onRefresh();
-                      },
-                    );
-                  } else {
-                    _updateRelationship(-10);
-                    _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan masturbasi bersamamu.');
-                  }
-                },
-              ),
+                    final bool success = _random.nextInt(100) < successChance;
+                    if (success) {
+                      AjakanMasturbasiDialog.show(
+                        context: context,
+                        character: widget.character,
+                        relationType: 'Pacar',
+                        viewerName: name,
+                        targetGender: 'Perempuan',
+                        isUserInitiated: true,
+                        onComplete: () {
+                          setState(() {});
+                          widget.onRefresh();
+                        },
+                      );
+                    } else {
+                      _updateRelationship(-10);
+                      _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan masturbasi bersamamu.');
+                    }
+                  },
+                ),
               if (widget.character.age >= 18)
                 _buildActionTile(
                   icon: Icons.diamond,
