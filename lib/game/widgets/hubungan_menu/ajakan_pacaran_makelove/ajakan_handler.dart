@@ -44,12 +44,6 @@ import 'ajakan_makelove/hetero/ajakan_ml_hetero_dosen.dart';
 import 'ajakan_makelove/hetero/ajakan_ml_hetero_coworker.dart';
 import 'ajakan_makelove/hetero/ajakan_ml_hetero_keluarga.dart';
 
-// Imports for ajakan masturbasi
-import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_teman_sekolah.dart';
-import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_guru_sekolah.dart';
-import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_dosen.dart';
-import 'ajakan_masturbasi/hetero/ajakan_masturbate_hetero_coworker.dart';
-
 // Idol sub-handlers
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_staf_idol.dart';
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_rekan_idol.dart';
@@ -297,11 +291,67 @@ class AjakanHandler {
         if (match) {
           schoolCandidates.add({
             'name': t['name'],
-            'relation': 'Guru',
+            'relation': 'Guru ${t['subject'] ?? ''}',
             'gender': t['gender'] ?? 'Laki-laki',
             'age': t['age'] ?? '35',
             'role': 'Guru',
           });
+        }
+      }
+
+      // Tambahkan Guru BK
+      if (character.bkTeacher != null) {
+        final bk = character.bkTeacher!;
+        final String sexuality = bk['sexuality'] ?? 'Heteroseksual';
+        final String tGender = (bk['gender'] ?? 'Laki-laki').trim().toLowerCase();
+        final String name = bk['name'] ?? '';
+        if (!character.isAnyPartnerNameMatching(name)) {
+          bool match = false;
+          if (sexuality == 'Heteroseksual') {
+            match = (myGenderLower != tGender);
+          } else if (sexuality == 'Biseksual') {
+            match = true;
+          } else {
+            match = (myGenderLower == tGender);
+          }
+
+          if (match) {
+            schoolCandidates.add({
+              'name': name,
+              'relation': 'Guru BK',
+              'gender': bk['gender'] ?? 'Laki-laki',
+              'age': bk['age'] ?? '35',
+              'role': 'Guru',
+            });
+          }
+        }
+      }
+
+      // Tambahkan Kepala Sekolah
+      if (character.headmaster != null) {
+        final hs = character.headmaster!;
+        final String sexuality = hs['sexuality'] ?? 'Heteroseksual';
+        final String tGender = (hs['gender'] ?? 'Laki-laki').trim().toLowerCase();
+        final String name = hs['name'] ?? '';
+        if (!character.isAnyPartnerNameMatching(name)) {
+          bool match = false;
+          if (sexuality == 'Heteroseksual') {
+            match = (myGenderLower != tGender);
+          } else if (sexuality == 'Biseksual') {
+            match = true;
+          } else {
+            match = (myGenderLower == tGender);
+          }
+
+          if (match) {
+            schoolCandidates.add({
+              'name': name,
+              'relation': 'Kepala Sekolah',
+              'gender': hs['gender'] ?? 'Laki-laki',
+              'age': hs['age'] ?? '45',
+              'role': 'Guru',
+            });
+          }
         }
       }
 
@@ -649,6 +699,20 @@ class AjakanHandler {
       selectedPool = schoolCandidates;
     }
 
+    // --- PRIORITAS KHUSUS GURU/DOSEN ---
+    // Agar guru lebih dominan dibanding teman sekelas (karena jumlah teman sekelas jauh lebih banyak di pool),
+    // kita beri peluang 70% untuk memotong pool hanya menyisakan Guru/Dosen jika kandidat Guru/Dosen tersedia.
+    if (selectedPool.isNotEmpty) {
+      final List<Map<String, dynamic>> guruDosenPool = selectedPool.where((c) {
+        final r = c['role'] ?? '';
+        return r == 'Guru' || r == 'Dosen';
+      }).toList();
+
+      if (guruDosenPool.isNotEmpty && random.nextInt(100) < 70) {
+        selectedPool = guruDosenPool;
+      }
+    }
+
     // Try processing proposal
     if (selectedPool.isNotEmpty) {
       List<Map<String, dynamic>> sameSexCandidates = [];
@@ -754,23 +818,16 @@ class AjakanHandler {
           }
         }
 
-        // Jika tidak mendapat ajakan pacaran/ML, evaluasi menggunakan sub-handler persentase khusus
-        if (character.activeProposal == null) {
-          if (!isGay && !isLesbian) {
-            character.activeProposal = AjakanMasturbateHeteroCoworker.check(character, candidate, random);
-          }
-          
-          // Fallback umum jika sub-handler tidak memicu proposal
-          if (character.activeProposal == null && random.nextInt(100) < 15) {
-            character.activeProposal = {
-              'name': candidate['name'],
-              'relation': candidate['relation'],
-              'type': 'Masturbasi',
-              'gender': candidate['gender'],
-              'age': candidate['age'],
-              'role': candidate['role'],
-            };
-          }
+        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi
+        if (character.activeProposal == null && random.nextInt(100) < 15) {
+          character.activeProposal = {
+            'name': candidate['name'],
+            'relation': candidate['relation'],
+            'type': 'Masturbasi',
+            'gender': candidate['gender'],
+            'age': candidate['age'],
+            'role': candidate['role'],
+          };
         }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
         final String rel = (candidate['relation'] ?? '').toString().toLowerCase();
@@ -811,89 +868,96 @@ class AjakanHandler {
         }
       } else {
         // Classmates, Teachers, Lecturers, Idols
-        if (isGay) {
-          if (candRole == 'Guru') {
-            final pacaran = AjakanPacaranGayGuruSekolah.check(character, candidate, random);
-            final ml = AjakanMlGayGuruSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Dosen') {
-            final pacaran = AjakanPacaranGayDosen.check(character, candidate, random);
-            final ml = AjakanMlGayDosen.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Staf Idol') {
-            final pacaran = AjakanPacaranGayStafIdol.check(character, candidate, random);
-            final ml = AjakanMlGayStafIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Rekan Idol') {
-            final pacaran = AjakanPacaranGayRekanIdol.check(character, candidate, random);
-            final ml = AjakanMlGayRekanIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else {
-            final pacaran = AjakanPacaranGayTemanSekolah.check(character, candidate, random);
-            final ml = AjakanMlGayTemanSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          }
-        } else if (isLesbian) {
-          if (candRole == 'Guru') {
-            final pacaran = AjakanPacaranLesbianGuruSekolah.check(character, candidate, random);
-            final ml = AjakanMlLesbianGuruSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Dosen') {
-            final pacaran = AjakanPacaranLesbianDosen.check(character, candidate, random);
-            final ml = AjakanMlLesbianDosen.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Staf Idol') {
-            final pacaran = AjakanPacaranLesbianStafIdol.check(character, candidate, random);
-            final ml = AjakanMlLesbianStafIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Rekan Idol') {
-            final pacaran = AjakanPacaranLesbianRekanIdol.check(character, candidate, random);
-            final ml = AjakanMlLesbianRekanIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else {
-            final pacaran = AjakanPacaranLesbianTemanSekolah.check(character, candidate, random);
-            final ml = AjakanMlLesbianTemanSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          }
-        } else {
-          // Hetero
-          if (candRole == 'Guru') {
-            final pacaran = AjakanPacaranHeteroGuruSekolah.check(character, candidate, random);
-            final ml = AjakanMlHeteroGuruSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Dosen') {
-            final pacaran = AjakanPacaranHeteroDosen.check(character, candidate, random);
-            final ml = AjakanMlHeteroDosen.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Staf Idol') {
-            final pacaran = AjakanPacaranHeteroStafIdol.check(character, candidate, random);
-            final ml = AjakanMlHeteroStafIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else if (candRole == 'Rekan Idol') {
-            final pacaran = AjakanPacaranHeteroRekanIdol.check(character, candidate, random);
-            final ml = AjakanMlHeteroRekanIdol.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
-          } else {
-            final pacaran = AjakanPacaranHeteroTemanSekolah.check(character, candidate, random);
-            final ml = AjakanMlHeteroTemanSekolah.check(character, candidate, random);
-            character.activeProposal = ml ?? pacaran;
+        final bool isTeacherOrLecturer = candRole == 'Guru' || candRole == 'Dosen';
+        
+        // Membagi rata peluang: Guru/Dosen memiliki peluang acak 45% langsung mengajak Masturbasi
+        if (isTeacherOrLecturer && random.nextInt(100) < 45) {
+          if (!(character.disableSameSexProposals && (isGay || isLesbian))) {
+            character.activeProposal = {
+              'name': candidate['name'],
+              'relation': candidate['relation'],
+              'type': 'Masturbasi',
+              'gender': candidate['gender'],
+              'age': candidate['age'],
+              'role': candidate['role'],
+            };
           }
         }
- 
-        // Jika tidak mendapat ajakan pacaran/ML, evaluasi menggunakan sub-handler persentase khusus
+
         if (character.activeProposal == null) {
-          if (!isGay && !isLesbian) {
+          if (isGay) {
             if (candRole == 'Guru') {
-              character.activeProposal = AjakanMasturbateHeteroGuruSekolah.check(character, candidate, random);
+              final pacaran = AjakanPacaranGayGuruSekolah.check(character, candidate, random);
+              final ml = AjakanMlGayGuruSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
             } else if (candRole == 'Dosen') {
-              character.activeProposal = AjakanMasturbateHeteroDosen.check(character, candidate, random);
-            } else if (candRole == 'Teman Sekelas' || candRole == 'Teman Kuliah') {
-              character.activeProposal = AjakanMasturbateHeteroTemanSekolah.check(character, candidate, random);
+              final pacaran = AjakanPacaranGayDosen.check(character, candidate, random);
+              final ml = AjakanMlGayDosen.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Staf Idol') {
+              final pacaran = AjakanPacaranGayStafIdol.check(character, candidate, random);
+              final ml = AjakanMlGayStafIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Rekan Idol') {
+              final pacaran = AjakanPacaranGayRekanIdol.check(character, candidate, random);
+              final ml = AjakanMlGayRekanIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else {
+              final pacaran = AjakanPacaranGayTemanSekolah.check(character, candidate, random);
+              final ml = AjakanMlGayTemanSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            }
+          } else if (isLesbian) {
+            if (candRole == 'Guru') {
+              final pacaran = AjakanPacaranLesbianGuruSekolah.check(character, candidate, random);
+              final ml = AjakanMlLesbianGuruSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Dosen') {
+              final pacaran = AjakanPacaranLesbianDosen.check(character, candidate, random);
+              final ml = AjakanMlLesbianDosen.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Staf Idol') {
+              final pacaran = AjakanPacaranLesbianStafIdol.check(character, candidate, random);
+              final ml = AjakanMlLesbianStafIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Rekan Idol') {
+              final pacaran = AjakanPacaranLesbianRekanIdol.check(character, candidate, random);
+              final ml = AjakanMlLesbianRekanIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else {
+              final pacaran = AjakanPacaranLesbianTemanSekolah.check(character, candidate, random);
+              final ml = AjakanMlLesbianTemanSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            }
+          } else {
+            // Hetero
+            if (candRole == 'Guru') {
+              final pacaran = AjakanPacaranHeteroGuruSekolah.check(character, candidate, random);
+              final ml = AjakanMlHeteroGuruSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Dosen') {
+              final pacaran = AjakanPacaranHeteroDosen.check(character, candidate, random);
+              final ml = AjakanMlHeteroDosen.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Staf Idol') {
+              final pacaran = AjakanPacaranHeteroStafIdol.check(character, candidate, random);
+              final ml = AjakanMlHeteroStafIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else if (candRole == 'Rekan Idol') {
+              final pacaran = AjakanPacaranHeteroRekanIdol.check(character, candidate, random);
+              final ml = AjakanMlHeteroRekanIdol.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
+            } else {
+              final pacaran = AjakanPacaranHeteroTemanSekolah.check(character, candidate, random);
+              final ml = AjakanMlHeteroTemanSekolah.check(character, candidate, random);
+              character.activeProposal = ml ?? pacaran;
             }
           }
-          
-          // Fallback umum jika sub-handler tidak memicu proposal
-          if (character.activeProposal == null && random.nextInt(100) < 15) {
+        }
+
+        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi (atau 45% untuk Guru/Dosen)
+        if (character.activeProposal == null && random.nextInt(100) < (isTeacherOrLecturer ? 45 : 15)) {
+          if (!(character.disableSameSexProposals && (isGay || isLesbian))) {
             character.activeProposal = {
               'name': candidate['name'],
               'relation': candidate['relation'],

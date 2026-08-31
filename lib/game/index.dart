@@ -1424,6 +1424,8 @@ class _GameScreenState extends State<GameScreen> {
 
     final String relLower = relation.toLowerCase();
     if (type == 'Masturbasi') {
+      // Ambil data dari proposal sebelum di-clear
+      final String propGender = partnerGender;
       _character.activeProposal = null;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         AjakanMasturbasiDialog.show(
@@ -1431,6 +1433,7 @@ class _GameScreenState extends State<GameScreen> {
           character: _character,
           relationType: relation,
           viewerName: cleanName,
+          targetGender: propGender,
           onComplete: () {
             setState(() {});
             _checkGlassesNeed();
@@ -1685,9 +1688,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _executeReportParent(context, partnerName, relation, 'Ibu');
                 },
                 child: Text(
-                  isGrandfatherProposal && _character.motherName != null
-                      ? 'Laporkan ke Ibu (${_character.motherName})'
-                      : 'Laporkan ke Ibu',
+                  'Laporkan ke Ibu',
                   style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
               ),
@@ -1699,11 +1700,9 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _executeReportParent(context, partnerName, relation, reportTarget);
                 },
                 child: Text(
-                  isGrandfatherProposal && _character.fatherName != null
-                      ? 'Laporkan ke Ayah (${_character.fatherName})'
-                      : (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned)
-                          ? 'Laporkan ke Ayah'
-                          : 'Laporkan ke Ayah Tiri',
+                  (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned)
+                      ? 'Laporkan ke Ayah'
+                      : 'Laporkan ke Ayah Tiri',
                   style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
                 ),
               ),

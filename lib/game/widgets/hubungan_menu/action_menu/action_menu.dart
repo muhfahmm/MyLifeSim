@@ -2934,7 +2934,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                       color: isDark ? Colors.white : Colors.black87)),
                               const SizedBox(height: 4),
                               Text(
-                                'Hubungan: ${_getDetailedRelationLabel()} | Umur: ${_getCurrentAgeValue()}',
+                                'Hubungan: ${_getDetailedRelationLabel()} | Gender: ${_getTargetGender()} | Umur: ${_getCurrentAgeValue()}',
                                 style: TextStyle(
                                     fontSize: 14,
                                     color: isDark ? Colors.white60 : Colors.black54),
@@ -3198,23 +3198,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       icon: Icons.flash_on,
       color: Colors.purple,
       onTap: () {
-        if (widget.character.age < 12) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Terlalu Muda 👶'),
-              content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-
         final String myGender = widget.character.gender.trim().toLowerCase();
         final String targetGender = _getTargetGender().trim().toLowerCase();
         

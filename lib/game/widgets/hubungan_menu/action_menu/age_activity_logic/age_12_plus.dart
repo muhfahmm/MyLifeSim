@@ -1115,23 +1115,6 @@ List<ActionItem> getAge12PlusActions(
       icon: Icons.flash_on,
       color: Colors.purple,
       onTap: () {
-        if (character.age < 12) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Terlalu Muda 👶'),
-              content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-
         final String myGender = character.gender.trim().toLowerCase();
         final String targetGender = _getNPCGender(character, targetName, targetRole).trim().toLowerCase();
         

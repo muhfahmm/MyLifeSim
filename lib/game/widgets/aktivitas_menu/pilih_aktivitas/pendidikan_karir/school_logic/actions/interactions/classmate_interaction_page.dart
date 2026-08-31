@@ -137,8 +137,9 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       } else if (widget.character.supervisor != null && widget.character.supervisor!['name'] == name) {
                         typeLabel = 'Supervisor / Atasan';
                       }
+                      final String targetGender = widget.classmate['gender'] ?? 'Laki-laki';
                       return Text(
-                        '$typeLabel • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
+                        '$typeLabel • Gender: $targetGender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                         style: TextStyle(
                           fontSize: 14,
                           color: isDark ? Colors.white70 : Colors.black54,

@@ -108,8 +108,9 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     const SizedBox(height: 4),
                     () {
                       final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
+                      final String gender = widget.teacher['gender'] ?? 'Laki-laki';
                       return Text(
-                        '${widget.role} • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
+                        '${widget.role} • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                         style: TextStyle(
                           fontSize: 14,
                           color: isDark ? Colors.white70 : Colors.black54,

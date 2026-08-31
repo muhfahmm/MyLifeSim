@@ -148,7 +148,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '$role • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $relationship%',
+                      '$role • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $relationship%',
                       style: const TextStyle(fontSize: 14, color: Colors.black54),
                     ),
                     const SizedBox(height: 16),

@@ -429,7 +429,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Penerima Donor Sperma • Umur: $age tahun • Hubungan: $relationship%',
+                      'Penerima Donor Sperma • Gender: Perempuan • Umur: $age tahun • Hubungan: $relationship%',
                       style: TextStyle(
                         fontSize: 13,
                         color: isDark ? Colors.white70 : Colors.black54,
