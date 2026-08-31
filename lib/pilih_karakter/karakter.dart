@@ -5,13 +5,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:bitlife/pilih_karakter/character.dart'; // Model utama
-import '../game/index.dart'; // Halaman game // Halaman game
+import '../game/index.dart'; // Halaman game
 import 'package:bitlife/pilih_karakter/logic/family_generator.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/pilih_karakter/customization/appearance_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
+import 'package:bitlife/pilih_karakter/customization/settings.dart'; // Tambahan Import
 import 'package:bitlife/main.dart';
 
 class KarakterScreen extends StatefulWidget {
@@ -916,6 +917,39 @@ class _KarakterScreenState extends State<KarakterScreen> {
                           : null,
                     ),
                   ),
+
+                  // --- MENU SETTINGAN BARU ---
+                  const SizedBox(height: 8),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.settings, color: Colors.blueGrey),
+                      title: Text(
+                        '⚙️ Settingan',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: isDark ? Colors.white54 : Colors.grey,
+                      ),
+                      onTap: () {
+                        // NAVIGASI KE SETTINGS PAGE
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const SettingsPage()),
+                        );
+                      },
+                    ),
+                  ),
+                  // -------------------------------------------------------
 
                   const SizedBox(height: 24),
                   MouseRegion(

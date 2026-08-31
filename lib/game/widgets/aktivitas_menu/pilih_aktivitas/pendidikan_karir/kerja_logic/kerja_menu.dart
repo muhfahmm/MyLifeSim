@@ -456,13 +456,24 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           ? 'Pro Player' 
           : (job.startsWith('Brand Ambassador Esport') ? 'Brand Ambassador' : 'Talent Esports');
 
+      // Tentukan seksualitas coworker secara acak (realistis)
+      final double sexRoll = random.nextDouble();
+      String coworkerSexuality;
+      if (sexRoll < 0.80) {
+        coworkerSexuality = 'Heteroseksual'; // 80% hetero
+      } else if (sexRoll < 0.90) {
+        coworkerSexuality = 'Homoseksual'; // 10% gay/lesbian
+      } else {
+        coworkerSexuality = 'Biseksual'; // 10% biseksual
+      }
+
       widget.character.coworkers.add({
         'name': name,
         'gender': gender,
         'relationship': (40 + random.nextInt(21)).toString(),
         'age': ageVal.toString(),
         'isDeceased': 'false',
-        'sexuality': 'Heteroseksual',
+        'sexuality': coworkerSexuality,
         'intelligence': (30 + random.nextInt(61)).toString(),
         'role': coworkerRole,
       });

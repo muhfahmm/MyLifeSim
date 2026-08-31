@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
 
 // Imports for gay dating
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
@@ -834,6 +835,44 @@ class AjakanHandler {
         }
       } else {
         if (isFromOthers && hasOppositeSexPartner && random.nextInt(100) >= 15) {
+          character.activeProposal = null;
+        }
+      }
+    }
+
+    // --- FILTER PREFERENSI KONTEN DEWASA ---
+    if (character.activeProposal != null) {
+      final proposal = character.activeProposal!;
+      final type = proposal['type'] ?? '';
+      final role = proposal['role'] ?? '';
+      final isFamily = role == 'Keluarga' || role == 'Tiri' || 
+                       (proposal['relation'] != null && 
+                        (proposal['relation'].toString().toLowerCase().contains('ayah') || 
+                         proposal['relation'].toString().toLowerCase().contains('ibu') ||
+                         proposal['relation'].toString().toLowerCase().contains('kakak') ||
+                         proposal['relation'].toString().toLowerCase().contains('adik') ||
+                         proposal['relation'].toString().toLowerCase().contains('paman') ||
+                         proposal['relation'].toString().toLowerCase().contains('bibi') ||
+                         proposal['relation'].toString().toLowerCase().contains('kakek') ||
+                         proposal['relation'].toString().toLowerCase().contains('nenek') ||
+                         proposal['relation'].toString().toLowerCase().contains('saudara')));
+
+      if (type == 'Masturbasi') {
+        if (isFamily && GlobalSettings.disableMasturbationFamily.value) {
+          character.activeProposal = null;
+        } else if (!isFamily && GlobalSettings.disableMasturbationNonFamily.value) {
+          character.activeProposal = null;
+        }
+      } else if (type == 'Bercinta' || type == 'Bercinta (Make Love)' || type == 'Bersetubuh') {
+        if (isFamily && GlobalSettings.disableMakeLoveFamily.value) {
+          character.activeProposal = null;
+        } else if (!isFamily && GlobalSettings.disableMakeLoveNonFamily.value) {
+          character.activeProposal = null;
+        }
+      } else if (type == 'Ajak Pacaran' || type == 'Pacaran') {
+        if (isFamily && GlobalSettings.disablePacaranFamily.value) {
+          character.activeProposal = null;
+        } else if (!isFamily && GlobalSettings.disablePacaranNonFamily.value) {
           character.activeProposal = null;
         }
       }
