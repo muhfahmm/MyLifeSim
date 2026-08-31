@@ -292,25 +292,6 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // ============ TOMBOL LIHAT KELUARGA ============
-            _buildActionTile(
-              icon: Icons.people,
-              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
-              title: 'Lihat Keluarga',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NpcFamilyViewScreen(
-                      npcName: name,
-                      npcGender: gender,
-                      npcAge: age,
-                      npcRole: 'Teman Sekelas',
-                    ),
-                  ),
-                );
-              },
-            ),
             const SizedBox(height: 8),
 
             if (StudentRomanceLogic.shouldShowRomanceButtons(

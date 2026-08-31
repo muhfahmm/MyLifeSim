@@ -967,25 +967,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       // - Disiplinkan (jika nakal)
       actions = [
         ActionItem(
-          label: 'Lihat Keluarga',
-          icon: Icons.people,
-          color: Colors.blueGrey,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => NpcFamilyViewScreen(
-                  npcName: widget.targetName,
-                  npcGender: widget.targetRole == 'Laki-laki' ? 'Laki-laki' : 'Perempuan',
-                  npcAge: targetAge,
-                  npcRole: widget.targetRole,
-                  character: widget.character,
-                ),
-              ),
-            );
-          },
-        ),
-        ActionItem(
           label: 'Beri Pelukan',
           icon: Icons.face,
           color: Colors.pinkAccent,
@@ -1807,57 +1788,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         cleanName.contains('ibu') ||
         cleanRole.contains('ayah') ||
         cleanRole.contains('ibu');
-    // Saudara juga bisa Lihat Keluarga
-    final bool isSiblingEntry = widget.character.siblings.any((sib) =>
-        '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
-        sib['name']!.toLowerCase() == cleanName);
-
-    // Cek apakah target ada di extendedFamily
-    final Map<String, String> extMember =
-        widget.character.extendedFamily.firstWhere(
-      (ext) =>
-          ext['name'] == widget.targetName ||
-          widget.targetName.contains(ext['name'] ?? ''),
-      orElse: () => <String, String>{},
-    );
-    final bool isExtendedEntry = extMember.isNotEmpty;
-
-    if (isFatherOrMother || isSiblingEntry || isExtendedEntry) {
-      String side = 'Ayah';
-      if (isExtendedEntry) {
-        final String rel = extMember['relation'] ?? '';
-        if (rel.contains('Ibu')) {
-          side = 'Ibu';
-        }
-      } else {
-        side = (cleanName.contains('ayah') || cleanRole.contains('ayah'))
-            ? 'Ayah'
-            : 'Ibu';
-      }
-
-      actions.insert(
-          0,
-          ActionItem(
-            label: 'Lihat Keluarga',
-            icon: Icons.people,
-            color: Colors.blueGrey,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SiblingFamilyViewScreen(
-                    character: widget.character,
-                    siblingName: widget.targetName,
-                    side: side,
-                    onRefresh: () {
-                      setState(() {});
-                    },
-                  ),
-                ),
-              );
-            },
-          ));
-    }
 
     // --- TAMBAHAN: TOMBOL BERCINTA, PUTUSKAN PACAR, DAN THREESOME UNTUK PASANGAN AKTIF (DI TOP MENU) ---
     final List<ActionItem> topActions = [];
@@ -3343,7 +3273,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         isDifferentCountry = true;
       }
     } else {
-      final bool isTargetFamily = isFatherOrMother || isSiblingEntry || isExtendedEntry;
+      final String _cleanNameLocal = widget.targetName.toLowerCase();
+      final String _cleanRoleLocal = widget.targetRole.toLowerCase();
+      final bool _isFatherOrMother = _cleanNameLocal.contains('ayah') ||
+          _cleanNameLocal.contains('ibu') ||
+          _cleanRoleLocal.contains('ayah') ||
+          _cleanRoleLocal.contains('ibu');
+      final bool _isSiblingEntry = widget.character.siblings.any((sib) =>
+          '${sib['name']} (${sib['relation']})'.toLowerCase() == _cleanNameLocal ||
+          sib['name']!.toLowerCase() == _cleanNameLocal);
+      final Map<String, String> _extMember = widget.character.extendedFamily.firstWhere(
+        (ext) => ext['name'] == widget.targetName || widget.targetName.contains(ext['name'] ?? ''),
+        orElse: () => <String, String>{},
+      );
+      final bool _isExtendedEntry = _extMember.isNotEmpty;
+      final bool isTargetFamily = _isFatherOrMother || _isSiblingEntry || _isExtendedEntry;
       if (isTargetFamily) {
         if (widget.character.location.toLowerCase() != (widget.character.birthCountry ?? 'Indonesia').toLowerCase()) {
           isDifferentCountry = true;
@@ -3359,18 +3303,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           act.label.toLowerCase().contains('3some'));
     }
 
-    // Pindahkan Lihat Keluarga ke posisi pertama paling atas
-    ActionItem? lihatKeluargaAct;
-    for (var act in actions) {
-      if (act.label == 'Lihat Keluarga') {
-        lihatKeluargaAct = act;
-        break;
-      }
-    }
-    if (lihatKeluargaAct != null) {
-      actions.remove(lihatKeluargaAct);
-      actions.insert(0, lihatKeluargaAct);
-    }
 
     // Pindahkan Minta Cerai / Minta Tidak Menikah Lagi ke posisi dinamis
     final List<ActionItem> matchingActs = [];

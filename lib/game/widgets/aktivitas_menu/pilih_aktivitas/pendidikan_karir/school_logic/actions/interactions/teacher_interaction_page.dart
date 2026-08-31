@@ -229,25 +229,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // ============ TOMBOL LIHAT KELUARGA ============
-            _buildActionTile(
-              icon: Icons.people,
-              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
-              title: 'Lihat Keluarga',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NpcFamilyViewScreen(
-                      npcName: name,
-                      npcGender: gender,
-                      npcAge: age,
-                      npcRole: widget.role,
-                    ),
-                  ),
-                );
-              },
-            ),
             const SizedBox(height: 8),
 
             if (widget.character.age >= 10) ...[

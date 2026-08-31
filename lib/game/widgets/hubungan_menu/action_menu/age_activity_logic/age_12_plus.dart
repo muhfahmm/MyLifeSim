@@ -158,26 +158,6 @@ List<ActionItem> getAge12PlusActions(
 
   // Jika target adalah anak (dengan status Laki-laki atau Perempuan)
   if (isChild) {
-    // 1. Lihat Keluarga
-    actions.add(ActionItem(
-      label: 'Lihat Keluarga',
-      icon: Icons.people,
-      color: Colors.blueGrey,
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => NpcFamilyViewScreen(
-              npcName: targetName,
-              npcGender: partnerGender == 'perempuan' ? 'Perempuan' : 'Laki-laki',
-              npcAge: AjakanResolver.getTargetAge(character, targetName, targetRole),
-              npcRole: targetRole,
-              character: character,
-            ),
-          ),
-        );
-      },
-    ));
 
     // 4. Beri Uang Jajan
     actions.add(ActionItem(

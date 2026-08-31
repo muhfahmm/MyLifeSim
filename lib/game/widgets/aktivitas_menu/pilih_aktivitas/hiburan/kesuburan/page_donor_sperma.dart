@@ -497,25 +497,6 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            _buildActionTile(
-              icon: Icons.people,
-              color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
-              title: 'Lihat Keluarga',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NpcFamilyViewScreen(
-                      npcName: name,
-                      npcGender: 'Perempuan',
-                      npcAge: age,
-                      npcRole: 'Penerima Donor',
-                      character: widget.character,
-                    ),
-                  ),
-                );
-              },
-            ),
 
             if (isPartner) ...[
               _buildActionTile(

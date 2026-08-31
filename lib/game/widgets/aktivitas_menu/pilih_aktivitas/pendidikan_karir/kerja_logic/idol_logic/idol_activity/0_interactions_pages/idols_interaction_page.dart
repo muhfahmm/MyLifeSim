@@ -259,25 +259,6 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi Lihat Keluarga dipaling atas
-            _buildActionTile(
-              icon: Icons.people,
-              color: Colors.blueGrey,
-              title: 'Lihat Keluarga',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => NpcFamilyViewScreen(
-                      npcName: name,
-                      npcGender: gender,
-                      npcAge: age,
-                      npcRole: role,
-                    ),
-                  ),
-                );
-              },
-            ),
 
             // Aksi 1: Bercinta / Make Love (Hanya jika berpacaran dengan rekan kerja/staff)
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
