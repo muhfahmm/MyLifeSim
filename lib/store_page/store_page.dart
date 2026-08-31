@@ -54,15 +54,15 @@ class _StorePageState extends State<StorePage> {
     });
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, bool isDark) {
     return Padding(
       padding: const EdgeInsets.only(left: 16, top: 20, bottom: 8),
       child: Text(
         title.toUpperCase(),
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 13,
           fontWeight: FontWeight.bold,
-          color: Colors.blueGrey,
+          color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
           letterSpacing: 1.2,
         ),
       ),
@@ -78,15 +78,20 @@ class _StorePageState extends State<StorePage> {
     required VoidCallback onTap,
     bool isUnlocked = false,
   }) {
+    // GUNAKAN PLATFORM BRIGHTNESS UNTUK MEMASTIKAN MENGIKUTI OS
+    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: isDark ? Colors.grey.shade800 : Colors.white, // Tambahkan warna card eksplisit
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
           gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade50],
+            colors: isDark
+                ? [Colors.grey.shade800, Colors.grey.shade900]
+                : [Colors.white, Colors.grey.shade50],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
@@ -98,7 +103,7 @@ class _StorePageState extends State<StorePage> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: iconBgColor.withOpacity(0.12),
+                  color: iconBgColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: iconBgColor, size: 28),
@@ -110,10 +115,10 @@ class _StorePageState extends State<StorePage> {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 4),
@@ -121,7 +126,7 @@ class _StorePageState extends State<StorePage> {
                       description,
                       style: TextStyle(
                         fontSize: 12,
-                        color: Colors.grey.shade600,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
                         height: 1.3,
                       ),
                     ),
@@ -136,14 +141,22 @@ class _StorePageState extends State<StorePage> {
                         vertical: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade50,
+                        color: isDark
+                            ? Colors.green.shade900.withValues(alpha: 0.5)
+                            : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: Colors.green.shade200),
+                        border: Border.all(
+                          color: isDark
+                              ? Colors.green.shade600
+                              : Colors.green.shade200,
+                        ),
                       ),
                       child: Text(
                         'Aktif',
                         style: TextStyle(
-                          color: Colors.green.shade700,
+                          color: isDark
+                              ? Colors.greenAccent
+                              : Colors.green.shade700,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
@@ -166,7 +179,7 @@ class _StorePageState extends State<StorePage> {
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF5C3C10).withOpacity(0.3),
+                              color: const Color(0xFF5C3C10).withValues(alpha: 0.3),
                               blurRadius: 4,
                               offset: const Offset(0, 2),
                             )
@@ -191,6 +204,8 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
+    // GUNAKAN PLATFORM BRIGHTNESS UNTUK MEMASTIKAN MENGIKUTI OS
+    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     final character = widget.character;
 
     return Scaffold(
@@ -211,7 +226,7 @@ class _StorePageState extends State<StorePage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: ListView(
           padding: const EdgeInsets.only(bottom: 30),
           children: [
@@ -229,7 +244,7 @@ class _StorePageState extends State<StorePage> {
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.amber.shade900.withOpacity(0.3),
+                      color: Colors.amber.shade900.withValues(alpha: 0.3),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     )
@@ -270,7 +285,7 @@ class _StorePageState extends State<StorePage> {
               ),
 
             // --- SEKSI FITUR PREMIUM ---
-            _buildSectionHeader('Fitur Premium'),
+            _buildSectionHeader('Fitur Premium', isDark),
             _buildStoreItem(
               icon: Icons.flash_on_rounded,
               iconBgColor: Colors.amber.shade700,
@@ -307,7 +322,7 @@ class _StorePageState extends State<StorePage> {
 
             // --- SEKSI PENINGKAT INSTAN ---
             if (character != null) ...[
-              _buildSectionHeader('Peningkat Atribut Instan'),
+              _buildSectionHeader('Peningkat Atribut Instan', isDark),
               _buildStoreItem(
                 icon: Icons.favorite_rounded,
                 iconBgColor: Colors.red.shade400,
@@ -348,7 +363,7 @@ class _StorePageState extends State<StorePage> {
 
             // --- SEKSI TOP UP UANG GAME ---
             if (character != null) ...[
-              _buildSectionHeader('Paket Dana / Koin'),
+              _buildSectionHeader('Paket Dana / Koin', isDark),
               _buildStoreItem(
                 icon: Icons.monetization_on_rounded,
                 iconBgColor: Colors.amber.shade600,
@@ -419,7 +434,9 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return Dialog(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
@@ -431,28 +448,42 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8A5A32)),
               ),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Menghubungkan ke App Store...',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Memproses pembelian "${widget.itemName}"',
-                style: const TextStyle(color: Colors.grey, fontSize: 12),
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontSize: 12,
+                ),
                 textAlign: TextAlign.center,
               ),
             ] else ...[
               const Icon(Icons.check_circle_rounded,
                   color: Colors.green, size: 64),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 'Pembayaran Berhasil!',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Item "${widget.itemName}" telah ditambahkan.',
-                style: const TextStyle(color: Colors.grey, fontSize: 13),
+                style: TextStyle(
+                  color: isDark ? Colors.white70 : Colors.grey,
+                  fontSize: 13,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 20),

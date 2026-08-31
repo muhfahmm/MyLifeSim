@@ -226,12 +226,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
     final randomAvatar = AvatarGenerator.generateRandomAvatar(widget.gender);
 
-    final int discipline = random.nextInt(101);
-    final int fertility = random.nextInt(101);
-    final int happiness = random.nextInt(101);
-    final int health = 50 + random.nextInt(51); // 50-100
-    final int karma = random.nextInt(101);
-    final int looks = random.nextInt(101);
+    // --- PERUBAHAN ALGORITMA DI SINI ---
+    // Membuat atribut awal lebih tinggi agar pemain baru tidak frustrasi
+    final int discipline = 60 + random.nextInt(41); // 60-100
+    final int fertility = random.nextInt(101);      // 0-100 (tetap acak)
+    final int happiness = 60 + random.nextInt(41);  // 60-100
+    final int health = 70 + random.nextInt(31);     // 70-100
+    final int karma = random.nextInt(101);          // 0-100 (tetap acak)
+    final int looks = random.nextInt(101);          // 0-100 (tetap acak)
     
     final int sexRoll = random.nextInt(100);
     String sexuality = 'Heteroseksual';
@@ -243,8 +245,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
       sexuality = 'Homoseksual';
     }
     
-    final int smarts = random.nextInt(101);
-    final int willpower = random.nextInt(101);
+    final int smarts = 60 + random.nextInt(41);     // 60-100
+    final int willpower = random.nextInt(101);      // 0-100 (tetap acak)
     
     final List<String> talentList = ['Tidak Ada', 'Akting', 'Kriminalitas', 'Pengedar', 'Modeling', 'Musik', 'Olahraga'];
     String specialTalent = 'Tidak Ada';
@@ -745,7 +747,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
                   
                   const SizedBox(height: 8),
                   
-                  Card(
+                                    Card(
                     elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -755,7 +757,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
                       leading: const Icon(Icons.flash_on, color: Colors.amber),
                       title: Text('⚡ Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                       subtitle: Text(
-                        'Penampilan: $_looks% | Kecerdasan: $_smarts% | Kesehatan: $_health%',
+                        // BAGIAN YANG DIUBAH
+                        'Kesehatan: $_health% | Kebahagiaan: $_happiness% | Kecerdasan: $_smarts%',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
                       trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
