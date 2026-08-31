@@ -62,7 +62,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     'PENDIDIKAN & BAHASA': [
       'Sastra & Bahasa',
       'Pendidikan / PGSD',
-      'Pendidikan Agama Islam',
+      'Pendidikan Agama',
     ],
     'KREATIF & SENI': [
       'Desain Komunikasi Visual (DKV)',
@@ -141,7 +141,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         return Icons.book;
       case 'Pendidikan / PGSD':
         return Icons.school;
-      case 'Pendidikan Agama Islam':
+      case 'Pendidikan Agama':
         return Icons.mosque;
       case 'Desain Komunikasi Visual (DKV)':
         return Icons.brush;

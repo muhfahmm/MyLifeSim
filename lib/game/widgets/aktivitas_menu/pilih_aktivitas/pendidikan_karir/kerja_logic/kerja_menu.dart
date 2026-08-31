@@ -4,6 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 import 'actions/rekan_kerja.dart';
 import 'actions/bekerja_keras.dart';
+import 'actions/murid_kerja.dart';
 import 'idol_logic/idol_manager.dart';
 import 'idol_logic/idol_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
@@ -122,11 +123,11 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
       // PENDIDIKAN & BAHASA
       case 'Guru SD':
-        return ['Pendidikan / PGSD', 'Pendidikan Agama Islam'];
+        return ['Pendidikan / PGSD', 'Pendidikan Agama'];
       case 'Guru SMP':
       case 'Guru SMA':
       case 'Dosen':
-        return ['Pendidikan / PGSD', 'Pendidikan Agama Islam', 'Sastra & Bahasa', 'Hukum', 'Kedokteran', 'Teknik Informatika'];
+        return ['Pendidikan / PGSD', 'Pendidikan Agama', 'Sastra & Bahasa', 'Hukum', 'Kedokteran', 'Teknik Informatika'];
       case 'Penerjemah':
         return ['Sastra & Bahasa', 'Hubungan Internasional'];
       case 'Penulis':
@@ -404,6 +405,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           : Character.globalLastNames;
       final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
       final ageVal = 30 + random.nextInt(31);
+      String? subject;
+      if (job.startsWith('Guru SD')) {
+        subject = ['Pendidikan Agama', 'Bahasa Indonesia', 'Matematika', 'PJOK', 'Seni Budaya', 'IPA', 'IPS', 'PPKn', 'Informatika'][random.nextInt(9)];
+      } else if (job.startsWith('Guru SMP')) {
+        subject = ['Matematika', 'IPA', 'Bahasa Indonesia', 'Bahasa Inggris', 'Pendidikan Agama', 'PPKn', 'IPS', 'Seni Budaya', 'PJOK', 'Informatika'][random.nextInt(10)];
+      } else if (job.startsWith('Guru SMA')) {
+        subject = ['Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'Geografi', 'Sosiologi', 'Ekonomi', 'Pendidikan Agama', 'PPKn', 'PJOK', 'Seni Budaya'][random.nextInt(14)];
+      }
+
       widget.character.supervisor = {
         'name': name,
         'gender': gender,
@@ -412,6 +422,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         'isDeceased': 'false',
         'sexuality': 'Heteroseksual',
         'intelligence': (50 + random.nextInt(41)).toString(),
+        if (subject != null) 'subject': subject,
       };
     }
 
@@ -445,16 +456,38 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           : Character.globalLastNames;
       final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
       int ageVal = 20 + random.nextInt(41);
-      if (job.startsWith('Talent Esports')) {
+      if (job.startsWith('Guru')) {
+        final double roll = random.nextDouble();
+        if (roll < 0.20) {
+          ageVal = 22 + random.nextInt(9); // 22-30 (20%)
+        } else if (roll < 0.60) {
+          ageVal = 31 + random.nextInt(10); // 31-40 (40%)
+        } else if (roll < 0.90) {
+          ageVal = 41 + random.nextInt(10); // 41-50 (30%)
+        } else {
+          ageVal = 51 + random.nextInt(10); // 51-60 (10%)
+        }
+      } else if (job.startsWith('Talent Esports')) {
         ageVal = 13 + random.nextInt(6); // 13-18
       } else if (job.startsWith('Brand Ambassador Esport')) {
         ageVal = 15 + random.nextInt(9); // 15-23
       } else if (job.startsWith('Pro Player Esport')) {
         ageVal = 13 + random.nextInt(13); // 13-25
       }
-      final String coworkerRole = isProPlayer 
+      String coworkerRole = isProPlayer 
           ? 'Pro Player' 
           : (job.startsWith('Brand Ambassador Esport') ? 'Brand Ambassador' : 'Talent Esports');
+      String? subject;
+      if (job.startsWith('Guru SD')) {
+        coworkerRole = 'Guru';
+        subject = ['Pendidikan Agama', 'Bahasa Indonesia', 'Matematika', 'PJOK', 'Seni Budaya', 'IPA', 'IPS', 'PPKn', 'Informatika'][random.nextInt(9)];
+      } else if (job.startsWith('Guru SMP')) {
+        coworkerRole = 'Guru';
+        subject = ['Matematika', 'IPA', 'Bahasa Indonesia', 'Bahasa Inggris', 'Pendidikan Agama', 'PPKn', 'IPS', 'Seni Budaya', 'PJOK', 'Informatika'][random.nextInt(10)];
+      } else if (job.startsWith('Guru SMA')) {
+        coworkerRole = 'Guru';
+        subject = ['Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi', 'Sejarah', 'Geografi', 'Sosiologi', 'Ekonomi', 'Pendidikan Agama', 'PPKn', 'PJOK', 'Seni Budaya'][random.nextInt(14)];
+      }
 
       // Tentukan seksualitas coworker secara acak (realistis)
       final double sexRoll = random.nextDouble();
@@ -476,6 +509,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         'sexuality': coworkerSexuality,
         'intelligence': (30 + random.nextInt(61)).toString(),
         'role': coworkerRole,
+        if (subject != null) 'subject': subject,
       });
     }
   }
@@ -583,6 +617,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   }
 
   // ============================================================
+  // HELPER: MEMFORMAT DAFTAR JURUSAN MENJADI KALIMAT YANG RAPI
+  // ============================================================
+  String _formatAllowedMajors(List<String> majors) {
+    if (majors.isEmpty) return 'Tidak ada spesifikasi jurusan';
+    if (majors.length == 1) return majors.first;
+    if (majors.length == 2) return '${majors[0]} atau ${majors[1]}';
+    return '${majors.sublist(0, majors.length - 1).join(', ')}, atau ${majors.last}';
+  }
+
+  // ============================================================
   // UI
   // ============================================================
   @override
@@ -685,8 +729,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(4),
                               child: LinearProgressIndicator(
-                                // Gunakan nilai performa dari kombinasi disiplin dan kebahagiaan
-                                // (atau bisa diganti dengan field khusus di character jika ada)
                                 value: ((character.discipline + character.happiness) / 2) / 100,
                                 minHeight: 8,
                                 backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
@@ -786,6 +828,29 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   },
                 ),
               ),
+              (() {
+                final String jobTitle = character.jobName ?? '';
+                final bool isTeacher = jobTitle.startsWith('Guru');
+                if (!isTeacher) return const SizedBox.shrink();
+                
+                return Padding(
+                  padding: const EdgeInsets.only(top: 8.0),
+                  child: _buildMenuTile(
+                    context: context,
+                    icon: Icons.school,
+                    color: Colors.indigo,
+                    title: 'Murid & Wali Kelas',
+                    subtitle: 'Berinteraksi dengan murid didik dan wali kelas',
+                    page: MuridKerjaPage(
+                      character: character,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    ),
+                  ),
+                );
+              })(),
               (() {
                 final String jName = character.jobName ?? '';
                 final bool isBA = jName.startsWith('Brand Ambassador Esport');
@@ -1047,6 +1112,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     );
   }
 
+  // ============================================================
+  // WIDGET KARTU PEKERJAAN (DENGAN DETAIL GELAR YANG JELAS)
+  // ============================================================
   Widget _buildJobCard(Map<String, dynamic> job, Character character) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final meetsIntel = character.intelligence >= job['minIntel'];
@@ -1054,6 +1122,12 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     final allowed = _getAllowedMajors(job['title']);
     final meetsGelar = requiresGelar ? _hasMatchingMajor(character, allowed) : true;
     final canApply = meetsIntel && meetsGelar;
+
+    // Dapatkan jurusan pengguna saat ini untuk ditampilkan sebagai perbandingan
+    final baseMajor = _getBaseMajor(character.univMajor);
+    final currentMajors = character.graduatedMajors.isNotEmpty 
+        ? character.graduatedMajors.join(", ") 
+        : (baseMajor ?? "Belum lulus / Tidak ada");
 
     return Card(
       elevation: 0,
@@ -1089,12 +1163,30 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                 color: isDark ? Colors.white60 : Colors.grey,
               ),
             ),
+            // --- LOGIKA PERSYARATAN GELAR YANG DIPERBAHARUI ---
             if (requiresGelar) ...[
               if (!character.isUnivGraduated)
-                Text('⚠️ Membutuhkan gelar sarjana', style: TextStyle(fontSize: 11, color: isDark ? Colors.orangeAccent : Colors.orange))
+                // Kasus 1: Belum lulus sama sekali
+                Text(
+                  '⚠️ Membutuhkan gelar Sarjana (S1) di bidang: ${_formatAllowedMajors(allowed)}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                  ),
+                )
               else if (!meetsGelar)
-                Text('⚠️ Butuh Gelar: ${allowed.join(", ")}', style: TextStyle(fontSize: 11, color: isDark ? Colors.orangeAccent : Colors.orange)),
+                // Kasus 2: Sudah lulus tapi jurusan salah
+                Text(
+                  '⚠️ Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}.\nJurusanmu saat ini: $currentMajors.',
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                  ),
+                ),
             ],
+            // ------------------------------------------------------
           ],
         ),
         trailing: Icon(
@@ -1112,8 +1204,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   !meetsIntel
                       ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
                       : (!character.isUnivGraduated
-                          ? 'Butuh gelar sarjana untuk posisi ini'
-                          : 'Jurusan Anda tidak sesuai. Butuh: ${allowed.join(", ")}'),
+                          ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
+                          : 'Jurusan Anda tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}. Jurusanmu: $currentMajors.'),
                 ),
                 backgroundColor: Colors.red,
               ),

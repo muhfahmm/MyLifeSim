@@ -747,6 +747,18 @@ class AjakanHandler {
             character.activeProposal = mlProp ?? pacaranProp;
           }
         }
+
+        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi
+        if (character.activeProposal == null && random.nextInt(100) < 15) {
+          character.activeProposal = {
+            'name': candidate['name'],
+            'relation': candidate['relation'],
+            'type': 'Masturbasi',
+            'gender': candidate['gender'],
+            'age': candidate['age'],
+            'role': candidate['role'],
+          };
+        }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
         final String rel = (candidate['relation'] ?? '').toString().toLowerCase();
         final bool isCloseFamily = rel == 'ayah' || rel == 'ayah kandung' || rel == 'ayah tiri' ||
@@ -854,12 +866,20 @@ class AjakanHandler {
             character.activeProposal = ml ?? pacaran;
           }
         }
+
+        // Jika tidak mendapat ajakan pacaran/ML, beri peluang 15% diajak Masturbasi
+        if (character.activeProposal == null && random.nextInt(100) < 15) {
+          character.activeProposal = {
+            'name': candidate['name'],
+            'relation': candidate['relation'],
+            'type': 'Masturbasi',
+            'gender': candidate['gender'],
+            'age': candidate['age'],
+            'role': candidate['role'],
+          };
+        }
       }
     }
-
-
-
-
 
     if (character.activeProposal != null) {
       final String propGender = (character.activeProposal!['gender'] ?? '').trim().toLowerCase();

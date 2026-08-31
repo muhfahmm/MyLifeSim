@@ -23,12 +23,21 @@ class SchoolGenerator {
     for (int i = 0; i < count; i++) {
       final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
       final name = generateRandomName(gender, character);
-      // Jarak usia maksimal 1-2 tahun (-1, 0, atau +1)
+      // Menyesuaikan umur murid didikan secara dinamis berdasarkan jenjang tempat mengajar user
       int classmateAge = character.age + _random.nextInt(3) - 1;
-      if (character.age >= 6 && classmateAge < 6) {
-        classmateAge = 6;
-      } else if (classmateAge < 0) {
-        classmateAge = 0;
+      final String jobName = character.jobName ?? '';
+      if (jobName.startsWith('Guru SD')) {
+        classmateAge = 6 + _random.nextInt(7); // 6 - 12 tahun
+      } else if (jobName.startsWith('Guru SMP')) {
+        classmateAge = 13 + _random.nextInt(3); // 13 - 15 tahun
+      } else if (jobName.startsWith('Guru SMA')) {
+        classmateAge = 16 + _random.nextInt(3); // 16 - 18 tahun
+      } else {
+        if (character.age >= 6 && classmateAge < 6) {
+          classmateAge = 6;
+        } else if (classmateAge < 0) {
+          classmateAge = 0;
+        }
       }
 
       character.classmates.add({
@@ -68,45 +77,57 @@ class SchoolGenerator {
       };
     }
 
-    // SD Teachers
+    // SD Teachers (5 Guru Kelas 5-6/Mapel)
     if (character.sdTeachers.isEmpty) {
-      for (int i = 0; i < 3; i++) {
+      final List<String> sdSubjects = [
+        'Bahasa Indonesia', 'Matematika', 'IPA', 'IPS', 'PPKn', 'Bahasa Inggris', 'Seni Budaya', 'Informatika', 'Pendidikan Agama', 'PJOK'
+      ];
+      for (int i = 0; i < 6; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.sdTeachers.add({
           'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
-          'subject': ['Matematika', 'B. Indonesia', 'IPA', 'IPS', 'B. Inggris'][i % 5],
+          'subject': sdSubjects[i % sdSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
           'sexuality': SexualityLogic.getTeacherSexuality(gender),
         });
       }
     }
 
-    // SMP Teachers
+    // SMP Teachers (10 Guru Mapel Lengkap)
     if (character.smpTeachers.isEmpty) {
-      for (int i = 0; i < 3; i++) {
+      final List<String> smpSubjects = [
+        'Matematika', 'IPA', 'Bahasa Indonesia', 'Bahasa Inggris', 'Pendidikan Agama',
+        'PPKn', 'IPS', 'Seni Budaya', 'PJOK', 'Informatika', 'Prakarya'
+      ];
+      for (int i = 0; i < 10; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.smpTeachers.add({
           'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
-          'subject': ['Matematika', 'B. Indonesia', 'Fisika', 'Sejarah', 'Olahraga'][i % 5],
+          'subject': smpSubjects[i % smpSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
           'sexuality': SexualityLogic.getTeacherSexuality(gender),
         });
       }
     }
 
-    // SMA Teachers
+    // SMA Teachers (14 Guru Mapel Lengkap dari Peminatan)
     if (character.smaTeachers.isEmpty) {
-      for (int i = 0; i < 3; i++) {
+      final List<String> smaSubjects = [
+        'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Fisika', 'Kimia', 'Biologi',
+        'Sejarah', 'Geografi', 'Sosiologi', 'Ekonomi', 'Pendidikan Agama', 'PPKn', 'PJOK',
+        'Seni Budaya', 'Informatika', 'Akuntansi', 'Antropologi'
+      ];
+      for (int i = 0; i < 14; i++) {
         final gender = _random.nextBool() ? 'Laki-laki' : 'Perempuan';
         character.smaTeachers.add({
           'name': generateRandomName(gender, character),
           'gender': gender,
           'relationship': (45 + _random.nextInt(16)).toString(),
-          'subject': ['Kalkulus', 'Kimia', 'Biologi', 'Sosiologi', 'Ekonomi'][i % 5],
+          'subject': smaSubjects[i % smaSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
           'sexuality': SexualityLogic.getTeacherSexuality(gender),
         });

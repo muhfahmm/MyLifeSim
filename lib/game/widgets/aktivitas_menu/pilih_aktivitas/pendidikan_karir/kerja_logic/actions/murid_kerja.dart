@@ -1,28 +1,35 @@
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/actions/murid_kerja.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
 
-class RekanKerjaPage extends StatefulWidget {
+class MuridKerjaPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
 
-  const RekanKerjaPage({
+  const MuridKerjaPage({
     super.key,
     required this.character,
     required this.onRefresh,
   });
 
   @override
-  State<RekanKerjaPage> createState() => _RekanKerjaPageState();
+  State<MuridKerjaPage> createState() => _MuridKerjaPageState();
 }
 
-class _RekanKerjaPageState extends State<RekanKerjaPage> {
+class _MuridKerjaPageState extends State<MuridKerjaPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final coworkers = widget.character.coworkers;
+    
+    // Murid-murid didapat dari target 'classmates' / murid sekolah tempat user mengajar.
+    // Jika daftar murid kosong, kita fallback/generate list murid default.
+    final students = widget.character.classmates;
+    
+    // Atasan/Supervisor diganti dengan 'Wali Kelas' (menggunakan data supervisor / rekan kerja guru)
     final supervisor = widget.character.supervisor;
+    
     final userAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
       widget.character,
       happiness: widget.character.happiness,
@@ -30,21 +37,17 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rekan Kerja & Atasan 👥'),
-        backgroundColor: Colors.green.shade700,
+        title: const Text('Murid & Wali Kelas 🏫'),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.indigo,
         foregroundColor: Colors.white,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // ================= SUPERVISOR SECTION =================
+          // ================= WALI KELAS (REKAN KERJA GURU) =================
           if (supervisor != null) ...[
             (() {
-              final String jobName = widget.character.jobName ?? '';
-              final bool isEsport = jobName.startsWith('Pro Player Esport') || jobName.startsWith('Brand Ambassador Esport') || jobName.startsWith('Talent Esports');
-              final String supervisorLabel = isEsport ? 'CEO' : 'Supervisor';
-              final String supervisorHeader = isEsport ? 'CEO / Manajemen' : 'Atasan / Supervisor';
-
               final String name = supervisor['name']!;
               final String gender = supervisor['gender']!;
               final int age = int.tryParse(supervisor['age'] ?? '40') ?? 40;
@@ -62,10 +65,10 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.supervisor_account, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
+                      Icon(Icons.assignment_ind, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
                       const SizedBox(width: 8),
                       Text(
-                        supervisorHeader,
+                        'Wali Kelas',
                         style: TextStyle(
                           fontSize: 16, 
                           fontWeight: FontWeight.bold, 
@@ -105,15 +108,15 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                               color: Colors.blue.shade700,
                               borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text(
-                              supervisorLabel,
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            child: const Text(
+                              'Guru Wali Kelas',
+                              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
                         ],
                       ),
                       subtitle: Text(
-                        '${supervisor['subject'] != null ? 'Guru ${supervisor['subject']} 📚 • ' : ''}$supervisorLabel • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${supervisor['intelligence']}%',
+                        'Wali Kelas • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${supervisor['intelligence']}%',
                         style: TextStyle(
                           color: isDark ? Colors.white70 : Colors.black54,
                         ),
@@ -142,42 +145,24 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
             const SizedBox(height: 24),
           ],
 
-          // ================= TEAM SECTION =================
+          // ================= DAFTAR MURID =================
           Row(
             children: [
-              Icon(Icons.group, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
+              Icon(Icons.people, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
               const SizedBox(width: 8),
               Text(
-                'Tim Kerja',
+                'Daftar Murid Didik',
                 style: TextStyle(
                   fontSize: 16, 
                   fontWeight: FontWeight.bold, 
                   color: isDark ? Colors.white70 : Colors.blueGrey,
                 ),
               ),
-              const SizedBox(width: 8),
-              if (supervisor != null)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.green.shade900 : Colors.green.shade100,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: isDark ? Colors.green.shade700 : Colors.green.shade300),
-                  ),
-                  child: Text(
-                    'Dikontrol oleh ${supervisor['name']!.split(" ").first}',
-                    style: TextStyle(
-                      fontSize: 10, 
-                      fontWeight: FontWeight.bold, 
-                      color: isDark ? Colors.greenAccent : Colors.green.shade800,
-                    ),
-                  ),
-                ),
             ],
           ),
           const SizedBox(height: 12),
 
-          // User Card (Kamu)
+          // User Card (Kamu sebagai Guru)
           Card(
             elevation: 0,
             color: isDark ? Colors.grey.shade800 : Colors.green.shade50,
@@ -210,14 +195,14 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: const Text(
-                      'Kamu',
+                      'Guru',
                       style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
               ),
               subtitle: Text(
-                'Posisi: ${widget.character.jobName} • Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
+                'Posisi: ${widget.character.jobName} • Umur: ${widget.character.age} tahun • Kinerja Guru: Maksimal',
                 style: TextStyle(
                   color: isDark ? Colors.white70 : Colors.black54,
                 ),
@@ -225,12 +210,12 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
             ),
           ),
 
-          if (coworkers.isEmpty)
+          if (students.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 32.0),
                 child: Text(
-                  'Tidak ada rekan kerja saat ini.',
+                  'Tidak ada murid saat ini.',
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.grey, 
                     fontSize: 16,
@@ -239,21 +224,22 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
               ),
             )
           else
-            ...coworkers.map((cm) {
+            ...students.map((cm) {
               final String name = cm['name']!;
               final String gender = cm['gender']!;
-              final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
+              final int age = int.tryParse(cm['age'] ?? '12') ?? 12;
               final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
               final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
                 name: name,
                 gender: gender,
                 age: age,
-                schoolLevel: 'SMA',
+                schoolLevel: 'SMP',
                 happiness: rel,
               );
 
               return Card(
                 elevation: 0,
+                color: isDark ? Colors.grey.shade800 : Colors.white,
                 margin: const EdgeInsets.only(bottom: 8),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -270,37 +256,21 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                         child: Text(
                           name,
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.bold, 
                             color: isDark ? Colors.white : Colors.black87,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      (() {
-                        final String? relStr = widget.character.getPartnerRelation(name);
-                        if (relStr == null) return const SizedBox.shrink();
-                        return Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.pink,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            relStr,
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      }()),
                     ],
                   ),
-                   subtitle: Text(
-                    '${cm['subject'] != null ? 'Guru ${cm['subject']} 📚 • ' : ''}Rekan Kerja • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
+                  subtitle: Text(
+                    'Murid • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence'] ?? '50'}%',
                     style: TextStyle(
                       color: isDark ? Colors.white70 : Colors.black54,
                     ),
                   ),
-                  trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.black87),
+                  trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.grey),
                   onTap: () {
                     Navigator.push(
                       context,

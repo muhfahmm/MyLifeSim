@@ -31,6 +31,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final classmates = widget.character.classmates;
     final age = widget.character.age;
 
@@ -55,7 +56,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Teman Sekelas (Kelas)'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
       body: ListView.builder(
@@ -83,14 +84,20 @@ class _KelasActionPageState extends State<KelasActionPage> {
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.teal.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.teal.shade50,
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.transparent,
                   backgroundImage: NetworkImage(avatarUrl),
                 ),
-                title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Guru Wali Kelas (Guru $subject) • Umur: $ageVal tahun • Hubungan: $rel%'),
+                title: Text(
+                  name,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                ),
+                subtitle: Text(
+                  'Guru Wali Kelas (Guru $subject) • Umur: $ageVal tahun • Hubungan: $rel%',
+                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                ),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.push(
@@ -126,14 +133,20 @@ class _KelasActionPageState extends State<KelasActionPage> {
               elevation: 2,
               margin: const EdgeInsets.only(bottom: 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              color: Colors.blue.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
               child: ListTile(
                 leading: CircleAvatar(
                   backgroundColor: Colors.transparent,
                   backgroundImage: NetworkImage(userAvatarUrl),
                 ),
-                title: Text(widget.character.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: Text('Siswa • Kamu • Umur: ${widget.character.age} tahun'),
+                title: Text(
+                  widget.character.name,
+                  style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                ),
+                subtitle: Text(
+                  'Siswa • Kamu • Umur: ${widget.character.age} tahun',
+                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                ),
                 trailing: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
@@ -167,6 +180,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
             elevation: 2,
             margin: const EdgeInsets.only(bottom: 12),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            color: isDark ? Colors.grey.shade800 : null,
             child: ListTile(
               leading: CircleAvatar(
                 backgroundColor: Colors.transparent,
@@ -175,7 +189,11 @@ class _KelasActionPageState extends State<KelasActionPage> {
               title: Row(
                 children: [
                   Expanded(
-                    child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                    child: Text(
+                      name,
+                      style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                   (() {
                     final String? relStr = widget.character.getPartnerRelation(name);
@@ -198,16 +216,22 @@ class _KelasActionPageState extends State<KelasActionPage> {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Teman Sekelas • Umur: $age tahun • Kecerdasan: ${cm['intelligence'] ?? '50'}%'),
+                  Text(
+                    'Teman Sekelas • Umur: $age tahun • Kecerdasan: ${cm['intelligence'] ?? '50'}%',
+                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                  ),
                   const SizedBox(height: 6),
-                  Text('Hubungan: $rel%'),
+                  Text(
+                    'Hubungan: $rel%',
+                    style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                  ),
                   const SizedBox(height: 4),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(4),
                     child: LinearProgressIndicator(
                       value: rel / 100.0,
                       color: rel > 70 ? Colors.green : (rel > 40 ? Colors.orange : Colors.red),
-                      backgroundColor: Colors.grey.shade200,
+                      backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                       minHeight: 6,
                     ),
                   ),

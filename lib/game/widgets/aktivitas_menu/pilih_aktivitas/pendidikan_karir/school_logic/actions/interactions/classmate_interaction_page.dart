@@ -1,5 +1,3 @@
-// lib/game/widgets/aktivitas_menu/school_logic/actions/interactions/classmate_interaction_page.dart
-
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
@@ -49,6 +47,8 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Gunakan platformBrightnessOf agar selalu mengikuti mode OS
+    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     final name = widget.classmate['name']!;
     
     // Jika teman sekelas ini sudah menjadi pasangan/pacar aktif, tampilkan menu ActionMenuScreen pacar agar menunya konsisten
@@ -90,10 +90,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -102,10 +103,10 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             // Header Profile Card
             Card(
               elevation: 0,
-              color: Colors.grey.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -119,7 +120,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     const SizedBox(height: 12),
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     () {
@@ -134,19 +139,22 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       }
                       return Text(
                         '$typeLabel • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
-                        style: const TextStyle(fontSize: 14, color: Colors.black54),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
                       );
                     }(),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text('Tingkat Kepuasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text('Tingkat Kepuasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: rel / 100.0,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 rel > 70 ? Colors.green : (rel > 40 ? Colors.amber : Colors.red),
                               ),
@@ -168,13 +176,13 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     const SizedBox(height: 12),
                     Row(
                       children: [
-                        const Text('Tingkat Kecerdasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text('Tingkat Kecerdasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: int.parse(widget.classmate['intelligence'] ?? '50') / 100.0,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                               valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
                               minHeight: 10,
                             ),
@@ -221,15 +229,20 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                         children: [
                           Row(
                             children: [
-                              const Text('Nilai Kekayaan: ',
-                                  style: TextStyle(
-                                      fontSize: 12, fontWeight: FontWeight.bold)),
+                              Text(
+                                'Nilai Kekayaan: ',
+                                style: TextStyle(
+                                  fontSize: 12, 
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(4),
                                   child: LinearProgressIndicator(
                                     value: progressVal,
-                                    backgroundColor: Colors.grey.shade200,
+                                    backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                     valueColor: AlwaysStoppedAnimation<Color>(barColor),
                                     minHeight: 10,
                                   ),
@@ -252,7 +265,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                         ],
@@ -264,16 +277,21 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'PILIH AKSI INTERAKSI',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+              style: TextStyle(
+                fontSize: 12, 
+                fontWeight: FontWeight.bold, 
+                color: isDark ? Colors.white70 : Colors.grey, 
+                letterSpacing: 1.0,
+              ),
             ),
             const SizedBox(height: 12),
 
             // ============ TOMBOL LIHAT KELUARGA ============
             _buildActionTile(
               icon: Icons.people,
-              color: Colors.blueGrey,
+              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
               title: 'Lihat Keluarga',
               onTap: () {
                 Navigator.push(
@@ -538,17 +556,29 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
     required String title,
     required VoidCallback onTap,
   }) {
+    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade100),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade100),
       ),
+      color: isDark ? Colors.grey.shade800 : null,
       child: ListTile(
         leading: Icon(icon, color: color),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: onTap,
       ),
     );

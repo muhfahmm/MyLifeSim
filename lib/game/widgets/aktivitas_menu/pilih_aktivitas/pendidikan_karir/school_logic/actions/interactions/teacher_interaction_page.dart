@@ -53,6 +53,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final name = widget.teacher['name']!;
     final gender = widget.teacher['gender']!;
     final int age = int.tryParse(widget.teacher['age'] ?? '40') ?? 40;
@@ -68,10 +69,11 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
@@ -80,10 +82,10 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             // Header Profile Card
             Card(
               elevation: 0,
-              color: Colors.grey.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -97,26 +99,36 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     const SizedBox(height: 12),
                     Text(
                       name,
-                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     () {
                       final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
                       return Text(
                         '${widget.role} • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
-                        style: const TextStyle(fontSize: 14, color: Colors.black54),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
                       );
                     }(),
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text('Tingkat Kepuasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Tingkat Kepuasan: ',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                        ),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: rel / 100.0,
-                              backgroundColor: Colors.grey.shade200,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
                                 rel > 70 ? Colors.green : (rel > 40 ? Colors.amber : Colors.red),
                               ),
@@ -156,15 +168,20 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                         children: [
                           Row(
                             children: [
-                              const Text('Nilai Kekayaan: ',
-                                  style: TextStyle(
-                                      fontSize: 12, fontWeight: FontWeight.bold)),
+                              Text(
+                                'Nilai Kekayaan: ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
                               Expanded(
                                 child: ClipRRect(
                                   borderRadius: BorderRadius.circular(4),
                                   child: LinearProgressIndicator(
                                     value: progressVal,
-                                    backgroundColor: Colors.grey.shade200,
+                                    backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                     valueColor: AlwaysStoppedAnimation<Color>(barColor),
                                     minHeight: 10,
                                   ),
@@ -187,7 +204,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black87,
+                              color: isDark ? Colors.white : Colors.black87,
                             ),
                           ),
                         ],
@@ -199,16 +216,21 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
             ),
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'PILIH AKSI INTERAKSI',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.grey,
+                letterSpacing: 1.0,
+              ),
             ),
             const SizedBox(height: 12),
 
             // ============ TOMBOL LIHAT KELUARGA ============
             _buildActionTile(
               icon: Icons.people,
-              color: Colors.blueGrey,
+              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
               title: 'Lihat Keluarga',
               onTap: () {
                 Navigator.push(
@@ -429,17 +451,29 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     required String title,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade100),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade100),
       ),
+      color: isDark ? Colors.grey.shade800 : null,
       child: ListTile(
         leading: Icon(icon, color: color),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.w600,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: onTap,
       ),
     );

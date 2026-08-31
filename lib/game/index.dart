@@ -27,6 +27,7 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/daftar_pasangan_hamil.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -2501,9 +2502,20 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
             );
           }
         } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
-          if (!_character.partnerIsPregnant && myFertility > 0 && random.nextDouble() < myFertility) {
+          // Ambil daftar nama pasangan yang sudah hamil (jika ada)
+          final String currentPartners = _character.pregnantByPartnerName ?? '';
+          final bool isAlreadyPregnantByThisPartner = currentPartners.split(', ').map((e) => e.trim().toLowerCase()).contains(partnerName.trim().toLowerCase());
+
+          // Jika pasangan ini BELUM hamil, dan roll berhasil:
+          if (!isAlreadyPregnantByThisPartner && myFertility > 0 && random.nextDouble() < myFertility) {
+            // Tambahkan nama pasangan baru ke daftar
+            if (currentPartners.isEmpty) {
+              _character.pregnantByPartnerName = partnerName;
+            } else {
+              _character.pregnantByPartnerName = '$currentPartners, $partnerName';
+            }
+            
             _character.partnerIsPregnant = true;
-            _character.pregnantByPartnerName = partnerName;
             _character.pregnantByPartnerRole = proposal['role'] ?? relation;
             _character.inbox.add(
               '👶 Kabar Kehamilan: Pasangan/keluargamu, $partnerName, hamil dari hasil hubungan intim denganmu!'
@@ -2544,7 +2556,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     }
 
     String addText = '';
-    if (_character.pregnantByPartnerName == partnerName) {
+    final String currentPartners = _character.pregnantByPartnerName ?? '';
+    final bool isThisPartnerPregnant = currentPartners.split(', ').map((e) => e.trim().toLowerCase()).contains(partnerName.trim().toLowerCase());
+
+    if (isThisPartnerPregnant) {
       if (_character.isPregnant) {
         addText = 'Kamu hamil! 🍼';
       } else if (_character.partnerIsPregnant) {
@@ -2827,33 +2842,57 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   // --- STATUS KEHAMILAN (PERBAIKAN) ---
                   if (_character.isPregnant || _character.partnerIsPregnant) ...[
                     const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.pink.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.pink.shade200, width: 1.2),
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            _character.isPregnant ? Icons.pregnant_woman : Icons.child_care,
-                            color: Colors.pink,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            _character.isPregnant 
-                              ? 'Status: Hamil 🍼' 
-                              : 'Status: ${_character.partner?['name'] ?? 'Pasangan'} Hamil 👶',
-                            style: const TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
+                    InkWell(
+                      onTap: _character.partnerIsPregnant
+                          ? () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => DaftarPasanganHamilScreen(character: _character),
+                                ),
+                              ).then((_) {
+                                if (mounted) setState(() {});
+                              });
+                            }
+                          : null,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.pink.shade50,
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.pink.shade200, width: 1.2),
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _character.isPregnant ? Icons.pregnant_woman : Icons.child_care,
                               color: Colors.pink,
+                              size: 18,
                             ),
-                          ),
-                        ],
+                            const SizedBox(width: 6),
+                            Text(
+                              _character.isPregnant 
+                                ? 'Status: Hamil 🍼' 
+                                : () {
+                                    final String partnersPregnant = _character.pregnantByPartnerName ?? '';
+                                    if (partnersPregnant.contains(', ')) {
+                                      int jumlahHamil = partnersPregnant.split(', ').length;
+                                      return 'Status: $jumlahHamil Pasangan Hamil 👶';
+                                    } else if (partnersPregnant.isNotEmpty) {
+                                      return 'Status: Pasangan Hamil ($partnersPregnant) 👶';
+                                    }
+                                    return 'Status: Pasangan Hamil 👶';
+                                  }(),
+                              style: const TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.pink,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

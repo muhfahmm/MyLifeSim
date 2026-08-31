@@ -205,6 +205,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return '$cmAge tahun';
         }
       }
+      for (var cw in widget.character.coworkers) {
+        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
+          int cwAge = int.tryParse(cw['age'] ?? '0') ?? 0;
+          return '$cwAge tahun';
+        }
+      }
     }
     return 'Tidak diketahui';
   }
@@ -478,6 +484,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return int.tryParse(cm['relationship'] ?? '50') ?? 50;
         }
       }
+      for (var cw in widget.character.coworkers) {
+        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
+          return int.tryParse(cw['relationship'] ?? '50') ?? 50;
+        }
+      }
     }
     return 50;
   }
@@ -622,6 +633,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         if (expectedLabel == name || cm['name'] == name) {
           int currentRel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
           cm['relationship'] =
+              (currentRel + changeAmount).clamp(0, 100).toString();
+          break;
+        }
+      }
+      for (var cw in widget.character.coworkers) {
+        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
+          int currentRel = int.tryParse(cw['relationship'] ?? '50') ?? 50;
+          cw['relationship'] =
               (currentRel + changeAmount).clamp(0, 100).toString();
           break;
         }
@@ -936,30 +955,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       },
     );
 
-    if ((widget.targetRole == 'Pacar' ||
-            widget.targetRole == 'Pacar (Rahasia)') &&
-        age < 12) {
-      final List<ActionItem> standardActions = getAge6to11Actions(
-        context,
-        widget.character,
-        widget.targetName,
-        widget.targetRole,
-        _random,
-        _showResultDialog,
-        _updateRelationship,
-        _updateState,
-      );
-      actions = standardActions.where((action) {
-        final label = action.label.toLowerCase();
-        return label == 'pujian' ||
-            label == 'hadiah' ||
-            label == 'menyinggung' ||
-            label == 'pergi ke bioskop bersama' ||
-            label == 'habiskan waktu bersama' ||
-            label == 'minta barang' ||
-            label == 'percakapan';
-      }).toList();
-    } else if (isChild && targetAge < 12) {
+    // Logika filter menu pacar dihilangkan agar menu dewasa/normal konsisten dengan getAge12PlusActions / getAge6to11Actions standar.
+    if (isChild && targetAge < 12) {
       // Jika target anak kita di bawah 12 tahun, tampilkan menu khusus orang tua mengasuh anak:
       // - Beri Uang Jajan (Minta uang dari sisi anak, di sini orang tua yang memberi uang)
       // - Beri Hadiah

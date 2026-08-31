@@ -1,26 +1,96 @@
-2. Event Meet & Greet / Fansign 📸
-Aktivitas: Menghadiri acara ketemu penggemar atau tanda tangan.
+1. Mapel untuk Guru SD (Sekolah Dasar)
+Biasanya guru SD mengampu satu kelas (wali kelas) atau mapel tertentu untuk beberapa kelas.
 
-Efek: Menaikkan Kebahagiaan dan Penampilan secara besar. Namun, membutuhkan biaya transportasi, dan menguras Kesehatan (karena bertemu banyak orang bisa capek).
+Guru Kelas 1-2: Pendidikan Agama, Bahasa Indonesia, Matematika, PJOK, Seni Budaya.
 
-3. Iklan & Sponsorship Produk 💰
-Aktivitas: Menerima tawaran endorse produk (minuman, skincare, perangkat gaming, dll).
+Guru Kelas 3-4: Bahasa Indonesia, Matematika, IPAS (Ilmu Pengetahuan Alam & Sosial), Pendidikan Pancasila, PJOK.
 
-Efek: Mendapatkan Uang yang sangat besar secara instan. Namun, jika produknya buruk (atau produk ilegal jika Kriminalitas tinggi), bisa merusak reputasi dan menurunkan Kebahagiaan serta Karma (jika ada).
+Guru Kelas 5-6: Bahasa Indonesia, Matematika, IPA, IPS, PPKn, Bahasa Inggris, Seni Budaya, Informatika (pengenalan komputer).
 
-4. Latihan Public Speaking & Akting 🎤
-Aktivitas: Ikut kelas vokal, akting, atau cara berbicara di depan umum.
+2. Mapel untuk Guru SMP (Sekolah Menengah Pertama)
+Guru SMP biasanya mengampu satu mapel spesifik untuk berbagai kelas (kelas 7, 8, 9).
 
-Efek: Menaikkan Kecerdasan dan Disiplin. Ini sangat berguna untuk meningkatkan kualitas konten dan negosiasi gaji dengan manajemen tim.
+Mapel Wajib (Eksakta & Bahasa):
 
-5. Review Kontrak & Negosiasi Bonus 📑
-Aktivitas: Melihat sisa kontrak, performa tim, atau mencoba menegosiasikan gaji yang lebih tinggi.
+Matematika
 
-Efek: Jika Disiplin dan Penampilan kamu tinggi, peluang sukses minta kenaikan gaji sangat besar (menambah gaji per tahun secara permanen). Jika gagal, hubungan dengan manajemen bisa menurun.
+IPA (Ilmu Pengetahuan Alam) / Fisika & Biologi dasar
 
-6. Interaksi Khusus dengan Pro Player 🎮
-(Menggantikan atau melengkapi menu "Rekan Kerja" yang generic)
+Bahasa Indonesia
 
-Aktivitas: Makan siang dengan pro player, ikut scrimmage (latihan bersama), atau mengajak main game.
+Bahasa Inggris
 
-Efek: Mempererat hubungan, bisa memicu event persaingan (jika kamu main buruk), atau membuka peluang karier baru (misalnya ditawari jadi pemain cadangan atau manajer tim).
+Mapel Wajib (Sosial & Agama):
+
+Pendidikan Agama (Islam, Kristen, Katolik, Hindu, Budha, atau Konghucu)
+
+PPKn (Pendidikan Pancasila dan Kewarganegaraan)
+
+IPS (Ilmu Pengetahuan Sosial) / Sejarah & Geografi dasar
+
+Mapel Keterampilan & Seni:
+
+Seni Budaya (Seni Rupa, Seni Musik, Seni Tari)
+
+PJOK (Pendidikan Jasmani, Olahraga, dan Kesehatan)
+
+Prakarya (Rekayasa, Pengolahan, Budidaya)
+
+Informatika (TIK / Komputer)
+
+Muatan Lokal (seperti Bahasa Jawa, Bahasa Sunda, atau Bahasa Daerah lainnya)
+
+3. Mapel untuk Guru SMA (Sekolah Menengah Atas)
+Mapel SMA lebih beragam karena ada peminatan (MIPA, IPS, Bahasa). Guru SMA biasanya sangat spesifik pada satu mapel.
+
+Mapel Wajib (Semua Jurusan):
+
+Pendidikan Agama
+
+PPKn
+
+Bahasa Indonesia
+
+Matematika (Wajib)
+
+Bahasa Inggris
+
+PJOK
+
+Sejarah (Wajib)
+
+Seni Budaya
+
+Mapel Peminatan MIPA (IPA):
+
+Matematika Peminatan
+
+Fisika
+
+Kimia
+
+Biologi
+
+Informatika
+
+Mapel Peminatan IPS (Sosial):
+
+Ekonomi
+
+Geografi
+
+Sosiologi
+
+Antropologi
+
+Akuntansi
+
+Mapel Peminatan Bahasa & Sastra:
+
+Bahasa Indonesia (Lanjutan/Sastra)
+
+Bahasa Asing (Jepang, Jerman, Prancis, atau Mandarin)
+
+Bahasa Inggris (Lanjutan/Sastra)
+
+Antropologi Bahasa
