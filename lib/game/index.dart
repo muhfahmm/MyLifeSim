@@ -1517,7 +1517,21 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       final orientationType = isSameSex ? (myGender == 'laki-laki' ? 'Gay' : 'Lesbian') : '';
       
       final String labelWithMu;
-      if (role == 'Guru') labelWithMu = 'Guru-mu';
+      // Logika cerdas untuk menampilkan Mapel / Role spesifik Guru
+      if (role == 'Guru' || role == 'Guru BK' || relation.contains('Guru')) {
+        // Cek apakah relation mengandung kata "Guru" dan ada mapel setelahnya
+        // Contoh relation: "Guru Matematika", "Guru BK", "Guru IPA"
+        if (relation.toLowerCase().contains('bk')) {
+          labelWithMu = 'Guru BK-mu';
+        } else if (relation.contains(' ')) {
+          // Ambil kata setelah "Guru " (misal: Matematika, IPA, Bahasa Inggris)
+          final List<String> parts = relation.split(' ');
+          final String mapel = parts.sublist(1).join(' ');
+          labelWithMu = 'Guru $mapel-mu';
+        } else {
+          labelWithMu = 'Guru-mu';
+        }
+      } 
       else if (role == 'Dosen') labelWithMu = 'Dosenmu';
       else if (role == 'Kepala Sekolah') labelWithMu = 'Kepala Sekolahmu';
       else if (role == 'Teman Sekelas') labelWithMu = 'Teman Sekelasmu';
