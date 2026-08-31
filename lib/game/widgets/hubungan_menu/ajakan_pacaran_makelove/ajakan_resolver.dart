@@ -58,6 +58,14 @@ import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_rekan_idol.dart'
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_staf_idol.dart';
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_rekan_idol.dart';
 
+// BA_talent sub-handlers
+import 'ajakan_makelove/gay/BA_talent/ajakan_ml_gay_ba_talent.dart';
+import 'ajakan_makelove/hetero/BA_talent/ajakan_ml_hetero_ba_talent.dart';
+import 'ajakan_makelove/lesbian/BA_talent/ajakan_ml_lesbian_ba_talent.dart';
+import 'ajakan_pacaran/gay/BA_talent/ajakan_pacaran_gay_ba_talent.dart';
+import 'ajakan_pacaran/hetero/BA_talent/ajakan_pacaran_hetero_ba_talent.dart';
+import 'ajakan_pacaran/lesbian/BA_talent/ajakan_pacaran_lesbian_ba_talent.dart';
+
 class AjakanResolver {
   static String getPartnerGender(String targetName) {
     if (targetName.startsWith('Ayah')) return 'Laki-laki';
@@ -176,7 +184,19 @@ class AjakanResolver {
 
     Map<String, dynamic>? result;
 
-    if (isFamily(targetName, targetRole)) {
+    final String userJob = character.jobName ?? '';
+    final bool isEsport = userJob.startsWith('Pro Player Esport') || userJob.startsWith('Brand Ambassador Esport') || userJob.startsWith('Talent Esports');
+    final bool isTargetEsport = targetRole == 'Brand Ambassador' || targetRole == 'CEO' || targetRole == 'Atasan' || targetRole == 'Supervisor' || (targetRole == 'Rekan Kerja' && isEsport);
+
+    if (isTargetEsport) {
+      if (isGay) {
+        result = AjakanPacaranGayBaTalent.check(character, candidate, random);
+      } else if (isLesbian) {
+        result = AjakanPacaranLesbianBaTalent.check(character, candidate, random);
+      } else {
+        result = AjakanPacaranHeteroBaTalent.check(character, candidate, random);
+      }
+    } else if (isFamily(targetName, targetRole)) {
       if (isGay) {
         result = AjakanPacaranGayKeluarga.check(character, candidate, random);
       } else if (isLesbian) {
@@ -257,7 +277,19 @@ class AjakanResolver {
 
     Map<String, dynamic>? result;
 
-    if (isFamily(targetName, targetRole)) {
+    final String userJob = character.jobName ?? '';
+    final bool isEsport = userJob.startsWith('Pro Player Esport') || userJob.startsWith('Brand Ambassador Esport') || userJob.startsWith('Talent Esports');
+    final bool isTargetEsport = targetRole == 'Brand Ambassador' || targetRole == 'CEO' || targetRole == 'Atasan' || targetRole == 'Supervisor' || (targetRole == 'Rekan Kerja' && isEsport);
+
+    if (isTargetEsport) {
+      if (isGay) {
+        result = AjakanMlGayBaTalent.check(character, candidate, random);
+      } else if (isLesbian) {
+        result = AjakanMlLesbianBaTalent.check(character, candidate, random);
+      } else {
+        result = AjakanMlHeteroBaTalent.check(character, candidate, random);
+      }
+    } else if (isFamily(targetName, targetRole)) {
       if (isGay) {
         result = AjakanMlGayKeluarga.check(character, candidate, random);
       } else if (isLesbian) {

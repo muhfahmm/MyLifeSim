@@ -452,6 +452,10 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       } else if (job.startsWith('Pro Player Esport')) {
         ageVal = 13 + random.nextInt(13); // 13-25
       }
+      final String coworkerRole = isProPlayer 
+          ? 'Pro Player' 
+          : (job.startsWith('Brand Ambassador Esport') ? 'Brand Ambassador' : 'Talent Esports');
+
       widget.character.coworkers.add({
         'name': name,
         'gender': gender,
@@ -460,6 +464,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         'isDeceased': 'false',
         'sexuality': 'Heteroseksual',
         'intelligence': (30 + random.nextInt(61)).toString(),
+        'role': coworkerRole,
       });
     }
   }

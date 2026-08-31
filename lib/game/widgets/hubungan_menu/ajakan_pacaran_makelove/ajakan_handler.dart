@@ -58,6 +58,14 @@ import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_rekan_idol.dart'
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_staf_idol.dart';
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_rekan_idol.dart';
 
+// BA_talent sub-handlers
+import 'ajakan_makelove/gay/BA_talent/ajakan_ml_gay_ba_talent.dart';
+import 'ajakan_makelove/hetero/BA_talent/ajakan_ml_hetero_ba_talent.dart';
+import 'ajakan_makelove/lesbian/BA_talent/ajakan_ml_lesbian_ba_talent.dart';
+import 'ajakan_pacaran/gay/BA_talent/ajakan_pacaran_gay_ba_talent.dart';
+import 'ajakan_pacaran/hetero/BA_talent/ajakan_pacaran_hetero_ba_talent.dart';
+import 'ajakan_pacaran/lesbian/BA_talent/ajakan_pacaran_lesbian_ba_talent.dart';
+
 class AjakanHandler {
   static void checkAndGenerateProposal(Character character, Random random) {
     final age = character.age;
@@ -372,6 +380,9 @@ class AjakanHandler {
       }
 
       if (character.jobName != null) {
+        final String userJob = character.jobName ?? '';
+        final bool isEsport = userJob.startsWith('Pro Player Esport') || userJob.startsWith('Brand Ambassador Esport') || userJob.startsWith('Talent Esports');
+
         for (var cm in character.coworkers) {
           final String sexuality = cm['sexuality'] ?? 'Heteroseksual';
           final String cmGender = (cm['gender'] ?? 'Laki-laki').trim().toLowerCase();
@@ -388,13 +399,43 @@ class AjakanHandler {
           }
 
           if (match) {
+            final String coworkerRole = cm['role'] ?? 'Rekan Kerja';
             schoolCandidates.add({
               'name': cm['name'],
-              'relation': 'Rekan Kerja',
+              'relation': coworkerRole,
               'gender': cm['gender'] ?? 'Laki-laki',
               'age': cm['age'] ?? age.toString(),
-              'role': 'Rekan Kerja',
+              'role': coworkerRole,
             });
+          }
+        }
+
+        // Collect supervisor / CEO
+        if (character.supervisor != null) {
+          final sv = character.supervisor!;
+          final String sexuality = sv['sexuality'] ?? 'Heteroseksual';
+          final String svGender = (sv['gender'] ?? 'Laki-laki').trim().toLowerCase();
+          final String name = sv['name'] ?? '';
+          if (!character.isAnyPartnerNameMatching(name)) {
+            bool match = false;
+            if (sexuality == 'Heteroseksual') {
+              match = (myGenderLower != svGender);
+            } else if (sexuality == 'Biseksual') {
+              match = true;
+            } else {
+              match = (myGenderLower == svGender);
+            }
+
+            if (match) {
+              final String svRole = isEsport ? 'CEO' : 'Supervisor';
+              schoolCandidates.add({
+                'name': name,
+                'relation': svRole,
+                'gender': sv['gender'] ?? 'Laki-laki',
+                'age': sv['age'] ?? '40',
+                'role': svRole,
+              });
+            }
           }
         }
       }
@@ -604,27 +645,55 @@ class AjakanHandler {
       }
 
       if (candRole == 'Rekan Kerja') {
-        if (isGay) {
-          final int roll = random.nextInt(100);
-          if (roll < 20) {
-            character.activeProposal = AjakanPacaranGayCoworker.check(character, candidate, random);
-          } else if (roll < 30) {
-            character.activeProposal = AjakanMlGayCoworker.check(character, candidate, random);
-          }
-        } else if (isLesbian) {
-          final int roll = random.nextInt(100);
-          if (roll < 20) {
-            character.activeProposal = AjakanPacaranLesbianCoworker.check(character, candidate, random);
-          } else if (roll < 30) {
-            character.activeProposal = AjakanMlLesbianCoworker.check(character, candidate, random);
+        final String userJob = character.jobName ?? '';
+        final bool isEsport = userJob.startsWith('Pro Player Esport') || userJob.startsWith('Brand Ambassador Esport') || userJob.startsWith('Talent Esports');
+
+        if (isEsport) {
+          if (isGay) {
+            final int roll = random.nextInt(100);
+            if (roll < 20) {
+              character.activeProposal = AjakanPacaranGayBaTalent.check(character, candidate, random);
+            } else if (roll < 30) {
+              character.activeProposal = AjakanMlGayBaTalent.check(character, candidate, random);
+            }
+          } else if (isLesbian) {
+            final int roll = random.nextInt(100);
+            if (roll < 20) {
+              character.activeProposal = AjakanPacaranLesbianBaTalent.check(character, candidate, random);
+            } else if (roll < 30) {
+              character.activeProposal = AjakanMlLesbianBaTalent.check(character, candidate, random);
+            }
+          } else {
+            final int roll = random.nextInt(100);
+            if (roll < 30) {
+              character.activeProposal = AjakanPacaranHeteroBaTalent.check(character, candidate, random);
+            } else if (roll < 60) {
+              character.activeProposal = AjakanMlHeteroBaTalent.check(character, candidate, random);
+            }
           }
         } else {
-          // Hetero
-          final int roll = random.nextInt(100);
-          if (roll < 30) {
-            character.activeProposal = AjakanPacaranHeteroCoworker.check(character, candidate, random);
-          } else if (roll < 60) {
-            character.activeProposal = AjakanMlHeteroCoworker.check(character, candidate, random);
+          if (isGay) {
+            final int roll = random.nextInt(100);
+            if (roll < 20) {
+              character.activeProposal = AjakanPacaranGayCoworker.check(character, candidate, random);
+            } else if (roll < 30) {
+              character.activeProposal = AjakanMlGayCoworker.check(character, candidate, random);
+            }
+          } else if (isLesbian) {
+            final int roll = random.nextInt(100);
+            if (roll < 20) {
+              character.activeProposal = AjakanPacaranLesbianCoworker.check(character, candidate, random);
+            } else if (roll < 30) {
+              character.activeProposal = AjakanMlLesbianCoworker.check(character, candidate, random);
+            }
+          } else {
+            // Hetero
+            final int roll = random.nextInt(100);
+            if (roll < 30) {
+              character.activeProposal = AjakanPacaranHeteroCoworker.check(character, candidate, random);
+            } else if (roll < 60) {
+              character.activeProposal = AjakanMlHeteroCoworker.check(character, candidate, random);
+            }
           }
         }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {

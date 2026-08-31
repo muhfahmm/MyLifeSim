@@ -1508,7 +1508,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     } else if (type == 'Ajak 3some') {
       dialogTitle = 'Ajakan 3some! 🔥';
       dialogBody = '$partnerName mengajakmu dan pasanganmu yang lain untuk melakukan hubungan intim threesome secara bersama-sama. Apakah kamu mau menerima ajakan threesome ini?';
-    } else if (role == 'Guru' || role == 'Dosen' || role == 'Kepala Sekolah' || role == 'Teman Sekelas' || role == 'Teman Kuliah' || role == 'Rekan Kerja') {
+    } else if (role == 'Guru' || role == 'Dosen' || role == 'Kepala Sekolah' || role == 'Teman Sekelas' || role == 'Teman Kuliah' || role == 'Rekan Kerja' || role == 'Brand Ambassador' || role == 'Pro Player' || role == 'Talent Esports' || role == 'CEO') {
       final isSameSex = myGender == partnerGender;
       final orientationType = isSameSex ? (myGender == 'laki-laki' ? 'Gay' : 'Lesbian') : '';
       
@@ -1519,6 +1519,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       else if (role == 'Teman Sekelas') labelWithMu = 'Teman Sekelasmu';
       else if (role == 'Teman Kuliah') labelWithMu = 'Teman Kuliahmu';
       else if (role == 'Rekan Kerja') labelWithMu = 'Rekan Kerjamu';
+      else if (role == 'Brand Ambassador') labelWithMu = 'Brand Ambassador-mu';
+      else if (role == 'Pro Player') labelWithMu = 'Rekan Pro Player-mu';
+      else if (role == 'Talent Esports') labelWithMu = 'Rekan Talent-mu';
+      else if (role == 'CEO') labelWithMu = 'CEO-mu';
       else labelWithMu = '${role}mu';
 
       if (type == 'Ajak Pacaran') {
