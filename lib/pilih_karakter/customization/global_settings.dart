@@ -3,6 +3,10 @@
 import 'package:flutter/material.dart';
 
 class GlobalSettings {
+  // --- TAMBAHAN BARU: STATUS PREMIUM ---
+  // (Ini yang dipanggil oleh store_page.dart untuk membuka fitur 18+)
+  static final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
+
   static final ValueNotifier<bool> musicEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> soundEffectsEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> animationsEnabled = ValueNotifier<bool>(true);
@@ -17,6 +21,11 @@ class GlobalSettings {
 
   // Method helper untuk mereset seluruh settingan ke default
   static void resetAll() {
+    // CATATAN: Status premium biasanya TIDAK direset saat "Reset All" 
+    // karena bersifat permanen setelah dibeli. 
+    // Jika Anda ingin menghapusnya juga, hilangkan tanda komentar (//) di bawah ini:
+    // isPremium.value = false; 
+
     musicEnabled.value = true;
     soundEffectsEnabled.value = true;
     animationsEnabled.value = true;

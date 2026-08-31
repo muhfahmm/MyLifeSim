@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
 import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/store_page/store_page.dart'; // Tambahkan Import ini
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -174,138 +175,222 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           const SizedBox(height: 8),
 
-          // --- SEKSI PREFERENSI KONTEN DEWASA ---
+          // =========================================================
+          // --- SEKSI PREFERENSI KONTEN DEWASA (DENGAN PREMIUM GATE) ---
+          // =========================================================
           _buildSectionTitle('Preferensi Konten Dewasa', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-            ),
-            child: Column(
-              children: [
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disableMasturbationFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.block, color: Colors.redAccent),
-                    title: Text(
-                      'Nonaktifkan Ajakan Masturbasi (Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+          
+          // Bungkus seluruh Card dengan ValueListenableBuilder yang mendengarkan status Premium
+          ValueListenableBuilder<bool>(
+            valueListenable: GlobalSettings.isPremium,
+            builder: (context, isPremium, _) {
+              
+              // Jika BELUM premium, tampilkan tampilan Terkunci (Lock)
+              if (!isPremium) {
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.lock,
+                          size: 48,
+                          color: isDark ? Colors.orange.shade200 : Colors.orange,
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          '🔒 Fitur Dewasa Terkunci',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Fitur ini hanya tersedia untuk pengguna Premium.\nSilakan aktifkan untuk membuka semua pengaturan.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.white70 : Colors.grey.shade600,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF8A5A32),
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            // MENGUBAH ONPRESSED: Arahkan ke Store Page dulu!
+                            onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const StorePage(),
+                                ),
+                              );
+                            },
+                            icon: const Icon(Icons.diamond),
+                            label: const Text(
+                              'Aktifkan Premium Sekarang 💎',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }
+
+              // Jika SUDAH premium, tampilkan Toggle seperti biasa
+              return Card(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                ),
+                child: Column(
+                  children: [
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMasturbationFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.block, color: Colors.redAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Masturbasi (Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan dari ayah, ibu, kakak, adik, paman, bibi, dll.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMasturbationFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan dari ayah, ibu, kakak, adik, paman, bibi, dll.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disableMasturbationFamily.value = newVal,
-                  ),
-                ),
-                const Divider(height: 1),
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disableMasturbationNonFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.group, color: Colors.orange),
-                    title: Text(
-                      'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                    const Divider(height: 1),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMasturbationNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.group, color: Colors.orange),
+                        title: Text(
+                          'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan dari teman, guru, rekan kerja, atau orang lain.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMasturbationNonFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan dari teman, guru, rekan kerja, atau orang lain.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disableMasturbationNonFamily.value = newVal,
-                  ),
-                ),
-                const Divider(height: 1),
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disableMakeLoveFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.favorite, color: Colors.pinkAccent),
-                    title: Text(
-                      'Nonaktifkan Ajakan Make Love (Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                    const Divider(height: 1),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMakeLoveFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.favorite, color: Colors.pinkAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Make Love (Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan hubungan intim dari anggota keluarga.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMakeLoveFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan hubungan intim dari anggota keluarga.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disableMakeLoveFamily.value = newVal,
-                  ),
-                ),
-                const Divider(height: 1),
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disableMakeLoveNonFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.people, color: Colors.blueAccent),
-                    title: Text(
-                      'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                    const Divider(height: 1),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMakeLoveNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.people, color: Colors.blueAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan hubungan intim dari teman, guru, rekan kerja, atau orang lain.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMakeLoveNonFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan hubungan intim dari teman, guru, rekan kerja, atau orang lain.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disableMakeLoveNonFamily.value = newVal,
-                  ),
-                ),
-                const Divider(height: 1),
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disablePacaranFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.heart_broken, color: Colors.red),
-                    title: Text(
-                      'Nonaktifkan Ajakan Pacaran (Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                    const Divider(height: 1),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disablePacaranFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.heart_broken, color: Colors.red),
+                        title: Text(
+                          'Nonaktifkan Ajakan Pacaran (Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan pacaran dari anggota keluarga.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disablePacaranFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan pacaran dari anggota keluarga.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disablePacaranFamily.value = newVal,
-                  ),
-                ),
-                const Divider(height: 1),
-                ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.disablePacaranNonFamily,
-                  builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.person_add_disabled, color: Colors.deepOrange),
-                    title: Text(
-                      'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                    const Divider(height: 1),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disablePacaranNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        secondary: const Icon(Icons.person_add_disabled, color: Colors.deepOrange),
+                        title: Text(
+                          'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: const Text(
+                          'Mencegah ajakan pacaran dari teman, guru, rekan kerja, atau orang lain.',
+                          style: TextStyle(fontSize: 12),
+                        ),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disablePacaranNonFamily.value = newVal,
                       ),
                     ),
-                    subtitle: const Text(
-                      'Mencegah ajakan pacaran dari teman, guru, rekan kerja, atau orang lain.',
-                      style: TextStyle(fontSize: 12),
-                    ),
-                    value: val,
-                    onChanged: (newVal) => GlobalSettings.disablePacaranNonFamily.value = newVal,
-                  ),
+                  ],
                 ),
-              ],
-            ),
+              );
+            },
           ),
+          // =========================================================
+          // --- AKHIR SEKSI PREMIUM GATE ---
+          // =========================================================
           const SizedBox(height: 8),
 
           // --- SEKSI DATA & PRIVASI ---

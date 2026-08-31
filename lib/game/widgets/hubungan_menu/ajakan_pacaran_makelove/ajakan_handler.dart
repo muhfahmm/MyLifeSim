@@ -701,14 +701,14 @@ class AjakanHandler {
 
     // --- PRIORITAS KHUSUS GURU/DOSEN ---
     // Agar guru lebih dominan dibanding teman sekelas (karena jumlah teman sekelas jauh lebih banyak di pool),
-    // kita beri peluang 70% untuk memotong pool hanya menyisakan Guru/Dosen jika kandidat Guru/Dosen tersedia.
+    // kita beri peluang 60% untuk memotong pool hanya menyisakan Guru/Dosen jika kandidat Guru/Dosen tersedia.
     if (selectedPool.isNotEmpty) {
       final List<Map<String, dynamic>> guruDosenPool = selectedPool.where((c) {
         final r = c['role'] ?? '';
         return r == 'Guru' || r == 'Dosen';
       }).toList();
 
-      if (guruDosenPool.isNotEmpty && random.nextInt(100) < 70) {
+      if (guruDosenPool.isNotEmpty && random.nextInt(100) < 60) {
         selectedPool = guruDosenPool;
       }
     }

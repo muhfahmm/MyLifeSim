@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_gender/gender.dart';
 import 'package:bitlife/intro_animation.dart';
+import 'package:bitlife/store_page/store_page.dart';
 
 // Global theme mode notifier
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -55,7 +56,6 @@ class _MyAppState extends State<MyApp> {
       title: 'BitLife Clone',
       debugShowCheckedModeBanner: false,
       themeMode: themeNotifier.value,
-      // DIHAPUS: themeAnimationDuration — penyebab 21x rerender per switch
       theme: _lightTheme,
       darkTheme: _darkTheme,
       home: const IntroAnimationScreen(nextScreen: HomePage()),
@@ -68,8 +68,6 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // HomePage rebuild dipicu oleh MaterialApp setState,
-    // bukan ValueListenableBuilder tersendiri — ini sudah efisien.
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
@@ -171,6 +169,27 @@ class HomePage extends StatelessWidget {
                     child: const Text('LANJUTKAN PERJALANAN', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   ),
                 ),
+                
+                // ===== TAMBAHAN BUTTON STORE =====
+                const SizedBox(height: 12),
+                MouseRegion(
+                  cursor: SystemMouseCursors.click,
+                  child: OutlinedButton.icon(
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const StorePage()),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: Colors.grey.shade700,
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    icon: const Icon(Icons.storefront),
+                    label: const Text('TOKO BITLIFE', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+                // ==================================
               ],
             ),
           ),

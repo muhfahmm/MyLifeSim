@@ -1,6 +1,9 @@
+// lib/game/widgets/store_page.dart (atau path sesuai proyek Anda)
+
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -17,9 +20,19 @@ class StorePage extends StatefulWidget {
 }
 
 class _StorePageState extends State<StorePage> {
-  // Mock states for Premium Features
   static bool _godModeUnlocked = false;
   static bool _removeAdsUnlocked = false;
+  static bool _premiumUnlocked = false;
+
+  // Helper untuk menampilkan SnackBar jika belum ada karakter
+  void _showNoCharacterMessage() {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Anda belum memiliki karakter. Buat karakter terlebih dahulu!'),
+        backgroundColor: Colors.orange,
+      ),
+    );
+  }
 
   void _simulatePurchase(String itemName, VoidCallback action) {
     showDialog(
@@ -33,7 +46,7 @@ class _StorePageState extends State<StorePage> {
         if (!mounted) return;
         action();
         widget.onPurchaseCompleted?.call();
-        setState(() {}); // Refresh StorePage UI
+        setState(() {});
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -78,13 +91,12 @@ class _StorePageState extends State<StorePage> {
     required VoidCallback onTap,
     bool isUnlocked = false,
   }) {
-    // GUNAKAN PLATFORM BRIGHTNESS UNTUK MEMASTIKAN MENGIKUTI OS
     final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDark ? Colors.grey.shade800 : Colors.white, // Tambahkan warna card eksplisit
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -136,27 +148,16 @@ class _StorePageState extends State<StorePage> {
               const SizedBox(width: 12),
               isUnlocked
                   ? Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 8,
-                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       decoration: BoxDecoration(
-                        color: isDark
-                            ? Colors.green.shade900.withValues(alpha: 0.5)
-                            : Colors.green.shade50,
+                        color: isDark ? Colors.green.shade900.withValues(alpha: 0.5) : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isDark
-                              ? Colors.green.shade600
-                              : Colors.green.shade200,
-                        ),
+                        border: Border.all(color: isDark ? Colors.green.shade600 : Colors.green.shade200),
                       ),
                       child: Text(
                         'Aktif',
                         style: TextStyle(
-                          color: isDark
-                              ? Colors.greenAccent
-                              : Colors.green.shade700,
+                          color: isDark ? Colors.greenAccent : Colors.green.shade700,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
@@ -166,32 +167,15 @@ class _StorePageState extends State<StorePage> {
                       onTap: onTap,
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
-                            colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
+                          gradient: const LinearGradient(colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)], begin: Alignment.topLeft, end: Alignment.bottomRight),
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color(0xFF5C3C10).withValues(alpha: 0.3),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            )
-                          ],
+                          boxShadow: [BoxShadow(color: const Color(0xFF5C3C10).withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))],
                         ),
                         child: Text(
                           price,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                          ),
+                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                       ),
                     ),
@@ -204,23 +188,15 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
-    // GUNAKAN PLATFORM BRIGHTNESS UNTUK MEMASTIKAN MENGIKUTI OS
     final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     final character = widget.character;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(
-          'Toko BitLife',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-        ),
+        title: const Text('Toko BitLife', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
+            gradient: LinearGradient(colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)], begin: Alignment.topLeft, end: Alignment.bottomRight),
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -236,47 +212,22 @@ class _StorePageState extends State<StorePage> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Colors.amber.shade700, Colors.amber.shade900],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
+                  gradient: LinearGradient(colors: [Colors.amber.shade700, Colors.amber.shade900], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.amber.shade900.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
+                  boxShadow: [BoxShadow(color: Colors.amber.shade900.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))],
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.account_balance_wallet_rounded,
-                        color: Colors.white, size: 36),
+                    const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 36),
                     const SizedBox(width: 16),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Keuangan Karakter Anda',
-                          style: TextStyle(
-                            color: Colors.white70,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
+                        const Text('Keuangan Karakter Anda', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 4),
                         Text(
-                          '\$${character.money.toString().replaceAllMapped(
-                                RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                                (Match m) => '${m[1]},',
-                              )}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          '\$${character.money.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
                         ),
                       ],
                     ),
@@ -287,6 +238,20 @@ class _StorePageState extends State<StorePage> {
             // --- SEKSI FITUR PREMIUM ---
             _buildSectionHeader('Fitur Premium', isDark),
             _buildStoreItem(
+              icon: Icons.verified_user,
+              iconBgColor: Colors.purple.shade600,
+              title: 'Premium Akses Penuh (18+)',
+              description: 'Membuka semua fitur 18+, inses, masturbasi, dan hubungan guru-murid.',
+              price: 'Rp 49.000',
+              isUnlocked: _premiumUnlocked,
+              onTap: () {
+                _simulatePurchase('Premium Akses Penuh (18+)', () {
+                  _premiumUnlocked = true;
+                  GlobalSettings.isPremium.value = true;
+                });
+              },
+            ),
+            _buildStoreItem(
               icon: Icons.flash_on_rounded,
               iconBgColor: Colors.amber.shade700,
               title: 'God Mode',
@@ -296,7 +261,6 @@ class _StorePageState extends State<StorePage> {
               onTap: () {
                 _simulatePurchase('God Mode', () {
                   _godModeUnlocked = true;
-                  // If character is present, make them perfect immediately as a bonus!
                   if (character != null) {
                     character.health = 100;
                     character.happiness = 100;
@@ -320,87 +284,89 @@ class _StorePageState extends State<StorePage> {
               },
             ),
 
-            // --- SEKSI PENINGKAT INSTAN ---
-            if (character != null) ...[
-              _buildSectionHeader('Peningkat Atribut Instan', isDark),
-              _buildStoreItem(
-                icon: Icons.favorite_rounded,
-                iconBgColor: Colors.red.shade400,
-                title: 'Serum Kesehatan Super',
-                description: 'Memulihkan kesehatan karakter menjadi 100% secara instan.',
-                price: 'Rp 15.000',
-                onTap: () {
-                  _simulatePurchase('Serum Kesehatan Super', () {
-                    character.health = 100;
-                  });
-                },
-              ),
-              _buildStoreItem(
-                icon: Icons.emoji_emotions_rounded,
-                iconBgColor: Colors.green.shade500,
-                title: 'Pil Kebahagiaan Abadi',
-                description: 'Memaksimalkan level kebahagiaan karakter Anda menjadi 100%.',
-                price: 'Rp 15.000',
-                onTap: () {
-                  _simulatePurchase('Pil Kebahagiaan Abadi', () {
-                    character.happiness = 100;
-                  });
-                },
-              ),
-              _buildStoreItem(
-                icon: Icons.psychology_rounded,
-                iconBgColor: Colors.blue.shade500,
-                title: 'Serum Kecerdasan Instan',
-                description: 'Meningkatkan kecerdasan karakter Anda menjadi 100%.',
-                price: 'Rp 15.000',
-                onTap: () {
-                  _simulatePurchase('Serum Kecerdasan Instan', () {
-                    character.intelligence = 100;
-                  });
-                },
-              ),
-            ],
+            // --- SEKSI PENINGKAT ATRIBUT (SELALU TAMPIL) ---
+            _buildSectionHeader('Peningkat Atribut Instan', isDark),
+            _buildStoreItem(
+              icon: Icons.favorite_rounded,
+              iconBgColor: Colors.red.shade400,
+              title: 'Serum Kesehatan Super',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Memulihkan kesehatan karakter menjadi 100% secara instan.',
+              price: 'Rp 15.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Serum Kesehatan Super', () {
+                  character.health = 100;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.emoji_emotions_rounded,
+              iconBgColor: Colors.green.shade500,
+              title: 'Pil Kebahagiaan Abadi',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Memaksimalkan level kebahagiaan karakter Anda menjadi 100%.',
+              price: 'Rp 15.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Pil Kebahagiaan Abadi', () {
+                  character.happiness = 100;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.psychology_rounded,
+              iconBgColor: Colors.blue.shade500,
+              title: 'Serum Kecerdasan Instan',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan kecerdasan karakter Anda menjadi 100%.',
+              price: 'Rp 15.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Serum Kecerdasan Instan', () {
+                  character.intelligence = 100;
+                });
+              },
+            ),
 
-            // --- SEKSI TOP UP UANG GAME ---
-            if (character != null) ...[
-              _buildSectionHeader('Paket Dana / Koin', isDark),
-              _buildStoreItem(
-                icon: Icons.monetization_on_rounded,
-                iconBgColor: Colors.amber.shade600,
-                title: 'Tabungan Pemula',
-                description: 'Tambahkan ekstra +\$50,000 ke dompet karakter.',
-                price: 'Rp 9.000',
-                onTap: () {
-                  _simulatePurchase('Tabungan Pemula', () {
-                    character.money += 50000;
-                  });
-                },
-              ),
-              _buildStoreItem(
-                icon: Icons.cases_rounded,
-                iconBgColor: Colors.amber.shade800,
-                title: 'Koper Jutawan',
-                description: 'Tambahkan ekstra +\$1,000,000 ke dompet karakter.',
-                price: 'Rp 29.000',
-                onTap: () {
-                  _simulatePurchase('Koper Jutawan', () {
-                    character.money += 1000000;
-                  });
-                },
-              ),
-              _buildStoreItem(
-                icon: Icons.account_balance_rounded,
-                iconBgColor: Colors.purple.shade700,
-                title: 'Gudang Harta',
-                description: 'Tambahkan ekstra +\$50,000,000 ke dompet karakter.',
-                price: 'Rp 99.000',
-                onTap: () {
-                  _simulatePurchase('Gudang Harta', () {
-                    character.money += 50000000;
-                  });
-                },
-              ),
-            ],
+            // --- SEKSI TOP UP UANG (SELALU TAMPIL) ---
+            _buildSectionHeader('Paket Dana / Koin', isDark),
+            _buildStoreItem(
+              icon: Icons.monetization_on_rounded,
+              iconBgColor: Colors.amber.shade600,
+              title: 'Tabungan Pemula',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$50,000 ke dompet karakter.',
+              price: 'Rp 9.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Tabungan Pemula', () {
+                  character.money += 50000;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.cases_rounded,
+              iconBgColor: Colors.amber.shade800,
+              title: 'Koper Jutawan',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$1,000,000 ke dompet karakter.',
+              price: 'Rp 29.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Koper Jutawan', () {
+                  character.money += 1000000;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.account_balance_rounded,
+              iconBgColor: Colors.purple.shade700,
+              title: 'Gudang Harta',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$50,000,000 ke dompet karakter.',
+              price: 'Rp 99.000',
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Gudang Harta', () {
+                  character.money += 50000000;
+                });
+              },
+            ),
           ],
         ),
       ),
@@ -413,12 +379,11 @@ class _PurchaseSimulationDialog extends StatefulWidget {
   const _PurchaseSimulationDialog({required this.itemName});
 
   @override
-  State<_PurchaseSimulationDialog> createState() =>
-      __PurchaseSimulationDialogState();
+  State<_PurchaseSimulationDialog> createState() => __PurchaseSimulationDialogState();
 }
 
 class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
-  int _step = 0; // 0: Processing, 1: Success
+  int _step = 0;
 
   @override
   void initState() {
@@ -444,59 +409,21 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (_step == 0) ...[
-              const CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8A5A32)),
-              ),
+              const CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF8A5A32))),
               const SizedBox(height: 20),
-              Text(
-                'Menghubungkan ke App Store...',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
+              Text('Menghubungkan ke App Store...', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 8),
-              Text(
-                'Memproses pembelian "${widget.itemName}"',
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.grey,
-                  fontSize: 12,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              Text('Memproses pembelian "${widget.itemName}"', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 12), textAlign: TextAlign.center),
             ] else ...[
-              const Icon(Icons.check_circle_rounded,
-                  color: Colors.green, size: 64),
+              const Icon(Icons.check_circle_rounded, color: Colors.green, size: 64),
               const SizedBox(height: 16),
-              Text(
-                'Pembayaran Berhasil!',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
+              Text('Pembayaran Berhasil!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 8),
-              Text(
-                'Item "${widget.itemName}" telah ditambahkan.',
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.grey,
-                  fontSize: 13,
-                ),
-                textAlign: TextAlign.center,
-              ),
+              Text('Item "${widget.itemName}" telah ditambahkan.', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 13), textAlign: TextAlign.center),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF8A5A32),
-                  foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minimumSize: const Size(120, 44),
-                ),
+                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF8A5A32), foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), minimumSize: const Size(120, 44)),
                 child: const Text('Mantap'),
               ),
             ],
