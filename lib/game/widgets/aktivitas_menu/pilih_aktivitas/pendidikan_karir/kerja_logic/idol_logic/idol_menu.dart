@@ -68,8 +68,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                 if (wasIdol && wasMain) {
                   widget.character.hasGraduatedIdol = true;
                 }
-                widget.character.jobName = null;
-                widget.character.jobSalary = null;
+                widget.character.resignJob();
                 widget.character.idolTrainees.clear();
                 widget.character.idolMainMembers.clear();
                 widget.character.idolStaff.clear();

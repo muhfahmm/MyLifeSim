@@ -277,9 +277,9 @@ class IdolManager {
       }
 
       if (getPromoted) {
-        character.jobName = 'Idol (Main Performer)';
         final double salaryMult = getCountrySalaryMultiplier(character.location);
-        character.jobSalary = ((1333 + rand.nextInt(1335)) * salaryMult).round(); 
+        final int finalSal = ((1333 + rand.nextInt(1335)) * salaryMult).round();
+        character.setJob('Idol (Main Performer)', finalSal);
         
         final String notice = '✨ Promosi Idol: Selamat! Setelah berjuang sebagai Trainee, kamu resmi dipromosikan menjadi anggota tim utama (Main Team) dengan gaji \$${character.jobSalary}/tahun! 🎤🌟';
         events.add(notice);
@@ -440,8 +440,7 @@ class IdolManager {
       }
       
       if (!delayGraduation) {
-        character.jobName = null;
-        character.jobSalary = null;
+        character.resignJob();
         character.idolTrainees.clear();
         character.idolMainMembers.clear();
         character.idolStaff.clear();

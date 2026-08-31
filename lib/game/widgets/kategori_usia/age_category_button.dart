@@ -184,76 +184,140 @@ class AgeCategoryButton extends StatelessWidget {
           context: context,
           title: '📊 Kategori & Status',
           isNotification: false,
-          content: Builder(builder: (context) {
-            final theme = Theme.of(context);
-            final isDark = theme.brightness == Brightness.dark;
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // --- HEADER: IKON USIA ---
-                Center(
-                  child: Column(
-                    children: [
-                      Icon(ageData['icon'], size: 56, color: color),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${ageData['label']}',
-                        style: TextStyle(
-                          fontSize: 20, 
-                          fontWeight: FontWeight.bold,
-                          color: color,
+          content: (() {
+            int activeTab = 0; // 0: Pendidikan, 1: Pekerjaan
+            return StatefulBuilder(
+              builder: (context, setDialogState) {
+                final theme = Theme.of(context);
+                final isDark = theme.brightness == Brightness.dark;
+                return Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    // --- HEADER: IKON USIA ---
+                    Center(
+                      child: Column(
+                        children: [
+                          Icon(ageData['icon'], size: 56, color: color),
+                          const SizedBox(height: 8),
+                          Text(
+                            '${ageData['label']}',
+                            style: TextStyle(
+                              fontSize: 20, 
+                              fontWeight: FontWeight.bold,
+                              color: color,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // --- INFO DASAR (Gender, Usia, Lokasi) ---
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                // --- INFO DASAR (Gender, Usia, Lokasi) ---
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildInfoItem(context, Icons.wc, 'Gender', gender, Colors.purple),
+                          _buildInfoItem(context, Icons.cake, 'Usia', '$age Tahun', Colors.blue),
+                          _buildInfoItem(context, Icons.location_on, 'Lokasi', location, Colors.orange),
+                        ],
+                      ),
                     ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      _buildInfoItem(context, Icons.wc, 'Gender', gender, Colors.purple),
-                      _buildInfoItem(context, Icons.cake, 'Usia', '$age Tahun', Colors.blue),
-                      _buildInfoItem(context, Icons.location_on, 'Lokasi', location, Colors.orange),
-                    ],
-                  ),
-                ),
-              const SizedBox(height: 16),
+                    const SizedBox(height: 16),
 
-              // --- STATISTIK KARAKTER ---
-              const Text('📈 Statistik Karakter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 8),
-              Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                children: [
-                  _buildStatChip(context, Icons.favorite, 'Kesehatan', health, Colors.red),
-                  _buildStatChip(context, Icons.sentiment_satisfied, 'Kebahagiaan', happiness, Colors.green),
-                  _buildStatChip(context, Icons.psychology, 'Kecerdasan', intelligence, Colors.blue),
-                  _buildStatChip(context, Icons.monetization_on, 'Uang', money, Colors.amber, isMoney: true),
-                  _buildStatChip(context, Icons.face, 'Penampilan', appearance, Colors.pink),
-                ],
-              ),
-              const SizedBox(height: 16),
+                    // --- STATISTIK KARAKTER ---
+                    const Text('📈 Statistik Karakter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: [
+                        _buildStatChip(context, Icons.favorite, 'Kesehatan', health, Colors.red),
+                        _buildStatChip(context, Icons.sentiment_satisfied, 'Kebahagiaan', happiness, Colors.green),
+                        _buildStatChip(context, Icons.psychology, 'Kecerdasan', intelligence, Colors.blue),
+                        _buildStatChip(context, Icons.monetization_on, 'Uang', money, Colors.amber, isMoney: true),
+                        _buildStatChip(context, Icons.face, 'Penampilan', appearance, Colors.pink),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
 
-              // --- RIWAYAT PENDIDIKAN ---
-              const Text('🎓 Riwayat Pendidikan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              const SizedBox(height: 8),
-              _buildEducationHistorySection(context),
-            ],
+                    // --- TAB MENU ---
+                    Row(
+                      children: [
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setDialogState(() => activeTab = 0),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: activeTab == 0 ? color : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '🎓 Pendidikan',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: activeTab == 0 ? color : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: InkWell(
+                            onTap: () => setDialogState(() => activeTab = 1),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: activeTab == 1 ? color : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  '💼 Pekerjaan',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: activeTab == 1 ? color : Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    if (activeTab == 0)
+                      _buildEducationHistorySection(context)
+                    else
+                      _buildJobHistorySection(context),
+                  ],
+                );
+              },
             );
-          }),
+          }()),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -322,6 +386,79 @@ class AgeCategoryButton extends StatelessWidget {
       ),
       backgroundColor: color.withOpacity(0.1),
       side: BorderSide(color: color.withOpacity(0.3)),
+    );
+  }
+
+  Widget _buildJobHistorySection(BuildContext context) {
+    final history = character.jobHistory;
+    if (history.isEmpty) {
+      return const Padding(
+        padding: EdgeInsets.symmetric(vertical: 12.0),
+        child: Text(
+          'Belum memiliki riwayat pekerjaan.',
+          style: TextStyle(fontSize: 12, fontStyle: FontStyle.italic, color: Colors.grey),
+          textAlign: TextAlign.center,
+        ),
+      );
+    }
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final cardBgColor = isDark ? Colors.grey.shade800 : Colors.grey.shade50;
+    final cardBorderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final textColor = isDark ? Colors.white : Colors.black87;
+
+    return Column(
+      children: history.map((job) {
+        final title = job['title'] as String? ?? 'Pekerjaan';
+        final salary = job['salary'] as int? ?? 0;
+        final startAge = job['startAge'] as int? ?? 0;
+        final endAge = job['endAge'] as int?;
+        final endAgeStr = endAge != null ? '$endAge Tahun' : 'Sekarang';
+
+        return Container(
+          margin: const EdgeInsets.only(bottom: 8),
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: cardBgColor,
+            border: Border.all(color: cardBorderColor),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            children: [
+              CircleAvatar(
+                backgroundColor: Colors.green.withOpacity(0.1),
+                child: const Icon(Icons.work, color: Colors.green),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: textColor,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Gaji: \$$salary/tahun',
+                      style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Masa Kerja: $startAge Tahun - $endAgeStr',
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
     );
   }
 }

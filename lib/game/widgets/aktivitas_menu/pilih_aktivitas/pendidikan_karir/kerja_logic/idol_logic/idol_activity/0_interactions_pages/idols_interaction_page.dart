@@ -377,8 +377,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
 
                   if (isFemale && isStaff && widget.character.idolStaffDatingFailures >= 3) {
                     setState(() {
-                      widget.character.jobName = null;
-                      widget.character.jobSalary = null;
+                      widget.character.resignJob();
                       widget.character.idolTrainees.clear();
                       widget.character.idolMainMembers.clear();
                       widget.character.idolStaff.clear();

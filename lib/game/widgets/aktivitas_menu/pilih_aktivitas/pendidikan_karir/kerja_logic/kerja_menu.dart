@@ -14,18 +14,17 @@ import 'esport_logic/proplayer/pro_player_percentage.dart';
 import 'esport_logic/talent/talent_esport_percentage.dart';
 import 'esport_logic/proplayer/esport_roster_page.dart';
 import 'esport_logic/esport_activities_page.dart';
+
 // ============================================================
 // EXTENSION untuk menambahkan isUnivGraduated ke Character
 // ============================================================
 extension CharacterExtension on Character {
   bool get isUnivGraduated {
-    // Cek riwayat kelulusan pendidikan tinggi
     if (educationHistory['S1'] == 'Lulus' ||
         educationHistory['S2'] == 'Lulus' ||
         educationHistory['S3'] == 'Lulus') {
       return true;
     }
-    // Fallback jika sedang kuliah dan sudah mencapai umur kelulusan (>= 22)
     if (univMajor != null && age >= 22) return true;
     return false;
   }
@@ -41,9 +40,6 @@ class KerjaMenuScreen extends StatefulWidget {
     required this.onRefresh,
   });
 
-  // ============================================================
-  // DAFTAR PEKERJAAN (LENGKAP DENGAN KATEGORI & SYARAT)
-  // ============================================================
   static final List<Map<String, dynamic>> availableJobs = JobDatabase.availableJobs;
 
   @override
@@ -168,12 +164,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
   }
 
-
-
   bool _hasMatchingMajor(Character character, List<String> allowed) {
     if (!character.isUnivGraduated) return false;
 
-    // Fallback: jika educationHistory sudah Lulus tapi graduatedMajors kosong (save game lama)
     final hasLulus = character.educationHistory['S1'] == 'Lulus' ||
                      character.educationHistory['S2'] == 'Lulus' ||
                      character.educationHistory['S3'] == 'Lulus';
@@ -191,7 +184,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     return false;
   }
 
-  // ============================================================
   void _applyJob(Map<String, dynamic> job) {
     if (job['title'] == 'Idol (Trainee)') {
       if (widget.character.hasGraduatedIdol) {
@@ -223,7 +215,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             title: const Text('Lamaran Ditolak 🚫'),
             content: Text(
               'Persyaratan menjadi Idol tidak terpenuhi.\n\n'
-              '• Kesehatan minimal: 80% (Kesehantanmu: ${widget.character.health}%)\n'
+              '• Kesehatan minimal: 80% (Kesehatanmu: ${widget.character.health}%)\n'
               '• Kedisiplinan minimal: 75% (Kedisiplinanmu: ${widget.character.discipline}%)',
             ),
             actions: [
@@ -255,7 +247,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       return;
     }
 
-    // Cek jika pekerjaan membutuhkan gelar
     if (job['category'] == 'Profesional' || job['category'] == 'Prestise') {
       final allowed = _getAllowedMajors(job['title']);
       if (!_hasMatchingMajor(widget.character, allowed)) {
@@ -285,9 +276,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
     }
 
-    // Cek persentase khusus untuk BA Esport
     if (job['title'] == 'Brand Ambassador Esport') {
-      final double chance = BaEsportPercentage.getApplyChance(widget.character.gender);
+      final double chance = BaEsportPercentage.getApplyChance(widget.character.gender, hasIdolHistory: widget.character.hasIdolHistory);
       if (Random().nextDouble() > chance) {
         showDialog(
           context: context,
@@ -308,7 +298,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
     }
 
-    // Cek persentase khusus untuk Pro Player Esport
     if (job['title'] == 'Pro Player Esport') {
       final double chance = ProPlayerPercentage.getApplyChance(widget.character.gender, widget.character.specialTalent);
       if (Random().nextDouble() > chance) {
@@ -331,9 +320,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
     }
 
-    // Cek persentase khusus untuk Talent Esports
     if (job['title'] == 'Talent Esports') {
-      final double chance = TalentEsportPercentage.getApplyChance(widget.character.gender);
+      final double chance = TalentEsportPercentage.getApplyChance(widget.character.gender, hasIdolHistory: widget.character.hasIdolHistory);
       if (Random().nextDouble() > chance) {
         showDialog(
           context: context,
@@ -368,10 +356,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     final double salaryMult = getCountrySalaryMultiplier(widget.character.location);
     final int finalSalary = (baseSalary * salaryMult).round();
 
-    // Lamaran diterima
     setState(() {
-      widget.character.jobName = finalTitle;
-      widget.character.jobSalary = finalSalary;
+      widget.character.setJob(finalTitle, finalSalary);
       if (finalTitle == 'Idol (Trainee)' || widget.character.isIdolStaff) {
         IdolManager.initializeTraineeTeam(widget.character);
       }
@@ -398,8 +384,14 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
   void _generateCoworkersIfEmpty() {
     final random = Random();
+    final String job = widget.character.jobName ?? '';
+    final bool isEsport = job.startsWith('Pro Player Esport') || job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
+
     if (widget.character.supervisor == null) {
-      final gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      if (isEsport) {
+        gender = random.nextDouble() < 0.95 ? 'Laki-laki' : 'Perempuan';
+      }
       final firstList = gender == 'Laki-laki'
           ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
               ? widget.character.maleFirstNames!
@@ -425,21 +417,20 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     if (widget.character.coworkers.isNotEmpty) return;
 
-    final String job = widget.character.jobName ?? '';
     final bool isProPlayer = job.startsWith('Pro Player Esport');
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
 
     int count = 5 + random.nextInt(6);
     if (isProPlayer) {
-      count = 3 + random.nextInt(3); // 3-5 pro player coworkers
+      count = 3 + random.nextInt(3);
     } else if (isBAOrTalent) {
-      count = 10 + random.nextInt(6); // 10-15 BA/Talent coworkers
+      count = 10 + random.nextInt(6);
     }
 
     for (int i = 0; i < count; i++) {
       String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
       if (isBAOrTalent) {
-        gender = random.nextDouble() < 0.85 ? 'Perempuan' : 'Laki-laki'; // Mostly female for BA/Talent
+        gender = random.nextDouble() < 0.85 ? 'Perempuan' : 'Laki-laki';
       }
 
       final firstList = gender == 'Laki-laki'
@@ -453,7 +444,14 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           ? widget.character.lastNames!
           : Character.globalLastNames;
       final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
-      final ageVal = 20 + random.nextInt(41);
+      int ageVal = 20 + random.nextInt(41);
+      if (job.startsWith('Talent Esports')) {
+        ageVal = 13 + random.nextInt(6); // 13-18
+      } else if (job.startsWith('Brand Ambassador Esport')) {
+        ageVal = 15 + random.nextInt(9); // 15-23
+      } else if (job.startsWith('Pro Player Esport')) {
+        ageVal = 13 + random.nextInt(13); // 13-25
+      }
       widget.character.coworkers.add({
         'name': name,
         'gender': gender,
@@ -481,10 +479,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             onPressed: () {
               Navigator.pop(context);
               setState(() {
-                widget.character.jobName = null;
-                widget.character.jobSalary = null;
-                widget.character.coworkers.clear();
-                widget.character.supervisor = null;
+                widget.character.resignJob();
               });
               widget.onRefresh();
             },
@@ -502,11 +497,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     List<Map<String, dynamic>> jobs = [];
 
     if (age < 18) {
-      // Under 18: Hanya tampilkan pekerjaan anak muda/remaja yang sesuai kriteria usia
       if (gender == 'Perempuan' && age >= 12) {
         jobs.add({
           'title': 'Idol (Trainee)',
-          // 10M - 20M IDR -> $667 to $1,333 USD
           'salary': 667 + Random().nextInt(667),
           'minIntel': 0,
           'category': 'Khusus',
@@ -516,7 +509,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         });
       }
 
-      // Ambil pekerjaan E-Sport dari database jika usia mencukupi
       for (final job in _availableJobs) {
         if (job['title'] == 'Pro Player Esport' && age >= 13) {
           jobs.add(job);
@@ -529,14 +521,12 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         }
       }
     } else {
-      // Lainnya (Usia >= 18): Mulai dengan semua pekerjaan standar
       jobs = List.from(_availableJobs);
 
-      // Tambahkan posisi staf manajemen Idol
       jobs.addAll([
         {
           'title': 'General Manager Idol',
-          'salary': 5000, // $5,000 USD (50M-100M IDR)
+          'salary': 5000,
           'minIntel': 75,
           'category': 'Profesional',
           'desc': 'Memimpin operasional dan strategi grup Idol',
@@ -545,7 +535,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         },
         {
           'title': 'Deputy General Manager Idol',
-          'salary': 3500, // $3,500 USD (40M-75M IDR)
+          'salary': 3500,
           'minIntel': 65,
           'category': 'Profesional',
           'desc': 'Membantu General Manager mengelola grup',
@@ -554,7 +544,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         },
         {
           'title': 'Staf Operasional Idol',
-          'salary': 500, // $500 USD (5M-10M IDR)
+          'salary': 500,
           'minIntel': 30,
           'category': 'Dasar',
           'desc': 'Mengurus kebutuhan panggung dan member Idol',
@@ -581,6 +571,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   // ============================================================
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final character = widget.character;
     if (character.isIdolRelated) {
       return IdolMenuScreen(
@@ -597,7 +588,6 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       _generateCoworkersIfEmpty();
     }
 
-    // Cari kategori pekerjaan saat ini (untuk badge)
     String currentCategory = '';
     if (hasJob) {
       final job = _availableJobs.firstWhere(
@@ -637,21 +627,81 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                     const SizedBox(height: 12),
                     Text(
                       hasJob ? 'Pekerjaan Saat Ini:' : 'Belum Memiliki Pekerjaan',
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
                     ),
                     if (hasJob) ...[
                       const SizedBox(height: 4),
                       Text(
                         character.jobName!,
-                        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.green),
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Gaji: \$${character.jobSalary}/tahun',
-                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                       ),
+                      // ========== BAR PERFORMA KERJA ==========
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Icon(Icons.trending_up, size: 16, color: Colors.blue),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Performa Kerja: ',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                // Gunakan nilai performa dari kombinasi disiplin dan kebahagiaan
+                                // (atau bisa diganti dengan field khusus di character jika ada)
+                                value: ((character.discipline + character.happiness) / 2) / 100,
+                                minHeight: 8,
+                                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  ((character.discipline + character.happiness) / 2) > 70
+                                      ? Colors.green
+                                      : ((character.discipline + character.happiness) / 2) > 40
+                                          ? Colors.amber
+                                          : Colors.red,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            '${((character.discipline + character.happiness) / 2).round()}%',
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                              color: ((character.discipline + character.happiness) / 2) > 70
+                                  ? Colors.green
+                                  : ((character.discipline + character.happiness) / 2) > 40
+                                      ? Colors.amber
+                                      : Colors.red,
+                            ),
+                          ),
+                        ],
+                      ),
+                      // ==========================================
                       if (currentCategory == 'Profesional' || currentCategory == 'Prestise') ...[
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 8),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                           decoration: BoxDecoration(
@@ -682,11 +732,14 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             ),
             const SizedBox(height: 24),
 
-            // Daftar Lowongan Pekerjaan vs Daftar Rekan Kerja
             if (hasJob) ...[
-              const Text(
+              Text(
                 'Aktivitas Pekerjaan',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : Colors.blueGrey,
+                ),
               ),
               const SizedBox(height: 12),
               _buildMenuTile(
@@ -748,6 +801,87 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   );
                 }
 
+                if (isTalent) {
+                  extraTiles.add(
+                    _buildMenuTile(
+                      context: context,
+                      icon: Icons.trending_up,
+                      color: Colors.amber,
+                      title: 'Minta Naik Menjadi BA 🌟',
+                      subtitle: 'Ajukan permohonan promosi menjadi Brand Ambassador',
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (ctx) => AlertDialog(
+                            title: const Text('Ajukan Promosi BA 🌟'),
+                            content: const Text('Apakah kamu yakin ingin mengajukan promosi dari Talent menjadi Brand Ambassador Esport?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(ctx);
+                                  final int ageVal = character.age;
+                                  double chance = 0.20;
+                                  if (ageVal >= 13 && ageVal <= 16) {
+                                    chance = 0.30;
+                                  } else if (ageVal >= 17 && ageVal <= 18) {
+                                    chance = 0.40;
+                                  } else if (ageVal >= 19 && ageVal <= 23) {
+                                    chance = 0.60;
+                                  }
+                                  
+                                  final bool isSuccess = Random().nextDouble() < chance;
+                                  if (isSuccess) {
+                                    setState(() {
+                                      character.setJob('Brand Ambassador Esport ($team)', 2500);
+                                    });
+                                    widget.onRefresh();
+                                    showDialog(
+                                      context: context,
+                                      builder: (c) => AlertDialog(
+                                        title: const Text('Promosi Diterima! 🎉'),
+                                        content: Text('Selamat! Manajemen menyetujui pengajuan promosi kamu menjadi Brand Ambassador Esport ($team) dengan gaji \$2500/tahun!'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(c),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  } else {
+                                    if (character.supervisor != null) {
+                                      final currentRel = int.tryParse(character.supervisor!['relationship'] ?? '50') ?? 50;
+                                      character.supervisor!['relationship'] = (currentRel - 10).clamp(0, 100).toString();
+                                    }
+                                    showDialog(
+                                      context: context,
+                                      builder: (c) => AlertDialog(
+                                        title: const Text('Promosi Ditolak 🚫'),
+                                        content: const Text('Manajemen menolak pengajuanmu dan merasa kinerjamu saat ini masih belum cukup untuk menjadi Brand Ambassador.'),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(c),
+                                            child: const Text('OK'),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: const Text('Ajukan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                              ),
+                              TextButton(
+                                onPressed: () => Navigator.pop(ctx),
+                                child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
+
                 if (isBA) {
                   extraTiles.add(
                     _buildMenuTile(
@@ -759,6 +893,11 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       page: EsportRosterPage(
                         teamName: team,
                         isViewingBA: false,
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
                       ),
                     ),
                   );
@@ -773,6 +912,11 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       page: EsportRosterPage(
                         teamName: team,
                         isViewingBA: true,
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
                       ),
                     ),
                   );
@@ -793,16 +937,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       _searchQuery = val;
                     });
                   },
-                  style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black87),
                   decoration: InputDecoration(
                     hintText: 'Cari Lowongan Pekerjaan...',
-                    hintStyle: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.grey),
+                    hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.grey),
                     prefixIcon: const Icon(Icons.search, color: Colors.green),
                     filled: true,
-                    fillColor: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade900 : Colors.grey.shade100,
+                    fillColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Theme.of(context).brightness == Brightness.dark ? Colors.grey.shade700 : Colors.grey.shade300),
+                      borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
@@ -812,9 +956,13 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                   ),
                 ),
               ),
-              const Text(
+              Text(
                 'Lowongan Pekerjaan Tersedia',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.white70 : Colors.blueGrey,
+                ),
               ),
               const SizedBox(height: 12),
               (() {
@@ -828,17 +976,21 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.green.shade50,
+                        color: isDark ? Colors.green.shade900 : Colors.green.shade50,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.green.shade200),
+                        border: Border.all(color: isDark ? Colors.green.shade700 : Colors.green.shade200),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.work_outline, size: 16, color: Colors.green.shade700),
+                          Icon(Icons.work_outline, size: 16, color: isDark ? Colors.greenAccent : Colors.green.shade700),
                           const SizedBox(width: 8),
                           Text(
                             'Pekerjaan Umum (Tidak Butuh Gelar)',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green.shade800),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.greenAccent : Colors.green.shade800,
+                            ),
                           ),
                         ],
                       ),
@@ -849,17 +1001,21 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       margin: const EdgeInsets.only(bottom: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.indigo.shade50,
+                        color: isDark ? Colors.indigo.shade900 : Colors.indigo.shade50,
                         borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.indigo.shade200),
+                        border: Border.all(color: isDark ? Colors.indigo.shade700 : Colors.indigo.shade200),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.school_outlined, size: 16, color: Colors.indigo.shade700),
+                          Icon(Icons.school_outlined, size: 16, color: isDark ? Colors.indigoAccent : Colors.indigo.shade700),
                           const SizedBox(width: 8),
                           Text(
                             'Pekerjaan Profesional (Butuh Gelar Sarjana)',
-                            style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.indigo.shade800),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.indigoAccent : Colors.indigo.shade800,
+                            ),
                           ),
                         ],
                       ),
@@ -876,12 +1032,11 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   }
 
   Widget _buildJobCard(Map<String, dynamic> job, Character character) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final meetsIntel = character.intelligence >= job['minIntel'];
     final requiresGelar = job['category'] == 'Profesional' || job['category'] == 'Prestise';
     final allowed = _getAllowedMajors(job['title']);
-    final meetsGelar = requiresGelar
-        ? _hasMatchingMajor(character, allowed)
-        : true;
+    final meetsGelar = requiresGelar ? _hasMatchingMajor(character, allowed) : true;
     final canApply = meetsIntel && meetsGelar;
 
     return Card(
@@ -889,34 +1044,49 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
       ),
+      color: isDark ? Colors.grey.shade800 : null,
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: job['color'].withOpacity(0.1),
+          backgroundColor: job['color'].withValues(alpha: 0.1),
           child: Icon(job['icon'], color: job['color']),
         ),
-        title: Text(job['title'], style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(
+          job['title'],
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Gaji: \$${(job['salary'] * getCountrySalaryMultiplier(character.location)).round()}/tahun • ${job['category']}'),
+            Text(
+              'Gaji: \$${(job['salary'] * getCountrySalaryMultiplier(character.location)).round()}/tahun • ${job['category']}',
+              style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+            ),
             Text(
               job['desc'],
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark ? Colors.white60 : Colors.grey,
+              ),
             ),
             if (requiresGelar) ...[
               if (!character.isUnivGraduated)
-                const Text('⚠️ Membutuhkan gelar sarjana', style: TextStyle(fontSize: 11, color: Colors.orange))
+                Text('⚠️ Membutuhkan gelar sarjana', style: TextStyle(fontSize: 11, color: isDark ? Colors.orangeAccent : Colors.orange))
               else if (!meetsGelar)
-                Text('⚠️ Butuh Gelar: ${allowed.join(", ")}', style: const TextStyle(fontSize: 11, color: Colors.orange))
+                Text('⚠️ Butuh Gelar: ${allowed.join(", ")}', style: TextStyle(fontSize: 11, color: isDark ? Colors.orangeAccent : Colors.orange)),
             ],
           ],
         ),
         trailing: Icon(
           canApply ? Icons.arrow_forward_ios : Icons.lock,
           size: 14,
-          color: canApply ? Colors.grey : Colors.red,
+          color: canApply
+              ? (isDark ? Colors.white54 : Colors.grey)
+              : Colors.red,
         ),
         onTap: () {
           if (!canApply) {
@@ -949,18 +1119,36 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     Widget? page,
     VoidCallback? onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
       ),
+      color: isDark ? Colors.grey.shade800 : null,
       child: ListTile(
         leading: Icon(icon, color: color, size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? Colors.white60 : Colors.grey,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: () {
           if (page != null) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => page));

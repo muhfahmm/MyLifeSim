@@ -454,6 +454,7 @@ class _GameScreenState extends State<GameScreen> {
                       _checkAdikRequestMoney(() {
                         _checkSchoolEnrollmentOptions(() {
                           _checkGraduationOptions();
+                          _checkEsportPromotion();
                         });
                       });
                     });
@@ -469,6 +470,7 @@ class _GameScreenState extends State<GameScreen> {
           _checkAdikRequestMoney(() {
             _checkSchoolEnrollmentOptions(() {
               _checkGraduationOptions();
+              _checkEsportPromotion();
             });
           });
         });
@@ -477,6 +479,7 @@ class _GameScreenState extends State<GameScreen> {
       _checkAdikRequestMoney(() {
         _checkSchoolEnrollmentOptions(() {
           _checkGraduationOptions();
+          _checkEsportPromotion();
         });
       });
     }
@@ -1338,6 +1341,53 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // --- LOGIKA NOTIFIKASI AJAKAN KELUARGA ---
+  void _checkEsportPromotion() {
+    final age = _character.age;
+    final job = _character.jobName ?? '';
+    if (job.startsWith('Talent Esports') && (age == 17 || age == 18)) {
+      if (Random().nextDouble() < 0.70) {
+        String team = '';
+        if (job.contains('(') && job.contains(')')) {
+          team = job.substring(job.indexOf('(') + 1, job.indexOf(')'));
+        }
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+            title: const Row(
+              children: [
+                Icon(Icons.star, color: Colors.amber, size: 28),
+                SizedBox(width: 10),
+                Text('Tawaran Promosi BA! 🌟', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: Text(
+              'Manajemen $team sangat puas dengan kinerjamu sebagai Talent. Mereka menawarkanmu naik jabatan menjadi Brand Ambassador Esport ($team) dengan gaji \$2500/tahun!',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  setState(() {
+                    _character.setJob('Brand Ambassador Esport ($team)', 2500);
+                  });
+                },
+                child: const Text('Terima Tawaran', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: const Text('Tolak', style: TextStyle(color: Colors.grey)),
+              ),
+            ],
+          ),
+        );
+      }
+    }
+  }
+
   void _checkActiveProposal() {
     if (_character.activeProposal == null) {
       _checkGlassesNeed();

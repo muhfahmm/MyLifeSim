@@ -179,6 +179,8 @@ class Character {
   List<Map<String, dynamic>> casinoHistory = [];
   int casinoTotalWin = 0;
   int casinoTotalLoss = 0;
+  List<Map<String, dynamic>> jobHistory = [];
+  bool get hasIdolHistory => jobHistory.any((j) => j['title'].toString().contains('Idol'));
   int casinoSlotJackpot = 0;
 
   Map<String, dynamic>? garasiMobil;
@@ -827,6 +829,35 @@ class Character {
     garasiMotor!['riwayat'] = riwayat;
     garasiMotor!['statistik']['totalMotor'] = totalMotor;
     garasiMotor!['statistik']['totalNilai'] = totalNilai;
+  }
+
+  void setJob(String name, int salary) {
+    jobName = name;
+    jobSalary = salary;
+    final bool alreadyInHistory = jobHistory.any((j) => j['title'] == name && j['endAge'] == null);
+    if (!alreadyInHistory) {
+      jobHistory.add({
+        'title': name,
+        'salary': salary,
+        'startAge': age,
+        'endAge': null,
+      });
+    }
+  }
+
+  void resignJob() {
+    if (jobName != null) {
+      for (var job in jobHistory.reversed) {
+        if (job['title'] == jobName && job['endAge'] == null) {
+          job['endAge'] = age;
+          break;
+        }
+      }
+    }
+    jobName = null;
+    jobSalary = null;
+    supervisor = null;
+    coworkers = [];
   }
 
   void handlePartnerBreakupOnArrest(List<String> eventsList) {

@@ -39,96 +39,106 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
         children: [
           // ================= SUPERVISOR SECTION =================
           if (supervisor != null) ...[
-            Row(
-              children: [
-                Icon(Icons.supervisor_account, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
-                const SizedBox(width: 8),
-                Text(
-                  'Atasan / Supervisor',
-                  style: TextStyle(
-                    fontSize: 16, 
-                    fontWeight: FontWeight.bold, 
-                    color: isDark ? Colors.white70 : Colors.blueGrey,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            Card(
-              elevation: 0,
-              color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.blue.shade100),
-              ),
-              child: () {
-                final String name = supervisor['name']!;
-                final String gender = supervisor['gender']!;
-                final int age = int.tryParse(supervisor['age'] ?? '40') ?? 40;
-                final int rel = int.tryParse(supervisor['relationship'] ?? '50') ?? 50;
-                final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
-                  name: name,
-                  gender: gender,
-                  age: age,
-                  schoolLevel: 'SMA',
-                  happiness: rel,
-                );
+            (() {
+              final String jobName = widget.character.jobName ?? '';
+              final bool isEsport = jobName.startsWith('Pro Player Esport') || jobName.startsWith('Brand Ambassador Esport') || jobName.startsWith('Talent Esports');
+              final String supervisorLabel = isEsport ? 'CEO' : 'Supervisor';
+              final String supervisorHeader = isEsport ? 'CEO / Manajemen' : 'Atasan / Supervisor';
 
-                return ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: NetworkImage(avatarUrl),
-                  ),
-                  title: Row(
+              final String name = supervisor['name']!;
+              final String gender = supervisor['gender']!;
+              final int age = int.tryParse(supervisor['age'] ?? '40') ?? 40;
+              final int rel = int.tryParse(supervisor['relationship'] ?? '50') ?? 50;
+              final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
+                name: name,
+                gender: gender,
+                age: age,
+                schoolLevel: 'SMA',
+                happiness: rel,
+              );
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold, 
-                            color: isDark ? Colors.lightBlueAccent : Colors.blue,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.shade700,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: const Text(
-                          'Supervisor',
-                          style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                      Icon(Icons.supervisor_account, size: 20, color: isDark ? Colors.white70 : Colors.blueGrey),
+                      const SizedBox(width: 8),
+                      Text(
+                        supervisorHeader,
+                        style: TextStyle(
+                          fontSize: 16, 
+                          fontWeight: FontWeight.bold, 
+                          color: isDark ? Colors.white70 : Colors.blueGrey,
                         ),
                       ),
                     ],
                   ),
-                  subtitle: Text(
-                    'Atasan • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${supervisor['intelligence']}%',
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
+                  const SizedBox(height: 8),
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.blue.shade100),
                     ),
-                  ),
-                  trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.blue),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ClassmateInteractionPage(
-                          classmate: supervisor,
-                          character: widget.character,
-                          onRefresh: () {
-                            setState(() {});
-                            widget.onRefresh();
-                          },
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: NetworkImage(avatarUrl),
+                      ),
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold, 
+                                color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade700,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              supervisorLabel,
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
+                      subtitle: Text(
+                        '$supervisorLabel • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${supervisor['intelligence']}%',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black54,
                         ),
                       ),
-                    );
-                  },
-                );
-              }(),
-            ),
+                      trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.blue),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClassmateInteractionPage(
+                              classmate: supervisor,
+                              character: widget.character,
+                              onRefresh: () {
+                                setState(() {});
+                                widget.onRefresh();
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              );
+            })(),
             const SizedBox(height: 24),
           ],
 
