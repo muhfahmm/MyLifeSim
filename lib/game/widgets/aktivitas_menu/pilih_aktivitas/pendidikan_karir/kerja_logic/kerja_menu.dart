@@ -9,10 +9,10 @@ import 'idol_logic/idol_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import 'database_nama_pekerjaan.dart';
 import 'esport_logic/tim_esport.dart';
-import 'esport_logic/ba_esport_percentage.dart';
-import 'esport_logic/pro_player_percentage.dart';
-import 'esport_logic/talent_esport_percentage.dart';
-import 'esport_logic/esport_roster_page.dart';
+import 'esport_logic/BA/ba_esport_percentage.dart';
+import 'esport_logic/proplayer/pro_player_percentage.dart';
+import 'esport_logic/talent/talent_esport_percentage.dart';
+import 'esport_logic/proplayer/esport_roster_page.dart';
 import 'esport_logic/esport_activities_page.dart';
 // ============================================================
 // EXTENSION untuk menambahkan isUnivGraduated ke Character
