@@ -4,12 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswi_guru_laki/siswi_guru_laki_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/siswa_guru_perempuan/siswa_guru_perempuan_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_laki_siswa_laki/guru_laki_siswa_laki_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/guru_perempuan_siswi/guru_perempuan_siswi_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
-import 'package:bitlife/game/premium_features/adult_features.dart';
+import 'package:bitlife/store_page/fitur_premium/adult_features.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'dart:math';
@@ -52,6 +47,107 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     );
   }
 
+  // ==========================================================
+  // LOGIKA INTERNAL PENGGANTI SCHOOL_SEXUALITY_LOGIC
+  // ==========================================================
+  String _getTeacherSexuality() {
+    return widget.teacher['sexuality'] ?? 'Heteroseksual';
+  }
+
+  bool _isSexualityCompatible(String userGender, String teacherGender) {
+    final String tSex = _getTeacherSexuality();
+    if (tSex == 'Biseksual') return true;
+    if (tSex == 'Homoseksual' || tSex == 'Lesbian' || tSex == 'Gay') {
+      return userGender == teacherGender;
+    }
+    // Default: Heteroseksual
+    return userGender != teacherGender;
+  }
+
+  void _handleBercinta() {
+    final String name = widget.teacher['name']!;
+    final String userGen = widget.character.gender;
+    final String teacherGen = widget.teacher['gender'] ?? 'Laki-laki';
+    final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
+
+    if (!_isSexualityCompatible(userGen, teacherGen)) {
+      _showOutcome('Tidak Sesuai 🚫', '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu.');
+      return;
+    }
+
+    final int successChance = rel >= 70 ? 70 : (rel >= 40 ? 50 : 30);
+    final bool success = Random().nextInt(100) < successChance;
+
+    if (success) {
+      final int change = 15 + Random().nextInt(11);
+      widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
+      widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+      widget.onRefresh();
+      _showOutcome('Berhasil 💖', 'Kamu berhasil melakukan hubungan intim dengan $name! Hubungan kalian meningkat pesat.');
+    } else {
+      final int change = 10 + Random().nextInt(16);
+      widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
+      widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
+      widget.onRefresh();
+      _showOutcome('Ditolak 💔', '$name menolak ajakanmu dan merasa sangat terkejut. Hubungan menurun.');
+    }
+  }
+
+  void _handleAjakPacaran() {
+    final String name = widget.teacher['name']!;
+    final String userGen = widget.character.gender;
+    final String teacherGen = widget.teacher['gender'] ?? 'Laki-laki';
+    final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
+
+    if (widget.character.isAnyPartnerNameMatching(name)) {
+      _showOutcome('Sudah Berpacaran 💑', 'Kamu sudah memiliki hubungan dengan $name.');
+      return;
+    }
+
+    if (!_isSexualityCompatible(userGen, teacherGen)) {
+      _showOutcome('Tidak Sesuai 🚫', '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu untuk berpacaran.');
+      return;
+    }
+
+    final int successChance = rel >= 70 ? 70 : (rel >= 40 ? 50 : 30);
+    final bool success = Random().nextInt(100) < successChance;
+
+    if (success) {
+      final int change = 10 + Random().nextInt(11);
+      widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
+      
+      final Map<String, String> newPartnerMap = {
+        'name': name,
+        'gender': teacherGen,
+        'age': widget.teacher['age'] ?? '40',
+        'relationship': widget.teacher['relationship'] ?? '50',
+        'relation': 'Pacar',
+        'isDeceased': 'false',
+      };
+
+      if (widget.character.partner == null) {
+        widget.character.partner = newPartnerMap;
+      } else if (widget.character.secondPartner == null) {
+        widget.character.secondPartner = newPartnerMap;
+        widget.character.isHavingAffair = true;
+      } else {
+        widget.character.secretPartners.add(newPartnerMap);
+        widget.character.isHavingAffair = true;
+      }
+
+      widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+      widget.onRefresh();
+      _showOutcome('Pacaran Baru! ❤️', 'Kamu berhasil mengajak $name untuk berpacaran dan dia menerimanya!');
+    } else {
+      final int change = 10 + Random().nextInt(11);
+      widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
+      widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
+      widget.onRefresh();
+      _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakanmu dan mengingatkanmu untuk menjaga sikap sebagai murid.');
+    }
+  }
+  // ==========================================================
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -80,7 +176,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Profile Card
             Card(
               elevation: 0,
               color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
@@ -228,11 +323,9 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               ),
             ),
             const SizedBox(height: 12),
-
             const SizedBox(height: 8),
 
             if (widget.character.age >= 10) ...[
-              // Aksi 1: Bercinta / Make Love (PREMIUM GATED)
               if (AdultFeatures.canMakeLove(
                 userAge: widget.character.age,
                 role: widget.role,
@@ -242,51 +335,8 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                   icon: Icons.favorite,
                   color: Colors.pink,
                   title: 'Bercinta / Make Love',
-                  onTap: () {
-                    final userGen = widget.character.gender;
-                    final teacherGen = gender;
-                    if (userGen == 'Perempuan' && teacherGen == 'Laki-laki') {
-                      // Siswi Perempuan ke Guru Laki-laki
-                      SiswiGuruLakiLogic.bercinta(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Laki-laki' && teacherGen == 'Perempuan') {
-                      // Siswa Laki-laki ke Guru Perempuan
-                      SiswaGuruPerempuanLogic.bercinta(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Laki-laki' && teacherGen == 'Laki-laki') {
-                      // Siswa Laki-laki ke Guru Laki-laki (Gay)
-                      GuruLakiSiswaLakiLogic.bercinta(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Perempuan' && teacherGen == 'Perempuan') {
-                      // Siswi Perempuan ke Guru Perempuan (Lesbian)
-                      GuruPerempuanSiswiLogic.bercinta(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else {
-                      _showOutcome('Bercinta Ditolak 🚫', '$name menolak ajakanmu.');
-                    }
-                  },
+                  onTap: _handleBercinta,
                 ),
-              // Aksi 1b: Ajak Masturbasi Bersama (Premium)
               if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
                 _buildActionTile(
                   icon: Icons.flash_on,
@@ -295,7 +345,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                   onTap: () {
                     int successChance = PersentaseAjakan.getSuccessChance(
                       character: widget.character,
-                      relationType: widget.role, // 'Guru', 'Guru BK', 'Kepala Sekolah', dll
+                      relationType: widget.role,
                       viewerName: name,
                     );
                     final bool success = Random().nextInt(100) < successChance;
@@ -313,7 +363,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                         },
                       );
                     } else {
-                      // Hukuman jika ditolak oleh Guru/BK/Kepsek: Dikeluarkan dari sekolah/hukuman berat jika non-kuliah
                       if (widget.role == 'Guru' || widget.role == 'Guru BK' || widget.role == 'Kepala Sekolah') {
                         widget.character.happiness = (widget.character.happiness - 50).clamp(0, 100);
                         widget.character.money = (widget.character.money * 0.5).round();
@@ -347,59 +396,15 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     }
                   },
                 ),
-              // Aksi 2: Ajak Pacaran (PREMIUM GATED)
               if (AdultFeatures.canProposeDating(widget.role, widget.role, userAge: widget.character.age))
                 _buildActionTile(
                   icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
                   color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
                   title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
-                  onTap: () {
-                    final userGen = widget.character.gender;
-                    final teacherGen = gender;
-                    if (userGen == 'Perempuan' && teacherGen == 'Laki-laki') {
-                      // Siswi Perempuan ke Guru Laki-laki
-                      SiswiGuruLakiLogic.ajakPacaran(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Laki-laki' && teacherGen == 'Perempuan') {
-                      // Siswa Laki-laki ke Guru Perempuan
-                      SiswaGuruPerempuanLogic.ajakPacaran(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Laki-laki' && teacherGen == 'Laki-laki') {
-                      // Siswa Laki-laki ke Guru Laki-laki (Gay)
-                      GuruLakiSiswaLakiLogic.ajakPacaran(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else if (userGen == 'Perempuan' && teacherGen == 'Perempuan') {
-                      // Siswi Perempuan ke Guru Perempuan (Lesbian)
-                      GuruPerempuanSiswiLogic.ajakPacaran(
-                        context: context,
-                        character: widget.character,
-                        teacher: widget.teacher,
-                        onRefresh: widget.onRefresh,
-                        showOutcome: (t, d) => _showOutcome(t, d),
-                      );
-                    } else {
-                      _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan pacaranmu.');
-                    }
-                  },
+                  onTap: _handleAjakPacaran,
                 ),
             ],
 
-            // Aksi 3: Cari Muka (Puji) - tetap dipertahankan
             _buildActionTile(
               icon: Icons.thumb_up_alt_outlined,
               color: Colors.teal,
@@ -420,13 +425,12 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               },
             ),
 
-            // Aksi 2: Bertingkah Laku (BARU)
             _buildActionTile(
               icon: Icons.emoji_people,
               color: Colors.blueAccent,
               title: 'Bertingkah Laku',
               onTap: () {
-                final change = 3 + Random().nextInt(8); // 3-10
+                final change = 3 + Random().nextInt(8);
                 widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
                 widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
                 widget.onRefresh();
@@ -434,7 +438,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               },
             ),
 
-            // Aksi 3: Gift (BARU)
             _buildActionTile(
               icon: Icons.card_giftcard,
               color: Colors.orange,
@@ -442,7 +445,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               onTap: () {
                 const int giftCost = 100;
                 if (widget.character.money >= giftCost) {
-                  final change = 10 + Random().nextInt(11); // 10-20
+                  final change = 10 + Random().nextInt(11);
                   widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
                   widget.character.money -= giftCost;
                   widget.onRefresh();
@@ -453,7 +456,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               },
             ),
 
-            // Aksi 4: Cium (PREMIUM GATED)
             if (AdultFeatures.canMakeLove(
               userAge: widget.character.age,
               role: widget.role,
@@ -465,13 +467,13 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                 title: 'Cium',
                 onTap: () {
                   if (rel >= 60) {
-                    final change = 10 + Random().nextInt(11); // 10-20
+                    final change = 10 + Random().nextInt(11);
                     widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
                     widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
                     widget.onRefresh();
                     _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa disayangi! Hubungan kalian semakin dekat.');
                   } else {
-                    final change = 10 + Random().nextInt(11); // 10-20 penurunan
+                    final change = 10 + Random().nextInt(11);
                     widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
                     widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
                     widget.onRefresh();
@@ -480,7 +482,6 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                 },
               ),
 
-            // Aksi 5: Menghina - tetap dipertahankan
             _buildActionTile(
               icon: Icons.sentiment_very_dissatisfied,
               color: Colors.red,

@@ -1,9 +1,21 @@
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/school_sexuality_logic.dart';
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart
+
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 
 class SchoolGenerator {
   static final Random _random = Random();
+
+  // Helper untuk menentukan seksualitas tanpa bergantung pada file external
+  static String _generateRandomSexuality(String gender) {
+    // 80% Heteroseksual, 10% Homoseksual/Lesbian, 10% Biseksual
+    final int roll = _random.nextInt(100);
+    if (roll < 80) return 'Heteroseksual';
+    if (roll < 90) {
+      return gender == 'Laki-laki' ? 'Homoseksual' : 'Lesbian';
+    }
+    return 'Biseksual';
+  }
 
   static String generateRandomName(String gender, Character character) {
     List<String> firstList = gender == 'Laki-laki' 
@@ -46,7 +58,7 @@ class SchoolGenerator {
         'relationship': (40 + _random.nextInt(21)).toString(), // 40 to 60 initial
         'age': classmateAge.toString(),
         'isDeceased': 'false',
-        'sexuality': SexualityLogic.getStudentSexuality(gender),
+        'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
         'intelligence': (30 + _random.nextInt(61)).toString(),
       });
     }
@@ -61,7 +73,7 @@ class SchoolGenerator {
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(),
         'age': (35 + _random.nextInt(26)).toString(), // 35 to 60
-        'sexuality': SexualityLogic.getTeacherSexuality(gender),
+        'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
       };
     }
 
@@ -73,7 +85,7 @@ class SchoolGenerator {
         'gender': gender,
         'relationship': (40 + _random.nextInt(21)).toString(),
         'age': (28 + _random.nextInt(23)).toString(), // 28 to 50
-        'sexuality': SexualityLogic.getTeacherSexuality(gender),
+        'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
       };
     }
 
@@ -90,7 +102,7 @@ class SchoolGenerator {
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': sdSubjects[i % sdSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
-          'sexuality': SexualityLogic.getTeacherSexuality(gender),
+          'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
         });
       }
     }
@@ -109,7 +121,7 @@ class SchoolGenerator {
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': smpSubjects[i % smpSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
-          'sexuality': SexualityLogic.getTeacherSexuality(gender),
+          'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
         });
       }
     }
@@ -129,7 +141,7 @@ class SchoolGenerator {
           'relationship': (45 + _random.nextInt(16)).toString(),
           'subject': smaSubjects[i % smaSubjects.length],
           'age': (25 + _random.nextInt(31)).toString(),
-          'sexuality': SexualityLogic.getTeacherSexuality(gender),
+          'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
         });
       }
     }

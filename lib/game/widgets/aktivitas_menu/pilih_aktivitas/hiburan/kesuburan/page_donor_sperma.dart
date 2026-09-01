@@ -6,7 +6,7 @@ import 'package:bitlife/avatar/avatar_generator.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
-import 'package:bitlife/game/premium_features/adult_features.dart';
+import 'package:bitlife/store_page/fitur_premium/adult_features.dart';
 
 class PageDonorSperma extends StatefulWidget {
   final Character character;

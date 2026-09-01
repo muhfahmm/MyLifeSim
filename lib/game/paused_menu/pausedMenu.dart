@@ -1,9 +1,12 @@
+// lib/game/paused_menu/paused_menu.dart
+
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/store_page/store_page.dart';
 import 'package:bitlife/game/paused_menu/darkmode.dart';
+import 'package:bitlife/pilih_karakter/settings/settings.dart';
 
-class PausedMenu extends StatelessWidget {
+class PausedMenu extends StatefulWidget {
   final Character? character;
   final VoidCallback? onPurchaseCompleted;
   final VoidCallback? onRestart;
@@ -19,6 +22,11 @@ class PausedMenu extends StatelessWidget {
     this.onNewGame,
   });
 
+  @override
+  State<PausedMenu> createState() => _PausedMenuState();
+}
+
+class _PausedMenuState extends State<PausedMenu> {
   Widget _buildMenuItem(
     BuildContext context, {
     required IconData icon,
@@ -56,14 +64,30 @@ class PausedMenu extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Drawer(
+    final isDark = theme.brightness == Brightness.dark;
+
+    final isFemale = widget.character?.gender.trim().toLowerCase() == 'perempuan';
+    final sameSexTitle = isFemale ? 'Nonaktifkan Ajakan Lesbian' : 'Nonaktifkan Ajakan Gay';
+    final bool isSameSexDisabled = widget.character?.disableSameSexProposals ?? false;
+    
+    return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
-      child: Column(
+      appBar: AppBar(
+        title: const Text('Game Paused'),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        foregroundColor: theme.colorScheme.onSurface,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Column(
         children: [
           // --- HEADER ELEGAN ---
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.only(top: 48, bottom: 24, left: 24, right: 24),
+            padding: const EdgeInsets.only(top: 24, bottom: 24, left: 24, right: 24),
             decoration: const BoxDecoration(
               gradient: LinearGradient(
                 colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)],
@@ -85,23 +109,22 @@ class PausedMenu extends StatelessWidget {
                     letterSpacing: 1.2,
                   ),
                 ),
+                SizedBox(height: 4),
                 Text(
                   'Game Paused',
                   style: TextStyle(
                     color: Colors.white70,
                     fontSize: 14,
-                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
             ),
           ),
-          const SizedBox(height: 16),
 
-          // --- LIST MENU ---
+          // --- LIST MENU PAUSED ---
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.symmetric(vertical: 12),
               children: [
                 // SECTION 1: KONTROL GAME
                 const Padding(
@@ -129,10 +152,57 @@ class PausedMenu extends StatelessWidget {
                   title: 'Restart (Reset Semua)',
                   iconColor: Colors.orange,
                   onTap: () {
-                    onRestart?.call();
+                    widget.onRestart?.call();
                     Navigator.pop(context);
                   },
                 ),
+                _buildMenuItem(
+                  context,
+                  icon: Icons.settings_rounded,
+                  title: 'Settingan',
+                  iconColor: Colors.blueGrey,
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const SettingsPage()),
+                    );
+                  },
+                ),
+
+                if (widget.character != null) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                    child: Card(
+                      elevation: 0,
+                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      child: SwitchListTile(
+                        secondary: const Icon(Icons.block_rounded, color: Colors.purpleAccent, size: 28),
+                        title: Text(
+                          sameSexTitle,
+                          style: TextStyle(
+                            color: isDark ? Colors.white70 : Colors.black87,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 15,
+                          ),
+                        ),
+                        subtitle: Text(
+                          isSameSexDisabled ? 'Ajakan Dinonaktifkan' : 'Ajakan Aktif',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isSameSexDisabled ? Colors.redAccent : Colors.grey,
+                          ),
+                        ),
+                        value: isSameSexDisabled,
+                        onChanged: (val) {
+                          setState(() {
+                            widget.character!.disableSameSexProposals = val;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                ],
 
                 const Divider(height: 32, indent: 20, endIndent: 20),
 
@@ -155,8 +225,7 @@ class PausedMenu extends StatelessWidget {
                   title: 'Simpan Progress',
                   iconColor: Colors.green,
                   onTap: () {
-                    onSaveProgress?.call();
-                    // Tidak langsung pop agar user bisa lihat SnackBar feedback
+                    widget.onSaveProgress?.call();
                   },
                 ),
                 _buildMenuItem(
@@ -165,7 +234,7 @@ class PausedMenu extends StatelessWidget {
                   title: 'Mulai Game Baru',
                   iconColor: Colors.purple,
                   onTap: () {
-                    onNewGame?.call();
+                    widget.onNewGame?.call();
                     Navigator.pop(context);
                   },
                 ),
@@ -195,8 +264,8 @@ class PausedMenu extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => StorePage(
-                          character: character,
-                          onPurchaseCompleted: onPurchaseCompleted,
+                          character: widget.character,
+                          onPurchaseCompleted: widget.onPurchaseCompleted,
                         ),
                       ),
                     );
@@ -218,7 +287,7 @@ class PausedMenu extends StatelessWidget {
                   iconColor: Colors.red,
                   isDestructive: true,
                   onTap: () {
-                    Navigator.pop(context); // Tutup Drawer
+                    Navigator.pop(context); // Tutup Paused Menu
                     Navigator.pop(context); // Kembali ke Home Page
                   },
                 ),

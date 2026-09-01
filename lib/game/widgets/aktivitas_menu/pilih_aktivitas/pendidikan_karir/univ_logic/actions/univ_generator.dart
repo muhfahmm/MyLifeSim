@@ -1,10 +1,21 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/actions/univ_generator.dart
-import 'package:bitlife/game/widgets/hubungan_menu/school_sexuality/school_sexuality_logic.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
 
 class UnivGenerator {
   static final Random _random = Random();
+
+  // Helper untuk menentukan seksualitas tanpa bergantung pada file external
+  static String _generateRandomSexuality(String gender) {
+    // 80% Heteroseksual, 10% Homoseksual, 10% Biseksual (sesuai standar game)
+    final int roll = _random.nextInt(100);
+    if (roll < 80) return 'Heteroseksual';
+    if (roll < 90) {
+      // Untuk Homoseksual, sesuaikan dengan gender agar tidak membingungkan
+      return gender == 'Laki-laki' ? 'Homoseksual' : 'Lesbian';
+    }
+    return 'Biseksual';
+  }
 
   static String generateRandomName(String gender, Character character) {
     List<String> firstList = gender == 'Laki-laki' 
@@ -41,7 +52,7 @@ class UnivGenerator {
         'relationship': (40 + _random.nextInt(21)).toString(), // 40 to 60 initial
         'age': classmateAge.toString(),
         'isDeceased': 'false',
-        'sexuality': SexualityLogic.getStudentSexuality(gender),
+        'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
         'intelligence': (30 + _random.nextInt(61)).toString(),
       });
     }
@@ -68,7 +79,7 @@ class UnivGenerator {
         'relationship': (45 + _random.nextInt(16)).toString(),
         'subject': subjects[i % subjects.length],
         'age': (30 + _random.nextInt(31)).toString(), // 30 to 60
-        'sexuality': SexualityLogic.getTeacherSexuality(gender),
+        'sexuality': _generateRandomSexuality(gender), // Diganti dari SexualityLogic
       });
     }
   }
