@@ -24,41 +24,24 @@ void main() {
   runApp(const MyApp());
 }
 
-// StatefulWidget agar listener bisa dikelola dengan benar
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  @override
-  void initState() {
-    super.initState();
-    themeNotifier.addListener(_onThemeChanged);
-  }
-
-  @override
-  void dispose() {
-    themeNotifier.removeListener(_onThemeChanged);
-    super.dispose();
-  }
-
-  void _onThemeChanged() {
-    // Hanya update themeMode, bukan rebuild seluruh tree
-    setState(() {});
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'BitLife Clone',
-      debugShowCheckedModeBanner: false,
-      themeMode: themeNotifier.value,
-      theme: _lightTheme,
-      darkTheme: _darkTheme,
-      home: const IntroAnimationScreen(nextScreen: HomePage()),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentMode, _) {
+        return MaterialApp(
+          title: 'BitLife Clone',
+          debugShowCheckedModeBanner: false,
+          themeMode: currentMode,
+          theme: _lightTheme,
+          darkTheme: _darkTheme,
+          themeAnimationDuration: Duration.zero, // Instant theme swap — menghilangkan lag interpolasi 200ms
+          home: const IntroAnimationScreen(nextScreen: HomePage()),
+        );
+      },
     );
   }
 }
@@ -71,9 +54,7 @@ class HomePage extends StatelessWidget {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 180),
-      curve: Curves.easeOut,
+    return Container(
       color: isDark ? Colors.grey.shade900 : Colors.white,
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -82,17 +63,10 @@ class HomePage extends StatelessWidget {
           elevation: 0,
           actions: [
             IconButton(
-              icon: AnimatedSwitcher(
-                duration: const Duration(milliseconds: 200),
-                transitionBuilder: (child, anim) => RotationTransition(
-                  turns: Tween(begin: 0.75, end: 1.0).animate(anim),
-                  child: FadeTransition(opacity: anim, child: child),
-                ),
-                child: Icon(
-                  isDark ? Icons.light_mode : Icons.dark_mode,
-                  key: ValueKey(isDark),
-                  color: isDark ? Colors.yellow.shade700 : Colors.grey.shade700,
-                ),
+              icon: Icon(
+                isDark ? Icons.light_mode : Icons.dark_mode,
+                key: ValueKey(isDark),
+                color: isDark ? Colors.yellow.shade700 : Colors.grey.shade700,
               ),
               onPressed: () {
                 themeNotifier.value = isDark ? ThemeMode.light : ThemeMode.dark;
@@ -111,29 +85,24 @@ class HomePage extends StatelessWidget {
               children: [
                 const Icon(Icons.favorite_rounded, size: 80, color: Colors.blue),
                 const SizedBox(height: 16),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOut,
+                Text(
+                  'BITLIFE',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
-                  child: const Text('BITLIFE', textAlign: TextAlign.center),
                 ),
                 const SizedBox(height: 8),
-                AnimatedDefaultTextStyle(
-                  duration: const Duration(milliseconds: 180),
-                  curve: Curves.easeOut,
+                Text(
+                  'Simulasi Kehidupan Tanpa Batas',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 14,
                     color: isDark ? Colors.white70 : Colors.black54,
                     fontStyle: FontStyle.italic,
-                  ),
-                  child: const Text(
-                    'Simulasi Kehidupan Tanpa Batas',
-                    textAlign: TextAlign.center,
                   ),
                 ),
                 const SizedBox(height: 48),
@@ -170,7 +139,7 @@ class HomePage extends StatelessWidget {
                   ),
                 ),
                 
-                // ===== TAMBAHAN BUTTON STORE =====
+                // ===== BUTTON STORE =====
                 const SizedBox(height: 12),
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
@@ -189,7 +158,6 @@ class HomePage extends StatelessWidget {
                     label: const Text('TOKO BITLIFE', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   ),
                 ),
-                // ==================================
               ],
             ),
           ),

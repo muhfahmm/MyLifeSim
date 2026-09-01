@@ -2191,8 +2191,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
       topActions.add(_buildAjakMasturbasiAction());
 
-      // Putuskan Pacar
-      topActions.add(putuskanPacarAction);
+      // Putuskan Pacar (hanya jika pacar, bukan ceraikan pasangan)
+      if (!isSpouse) {
+        topActions.add(putuskanPacarAction);
+      }
 
       // Minta Tidak Menikah Lagi (hanya jika ayah berstatus duda / tidak memiliki ibu tiri)
       if (isDatingBiologicalFather &&
@@ -2466,8 +2468,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
       topActions.add(_buildAjakMasturbasiAction());
 
-      // 2. Putuskan Pacar
-      topActions.add(putuskanPacarAction);
+      // 2. Putuskan Pacar (hanya untuk pacar, bukan ceraikan pasangan)
+      if (!isSpouse) {
+        topActions.add(putuskanPacarAction);
+      }
 
       // 3. Minta Cerai (jika target adalah ayah/ibu kandung/tiri yang sedang pacaran dengan anak dan pasangannya masih ada)
       final String myGenderLower = widget.character.gender.toLowerCase();
@@ -3602,7 +3606,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Text('Tingkat Kepuasan: ',
+                        Text('Tingkat Hubungan: ',
                             style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,

@@ -12,6 +12,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/store_page/store_page.dart';
 
 class AnakSakitEvent {
   // ================================================================
@@ -47,7 +48,7 @@ class AnakSakitEvent {
     required Character character,
     required VoidCallback onComplete,
   }) {
-    if (character.children.isEmpty) return;
+    if (StorePage.isImmunityUnlocked || character.children.isEmpty) return;
 
     final Random rng = Random();
 

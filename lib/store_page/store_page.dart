@@ -7,6 +7,7 @@ import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 // IMPOR FILE BARU
 import 'package:bitlife/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
 import 'package:bitlife/store_page/fitur_premium/god_mode/god_mode_page.dart';
+import 'package:bitlife/store_page/fitur_premium/top_up_page/top_up_page.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -21,6 +22,9 @@ class StorePage extends StatefulWidget {
   static bool get isGodModeUnlocked => _StorePageState._godModeUnlocked;
   static set isGodModeUnlocked(bool value) => _StorePageState._godModeUnlocked = value;
 
+  static bool get isImmunityUnlocked => _StorePageState._immunityUnlocked;
+  static set isImmunityUnlocked(bool value) => _StorePageState._immunityUnlocked = value;
+
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -29,6 +33,7 @@ class _StorePageState extends State<StorePage> {
   static bool _godModeUnlocked = false;
   static bool _removeAdsUnlocked = false;
   static bool _premiumUnlocked = false;
+  static bool _immunityUnlocked = false;
 
   void _showNoCharacterMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -269,16 +274,37 @@ class _StorePageState extends State<StorePage> {
                   children: [
                     const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 36),
                     const SizedBox(width: 16),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text('Keuangan Karakter Anda', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
-                        const SizedBox(height: 4),
-                        Text(
-                          '\$${character.money.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
-                          style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-                        ),
-                      ],
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text('Keuangan Karakter Anda', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                          const SizedBox(height: 4),
+                          Text(
+                            '\$${character.money.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}',
+                            style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: const Color(0xFFB45309),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        elevation: 3,
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TopUpPage(character: character),
+                          ),
+                        ).then((_) => setState(() {}));
+                      },
+                      icon: const Icon(Icons.add_circle_rounded, size: 18, color: Color(0xFFD97706)),
+                      label: const Text('TOP UP', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Color(0xFFB45309))),
                     ),
                   ],
                 ),
@@ -351,6 +377,19 @@ class _StorePageState extends State<StorePage> {
                 });
               },
             ),
+            _buildStoreItem(
+              icon: Icons.health_and_safety_rounded,
+              iconBgColor: Colors.teal.shade600,
+              title: 'Kekebalan Abadi (Bebas Penyakit)',
+              description: 'Karakter dan seluruh anggota keluarga menjadi kebal 100% dari segala penyakit selamanya.',
+              price: 'Rp 29.000',
+              isUnlocked: _immunityUnlocked,
+              onTap: () {
+                _simulatePurchase('Kekebalan Abadi (Bebas Penyakit)', () {
+                  _immunityUnlocked = true;
+                });
+              },
+            ),
 
             // --- SEKSI PENINGKAT ATRIBUT ---
             _buildSectionHeader('Peningkat Atribut Instan', isDark),
@@ -390,48 +429,6 @@ class _StorePageState extends State<StorePage> {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kecerdasan Instan', () {
                   character.intelligence = 100;
-                });
-              },
-            ),
-
-            // --- SEKSI TOP UP UANG ---
-            _buildSectionHeader('Paket Dana / Koin', isDark),
-            _buildStoreItem(
-              icon: Icons.monetization_on_rounded,
-              iconBgColor: Colors.amber.shade600,
-              title: 'Tabungan Pemula',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$50,000 ke dompet karakter.',
-              price: 'Rp 9.000',
-              onTap: () {
-                if (character == null) return _showNoCharacterMessage();
-                _simulatePurchase('Tabungan Pemula', () {
-                  character.money += 50000;
-                });
-              },
-            ),
-            _buildStoreItem(
-              icon: Icons.cases_rounded,
-              iconBgColor: Colors.amber.shade800,
-              title: 'Koper Jutawan',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$1,000,000 ke dompet karakter.',
-              price: 'Rp 29.000',
-              onTap: () {
-                if (character == null) return _showNoCharacterMessage();
-                _simulatePurchase('Koper Jutawan', () {
-                  character.money += 1000000;
-                });
-              },
-            ),
-            _buildStoreItem(
-              icon: Icons.account_balance_rounded,
-              iconBgColor: Colors.purple.shade700,
-              title: 'Gudang Harta',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Tambahkan ekstra +\$50,000,000 ke dompet karakter.',
-              price: 'Rp 99.000',
-              onTap: () {
-                if (character == null) return _showNoCharacterMessage();
-                _simulatePurchase('Gudang Harta', () {
-                  character.money += 50000000;
                 });
               },
             ),

@@ -14,6 +14,53 @@ class UnivMajorSelectionPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
 
+  static const Map<String, List<String>> categoryMajors = {
+    'STEM & TEKNIK': [
+      'Teknik Informatika',
+      'Sistem Informasi',
+      'Teknik Sipil',
+      'Teknik Elektro',
+      'Teknik Mesin',
+      'Teknik Kimia',
+      'Arsitektur',
+    ],
+    'KESEHATAN': [
+      'Kedokteran',
+      'Kedokteran Gigi',
+      'Farmasi',
+      'Keperawatan',
+      'Gizi & Ilmu Pangan',
+    ],
+    'BISNIS & EKONOMI': [
+      'Manajemen',
+      'Akuntansi',
+      'Ekonomi Pembangunan',
+      'Perbankan & Keuangan',
+      'Pemasaran Digital',
+    ],
+    'HUKUM & SOSIAL': [
+      'Hukum',
+      'Hubungan Internasional',
+      'Ilmu Komunikasi',
+      'Psikologi',
+      'Administrasi Publik',
+      'Kriminologi',
+    ],
+    'SENI & HUMANIORA': [
+      'Sastra Inggris',
+      'Seni Rupa & Desain',
+      'Desain Komunikasi Visual',
+      'Ilmu Sejarah',
+      'Filsafat',
+    ],
+    'PERTANIAN & LINGKUNGAN': [
+      'Agroteknologi',
+      'Kehutanan',
+      'Ilmu Kelautan',
+      'Teknologi Pangan',
+    ],
+  };
+
   const UnivMajorSelectionPage({
     super.key,
     required this.character,

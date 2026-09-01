@@ -157,7 +157,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        const Text('Tingkat Kepuasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                        const Text('Tingkat Hubungan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),

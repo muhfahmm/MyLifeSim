@@ -158,7 +158,20 @@ class Character {
   // --- FIELD PEKERJAAN ---
   String? jobName;
   int? jobSalary;
+  String? partTimeJobName;
+  int? partTimeJobSalary;
+  bool bypassDegreeRequirement = false;
   String? custodyParent; // 'Ayah' atau 'Ibu' setelah cerai
+
+  bool get isUnivGraduated {
+    if (educationHistory['S1'] == 'Lulus' ||
+        educationHistory['S2'] == 'Lulus' ||
+        educationHistory['S3'] == 'Lulus') {
+      return true;
+    }
+    if (univMajor != null && age >= 22) return true;
+    return false;
+  }
 
   // --- FIELD PEKERJAAN IDOL ---
   bool get isIdol => jobName == 'Idol (Trainee)' || jobName == 'Idol (Main Performer)';
@@ -1127,6 +1140,13 @@ class Character {
       jobSalary = jobSalary! + raiseAmount;
       money += jobSalary!;
       final String notice = '💼 Gajian: Kamu menerima gaji sebesar \$$jobSalary (naik \$$raiseAmount) dari pekerjaanmu sebagai $jobName.';
+      inbox.add(notice);
+    }
+
+    // Tambah gaji dari pekerjaan part-time jika ada
+    if (!isImprisoned && partTimeJobName != null && partTimeJobSalary != null) {
+      money += partTimeJobSalary!;
+      final String notice = '⏱️ Gajian Part-Time: Kamu menerima gaji paruh waktu sebesar \$$partTimeJobSalary dari pekerjaanmu sebagai $partTimeJobName.';
       inbox.add(notice);
     }
 

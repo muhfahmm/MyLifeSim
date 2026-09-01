@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/skin_color_inheritance.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/database_nama_pekerjaan.dart';
 
 class GodModePage extends StatefulWidget {
   final Character character;
@@ -188,9 +190,9 @@ class _GodModePageState extends State<GodModePage> {
                     const Divider(),
                     const SizedBox(height: 16),
 
-                    // UANG & UMUR INSTAN
+                    // KONTROL KEUANGAN (INSTAN)
                     Text(
-                      'Uang & Umur (Instan)',
+                      'Kontrol Keuangan (Instan)',
                       style: TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -216,35 +218,6 @@ class _GodModePageState extends State<GodModePage> {
                         }),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'Set Umur Langsung:',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white70 : Colors.black54,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        _buildAgeChip(18, character),
-                        _buildAgeChip(30, character),
-                        _buildAgeChip(50, character),
-                        _buildAgeChip(80, character),
-                        _buildActionChip('+1 Tahun', () {
-                          setState(() {
-                            character.age += 1;
-                            if (character.currentDate != null) {
-                              character.currentDate = character.currentDate!.add(const Duration(days: 365));
-                            }
-                          });
-                          _showToast('Umur bertambah 1 tahun');
-                        }),
-                      ],
-                    ),
 
                     const SizedBox(height: 24),
                     const Divider(),
@@ -260,51 +233,53 @@ class _GodModePageState extends State<GodModePage> {
                       ),
                     ),
                     const SizedBox(height: 12),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                            side: const BorderSide(color: Colors.blue),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          icon: const Icon(Icons.school),
-                          label: const Text('Langsung Lulus Universitas', style: TextStyle(fontWeight: FontWeight.bold)),
-                          onPressed: () => _showUnivGraduationDialog(isDark),
-                        ),
-                        const SizedBox(height: 8),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.blue,
-                            side: const BorderSide(color: Colors.blue),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          icon: const Icon(Icons.work),
-                          label: const Text('Langsung Dapat Pekerjaan', style: TextStyle(fontWeight: FontWeight.bold)),
-                          onPressed: () => _showJobSelectionDialog(isDark),
-                        ),
-                        const SizedBox(height: 8),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
-                            side: const BorderSide(color: Colors.redAccent),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          icon: const Icon(Icons.work_off),
-                          label: const Text('Berhenti Bekerja', style: TextStyle(fontWeight: FontWeight.bold)),
-                          onPressed: () {
-                            setState(() {
-                              character.jobName = null;
-                              character.jobSalary = null;
-                            });
-                            _showToast('Karakter kini menganggur');
-                          },
-                        ),
-                      ],
+                    Builder(
+                      builder: (context) {
+                        final bool isEligible = character.age >= 18;
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: isEligible ? Colors.blue : Colors.grey,
+                                side: BorderSide(color: isEligible ? Colors.blue : Colors.grey.shade400),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: const Icon(Icons.school),
+                              label: Text(
+                                isEligible ? 'Langsung Lulus Universitas' : 'Langsung Lulus Universitas (Belum Kuliah/Belum 18thn)',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: isEligible
+                                  ? () => _showUnivGraduationDialog(isDark)
+                                  : () => _showToast('⚠️ Karakter belum memenuhi syarat / belum lulus sekolah (minimal usia 18 tahun)!'),
+                            ),
+                            const SizedBox(height: 8),
+                            OutlinedButton.icon(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: widget.character.bypassDegreeRequirement ? Colors.green : Colors.blue,
+                                side: BorderSide(color: widget.character.bypassDegreeRequirement ? Colors.green : Colors.blue),
+                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              icon: Icon(widget.character.bypassDegreeRequirement ? Icons.verified : Icons.lock_open_rounded),
+                              label: Text(
+                                widget.character.bypassDegreeRequirement
+                                    ? 'Bebas Syarat Gelar Sarjana (Aktif)'
+                                    : 'Buka Pekerjaan Sarjana (Tanpa Lulus Univ)',
+                                style: const TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  widget.character.bypassDegreeRequirement = true;
+                                });
+                                _showToast('🎓 Syarat Gelar Sarjana Dibebaskan! 🎉\nKaraktermu sekarang dapat melamar semua pekerjaan profesional & sarjana tanpa perlu lulus universitas.');
+                              },
+                            ),
+                          ],
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 24),
@@ -399,28 +374,6 @@ class _GodModePageState extends State<GodModePage> {
                           icon: const Icon(Icons.person_add_alt_1),
                           label: const Text('Tambahkan Pasangan Baru', style: TextStyle(fontWeight: FontWeight.bold)),
                           onPressed: () => _showAddPartnerDialog(isDark),
-                        ),
-                        const SizedBox(height: 8),
-                        OutlinedButton.icon(
-                          style: OutlinedButton.styleFrom(
-                            foregroundColor: Colors.redAccent,
-                            side: const BorderSide(color: Colors.redAccent),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                          ),
-                          icon: const Icon(Icons.heart_broken),
-                          label: const Text('Ceraikan / Putuskan Pasangan', style: TextStyle(fontWeight: FontWeight.bold)),
-                          onPressed: () {
-                            setState(() {
-                              character.partner = null;
-                              character.secondPartner = null;
-                              character.thirdPartner = null;
-                              character.fourthPartner = null;
-                              character.fifthPartner = null;
-                              character.secretPartners.clear();
-                            });
-                            _showToast('Semua pasangan diputuskan');
-                          },
                         ),
                       ],
                     ),
@@ -600,18 +553,15 @@ class _GodModePageState extends State<GodModePage> {
   }
 
   void _showUnivGraduationDialog(bool isDark) {
-    final List<String> majors = [
-      'Teknik Informatika',
-      'Kedokteran',
-      'Hukum',
-      'Manajemen',
-      'Akuntansi',
-      'Farmasi',
-      'Psikologi',
-      'Hubungan Internasional',
-      'Teknik Mesin',
-      'Seni Rupa & Desain',
-    ];
+    if (widget.character.age < 18) {
+      _showToast('⚠️ Karakter belum memenuhi syarat / belum lulus sekolah (minimal usia 18 tahun)!');
+      return;
+    }
+    // Mengambil seluruh data jurusan dari database UnivMajorSelectionPage.categoryMajors
+    final List<String> majors = UnivMajorSelectionPage.categoryMajors.values
+        .expand((element) => element)
+        .toSet()
+        .toList();
     String selectedMajor = majors.first;
 
     showDialog(
@@ -619,15 +569,18 @@ class _GodModePageState extends State<GodModePage> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-          title: const Text('Pilih Jurusan Kuliah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          content: DropdownButtonFormField<String>(
-            value: selectedMajor,
-            dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            items: majors.map((m) => DropdownMenuItem(value: m, child: Text(m))).toList(),
-            onChanged: (val) {
-              if (val != null) setDialogState(() => selectedMajor = val);
-            },
+          title: const Text('Pilih Jurusan Kuliah (Database)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          content: SingleChildScrollView(
+            child: DropdownButtonFormField<String>(
+              value: selectedMajor,
+              isExpanded: true,
+              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              items: majors.map((m) => DropdownMenuItem(value: m, child: Text(m, overflow: TextOverflow.ellipsis))).toList(),
+              onChanged: (val) {
+                if (val != null) setDialogState(() => selectedMajor = val);
+              },
+            ),
           ),
           actions: [
             TextButton(
@@ -658,17 +611,12 @@ class _GodModePageState extends State<GodModePage> {
   }
 
   void _showJobSelectionDialog(bool isDark) {
-    final List<Map<String, dynamic>> jobs = [
-      {'title': 'CEO Startup', 'salary': 150000},
-      {'title': 'Dokter Spesialis', 'salary': 90000},
-      {'title': 'Pilot Senior', 'salary': 85000},
-      {'title': 'Pengacara Senior', 'salary': 80000},
-      {'title': 'Senior Software Engineer', 'salary': 65000},
-      {'title': 'Manajer Bank', 'salary': 50000},
-      {'title': 'Idol (Main Performer)', 'salary': 120000},
-      {'title': 'Polisi', 'salary': 25000},
-      {'title': 'Guru', 'salary': 20000},
-    ];
+    if (widget.character.age < 18) {
+      _showToast('⚠️ Karakter belum berusia 18 tahun (belum memenuhi syarat bekerja)!');
+      return;
+    }
+    // Mengambil seluruh data pekerjaan dari database JobDatabase.availableJobs
+    final List<Map<String, dynamic>> jobs = JobDatabase.availableJobs;
     Map<String, dynamic> selectedJob = jobs.first;
 
     showDialog(
@@ -676,20 +624,23 @@ class _GodModePageState extends State<GodModePage> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setDialogState) => AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-          title: const Text('Pilih Pekerjaan Instan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          content: DropdownButtonFormField<Map<String, dynamic>>(
-            value: selectedJob,
-            dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
-            items: jobs.map((j) {
-              return DropdownMenuItem<Map<String, dynamic>>(
-                value: j,
-                child: Text('${j['title']} (\$${j['salary']}/thn)'),
-              );
-            }).toList(),
-            onChanged: (val) {
-              if (val != null) setDialogState(() => selectedJob = val);
-            },
+          title: const Text('Pilih Pekerjaan (Database)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          content: SingleChildScrollView(
+            child: DropdownButtonFormField<Map<String, dynamic>>(
+              value: selectedJob,
+              isExpanded: true,
+              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+              items: jobs.map((j) {
+                return DropdownMenuItem<Map<String, dynamic>>(
+                  value: j,
+                  child: Text('${j['title']} (Rp ${j['salary']}/thn)', overflow: TextOverflow.ellipsis),
+                );
+              }).toList(),
+              onChanged: (val) {
+                if (val != null) setDialogState(() => selectedJob = val);
+              },
+            ),
           ),
           actions: [
             TextButton(
@@ -702,7 +653,7 @@ class _GodModePageState extends State<GodModePage> {
                 Navigator.pop(ctx);
                 setState(() {
                   widget.character.jobName = selectedJob['title'];
-                  widget.character.jobSalary = selectedJob['salary'];
+                  widget.character.jobSalary = (selectedJob['salary'] as num).toInt();
                 });
                 _showToast('Dapat pekerjaan baru: ${selectedJob['title']}!');
               },

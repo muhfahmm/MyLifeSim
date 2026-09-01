@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/store_page/store_page.dart';
 
 // ============================================================
 // STD berlaku untuk:
@@ -125,6 +126,7 @@ Future<void> handleSTDCheck(
   String partnerName,
   Random random,
 ) async {
+  if (StorePage.isImmunityUnlocked) return;
   final String myGender = character.gender.trim().toLowerCase();
   final String partnerGender = _detectPartnerGender(character, partnerRole, partnerName);
 

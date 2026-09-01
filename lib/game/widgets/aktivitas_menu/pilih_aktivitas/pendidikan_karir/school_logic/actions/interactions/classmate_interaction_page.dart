@@ -254,7 +254,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     const SizedBox(height: 16),
                     Row(
                       children: [
-                        Text('Tingkat Kepuasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                        Text('Tingkat Hubungan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),

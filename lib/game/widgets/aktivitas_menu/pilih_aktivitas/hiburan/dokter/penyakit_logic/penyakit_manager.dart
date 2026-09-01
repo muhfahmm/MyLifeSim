@@ -1,10 +1,12 @@
 import 'dart:math';
 import '../../../../../../../../pilih_karakter/character.dart';
+import 'package:bitlife/store_page/store_page.dart';
 import 'penyakit_ringan.dart';
 import 'penyakit_berat.dart';
 
 class PenyakitManager {
   static void checkAnnualDisease(Character character, List<String> events) {
+    if (StorePage.isImmunityUnlocked) return;
     final int currentHealth = character.health;
     // Peluang Sakit (%) berdasarkan tingkat kesehatan
     int sicknessChance = 5;

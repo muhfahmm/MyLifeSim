@@ -217,7 +217,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     Row(
                       children: [
                         Text(
-                          'Tingkat Kepuasan: ',
+                          'Tingkat Hubungan: ',
                           style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
                         ),
                         Expanded(

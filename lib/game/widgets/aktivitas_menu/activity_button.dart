@@ -23,6 +23,9 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berb
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/school_menu_page.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/freelance/freelance_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/army_logic/army_menu.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/pekerjaan_part_time_logic/part_time_menu.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
@@ -41,7 +44,7 @@ class ActivityButton extends StatelessWidget {
   });
 
   void _executeAction(BuildContext context, VoidCallback action) {
-    Future.delayed(Duration.zero, action);
+    action();
   }
 
   @override
@@ -99,6 +102,11 @@ class ActivityButton extends StatelessWidget {
                 onRefresh();
                 setStateDialog(() {});
               };
+              final bool isMilitaryJob = character.jobName != null &&
+                  (character.jobName!.contains('Angkatan Darat') ||
+                   character.jobName!.contains('Angkatan Laut') ||
+                   character.jobName!.contains('Angkatan Udara'));
+              final bool hasCivilianJob = character.jobName != null && !isMilitaryJob;
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -174,11 +182,15 @@ class ActivityButton extends StatelessWidget {
                     );
                   }(),
 
-                  // Item Bekerja
+                  // Item Bekerja (Pekerjaan Tetap)
                   _buildActivityTile(
                     context: context,
-                    label: 'Bekerja',
-                    subtitle: 'Mulai bekerja untuk menghasilkan uang tunai',
+                    label: hasCivilianJob
+                        ? 'Bekerja (${character.jobName})'
+                        : 'Bekerja',
+                    subtitle: (hasCivilianJob && character.jobSalary != null)
+                        ? '${character.jobName} - Gaji: \$${character.jobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
+                        : 'Mulai bekerja untuk menghasilkan uang tunai',
                     icon: Icons.work,
                     color: Colors.green,
                     minAge: (character.gender == 'Perempuan' && age >= 12) ? age : (age >= 13 ? age : 18),
@@ -188,6 +200,80 @@ class ActivityButton extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => KerjaMenuScreen(
+                            character: character,
+                            onRefresh: localRefresh,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // Item Freelancer
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Freelancer',
+                    subtitle: 'Ambil proyek pekerjaan lepas secara mandiri',
+                    icon: Icons.laptop_chromebook,
+                    color: Colors.purple,
+                    minAge: 13,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FreelanceMenuPage(
+                            character: character,
+                            onRefresh: localRefresh,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // Item Militer
+                  _buildActivityTile(
+                    context: context,
+                    label: isMilitaryJob
+                        ? 'Militer (${character.jobName})'
+                        : 'Militer',
+                    subtitle: (isMilitaryJob && character.jobSalary != null)
+                        ? '${character.jobName} - Gaji: \$${character.jobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
+                        : 'Bergabung dengan Angkatan Darat, Laut, atau Udara',
+                    icon: Icons.military_tech,
+                    color: Colors.green.shade800,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ArmyMenuPage(
+                            character: character,
+                            onRefresh: localRefresh,
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+
+                  // Item Pekerjaan Part Time
+                  _buildActivityTile(
+                    context: context,
+                    label: character.partTimeJobName != null
+                        ? 'Pekerjaan Part Time (${character.partTimeJobName})'
+                        : 'Pekerjaan Part Time',
+                    subtitle: (character.partTimeJobName != null && character.partTimeJobSalary != null)
+                        ? '${character.partTimeJobName} - Gaji: \$${character.partTimeJobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
+                        : 'Kerja paruh waktu sampingan untuk penghasilan tambahan',
+                    icon: Icons.access_time_filled_rounded,
+                    color: Colors.teal,
+                    minAge: 14,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => PartTimeMenuPage(
                             character: character,
                             onRefresh: localRefresh,
                           ),
