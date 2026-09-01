@@ -101,9 +101,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               backgroundColor: Colors.grey.shade300,
               foregroundColor: Colors.grey.shade600,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: Colors.grey.shade400, width: 1.5),
               ),
             )
@@ -111,9 +113,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               backgroundColor: Colors.pink.withOpacity(0.2),
               foregroundColor: Colors.pink,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 side: const BorderSide(color: Colors.pink, width: 1.5),
               ),
             ),
@@ -885,16 +889,19 @@ class _RelationshipButtonState extends State<RelationshipButton> {
           ],
         );
       },
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.favorite, size: 28, color: Colors.pink),
-          SizedBox(height: 4),
-          Text(
-            'Hubungan',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.pink),
-          ),
-        ],
+      child: const FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.favorite, size: 20, color: Colors.pink),
+            Text(
+              'Hubungan',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.pink),
+            ),
+          ],
+        ),
       ),
     );
   }

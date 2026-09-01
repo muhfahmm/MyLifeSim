@@ -6,6 +6,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 // IMPOR FILE BARU
 import 'package:bitlife/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
+import 'package:bitlife/store_page/fitur_premium/god_mode/god_mode_page.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -16,6 +17,9 @@ class StorePage extends StatefulWidget {
     this.character,
     this.onPurchaseCompleted,
   });
+
+  static bool get isGodModeUnlocked => _StorePageState._godModeUnlocked;
+  static set isGodModeUnlocked(bool value) => _StorePageState._godModeUnlocked = value;
 
   @override
   State<StorePage> createState() => _StorePageState();
@@ -320,6 +324,18 @@ class _StorePageState extends State<StorePage> {
                     character.discipline = 100;
                   }
                 });
+              },
+              onActiveTap: () {
+                if (character != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => GodModePage(character: character!),
+                    ),
+                  );
+                } else {
+                  _showNoCharacterMessage();
+                }
               },
             ),
             _buildStoreItem(

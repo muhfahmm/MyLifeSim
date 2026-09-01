@@ -326,26 +326,27 @@ class AgeCategoryButton extends StatelessWidget {
           ],
         );
       },
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
         decoration: BoxDecoration(
           color: color.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: color, width: 2),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color, width: 1.5),
         ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(ageData['icon'], color: color, size: 28),
-            const SizedBox(width: 8),
-            Text(
-              ageData['label'],
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: color),
-            ),
-            const SizedBox(width: 4),
-            Icon(Icons.arrow_forward_ios, size: 12, color: color.withOpacity(0.5)),
-          ],
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(ageData['icon'], color: color, size: 20),
+              Text(
+                ageData['label'],
+                style: TextStyle(fontWeight: FontWeight.w600, fontSize: 10, color: color),
+              ),
+            ],
+          ),
         ),
       ),
     );

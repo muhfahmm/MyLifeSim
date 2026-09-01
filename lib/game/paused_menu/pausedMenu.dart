@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/store_page/store_page.dart';
-import 'package:bitlife/game/paused_menu/darkmode.dart';
+import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
 import 'package:bitlife/pilih_karakter/settings/settings.dart';
 
 class PausedMenu extends StatefulWidget {
@@ -272,9 +272,46 @@ class _PausedMenuState extends State<PausedMenu> {
                   },
                 ),
 
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  child: DarkModeButton(),
+                // --- TAMBAHAN: DARK MODE DENGAN TOGGLE SWITCH ---
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                  child: Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: ValueListenableBuilder<ThemeMode>(
+                      valueListenable: themeNotifier,
+                      builder: (context, mode, _) {
+                        final bool isDarkMode = mode == ThemeMode.dark;
+                        return SwitchListTile(
+                          secondary: Icon(
+                            isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                            color: isDarkMode ? Colors.yellow.shade700 : Colors.blue,
+                            size: 28,
+                          ),
+                          title: Text(
+                            'Mode Gelap',
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black87,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 15,
+                            ),
+                          ),
+                          subtitle: Text(
+                            isDarkMode ? 'Mode gelap aktif' : 'Mode terang aktif',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white54 : Colors.grey,
+                            ),
+                          ),
+                          value: isDarkMode,
+                          onChanged: (val) {
+                            themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
+                          },
+                        );
+                      },
+                    ),
+                  ),
                 ),
 
                 const Divider(height: 32, indent: 20, endIndent: 20),

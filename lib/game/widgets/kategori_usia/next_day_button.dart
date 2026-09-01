@@ -8,28 +8,25 @@ class NextDayButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ElevatedButton(
+    return ElevatedButton.icon(
       onPressed: onPressed,
+      icon: const Icon(Icons.today, size: 16),
+      label: const Text(
+        'Tambah Hari',
+        style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+      ),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.teal,
         foregroundColor: Colors.white,
-        elevation: 6,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+        elevation: 2,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        minimumSize: Size.zero,
+        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
         ),
-      ),
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.today, size: 28),
-          SizedBox(height: 4),
-          Text(
-            'Tambah Hari',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
-          ),
-        ],
       ),
     );
   }
 }
+

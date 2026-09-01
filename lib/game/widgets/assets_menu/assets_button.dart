@@ -28,9 +28,11 @@ class AssetsButton extends StatelessWidget {
               backgroundColor: Colors.grey.shade300,
               foregroundColor: Colors.grey.shade600,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: Colors.grey.shade400, width: 1.5),
               ),
             )
@@ -38,9 +40,11 @@ class AssetsButton extends StatelessWidget {
               backgroundColor: Colors.amber.withOpacity(0.2),
               foregroundColor: Colors.amber,
               elevation: 0,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
+              minimumSize: Size.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 side: const BorderSide(color: Colors.amber, width: 1.5),
               ),
             ),
@@ -94,13 +98,19 @@ class AssetsButton extends StatelessWidget {
           ],
         ).then((_) => onRefresh?.call());
       },
-      child: const Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.account_balance_wallet, size: 28),
-          SizedBox(height: 4),
-          Text('Assets', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.amber)),
-        ],
+      child: const FittedBox(
+        fit: BoxFit.scaleDown,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.account_balance_wallet, size: 20),
+            Text(
+              'Assets',
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.amber),
+            ),
+          ],
+        ),
       ),
     );
   }

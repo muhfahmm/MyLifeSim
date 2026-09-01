@@ -15,9 +15,11 @@ class InboxButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final int count = character.inbox.length;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
-    return ElevatedButton(
-      onPressed: () {
+    return InkWell(
+      onTap: () {
         final double screenWidth = MediaQuery.of(context).size.width;
         final bool isMobile = screenWidth < 600;
 
@@ -29,8 +31,8 @@ class InboxButton extends StatelessWidget {
           transitionDuration: Duration.zero,
           transitionBuilder: (context, anim1, anim2, child) => child,
           pageBuilder: (context, anim1, anim2) {
-            final theme = Theme.of(context);
-            final isDark = theme.brightness == Brightness.dark;
+            final dialogTheme = Theme.of(context);
+            final dialogIsDark = dialogTheme.brightness == Brightness.dark;
             return StatefulBuilder(
               builder: (context, setDialogState) => Center(
                 child: Material(
@@ -43,14 +45,14 @@ class InboxButton extends StatelessWidget {
                         : const BoxConstraints(maxHeight: 750, minHeight: 200),
                     padding: const EdgeInsets.all(24.0),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.grey.shade900 : Colors.white,
+                      color: dialogIsDark ? Colors.grey.shade900 : Colors.white,
                       borderRadius: isMobile ? BorderRadius.zero : BorderRadius.circular(16),
-                      boxShadow: isMobile ? null : [BoxShadow(color: isDark ? Colors.black54 : Colors.black26, blurRadius: 10)],
+                      boxShadow: isMobile ? null : [BoxShadow(color: dialogIsDark ? Colors.black54 : Colors.black26, blurRadius: 10)],
                     ),
                     child: SafeArea(
                       child: DefaultTextStyle(
                         style: TextStyle(
-                          color: isDark ? Colors.white70 : Colors.black87,
+                          color: dialogIsDark ? Colors.white70 : Colors.black87,
                           fontSize: 14,
                         ),
                         child: Column(
@@ -67,7 +69,7 @@ class InboxButton extends StatelessWidget {
                                     style: TextStyle(
                                       fontSize: 18, 
                                       fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : Colors.black87,
+                                      color: dialogIsDark ? Colors.white : Colors.black87,
                                     ),
                                   ),
                                 ),
@@ -83,7 +85,7 @@ class InboxButton extends StatelessWidget {
                                     },
                                   ),
                                 IconButton(
-                                  icon: Icon(Icons.close, color: isDark ? Colors.white70 : Colors.black54),
+                                  icon: Icon(Icons.close, color: dialogIsDark ? Colors.white70 : Colors.black54),
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ],
@@ -107,11 +109,11 @@ class InboxButton extends StatelessWidget {
                                         final item = character.inbox[index];
                                         return Card(
                                           elevation: 0,
-                                          color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                                          color: dialogIsDark ? Colors.grey.shade800 : Colors.grey.shade50,
                                           margin: const EdgeInsets.only(bottom: 8),
                                           shape: RoundedRectangleBorder(
                                             borderRadius: BorderRadius.circular(10),
-                                            side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
+                                            side: BorderSide(color: dialogIsDark ? Colors.grey.shade800 : Colors.grey.shade200),
                                           ),
                                           child: ListTile(
                                             title: Text(
@@ -119,7 +121,7 @@ class InboxButton extends StatelessWidget {
                                               style: TextStyle(
                                                 fontSize: 13, 
                                                 fontWeight: FontWeight.w500,
-                                                color: isDark ? Colors.white : Colors.black87,
+                                                color: dialogIsDark ? Colors.white : Colors.black87,
                                               ),
                                             ),
                                             trailing: IconButton(
@@ -147,56 +149,43 @@ class InboxButton extends StatelessWidget {
           },
         );
       },
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.blue.withOpacity(0.2),
-        foregroundColor: Colors.blue,
-        elevation: 0,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16),
-          side: const BorderSide(color: Colors.blue, width: 1.5),
+      borderRadius: BorderRadius.circular(10),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: isDark ? Colors.blue.withOpacity(0.15) : Colors.blue.shade50,
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: isDark ? Colors.blue.shade700 : Colors.blue.shade200, width: 1.2),
         ),
-      ),
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          const Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(Icons.mail_outline, size: 28),
-              SizedBox(height: 4),
-              Text(
-                'Inbox',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.blue),
-              ),
-            ],
-          ),
-          if (count > 0)
-            Positioned(
-              right: -10,
-              top: -10,
-              child: Container(
-                padding: const EdgeInsets.all(4),
-                decoration: const BoxDecoration(
+        child: Row(
+          children: [
+            const Icon(Icons.mail_outline, color: Colors.blue, size: 20),
+            const SizedBox(width: 10),
+            const Text(
+              'Kotak Masuk (Inbox)',
+              style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+            ),
+            const Spacer(),
+            if (count > 0)
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
                   color: Colors.red,
-                  shape: BoxShape.circle,
-                ),
-                constraints: const BoxConstraints(
-                  minWidth: 18,
-                  minHeight: 18,
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   '$count',
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 10,
+                    fontSize: 11,
                     fontWeight: FontWeight.bold,
                   ),
-                  textAlign: TextAlign.center,
                 ),
-              ),
-            ),
-        ],
+              )
+            else
+              const Icon(Icons.chevron_right, color: Colors.blue, size: 18),
+          ],
+        ),
       ),
     );
   }

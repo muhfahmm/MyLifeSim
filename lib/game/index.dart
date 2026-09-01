@@ -16,6 +16,8 @@ import 'package:bitlife/game/widgets/assets_menu/assets_button.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/relationship_button.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
+import 'package:bitlife/game/widgets/kategori_usia/kurangi_umur_button.dart';
+import 'package:bitlife/store_page/store_page.dart';
 import 'package:bitlife/game/widgets/kategori_usia/next_day_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
@@ -371,6 +373,47 @@ class _GameScreenState extends State<GameScreen> {
         });
       });
     });
+  }
+
+  void _ageDown() {
+    if (!_character.isAlive) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Karakter sudah meninggal!')),
+      );
+      return;
+    }
+    if (_character.age <= 0) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('⚠️ Usia karakter sudah 0 tahun (tidak bisa dikurangi lagi).'),
+          backgroundColor: Colors.orange,
+        ),
+      );
+      return;
+    }
+
+    setState(() {
+      _character.age -= 1;
+      if (_character.currentDate != null) {
+        _character.currentDate = DateTime(
+          _character.currentDate!.year - 1,
+          _character.currentDate!.month,
+          _character.currentDate!.day,
+        );
+      }
+      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+        _character,
+        happiness: _character.happiness,
+      );
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('⏪ GodMode: Umur berhasil dikurangi 1 tahun! (Sekarang usia ${_character.age} tahun)'),
+        backgroundColor: Colors.purple.shade700,
+        duration: const Duration(seconds: 2),
+      ),
+    );
   }
 
   void _ageUp() {
@@ -3563,6 +3606,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('BitLife'),
+        centerTitle: true,
         backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.colorScheme.onSurface,
         elevation: 0,
@@ -3594,7 +3638,17 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
             );
           },
         ),
-        leadingWidth: 200, // Beri space yang cukup untuk hamburger + tanggal
+        leadingWidth: 170, // Beri space yang cukup untuk hamburger + tanggal
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12.0),
+            child: Center(
+              child: NextDayButton(
+                onPressed: _character.isAlive ? _nextDay : null,
+              ),
+            ),
+          ),
+        ],
       ),
       drawer: PausedMenu(
         character: _character,
@@ -3746,6 +3800,18 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _buildStatRow('Disiplin', _character.discipline, Colors.purple),
                   const SizedBox(height: 10),
                   _buildSexualityRow('Seksualitas', _character.sexuality),
+                  const SizedBox(height: 10),
+                  InboxButton(
+                    character: _character,
+                    onRefresh: () {
+                      setState(() {
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                          _character,
+                          happiness: _character.happiness,
+                        );
+                      });
+                    },
+                  ),
 
                   // --- STATUS KEHAMILAN (PERBAIKAN) ---
                   if (_character.isPregnant || _character.partnerIsPregnant) ...[
@@ -3821,133 +3887,164 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
             ),
           ),
 
-          // Sticky Bottom Actions Container
-          Container(
+                    // Sticky Bottom Actions Outer Wrapper (Protruding FAB Style + 100% Hit-Test)
+          SizedBox(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-            decoration: BoxDecoration(
-              color: theme.scaffoldBackgroundColor,
-              boxShadow: [
-                BoxShadow(
-                  color: isDark ? Colors.black38 : Colors.black.withOpacity(0.06),
-                  blurRadius: 10,
-                  offset: const Offset(0, -4),
+            height: 115,
+            child: Stack(
+              alignment: Alignment.bottomCenter,
+              clipBehavior: Clip.none,
+              children: [
+                // Background Container (Draws border line at top: 28)
+                Positioned(
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  top: 28,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: theme.scaffoldBackgroundColor,
+                      boxShadow: [
+                        BoxShadow(
+                          color: isDark ? Colors.black38 : Colors.black.withOpacity(0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, -4),
+                        ),
+                      ],
+                      border: Border(
+                        top: BorderSide(color: theme.dividerColor, width: 1),
+                      ),
+                    ),
+                  ),
+                ),
+                SafeArea(
+                  top: false,
+                  child: SizedBox(
+                    height: 115,
+                    child: Stack(
+                      alignment: Alignment.bottomCenter,
+                      clipBehavior: Clip.none,
+                      children: [
+                        // Row 4 tombol utama di bawah
+                        Positioned(
+                          left: 4,
+                          right: 4,
+                          bottom: 10,
+                          height: 52,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: AgeCategoryButton(
+                                  character: _character,
+                                  ageData: ageData,
+                                  age: _character.age,
+                                  gender: _character.gender ?? 'Laki-laki',
+                                  location: _character.location ?? 'Indonesia',
+                                  health: _character.health,
+                                  happiness: _character.happiness,
+                                  intelligence: _character.intelligence,
+                                  money: _character.money,
+                                  appearance: _character.appearance ?? 50,
+                                ),
+                              )),
+                              Expanded(child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: AssetsButton(
+                                  character: _character,
+                                  onRefresh: () {
+                                    setState(() {
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                        _character,
+                                        happiness: _character.happiness,
+                                      );
+                                    });
+                                  },
+                                ),
+                              )),
+                              Expanded(child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: RelationshipButton(
+                                  character: _character,
+                                  isAlive: _character.isAlive,
+                                  onRefresh: () {
+                                    setState(() {
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                        _character,
+                                        happiness: _character.happiness,
+                                      );
+                                    });
+                                  },
+                                ),
+                              )),
+                              Expanded(child: Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 2),
+                                child: ActivityButton(
+                                  character: _character,
+                                  isAlive: _character.isAlive,
+                                  onRefresh: () {
+                                    setState(() {
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                        _character,
+                                        happiness: _character.happiness,
+                                      );
+                                    });
+                                  },
+                                  onWork: () {
+                                    setState(() {
+                                      _character.money += 100;
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                        _character,
+                                        happiness: _character.happiness,
+                                      );
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Mendapatkan uang 100!')),
+                                    );
+                                  },
+                                  onExercise: () {
+                                    setState(() {
+                                      _character.health += 10;
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                        _character,
+                                        happiness: _character.happiness,
+                                      );
+                                    });
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Kesehatan +10!')),
+                                    );
+                                  },
+                                ),
+                              )),
+                            ],
+                          ),
+                        ),
+                        // Tombol Tambah Umur & Kurangi Umur (Besar & Menonjol Tinggi di Atas Garis + Hover 100% Aktif!)
+                        Positioned(
+                          top: 2,
+                          child: StorePage.isGodModeUnlocked
+                              ? Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    KurangiUmurButton(
+                                      onPressed: _ageDown,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    AgeUpButton(
+                                      onPressed: _character.isAlive ? _ageUp : null,
+                                    ),
+                                  ],
+                                )
+                              : AgeUpButton(
+                                  onPressed: _character.isAlive ? _ageUp : null,
+                                ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ],
-              border: Border(
-                top: BorderSide(color: theme.dividerColor, width: 1),
-              ),
-            ),
-            child: SafeArea(
-              top: false,
-              child: Wrap(
-                spacing: 8.0,
-                runSpacing: 8.0,
-                alignment: WrapAlignment.center,
-                children: [
-                  // 1. KATEGORI
-                  AgeCategoryButton(
-                    character: _character,
-                    ageData: ageData,
-                    age: _character.age,
-                    gender: _character.gender ?? 'Laki-laki',
-                    location: _character.location ?? 'Indonesia',
-                    health: _character.health,
-                    happiness: _character.happiness,
-                    intelligence: _character.intelligence,
-                    money: _character.money,
-                    appearance: _character.appearance ?? 50,
-                  ),
-                  
-                  // 2. ASSETS
-                  AssetsButton(
-                    character: _character,
-                    onRefresh: () {
-                      setState(() {
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                    },
-                  ),
-                  
-                  // 3. HUBUNGAN
-                  RelationshipButton(
-                    character: _character,
-                    isAlive: _character.isAlive,
-                    onRefresh: () {
-                      setState(() {
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                    },
-                  ),
-                  
-                  // INBOX NOTIFIKASI
-                  InboxButton(
-                    character: _character,
-                    onRefresh: () {
-                      setState(() {
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                    },
-                  ),
-                  
-                  // 4. AKTIVITAS
-                  ActivityButton(
-                    character: _character,
-                    isAlive: _character.isAlive,
-                    onRefresh: () {
-                      setState(() {
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                    },
-                    onWork: () {
-                      setState(() {
-                        _character.money += 100;
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Mendapatkan uang 100!')),
-                      );
-                    },
-                    onExercise: () {
-                      setState(() {
-                        _character.health += 10;
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Kesehatan +10!')),
-                      );
-                    },
-                  ),
-                  
-                  // 5. TAMBAH UMUR
-                  AgeUpButton(
-                    onPressed: _character.isAlive ? _ageUp : null,
-                  ),
-
-                  // 6. TAMBAH HARI
-                  NextDayButton(
-                    onPressed: _character.isAlive ? _nextDay : null,
-                  ),
-                ],
-              ),
             ),
           ),
         ],
