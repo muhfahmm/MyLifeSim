@@ -14,13 +14,16 @@ class AdultFeatures {
     // Cek usia minimum absolut (12 tahun)
     if (userAge < 12) return false;
 
-    final rLower = role.toLowerCase();
+    final rLower = '$role $relation'.toLowerCase();
 
-    // Peran sensitif yang HANYA boleh untuk premium
+    // Peran sensitif (termasuk Keluarga, Guru, Dosen, Bos, Idol, dll) yang HANYA boleh untuk premium
     const sensitiveRoles = [
       'guru', 'teacher', 'dosen', 'professor',
       'kepala sekolah', 'supervisor', 'ceo', 'bos',
       'staf idol', 'manajer idol',
+      'ayah', 'ibu', 'ortu', 'orang tua', 'kakak', 'adik', 'saudara',
+      'anak', 'sepupu', 'paman', 'bibi', 'kakek', 'nenek', 'keluarga', 'kandung',
+      'father', 'mother', 'parent', 'brother', 'sister', 'uncle', 'aunt', 'cousin',
     ];
     final isSensitiveRole = sensitiveRoles.any((r) => rLower.contains(r));
 

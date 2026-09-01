@@ -1879,7 +1879,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               !isAlreadyPartner &&
               !isAlreadySecondPartner &&
               !isPartnerRole &&
-              AdultFeatures.canProposeDating(widget.targetRole, widget.targetRole, userAge: widget.character.age)) {
+              AdultFeatures.canProposeDating(widget.targetRole, widget.targetName, userAge: widget.character.age)) {
             final bool hasExistingPartner = widget.character.partner != null;
             actions.add(ActionItem(
               label: hasExistingPartner

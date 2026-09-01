@@ -398,7 +398,7 @@ List<ActionItem> getAge12PlusActions(
   }
 
   // 2. Ajak Pacaran / Ajak Balikan (dengan logika khusus mantan pacar)
-  if (!isActivePartner && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole && AdultFeatures.canProposeDating(targetRole, targetRole, userAge: character.age)) {
+  if (!isActivePartner && !isAlreadyPartner && !isAlreadySecondPartner && !isPartnerRole && AdultFeatures.canProposeDating(targetRole, targetName, userAge: character.age)) {
     final bool isExPartner = character.exPartners.any((ex) => ex['name'] == targetName);
     final String actionLabel = isExPartner 
         ? 'Ajak Balikan' 

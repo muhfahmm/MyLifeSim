@@ -205,20 +205,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
   }
 
   void _randomizeAll() {
-    if (_countriesList.isNotEmpty) {
-      final random = Random();
-      final selectedCountry = _countriesList[random.nextInt(_countriesList.length)];
-      setState(() {
-        _currentCountryIso = selectedCountry['iso'];
-        _currentCountry = selectedCountry['name'].toString().split(' ').map((word) {
-          if (word.isEmpty) return '';
-          return word[0].toUpperCase() + word.substring(1);
-        }).join(' ');
-      });
-      _loadNamesData();
-    } else {
-      _generateRandomName();
-    }
+    _generateRandomName();
   }
 
   void _generateRandomName() {
@@ -256,59 +243,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
       lastName = Character.globalLastNames.isNotEmpty ? Character.globalLastNames[random.nextInt(Character.globalLastNames.length)] : '';
     }
 
-    final randomAvatar = AvatarGenerator.generateRandomAvatar(widget.gender);
-
-    // --- PERUBAHAN ALGORITMA DI SINI ---
-    // Membuat atribut awal lebih tinggi agar pemain baru tidak frustrasi
-    final int discipline = 60 + random.nextInt(41); // 60-100
-    final int fertility = random.nextInt(101);      // 0-100 (tetap acak)
-    final int happiness = 60 + random.nextInt(41);  // 60-100
-    final int health = 70 + random.nextInt(31);     // 70-100
-    final int karma = random.nextInt(101);          // 0-100 (tetap acak)
-    final int looks = random.nextInt(101);          // 0-100 (tetap acak)
-    
-    final int sexRoll = random.nextInt(100);
-    String sexuality = 'Heteroseksual';
-    if (sexRoll < 85) {
-      sexuality = 'Heteroseksual';
-    } else if (sexRoll < 92) {
-      sexuality = 'Biseksual';
-    } else {
-      sexuality = 'Homoseksual';
-    }
-    
-    final int smarts = 60 + random.nextInt(41);     // 60-100
-    final int willpower = random.nextInt(101);      // 0-100 (tetap acak)
-    
-    final List<String> talentList = ['Tidak Ada', 'Akting', 'Kriminalitas', 'Pengedar', 'Modeling', 'Musik', 'Olahraga'];
-    String specialTalent = 'Tidak Ada';
-    if (random.nextInt(100) < 40) {
-      specialTalent = talentList[1 + random.nextInt(talentList.length - 1)];
-    }
-
     setState(() {
       _firstNameController.text = firstName;
       _lastNameController.text = lastName;
-      if (_citiesList.isNotEmpty) {
-        _selectedCity = _citiesList[random.nextInt(_citiesList.length)];
-      }
-      _selectedTopType = randomAvatar['topType']!;
-      _selectedAccessoriesType = randomAvatar['accessoriesType']!;
-      _selectedHairColor = randomAvatar['hairColor']!;
-      _selectedClotheType = randomAvatar['clotheType']!;
-      _selectedClotheColor = randomAvatar['clotheColor']!;
-      _selectedSkinColor = randomAvatar['skinColor']!;
-      
-      _discipline = discipline;
-      _fertility = fertility;
-      _happiness = happiness;
-      _health = health;
-      _karma = karma;
-      _looks = looks;
-      _sexuality = sexuality;
-      _smarts = smarts;
-      _willpower = willpower;
-      _specialTalent = specialTalent;
     });
   }
 

@@ -1,32 +1,71 @@
-Selain daftar yang sudah disinggung sebelumnya, tren global menunjukkan **banyak negara lain yang juga menerapkan pembatasan media sosial**, baik berupa blokir total maupun pembatasan usia yang sangat ketat. 
+Untuk halaman ranking ini, masalah utamanya bukan di `ListView.builder`-nya (itu sudah lazy-build, bagus) — masalahnya ada di **cara data dimuat dan distrukturkan**. Kamu memuat ~4140 baris (207 negara × 10 negeri + 10 swasta) sekaligus ke satu list flat, dan proses loading-nya melakukan **ratusan `rootBundle.loadString()` terpisah** secara sequential. Itu bottleneck terbesarnya.
 
-Berikut adalah daftar tambahan negara-negara tersebut, dikelompokkan berdasarkan jenis pembatasannya:
+## 1. Restrukturisasi arsitektur halaman (paling berdampak)
 
-### 🌍 Kelompok Negara dengan Pembatasan Usia Ketat (Baru-Baru Ini / Segera Berlaku)
-Negara-negara ini baru saja menerapkan atau sedang memfinalisasi undang-undang untuk melarang anak di bawah usia tertentu mengakses media sosial. 
-*   **Brasil**: Sejak Maret 2026, wajib menghubungkan akun anak di bawah 16 tahun dengan akun orang tua dan dilarang fitur adiktif seperti *infinite scroll*. 
-*   **Indonesia**: Sejak akhir Maret 2026, secara resmi melarang anak di bawah 16 tahun menggunakan media sosial. 
-*   **Malaysia**: Mulai 1 Januari 2026, melarang anak di bawah 16 tahun memiliki akun sendiri tanpa pengawasan langsung orang tua. 
-*   **Turki**: Mulai April 2026, melarang anak di bawah 15 tahun dari media sosial dan memberikan regulasi baru pada perusahaan game online. 
-*   **Denmark**: Rencana larangan berlaku untuk anak di bawah 15 tahun pada 2026, dengan pengecualian bagi anak usia 13-14 tahun dengan izin orang tua. 
-*   **Yunani**: Mulai 1 Januari 2027, secara resmi melarang anak di bawah 15 tahun menggunakan media sosial. 
-*   **Spanyol**: Pemerintah sedang mendorong undang-undang untuk menaikkan usia minimum pendaftaran dari 14 tahun menjadi 16 tahun. 
-*   **Inggris Raya (UK)** dan **Kanada**: Pemerintah keduanya telah mengumumkan rencana larangan atau memfinalisasi undang-undang untuk anak di bawah 16 tahun. 
+Realistisnya tidak ada user yang scroll 4140 item di satu list flat. Pecah jadi 2 level:
 
-### ⚖️ Kelompok Negara dengan Pembatasan Parsial / Kondisional
-Negara-negara ini sering memblokir media sosial secara mendadak atau menerapkan pembatasan berat saat terjadi gejolak politik atau keamanan: 
-*   **Afghanistan**: Pada September 2025, pemerintah Taliban memutus internet selama 48 jam dan membatasi akses ke platform seperti Facebook dan Instagram untuk mencegah "moral korupsi". 
-*   **Myanmar**: Setelah kudeta militer pada Februari 2021, pemerintah membatasi akses ke Facebook dan YouTube untuk menekan oposisi. 
-*   **Pakistan**: Sering memblokir platform seperti TikTok dan Twitter/X karena dianggap mengandung konten "imoral" atau saat krisis politik. 
-*   **Kenya**, **Togo**, dan **Republik Demokratik Kongo**: Ketiga negara ini pernah memblokir Telegram, Facebook, atau Twitter/X selama aksi demonstrasi anti-pemerintah. 
-*   **Sri Lanka**: Pernah memblokir akses media sosial pada tahun 2022 untuk mencegah penyebaran misinformasi selama protes. 
-*   **Afrika Selatan**: Tidak memblokir, tetapi menerapkan "pajak media sosial" pada 2018 yang secara efektif membatasi akses bagi banyak pengguna karena biaya. 
+- **Halaman 1**: daftar 207 negara (dengan bendera, jumlah univ negeri/swasta)
+- **Halaman 2**: setelah tap negara → baru load 20 universitas negara itu
+
+Ini langsung memangkas initial load dari "baca 414 file JSON" jadi "baca 1 file index kecil" (nama negara + iso + count saja), dan baru fetch detail per-negara saat dibutuhkan (on-demand).
+
+## 2. Kalau tetap mau 1 halaman flat: gabungkan JSON di build-time
+
+Alih-alih runtime membaca 400+ file kecil satu-satu lewat `for` loop + `await`, buat **satu file `all_universities.json` gabungan** menggunakan script (Node/Python/Dart) yang dijalankan sekali saat development, hasilnya di-bundle sebagai 1 asset:
+
+```json
+{
+  "id": {"iso":"ID","negeri":["UI","UGM",...],"swasta":["BINUS","Telkom Univ",...]},
+  "us": {"iso":"US","negeri":[...],"swasta":[...]},
+  ...
+}
+```
+
+Runtime tinggal:
+```dart
+final raw = await rootBundle.loadString('json/nama_unniv/all_universities.json');
+final Map<String, dynamic> data = jsonDecode(raw);
+```
+1 file read + 1 decode, bukan 400+ read. Ini biasanya penghematan I/O terbesar.
+
+## 3. Pindahkan parsing berat ke isolate
+
+`jsonDecode` untuk ~4000 entri di main isolate bisa bikin jank saat startup. Pakai `compute()`:
+
+```dart
+List<Map<String, dynamic>> allUnivs = await compute(_parseUniversities, raw);
+```
+
+## 4. Precompute search key, jangan `toLowerCase()` tiap filter
+
+Saat ini `_filterData()` memanggil `.toLowerCase()` pada `name` dan `country` setiap kali user mengetik, untuk 4140 item. Simpan versi lowercase sekali saat load:
+
+```dart
+univs.add({
+  ...,
+  'searchKey': '${item.toString()} $countryName'.toLowerCase(),
+});
+```
+Filter tinggal `univ['searchKey'].contains(query)` — jauh lebih murah.
+
+## 5. Debounce search input
+
+`onChanged: (val) => _filterData()` men-trigger filter+`setState` (rebuild) di **setiap keystroke**. Untuk UX yang lebih halus saat mengetik cepat:
+
+```dart
+Timer? _debounce;
+void _onSearchChanged(String val) {
+  _debounce?.cancel();
+  _debounce = Timer(const Duration(milliseconds: 250), _filterData);
+}
+```
+
+## 6. Hindari rebuild seluruh Scaffold saat filter berubah
+
+`setState` di `_filterData()` saat ini rebuild seluruh `build()` (termasuk search bar & chip filter). Bungkus list-nya dengan `ValueListenableBuilder`/`ValueNotifier<List<...>>` supaya hanya bagian `ListView` yang rebuild, bukan seluruh halaman.
 
 ---
 
-### 💡 Saran Implementasi di Game:
-Karena regulasi ini sangat dinamis, untuk game Anda, Anda bisa menerapkan logika pembatasan berdasarkan **tingkat regulasi** di masing-masing negara:
-1.  **Blokir Total**: Jika karakter berada di **China, Korea Utara, Iran, Turkmenistan**, atau negara yang sedang dalam "krisis" (seperti Myanmar atau Afghanistan), gunakan teks seperti: *"Akses Sosial Media diblokir oleh pemerintah negara ini."*
-2.  **Batasan Usia**: Untuk negara seperti **Australia, Indonesia, Malaysia, Brasil, Turki**, dll., gunakan logika yang mengharuskan karakter berumur **16 tahun ke atas** untuk membuka menu Sosial Media. 
+**Ringkas prioritas:** #1 (pecah jadi 2 halaman) memberi dampak paling besar untuk UX & performa; kalau tidak memungkinkan, #2 (gabungkan JSON) adalah fix teknis paling murah untuk masalah loading lambatmu sekarang.
 
-Data ini diambil dari berbagai laporan media internasional dan laporan pemantau internet seperti OONI pada akhir 2025 hingga pertengahan 2026, sehingga mencerminkan regulasi yang paling baru. 
+Mau saya bantu tuliskan versi refactor-nya, mulai dari halaman daftar negara dulu atau langsung script penggabungan JSON-nya?

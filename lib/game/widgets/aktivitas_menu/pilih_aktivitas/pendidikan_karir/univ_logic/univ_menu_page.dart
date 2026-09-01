@@ -1,7 +1,9 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'dart:math';
+import 'dart:convert';
 import 'actions/belajar.dart';
 import 'actions/kelas.dart';
 import 'actions/dosen.dart';
@@ -305,93 +307,233 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     return 'Complete';
   }
 
-  void _tryNegeri(BuildContext context, String major) {
-    if (widget.character.intelligence >= 60) {
-      final String level = _determineCurrentRegisterLevel();
-      widget.character.univMajor = '$major ($level - Negeri)';
-      widget.character.educationHistory[level] = 'Belum Lulus';
-      widget.character.currentUnivStudyYears = 0;
-      widget.onRefresh();
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Lolos Seleksi Negeri! 🎉'),
-          content: Text('Selamat! Kamu berhasil lolos tes masuk Universitas Negeri untuk jenjang $level dengan jurusan $major.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Gagal Tes Masuk 🚫'),
-          content: const Text('Kecerdasanmu tidak mencukupi untuk lolos tes masuk Universitas Negeri. Coba jalur lain atau tingkatkan kecerdasanmu!'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
-        ),
-      );
-    }
+  String _getContinentForCountry(String country) {
+    final c = country.toLowerCase().trim();
+    const africa = {'afrika selatan', 'aljazair', 'angola', 'benin', 'botswana', 'burkina faso', 'burundi', 'chad', 'djibouti', 'eritrea', 'eswatini', 'ethiopia', 'gabon', 'gambia', 'ghana', 'guinea bissau', 'guinea', 'kenya', 'komoro', 'kongo', 'lesotho', 'liberia', 'libya', 'madagaskar', 'malawi', 'mali', 'maroko', 'mauritania', 'mauritius', 'mesir', 'mozambik', 'namibia', 'niger', 'nigeria', 'pantai gading', 'republik afrika tengah', 'republik demokratik kongo', 'republik sudan', 'republik tanzania', 'republik uganda', 'republik zambia', 'republik zimbabwe', 'rwanda', 'sao tome dan principe', 'senegal', 'seychelles', 'sierra leone', 'somalia', 'sudan selatan', 'tanjung verde', 'togo', 'tunisia'};
+    const asia = {'afganistan', 'arab saudi', 'armenia', 'azerbaijan', 'bahrain', 'bangladesh', 'bhutan', 'brunei', 'china', 'filipina', 'georgia', 'hong kong', 'india', 'indonesia', 'irak', 'iran', 'israel', 'jepang', 'kamboja', 'kamerun', 'kazakhstan', 'kirgizstan', 'korea selatan', 'korea utara', 'kuwait', 'laos', 'lebanon', 'makau', 'malaysia', 'maldives', 'mongolia', 'myanmar', 'nepal', 'oman', 'pakistan', 'palestina', 'qatar', 'republik timor leste', 'singapura', 'siprus', 'sri lanka', 'suriah', 'taiwan', 'tajikistan', 'thailand', 'turki', 'turkmenistan', 'uni emirat arab', 'uzbekistan', 'vietnam', 'yaman', 'yordania'};
+    const eropa = {'albania', 'andorra', 'austria', 'belanda', 'belarus', 'belgia', 'bosnia dan hercegovina', 'bulgaria', 'ceko', 'denmark', 'estonia', 'finlandia', 'gibraltar', 'hungaria', 'inggris', 'irlandia', 'islandia', 'italia', 'jerman', 'kepulauan faroe', 'kosovo', 'kroasia', 'latvia', 'liechtenstein', 'lithuania', 'luksemburg', 'makedonia utara', 'malta', 'moldova', 'monako', 'montenegro', 'norwegia', 'polandia', 'portugal', 'prancis', 'republik rumania', 'republik serbia', 'rusia', 'san marino', 'slovenia', 'slowakia', 'spanyol', 'swedia', 'swiss', 'ukraina', 'vatikan', 'yunani'};
+    const na = {'amerika serikat', 'antigua dan barbuda', 'bahama', 'barbados', 'belize', 'bermuda', 'costa rica', 'curacao', 'dominika', 'el salvador', 'greenland', 'grenada', 'guatemala', 'haiti', 'honduras', 'jamaika', 'kanada', 'kuba', 'meksiko', 'nikaragua', 'panama', 'puerto rico', 'republik dominika', 'saint kitts dan nevis', 'saint lucia', 'saint vincent dan grenadine', 'trinidad dan tobago'};
+    const sa = {'argentina', 'bolivia', 'brazil', 'chile', 'ekuador', 'guiana prancis', 'guyana', 'kolombia', 'paraguay', 'peru', 'suriname', 'uruguay', 'venezuela'};
+    const oceania = {'australia', 'fiji', 'guam', 'kiribati', 'marshall', 'mikronesia', 'nauru', 'palau', 'papua nugini', 'samoa amerika', 'samoa', 'selandia baru', 'tahiti', 'tonga', 'tuvalu', 'vanuatu'};
+
+    if (africa.contains(c)) return 'afrika';
+    if (asia.contains(c)) return 'asia';
+    if (eropa.contains(c)) return 'eropa';
+    if (na.contains(c)) return 'na';
+    if (sa.contains(c)) return 'sa';
+    if (oceania.contains(c)) return 'oceania';
+    return 'asia';
   }
 
-  void _trySwasta(BuildContext context, String major) {
-    final parentRel = ((widget.character.fatherRelationship ?? 50) + (widget.character.motherRelationship ?? 50)) ~/ 2;
-    final bool success = Random().nextInt(100) < parentRel;
+  Future<List<String>> _getUnivList(bool isNegeri) async {
+    final String rawCountry = widget.character.location.isNotEmpty 
+        ? widget.character.location 
+        : (widget.character.birthCountry ?? 'Indonesia');
+    final String country = rawCountry.toLowerCase().trim();
+    final String continent = _getContinentForCountry(country);
+    final String fileName = isNegeri ? 'unniv_negeri.json' : 'unniv_swasta.json';
+    final String assetPath = 'json/nama_unniv/$continent/$country/$fileName';
 
-    if (success) {
-      final String level = _determineCurrentRegisterLevel();
-      widget.character.univMajor = '$major ($level - Swasta)';
-      widget.character.educationHistory[level] = 'Belum Lulus';
-      widget.character.currentUnivStudyYears = 0;
-      widget.onRefresh();
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Pendaftaran Disetujui! 💸'),
-          content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di Universitas Swasta untuk jenjang $level dengan jurusan $major.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
-        ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Permintaan Ditolak 🚫'),
-          content: const Text('Orang tuamu menolak membiayaimu masuk Universitas Swasta karena keterbatasan finansial.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
-        ),
-      );
+    try {
+      final String jsonString = await rootBundle.loadString(assetPath);
+      final List<dynamic> list = jsonDecode(jsonString);
+      if (list.isNotEmpty) {
+        return list.map((e) => e.toString()).toList();
+      }
+    } catch (e) {
+      debugPrint('Error loading univ JSON from $assetPath: $e');
     }
+
+    return isNegeri ? ['Universitas Negeri Utama'] : ['Universitas Swasta Utama'];
   }
 
-  void _tryBeasiswa(BuildContext context, String major) {
-    if (widget.character.intelligence >= 90) {
-      final isLuarNegeri = Random().nextInt(100) < 20;
-      final type = isLuarNegeri ? 'Luar Negeri' : 'Dalam Negeri';
-      final String level = _determineCurrentRegisterLevel();
-      widget.character.univMajor = '$major ($level - Beasiswa $type)';
-      widget.character.educationHistory[level] = 'Belum Lulus';
-      widget.character.currentUnivStudyYears = 0;
-      widget.onRefresh();
-      Navigator.pop(context);
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Beasiswa Diterima! 🌟'),
-          content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $type gratis sepenuhnya untuk jenjang $level dengan jurusan $major.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+  void _showUnivSelectionModal({
+    required BuildContext context,
+    required String title,
+    required List<String> univList,
+    required Function(String chosenUniv) onSelected,
+  }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    showDialog(
+      context: context,
+      builder: (dialogCtx) => AlertDialog(
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
+            fontSize: 18,
+          ),
         ),
-      );
-    } else {
-      showDialog(
-        context: context,
-        builder: (c) => AlertDialog(
-          title: const Text('Beasiswa Ditolak 🚫'),
-          content: const Text('Lamaran beasiswa ditolak karena kecerdasanmu berada di bawah 90%. Beasiswa hanya diberikan untuk siswa berprestasi tinggi.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        content: SizedBox(
+          width: double.maxFinite,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Pilih universitas yang ingin kamu daftari:',
+                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 13),
+              ),
+              const SizedBox(height: 12),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.45,
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  itemCount: univList.length,
+                  separatorBuilder: (c, i) => const Divider(height: 1),
+                  itemBuilder: (c, index) {
+                    final univName = univList[index];
+                    return ListTile(
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      leading: Icon(Icons.school, color: isDark ? Colors.lightBlueAccent : Colors.blueAccent),
+                      title: Text(
+                        univName,
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 14),
+                      onTap: () {
+                        Navigator.pop(dialogCtx);
+                        onSelected(univName);
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
-      );
-    }
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogCtx),
+            child: const Text('Batal'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _tryNegeri(BuildContext context, String major) async {
+    final univList = await _getUnivList(true);
+    _showUnivSelectionModal(
+      context: context,
+      title: 'Pilih Universitas Negeri 🏛️',
+      univList: univList,
+      onSelected: (chosenUniv) {
+        if (widget.character.intelligence >= 60) {
+          final String level = _determineCurrentRegisterLevel();
+          widget.character.univName = chosenUniv;
+          widget.character.univMajor = '$major ($level - Negeri)';
+          widget.character.educationHistory[level] = 'Belum Lulus';
+          widget.character.currentUnivStudyYears = 0;
+          widget.onRefresh();
+          if (Navigator.canPop(context)) Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Lolos Seleksi Negeri! 🎉'),
+              content: Text('Selamat! Kamu berhasil lolos tes masuk di $chosenUniv untuk jenjang $level dengan jurusan $major.'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Gagal Tes Masuk 🚫'),
+              content: Text('Kecerdasanmu tidak mencukupi untuk lolos tes masuk di $chosenUniv. Coba tingkatkan kecerdasanmu!'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void _trySwasta(BuildContext context, String major) async {
+    final univList = await _getUnivList(false);
+    _showUnivSelectionModal(
+      context: context,
+      title: 'Pilih Universitas Swasta 🏢',
+      univList: univList,
+      onSelected: (chosenUniv) {
+        final parentRel = ((widget.character.fatherRelationship ?? 50) + (widget.character.motherRelationship ?? 50)) ~/ 2;
+        final bool success = Random().nextInt(100) < parentRel;
+
+        if (success) {
+          final String level = _determineCurrentRegisterLevel();
+          widget.character.univName = chosenUniv;
+          widget.character.univMajor = '$major ($level - Swasta)';
+          widget.character.educationHistory[level] = 'Belum Lulus';
+          widget.character.currentUnivStudyYears = 0;
+          widget.onRefresh();
+          if (Navigator.canPop(context)) Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Pendaftaran Disetujui! 💸'),
+              content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di $chosenUniv untuk jenjang $level dengan jurusan $major.'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Permintaan Ditolak 🚫'),
+              content: Text('Orang tuamu menolak membiayaimu masuk $chosenUniv karena keterbatasan finansial.'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        }
+      },
+    );
+  }
+
+  void _tryBeasiswa(BuildContext context, String major) async {
+    final isLuarNegeri = Random().nextInt(100) < 20;
+    final isNegeri = Random().nextBool();
+    final univList = await _getUnivList(isNegeri);
+    _showUnivSelectionModal(
+      context: context,
+      title: 'Pilih Universitas (Beasiswa) 🌟',
+      univList: univList,
+      onSelected: (chosenUniv) {
+        if (widget.character.intelligence >= 90) {
+          final type = isLuarNegeri ? 'Luar Negeri' : 'Dalam Negeri';
+          final String level = _determineCurrentRegisterLevel();
+          widget.character.univName = chosenUniv;
+          widget.character.univMajor = '$major ($level - Beasiswa $type)';
+          widget.character.educationHistory[level] = 'Belum Lulus';
+          widget.character.currentUnivStudyYears = 0;
+          widget.onRefresh();
+          if (Navigator.canPop(context)) Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Beasiswa Diterima! 🌟'),
+              content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $chosenUniv ($type) secara gratis untuk jenjang $level jurusan $major.'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        } else {
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              title: const Text('Beasiswa Ditolak 🚫'),
+              content: Text('Lamaran beasiswa di $chosenUniv ditolak karena kecerdasanmu berada di bawah 90%.'),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
@@ -683,6 +825,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                   setState(() {});
                 },
               ),
+              const SizedBox(height: 12),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => Navigator.pop(context),

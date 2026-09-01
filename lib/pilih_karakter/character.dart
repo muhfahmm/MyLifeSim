@@ -107,6 +107,7 @@ class Character {
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
   String? schoolType; // Jenis sekolah ('Negeri' atau 'Swasta')
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
+  String? univName; // Nama Universitas (e.g. 'Universitas Indonesia (UI)')
   List<String> graduatedMajors = [];
   Map<String, String> educationHistory = {};
   int currentUnivStudyYears = 0;
