@@ -140,18 +140,23 @@ class _LombaQuizDialogState extends State<LombaQuizDialog> {
 }
 
 void showLombaOutcome(BuildContext context, String title, String message, {VoidCallback? onConfirm}) {
-  DialogHelper.show(
-    context: context,
-    title: title,
-    content: Text(message),
-    actions: [
-      TextButton(
-        onPressed: () {
-          Navigator.pop(context);
-          if (onConfirm != null) onConfirm();
-        },
-        child: const Text('OK'),
-      ),
-    ],
-  );
+  Future.microtask(() {
+    if (!context.mounted) return;
+    DialogHelper.show(
+      context: context,
+      title: title,
+      content: Text(message),
+      actions: [
+        Builder(
+          builder: (dialogCtx) => TextButton(
+            onPressed: () {
+              Navigator.pop(dialogCtx);
+              if (onConfirm != null) onConfirm();
+            },
+            child: const Text('OK'),
+          ),
+        ),
+      ],
+    );
+  });
 }

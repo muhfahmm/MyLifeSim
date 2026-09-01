@@ -973,6 +973,23 @@ class AjakanHandler {
     }
 
     if (character.activeProposal != null) {
+      // Cek perlindungan Fitur Premium untuk ajakan otomatis yang sensitif
+      final String propRole = character.activeProposal!['role'] ?? '';
+      final String propRelation = character.activeProposal!['relation'] ?? '';
+      final String propType = character.activeProposal!['type'] ?? '';
+
+      if (propType == 'Ajak Pacaran' || propType == 'Pacaran') {
+        if (!AdultFeatures.canProposeDating(propRole, propRelation, userAge: character.age)) {
+          character.activeProposal = null;
+          return;
+        }
+      } else if (propType == 'Bercinta' || propType == 'Make Love') {
+        if (!AdultFeatures.canMakeLove(userAge: character.age, role: propRole, relation: propRelation)) {
+          character.activeProposal = null;
+          return;
+        }
+      }
+
       final String propGender = (character.activeProposal!['gender'] ?? '').trim().toLowerCase();
       final bool isSameSex = (myGenderLower == propGender);
       final bool isFromOthers = !character.isAnyPartnerNameMatching(character.activeProposal!['name'] ?? '');
