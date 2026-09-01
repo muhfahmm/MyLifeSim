@@ -1,4 +1,4 @@
-import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 
 class AdultFeatures {
   /// Memeriksa apakah fitur Premium Akses Penuh (18+) aktif.

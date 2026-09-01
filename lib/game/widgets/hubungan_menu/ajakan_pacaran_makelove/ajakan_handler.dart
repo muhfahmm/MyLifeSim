@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 import 'package:bitlife/game/premium_features/adult_features.dart';
 
 // Imports for gay dating

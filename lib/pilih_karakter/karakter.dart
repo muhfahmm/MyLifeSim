@@ -12,7 +12,7 @@ import 'package:bitlife/pilih_karakter/customization/appearance_customization.da
 import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
-import 'package:bitlife/pilih_karakter/customization/settings.dart'; // Tambahan Import
+import 'package:bitlife/pilih_karakter/settings/settings.dart'; // Tambahan Import
 import 'package:bitlife/main.dart';
 
 class KarakterScreen extends StatefulWidget {

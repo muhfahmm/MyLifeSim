@@ -1,9 +1,11 @@
-// lib/game/widgets/store_page.dart (atau path sesuai proyek Anda)
+// lib/game/widgets/store_page.dart
 
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
+// IMPOR FILE BARU
+import 'package:bitlife/store_page/fitur_premium/akses_18plus_page.dart'; 
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -24,7 +26,6 @@ class _StorePageState extends State<StorePage> {
   static bool _removeAdsUnlocked = false;
   static bool _premiumUnlocked = false;
 
-  // Helper untuk menampilkan SnackBar jika belum ada karakter
   void _showNoCharacterMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -82,6 +83,7 @@ class _StorePageState extends State<StorePage> {
     );
   }
 
+  // --- MODIFIKASI HELPER _buildStoreItem ---
   Widget _buildStoreItem({
     required IconData icon,
     required Color iconBgColor,
@@ -90,6 +92,7 @@ class _StorePageState extends State<StorePage> {
     required String price,
     required VoidCallback onTap,
     bool isUnlocked = false,
+    VoidCallback? onActiveTap, // PARAMETER BARU
   }) {
     final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
     return Card(
@@ -147,19 +150,30 @@ class _StorePageState extends State<StorePage> {
               ),
               const SizedBox(width: 12),
               isUnlocked
-                  ? Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.green.shade900.withValues(alpha: 0.5) : Colors.green.shade50,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(color: isDark ? Colors.green.shade600 : Colors.green.shade200),
-                      ),
-                      child: Text(
-                        'Aktif',
-                        style: TextStyle(
-                          color: isDark ? Colors.greenAccent : Colors.green.shade700,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 13,
+                  ? InkWell(
+                      onTap: onActiveTap, // JIKA DIKLIK, BUKA HALAMAN
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.green.shade900.withValues(alpha: 0.5) : Colors.green.shade50,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: isDark ? Colors.green.shade600 : Colors.green.shade200),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Aktif',
+                              style: TextStyle(
+                                color: isDark ? Colors.greenAccent : Colors.green.shade700,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.greenAccent : Colors.green.shade700),
+                          ],
                         ),
                       ),
                     )
@@ -167,15 +181,32 @@ class _StorePageState extends State<StorePage> {
                       onTap: onTap,
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [BoxShadow(color: const Color(0xFF5C3C10).withValues(alpha: 0.3), blurRadius: 4, offset: const Offset(0, 2))],
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFF5C3C10).withValues(alpha: 0.3),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            )
+                          ],
                         ),
                         child: Text(
                           price,
-                          style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                          ),
                         ),
                       ),
                     ),
@@ -196,7 +227,11 @@ class _StorePageState extends State<StorePage> {
         title: const Text('Toko BitLife', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
-            gradient: LinearGradient(colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)], begin: Alignment.topLeft, end: Alignment.bottomRight),
+            gradient: LinearGradient(
+              colors: [Color(0xFF5C3C10), Color(0xFF8A5A32)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
           ),
         ),
         iconTheme: const IconThemeData(color: Colors.white),
@@ -212,9 +247,19 @@ class _StorePageState extends State<StorePage> {
                 margin: const EdgeInsets.all(16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [Colors.amber.shade700, Colors.amber.shade900], begin: Alignment.topLeft, end: Alignment.bottomRight),
+                  gradient: LinearGradient(
+                    colors: [Colors.amber.shade700, Colors.amber.shade900],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
                   borderRadius: BorderRadius.circular(20),
-                  boxShadow: [BoxShadow(color: Colors.amber.shade900.withValues(alpha: 0.3), blurRadius: 8, offset: const Offset(0, 4))],
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.amber.shade900.withValues(alpha: 0.3),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    )
+                  ],
                 ),
                 child: Row(
                   children: [
@@ -250,6 +295,13 @@ class _StorePageState extends State<StorePage> {
                   GlobalSettings.isPremium.value = true;
                 });
               },
+              // TAMBAHKAN NAVIGASI INI
+              onActiveTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
+                );
+              },
             ),
             _buildStoreItem(
               icon: Icons.flash_on_rounded,
@@ -284,7 +336,7 @@ class _StorePageState extends State<StorePage> {
               },
             ),
 
-            // --- SEKSI PENINGKAT ATRIBUT (SELALU TAMPIL) ---
+            // --- SEKSI PENINGKAT ATRIBUT ---
             _buildSectionHeader('Peningkat Atribut Instan', isDark),
             _buildStoreItem(
               icon: Icons.favorite_rounded,
@@ -326,7 +378,7 @@ class _StorePageState extends State<StorePage> {
               },
             ),
 
-            // --- SEKSI TOP UP UANG (SELALU TAMPIL) ---
+            // --- SEKSI TOP UP UANG ---
             _buildSectionHeader('Paket Dana / Koin', isDark),
             _buildStoreItem(
               icon: Icons.monetization_on_rounded,

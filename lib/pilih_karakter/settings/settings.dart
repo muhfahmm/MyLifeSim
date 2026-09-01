@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
-import 'package:bitlife/pilih_karakter/customization/global_settings.dart';
+import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 import 'package:bitlife/store_page/store_page.dart'; // Tambahkan Import ini
 
 class SettingsPage extends StatefulWidget {
