@@ -3752,7 +3752,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                           })(),
                           Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
                           const SizedBox(height: 2),
-                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.location}', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
+                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.currentCity != null ? '${_character.currentCity}, ' : ''}${_character.location}', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
                           Text('Umur: ${_character.age} Tahun', style: TextStyle(fontSize: 14, color: isDark ? Colors.white54 : Colors.grey)),
                           const SizedBox(height: 2),
                           (() {

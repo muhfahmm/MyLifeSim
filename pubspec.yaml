@@ -22,6 +22,12 @@ flutter:
   uses-material-design: true
 
   assets:
+    - json/nama_kota/afrika/
+    - json/nama_kota/asia/
+    - json/nama_kota/eropa/
+    - json/nama_kota/na/
+    - json/nama_kota/oceania/
+    - json/nama_kota/sa/
     - json/bendera_negara/countries.json
     - json/firstname_lastname/afrika/afrika selatan/female/
     - json/firstname_lastname/afrika/afrika selatan/male/

@@ -34,6 +34,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
   List<String> _allLastNames = const [];
   bool _isLoading = true;
   bool _hasJsonData = false;
+  List<String> _citiesList = const [];
+  String? _selectedCity;
   String _currentCountry = 'Indonesia';
   String? _currentCountryIso = 'ID';
   List<Map<String, dynamic>> _countriesList = [];
@@ -82,15 +84,15 @@ class _KarakterScreenState extends State<KarakterScreen> {
       loadedList.sort((a, b) => a['name'].toString().toLowerCase().compareTo(b['name'].toString().toLowerCase()));
       setState(() {
         _countriesList = loadedList;
-        final defaultCountry = loadedList.firstWhere(
-          (c) => c['name'].toString().toLowerCase() == 'indonesia',
-          orElse: () => {'iso': 'ID', 'name': 'Indonesia'},
-        );
-        _currentCountryIso = defaultCountry['iso'];
-        _currentCountry = defaultCountry['name'].toString().split(' ').map((word) {
-          if (word.isEmpty) return '';
-          return word[0].toUpperCase() + word.substring(1);
-        }).join(' ');
+        if (loadedList.isNotEmpty) {
+          final random = Random();
+          final selectedCountry = loadedList[random.nextInt(loadedList.length)];
+          _currentCountryIso = selectedCountry['iso'];
+          _currentCountry = selectedCountry['name'].toString().split(' ').map((word) {
+            if (word.isEmpty) return '';
+            return word[0].toUpperCase() + word.substring(1);
+          }).join(' ');
+        }
       });
       debugPrint('Successfully loaded ${_countriesList.length} countries.');
     } catch (e) {
@@ -98,64 +100,76 @@ class _KarakterScreenState extends State<KarakterScreen> {
     }
   }
 
-  Future<void> _loadNamesData() async {
-    setState(() {
-      _isLoading = true;
-      _hasJsonData = false;
-    });
+  String _getContinentForIso(String? iso) {
+    if (iso == null) return 'asia';
+    const africaIsos = {'ZA', 'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'TD', 'DJ', 'ER', 'SZ', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML', 'MR', 'MU', 'EG', 'MZ', 'NA', 'NE', 'NG', 'CI', 'CF', 'CD', 'SD', 'TZ', 'UG', 'ZM', 'ZW', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'SS', 'TG', 'TN', 'CV', 'KM', 'CG', 'MA'};
+    const asiaIsos = {'AF', 'SA', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'CN', 'PH', 'GE', 'HK', 'IN', 'ID', 'IQ', 'IR', 'IL', 'JP', 'KH', 'KZ', 'KG', 'KR', 'KP', 'KW', 'LA', 'LB', 'MO', 'MY', 'MV', 'MN', 'MM', 'NP', 'OM', 'PK', 'PS', 'QA', 'TL', 'SG', 'CY', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE', 'JO'};
+    const eropaIsos = {'AL', 'AD', 'AT', 'NL', 'BY', 'BE', 'BA', 'BG', 'CZ', 'DK', 'EE', 'FI', 'GI', 'HU', 'GB', 'IE', 'IS', 'IT', 'DE', 'FO', 'XK', 'HR', 'LV', 'LI', 'LT', 'LU', 'MK', 'MT', 'MD', 'MC', 'ME', 'NO', 'PL', 'PT', 'FR', 'RO', 'RS', 'RU', 'SM', 'SI', 'SK', 'ES', 'SE', 'CH', 'UA', 'VA', 'GR'};
+    const naIsos = {'US', 'AG', 'BS', 'BB', 'BZ', 'BM', 'CR', 'CW', 'DM', 'SV', 'GL', 'GD', 'GT', 'HT', 'HN', 'JM', 'CA', 'CU', 'MX', 'NI', 'PA', 'PR', 'DO', 'KN', 'LC', 'VC', 'TT'};
+    const saIsos = {'AR', 'BO', 'BR', 'CL', 'EC', 'GF', 'GY', 'CO', 'PY', 'PE', 'SR', 'UY', 'VE'};
+    const oceaniaIsos = {'AU', 'FJ', 'GU', 'KI', 'MH', 'FM', 'NR', 'PW', 'PG', 'WS', 'AS', 'NZ', 'PF', 'TO', 'TV', 'VU'};
 
-    final String countryLower = _currentCountry.toLowerCase();
-    const List<String> continents = ['asia', 'afrika', 'eropa', 'na', 'sa', 'oceania'];
-    
-    String? foundContinent;
+    if (africaIsos.contains(iso)) return 'afrika';
+    if (asiaIsos.contains(iso)) return 'asia';
+    if (eropaIsos.contains(iso)) return 'eropa';
+    if (naIsos.contains(iso)) return 'na';
+    if (saIsos.contains(iso)) return 'sa';
+    if (oceaniaIsos.contains(iso)) return 'oceania';
+    return 'asia';
+  }
 
-    for (String continent in continents) {
-      final String checkPath = 'json/firstname_lastname/$continent/$countryLower/male/firstname.json';
-      try {
-        await rootBundle.loadString(checkPath);
-        foundContinent = continent;
-        break;
-      } catch (e) {
-        // Try next continent
-      }
+  Future<void> _loadNamesData({bool showLoading = false}) async {
+    if (showLoading) {
+      setState(() {
+        _isLoading = true;
+        _hasJsonData = false;
+      });
     }
 
-    if (foundContinent != null) {
+    final String countryLower = _currentCountry.toLowerCase();
+    final String foundContinent = _getContinentForIso(_currentCountryIso);
+
+    try {
+      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/firstname.json');
+      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/firstname.json');
+      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/lastname.json');
+      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/lastname.json');
+
+      final List<String> maleFirst = List<String>.from(jsonDecode(maleFirstContent));
+      final List<String> femaleFirst = List<String>.from(jsonDecode(femaleFirstContent));
+      final List<String> maleLast = List<String>.from(jsonDecode(maleLastContent));
+      final List<String> femaleLast = List<String>.from(jsonDecode(femaleLastContent));
+
+      List<String> loadedCities = [];
       try {
-        final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/firstname.json');
-        final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/firstname.json');
-        final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/lastname.json');
-        final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/lastname.json');
-
-        final List<String> maleFirst = List<String>.from(jsonDecode(maleFirstContent));
-        final List<String> femaleFirst = List<String>.from(jsonDecode(femaleFirstContent));
-        final List<String> maleLast = List<String>.from(jsonDecode(maleLastContent));
-        final List<String> femaleLast = List<String>.from(jsonDecode(femaleLastContent));
-
-        setState(() {
-          _maleFirstNames = maleFirst;
-          _femaleFirstNames = femaleFirst;
-          _maleLastNames = maleLast;
-          _femaleLastNames = femaleLast;
-          _allLastNames = {...maleLast, ...femaleLast}.toList();
-          _hasJsonData = true;
-          _isLoading = false;
-        });
-        Character.globalMaleFirstNames = maleFirst;
-        Character.globalFemaleFirstNames = femaleFirst;
-        Character.globalLastNames = _allLastNames;
-        _generateRandomName();
-        debugPrint('Successfully loaded names from $foundContinent for $countryLower');
+        final String cityContent = await rootBundle.loadString('json/nama_kota/$foundContinent/$countryLower.json');
+        loadedCities = List<String>.from(jsonDecode(cityContent));
       } catch (e) {
-        debugPrint('Error decoding JSON names for $countryLower: $e');
-        setState(() {
-          _isLoading = false;
-          _hasJsonData = false;
-          _clearNames();
-        });
+        debugPrint('Error loading city JSON for $countryLower: $e');
       }
-    } else {
-      debugPrint('No names JSON found for country: $countryLower');
+
+      setState(() {
+        _maleFirstNames = maleFirst;
+        _femaleFirstNames = femaleFirst;
+        _maleLastNames = maleLast;
+        _femaleLastNames = femaleLast;
+        _allLastNames = {...maleLast, ...femaleLast}.toList();
+        _citiesList = loadedCities;
+        if (loadedCities.isNotEmpty) {
+          _selectedCity = loadedCities[Random().nextInt(loadedCities.length)];
+        } else {
+          _selectedCity = null;
+        }
+        _hasJsonData = true;
+        _isLoading = false;
+      });
+      Character.globalMaleFirstNames = maleFirst;
+      Character.globalFemaleFirstNames = femaleFirst;
+      Character.globalLastNames = _allLastNames;
+      _generateRandomName();
+      debugPrint('Successfully loaded names from $foundContinent for $countryLower');
+    } catch (e) {
+      debugPrint('Error decoding JSON names for $countryLower: $e');
       setState(() {
         _isLoading = false;
         _hasJsonData = false;
@@ -188,6 +202,23 @@ class _KarakterScreenState extends State<KarakterScreen> {
     _selectedClotheType = AvatarGenerator.clothes.values.first;
     _selectedClotheColor = AvatarGenerator.clotheColors.values.first;
     _selectedSkinColor = AvatarGenerator.skinColors.values.first;
+  }
+
+  void _randomizeAll() {
+    if (_countriesList.isNotEmpty) {
+      final random = Random();
+      final selectedCountry = _countriesList[random.nextInt(_countriesList.length)];
+      setState(() {
+        _currentCountryIso = selectedCountry['iso'];
+        _currentCountry = selectedCountry['name'].toString().split(' ').map((word) {
+          if (word.isEmpty) return '';
+          return word[0].toUpperCase() + word.substring(1);
+        }).join(' ');
+      });
+      _loadNamesData();
+    } else {
+      _generateRandomName();
+    }
   }
 
   void _generateRandomName() {
@@ -258,6 +289,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
     setState(() {
       _firstNameController.text = firstName;
       _lastNameController.text = lastName;
+      if (_citiesList.isNotEmpty) {
+        _selectedCity = _citiesList[random.nextInt(_citiesList.length)];
+      }
       _selectedTopType = randomAvatar['topType']!;
       _selectedAccessoriesType = randomAvatar['accessoriesType']!;
       _selectedHairColor = randomAvatar['hairColor']!;
@@ -316,6 +350,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
       avatarFacialHairType: 'blank',
       disableSameSexProposals: _disableSameSexProposals,
     );
+    newCharacter.birthCountry = _currentCountry;
+    newCharacter.birthCity = _selectedCity;
+    newCharacter.currentCity = _selectedCity;
 
     if (_customFamilyData != null) {
       // Generate silsilah keluarga menggunakan input kustomisasi
@@ -490,6 +527,81 @@ class _KarakterScreenState extends State<KarakterScreen> {
     );
   }
 
+  void _showCityPicker() {
+    if (_citiesList.isEmpty) return;
+    String searchQuery = '';
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            List<String> filteredCities = _citiesList;
+            if (searchQuery.isNotEmpty) {
+              filteredCities = filteredCities
+                  .where((c) => c.toLowerCase().contains(searchQuery.toLowerCase()))
+                  .toList();
+            }
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.7,
+                  maxWidth: 400,
+                ),
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Pilih Kota Asal ($_currentCountry)',
+                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 12),
+                    TextField(
+                      decoration: InputDecoration(
+                        hintText: 'Cari kota...',
+                        prefixIcon: const Icon(Icons.search),
+                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      ),
+                      onChanged: (value) {
+                        setStateDialog(() {
+                          searchQuery = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 12),
+                    Expanded(
+                      child: filteredCities.isEmpty
+                          ? const Center(child: Text('Tidak ada kota ditemukan', style: TextStyle(color: Colors.grey)))
+                          : ListView.builder(
+                              itemCount: filteredCities.length,
+                              itemBuilder: (context, index) {
+                                final city = filteredCities[index];
+                                return ListTile(
+                                  leading: const Icon(Icons.location_city, color: Colors.blue),
+                                  title: Text(city),
+                                  selected: city == _selectedCity,
+                                  onTap: () {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      _selectedCity = city;
+                                    });
+                                  },
+                                );
+                              },
+                            ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     // --- LOGIKA VISUALISASI GENDER ---
@@ -597,46 +709,109 @@ class _KarakterScreenState extends State<KarakterScreen> {
                 
                 const SizedBox(height: 16),
 
-                Text(
-                  'Negara Asal:',
-                  style: TextStyle(
-                    fontSize: 14, 
-                    fontWeight: FontWeight.bold, 
-                    color: isDark ? Colors.white70 : Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                InkWell(
-                  onTap: _showCountryPicker,
-                  borderRadius: BorderRadius.circular(12),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
-                      borderRadius: BorderRadius.circular(12),
-                      color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
-                    ),
-                    child: Row(
-                      children: [
-                        Text(
-                          _countryCodeToEmoji(_currentCountryIso ?? ''),
-                          style: const TextStyle(fontSize: 24),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            _currentCountry,
+                Row(
+                  children: [
+                    // Negara Asal
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Negara Asal:',
                             style: TextStyle(
-                              fontSize: 16, 
-                              fontWeight: FontWeight.w600, 
-                              color: isDark ? Colors.white : Colors.black87,
+                              fontSize: 14, 
+                              fontWeight: FontWeight.bold, 
+                              color: isDark ? Colors.white70 : Colors.black87,
                             ),
                           ),
-                        ),
-                        Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
-                      ],
+                          const SizedBox(height: 6),
+                          InkWell(
+                            onTap: _showCountryPicker,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(12),
+                                color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+                              ),
+                              child: Row(
+                                children: [
+                                  Text(
+                                    _countryCodeToEmoji(_currentCountryIso ?? ''),
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _currentCountry,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 14, 
+                                        fontWeight: FontWeight.w600, 
+                                        color: isDark ? Colors.white : Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                    const SizedBox(width: 12),
+                    // Kota Asal
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Kota Asal:',
+                            style: TextStyle(
+                              fontSize: 14, 
+                              fontWeight: FontWeight.bold, 
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          InkWell(
+                            onTap: _citiesList.isNotEmpty ? _showCityPicker : null,
+                            borderRadius: BorderRadius.circular(12),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(12),
+                                color: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+                              ),
+                              child: Row(
+                                children: [
+                                  const Icon(Icons.location_city, size: 20, color: Colors.blue),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      _selectedCity ?? 'Pilih Kota',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: TextStyle(
+                                        fontSize: 14, 
+                                        fontWeight: FontWeight.w600, 
+                                        color: isDark ? Colors.white : Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  Icon(Icons.arrow_drop_down, color: isDark ? Colors.white70 : Colors.black54),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
 
@@ -690,7 +865,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
                       MouseRegion(
                         cursor: SystemMouseCursors.click,
                         child: ElevatedButton(
-                          onPressed: _hasJsonData ? _generateRandomName : null,
+                          onPressed: _hasJsonData ? _randomizeAll : null,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
                             foregroundColor: isDark ? Colors.white70 : Colors.black87,

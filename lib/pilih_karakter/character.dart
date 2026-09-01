@@ -40,6 +40,8 @@ class Character {
   String gender;
   String location;
   String? birthCountry;
+  String? birthCity;
+  String? currentCity;
   int age;
   int health;
   int happiness;
