@@ -4,7 +4,7 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/game/widgets/dialog_helper.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features.dart';
+import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'dart:math';

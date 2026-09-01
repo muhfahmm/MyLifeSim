@@ -1,5 +1,3 @@
-  // lib/store_page/fitur_premium/akses_18plus.dart
-
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 // IMPOR FILE BARU
-import 'package:bitlife/store_page/fitur_premium/akses_18plus_page.dart'; 
+import 'package:bitlife/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
 
 class StorePage extends StatefulWidget {
   final Character? character;

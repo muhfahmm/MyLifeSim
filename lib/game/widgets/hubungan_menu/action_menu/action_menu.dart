@@ -2,7 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features.dart';
+import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
 
 // Import logic per usia
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_base.dart';
