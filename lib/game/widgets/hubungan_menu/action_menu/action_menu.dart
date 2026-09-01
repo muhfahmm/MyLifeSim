@@ -1176,6 +1176,182 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         );
       }
     }
+
+    // --- PREMIUM: Tombol dewasa untuk ANAK usia >= 12 tahun ---
+    if (isChild && targetAge >= 12 && AdultFeatures.isPremiumUnlocked) {
+      // 1. Bercinta / Make Love
+      final bool hasBercintaAlready = actions.any((a) =>
+          a.label.toLowerCase().contains('bercinta') ||
+          a.label.toLowerCase().contains('make love'));
+      if (!hasBercintaAlready) {
+        actions.insert(0, ActionItem(
+          label: 'Bercinta / Make Love',
+          icon: Icons.favorite,
+          color: Colors.pink,
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => BercintaScreen(
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  onActionComplete: () {
+                    _updateState();
+                  },
+                ),
+              ),
+            );
+          },
+        ));
+      }
+
+      // 2. Ajak Masturbasi Bersama
+      final bool hasMasturbasiAlready = actions.any((a) =>
+          a.label.toLowerCase().contains('masturbasi'));
+      if (!hasMasturbasiAlready) {
+        actions.insert(1, _buildAjakMasturbasiAction());
+      }
+
+      // 3. Ajak Pacaran (atau Selingkuh jika sudah punya pasangan)
+      final bool isAlreadyChildPartner = widget.character.isAnyPartnerNameMatching(widget.targetName);
+      if (!isAlreadyChildPartner) {
+        final bool hasPacaranAlready = actions.any((a) =>
+            a.label.toLowerCase().contains('pacaran') ||
+            a.label.toLowerCase().contains('balikan'));
+        if (!hasPacaranAlready) {
+          final bool hasPartner = widget.character.partner != null;
+          actions.insert(2, ActionItem(
+            label: hasPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+            icon: hasPartner ? Icons.heart_broken : Icons.favorite_border,
+            color: hasPartner ? Colors.deepOrange : Colors.redAccent,
+            onTap: () {
+              final bool accepted = _random.nextInt(100) < 50;
+              if (accepted) {
+                _showResultDialog(
+                  'Pacaran Baru! ❤️',
+                  'Ajakanmu diterima oleh ${widget.targetName}! Kalian kini menjadi sepasang kekasih.',
+                  Icons.favorite,
+                  Colors.pinkAccent,
+                  () {
+                    final String childGender = _getTargetGender();
+                    final partnerMap = {
+                      'name': widget.targetName,
+                      'relation': 'Pacar',
+                      'gender': childGender,
+                      'age': targetAge.toString(),
+                      'relationship': '80',
+                      'isDeceased': 'false',
+                    };
+                    if (widget.character.partner == null) {
+                      widget.character.partner = partnerMap;
+                    } else {
+                      widget.character.secondPartner = partnerMap;
+                      widget.character.isHavingAffair = true;
+                    }
+                    _updateRelationship(20);
+                    _updateState();
+                  },
+                );
+              } else {
+                _showResultDialog(
+                  'Ajakan Ditolak 💔',
+                  '${widget.targetName} menolak ajakanmu untuk berpacaran. Hubungan menjadi sedikit canggung (-10% hubungan).',
+                  Icons.block,
+                  Colors.red,
+                  () {
+                    _updateRelationship(-10);
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ));
+        }
+      }
+
+      // 4. Minta Putus / Ceraikan (jika anak punya pasangan)
+      Map<String, String>? childDataPremium;
+      for (var c in widget.character.children) {
+        final String cn = c['name'] ?? '';
+        final String cleanSearchN = widget.targetName.replaceAll(' (Wafat)', '').trim().toLowerCase();
+        if (cn.toLowerCase() == cleanSearchN || cleanSearchN.contains(cn.toLowerCase())) {
+          childDataPremium = c;
+          break;
+        }
+      }
+      final String? childCurrentPartner = childDataPremium?['partnerName'];
+      if (childCurrentPartner != null && childCurrentPartner.isNotEmpty) {
+        final bool hasMintaPutus = actions.any((a) =>
+            a.label.toLowerCase().contains('minta cerai') ||
+            a.label.toLowerCase().contains('minta putus') ||
+            a.label.toLowerCase().contains('pisahkan'));
+        if (!hasMintaPutus) {
+          actions.insert(
+            isAlreadyChildPartner ? 2 : 3,
+            ActionItem(
+              label: 'Minta Cerai dengan $childCurrentPartner',
+              icon: Icons.heart_broken,
+              color: Colors.redAccent,
+              onTap: () {
+                final screenCtx = context;
+                showDialog(
+                  context: screenCtx,
+                  builder: (confirmCtx) => AlertDialog(
+                    title: const Text('Minta Cerai 💔',
+                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text(
+                        'Apakah kamu yakin ingin meminta ${widget.targetName} untuk memutuskan hubungannya dengan $childCurrentPartner?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmCtx),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmCtx);
+                          final bool success = _random.nextInt(100) < 40;
+                          if (success) {
+                            childDataPremium!['partnerName'] = '';
+                            childDataPremium['partnerGender'] = '';
+                            _updateRelationship(-10);
+                            _updateState();
+                            _showResultDialog(
+                              'Berhasil 💔',
+                              '${widget.targetName} memutuskan hubungannya dengan $childCurrentPartner atas permintaanmu.',
+                              Icons.done,
+                              Colors.green,
+                              () {},
+                            );
+                          } else {
+                            _updateRelationship(-20);
+                            _updateState();
+                            _showResultDialog(
+                              'Ditolak 🚫',
+                              '${widget.targetName} menolak permintaanmu dan tetap bersama $childCurrentPartner. Hubunganmu dengannya menurun.',
+                              Icons.block,
+                              Colors.red,
+                              () {},
+                            );
+                          }
+                        },
+                        child: const Text('Ya, Minta',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          );
+        }
+      }
+    }
+    // --- END PREMIUM CHILD BUTTONS ---
+
+
     final String mintaAdikTargetName = widget.targetName.toLowerCase();
     final bool mintaAdikIsMother = mintaAdikTargetName.contains('ibu') && !mintaAdikTargetName.contains('tiri');
     if (widget.character.age >= 6 &&
