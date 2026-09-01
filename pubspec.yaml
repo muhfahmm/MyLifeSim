@@ -171,8 +171,6 @@ flutter:
     - json/firstname_lastname/asia/jepang/male/
     - json/firstname_lastname/asia/kamboja/female/
     - json/firstname_lastname/asia/kamboja/male/
-    - json/firstname_lastname/asia/kamerun/female/
-    - json/firstname_lastname/asia/kamerun/male/
     - json/firstname_lastname/asia/kazakhstan/female/
     - json/firstname_lastname/asia/kazakhstan/male/
     - json/firstname_lastname/asia/kirgizstan/female/

@@ -17,7 +17,6 @@
   "Khattak",
   "Kohistani",
   "Lodi",
-  "Mansoor",
   "Mohammadi",
   "Mukhtar",
   "Noorzai",
@@ -33,7 +32,6 @@
   "Suleimankhil",
   "Stanikzai",
   "Tani",
-  "Tariq",
   "Tarzi",
   "Wardak",
   "Yousafzai",
@@ -54,7 +52,6 @@
   "Surkhrodi",
   "Tarakai",
   "Utmanzai",
-  "Wazir",
   "Zazai",
   "Afridi",
   "Bangash",
@@ -98,5 +95,8 @@
   "Sar-e-Pol",
   "Uruzgani",
   "Zabuli",
-  "Achakzai"
+  "Achakzai",
+  "Alikozai",
+  "Al-Ahmadi-B",
+  "Al-Ahmadi-C"
 ]
