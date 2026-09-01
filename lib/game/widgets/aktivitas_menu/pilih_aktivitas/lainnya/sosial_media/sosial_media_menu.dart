@@ -5,6 +5,8 @@ import 'package:bitlife/pilih_karakter/character.dart';
 // Import halaman dashboard sosial media
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/medsos_dashboard/medsos_dashboard.dart';
 
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/batasan_sosmed_logic/batasan_sosmed_logic.dart';
+
 class SocialMediaMenuHelper {
   static const List<Map<String, dynamic>> platforms = [
     {'name': 'YouTube', 'icon': Icons.play_circle_filled, 'color': Colors.red},
@@ -13,15 +15,26 @@ class SocialMediaMenuHelper {
     {'name': 'Telegram', 'icon': Icons.telegram, 'color': Colors.blue},
   ];
 
-  // Fungsi ini sekarang langsung mengarahkan ke halaman penuh, BUKAN modal!
+  // Fungsi ini memeriksa batasan negara & usia sebelum membuka menu sosial media
   static void showSocialMediaMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    if (character.age < 12) {
+    final String currentCountry = character.location.isNotEmpty ? character.location : (character.birthCountry ?? 'Indonesia');
+    final hasilPemeriksaan = BatasanSosmedLogic.periksaAksesSosmed(
+      country: currentCountry,
+      age: character.age,
+    );
+
+    if (!hasilPemeriksaan.diizinkan) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 12 tahun untuk memiliki akun sosial media.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+          title: Text(hasilPemeriksaan.judul),
+          content: Text(hasilPemeriksaan.pesan),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('OK'),
+            ),
+          ],
         ),
       );
       return;
