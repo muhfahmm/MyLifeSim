@@ -1,96 +1,32 @@
-1. Mapel untuk Guru SD (Sekolah Dasar)
-Biasanya guru SD mengampu satu kelas (wali kelas) atau mapel tertentu untuk beberapa kelas.
+Berikut adalah daftar negara yang memiliki pembatasan akses sosial media berdasarkan regulasi dunia nyata. Anda bisa mengimplementasikannya sebagai **kondisi geografis** di dalam game, di mana fitur Sosial Media tidak dapat diakses (atau dibatasi) jika karakter lahir/berada di negara tersebut.
 
-Guru Kelas 1-2: Pendidikan Agama, Bahasa Indonesia, Matematika, PJOK, Seni Budaya.
+### 🌍 Kelompok Negara dengan Blokir Total (Akses Diblokir Selamanya)
+Negara-negara ini memblokir akses ke platform sosial media global (seperti Facebook, Instagram, YouTube, dan Twitter/X) untuk seluruh penduduknya:
+*   **China** (Blokir akses luar negeri seperti "Great Firewall") 
+*   **Korea Utara** (Blokir total, hanya akses intranet domestik) 
+*   **Iran** (Pemblokiran platform seperti Facebook, Twitter, dan YouTube) 
+*   **Turkmenistan** (Blokir hampir semua platform sosial media asing) 
+*   **Afghanistan** (Pembatasan ketat akses sosial media sejak 2025) 
 
-Guru Kelas 3-4: Bahasa Indonesia, Matematika, IPAS (Ilmu Pengetahuan Alam & Sosial), Pendidikan Pancasila, PJOK.
+### 👶 Kelompok Negara dengan Pembatasan Usia (Akses Diblokir Jika Karakter di Bawah 16 Tahun)
+Negara-negara ini menerapkan aturan ketat, di mana anak-anak di bawah usia 16 tahun **dilarang** memiliki akun sosial media:
+*   **Australia** (Efektif Desember 2025, salah satu regulasi terketat di dunia) 
+*   **Indonesia** (Efektif Maret 2026, larangan untuk platform berisiko tinggi) 
+*   **Malaysia** (Efektif Juni 2026) 
+*   **Inggris** (Proposal larangan untuk anak di bawah 16 tahun) 
+*   **Spanyol** (Proposal larangan untuk anak di bawah 16 tahun) 
+*   **Turki** (Undang-undang pembatasan akses untuk anak di bawah 15 tahun) 
+*   **Denmark** (Larangan untuk di bawah 15 tahun) 
+*   **Prancis**, **Polandia**, **Yunani**, **Slovenia** (Proposal larangan untuk anak di bawah 15 tahun) 
 
-Guru Kelas 5-6: Bahasa Indonesia, Matematika, IPA, IPS, PPKn, Bahasa Inggris, Seni Budaya, Informatika (pengenalan komputer).
+### ⚖️ Kelompok Negara dengan Regulasi Ketat (Akses Diblokir Jika Berusia Terlalu Muda)
+*   **Rusia** (Pemblokiran platform Meta sejak 2022) 
+*   **UAE (Uni Emirat Arab)** (Batasan usia minimum 15 tahun untuk akun sosial media) 
+*   **India** (Larangan untuk platform tertentu seperti TikTok, meskipun sebagian besar akses dibuka) 
 
-2. Mapel untuk Guru SMP (Sekolah Menengah Pertama)
-Guru SMP biasanya mengampu satu mapel spesifik untuk berbagai kelas (kelas 7, 8, 9).
+---
 
-Mapel Wajib (Eksakta & Bahasa):
-
-Matematika
-
-IPA (Ilmu Pengetahuan Alam) / Fisika & Biologi dasar
-
-Bahasa Indonesia
-
-Bahasa Inggris
-
-Mapel Wajib (Sosial & Agama):
-
-Pendidikan Agama (Islam, Kristen, Katolik, Hindu, Budha, atau Konghucu)
-
-PPKn (Pendidikan Pancasila dan Kewarganegaraan)
-
-IPS (Ilmu Pengetahuan Sosial) / Sejarah & Geografi dasar
-
-Mapel Keterampilan & Seni:
-
-Seni Budaya (Seni Rupa, Seni Musik, Seni Tari)
-
-PJOK (Pendidikan Jasmani, Olahraga, dan Kesehatan)
-
-Prakarya (Rekayasa, Pengolahan, Budidaya)
-
-Informatika (TIK / Komputer)
-
-Muatan Lokal (seperti Bahasa Jawa, Bahasa Sunda, atau Bahasa Daerah lainnya)
-
-3. Mapel untuk Guru SMA (Sekolah Menengah Atas)
-Mapel SMA lebih beragam karena ada peminatan (MIPA, IPS, Bahasa). Guru SMA biasanya sangat spesifik pada satu mapel.
-
-Mapel Wajib (Semua Jurusan):
-
-Pendidikan Agama
-
-PPKn
-
-Bahasa Indonesia
-
-Matematika (Wajib)
-
-Bahasa Inggris
-
-PJOK
-
-Sejarah (Wajib)
-
-Seni Budaya
-
-Mapel Peminatan MIPA (IPA):
-
-Matematika Peminatan
-
-Fisika
-
-Kimia
-
-Biologi
-
-Informatika
-
-Mapel Peminatan IPS (Sosial):
-
-Ekonomi
-
-Geografi
-
-Sosiologi
-
-Antropologi
-
-Akuntansi
-
-Mapel Peminatan Bahasa & Sastra:
-
-Bahasa Indonesia (Lanjutan/Sastra)
-
-Bahasa Asing (Jepang, Jerman, Prancis, atau Mandarin)
-
-Bahasa Inggris (Lanjutan/Sastra)
-
-Antropologi Bahasa
+### 💡 Saran Implementasi di Game:
+1.  **Jika Karakter di Negara "Blokir Total"**: Saat menekan menu Sosial Media, muncul *pop-up* atau *modal* yang menampilkan pesan: *"Akses Sosial Media diblokir oleh pemerintah negara ini."* Hal ini membuat gameplay terasa sangat realistis.
+2.  **Jika Karakter di Negara "Batasan Usia"**: Gunakan logika seperti yang sudah Anda terapkan pada fitur premium 18+. Jika `character.age < 16`, tampilkan pesan terkunci, dan jika `>= 16`, fitur tersebut terbuka normal. Ini juga memberikan alasan realistis mengapa seorang anak kecil tidak bisa bermain TikTok atau Instagram di dalam game.
+3.  **Sistem Bonus vs Penalti**: Anda bisa menambahkan efek samping dari pemblokiran ini. Misalnya, di negara yang memblokir sosial media, karakter mungkin memiliki **Kebahagiaan yang sedikit lebih tinggi** (karena tidak terpengaruh *cyberbullying*), atau **Kecerdasan sedikit lebih tinggi** (karena lebih banyak membaca buku daripada *scrolling*).
