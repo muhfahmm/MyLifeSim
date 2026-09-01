@@ -121,6 +121,7 @@ class Character {
   Map<String, String>? bkTeacher; // Guru BK SMA
   Map<String, String>? sdHeadmaster; // Kepala Sekolah SD
   Map<String, String>? sdBkTeacher; // Guru BK SD
+  List<String> joinedExtracurriculars = []; // Daftar ekstrakurikuler yang diikuti
   Map<String, String>? smpHeadmaster; // Kepala Sekolah SMP
   Map<String, String>? smpBkTeacher; // Guru BK SMP
 
