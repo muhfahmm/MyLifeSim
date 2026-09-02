@@ -109,6 +109,8 @@ class _GameScreenState extends State<GameScreen> {
   ];
 
   void _checkGlassesNeed([VoidCallback? onFinish]) {
+    final VoidCallback done = onFinish ?? _finishAgeUp;
+
     // Cek apakah perlu memilih hak asuh setelah orang tua bercerai di tengah game
     if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
         _character.custodyParent == null &&
@@ -117,34 +119,33 @@ class _GameScreenState extends State<GameScreen> {
         _character.motherName != null &&
         !_character.isFatherDeceased &&
         !_character.isMotherDeceased) {
-      _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!);
-      onFinish?.call();
+      _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!, done);
       return;
     }
 
     if (_character.avatarAccessoriesType != 'blank' && _character.avatarAccessoriesType != null) {
-      onFinish?.call();
+      done();
       return; // Sudah pakai kacamata
     }
     final int age = _character.age;
     if (age <= 0) {
-      onFinish?.call();
+      done();
       return;
     }
 
     // Batasi tes hanya pada rentang usia 1-18 dan 40-60
     if (age >= 1 && age <= 18) {
       if (_character.eyeTestsCountYoung >= 2) {
-        onFinish?.call();
+        done();
         return;
       }
     } else if (age >= 40 && age <= 60) {
       if (_character.eyeTestsCountOld >= 2) {
-        onFinish?.call();
+        done();
         return;
       }
     } else {
-      onFinish?.call();
+      done();
       return; // Tidak ada tes di luar rentang usia tersebut
     }
 
@@ -162,9 +163,9 @@ class _GameScreenState extends State<GameScreen> {
       } else if (age >= 40 && age <= 60) {
         _character.eyeTestsCountOld++;
       }
-      _showEyeTestMinigame(onFinish);
+      _showEyeTestMinigame(done);
     } else {
-      onFinish?.call();
+      done();
     }
   }
 
@@ -363,7 +364,7 @@ class _GameScreenState extends State<GameScreen> {
     });
 
     final random = Random();
-    // Panggil checkAndGenerateProposal secara langsung agar persentase internal (ml, pacaran, 3some) tetap sama persis seperti saat bertambah umur
+    // Panggil checkAndGenerateProposal secara langsung (100% sama seperti Tambah Umur)
     AjakanHandler.checkAndGenerateProposal(_character, random);
     if (_character.activeProposal != null) {
       _checkActiveProposal();
@@ -2481,7 +2482,7 @@ class _GameScreenState extends State<GameScreen> {
           targetGender: propGender,
           onComplete: () {
             setState(() {});
-            _checkGlassesNeed();
+            _checkGlassesNeed(onDone);
           },
         );
       });
@@ -2782,7 +2783,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _executeReportStaff(context, cleanName, role);
+                  _executeReportStaff(context, cleanName, role, onDone);
                 },
                 child: const Text(
                   'Laporkan ke Guru',
@@ -2810,7 +2811,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     proposalData: proposal,
                     onComplete: () {
                       setState(() {});
-                      _checkGlassesNeed();
+                      _checkGlassesNeed(onDone);
                     },
                   );
                 },
@@ -3018,7 +3019,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   );
                   _checkGlassesNeed(onDone);
                 } else {
-                  _showIncomingCondomDialog(proposal);
+                  _showIncomingCondomDialog(proposal, onDone);
                 }
               },
               child: Text(
@@ -3168,13 +3169,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
-  void _showCustodySelectionDialog(BuildContext context, String fatherName, String motherName) {
+  void _showCustodySelectionDialog(BuildContext context, String fatherName, String motherName, [VoidCallback? onDone]) {
     final bool fatherAliveAndFree = _character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned;
     final bool stepFatherAliveAndFree = _character.stepFatherName != null && !_character.isStepFatherDeceased;
     final bool motherAliveAndFree = _character.motherName != null && !_character.isMotherDeceased && !_character.isMotherImprisoned;
 
     // Jika user berusia 18 tahun ke atas, tidak perlu hak asuh
     if (_character.age >= 18) {
+      _checkGlassesNeed(onDone);
       return;
     }
 
@@ -3209,6 +3211,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _character.custodyParent = null;
                   _character.inbox.add('🏡 Hidup Mandiri: Kamu menempati rumah peninggalan ibumu setelah dia dipenjara.');
                 });
+                _checkGlassesNeed(onDone);
               },
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -3249,6 +3252,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   }
                   _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan $fatherOrStepFatherLabel.');
                 });
+                _checkGlassesNeed(onDone);
               },
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -3283,6 +3287,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _character.custodyParent = 'Ibu';
                   _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan Ibumu ($motherName).');
                 });
+                _checkGlassesNeed(onDone);
               },
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -3322,7 +3327,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 }
                 _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama $fatherOrStepFatherLabel.');
               });
-              _checkGlassesNeed();
+              _checkGlassesNeed(onDone);
             },
             child: Text('Ikut Ayah ($fatherOrStepFatherLabel)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
           ),
@@ -3339,7 +3344,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 _character.custodyParent = 'Ibu';
                 _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ibumu ($motherName).');
               });
-              _checkGlassesNeed();
+              _checkGlassesNeed(onDone);
             },
             child: Text('Ikut Ibu ($motherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
           ),
@@ -3348,7 +3353,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
-  void _executeReportStaff(BuildContext context, String partnerName, String role) {
+  void _executeReportStaff(BuildContext context, String partnerName, String role, [VoidCallback? onDone]) {
     final rand = Random();
     final int roll = rand.nextInt(100);
     final bool isFired = roll < 70; // 70% chance of being fired
@@ -3411,7 +3416,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _checkGlassesNeed();
+              _checkGlassesNeed(onDone);
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
@@ -3420,7 +3425,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
-  void _showIncomingCondomDialog(Map<String, dynamic> proposal) {
+  void _showIncomingCondomDialog(Map<String, dynamic> proposal, [VoidCallback? onDone]) {
     final String partnerName = proposal['name'];
     final String relation = proposal['relation'];
     final String myGender = _character.gender.trim().toLowerCase();
@@ -3429,7 +3434,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
 
     // Jika sesama jenis (Gay/Lesbian), lewati dialog kondom dan langsung eksekusi tanpa kondom
     if (!isHetero) {
-      _executeIncomingBercinta(proposal, false);
+      _executeIncomingBercinta(proposal, false, onDone);
       return;
     }
 
@@ -3501,14 +3506,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _executeIncomingBercinta(proposal, true);
+              _executeIncomingBercinta(proposal, true, onDone);
             },
             child: const Text('Ya, pakai', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              _executeIncomingBercinta(proposal, false);
+              _executeIncomingBercinta(proposal, false, onDone);
             },
             child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           ),
@@ -3538,7 +3543,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     return 0.0;
   }
 
-  void _executeIncomingBercinta(Map<String, dynamic> proposal, bool useCondom) {
+  void _executeIncomingBercinta(Map<String, dynamic> proposal, bool useCondom, [VoidCallback? onDone]) {
     final String partnerName = proposal['name'];
     final String relation = proposal['relation'];
     final String myGender = _character.gender.trim().toLowerCase();
@@ -3636,7 +3641,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       relationshipValue: relValue,
       additionalText: addText.isNotEmpty ? addText : null,
       onComplete: () {
-        _checkGlassesNeed();
+        _checkGlassesNeed(onDone);
       },
     );
   }

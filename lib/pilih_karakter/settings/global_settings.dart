@@ -12,6 +12,7 @@ class GlobalSettings {
   static final ValueNotifier<bool> animationsEnabled = ValueNotifier<bool>(true);
 
   // Filter Konten Dewasa
+  static final ValueNotifier<String> userGender = ValueNotifier<String>('Perempuan');
   static final ValueNotifier<bool> disableMasturbationFamily = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> disableMasturbationNonFamily = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> disableMakeLoveFamily = ValueNotifier<bool>(false);

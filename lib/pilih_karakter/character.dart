@@ -8,6 +8,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajaka
 import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
+import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 
 // Import Atribut Karakter yang Dipisah
 import 'package:bitlife/pilih_karakter/atribut_karakter/disiplin.dart';
@@ -727,6 +728,7 @@ class Character {
     this.disableSameSexProposals = false,
   }) : inbox = [] {
     birthCountry = location;
+    GlobalSettings.userGender.value = gender;
     if (partner != null) {
       this.partner = partner;
     }
@@ -1873,8 +1875,8 @@ class Character {
     }
 
     // --- LOGIKA AJAKAN INCEST DARI KELUARGA ATAU ROMANTIKA SEKOLAH ---
-    // Dipicu jika usia karakter >= 6 tahun dan belum punya proposal aktif
-    if (age >= 6 && activeProposal == null) {
+    // Dipicu jika usia karakter >= 10 tahun dan belum punya proposal aktif
+    if (age >= 10 && activeProposal == null) {
       // --- DELEGASI LOGIKA AJAKAN PACARAN & MAKE LOVE KE AJAKAN_HANDLER ---
       AjakanHandler.checkAndGenerateProposal(this, random);
     }
