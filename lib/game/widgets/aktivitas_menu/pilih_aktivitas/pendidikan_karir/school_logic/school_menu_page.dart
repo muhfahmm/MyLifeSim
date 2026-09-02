@@ -6,7 +6,6 @@ import 'actions/kelas.dart';
 import 'actions/guru.dart';
 import 'actions/pindah_sekolah.dart';
 import 'actions/ekstrakurikuler.dart';
-import 'actions/lomba.dart';
 
 class SchoolMenuPage extends StatefulWidget {
   final Character character;
@@ -243,14 +242,6 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
               title: 'Ikut Ekstrakurikuler',
               subtitle: 'Mengikuti kegiatan klub & ekstrakurikuler sekolah',
               page: ExtracurricularActionPage(character: character, onRefresh: widget.onRefresh),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.emoji_events,
-              color: Colors.amber.shade800,
-              title: 'Ikut Lomba',
-              subtitle: 'Mengikuti ajang kompetisi & olimpiade sekolah',
-              page: LombaActionPage(character: character, onRefresh: widget.onRefresh),
             ),
             _buildMenuTile(
               context: context,
