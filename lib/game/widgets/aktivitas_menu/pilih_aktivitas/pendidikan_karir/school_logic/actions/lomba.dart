@@ -90,10 +90,10 @@ class _LombaActionPageState extends State<LombaActionPage> {
               }),
         },
         {
-          'title': 'Lomba Menghafal (Al-Qur\'an / Puisi)',
-          'category': 'Agama & Bahasa',
-          'effect': 'Disiplin +, Karma +.',
-          'icon': Icons.auto_stories,
+          'title': 'Lomba Mengingat Pengetahuan Umum / Cerdas Cermat Memory',
+          'category': 'Pengetahuan Umum & Sains',
+          'effect': 'Kecerdasan +, Disiplin +.',
+          'icon': Icons.psychology,
           'color': Colors.teal,
           'action': () => runLombaHafalanSD(context, widget.character, () {
                 setState(() {});

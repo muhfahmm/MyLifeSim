@@ -2827,8 +2827,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               final isDark = Theme.of(screenContext).brightness == Brightness.dark;
               showDialog(
                 context: screenContext,
-                barrierDismissible: true,
-                builder: (dialogContext) => AlertDialog(
+                barrierDismissible: false,
+                builder: (dialogContext) => PopScope(
+                  canPop: false,
+                  child: AlertDialog(
                   backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
                   title: Row(
                     children: [
@@ -2843,13 +2845,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
-                      ),
-                      // X BUTTON
-                      IconButton(
-                        icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.black45, size: 20),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        onPressed: () => Navigator.pop(dialogContext),
                       ),
                     ],
                   ),
@@ -2920,15 +2915,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           },
                           child: const Text('🏛️ Sekolah Swasta (\$1,500)', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
-                        const SizedBox(height: 8),
-                        TextButton(
-                          onPressed: () => Navigator.pop(dialogContext),
-                          child: const Text('Batal'),
-                        ),
                       ],
                     )
                   ],
                 ),
+              ),
               );
             },
           ));

@@ -216,6 +216,16 @@ class _LombaLariTappingDialogState extends State<_LombaLariTappingDialog> {
           ),
         ),
       ),
+      actions: [
+        TextButton.icon(
+          icon: const Icon(Icons.flag_outlined, color: Colors.red, size: 18),
+          label: const Text('Menyerah', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          onPressed: () {
+            _timer?.cancel();
+            Navigator.pop(context);
+          },
+        ),
+      ],
     );
   }
 }

@@ -279,9 +279,10 @@ class _LombaGambarDialogState extends State<_LombaGambarDialog> {
         ),
       ),
       actions: [
-        TextButton(
+        TextButton.icon(
+          icon: const Icon(Icons.flag_outlined, color: Colors.red, size: 18),
+          label: const Text('Menyerah', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
           onPressed: () => Navigator.pop(context),
-          child: const Text('Batal', style: TextStyle(color: Colors.grey)),
         ),
         ElevatedButton.icon(
           icon: const Icon(Icons.send),

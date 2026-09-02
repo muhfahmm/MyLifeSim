@@ -43,6 +43,15 @@ class _GameScreenState extends State<GameScreen> {
   late Character _character;
   // Cache avatar URL agar tidak di-rebuild ulang setiap kali state berubah
   late String _avatarUrl;
+  bool _isAgingUp = false;
+
+  void _finishAgeUp() {
+    if (mounted) {
+      setState(() {
+        _isAgingUp = false;
+      });
+    }
+  }
 
   @override
   void initState() {
@@ -99,7 +108,7 @@ class _GameScreenState extends State<GameScreen> {
     {'text': '8888B888', 'odd': 'B', 'options': ['8', 'B', '3', '6']},
   ];
 
-  void _checkGlassesNeed() {
+  void _checkGlassesNeed([VoidCallback? onFinish]) {
     // Cek apakah perlu memilih hak asuh setelah orang tua bercerai di tengah game
     if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
         _character.custodyParent == null &&
@@ -109,21 +118,33 @@ class _GameScreenState extends State<GameScreen> {
         !_character.isFatherDeceased &&
         !_character.isMotherDeceased) {
       _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!);
+      onFinish?.call();
       return;
     }
 
     if (_character.avatarAccessoriesType != 'blank' && _character.avatarAccessoriesType != null) {
+      onFinish?.call();
       return; // Sudah pakai kacamata
     }
     final int age = _character.age;
-    if (age <= 0) return;
+    if (age <= 0) {
+      onFinish?.call();
+      return;
+    }
 
     // Batasi tes hanya pada rentang usia 1-18 dan 40-60
     if (age >= 1 && age <= 18) {
-      if (_character.eyeTestsCountYoung >= 2) return;
+      if (_character.eyeTestsCountYoung >= 2) {
+        onFinish?.call();
+        return;
+      }
     } else if (age >= 40 && age <= 60) {
-      if (_character.eyeTestsCountOld >= 2) return;
+      if (_character.eyeTestsCountOld >= 2) {
+        onFinish?.call();
+        return;
+      }
     } else {
+      onFinish?.call();
       return; // Tidak ada tes di luar rentang usia tersebut
     }
 
@@ -141,11 +162,13 @@ class _GameScreenState extends State<GameScreen> {
       } else if (age >= 40 && age <= 60) {
         _character.eyeTestsCountOld++;
       }
-      _showEyeTestMinigame();
+      _showEyeTestMinigame(onFinish);
+    } else {
+      onFinish?.call();
     }
   }
 
-  void _showEyeTestMinigame() {
+  void _showEyeTestMinigame([VoidCallback? onFinish]) {
     final randomTest = _eyeTests[Random().nextInt(_eyeTests.length)];
     final String targetText = randomTest['text']!;
     final String oddChar = randomTest['odd']!;
@@ -160,147 +183,167 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            if (countdownTimer == null) {
-              countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-                if (timeLeft > 1) {
-                  setDialogState(() {
-                    timeLeft--;
-                  });
-                } else {
-                  timer.cancel();
-                  if (!answered) {
-                    answered = true;
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setDialogState) {
+              if (countdownTimer == null) {
+                countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+                  if (timeLeft > 1) {
                     setDialogState(() {
-                      timeLeft = 0;
+                      timeLeft--;
                     });
-                    setState(() {
-                      _character.avatarAccessoriesType = 'prescription01';
-                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
-                    });
-                    showDialog(
-                      context: dialogContext,
-                      builder: (timeoutContext) => AlertDialog(
-                        title: const Text('Waktu Habis! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                        content: Text('Kamu tidak sempat membaca huruf tersebut. Kunci jawabannya adalah: "$oddChar". Dokter mendiagnosis mata silinder/minus, sehingga kamu harus memakai kacamata.'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(timeoutContext);
-                              Navigator.pop(dialogContext);
-                            },
-                            child: const Text('OK'),
+                  } else {
+                    timer.cancel();
+                    if (!answered) {
+                      answered = true;
+                      setDialogState(() {
+                        timeLeft = 0;
+                      });
+                      setState(() {
+                        _character.avatarAccessoriesType = 'prescription01';
+                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
+                      });
+                      showDialog(
+                        context: dialogContext,
+                        barrierDismissible: false,
+                        builder: (timeoutContext) => PopScope(
+                          canPop: false,
+                          child: AlertDialog(
+                            title: const Text('Waktu Habis! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
+                            content: Text('Kamu tidak sempat membaca huruf tersebut. Kunci jawabannya adalah: "$oddChar". Dokter mendiagnosis mata silinder/minus, sehingga kamu harus memakai kacamata.'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(timeoutContext);
+                                  Navigator.pop(dialogContext);
+                                  onFinish?.call();
+                                },
+                                child: const Text('OK'),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                }
-              });
-            }
-
-            return AlertDialog(
-              title: Row(
-                children: const [
-                  Icon(Icons.remove_red_eye, color: Colors.blueAccent),
-                  SizedBox(width: 8),
-                  Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Text(
-                    'Matamu terasa sedikit buram. Dokter meminta untuk menyebutkan satu huruf/angka yang berbeda dalam teks berikut dalam 5 detik!',
-                    style: TextStyle(fontSize: 14),
-                  ),
-                  const SizedBox(height: 20),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[200],
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blueAccent, width: 2),
-                    ),
-                    child: Text(
-                      targetText,
-                      style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.black87),
-                    ),
-                  ),
-                  const SizedBox(height: 15),
-                  Text(
-                    'Sisa waktu: $timeLeft detik',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: timeLeft <= 2 ? Colors.red : Colors.orange,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text('Pilih huruf/angka yang berbeda:', style: TextStyle(fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
-                  Wrap(
-                    spacing: 12,
-                    children: options.map((opt) {
-                      return ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blueAccent,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                         ),
-                        onPressed: answered ? null : () {
-                          answered = true;
-                          countdownTimer?.cancel();
-                          if (opt == oddChar) {
-                            showDialog(
-                              context: dialogContext,
-                              builder: (successContext) => AlertDialog(
-                                title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
-                                content: const Text('Kamu berhasil menemukan huruf yang berbeda! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(successContext);
-                                      Navigator.pop(dialogContext);
-                                    },
-                                    child: const Text('Lanjutkan'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          } else {
-                            setState(() {
-                              _character.avatarAccessoriesType = 'prescription01';
-                              _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
-                            });
-                            showDialog(
-                              context: dialogContext,
-                              builder: (failContext) => AlertDialog(
-                                title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                                content: Text('Jawabanmu salah. Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(failContext);
-                                      Navigator.pop(dialogContext);
-                                    },
-                                    child: const Text('Mengerti'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
-                        child: Text(opt, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                       );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            );
-          },
+                    }
+                  }
+                });
+              }
+
+              return AlertDialog(
+                title: const Row(
+                  children: [
+                    Icon(Icons.remove_red_eye, color: Colors.blueAccent),
+                    SizedBox(width: 8),
+                    Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Text(
+                      'Matamu terasa sedikit buram. Dokter meminta untuk menyebutkan satu huruf/angka yang berbeda dalam teks berikut dalam 5 detik!',
+                      style: TextStyle(fontSize: 14),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.blueAccent, width: 2),
+                      ),
+                      child: Text(
+                        targetText,
+                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.black87),
+                      ),
+                    ),
+                    const SizedBox(height: 15),
+                    Text(
+                      'Sisa waktu: $timeLeft detik',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: timeLeft <= 2 ? Colors.red : Colors.orange,
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    const Text('Pilih huruf/angka yang berbeda:', style: TextStyle(fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 12,
+                      children: options.map((opt) {
+                        return ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueAccent,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
+                          onPressed: answered
+                              ? null
+                              : () {
+                                  answered = true;
+                                  countdownTimer?.cancel();
+                                  if (opt == oddChar) {
+                                    showDialog(
+                                      context: dialogContext,
+                                      barrierDismissible: false,
+                                      builder: (successContext) => PopScope(
+                                        canPop: false,
+                                        child: AlertDialog(
+                                          title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          content: const Text('Kamu berhasil menemukan huruf yang berbeda! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(successContext);
+                                                Navigator.pop(dialogContext);
+                                                onFinish?.call();
+                                              },
+                                              child: const Text('Lanjutkan'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  } else {
+                                    setState(() {
+                                      _character.avatarAccessoriesType = 'prescription01';
+                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
+                                    });
+                                    showDialog(
+                                      context: dialogContext,
+                                      barrierDismissible: false,
+                                      builder: (failContext) => PopScope(
+                                        canPop: false,
+                                        child: AlertDialog(
+                                          title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
+                                          content: Text('Jawabanmu salah. Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(failContext);
+                                                Navigator.pop(dialogContext);
+                                                onFinish?.call();
+                                              },
+                                              child: const Text('OK'),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                          child: Text(opt, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         );
       },
     ).then((_) {
@@ -362,13 +405,14 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
-  void _runAgeUpSequence(List<String> sicknessEvents) {
+  void _runAgeUpSequence(List<String> sicknessEvents, VoidCallback onFinish) {
     _handleSicknessSequence(sicknessEvents, () {
       _checkAdikRequestMoney(() {
         _checkSchoolEnrollmentOptions(() {
           _checkChildrenEvents(() {
-            _checkGraduationOptions();
-            _checkEsportPromotion();
+            _checkGraduationOptions(() {
+              _checkEsportPromotion(onFinish);
+            });
           });
         });
       });
@@ -417,14 +461,18 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _ageUp() {
-    List<String> events = [];
+    if (_isAgingUp || !_character.isAlive) return;
+
     setState(() {
-      events = _character.ageUp();
-      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-        _character,
-        happiness: _character.happiness,
-      );
+      _isAgingUp = true;
     });
+
+    List<String> events = [];
+    events = _character.ageUp();
+    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+      _character,
+      happiness: _character.happiness,
+    );
 
     // Cek kehamilan saat bertambah umur
     if (_character.isPregnant || _character.partnerIsPregnant) {
@@ -434,11 +482,12 @@ class _GameScreenState extends State<GameScreen> {
 
       if (isSuccess) {
         // Logika melahirkan sukses (panggil fungsi lahir)
-        _handleBirth();
+        _handleBirth(_finishAgeUp);
       } else {
         // Logika keguguran
-        _handleMiscarriage();
+        _handleMiscarriage(_finishAgeUp);
       }
+      return;
     }
 
     if (!_character.isAlive) {
@@ -446,18 +495,22 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Text('Karakter Meninggal'),
-          content: Text('${_character.name} meninggal pada usia ${_character.age} tahun.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.of(context).pop();
-              },
-              child: const Text('Selesai'),
-            ),
-          ],
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: const Text('Karakter Meninggal'),
+            content: Text('${_character.name} meninggal pada usia ${_character.age} tahun.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  Navigator.of(context).pop();
+                  _finishAgeUp();
+                },
+                child: const Text('Selesai'),
+              ),
+            ],
+          ),
         ),
       );
     } else if (events.isNotEmpty) {
@@ -469,57 +522,59 @@ class _GameScreenState extends State<GameScreen> {
       if (otherEvents.isNotEmpty) {
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (context) {
-            return AlertDialog(
-              title: const Row(
-                children: [
-                  Icon(Icons.notifications_active, color: Colors.orange, size: 28),
-                  const SizedBox(width: 8),
-                  Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
+            return PopScope(
+              canPop: false,
+              child: AlertDialog(
+                title: const Row(
+                  children: [
+                    Icon(Icons.notifications_active, color: Colors.orange, size: 28),
+                    SizedBox(width: 8),
+                    Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ],
+                ),
+                content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: otherEvents.map((e) {
+                    final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
+                    String displayText = e;
+                    if (isSameSexEvent) {
+                      if (displayText.startsWith('💬')) {
+                        displayText = '🏳️‍🌈' + displayText.substring(1);
+                      } else if (displayText.startsWith('💍')) {
+                        displayText = '🏳️‍🌈' + displayText.substring(1);
+                      } else if (displayText.startsWith('🎉')) {
+                        displayText = '🏳️‍🌈' + displayText.substring(1);
+                      } else if (!displayText.startsWith('🏳️‍🌈')) {
+                        displayText = '🏳️‍🌈 ' + displayText;
+                      }
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                    );
+                  }).toList(),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _runAgeUpSequence(sicknessEvents, _finishAgeUp);
+                    },
+                    child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
                 ],
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: otherEvents.map((e) {
-                  // Determine if this specific event line contains gay/lesbian
-                  final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
-                  String displayText = e;
-                  if (isSameSexEvent) {
-                    // Replace the starting emoji or icon (e.g. 💬, 💍, 🎉) with 🏳️‍🌈 if possible
-                    if (displayText.startsWith('💬')) {
-                      displayText = '🏳️‍🌈' + displayText.substring(1);
-                    } else if (displayText.startsWith('💍')) {
-                      displayText = '🏳️‍🌈' + displayText.substring(1);
-                    } else if (displayText.startsWith('🎉')) {
-                      displayText = '🏳️‍🌈' + displayText.substring(1);
-                    } else if (!displayText.startsWith('🏳️‍🌈')) {
-                      displayText = '🏳️‍🌈 ' + displayText;
-                    }
-                  }
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 8.0),
-                    child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                  );
-                }).toList(),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _runAgeUpSequence(sicknessEvents);
-                  },
-                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
             );
           },
         );
       } else {
-        _runAgeUpSequence(sicknessEvents);
+        _runAgeUpSequence(sicknessEvents, _finishAgeUp);
       }
     } else {
-      _runAgeUpSequence([]);
+      _runAgeUpSequence([], _finishAgeUp);
     }
   }
 
@@ -1452,8 +1507,10 @@ class _GameScreenState extends State<GameScreen> {
         barrierDismissible: false,
         builder: (context) {
           final bool isDark = Theme.of(context).brightness == Brightness.dark;
-          return AlertDialog(
-            backgroundColor: isDark ? Colors.grey.shade900 : null,
+          return PopScope(
+            canPop: false,
+            child: AlertDialog(
+              backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Row(
               children: [
                 Icon(Icons.school, color: Colors.indigo.shade600),
@@ -1612,6 +1669,7 @@ class _GameScreenState extends State<GameScreen> {
                 ],
               )
             ],
+          ),
           );
         },
       );
@@ -1631,7 +1689,9 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
           title: Row(
             children: [
               Icon(Icons.school, color: Colors.blue.shade700),
@@ -1734,6 +1794,7 @@ class _GameScreenState extends State<GameScreen> {
             )
           ],
         ),
+      ),
       );
     }
 
@@ -1747,7 +1808,9 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
           title: Row(
             children: [
               Icon(Icons.school, color: Colors.blue.shade700),
@@ -1821,20 +1884,23 @@ class _GameScreenState extends State<GameScreen> {
             )
           ],
         ),
+      ),
       );
     } else {
       processKidsEnrollment(0, onDone);
     }
   }
 
-  void _checkGraduationOptions() {
+  void _checkGraduationOptions([VoidCallback? onDone]) {
     if (_character.age == 18 && _character.univMajor == null && _character.jobName == null) {
       showDialog(
   context: context,
   barrierDismissible: false,
   builder: (dialogContext) {
     final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
-    return AlertDialog(
+    return PopScope(
+      canPop: false,
+      child: AlertDialog(
       backgroundColor: isDark ? Colors.grey.shade900 : null,
       title: Row(
         children: [
@@ -1869,7 +1935,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               onPressed: () {
                 Navigator.pop(dialogContext);
-                _checkActiveProposal();
+                _checkUniversityGraduationOptions(onDone);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -1892,7 +1958,7 @@ class _GameScreenState extends State<GameScreen> {
               ),
               onPressed: () {
                 Navigator.pop(dialogContext);
-                _checkActiveProposal();
+                _checkUniversityGraduationOptions(onDone);
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -1916,7 +1982,7 @@ class _GameScreenState extends State<GameScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
                 );
-                _checkActiveProposal();
+                _checkUniversityGraduationOptions(onDone);
               },
               child: Text(
                 'Tidak Memilih Apapun (Menganggur)',
@@ -1929,21 +1995,24 @@ class _GameScreenState extends State<GameScreen> {
           ],
         ),
       ],
+    ),
     );
   },
 );
     } else {
-      _checkUniversityGraduationOptions();
+      _checkUniversityGraduationOptions(onDone);
     }
   }
 
-  void _checkUniversityGraduationOptions() {
+  void _checkUniversityGraduationOptions([VoidCallback? onDone]) {
     if (_character.justGraduatedStage == 'S1') {
       final String major = _character.justGraduatedMajor ?? '';
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
           title: Row(
             children: [
               Icon(Icons.school, color: Colors.blue.shade700),
@@ -1970,7 +2039,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                     _character.justGraduatedStage = null;
-                    _checkActiveProposal();
+                    _checkEsportPromotion(onDone);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -1994,7 +2063,7 @@ class _GameScreenState extends State<GameScreen> {
                   onPressed: () {
                     Navigator.pop(context);
                     _character.justGraduatedStage = null;
-                    _checkActiveProposal();
+                    _checkEsportPromotion(onDone);
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -2011,14 +2080,15 @@ class _GameScreenState extends State<GameScreen> {
             )
           ],
         ),
+      ),
       );
     } else {
-      _checkActiveProposal();
+      _checkEsportPromotion(onDone);
     }
   }
 
   // --- LOGIKA MELAHIRKAN (80%) ---
-  void _handleBirth() {
+  void _handleBirth([VoidCallback? onDone]) {
     final Random random = Random();
     final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
     
@@ -2082,48 +2152,54 @@ class _GameScreenState extends State<GameScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.celebration, color: Colors.green, size: 28),
-            SizedBox(width: 8),
-            Text('Selamat! Bayi Lahir 🍼', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
+      builder: (context) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.celebration, color: Colors.green, size: 28),
+              SizedBox(width: 8),
+              Text('Selamat! Bayi Lahir 🍼', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(
+            'Proses persalinan berjalan lancar!\n\n'
+            'Selamat, ${_character.name} telah melahirkan seorang ${childGender == 'Laki-laki' ? 'putra' : 'putri'} bernama $childName.\n\n'
+            'Hubunganmu dengan $partnerName semakin erat!',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: hasLivingParents
+              ? [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showTellParentsResult(isMarried, onDone);
+                    },
+                    child: const Text('Beri tahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      _showHideParentsResult(onDone);
+                    },
+                    child: const Text('Sembunyikan dari Orang Tua', style: TextStyle(color: Colors.grey)),
+                  ),
+                ]
+              : [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                      onDone?.call();
+                    },
+                    child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
         ),
-        content: Text(
-          'Proses persalinan berjalan lancar!\n\n'
-          'Selamat, ${_character.name} telah melahirkan seorang ${childGender == 'Laki-laki' ? 'putra' : 'putri'} bernama $childName.\n\n'
-          'Hubunganmu dengan $partnerName semakin erat!',
-          style: const TextStyle(fontSize: 14),
-        ),
-        actions: hasLivingParents
-            ? [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showTellParentsResult(isMarried);
-                  },
-                  child: const Text('Beri tahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                    _showHideParentsResult();
-                  },
-                  child: const Text('Sembunyikan dari Orang Tua', style: TextStyle(color: Colors.grey)),
-                ),
-              ]
-            : [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
       ),
     );
   }
 
-  void _showTellParentsResult(bool isMarried) {
+  void _showTellParentsResult(bool isMarried, [VoidCallback? onDone]) {
     if (!isMarried) {
       // Hamil/Melahirkan di luar nikah -> Ortu marah, hubungan turun
       setState(() {
@@ -2144,25 +2220,31 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.sentiment_very_dissatisfied, color: Colors.red, size: 28),
-              SizedBox(width: 8),
-              Text('Orang Tua Marah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.sentiment_very_dissatisfied, color: Colors.red, size: 28),
+                SizedBox(width: 8),
+                Text('Orang Tua Marah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: const Text(
+              'Orang tuamu sangat terkejut dan marah besar mengetahui kamu melahirkan anak di luar nikah!\n\n'
+              'Hubungan kalian memburuk secara drastis (-40% hubungan).',
+              style: TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onDone?.call();
+                },
+                child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
-          content: const Text(
-            'Orang tuamu sangat terkejut dan marah besar mengetahui kamu melahirkan anak di luar nikah!\n\n'
-            'Hubungan kalian memburuk secara drastis (-40% hubungan).',
-            style: TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
         ),
       );
     } else {
@@ -2185,58 +2267,70 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.sentiment_very_satisfied, color: Colors.green, size: 28),
-              SizedBox(width: 8),
-              Text('Orang Tua Senang! 🥰', style: TextStyle(fontWeight: FontWeight.bold)),
+        builder: (context) => PopScope(
+          canPop: false,
+          child: AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.sentiment_very_satisfied, color: Colors.green, size: 28),
+                SizedBox(width: 8),
+                Text('Orang Tua Senang! 🥰', style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            content: const Text(
+              'Orang tuamu sangat bahagia menyambut kelahiran cucu baru mereka!\n\n'
+              'Hubungan kalian semakin erat (+15% hubungan).',
+              style: TextStyle(fontSize: 14),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                  onDone?.call();
+                },
+                child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
-          content: const Text(
-            'Orang tuamu sangat bahagia menyambut kelahiran cucu baru mereka!\n\n'
-            'Hubungan kalian semakin erat (+15% hubungan).',
-            style: TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
         ),
       );
     }
   }
 
-  void _showHideParentsResult() {
+  void _showHideParentsResult([VoidCallback? onDone]) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.vpn_key, color: Colors.blueGrey, size: 28),
-            SizedBox(width: 8),
-            Text('Rahasia Terjaga 🤫', style: TextStyle(fontWeight: FontWeight.bold)),
+      builder: (context) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.vpn_key, color: Colors.blueGrey, size: 28),
+              SizedBox(width: 8),
+              Text('Rahasia Terjaga 🤫', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: const Text(
+            'Kamu memilih untuk merahasiakan kelahiran anakmu dari orang tua demi menghindari konflik atau ketegangan.',
+            style: TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onDone?.call();
+              },
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
-        content: const Text(
-          'Kamu memilih untuk merahasiakan kelahiran anakmu dari orang tua demi menghindari konflik atau ketegangan.',
-          style: TextStyle(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
     );
   }
 
   // --- LOGIKA KEGUGURAN (20%) ---
-  void _handleMiscarriage() {
+  void _handleMiscarriage([VoidCallback? onDone]) {
     String partnerName = _character.pregnantByPartnerName ?? 'Pasangan';
 
     // Reset status hamil
@@ -2253,34 +2347,40 @@ class _GameScreenState extends State<GameScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-                title: const Row(
-          children: [
-            Icon(Icons.warning, color: Colors.red, size: 28),
-            SizedBox(width: 8),
-            Text('Keguguran 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+      builder: (context) => PopScope(
+        canPop: false,
+        child: AlertDialog(
+          title: const Row(
+            children: [
+              Icon(Icons.warning, color: Colors.red, size: 28),
+              SizedBox(width: 8),
+              Text('Keguguran 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(
+            'Kabar duka menyelimuti keluarga.\n\n'
+            'Sayangnya, kehamilan yang dijalani bersama $partnerName tidak berhasil. '
+            'Proses persalinan berakhir dengan keguguran.\n\n'
+            'Kebahagiaanmu turun drastis (-40%).\n\n'
+            'Sabar ya, semoga ada rezeki lain nanti.',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                onDone?.call();
+              },
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
           ],
         ),
-        content: Text(
-          'Kabar duka menyelimuti keluarga.\n\n'
-          'Sayangnya, kehamilan yang dijalani bersama $partnerName tidak berhasil. '
-          'Proses persalinan berakhir dengan keguguran.\n\n'
-          'Kebahagiaanmu turun drastis (-40%).\n\n'
-          'Sabar ya, semoga ada rezeki lain nanti.',
-          style: const TextStyle(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
       ),
     );
   }
 
   // --- LOGIKA NOTIFIKASI AJAKAN KELUARGA ---
-  void _checkEsportPromotion() {
+  void _checkEsportPromotion([VoidCallback? onDone]) {
     final age = _character.age;
     final job = _character.jobName ?? '';
     if (job.startsWith('Talent Esports') && (age == 17 || age == 18)) {
@@ -2292,44 +2392,51 @@ class _GameScreenState extends State<GameScreen> {
         showDialog(
           context: context,
           barrierDismissible: false,
-          builder: (ctx) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-            title: const Row(
-              children: [
-                Icon(Icons.star, color: Colors.amber, size: 28),
-                SizedBox(width: 10),
-                Text('Tawaran Promosi BA! 🌟', style: TextStyle(fontWeight: FontWeight.bold)),
+          builder: (ctx) => PopScope(
+            canPop: false,
+            child: AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              title: const Row(
+                children: [
+                  Icon(Icons.star, color: Colors.amber, size: 28),
+                  SizedBox(width: 10),
+                  Text('Tawaran Promosi BA! 🌟', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: Text(
+                'Manajemen $team sangat puas dengan kinerjamu sebagai Talent. Mereka menawarkanmu naik jabatan menjadi Brand Ambassador Esport ($team) dengan gaji \$2500/tahun!',
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    setState(() {
+                      _character.setJob('Brand Ambassador Esport ($team)', 2500);
+                    });
+                    _checkActiveProposal(onDone);
+                  },
+                  child: const Text('Terima Tawaran', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _checkActiveProposal(onDone);
+                  },
+                  child: const Text('Tolak', style: TextStyle(color: Colors.grey)),
+                ),
               ],
             ),
-            content: Text(
-              'Manajemen $team sangat puas dengan kinerjamu sebagai Talent. Mereka menawarkanmu naik jabatan menjadi Brand Ambassador Esport ($team) dengan gaji \$2500/tahun!',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  setState(() {
-                    _character.setJob('Brand Ambassador Esport ($team)', 2500);
-                  });
-                },
-                child: const Text('Terima Tawaran', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-              ),
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(ctx);
-                },
-                child: const Text('Tolak', style: TextStyle(color: Colors.grey)),
-              ),
-            ],
           ),
         );
+        return;
       }
     }
+    _checkActiveProposal(onDone);
   }
 
-  void _checkActiveProposal() {
+  void _checkActiveProposal([VoidCallback? onDone]) {
     if (_character.activeProposal == null) {
-      _checkGlassesNeed();
+      _checkGlassesNeed(onDone);
       return;
     }
     
@@ -2597,7 +2704,9 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       barrierDismissible: false,
       builder: (context) {
         final bool isGayOrLesbian = dialogTitle.contains('Gay') || dialogTitle.contains('Lesbian');
-        return AlertDialog(
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
           title: Row(
             children: [
               isGayOrLesbian
@@ -2759,7 +2868,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                         TextButton(
                           onPressed: () {
                             Navigator.pop(context);
-                            _checkGlassesNeed();
+                            _checkGlassesNeed(onDone);
                           },
                           child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
                         ),
@@ -2797,7 +2906,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                       backgroundColor: Colors.pinkAccent,
                     ),
                   );
-                  _checkGlassesNeed();
+                  _checkGlassesNeed(onDone);
                 } else if (type == 'Rencanakan Nikah') {
                   setState(() {
                     final spouseRelation = partnerGender == 'perempuan' ? 'Istri' : 'Suami';
@@ -2830,7 +2939,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                       backgroundColor: Colors.pink,
                     ),
                   );
-                  _checkGlassesNeed();
+                  _checkGlassesNeed(onDone);
                 } else if (type == 'Ajak Pacaran') {
                   setState(() {
                     final String relationRole = (_character.partner != null && !_character.isAnyPartnerNameMatching(partnerName)) ? 'Pacar (Selingkuhan)' : (role == 'Guru' ? 'Pacar (Guru)' : 'Pacar');
@@ -2907,7 +3016,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                       backgroundColor: Colors.pink,
                     ),
                   );
-                  _checkGlassesNeed();
+                  _checkGlassesNeed(onDone);
                 } else {
                   _showIncomingCondomDialog(proposal);
                 }
@@ -2942,11 +3051,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     backgroundColor: Colors.red,
                   ),
                 );
-                _checkGlassesNeed();
+                _checkGlassesNeed(onDone);
               },
               child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
             ),
           ],
+        ),
         );
       },
     );
@@ -4032,12 +4142,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                     ),
                                     const SizedBox(width: 8),
                                     AgeUpButton(
-                                      onPressed: _character.isAlive ? _ageUp : null,
+                                      onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
                                     ),
                                   ],
                                 )
                               : AgeUpButton(
-                                  onPressed: _character.isAlive ? _ageUp : null,
+                                  onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
                                 ),
                         ),
                       ],
