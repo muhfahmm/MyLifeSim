@@ -1,47 +1,47 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
 
 class AjakanMlBiseksualKeluarga {
-  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+  static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = candidate['relation'].toString().toLowerCase();
     final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
 
-    int chance;
     if (isBiseksual) {
       if (rel.contains('ayah tiri')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('ayah mertua')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('ayah')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('ibu tiri')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('ibu mertua')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('ibu')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('kakak laki') || rel.contains('adik laki')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('kakak perempuan') || rel.contains('adik perempuan')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('paman')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('pasangan paman') || rel.contains('bibi')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('sepupu')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('kakek') || rel.contains('nenek')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('anak') || rel.contains('keponakan')) {
-        chance = 50;
+        return 50;
       } else {
-        chance = 50;
+        return 50;
       }
-    } else {
-      chance = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender).toInt();
     }
+    return 50;
+  }
 
+  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+    final int chance = getChance(character, candidate);
     if (rand.nextInt(100) < chance) {
       return {
         'name': candidate['name'],

@@ -1,28 +1,29 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
 
 class AjakanPacaranBiseksualRekanIdol {
-  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+  static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString().toLowerCase();
     final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
 
-    int chance;
     if (isBiseksual) {
       if (rel.contains('leader') || rel.contains('pemimpin')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('center') || rel.contains('main member') || rel.contains('utama')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('rekan idol') || rel.contains('member')) {
-        chance = 50;
+        return 50;
       } else if (rel.contains('trainee')) {
-        chance = 50;
+        return 50;
       } else {
-        chance = 50;
+        return 50;
       }
-    } else {
-      chance = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender).toInt();
     }
+    return 50;
+  }
+
+  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+    final int chance = getChance(character, candidate);
 
     if (rand.nextInt(100) < chance) {
       return {

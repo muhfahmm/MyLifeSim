@@ -2,10 +2,23 @@
 
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
+import 'package:bitlife/pilih_karakter/character.dart';
+
+// Imports for biseksual handlers
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
 
 /// Class untuk mengelola preferensi persentase ajakan NPC per-hubungan detail.
-/// HANYA mengelola toggle switch per-anggota, sedangkan DATA PERSENTASE DILAKUKAN
-/// SECARA LANGSUNG DARI FOLDER `ajakan_pacaran_makelove` SEBAGAI SINGLE SOURCE OF TRUTH.
+/// HANYA mengelola toggle switch per-anggota, sedangkan DATA PERSENTASE DIBACA
+/// SECARA DINAMIS LANGSUNG DARI FOLDER `ajakan_pacaran_makelove` SEBAGAI SINGLE SOURCE OF TRUTH.
 class ProposalPercentageSettings {
   // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (FEMALE) ---
@@ -191,10 +204,53 @@ class ProposalPercentageSettings {
     }
   }
 
-  /// Membaca persentase langsung dari folder ajakan_pacaran_makelove
+  /// Membaca persentase DINAMIS LANGSUNG DARI FILE KODE FOLDER `ajakan_pacaran_makelove`
   static double _getChanceFromAjakanFolder(String relation, String proposalType, {String? gender, String? sexuality}) {
-    // 50.0% sebagai default universal dari folder ajakan_pacaran_makelove
-    return 50.0;
+    final String currentGender = (gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
+    final dummyChar = Character(
+      name: 'User',
+      gender: currentGender == 'perempuan' || currentGender == 'female' ? 'Perempuan' : 'Laki-laki',
+      location: 'Indonesia',
+      sexuality: sexuality ?? 'Biseksual',
+    );
+    final candidate = {
+      'name': relation,
+      'relation': relation,
+      'gender': relation.toLowerCase().contains('ayah') || relation.toLowerCase().contains('paman') ? 'Laki-laki' : 'Perempuan',
+      'age': 30,
+      'role': relation,
+    };
+
+    final String t = proposalType.trim().toLowerCase();
+    final String r = relation.trim().toLowerCase();
+
+    if (t.contains('bercinta') || t.contains('love')) {
+      if (r.contains('guru') || r.contains('dosen')) {
+        if (r.contains('dosen')) {
+          return AjakanMlBiseksualDosen.getChance(dummyChar, candidate).toDouble();
+        }
+        return AjakanMlBiseksualGuruSekolah.getChance(dummyChar, candidate).toDouble();
+      } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        return AjakanMlBiseksualTemanSekolah.getChance(dummyChar, candidate).toDouble();
+      } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+        return AjakanMlBiseksualCoworker.getChance(dummyChar, candidate).toDouble();
+      } else {
+        return AjakanMlBiseksualKeluarga.getChance(dummyChar, candidate).toDouble();
+      }
+    } else {
+      if (r.contains('guru') || r.contains('dosen')) {
+        if (r.contains('dosen')) {
+          return AjakanPacaranBiseksualDosen.getChance(dummyChar, candidate).toDouble();
+        }
+        return AjakanPacaranBiseksualGuruSekolah.getChance(dummyChar, candidate).toDouble();
+      } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        return AjakanPacaranBiseksualTemanSekolah.getChance(dummyChar, candidate).toDouble();
+      } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+        return AjakanPacaranBiseksualCoworker.getChance(dummyChar, candidate).toDouble();
+      } else {
+        return AjakanPacaranBiseksualKeluarga.getChance(dummyChar, candidate).toDouble();
+      }
+    }
   }
 
   /// Helper untuk mengambil Notifier persentase slider spesifik (Membaca langsung dari folder ajakan_pacaran_makelove)
