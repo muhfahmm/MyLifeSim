@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
 import 'package:bitlife/store_page/store_page.dart'; // Tambahkan Import ini
 import 'kategori_persentase/keluarga/keluarga_settings_page.dart';
 import 'kategori_persentase/teman_sekolah/teman_sekolah_settings_page.dart';
@@ -403,21 +402,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         valueListenable: GlobalSettings.userGender,
                         builder: (context, genderVal, _) {
                           final bool isFemale = genderVal.trim().toLowerCase() == 'perempuan' || genderVal.trim().toLowerCase() == 'female';
-                          return InkWell(
-                            borderRadius: BorderRadius.circular(20),
-                            onTap: () {
-                              final String nextGender = isFemale ? 'Laki-laki' : 'Perempuan';
-                              GlobalSettings.userGender.value = nextGender;
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Gender karakter aktif diubah ke $nextGender'),
-                                  duration: const Duration(milliseconds: 900),
-                                  backgroundColor: isFemale ? Colors.blue : Colors.pink,
-                                ),
-                              );
-                            },
-                            child: Container(
+                          return Container(
                               margin: const EdgeInsets.only(right: 12, top: 12),
                               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
@@ -447,8 +432,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ],
                               ),
-                            ),
-                          );
+                            );
                         },
                       ),
                     ],
@@ -481,85 +465,6 @@ class _SettingsPageState extends State<SettingsPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () {
-                              ProposalPercentageSettings.enableAllRelations();
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Semua anggota berhasil DIAKTIFKAN'),
-                                  duration: Duration(milliseconds: 900),
-                                  backgroundColor: Colors.green,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.green.shade400, width: 1),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 16),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Aktifkan Semua',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.greenAccent),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(8),
-                            onTap: () {
-                              ProposalPercentageSettings.disableAllRelations();
-                              ScaffoldMessenger.of(context).clearSnackBars();
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Semua anggota berhasil DIMATIKAN'),
-                                  duration: Duration(milliseconds: 900),
-                                  backgroundColor: Colors.redAccent,
-                                ),
-                              );
-                            },
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                              decoration: BoxDecoration(
-                                color: Colors.red.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade400, width: 1),
-                              ),
-                              child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.highlight_off, color: Colors.redAccent, size: 16),
-                                  SizedBox(width: 6),
-                                  Text(
-                                    'Matikan Semua',
-                                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.redAccent),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   // CARD NAVIGATION BUTTONS UNTUK 3 KATEGORI PERSENTASE
                   Card(
                     elevation: 1,

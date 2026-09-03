@@ -28,41 +28,34 @@ class KeluargaSettingsPage extends StatelessWidget {
               return Padding(
                 padding: const EdgeInsets.only(right: 16.0),
                 child: Center(
-                  child: InkWell(
-                    borderRadius: BorderRadius.circular(20),
-                    onTap: () {
-                      final String nextGender = isFemale ? 'Laki-laki' : 'Perempuan';
-                      GlobalSettings.userGender.value = nextGender;
-                    },
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: isFemale ? Colors.pink.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: isFemale ? Colors.pink.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
+                        width: 1.2,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isFemale ? Icons.female : Icons.male,
                           color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                          width: 1.2,
+                          size: 14,
                         ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            isFemale ? Icons.female : Icons.male,
+                        const SizedBox(width: 4),
+                        Text(
+                          isFemale ? 'Perempuan' : 'Laki-laki',
+                          style: TextStyle(
+                            fontSize: 11,
+                            fontWeight: FontWeight.bold,
                             color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                            size: 14,
                           ),
-                          const SizedBox(width: 4),
-                          Text(
-                            isFemale ? 'Perempuan' : 'Laki-laki',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -73,7 +66,85 @@ class KeluargaSettingsPage extends StatelessWidget {
       ),
       body: ListView(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        children: const [
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(bottom: 12),
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      ProposalPercentageSettings.enableAllRelations();
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Semua anggota keluarga berhasil DIAKTIFKAN'),
+                          duration: Duration(milliseconds: 900),
+                          backgroundColor: Colors.green,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.green.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.green.shade400, width: 1),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.check_circle_outline, color: Colors.greenAccent, size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            'Aktifkan Semua',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.greenAccent),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () {
+                      ProposalPercentageSettings.disableAllRelations();
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Semua anggota keluarga berhasil DIMATIKAN'),
+                          duration: Duration(milliseconds: 900),
+                          backgroundColor: Colors.redAccent,
+                        ),
+                      );
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade400, width: 1),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.highlight_off, color: Colors.redAccent, size: 16),
+                          SizedBox(width: 6),
+                          Text(
+                            'Matikan Semua',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           RelationPercentageGroupCard(
             title: 'Ayah Kandung',
             icon: Icons.person,

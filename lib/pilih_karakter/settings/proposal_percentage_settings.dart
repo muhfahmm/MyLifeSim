@@ -72,48 +72,48 @@ class ProposalPercentageSettings {
   // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (FEMALE) ---
   // =========================================================
-  static final ValueNotifier<bool> femaleAyahKandungEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleAyahTiriEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleAyahMertuaEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleIbuKandungEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleIbuTiriEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleIbuMertuaEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleKakakLakiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleKakakPerempuanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleAdikLakiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleAdikPerempuanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femalePamanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femalePasanganPamanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleBibiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleSepupuEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleKakekEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleNenekEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleAnakKeponakanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleGuruDosenEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> femaleNonKeluargaLainEnabled = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> femaleAyahKandungEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleAyahTiriEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleAyahMertuaEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleIbuKandungEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleIbuTiriEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleIbuMertuaEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleKakakLakiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleKakakPerempuanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleAdikLakiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleAdikPerempuanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femalePamanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femalePasanganPamanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleBibiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleSepupuEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleKakekEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleNenekEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleAnakKeponakanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleGuruDosenEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> femaleNonKeluargaLainEnabled = ValueNotifier<bool>(true);
 
   // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (MALE) ---
   // =========================================================
-  static final ValueNotifier<bool> maleAyahKandungEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleAyahTiriEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleAyahMertuaEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleIbuKandungEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleIbuTiriEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleIbuMertuaEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleKakakLakiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleKakakPerempuanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleAdikLakiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleAdikPerempuanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> malePamanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> malePasanganPamanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleBibiEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleSepupuEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleKakekEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleNenekEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleAnakKeponakanEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleGuruDosenEnabled = ValueNotifier<bool>(false);
-  static final ValueNotifier<bool> maleNonKeluargaLainEnabled = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> maleAyahKandungEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleAyahTiriEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleAyahMertuaEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleIbuKandungEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleIbuTiriEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleIbuMertuaEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleKakakLakiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleKakakPerempuanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleAdikLakiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleAdikPerempuanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> malePamanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> malePasanganPamanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleBibiEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleSepupuEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleKakekEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleNenekEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleAnakKeponakanEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleGuruDosenEnabled = ValueNotifier<bool>(true);
+  static final ValueNotifier<bool> maleNonKeluargaLainEnabled = ValueNotifier<bool>(true);
 
   // Cache notifier lokal untuk Slider UI agar langsung mencerminkan data dari folder ajakan_pacaran_makelove
   static final Map<String, ValueNotifier<double>> _dynamicNotifiers = {};
@@ -456,45 +456,45 @@ class ProposalPercentageSettings {
 
   /// Reset semua toggle switch
   static void resetAll() {
-    femaleAyahKandungEnabled.value = false;
-    femaleAyahTiriEnabled.value = false;
-    femaleAyahMertuaEnabled.value = false;
-    femaleIbuKandungEnabled.value = false;
-    femaleIbuTiriEnabled.value = false;
-    femaleIbuMertuaEnabled.value = false;
-    femaleKakakLakiEnabled.value = false;
-    femaleKakakPerempuanEnabled.value = false;
-    femaleAdikLakiEnabled.value = false;
-    femaleAdikPerempuanEnabled.value = false;
-    femalePamanEnabled.value = false;
-    femalePasanganPamanEnabled.value = false;
-    femaleBibiEnabled.value = false;
-    femaleSepupuEnabled.value = false;
-    femaleKakekEnabled.value = false;
-    femaleNenekEnabled.value = false;
-    femaleAnakKeponakanEnabled.value = false;
-    femaleGuruDosenEnabled.value = false;
-    femaleNonKeluargaLainEnabled.value = false;
+    femaleAyahKandungEnabled.value = true;
+    femaleAyahTiriEnabled.value = true;
+    femaleAyahMertuaEnabled.value = true;
+    femaleIbuKandungEnabled.value = true;
+    femaleIbuTiriEnabled.value = true;
+    femaleIbuMertuaEnabled.value = true;
+    femaleKakakLakiEnabled.value = true;
+    femaleKakakPerempuanEnabled.value = true;
+    femaleAdikLakiEnabled.value = true;
+    femaleAdikPerempuanEnabled.value = true;
+    femalePamanEnabled.value = true;
+    femalePasanganPamanEnabled.value = true;
+    femaleBibiEnabled.value = true;
+    femaleSepupuEnabled.value = true;
+    femaleKakekEnabled.value = true;
+    femaleNenekEnabled.value = true;
+    femaleAnakKeponakanEnabled.value = true;
+    femaleGuruDosenEnabled.value = true;
+    femaleNonKeluargaLainEnabled.value = true;
 
-    maleAyahKandungEnabled.value = false;
-    maleAyahTiriEnabled.value = false;
-    maleAyahMertuaEnabled.value = false;
-    maleIbuKandungEnabled.value = false;
-    maleIbuTiriEnabled.value = false;
-    maleIbuMertuaEnabled.value = false;
-    maleKakakLakiEnabled.value = false;
-    maleKakakPerempuanEnabled.value = false;
-    maleAdikLakiEnabled.value = false;
-    maleAdikPerempuanEnabled.value = false;
-    malePamanEnabled.value = false;
-    malePasanganPamanEnabled.value = false;
-    maleBibiEnabled.value = false;
-    maleSepupuEnabled.value = false;
-    maleKakekEnabled.value = false;
-    maleNenekEnabled.value = false;
-    maleAnakKeponakanEnabled.value = false;
-    maleGuruDosenEnabled.value = false;
-    maleNonKeluargaLainEnabled.value = false;
+    maleAyahKandungEnabled.value = true;
+    maleAyahTiriEnabled.value = true;
+    maleAyahMertuaEnabled.value = true;
+    maleIbuKandungEnabled.value = true;
+    maleIbuTiriEnabled.value = true;
+    maleIbuMertuaEnabled.value = true;
+    maleKakakLakiEnabled.value = true;
+    maleKakakPerempuanEnabled.value = true;
+    maleAdikLakiEnabled.value = true;
+    maleAdikPerempuanEnabled.value = true;
+    malePamanEnabled.value = true;
+    malePasanganPamanEnabled.value = true;
+    maleBibiEnabled.value = true;
+    maleSepupuEnabled.value = true;
+    maleKakekEnabled.value = true;
+    maleNenekEnabled.value = true;
+    maleAnakKeponakanEnabled.value = true;
+    maleGuruDosenEnabled.value = true;
+    maleNonKeluargaLainEnabled.value = true;
 
     _dynamicNotifiers.forEach((key, notifier) {
       notifier.value = 50.0;

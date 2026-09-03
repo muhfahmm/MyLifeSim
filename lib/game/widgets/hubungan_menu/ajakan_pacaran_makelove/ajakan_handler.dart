@@ -652,20 +652,8 @@ class AjakanHandler {
     familyCandidates = familyCandidates.where(isCandidateActive).toList();
     schoolCandidates = schoolCandidates.where(isCandidateActive).toList();
 
-    // Tentukan pool kandidat terpilih (Beri peluang 65% untuk keluarga agar lebih sering muncul)
-    List<Map<String, dynamic>> selectedPool = [];
-    if (familyCandidates.isNotEmpty && random.nextInt(100) < 65) {
-      selectedPool = familyCandidates;
-    } else {
-      selectedPool = schoolCandidates;
-    }
-
-    if (selectedPool.isEmpty && familyCandidates.isNotEmpty) {
-      selectedPool = familyCandidates;
-    }
-    if (selectedPool.isEmpty && schoolCandidates.isNotEmpty) {
-      selectedPool = schoolCandidates;
-    }
+    // Tentukan pool kandidat terpilih dari seluruh kandidat aktif
+    List<Map<String, dynamic>> selectedPool = [...familyCandidates, ...schoolCandidates];
 
     // --- PRIORITAS KHUSUS GURU/DOSEN ---
     // Agar guru lebih dominan dibanding teman sekelas (karena jumlah teman sekelas jauh lebih banyak di pool),

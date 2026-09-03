@@ -11,8 +11,8 @@ class AdultFeatures {
   /// - Pacaran dengan Guru, Dosen, dan peran sejenis HANYA untuk premium (karena sensitif).
   /// - Selain itu, pacaran bebas (open untuk non-premium) — tidak perlu premium hanya untuk pacaran biasa.
   static bool canProposeDating(String role, String relation, {int userAge = 18}) {
-    // Cek usia minimum absolut (12 tahun)
-    if (userAge < 12) return false;
+    // Cek usia minimum absolut (10 tahun)
+    if (userAge < 10) return false;
 
     final rLower = '$role $relation'.toLowerCase();
 
@@ -39,12 +39,14 @@ class AdultFeatures {
   ///
   /// Aturan:
   /// - Non-Premium: Usia >= 18 tahun, hanya dengan Teman Sekolah/Kuliah/Partner.
-  /// - Premium: Semua role diizinkan (selama usia >= 18).
+  /// - Premium: Semua role diizinkan (selama usia >= 10).
   static bool canMakeLove({
     required int userAge,
     required String role,
     required String relation,
   }) {
+    if (userAge < 10) return false;
+
     if (isPremiumUnlocked) return true;
 
     if (userAge < 18) return false;
