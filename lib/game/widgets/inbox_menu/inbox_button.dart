@@ -1,6 +1,8 @@
-// lib/game/widgets/inbox_menu/inbox_button.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
 
 class InboxButton extends StatelessWidget {
   final Character character;
@@ -89,6 +91,58 @@ class InboxButton extends StatelessWidget {
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ],
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                              decoration: BoxDecoration(
+                                color: dialogIsDark ? Colors.grey.shade800.withValues(alpha: 0.5) : Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: dialogIsDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => StatistikAjakanPacaranPage(character: character)),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Pacaran: ${character.countAjakanPacaran}x',
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.pinkAccent),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => StatistikAjakanMakelovePage(character: character)),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Make Love: ${character.countAjakanMakeLove}x',
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                                    ),
+                                  ),
+                                  InkWell(
+                                    onTap: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(builder: (context) => StatistikAjakanMasturbasiPage(character: character)),
+                                      );
+                                    },
+                                    child: Text(
+                                      'Masturbasi: ${character.countAjakanMasturbasi}x',
+                                      style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.purpleAccent),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                             const SizedBox(height: 12),
                             Flexible(

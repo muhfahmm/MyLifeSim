@@ -482,6 +482,7 @@ class AjakanMasturbasiDialog {
     character.happiness = (character.happiness + 15).clamp(0, 100);
     _modifyRelativeRelationship(character, relationType, viewerName, 20);
     character.addTabooSecret(viewerName, relationType, 'Masturbasi');
+    character.addProposalHistory(name: viewerName, relation: relationType, type: 'Masturbasi', status: 'Diterima');
 
     final String relLower = relationType.toLowerCase();
     String inboxMsg;
@@ -530,6 +531,7 @@ class AjakanMasturbasiDialog {
     String viewerName,
     VoidCallback? onComplete,
   ) {
+    character.addProposalHistory(name: viewerName, relation: relationType, type: 'Masturbasi', status: 'Ditolak');
     _modifyRelativeRelationship(character, relationType, viewerName, -15);
 
     final parsed = _parseRelation(relationType);

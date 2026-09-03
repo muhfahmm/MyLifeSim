@@ -83,6 +83,25 @@ class Character {
   int idolStaffDatingFailures = 0;
   int idolSalaryRaiseCount = 0;
   bool disableSameSexProposals = false;
+  int countAjakanPacaran = 0;
+  int countAjakanMakeLove = 0;
+  int countAjakanMasturbasi = 0;
+  List<Map<String, dynamic>> proposalHistory = [];
+
+  void addProposalHistory({
+    required String name,
+    required String relation,
+    required String type,
+    required String status,
+  }) {
+    proposalHistory.add({
+      'name': name,
+      'relation': relation,
+      'type': type,
+      'status': status,
+      'age': age.toString(),
+    });
+  }
 
   // --- WARNA KULIT ORANG TUA (untuk warisan) ---
   String? fatherSkinColor;  // hex warna kulit ayah

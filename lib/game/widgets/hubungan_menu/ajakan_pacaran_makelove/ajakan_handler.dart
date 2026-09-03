@@ -105,7 +105,7 @@ import 'ajakan_pacaran/hetero/hetero_laki/BA_talent/ajakan_pacaran_hetero_laki_b
 import 'ajakan_pacaran/lesbian/BA_talent/ajakan_pacaran_lesbian_ba_talent.dart';
 
 class AjakanHandler {
-  static void checkAndGenerateProposal(Character character, Random random) {
+  static void checkAndGenerateProposal(Character character, Random random, {bool isDaily = false}) {
     final age = character.age;
     if (age < 10 || character.activeProposal != null) return;
 
@@ -820,14 +820,21 @@ class AjakanHandler {
 
         if (totalWeight <= 0) return;
 
+        final double baseCap = totalWeight < 100.0 ? 100.0 : totalWeight;
+        final double maxCap = isDaily ? (baseCap * 2.5) : baseCap;
+        final double roll = (random.nextInt(1000) / 1000.0) * maxCap;
+
         String proposalType;
-        final double roll = (random.nextInt(100) / 100.0) * totalWeight;
         if (roll < pacaranWeight) {
           proposalType = 'Ajak Pacaran';
         } else if (roll < pacaranWeight + masturbationWeight) {
           proposalType = 'Masturbasi';
-        } else {
+        } else if (roll < totalWeight) {
           proposalType = 'Bercinta';
+        } else {
+          // roll >= totalWeight (terjadi ketika totalWeight < 100.0)
+          // Berarti hari/tahun ini tidak ada ajakan apapun!
+          return;
         }
         
         if (proposalType == 'Ajak Pacaran') {
@@ -896,7 +903,12 @@ class AjakanHandler {
         final double totalWeight = pacaranWeight + masturbationWeight + makeLoveWeight;
 
         if (totalWeight > 0) {
-          final double roll = (random.nextInt(100) / 100.0) * totalWeight;
+          final double baseCap = totalWeight < 100.0 ? 100.0 : totalWeight;
+          final double maxCap = isDaily ? (baseCap * 2.5) : baseCap;
+          final double roll = (random.nextInt(1000) / 1000.0) * maxCap;
+
+          if (roll >= totalWeight) return;
+
           if (roll < pacaranWeight) {
             Map<String, dynamic>? proposal;
             final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
@@ -1139,6 +1151,17 @@ class AjakanHandler {
         if (character.activeProposal != null && isFamily && !AdultFeatures.isPremiumUnlocked) {
           character.activeProposal = null;
         }
+      }
+    }
+
+    if (character.activeProposal != null) {
+      final String finalType = character.activeProposal!['type'] ?? '';
+      if (finalType == 'Ajak Pacaran' || finalType == 'Pacaran') {
+        character.countAjakanPacaran++;
+      } else if (finalType == 'Bercinta' || finalType == 'Bercinta (Make Love)' || finalType == 'Bersetubuh') {
+        character.countAjakanMakeLove++;
+      } else if (finalType == 'Masturbasi') {
+        character.countAjakanMasturbasi++;
       }
     }
   }

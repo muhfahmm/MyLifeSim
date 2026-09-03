@@ -31,6 +31,9 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/daftar_pasangan_hamil.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
+import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -127,8 +130,8 @@ class _GameScreenState extends State<GameScreen> {
     });
 
     final random = Random();
-    // Panggil checkAndGenerateProposal secara langsung (100% sama seperti Tambah Umur)
-    AjakanHandler.checkAndGenerateProposal(_character, random);
+    // Panggil checkAndGenerateProposal dengan mode harian (isDaily: true)
+    AjakanHandler.checkAndGenerateProposal(_character, random, isDaily: true);
     if (_character.activeProposal != null) {
       _checkActiveProposal();
       return;
@@ -2768,6 +2771,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                       );
                     }
 
+                    _character.addProposalHistory(
+                      name: partnerName,
+                      relation: relation,
+                      type: type,
+                      status: 'Diterima',
+                    );
                     _character.activeProposal = null;
                   });
 
@@ -2796,6 +2805,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {
+                  _character.addProposalHistory(
+                    name: partnerName,
+                    relation: relation,
+                    type: type,
+                    status: 'Ditolak',
+                  );
                   if (type == 'Ajak 3some') {
                     _character.inbox.add('📢 Tolak 3some: Kamu menolak ajakan 3some dari $partnerName.');
                   } else {
@@ -3679,6 +3694,8 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   const SizedBox(height: 10),
                   _buildSexualityRow('Seksualitas', _character.sexuality),
                   const SizedBox(height: 10),
+                  _buildProposalStatsCard(),
+                  const SizedBox(height: 10),
                   InboxButton(
                     character: _character,
                     onRefresh: () {
@@ -4183,6 +4200,120 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         ),
         const SizedBox(height: 4),
       ],
+    );
+  }
+
+  // --- WIDGET REKAP STATISTIK AJAKAN ---
+  Widget _buildProposalStatsCard() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final int countPacaran = _character.countAjakanPacaran;
+    final int countML = _character.countAjakanMakeLove;
+    final int countMasturbasi = _character.countAjakanMasturbasi;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade900 : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.pink.shade900.withValues(alpha: 0.5) : Colors.pink.shade100,
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: isDark ? Colors.black45 : Colors.black12,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.favorite_rounded, color: Colors.pinkAccent, size: 16),
+              const SizedBox(width: 6),
+              Text(
+                'Statistik Ajakan Diterima',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 12,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _buildProposalStatBadge(
+                'Ajakan Pacaran',
+                countPacaran,
+                Colors.pinkAccent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StatistikAjakanPacaranPage(character: _character)),
+                  );
+                },
+              ),
+              Container(width: 1, height: 24, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+              _buildProposalStatBadge(
+                'Ajakan Make Love',
+                countML,
+                Colors.redAccent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StatistikAjakanMakelovePage(character: _character)),
+                  );
+                },
+              ),
+              Container(width: 1, height: 24, color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+              _buildProposalStatBadge(
+                'Ajakan Masturbasi',
+                countMasturbasi,
+                Colors.purpleAccent,
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => StatistikAjakanMasturbasiPage(character: _character)),
+                  );
+                },
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildProposalStatBadge(String label, int count, Color color, {VoidCallback? onTap}) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(8),
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Column(
+          children: [
+            Text(
+              '${count}x',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: const TextStyle(fontSize: 10, color: Colors.grey),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
