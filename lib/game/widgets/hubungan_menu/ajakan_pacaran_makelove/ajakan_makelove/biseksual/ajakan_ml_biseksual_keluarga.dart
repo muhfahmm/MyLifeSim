@@ -10,7 +10,7 @@ class AjakanMlBiseksualKeluarga {
     int chance;
     if (isBiseksual) {
       if (rel.contains('ayah tiri')) {
-        chance = 65;
+        chance = 60;
       } else if (rel.contains('ayah mertua')) {
         chance = 50;
       } else if (rel.contains('ayah')) {

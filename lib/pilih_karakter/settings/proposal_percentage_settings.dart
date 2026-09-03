@@ -36,77 +36,77 @@ class ProposalPercentageSettings {
   static final ValueNotifier<double> femaleAyahKandungMasturbasi = ValueNotifier<double>(55.0);
   static final ValueNotifier<double> femaleAyahKandungMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleAyahTiriPacaran = ValueNotifier<double>(60.0);
+  static final ValueNotifier<double> femaleAyahTiriPacaran = ValueNotifier<double>(65.0);
   static final ValueNotifier<double> femaleAyahTiriMasturbasi = ValueNotifier<double>(60.0);
   static final ValueNotifier<double> femaleAyahTiriMakeLove = ValueNotifier<double>(60.0);
 
-  static final ValueNotifier<double> femaleAyahMertuaPacaran = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> femaleAyahMertuaMasturbasi = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> femaleAyahMertuaMakeLove = ValueNotifier<double>(35.0);
+  static final ValueNotifier<double> femaleAyahMertuaPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleAyahMertuaMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleAyahMertuaMakeLove = ValueNotifier<double>(50.0);
 
-  static final ValueNotifier<double> femaleIbuKandungPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleIbuKandungMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleIbuKandungMakeLove = ValueNotifier<double>(10.0);
+  static final ValueNotifier<double> femaleIbuKandungPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleIbuKandungMasturbasi = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleIbuKandungMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleIbuTiriPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleIbuTiriMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleIbuTiriMakeLove = ValueNotifier<double>(10.0);
+  static final ValueNotifier<double> femaleIbuTiriPacaran = ValueNotifier<double>(60.0);
+  static final ValueNotifier<double> femaleIbuTiriMasturbasi = ValueNotifier<double>(60.0);
+  static final ValueNotifier<double> femaleIbuTiriMakeLove = ValueNotifier<double>(60.0);
 
-  static final ValueNotifier<double> femaleIbuMertuaPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleIbuMertuaMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleIbuMertuaMakeLove = ValueNotifier<double>(30.0);
+  static final ValueNotifier<double> femaleIbuMertuaPacaran = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleIbuMertuaMasturbasi = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleIbuMertuaMakeLove = ValueNotifier<double>(45.0);
 
   static final ValueNotifier<double> femaleKakakLakiPacaran = ValueNotifier<double>(45.0);
   static final ValueNotifier<double> femaleKakakLakiMasturbasi = ValueNotifier<double>(45.0);
   static final ValueNotifier<double> femaleKakakLakiMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleKakakPerempuanPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleKakakPerempuanMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleKakakPerempuanMakeLove = ValueNotifier<double>(30.0);
+  static final ValueNotifier<double> femaleKakakPerempuanPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleKakakPerempuanMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleKakakPerempuanMakeLove = ValueNotifier<double>(50.0);
 
   static final ValueNotifier<double> femaleAdikLakiPacaran = ValueNotifier<double>(45.0);
   static final ValueNotifier<double> femaleAdikLakiMasturbasi = ValueNotifier<double>(45.0);
   static final ValueNotifier<double> femaleAdikLakiMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleAdikPerempuanPacaran = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> femaleAdikPerempuanMasturbasi = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> femaleAdikPerempuanMakeLove = ValueNotifier<double>(40.0);
+  static final ValueNotifier<double> femaleAdikPerempuanPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleAdikPerempuanMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleAdikPerempuanMakeLove = ValueNotifier<double>(50.0);
 
-  static final ValueNotifier<double> femalePamanPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femalePamanMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femalePamanMakeLove = ValueNotifier<double>(30.0);
+  static final ValueNotifier<double> femalePamanPacaran = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femalePamanMasturbasi = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femalePamanMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femalePasanganPamanPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femalePasanganPamanMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femalePasanganPamanMakeLove = ValueNotifier<double>(10.0);
+  static final ValueNotifier<double> femalePasanganPamanPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femalePasanganPamanMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femalePasanganPamanMakeLove = ValueNotifier<double>(50.0);
 
-  static final ValueNotifier<double> femaleBibiPacaran = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> femaleBibiMasturbasi = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> femaleBibiMakeLove = ValueNotifier<double>(25.0);
+  static final ValueNotifier<double> femaleBibiPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleBibiMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleBibiMakeLove = ValueNotifier<double>(50.0);
 
-  static final ValueNotifier<double> femaleSepupuPacaran = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> femaleSepupuMasturbasi = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> femaleSepupuMakeLove = ValueNotifier<double>(40.0);
+  static final ValueNotifier<double> femaleSepupuPacaran = ValueNotifier<double>(55.0);
+  static final ValueNotifier<double> femaleSepupuMasturbasi = ValueNotifier<double>(55.0);
+  static final ValueNotifier<double> femaleSepupuMakeLove = ValueNotifier<double>(55.0);
 
-  static final ValueNotifier<double> femaleKakekPacaran = ValueNotifier<double>(15.0);
-  static final ValueNotifier<double> femaleKakekMasturbasi = ValueNotifier<double>(15.0);
-  static final ValueNotifier<double> femaleKakekMakeLove = ValueNotifier<double>(15.0);
+  static final ValueNotifier<double> femaleKakekPacaran = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleKakekMasturbasi = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleKakekMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleNenekPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleNenekMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> femaleNenekMakeLove = ValueNotifier<double>(10.0);
+  static final ValueNotifier<double> femaleNenekPacaran = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleNenekMasturbasi = ValueNotifier<double>(45.0);
+  static final ValueNotifier<double> femaleNenekMakeLove = ValueNotifier<double>(45.0);
 
-  static final ValueNotifier<double> femaleAnakKeponakanPacaran = ValueNotifier<double>(65.0);
-  static final ValueNotifier<double> femaleAnakKeponakanMasturbasi = ValueNotifier<double>(65.0);
-  static final ValueNotifier<double> femaleAnakKeponakanMakeLove = ValueNotifier<double>(65.0);
+  static final ValueNotifier<double> femaleAnakKeponakanPacaran = ValueNotifier<double>(60.0);
+  static final ValueNotifier<double> femaleAnakKeponakanMasturbasi = ValueNotifier<double>(60.0);
+  static final ValueNotifier<double> femaleAnakKeponakanMakeLove = ValueNotifier<double>(60.0);
 
-  static final ValueNotifier<double> femaleGuruDosenPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleGuruDosenMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleGuruDosenMakeLove = ValueNotifier<double>(30.0);
+  static final ValueNotifier<double> femaleGuruDosenPacaran = ValueNotifier<double>(55.0);
+  static final ValueNotifier<double> femaleGuruDosenMasturbasi = ValueNotifier<double>(55.0);
+  static final ValueNotifier<double> femaleGuruDosenMakeLove = ValueNotifier<double>(55.0);
 
-  static final ValueNotifier<double> femaleNonKeluargaLainPacaran = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> femaleNonKeluargaLainMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> femaleNonKeluargaLainMakeLove = ValueNotifier<double>(30.0);
+  static final ValueNotifier<double> femaleNonKeluargaLainPacaran = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleNonKeluargaLainMasturbasi = ValueNotifier<double>(50.0);
+  static final ValueNotifier<double> femaleNonKeluargaLainMakeLove = ValueNotifier<double>(50.0);
 
   // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (MALE) ---
@@ -542,77 +542,77 @@ class ProposalPercentageSettings {
     femaleAyahKandungMasturbasi.value = 55.0;
     femaleAyahKandungMakeLove.value = 45.0;
 
-    femaleAyahTiriPacaran.value = 60.0;
+    femaleAyahTiriPacaran.value = 65.0;
     femaleAyahTiriMasturbasi.value = 60.0;
     femaleAyahTiriMakeLove.value = 60.0;
 
-    femaleAyahMertuaPacaran.value = 35.0;
-    femaleAyahMertuaMasturbasi.value = 35.0;
-    femaleAyahMertuaMakeLove.value = 35.0;
+    femaleAyahMertuaPacaran.value = 50.0;
+    femaleAyahMertuaMasturbasi.value = 50.0;
+    femaleAyahMertuaMakeLove.value = 50.0;
 
-    femaleIbuKandungPacaran.value = 10.0;
-    femaleIbuKandungMasturbasi.value = 75.0;
-    femaleIbuKandungMakeLove.value = 10.0;
+    femaleIbuKandungPacaran.value = 50.0;
+    femaleIbuKandungMasturbasi.value = 45.0;
+    femaleIbuKandungMakeLove.value = 45.0;
 
-    femaleIbuTiriPacaran.value = 10.0;
-    femaleIbuTiriMasturbasi.value = 75.0;
-    femaleIbuTiriMakeLove.value = 10.0;
+    femaleIbuTiriPacaran.value = 60.0;
+    femaleIbuTiriMasturbasi.value = 60.0;
+    femaleIbuTiriMakeLove.value = 60.0;
 
-    femaleIbuMertuaPacaran.value = 30.0;
-    femaleIbuMertuaMasturbasi.value = 35.0;
-    femaleIbuMertuaMakeLove.value = 30.0;
+    femaleIbuMertuaPacaran.value = 45.0;
+    femaleIbuMertuaMasturbasi.value = 45.0;
+    femaleIbuMertuaMakeLove.value = 45.0;
 
     femaleKakakLakiPacaran.value = 45.0;
-    femaleKakakLakiMasturbasi.value = 75.0;
+    femaleKakakLakiMasturbasi.value = 45.0;
     femaleKakakLakiMakeLove.value = 45.0;
 
-    femaleKakakPerempuanPacaran.value = 30.0;
-    femaleKakakPerempuanMasturbasi.value = 75.0;
-    femaleKakakPerempuanMakeLove.value = 30.0;
+    femaleKakakPerempuanPacaran.value = 50.0;
+    femaleKakakPerempuanMasturbasi.value = 50.0;
+    femaleKakakPerempuanMakeLove.value = 50.0;
 
     femaleAdikLakiPacaran.value = 45.0;
-    femaleAdikLakiMasturbasi.value = 75.0;
+    femaleAdikLakiMasturbasi.value = 45.0;
     femaleAdikLakiMakeLove.value = 45.0;
 
-    femaleAdikPerempuanPacaran.value = 40.0;
-    femaleAdikPerempuanMasturbasi.value = 75.0;
-    femaleAdikPerempuanMakeLove.value = 40.0;
+    femaleAdikPerempuanPacaran.value = 50.0;
+    femaleAdikPerempuanMasturbasi.value = 50.0;
+    femaleAdikPerempuanMakeLove.value = 50.0;
 
-    femalePamanPacaran.value = 30.0;
-    femalePamanMasturbasi.value = 25.0;
-    femalePamanMakeLove.value = 30.0;
+    femalePamanPacaran.value = 45.0;
+    femalePamanMasturbasi.value = 45.0;
+    femalePamanMakeLove.value = 45.0;
 
-    femalePasanganPamanPacaran.value = 10.0;
-    femalePasanganPamanMasturbasi.value = 25.0;
-    femalePasanganPamanMakeLove.value = 10.0;
+    femalePasanganPamanPacaran.value = 50.0;
+    femalePasanganPamanMasturbasi.value = 50.0;
+    femalePasanganPamanMakeLove.value = 50.0;
 
-    femaleBibiPacaran.value = 25.0;
-    femaleBibiMasturbasi.value = 25.0;
-    femaleBibiMakeLove.value = 25.0;
+    femaleBibiPacaran.value = 50.0;
+    femaleBibiMasturbasi.value = 50.0;
+    femaleBibiMakeLove.value = 50.0;
 
-    femaleSepupuPacaran.value = 40.0;
-    femaleSepupuMasturbasi.value = 30.0;
-    femaleSepupuMakeLove.value = 40.0;
+    femaleSepupuPacaran.value = 55.0;
+    femaleSepupuMasturbasi.value = 55.0;
+    femaleSepupuMakeLove.value = 55.0;
 
-    femaleKakekPacaran.value = 15.0;
-    femaleKakekMasturbasi.value = 25.0;
-    femaleKakekMakeLove.value = 15.0;
+    femaleKakekPacaran.value = 45.0;
+    femaleKakekMasturbasi.value = 45.0;
+    femaleKakekMakeLove.value = 45.0;
 
-    femaleNenekPacaran.value = 10.0;
-    femaleNenekMasturbasi.value = 25.0;
-    femaleNenekMakeLove.value = 10.0;
+    femaleNenekPacaran.value = 45.0;
+    femaleNenekMasturbasi.value = 45.0;
+    femaleNenekMakeLove.value = 45.0;
 
-    femaleAnakKeponakanPacaran.value = 65.0;
-    femaleAnakKeponakanMasturbasi.value = 30.0;
-    femaleAnakKeponakanMakeLove.value = 65.0;
+    femaleAnakKeponakanPacaran.value = 60.0;
+    femaleAnakKeponakanMasturbasi.value = 60.0;
+    femaleAnakKeponakanMakeLove.value = 60.0;
 
-    femaleGuruDosenPacaran.value = 30.0;
-    femaleGuruDosenMasturbasi.value = 45.0;
-    femaleGuruDosenMakeLove.value = 30.0;
+    femaleGuruDosenPacaran.value = 55.0;
+    femaleGuruDosenMasturbasi.value = 55.0;
+    femaleGuruDosenMakeLove.value = 55.0;
 
-    femaleNonKeluargaLainPacaran.value = 40.0;
-    femaleNonKeluargaLainMasturbasi.value = 15.0;
-    femaleNonKeluargaLainMakeLove.value = 30.0;
+    femaleNonKeluargaLainPacaran.value = 50.0;
+    femaleNonKeluargaLainMasturbasi.value = 50.0;
+    femaleNonKeluargaLainMakeLove.value = 50.0;
 
     // --- RESET MALE ---
     maleAyahKandungPacaran.value = 10.0;
