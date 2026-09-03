@@ -23,7 +23,7 @@ class AjakanPacaranHeteroKeluarga {
     }
 
     if (myGenderLower == 'perempuan') {
-      if (rel.contains('ayah mertua')) chance = 30; // Ayah Mertua: 30%
+      if (rel.contains('ayah mertua')) chance = 35; // Ayah Mertua: 35%
       else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') chance = 60; // Anak: 60%
       else if (rel.contains('keponakan')) chance = 30; // Keponakan: 30%
       else if (rel.contains('paman')) chance = 25; // Paman: 25%

@@ -3918,6 +3918,64 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                   onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
                                 ),
                         ),
+                        // Tombol Toko (Di Samping Kanan Di Atas Garis)
+                        Positioned(
+                          right: 16,
+                          top: 4,
+                          child: Material(
+                            color: Colors.transparent,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => StorePage(
+                                      character: _character,
+                                      onPurchaseCompleted: () {
+                                        setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                ).then((_) => setState(() {}));
+                              },
+                              borderRadius: BorderRadius.circular(20),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                decoration: BoxDecoration(
+                                  gradient: const LinearGradient(
+                                    colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                  ),
+                                  borderRadius: BorderRadius.circular(20),
+                                  border: Border.all(color: Colors.amberAccent, width: 1.5),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.amber.withOpacity(0.4),
+                                      blurRadius: 6,
+                                      offset: const Offset(0, 3),
+                                    ),
+                                  ],
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: const [
+                                    Icon(Icons.shopping_bag, color: Colors.black87, size: 16),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Toko',
+                                      style: TextStyle(
+                                        color: Colors.black87,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

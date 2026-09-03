@@ -25,6 +25,13 @@ import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_dosen.dart';
 import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_coworker.dart';
 import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_keluarga.dart';
 
+// Imports for biseksual dating
+import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
+import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_guru_sekolah.dart';
+import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_dosen.dart';
+import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_coworker.dart';
+import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_keluarga.dart';
+
 // Imports for gay ml
 import 'ajakan_makelove/gay/ajakan_ml_gay_teman_sekolah.dart';
 import 'ajakan_makelove/gay/ajakan_ml_gay_guru_sekolah.dart';
@@ -53,6 +60,8 @@ import 'ajakan_pacaran/lesbian/idol_gf_bf/ajakan_pacaran_lesbian_staf_idol.dart'
 import 'ajakan_pacaran/lesbian/idol_gf_bf/ajakan_pacaran_lesbian_rekan_idol.dart';
 import 'ajakan_pacaran/hetero/idol_gf_bf/ajakan_pacaran_hetero_staf_idol.dart';
 import 'ajakan_pacaran/hetero/idol_gf_bf/ajakan_pacaran_hetero_rekan_idol.dart';
+import 'ajakan_pacaran/biseksual/idol_gf_bf/ajakan_pacaran_biseksual_staf_idol.dart';
+import 'ajakan_pacaran/biseksual/idol_gf_bf/ajakan_pacaran_biseksual_rekan_idol.dart';
 
 import 'ajakan_makelove/gay/idol_makelove/ajakan_ml_gay_staf_idol.dart';
 import 'ajakan_makelove/gay/idol_makelove/ajakan_ml_gay_rekan_idol.dart';
@@ -60,6 +69,16 @@ import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_staf_idol.dart';
 import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_rekan_idol.dart';
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_staf_idol.dart';
 import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_rekan_idol.dart';
+
+// Imports for biseksual ml
+import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
+import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_guru_sekolah.dart';
+import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_dosen.dart';
+import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_coworker.dart';
+import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_keluarga.dart';
+import 'ajakan_makelove/biseksual/idol_makelove/ajakan_ml_biseksual_staf_idol.dart';
+import 'ajakan_makelove/biseksual/idol_makelove/ajakan_ml_biseksual_rekan_idol.dart';
+import 'ajakan_makelove/biseksual/BA_talent/ajakan_ml_biseksual_ba_talent.dart';
 
 // BA_talent sub-handlers
 import 'ajakan_makelove/gay/BA_talent/ajakan_ml_gay_ba_talent.dart';
@@ -262,6 +281,30 @@ class AjakanHandler {
       }
     }
 
+    // Helper untuk mengecek apakah target sesuai dengan seksualitas karakter pemain & target
+    bool isSexualityMatch(String targetSexuality, String targetGender) {
+      final String mySex = character.sexuality.trim().toLowerCase();
+      final String tSex = targetSexuality.trim().toLowerCase();
+      final String tGen = targetGender.trim().toLowerCase();
+
+      // Jika player Biseksual, bisa dipasangkan dengan siapa saja (sesama maupun lawan jenis)
+      if (mySex == 'biseksual') {
+        return true;
+      }
+
+      // Jika player Homoseksual / Gay / Lesbian, diutamakan sesama gender
+      if (mySex == 'homoseksual' || mySex == 'gay' || mySex == 'lesbian') {
+        return (myGenderLower == tGen);
+      }
+
+      // Jika player Heteroseksual (default)
+      if (tSex == 'biseksual') return true;
+      if (tSex == 'homoseksual' || tSex == 'gay' || tSex == 'lesbian') {
+        return (myGenderLower == tGen);
+      }
+      return (myGenderLower != tGen);
+    }
+
     // 2. Collect School / College / Job candidates
     List<Map<String, dynamic>> schoolCandidates = [];
 
@@ -281,16 +324,7 @@ class AjakanHandler {
         final String name = t['name'] ?? '';
         if (character.isAnyPartnerNameMatching(name)) continue;
 
-        bool match = false;
-        if (sexuality == 'Heteroseksual') {
-          match = (myGenderLower != tGender);
-        } else if (sexuality == 'Biseksual') {
-          match = true;
-        } else {
-          match = (myGenderLower == tGender);
-        }
-
-        if (match) {
+        if (isSexualityMatch(sexuality, tGender)) {
           schoolCandidates.add({
             'name': t['name'],
             'relation': 'Guru ${t['subject'] ?? ''}',
@@ -308,16 +342,7 @@ class AjakanHandler {
         final String tGender = (bk['gender'] ?? 'Laki-laki').trim().toLowerCase();
         final String name = bk['name'] ?? '';
         if (!character.isAnyPartnerNameMatching(name)) {
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != tGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == tGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, tGender)) {
             schoolCandidates.add({
               'name': name,
               'relation': 'Guru BK',
@@ -336,16 +361,7 @@ class AjakanHandler {
         final String tGender = (hs['gender'] ?? 'Laki-laki').trim().toLowerCase();
         final String name = hs['name'] ?? '';
         if (!character.isAnyPartnerNameMatching(name)) {
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != tGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == tGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, tGender)) {
             schoolCandidates.add({
               'name': name,
               'relation': 'Kepala Sekolah',
@@ -363,16 +379,7 @@ class AjakanHandler {
         final String name = cm['name'] ?? '';
         if (character.isAnyPartnerNameMatching(name)) continue;
 
-        bool match = false;
-        if (sexuality == 'Heteroseksual') {
-          match = (myGenderLower != cmGender);
-        } else if (sexuality == 'Biseksual') {
-          match = true;
-        } else {
-          match = (myGenderLower == cmGender);
-        }
-
-        if (match) {
+        if (isSexualityMatch(sexuality, cmGender)) {
           schoolCandidates.add({
             'name': cm['name'],
             'relation': 'Teman Sekelas',
@@ -394,16 +401,7 @@ class AjakanHandler {
           final String name = cw['name'] ?? '';
           if (character.isAnyPartnerNameMatching(name)) continue;
 
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != cwGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == cwGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, cwGender)) {
             final String coworkerRole = cw['role'] ?? 'Rekan Kerja';
             schoolCandidates.add({
               'name': cw['name'],
@@ -422,15 +420,7 @@ class AjakanHandler {
           final String svGender = (sv['gender'] ?? 'Laki-laki').trim().toLowerCase();
           final String svName = sv['name'] ?? '';
           if (!character.isAnyPartnerNameMatching(svName)) {
-            bool match = false;
-            if (sexuality == 'Heteroseksual') {
-              match = (myGenderLower != svGender);
-            } else if (sexuality == 'Biseksual') {
-              match = true;
-            } else {
-              match = (myGenderLower == svGender);
-            }
-            if (match) {
+            if (isSexualityMatch(sexuality, svGender)) {
               final String svRole = isEsportUnder18 ? 'CEO' : 'Supervisor';
               schoolCandidates.add({
                 'name': svName,
@@ -452,16 +442,7 @@ class AjakanHandler {
           final String name = cm['name'] ?? '';
           if (character.isAnyPartnerNameMatching(name)) continue;
 
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != cmGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == cmGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, cmGender)) {
             schoolCandidates.add({
               'name': cm['name'],
               'relation': 'Teman Kuliah',
@@ -478,16 +459,7 @@ class AjakanHandler {
           final String name = t['name'] ?? '';
           if (character.isAnyPartnerNameMatching(name)) continue;
 
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != tGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == tGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, tGender)) {
             schoolCandidates.add({
               'name': t['name'],
               'relation': 'Dosen',
@@ -509,16 +481,7 @@ class AjakanHandler {
           final String name = cm['name'] ?? '';
           if (character.isAnyPartnerNameMatching(name)) continue;
 
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != cmGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == cmGender);
-          }
-
-          if (match) {
+          if (isSexualityMatch(sexuality, cmGender)) {
             final String coworkerRole = cm['role'] ?? 'Rekan Kerja';
             schoolCandidates.add({
               'name': cm['name'],
@@ -537,16 +500,7 @@ class AjakanHandler {
           final String svGender = (sv['gender'] ?? 'Laki-laki').trim().toLowerCase();
           final String name = sv['name'] ?? '';
           if (!character.isAnyPartnerNameMatching(name)) {
-            bool match = false;
-            if (sexuality == 'Heteroseksual') {
-              match = (myGenderLower != svGender);
-            } else if (sexuality == 'Biseksual') {
-              match = true;
-            } else {
-              match = (myGenderLower == svGender);
-            }
-
-            if (match) {
+            if (isSexualityMatch(sexuality, svGender)) {
               final String svRole = isEsport ? 'CEO' : 'Supervisor';
               schoolCandidates.add({
                 'name': name,
@@ -568,17 +522,8 @@ class AjakanHandler {
           
           final String sexuality = staff['sexuality'] ?? 'Heteroseksual';
           final String stGender = (staff['gender'] ?? 'Laki-laki').trim().toLowerCase();
-          
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != stGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == stGender);
-          }
-          
-          if (match) {
+
+          if (isSexualityMatch(sexuality, stGender)) {
             schoolCandidates.add({
               'name': staff['name'],
               'relation': 'Staf Idol (${staff['role']})',
@@ -601,16 +546,7 @@ class AjakanHandler {
           final String sexuality = member['sexuality'] ?? 'Heteroseksual';
           final String mbGender = (member['gender'] ?? 'Perempuan').trim().toLowerCase();
           
-          bool match = false;
-          if (sexuality == 'Heteroseksual') {
-            match = (myGenderLower != mbGender);
-          } else if (sexuality == 'Biseksual') {
-            match = true;
-          } else {
-            match = (myGenderLower == mbGender);
-          }
-          
-          if (match) {
+          if (isSexualityMatch(sexuality, mbGender)) {
             schoolCandidates.add({
               'name': member['name'],
               'relation': 'Rekan Idol',
@@ -758,30 +694,32 @@ class AjakanHandler {
         }
         // remaining 15% (roll >= 85) results in no proposal (candidate remains null)
       } else if (mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') {
-        if (roll < 40) {
-          if (oppositeSexCandidates.isNotEmpty) {
-            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
-          }
-        } else {
-          if (sameSexCandidates.isNotEmpty) {
-            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
-          }
+        if (sameSexCandidates.isNotEmpty) {
+          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+        } else if (oppositeSexCandidates.isNotEmpty && roll < 20) {
+          candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
         }
       } else {
-        // Bisexual or others: 50% opposite sex, 50% same sex
+        // Biseksual: 50% sesama gender, 50% lawan jenis
         if (roll < 50) {
-          if (oppositeSexCandidates.isNotEmpty) {
+          if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          } else if (oppositeSexCandidates.isNotEmpty) {
             candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
           }
         } else {
-          if (sameSexCandidates.isNotEmpty) {
+          if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          } else if (sameSexCandidates.isNotEmpty) {
             candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
           }
         }
       }
 
       if (candidate == null && selectedPool.isNotEmpty) {
-        if (oppositeSexCandidates.isNotEmpty) {
+        if ((mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') && sameSexCandidates.isNotEmpty) {
+          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+        } else if (oppositeSexCandidates.isNotEmpty) {
           candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
         } else {
           candidate = selectedPool[random.nextInt(selectedPool.length)];
@@ -843,7 +781,7 @@ class AjakanHandler {
         }
 
         // Jika tidak mendapat ajakan pacaran/ML, beri peluang sesuai setting diajak Masturbasi
-        final double fallbackMasturbasiChance = ProposalPercentageSettings.getChance((candidate['relation'] ?? '').toString(), 'Masturbasi');
+        final double fallbackMasturbasiChance = ProposalPercentageSettings.getChance((candidate['relation'] ?? '').toString(), 'Masturbasi', gender: character.gender);
         if (character.activeProposal == null && random.nextInt(100) < fallbackMasturbasiChance.toInt()) {
           character.activeProposal = {
             'name': candidate['name'],
@@ -858,9 +796,9 @@ class AjakanHandler {
         final String rel = (candidate['relation'] ?? '').toString();
 
         // Hitung jenis ajakan berdasarkan bobot persentase dinamis per-hubungan yang diatur oleh user
-        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran');
-        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi');
-        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta');
+        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
+        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender);
+        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender);
         final double totalWeight = pacaranWeight + masturbationWeight + makeLoveWeight;
 
         if (totalWeight <= 0) return;
@@ -877,7 +815,10 @@ class AjakanHandler {
         
         if (proposalType == 'Ajak Pacaran') {
           Map<String, dynamic>? proposal;
-          if (isGay) {
+          final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
+          if (isBiseksual) {
+            proposal = AjakanPacaranBiseksualKeluarga.check(character, candidate, random);
+          } else if (isGay) {
             proposal = AjakanPacaranGayKeluarga.check(character, candidate, random);
           } else if (isLesbian) {
             proposal = AjakanPacaranLesbianKeluarga.check(character, candidate, random);
@@ -903,7 +844,10 @@ class AjakanHandler {
           };
         } else {
           Map<String, dynamic>? proposal;
-          if (isGay) {
+          final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
+          if (isBiseksual) {
+            proposal = AjakanMlBiseksualKeluarga.check(character, candidate, random);
+          } else if (isGay) {
             proposal = AjakanMlGayKeluarga.check(character, candidate, random);
           } else if (isLesbian) {
             proposal = AjakanMlLesbianKeluarga.check(character, candidate, random);
@@ -923,16 +867,23 @@ class AjakanHandler {
         // Classmates, Teachers, Lecturers, Idols, Coworkers, BA Talent
         final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString();
 
-        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran');
-        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi');
-        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta');
+        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
+        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender);
+        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender);
         final double totalWeight = pacaranWeight + masturbationWeight + makeLoveWeight;
 
         if (totalWeight > 0) {
           final double roll = (random.nextInt(100) / 100.0) * totalWeight;
           if (roll < pacaranWeight) {
             Map<String, dynamic>? proposal;
-            if (isGay) {
+            final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
+            if (isBiseksual) {
+              if (candRole == 'Guru') proposal = AjakanPacaranBiseksualGuruSekolah.check(character, candidate, random);
+              else if (candRole == 'Dosen') proposal = AjakanPacaranBiseksualDosen.check(character, candidate, random);
+              else if (candRole == 'Staf Idol') proposal = AjakanPacaranBiseksualStafIdol.check(character, candidate, random);
+              else if (candRole == 'Rekan Idol') proposal = AjakanPacaranBiseksualRekanIdol.check(character, candidate, random);
+              else proposal = AjakanPacaranBiseksualTemanSekolah.check(character, candidate, random);
+            } else if (isGay) {
               if (candRole == 'Guru') proposal = AjakanPacaranGayGuruSekolah.check(character, candidate, random);
               else if (candRole == 'Dosen') proposal = AjakanPacaranGayDosen.check(character, candidate, random);
               else if (candRole == 'Staf Idol') proposal = AjakanPacaranGayStafIdol.check(character, candidate, random);
@@ -970,7 +921,14 @@ class AjakanHandler {
             };
           } else {
             Map<String, dynamic>? proposal;
-            if (isGay) {
+            final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
+            if (isBiseksual) {
+              if (candRole == 'Guru') proposal = AjakanMlBiseksualGuruSekolah.check(character, candidate, random);
+              else if (candRole == 'Dosen') proposal = AjakanMlBiseksualDosen.check(character, candidate, random);
+              else if (candRole == 'Staf Idol') proposal = AjakanMlBiseksualStafIdol.check(character, candidate, random);
+              else if (candRole == 'Rekan Idol') proposal = AjakanMlBiseksualRekanIdol.check(character, candidate, random);
+              else proposal = AjakanMlBiseksualTemanSekolah.check(character, candidate, random);
+            } else if (isGay) {
               if (candRole == 'Guru') proposal = AjakanMlGayGuruSekolah.check(character, candidate, random);
               else if (candRole == 'Dosen') proposal = AjakanMlGayDosen.check(character, candidate, random);
               else if (candRole == 'Staf Idol') proposal = AjakanMlGayStafIdol.check(character, candidate, random);

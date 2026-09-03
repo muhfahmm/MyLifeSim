@@ -220,6 +220,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
   String _getPlainTargetName() {
     final String role = widget.targetRole;
     final String name = widget.targetName;
+    final String nameLower = name.toLowerCase().trim();
+
+    if (widget.character.motherName != null &&
+        (nameLower.contains(widget.character.motherName!.toLowerCase().trim()) ||
+         widget.character.motherName!.toLowerCase().trim().contains(nameLower))) {
+      return widget.character.motherName!;
+    }
+    if (widget.character.fatherName != null &&
+        (nameLower.contains(widget.character.fatherName!.toLowerCase().trim()) ||
+         widget.character.fatherName!.toLowerCase().trim().contains(nameLower))) {
+      return widget.character.fatherName!;
+    }
+    if (widget.character.stepMotherName != null &&
+        (nameLower.contains(widget.character.stepMotherName!.toLowerCase().trim()) ||
+         widget.character.stepMotherName!.toLowerCase().trim().contains(nameLower))) {
+      return widget.character.stepMotherName!;
+    }
+    if (widget.character.stepFatherName != null &&
+        (nameLower.contains(widget.character.stepFatherName!.toLowerCase().trim()) ||
+         widget.character.stepFatherName!.toLowerCase().trim().contains(nameLower))) {
+      return widget.character.stepFatherName!;
+    }
 
     if (role == 'Mantan Pacar') {
       for (var ex in widget.character.exPartners) {
@@ -264,7 +286,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    final String nameLower = name.toLowerCase();
     if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
       return widget.character.fatherName ?? name;
     } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
@@ -297,6 +318,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     }
+
+    if (name.contains('(') && name.endsWith(')')) {
+      final int openIdx = name.indexOf('(');
+      final String inside = name.substring(openIdx + 1, name.length - 1).trim();
+      if (inside.isNotEmpty) {
+        return inside;
+      }
+    }
+
     return name.replaceAll(' (Wafat)', '').trim();
   }
 
@@ -688,7 +718,37 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String nameLower = name.toLowerCase().trim();
     final String roleLower = role.toLowerCase().trim();
 
-    // 1. Cek partner utama & selingkuhan
+    // 1. Cek Orang Tua Kandung & Tiri dulu (dengan pencocokan fleksibel)
+    if (widget.character.motherName != null &&
+        (nameLower.contains(widget.character.motherName!.toLowerCase().trim()) ||
+         widget.character.motherName!.toLowerCase().trim().contains(nameLower))) {
+      return 'Perempuan';
+    }
+    if (widget.character.stepMotherName != null &&
+        (nameLower.contains(widget.character.stepMotherName!.toLowerCase().trim()) ||
+         widget.character.stepMotherName!.toLowerCase().trim().contains(nameLower))) {
+      return 'Perempuan';
+    }
+    if (widget.character.fatherName != null &&
+        (nameLower.contains(widget.character.fatherName!.toLowerCase().trim()) ||
+         widget.character.fatherName!.toLowerCase().trim().contains(nameLower))) {
+      return 'Laki-laki';
+    }
+    if (widget.character.stepFatherName != null &&
+        (nameLower.contains(widget.character.stepFatherName!.toLowerCase().trim()) ||
+         widget.character.stepFatherName!.toLowerCase().trim().contains(nameLower))) {
+      return 'Laki-laki';
+    }
+
+    // 2. Cek keyword nama / role untuk Ibu atau Ayah
+    if (nameLower.startsWith('ibu') || roleLower.contains('ibu') || roleLower.contains('bibi') || roleLower.contains('nenek') || roleLower.contains('istri') || roleLower.contains('perempuan')) {
+      return 'Perempuan';
+    }
+    if (nameLower.startsWith('ayah') || roleLower.contains('ayah') || roleLower.contains('paman') || roleLower.contains('kakek') || roleLower.contains('suami') || roleLower.contains('laki')) {
+      return 'Laki-laki';
+    }
+
+    // 3. Cek partner utama & selingkuhan
     if (widget.character.partner != null &&
         (widget.character.partner!['name']?.toLowerCase().trim() == nameLower ||
          nameLower.contains(widget.character.partner!['name']?.toLowerCase().trim() ?? '___') ||
@@ -720,20 +780,6 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return widget.character.fifthPartner!['gender'] ?? 'Perempuan';
     }
 
-    // 2. Cek Ayah/Ibu kandung & tiri
-    if (widget.character.fatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
-    if (widget.character.stepFatherName?.toLowerCase().trim() == nameLower) return 'Laki-laki';
-    if (widget.character.motherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
-    if (widget.character.stepMotherName?.toLowerCase().trim() == nameLower) return 'Perempuan';
-
-    // 3. Cek peran-peran spesifik keluarga
-    if (roleLower.contains('ayah') || roleLower.contains('paman') || roleLower.contains('kakek') || roleLower.contains('suami')) {
-      return 'Laki-laki';
-    }
-    if (roleLower.contains('ibu') || roleLower.contains('bibi') || roleLower.contains('nenek') || roleLower.contains('istri')) {
-      return 'Perempuan';
-    }
-
     // 4. Cari di semua list NPC
     for (var list in [
       widget.character.siblings,
@@ -749,8 +795,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     ]) {
       for (var npc in list) {
         final String? npcName = npc['name']?.toLowerCase().trim();
-        if (npcName == nameLower || nameLower.contains(npcName ?? '___') || (npcName ?? '').contains(nameLower)) {
-          return npc['gender'] ?? 'Laki-laki';
+        if (npcName != null && npcName.isNotEmpty && (npcName == nameLower || nameLower.contains(npcName) || npcName.contains(nameLower))) {
+          return npc['gender'] ?? 'Perempuan';
         }
       }
     }
@@ -763,7 +809,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       return 'Laki-laki';
     }
 
-    return 'Laki-laki'; // Fallback terakhir
+    return 'Perempuan';
   }
 
   int _getFertilityRate(int age, String gender) {
@@ -3533,12 +3579,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                 age: targetAge,
                                 happiness: relationshipVal,
                                 forcedSkinColor: () {
-                                  final String plainName = _getPlainTargetName().toLowerCase();
-                                  if (widget.character.motherName != null && plainName == widget.character.motherName!.toLowerCase()) {
-                                    return widget.character.motherSkinColor;
+                                  final String plainName = _getPlainTargetName().toLowerCase().trim();
+                                  final String rawName = widget.targetName.toLowerCase().trim();
+                                  if (widget.character.motherName != null) {
+                                    final String mName = widget.character.motherName!.toLowerCase().trim();
+                                    if (plainName.contains(mName) || rawName.contains(mName) || mName.contains(plainName)) {
+                                      return widget.character.motherSkinColor;
+                                    }
                                   }
-                                  if (widget.character.fatherName != null && plainName == widget.character.fatherName!.toLowerCase()) {
-                                    return widget.character.fatherSkinColor;
+                                  if (widget.character.fatherName != null) {
+                                    final String fName = widget.character.fatherName!.toLowerCase().trim();
+                                    if (plainName.contains(fName) || rawName.contains(fName) || fName.contains(plainName)) {
+                                      return widget.character.fatherSkinColor;
+                                    }
                                   }
                                   if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
                                     return widget.character.partner!['skinColor'];
