@@ -1,71 +1,137 @@
-Untuk halaman ranking ini, masalah utamanya bukan di `ListView.builder`-nya (itu sudah lazy-build, bagus) — masalahnya ada di **cara data dimuat dan distrukturkan**. Kamu memuat ~4140 baris (207 negara × 10 negeri + 10 swasta) sekaligus ke satu list flat, dan proses loading-nya melakukan **ratusan `rootBundle.loadString()` terpisah** secara sequential. Itu bottleneck terbesarnya.
+Ide yang sangat bagus! Ini akan menambahkan dimensi realisme dan variasi yang kuat ke dalam game, karena konsekuensi hidup di Korea Selatan (18 bulan) akan sangat berbeda dengan hidup di Swiss (pria dan wanita) atau Indonesia (hanya pria, dan terkadang ada pengecualian). 
 
-## 1. Restrukturisasi arsitektur halaman (paling berdampak)
+Karena kamu sudah memiliki struktur folder yang rapi, logika **Wajib Militer** paling cocok diimplementasikan sebagai **Event/Trigger saat karakter "Naik Usia" (Age Up)**, dan dihubungkan ke atribut serta kepribadian.
 
-Realistisnya tidak ada user yang scroll 4140 item di satu list flat. Pecah jadi 2 level:
+Berikut adalah rancangan logika dan contoh implementasinya di Dart:
 
-- **Halaman 1**: daftar 207 negara (dengan bendera, jumlah univ negeri/swasta)
-- **Halaman 2**: setelah tap negara → baru load 20 universitas negara itu
+### 1. Logika Dasar Trigger
+Saat karakter beranjak usia (misalnya dari 17 ke 18 tahun), aplikasi harus memanggil fungsi `checkMandatoryMilitary(Character character)`.
 
-Ini langsung memangkas initial load dari "baca 414 file JSON" jadi "baca 1 file index kecil" (nama negara + iso + count saja), dan baru fetch detail per-negara saat dibutuhkan (on-demand).
-
-## 2. Kalau tetap mau 1 halaman flat: gabungkan JSON di build-time
-
-Alih-alih runtime membaca 400+ file kecil satu-satu lewat `for` loop + `await`, buat **satu file `all_universities.json` gabungan** menggunakan script (Node/Python/Dart) yang dijalankan sekali saat development, hasilnya di-bundle sebagai 1 asset:
-
-```json
-{
-  "id": {"iso":"ID","negeri":["UI","UGM",...],"swasta":["BINUS","Telkom Univ",...]},
-  "us": {"iso":"US","negeri":[...],"swasta":[...]},
-  ...
+```dart
+// Di dalam logic naik usia (misal: saat tombol "Lanjutkan" ditekan)
+void onAgeUp(Character character) {
+    character.age++;
+    
+    // Cek Wajib Militer
+    checkMilitaryService(character);
+    
+    // Refresh UI lainnya...
 }
 ```
 
-Runtime tinggal:
-```dart
-final raw = await rootBundle.loadString('json/nama_unniv/all_universities.json');
-final Map<String, dynamic> data = jsonDecode(raw);
-```
-1 file read + 1 decode, bukan 400+ read. Ini biasanya penghematan I/O terbesar.
-
-## 3. Pindahkan parsing berat ke isolate
-
-`jsonDecode` untuk ~4000 entri di main isolate bisa bikin jank saat startup. Pakai `compute()`:
+### 2. Definisi Negara dan Usia Wajib Militer
+Kamu perlu sebuah `Map` atau class penentu. (Perlu diingat, aturan ini bisa kamu *simplify* untuk game, tidak harus 100% akurat dengan hukum real-time).
 
 ```dart
-List<Map<String, dynamic>> allUnivs = await compute(_parseUniversities, raw);
-```
+// lib/core/services/military_service.dart
+const Map<String, int> militaryCountries = {
+  'Indonesia': 18, // Pria
+  'Korea Selatan': 18, // Pria (kurang lebih 18-21 tahun)
+  'Singapura': 18, // Pria
+  'Israel': 18, // Pria & Wanita
+  'Swiss': 19, // Pria & Wanita
+  'Norwegia': 19, // Pria & Wanita
+  'Mesir': 18, // Pria
+  // Sisanya bisa null atau kosong
+};
 
-## 4. Precompute search key, jangan `toLowerCase()` tiap filter
-
-Saat ini `_filterData()` memanggil `.toLowerCase()` pada `name` dan `country` setiap kali user mengetik, untuk 4140 item. Simpan versi lowercase sekali saat load:
-
-```dart
-univs.add({
-  ...,
-  'searchKey': '${item.toString()} $countryName'.toLowerCase(),
-});
-```
-Filter tinggal `univ['searchKey'].contains(query)` — jauh lebih murah.
-
-## 5. Debounce search input
-
-`onChanged: (val) => _filterData()` men-trigger filter+`setState` (rebuild) di **setiap keystroke**. Untuk UX yang lebih halus saat mengetik cepat:
-
-```dart
-Timer? _debounce;
-void _onSearchChanged(String val) {
-  _debounce?.cancel();
-  _debounce = Timer(const Duration(milliseconds: 250), _filterData);
+void checkMilitaryService(Character character) {
+  int? draftAge = militaryCountries[character.country];
+  
+  // Cek umur dan gender (jika negara hanya laki-laki)
+  if (draftAge != null && character.age == draftAge) {
+      // Jika di Indonesia/Mesir/Korsel, hanya Laki-laki
+      if (character.country == 'Indonesia' || character.country == 'Korea Selatan' || character.country == 'Mesir' || character.country == 'Singapura') {
+          if (character.gender == 'Laki-laki') {
+              showMilitaryEventDialog(context, character);
+          }
+      } else {
+          // Semua gender (Swiss, Israel, Norwegia)
+          showMilitaryEventDialog(context, character);
+      }
+  }
 }
 ```
 
-## 6. Hindari rebuild seluruh Scaffold saat filter berubah
+### 3. Dialog Pilihan & Dampak Atribut (Memakai Kepribadian)
+Setelah *trigger* terpanggil, kamu akan memunculkan dialog interaktif. Pilihan harus dipengaruhi oleh kepribadian (Pemberani, Pemalas, Kutu Buku, dll).
 
-`setState` di `_filterData()` saat ini rebuild seluruh `build()` (termasuk search bar & chip filter). Bungkus list-nya dengan `ValueListenableBuilder`/`ValueNotifier<List<...>>` supaya hanya bagian `ListView` yang rebuild, bukan seluruh halaman.
+```dart
+void showMilitaryEventDialog(BuildContext context, Character character) {
+  showDialog(
+    context: context,
+    builder: (ctx) => AlertDialog(
+      title: const Text('Panggilan Wajib Militer 🪖'),
+      content: Text('Pemerintah ${character.country} telah memanggilmu untuk mengikuti wajib militer. Apa yang akan kamu lakukan?'),
+      actions: [
+        TextButton(
+          onPressed: () { 
+             Navigator.pop(ctx);
+             // Pilihan 1: Ikut Wajib Militer
+             applyMilitaryDecision(character, 'ikut');
+          },
+          child: const Text('Patuh & Ikut'),
+        ),
+        TextButton(
+          onPressed: () { 
+             Navigator.pop(ctx);
+             // Pilihan 2: Menghindar (Menurunkan Karma, Resiko Penjara)
+             applyMilitaryDecision(character, 'menghindar');
+          },
+          child: const Text('Menghindar / Kabur'),
+        ),
+      ],
+    ),
+  );
+}
+```
 
----
+### 4. Fungsi Perubahan Statistik (Logika dalam `applyMilitaryDecision`)
+*Catatan: Perbedaan negara dan kepribadian akan mengubah hasilnya.*
 
-**Ringkas prioritas:** #1 (pecah jadi 2 halaman) memberi dampak paling besar untuk UX & performa; kalau tidak memungkinkan, #2 (gabungkan JSON) adalah fix teknis paling murah untuk masalah loading lambatmu sekarang.
+```dart
+void applyMilitaryDecision(Character character, String decision) {
+  if (decision == 'ikut') {
+    // Dampak umum mengikuti militer:
+    character.discipline = (character.discipline + 25).clamp(0, 100);
+    character.health = (character.health + 15).clamp(0, 100);
+    character.money += 200; // Gaji selama dinas
 
-Mau saya bantu tuliskan versi refactor-nya, mulai dari halaman daftar negara dulu atau langsung script penggabungan JSON-nya?
+    // Efek Kepribadian:
+    if (character.traits.contains('Pemberani')) {
+        character.happiness = (character.happiness + 20).clamp(0, 100); // Bangga
+    } else if (character.traits.contains('Pemalas')) {
+        character.happiness = (character.happiness - 15).clamp(0, 100); // Sengsara
+    } else if (character.traits.contains('Kutu Buku')) {
+        character.intelligence += 5; // Belajar hal teknis
+    } else {
+        character.happiness = (character.happiness + 5).clamp(0, 100);
+    }
+    
+    // Konsekuensi jangka panjang: Membuka peluang karier militer di masa depan.
+    
+  } else if (decision == 'menghindar') {
+    character.karma = (character.karma - 25).clamp(0, 100);
+    character.happiness = (character.happiness + 10).clamp(0, 100); // Senang bebas
+
+    // Konsekuensi random: Tertangkap dan dipenjara
+    if (Random().nextInt(100) < 40) {
+        character.money -= 500; // Denda
+        character.health = (character.health - 10).clamp(0, 100); // Stres
+        showEventOutcome('Kamu tertangkap! Kamu dipenjara selama 6 bulan.', character);
+    }
+  }
+}
+```
+
+### 5. Koneksi ke Fitur Online
+Karena kamu ingin mengimplementasikan fitur online (Lomba), logika Militer ini juga penting untuk **divalidasi di server**.
+*   Jika ada pemain yang berada di Korea Selatan dan usianya 18 tahun, server harus memaksa mereka menjalani event ini.
+*   Jika pemain *menghindar*, server harus mencatat penurunan Karma dan menambahkan status "Buronan" ke database akun mereka. 
+*   Ini juga menciptakan cerita yang sangat berbeda: Pemain yang lulus dari militer bisa memiliki akses ke pekerjaan khusus (seperti "Tentara Bayaran" atau "Polisi Militer") dengan gaji tinggi di fitur online nanti.
+
+**Bonus Saran:**
+Untuk membuat lebih mirip BitLife, kamu bisa menambahkan pilihan ketiga: **"Alasan Medis / Pura-pura Sakit"**. Ini akan sangat bergantung pada atribut `Kesehatan` dan `Kecerdasan` (untuk memalsukan surat dokter). Jika gagal, mereka tetap dipaksa militer dan mendapatkan penalti tambahan!
+
+Apakah kamu ingin saya buatkan file contoh lengkap untuk `military_service.dart` yang bisa langsung kamu copy-paste ke dalam proyek?
+
