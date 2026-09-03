@@ -21,6 +21,7 @@ import 'package:bitlife/store_page/store_page.dart';
 import 'package:bitlife/game/widgets/kategori_usia/next_day_button.dart';
 import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
+import 'package:bitlife/game/widgets/penyakit_logic/eye_test_logic.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
@@ -95,261 +96,23 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   // --- LOGIKA TES KESEHATAN MATA ---
-  final List<Map<String, dynamic>> _eyeTests = [
-    {'text': 'AAAA4AAA', 'odd': '4', 'options': ['A', '4', 'X', 'Y']},
-    {'text': 'SSSSS5SSS', 'odd': '5', 'options': ['S', '5', '8', '2']},
-    {'text': 'OOOO0OOO', 'odd': '0', 'options': ['O', '0', 'Q', 'C']},
-    {'text': 'IIIII1III', 'odd': '1', 'options': ['I', '1', 'L', 'T']},
-    {'text': 'ZZZZ2ZZZ', 'odd': '2', 'options': ['Z', '2', '7', 'S']},
-    {'text': 'VVVVUvvvv', 'odd': 'U', 'options': ['V', 'U', 'W', 'Y']},
-    {'text': 'UUUUWUUU', 'odd': 'W', 'options': ['U', 'W', 'V', 'M']},
-    {'text': 'MMMMWMMM', 'odd': 'W', 'options': ['M', 'W', 'N', 'V']},
-    {'text': 'KKKKXKKK', 'odd': 'X', 'options': ['K', 'X', 'Y', 'H']},
-    {'text': '8888B888', 'odd': 'B', 'options': ['8', 'B', '3', '6']},
-  ];
-
   void _checkGlassesNeed([VoidCallback? onFinish]) {
     final VoidCallback done = onFinish ?? _finishAgeUp;
-
-    // Cek apakah perlu memilih hak asuh setelah orang tua bercerai di tengah game
-    if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
-        _character.custodyParent == null &&
-        _character.age < 18 &&
-        _character.fatherName != null &&
-        _character.motherName != null &&
-        !_character.isFatherDeceased &&
-        !_character.isMotherDeceased) {
-      _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!, done);
-      return;
-    }
-
-    if (_character.avatarAccessoriesType != 'blank' && _character.avatarAccessoriesType != null) {
-      done();
-      return; // Sudah pakai kacamata
-    }
-    final int age = _character.age;
-    if (age <= 0) {
-      done();
-      return;
-    }
-
-    // Batasi tes hanya pada rentang usia 1-18 dan 40-60
-    if (age >= 1 && age <= 18) {
-      if (_character.eyeTestsCountYoung >= 2) {
-        done();
-        return;
-      }
-    } else if (age >= 40 && age <= 60) {
-      if (_character.eyeTestsCountOld >= 2) {
-        done();
-        return;
-      }
-    } else {
-      done();
-      return; // Tidak ada tes di luar rentang usia tersebut
-    }
-
-    int chance = 0;
-    if (age >= 1 && age <= 6) chance = 5;
-    else if (age >= 7 && age <= 10) chance = 20;
-    else if (age >= 11 && age <= 18) chance = 25;
-    else if (age >= 40 && age <= 45) chance = 35;
-    else if (age >= 46 && age <= 55) chance = 40;
-    else if (age >= 56 && age <= 60) chance = 40;
-
-    if (Random().nextInt(100) < chance) {
-      if (age >= 1 && age <= 18) {
-        _character.eyeTestsCountYoung++;
-      } else if (age >= 40 && age <= 60) {
-        _character.eyeTestsCountOld++;
-      }
-      _showEyeTestMinigame(done);
-    } else {
-      done();
-    }
-  }
-
-  void _showEyeTestMinigame([VoidCallback? onFinish]) {
-    final randomTest = _eyeTests[Random().nextInt(_eyeTests.length)];
-    final String targetText = randomTest['text']!;
-    final String oddChar = randomTest['odd']!;
-    final List<String> options = List<String>.from(randomTest['options']!);
-    options.shuffle();
-
-    int timeLeft = 5;
-    Timer? countdownTimer;
-    bool answered = false;
-
-    showDialog(
+    EyeTestLogic.checkGlassesNeed(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) {
-        return PopScope(
-          canPop: false,
-          child: StatefulBuilder(
-            builder: (context, setDialogState) {
-              if (countdownTimer == null) {
-                countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-                  if (timeLeft > 1) {
-                    setDialogState(() {
-                      timeLeft--;
-                    });
-                  } else {
-                    timer.cancel();
-                    if (!answered) {
-                      answered = true;
-                      setDialogState(() {
-                        timeLeft = 0;
-                      });
-                      setState(() {
-                        _character.avatarAccessoriesType = 'prescription01';
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
-                      });
-                      showDialog(
-                        context: dialogContext,
-                        barrierDismissible: false,
-                        builder: (timeoutContext) => PopScope(
-                          canPop: false,
-                          child: AlertDialog(
-                            title: const Text('Waktu Habis! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                            content: Text('Kamu tidak sempat membaca huruf tersebut. Kunci jawabannya adalah: "$oddChar". Dokter mendiagnosis mata silinder/minus, sehingga kamu harus memakai kacamata.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(timeoutContext);
-                                  Navigator.pop(dialogContext);
-                                  onFinish?.call();
-                                },
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }
-                  }
-                });
-              }
-
-              return AlertDialog(
-                title: const Row(
-                  children: [
-                    Icon(Icons.remove_red_eye, color: Colors.blueAccent),
-                    SizedBox(width: 8),
-                    Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-                  ],
-                ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text(
-                      'Matamu terasa sedikit buram. Dokter meminta untuk menyebutkan satu huruf/angka yang berbeda dalam teks berikut dalam 5 detik!',
-                      style: TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blueAccent, width: 2),
-                      ),
-                      child: Text(
-                        targetText,
-                        style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: 4, color: Colors.black87),
-                      ),
-                    ),
-                    const SizedBox(height: 15),
-                    Text(
-                      'Sisa waktu: $timeLeft detik',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: timeLeft <= 2 ? Colors.red : Colors.orange,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text('Pilih huruf/angka yang berbeda:', style: TextStyle(fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-                    Wrap(
-                      spacing: 12,
-                      children: options.map((opt) {
-                        return ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.blueAccent,
-                            foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                          ),
-                          onPressed: answered
-                              ? null
-                              : () {
-                                  answered = true;
-                                  countdownTimer?.cancel();
-                                  if (opt == oddChar) {
-                                    showDialog(
-                                      context: dialogContext,
-                                      barrierDismissible: false,
-                                      builder: (successContext) => PopScope(
-                                        canPop: false,
-                                        child: AlertDialog(
-                                          title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
-                                          content: const Text('Kamu berhasil menemukan huruf yang berbeda! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(successContext);
-                                                Navigator.pop(dialogContext);
-                                                onFinish?.call();
-                                              },
-                                              child: const Text('Lanjutkan'),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  } else {
-                                    setState(() {
-                                      _character.avatarAccessoriesType = 'prescription01';
-                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
-                                    });
-                                    showDialog(
-                                      context: dialogContext,
-                                      barrierDismissible: false,
-                                      builder: (failContext) => PopScope(
-                                        canPop: false,
-                                        child: AlertDialog(
-                                          title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                                          content: Text('Jawabanmu salah. Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () {
-                                                Navigator.pop(failContext);
-                                                Navigator.pop(dialogContext);
-                                                onFinish?.call();
-                                              },
-                                              child: const Text('OK'),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                          child: Text(opt, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                ),
-              );
-            },
-          ),
-        );
+      character: _character,
+      onFinish: done,
+      onUpdateAvatar: () {
+        if (mounted) {
+          setState(() {
+            _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(_character, happiness: _character.happiness);
+          });
+        }
       },
-    ).then((_) {
-      countdownTimer?.cancel();
-    });
+      showCustodySelection: (ctx, fName, mName, callback) {
+        _showCustodySelectionDialog(ctx, fName, mName, callback);
+      },
+    );
   }
 
   // --- LOGIKA TAMBAH HARI ---
