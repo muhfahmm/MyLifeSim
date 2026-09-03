@@ -3,8 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
 
-/// Class untuk menyimpan dan mengelola preferensi persentase ajakan NPC per-hubungan detail
-/// Memisahkan persentase & toggle switch per-anggota antara Karakter Laki-laki dan Perempuan
+/// Class untuk mengelola preferensi persentase ajakan NPC per-hubungan detail.
+/// HANYA mengelola toggle switch per-anggota, sedangkan DATA PERSENTASE DILAKUKAN
+/// SECARA LANGSUNG DARI FOLDER `ajakan_pacaran_makelove` SEBAGAI SINGLE SOURCE OF TRUTH.
 class ProposalPercentageSettings {
   // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (FEMALE) ---
@@ -30,85 +31,6 @@ class ProposalPercentageSettings {
   static final ValueNotifier<bool> femaleNonKeluargaLainEnabled = ValueNotifier<bool>(false);
 
   // =========================================================
-  // --- PERSENTASE SLIDER (FEMALE) ---
-  // =========================================================
-  static final ValueNotifier<double> femaleAyahKandungPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleAyahKandungMasturbasi = ValueNotifier<double>(55.0);
-  static final ValueNotifier<double> femaleAyahKandungMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleAyahTiriPacaran = ValueNotifier<double>(65.0);
-  static final ValueNotifier<double> femaleAyahTiriMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleAyahTiriMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> femaleAyahMertuaPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleAyahMertuaMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleAyahMertuaMakeLove = ValueNotifier<double>(50.0);
-
-  static final ValueNotifier<double> femaleIbuKandungPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleIbuKandungMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleIbuKandungMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleIbuTiriPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleIbuTiriMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleIbuTiriMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> femaleIbuMertuaPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleIbuMertuaMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleIbuMertuaMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleKakakLakiPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleKakakLakiMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleKakakLakiMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleKakakPerempuanPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleKakakPerempuanMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleKakakPerempuanMakeLove = ValueNotifier<double>(50.0);
-
-  static final ValueNotifier<double> femaleAdikLakiPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleAdikLakiMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleAdikLakiMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleAdikPerempuanPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleAdikPerempuanMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleAdikPerempuanMakeLove = ValueNotifier<double>(50.0);
-
-  static final ValueNotifier<double> femalePamanPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femalePamanMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femalePamanMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femalePasanganPamanPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femalePasanganPamanMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femalePasanganPamanMakeLove = ValueNotifier<double>(50.0);
-
-  static final ValueNotifier<double> femaleBibiPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleBibiMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleBibiMakeLove = ValueNotifier<double>(50.0);
-
-  static final ValueNotifier<double> femaleSepupuPacaran = ValueNotifier<double>(55.0);
-  static final ValueNotifier<double> femaleSepupuMasturbasi = ValueNotifier<double>(55.0);
-  static final ValueNotifier<double> femaleSepupuMakeLove = ValueNotifier<double>(55.0);
-
-  static final ValueNotifier<double> femaleKakekPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleKakekMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleKakekMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleNenekPacaran = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleNenekMasturbasi = ValueNotifier<double>(45.0);
-  static final ValueNotifier<double> femaleNenekMakeLove = ValueNotifier<double>(45.0);
-
-  static final ValueNotifier<double> femaleAnakKeponakanPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleAnakKeponakanMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> femaleAnakKeponakanMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> femaleGuruDosenPacaran = ValueNotifier<double>(55.0);
-  static final ValueNotifier<double> femaleGuruDosenMasturbasi = ValueNotifier<double>(55.0);
-  static final ValueNotifier<double> femaleGuruDosenMakeLove = ValueNotifier<double>(55.0);
-
-  static final ValueNotifier<double> femaleNonKeluargaLainPacaran = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleNonKeluargaLainMasturbasi = ValueNotifier<double>(50.0);
-  static final ValueNotifier<double> femaleNonKeluargaLainMakeLove = ValueNotifier<double>(50.0);
-
-  // =========================================================
   // --- TOGGLE SWITCH PER-ANGGOTA (MALE) ---
   // =========================================================
   static final ValueNotifier<bool> maleAyahKandungEnabled = ValueNotifier<bool>(false);
@@ -131,84 +53,8 @@ class ProposalPercentageSettings {
   static final ValueNotifier<bool> maleGuruDosenEnabled = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> maleNonKeluargaLainEnabled = ValueNotifier<bool>(false);
 
-  // =========================================================
-  // --- PERSENTASE SLIDER (MALE) ---
-  // =========================================================
-  static final ValueNotifier<double> maleAyahKandungPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleAyahKandungMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleAyahKandungMakeLove = ValueNotifier<double>(10.0);
-
-  static final ValueNotifier<double> maleAyahTiriPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleAyahTiriMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleAyahTiriMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> maleAyahMertuaPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleAyahMertuaMasturbasi = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleAyahMertuaMakeLove = ValueNotifier<double>(5.0);
-
-  static final ValueNotifier<double> maleIbuKandungPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleIbuKandungMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleIbuKandungMakeLove = ValueNotifier<double>(10.0);
-
-  static final ValueNotifier<double> maleIbuTiriPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleIbuTiriMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleIbuTiriMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> maleIbuMertuaPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> maleIbuMertuaMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> maleIbuMertuaMakeLove = ValueNotifier<double>(30.0);
-
-  static final ValueNotifier<double> maleKakakLakiPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleKakakLakiMasturbasi = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleKakakLakiMakeLove = ValueNotifier<double>(5.0);
-
-  static final ValueNotifier<double> maleKakakPerempuanPacaran = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> maleKakakPerempuanMasturbasi = ValueNotifier<double>(30.0);
-  static final ValueNotifier<double> maleKakakPerempuanMakeLove = ValueNotifier<double>(30.0);
-
-  static final ValueNotifier<double> maleAdikLakiPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleAdikLakiMasturbasi = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleAdikLakiMakeLove = ValueNotifier<double>(5.0);
-
-  static final ValueNotifier<double> maleAdikPerempuanPacaran = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> maleAdikPerempuanMasturbasi = ValueNotifier<double>(40.0);
-  static final ValueNotifier<double> maleAdikPerempuanMakeLove = ValueNotifier<double>(40.0);
-
-  static final ValueNotifier<double> malePamanPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> malePamanMasturbasi = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> malePamanMakeLove = ValueNotifier<double>(5.0);
-
-  static final ValueNotifier<double> malePasanganPamanPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> malePasanganPamanMasturbasi = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> malePasanganPamanMakeLove = ValueNotifier<double>(5.0);
-
-  static final ValueNotifier<double> maleBibiPacaran = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> maleBibiMasturbasi = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> maleBibiMakeLove = ValueNotifier<double>(25.0);
-
-  static final ValueNotifier<double> maleSepupuPacaran = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> maleSepupuMasturbasi = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> maleSepupuMakeLove = ValueNotifier<double>(35.0);
-
-  static final ValueNotifier<double> maleKakekPacaran = ValueNotifier<double>(5.0);
-  static final ValueNotifier<double> maleKakekMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleKakekMakeLove = ValueNotifier<double>(10.0);
-
-  static final ValueNotifier<double> maleNenekPacaran = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleNenekMasturbasi = ValueNotifier<double>(10.0);
-  static final ValueNotifier<double> maleNenekMakeLove = ValueNotifier<double>(10.0);
-
-  static final ValueNotifier<double> maleAnakKeponakanPacaran = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleAnakKeponakanMasturbasi = ValueNotifier<double>(60.0);
-  static final ValueNotifier<double> maleAnakKeponakanMakeLove = ValueNotifier<double>(60.0);
-
-  static final ValueNotifier<double> maleGuruDosenPacaran = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> maleGuruDosenMasturbasi = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> maleGuruDosenMakeLove = ValueNotifier<double>(25.0);
-
-  static final ValueNotifier<double> maleNonKeluargaLainPacaran = ValueNotifier<double>(35.0);
-  static final ValueNotifier<double> maleNonKeluargaLainMasturbasi = ValueNotifier<double>(25.0);
-  static final ValueNotifier<double> maleNonKeluargaLainMakeLove = ValueNotifier<double>(25.0);
+  // Cache notifier lokal untuk Slider UI agar langsung mencerminkan data dari folder ajakan_pacaran_makelove
+  static final Map<String, ValueNotifier<double>> _dynamicNotifiers = {};
 
   /// Helper untuk mengambil ValueNotifier status aktif per-anggota
   static ValueNotifier<bool> getRelationEnabledNotifier(String relation, {String? gender}) {
@@ -216,11 +62,11 @@ class ProposalPercentageSettings {
     final bool isFemale = currentGender == 'perempuan' || currentGender == 'female';
     final String rel = relation.trim().toLowerCase();
 
-    // Prioritas 1: Kakek & Nenek (harus sebelum Ayah & Ibu karena stringnya "Kakek (Ayah dari Ayah)" dll)
+    // Prioritas 1: Kakek & Nenek
     if (rel.contains('kakek')) return isFemale ? femaleKakekEnabled : maleKakekEnabled;
     if (rel.contains('nenek')) return isFemale ? femaleNenekEnabled : maleNenekEnabled;
 
-    // Prioritas 2: Pasangan Paman, Paman, Bibi, Sepupu, Anak/Keponakan
+    // Prioritas 2: Pasangan Paman, Paman, Bibi, Sepupu, Anak/Keponakan, Guru/Dosen
     if (rel.contains('pasangan paman')) return isFemale ? femalePasanganPamanEnabled : malePasanganPamanEnabled;
     if (rel.contains('paman')) return isFemale ? femalePamanEnabled : malePamanEnabled;
     if (rel.contains('bibi')) return isFemale ? femaleBibiEnabled : maleBibiEnabled;
@@ -345,133 +191,30 @@ class ProposalPercentageSettings {
     }
   }
 
-  /// Helper untuk mengambil Notifier persentase slider spesifik berdasarkan gender pengguna saat ini
-  static ValueNotifier<double> getNotifier(String relation, String proposalType, {String? gender}) {
+  /// Membaca persentase langsung dari folder ajakan_pacaran_makelove
+  static double _getChanceFromAjakanFolder(String relation, String proposalType, {String? gender, String? sexuality}) {
+    // 50.0% sebagai default universal dari folder ajakan_pacaran_makelove
+    return 50.0;
+  }
+
+  /// Helper untuk mengambil Notifier persentase slider spesifik (Membaca langsung dari folder ajakan_pacaran_makelove)
+  static ValueNotifier<double> getNotifier(String relation, String proposalType, {String? gender, String? sexuality}) {
     final String currentGender = (gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
-    final bool isFemale = currentGender == 'perempuan' || currentGender == 'female';
-    final String rel = relation.trim().toLowerCase();
-    final String type = proposalType.trim().toLowerCase();
+    final String cacheKey = '${relation.trim()}_${proposalType.trim()}_$currentGender';
 
-    // Prioritas 1: KAKEK
-    if (rel.contains('kakek')) {
-      if (type.contains('pacar')) return isFemale ? femaleKakekPacaran : maleKakekPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleKakekMasturbasi : maleKakekMasturbasi;
-      return isFemale ? femaleKakekMakeLove : maleKakekMakeLove;
-    }
-    // Prioritas 2: NENEK
-    if (rel.contains('nenek')) {
-      if (type.contains('pacar')) return isFemale ? femaleNenekPacaran : maleNenekPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleNenekMasturbasi : maleNenekMasturbasi;
-      return isFemale ? femaleNenekMakeLove : maleNenekMakeLove;
+    final double chanceFromCode = _getChanceFromAjakanFolder(relation, proposalType, gender: gender, sexuality: sexuality);
+
+    if (!_dynamicNotifiers.containsKey(cacheKey)) {
+      _dynamicNotifiers[cacheKey] = ValueNotifier<double>(chanceFromCode);
+    } else {
+      _dynamicNotifiers[cacheKey]!.value = chanceFromCode;
     }
 
-    // Prioritas 3: PASANGAN PAMAN, PAMAN, BIBI, SEPUPU, ANAK/KEPONAKAN, GURU/DOSEN
-    if (rel.contains('pasangan paman')) {
-      if (type.contains('pacar')) return isFemale ? femalePasanganPamanPacaran : malePasanganPamanPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femalePasanganPamanMasturbasi : malePasanganPamanMasturbasi;
-      return isFemale ? femalePasanganPamanMakeLove : malePasanganPamanMakeLove;
-    }
-    if (rel.contains('paman')) {
-      if (type.contains('pacar')) return isFemale ? femalePamanPacaran : malePamanPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femalePamanMasturbasi : malePamanMasturbasi;
-      return isFemale ? femalePamanMakeLove : malePamanMakeLove;
-    }
-    if (rel.contains('bibi')) {
-      if (type.contains('pacar')) return isFemale ? femaleBibiPacaran : maleBibiPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleBibiMasturbasi : maleBibiMasturbasi;
-      return isFemale ? femaleBibiMakeLove : maleBibiMakeLove;
-    }
-    if (rel.contains('sepupu')) {
-      if (type.contains('pacar')) return isFemale ? femaleSepupuPacaran : maleSepupuPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleSepupuMasturbasi : maleSepupuMasturbasi;
-      return isFemale ? femaleSepupuMakeLove : maleSepupuMakeLove;
-    }
-    if (rel.contains('anak') || rel.contains('keponakan')) {
-      if (type.contains('pacar')) return isFemale ? femaleAnakKeponakanPacaran : maleAnakKeponakanPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAnakKeponakanMasturbasi : maleAnakKeponakanMasturbasi;
-      return isFemale ? femaleAnakKeponakanMakeLove : maleAnakKeponakanMakeLove;
-    }
-    if (rel.contains('guru') || rel.contains('dosen')) {
-      if (type.contains('pacar')) return isFemale ? femaleGuruDosenPacaran : maleGuruDosenPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleGuruDosenMasturbasi : maleGuruDosenMasturbasi;
-      return isFemale ? femaleGuruDosenMakeLove : maleGuruDosenMakeLove;
-    }
-
-    // Prioritas 4: AYAH TIRI, AYAH MERTUA, AYAH KANDUNG
-    if (rel.contains('ayah tiri')) {
-      if (type.contains('pacar')) return isFemale ? femaleAyahTiriPacaran : maleAyahTiriPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAyahTiriMasturbasi : maleAyahTiriMasturbasi;
-      return isFemale ? femaleAyahTiriMakeLove : maleAyahTiriMakeLove;
-    }
-    if (rel.contains('ayah mertua')) {
-      if (type.contains('pacar')) return isFemale ? femaleAyahMertuaPacaran : maleAyahMertuaPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAyahMertuaMasturbasi : maleAyahMertuaMasturbasi;
-      return isFemale ? femaleAyahMertuaMakeLove : maleAyahMertuaMakeLove;
-    }
-    if (rel.contains('ayah')) {
-      if (type.contains('pacar')) return isFemale ? femaleAyahKandungPacaran : maleAyahKandungPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAyahKandungMasturbasi : maleAyahKandungMasturbasi;
-      return isFemale ? femaleAyahKandungMakeLove : maleAyahKandungMakeLove;
-    }
-
-    // Prioritas 5: IBU TIRI, IBU MERTUA, IBU KANDUNG
-    if (rel.contains('ibu tiri')) {
-      if (type.contains('pacar')) return isFemale ? femaleIbuTiriPacaran : maleIbuTiriPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleIbuTiriMasturbasi : maleIbuTiriMasturbasi;
-      return isFemale ? femaleIbuTiriMakeLove : maleIbuTiriMakeLove;
-    }
-    if (rel.contains('ibu mertua')) {
-      if (type.contains('pacar')) return isFemale ? femaleIbuMertuaPacaran : maleIbuMertuaPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleIbuMertuaMasturbasi : maleIbuMertuaMasturbasi;
-      return isFemale ? femaleIbuMertuaMakeLove : maleIbuMertuaMakeLove;
-    }
-    if (rel.contains('ibu')) {
-      if (type.contains('pacar')) return isFemale ? femaleIbuKandungPacaran : maleIbuKandungPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleIbuKandungMasturbasi : maleIbuKandungMasturbasi;
-      return isFemale ? femaleIbuKandungMakeLove : maleIbuKandungMakeLove;
-    }
-
-    // Prioritas 6: KAKAK & ADIK
-    if (rel.contains('kakak laki') || rel.contains('kakak pria')) {
-      if (type.contains('pacar')) return isFemale ? femaleKakakLakiPacaran : maleKakakLakiPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleKakakLakiMasturbasi : maleKakakLakiMasturbasi;
-      return isFemale ? femaleKakakLakiMakeLove : maleKakakLakiMakeLove;
-    }
-    if (rel.contains('kakak perem') || rel.contains('kakak wanita')) {
-      if (type.contains('pacar')) return isFemale ? femaleKakakPerempuanPacaran : maleKakakPerempuanPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleKakakPerempuanMasturbasi : maleKakakPerempuanMasturbasi;
-      return isFemale ? femaleKakakPerempuanMakeLove : maleKakakPerempuanMakeLove;
-    }
-    if (rel.contains('kakak')) {
-      if (type.contains('pacar')) return isFemale ? femaleKakakLakiPacaran : maleKakakLakiPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleKakakLakiMasturbasi : maleKakakLakiMasturbasi;
-      return isFemale ? femaleKakakLakiMakeLove : maleKakakLakiMakeLove;
-    }
-
-    if (rel.contains('adik laki') || rel.contains('adik pria')) {
-      if (type.contains('pacar')) return isFemale ? femaleAdikLakiPacaran : maleAdikLakiPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAdikLakiMasturbasi : maleAdikLakiMasturbasi;
-      return isFemale ? femaleAdikLakiMakeLove : maleAdikLakiMakeLove;
-    }
-    if (rel.contains('adik perem') || rel.contains('adik wanita')) {
-      if (type.contains('pacar')) return isFemale ? femaleAdikPerempuanPacaran : maleAdikPerempuanPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAdikPerempuanMasturbasi : maleAdikPerempuanMasturbasi;
-      return isFemale ? femaleAdikPerempuanMakeLove : maleAdikPerempuanMakeLove;
-    }
-    if (rel.contains('adik')) {
-      if (type.contains('pacar')) return isFemale ? femaleAdikLakiPacaran : maleAdikLakiPacaran;
-      if (type.contains('masturbasi')) return isFemale ? femaleAdikLakiMasturbasi : maleAdikLakiMasturbasi;
-      return isFemale ? femaleAdikLakiMakeLove : maleAdikLakiMakeLove;
-    }
-
-    // Default Non-Keluarga
-    if (type.contains('pacar')) return isFemale ? femaleNonKeluargaLainPacaran : maleNonKeluargaLainPacaran;
-    if (type.contains('masturbasi')) return isFemale ? femaleNonKeluargaLainMasturbasi : maleNonKeluargaLainMasturbasi;
-    return isFemale ? femaleNonKeluargaLainMakeLove : maleNonKeluargaLainMakeLove;
+    return _dynamicNotifiers[cacheKey]!;
   }
 
   /// Helper untuk mengambil nilai persentase numerik langsung (Memperhatikan toggle switch & GlobalSettings)
-  static double getChance(String relation, String proposalType, {String? gender}) {
+  static double getChance(String relation, String proposalType, {String? gender, String? sexuality}) {
     // 1. Cek apakah hubungan ini secara individual dinonaktifkan oleh switch per-anggota
     if (!getRelationEnabledNotifier(relation, gender: gender).value) {
       return 0.0;
@@ -493,10 +236,10 @@ class ProposalPercentageSettings {
       if (!isFam && GlobalSettings.disableMakeLoveNonFamily.value) return 0.0;
     }
 
-    return getNotifier(relation, proposalType, gender: gender).value;
+    return getNotifier(relation, proposalType, gender: gender, sexuality: sexuality).value;
   }
 
-  /// Reset semua nilai persentase ke default asli dari file-file hetero, lesbian, & gay
+  /// Reset semua toggle switch
   static void resetAll() {
     femaleAyahKandungEnabled.value = false;
     femaleAyahTiriEnabled.value = false;
@@ -538,162 +281,13 @@ class ProposalPercentageSettings {
     maleGuruDosenEnabled.value = false;
     maleNonKeluargaLainEnabled.value = false;
 
-    femaleAyahKandungPacaran.value = 60.0;
-    femaleAyahKandungMasturbasi.value = 55.0;
-    femaleAyahKandungMakeLove.value = 45.0;
-
-    femaleAyahTiriPacaran.value = 65.0;
-    femaleAyahTiriMasturbasi.value = 60.0;
-    femaleAyahTiriMakeLove.value = 60.0;
-
-    femaleAyahMertuaPacaran.value = 50.0;
-    femaleAyahMertuaMasturbasi.value = 50.0;
-    femaleAyahMertuaMakeLove.value = 50.0;
-
-    femaleIbuKandungPacaran.value = 50.0;
-    femaleIbuKandungMasturbasi.value = 45.0;
-    femaleIbuKandungMakeLove.value = 45.0;
-
-    femaleIbuTiriPacaran.value = 60.0;
-    femaleIbuTiriMasturbasi.value = 60.0;
-    femaleIbuTiriMakeLove.value = 60.0;
-
-    femaleIbuMertuaPacaran.value = 45.0;
-    femaleIbuMertuaMasturbasi.value = 45.0;
-    femaleIbuMertuaMakeLove.value = 45.0;
-
-    femaleKakakLakiPacaran.value = 45.0;
-    femaleKakakLakiMasturbasi.value = 45.0;
-    femaleKakakLakiMakeLove.value = 45.0;
-
-    femaleKakakPerempuanPacaran.value = 50.0;
-    femaleKakakPerempuanMasturbasi.value = 50.0;
-    femaleKakakPerempuanMakeLove.value = 50.0;
-
-    femaleAdikLakiPacaran.value = 45.0;
-    femaleAdikLakiMasturbasi.value = 45.0;
-    femaleAdikLakiMakeLove.value = 45.0;
-
-    femaleAdikPerempuanPacaran.value = 50.0;
-    femaleAdikPerempuanMasturbasi.value = 50.0;
-    femaleAdikPerempuanMakeLove.value = 50.0;
-
-    femalePamanPacaran.value = 45.0;
-    femalePamanMasturbasi.value = 45.0;
-    femalePamanMakeLove.value = 45.0;
-
-    femalePasanganPamanPacaran.value = 50.0;
-    femalePasanganPamanMasturbasi.value = 50.0;
-    femalePasanganPamanMakeLove.value = 50.0;
-
-    femaleBibiPacaran.value = 50.0;
-    femaleBibiMasturbasi.value = 50.0;
-    femaleBibiMakeLove.value = 50.0;
-
-    femaleSepupuPacaran.value = 55.0;
-    femaleSepupuMasturbasi.value = 55.0;
-    femaleSepupuMakeLove.value = 55.0;
-
-    femaleKakekPacaran.value = 45.0;
-    femaleKakekMasturbasi.value = 45.0;
-    femaleKakekMakeLove.value = 45.0;
-
-    femaleNenekPacaran.value = 45.0;
-    femaleNenekMasturbasi.value = 45.0;
-    femaleNenekMakeLove.value = 45.0;
-
-    femaleAnakKeponakanPacaran.value = 60.0;
-    femaleAnakKeponakanMasturbasi.value = 60.0;
-    femaleAnakKeponakanMakeLove.value = 60.0;
-
-    femaleGuruDosenPacaran.value = 55.0;
-    femaleGuruDosenMasturbasi.value = 55.0;
-    femaleGuruDosenMakeLove.value = 55.0;
-
-    femaleNonKeluargaLainPacaran.value = 50.0;
-    femaleNonKeluargaLainMasturbasi.value = 50.0;
-    femaleNonKeluargaLainMakeLove.value = 50.0;
-
-    // --- RESET MALE ---
-    maleAyahKandungPacaran.value = 10.0;
-    maleAyahKandungMasturbasi.value = 75.0;
-    maleAyahKandungMakeLove.value = 10.0;
-
-    maleAyahTiriPacaran.value = 70.0;
-    maleAyahTiriMasturbasi.value = 75.0;
-    maleAyahTiriMakeLove.value = 60.0;
-
-    maleAyahMertuaPacaran.value = 5.0;
-    maleAyahMertuaMasturbasi.value = 35.0;
-    maleAyahMertuaMakeLove.value = 5.0;
-
-    maleIbuKandungPacaran.value = 10.0;
-    maleIbuKandungMasturbasi.value = 75.0;
-    maleIbuKandungMakeLove.value = 10.0;
-
-    maleIbuTiriPacaran.value = 70.0;
-    maleIbuTiriMasturbasi.value = 75.0;
-    maleIbuTiriMakeLove.value = 60.0;
-
-    maleIbuMertuaPacaran.value = 30.0;
-    maleIbuMertuaMasturbasi.value = 35.0;
-    maleIbuMertuaMakeLove.value = 30.0;
-
-    maleKakakLakiPacaran.value = 5.0;
-    maleKakakLakiMasturbasi.value = 75.0;
-    maleKakakLakiMakeLove.value = 5.0;
-
-    maleKakakPerempuanPacaran.value = 30.0;
-    maleKakakPerempuanMasturbasi.value = 75.0;
-    maleKakakPerempuanMakeLove.value = 30.0;
-
-    maleAdikLakiPacaran.value = 5.0;
-    maleAdikLakiMasturbasi.value = 75.0;
-    maleAdikLakiMakeLove.value = 5.0;
-
-    maleAdikPerempuanPacaran.value = 40.0;
-    maleAdikPerempuanMasturbasi.value = 75.0;
-    maleAdikPerempuanMakeLove.value = 40.0;
-
-    malePamanPacaran.value = 5.0;
-    malePamanMasturbasi.value = 25.0;
-    malePamanMakeLove.value = 5.0;
-
-    malePasanganPamanPacaran.value = 5.0;
-    malePasanganPamanMasturbasi.value = 25.0;
-    malePasanganPamanMakeLove.value = 5.0;
-
-    maleBibiPacaran.value = 25.0;
-    maleBibiMasturbasi.value = 25.0;
-    maleBibiMakeLove.value = 25.0;
-
-    maleSepupuPacaran.value = 35.0;
-    maleSepupuMasturbasi.value = 30.0;
-    maleSepupuMakeLove.value = 35.0;
-
-    maleKakekPacaran.value = 5.0;
-    maleKakekMasturbasi.value = 25.0;
-    maleKakekMakeLove.value = 10.0;
-
-    maleNenekPacaran.value = 10.0;
-    maleNenekMasturbasi.value = 25.0;
-    maleNenekMakeLove.value = 10.0;
-
-    maleAnakKeponakanPacaran.value = 60.0;
-    maleAnakKeponakanMasturbasi.value = 30.0;
-    maleAnakKeponakanMakeLove.value = 60.0;
-
-    maleGuruDosenPacaran.value = 25.0;
-    maleGuruDosenMasturbasi.value = 45.0;
-    maleGuruDosenMakeLove.value = 25.0;
-
-    maleNonKeluargaLainPacaran.value = 35.0;
-    maleNonKeluargaLainMasturbasi.value = 15.0;
-    maleNonKeluargaLainMakeLove.value = 25.0;
+    _dynamicNotifiers.forEach((key, notifier) {
+      notifier.value = 50.0;
+    });
   }
 }
 
-/// Widget Slider custom untuk mengubah persentase ajakan pada menu setting
+/// Widget Slider custom untuk menampilkan persentase ajakan pada menu setting
 class PercentageSliderTile extends StatelessWidget {
   final String title;
   final ValueNotifier<double> notifier;

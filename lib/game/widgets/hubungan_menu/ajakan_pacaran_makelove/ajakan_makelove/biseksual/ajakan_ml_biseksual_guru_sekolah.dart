@@ -10,15 +10,15 @@ class AjakanMlBiseksualGuruSekolah {
     int chance;
     if (isBiseksual) {
       if (rel.contains('wali kelas')) {
-        chance = 50;
+        chance = 55;
       } else if (rel.contains('kepala sekolah')) {
-        chance = 50;
+        chance = 55;
       } else if (rel.contains('guru bk')) {
-        chance = 50;
+        chance = 55;
       } else if (rel.contains('guru')) {
-        chance = 50;
+        chance = 55;
       } else {
-        chance = 50;
+        chance = 55;
       }
     } else {
       chance = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender).toInt();
