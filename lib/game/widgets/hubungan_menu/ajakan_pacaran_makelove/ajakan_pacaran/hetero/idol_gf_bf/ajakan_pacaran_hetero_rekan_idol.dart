@@ -2,22 +2,24 @@ import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class AjakanPacaranHeteroRekanIdol {
-  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
-    final String rel = candidate['relation'].toString().toLowerCase();
-    int chance = 15;
+  static int getChance(Character character, Map<String, dynamic> candidate) {
+    final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString().toLowerCase();
 
-    if (rel.contains('main member') || rel.contains('utama') || rel.contains('center')) {
-      // Main Member / Center: +10%
-      chance += 10;
+    if (rel.contains('leader') || rel.contains('pemimpin')) {
+      return 37;
+    } else if (rel.contains('center') || rel.contains('main member') || rel.contains('utama')) {
+      return 35;
+    } else if (rel.contains('rekan idol') || rel.contains('member')) {
+      return 30;
     } else if (rel.contains('trainee')) {
-      // Trainee Baru: -5%
-      chance = (chance - 5).clamp(0, 100);
-    } else if (rel.contains('leader') || rel.contains('pemimpin')) {
-      // Group Leader: +12%
-      chance += 12;
+      return 25;
     }
+    return 30;
+  }
 
-    if (rand.nextDouble() < (chance / 100.0)) {
+  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+    final int chance = getChance(character, candidate);
+    if (rand.nextInt(100) < chance) {
       return {
         'name': '${candidate['name']} (Rekan Idol)',
         'relation': 'Rekan Idol',

@@ -2,44 +2,35 @@ import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class AjakanMlLesbianKeluarga {
-  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+  static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = candidate['relation'].toString().toLowerCase();
-    int chance = 30;
+    int chance = 10;
 
-    if (rel.contains('ibu mertua')) {
-      // Ibu Mertua: 5%
-      chance = 5;
-    } else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') {
-      // Anak Kandung/Tiri: 60%
-      chance = 60;
-    } else if (rel.contains('keponakan')) {
-      // Keponakan: 30%
-      chance = 30;
-    } else if (rel.contains('pasangan paman')) {
-      // Pasangan Paman (Istri Paman / Bibi): 25%
-      chance = 25;
-    } else if (rel.contains('bibi')) {
-      // Bibi Kandung: 15%
-      chance = 15;
+    if (rel.contains('ibu tiri')) {
+      return 60;
+    } else if (rel.contains('ibu mertua')) {
+      return 30;
     } else if (rel.contains('ibu')) {
-      // Ibu Kandung: 10% jika hak asuh di Ayah, 20% jika di Ibu
-      chance = character.custodyParent == 'Ayah' ? 10 : 20;
+      return character.custodyParent == 'Ibu' ? 45 : 10;
     } else if (rel.contains('kakak perempuan')) {
-      // Kakak Perempuan: 30%
-      chance = 30;
+      return 30;
     } else if (rel.contains('adik perempuan')) {
-      // Adik Perempuan: 30%
-      chance = 30;
+      return 40;
+    } else if (rel.contains('bibi')) {
+      return 25;
     } else if (rel.contains('sepupu')) {
-      // Sepupu: 35%
-      chance = 35;
+      return 40;
     } else if (rel.contains('nenek')) {
-      // Nenek: 5%
-      chance = 5;
+      return 10;
+    } else if (rel.contains('anak') || rel.contains('keponakan')) {
+      return 65;
     }
 
-    chance += 5; // player female bonus
+    return chance;
+  }
 
+  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+    final int chance = getChance(character, candidate);
     if (rand.nextInt(100) < chance) {
       return {
         'name': candidate['name'],
