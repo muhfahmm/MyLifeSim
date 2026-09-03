@@ -1,17 +1,17 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanPacaranHeteroGuruSekolah {
+class AjakanMlHeteroPerempuanDosen {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = candidate['relation'].toString().toLowerCase();
 
-    if (rel.contains('wali kelas')) {
+    if (rel.contains('pembimbing') || rel.contains('skripsi')) {
       return 30;
-    } else if (rel.contains('kepala sekolah')) {
+    } else if (rel.contains('dekan') || rel.contains('kaprodi')) {
       return 25;
-    } else if (rel.contains('guru bk')) {
+    } else if (rel.contains('penguji')) {
       return 25;
-    } else if (rel.contains('guru')) {
+    } else if (rel.contains('dosen')) {
       return 30;
     }
     return 30;
@@ -23,7 +23,7 @@ class AjakanPacaranHeteroGuruSekolah {
       return {
         'name': candidate['name'],
         'relation': candidate['relation'],
-        'type': 'Ajak Pacaran',
+        'type': 'Bercinta',
         'gender': candidate['gender'],
         'age': candidate['age'],
         'role': candidate['role'],

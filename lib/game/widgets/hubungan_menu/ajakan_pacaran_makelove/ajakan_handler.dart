@@ -19,11 +19,16 @@ import 'ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_coworker.dart';
 import 'ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_keluarga.dart';
 
 // Imports for hetero dating
-import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_teman_sekolah.dart';
-import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_guru_sekolah.dart';
-import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_dosen.dart';
-import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_coworker.dart';
-import 'ajakan_pacaran/hetero/ajakan_pacaran_hetero_keluarga.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_teman_sekolah.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_guru_sekolah.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_dosen.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_coworker.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_keluarga.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_teman_sekolah.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_guru_sekolah.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_dosen.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_coworker.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_keluarga.dart';
 
 // Imports for biseksual dating
 import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
@@ -47,19 +52,26 @@ import 'ajakan_makelove/lesbian/ajakan_ml_lesbian_coworker.dart';
 import 'ajakan_makelove/lesbian/ajakan_ml_lesbian_keluarga.dart';
 
 // Imports for hetero ml
-import 'ajakan_makelove/hetero/ajakan_ml_hetero_teman_sekolah.dart';
-import 'ajakan_makelove/hetero/ajakan_ml_hetero_guru_sekolah.dart';
-import 'ajakan_makelove/hetero/ajakan_ml_hetero_dosen.dart';
-import 'ajakan_makelove/hetero/ajakan_ml_hetero_coworker.dart';
-import 'ajakan_makelove/hetero/ajakan_ml_hetero_keluarga.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_teman_sekolah.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_guru_sekolah.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_dosen.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_coworker.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_keluarga.dart';
+import 'ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_teman_sekolah.dart';
+import 'ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_guru_sekolah.dart';
+import 'ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_dosen.dart';
+import 'ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_coworker.dart';
+import 'ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_keluarga.dart';
 
 // Idol sub-handlers
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_staf_idol.dart';
 import 'ajakan_pacaran/gay/idol_gf_bf/ajakan_pacaran_gay_rekan_idol.dart';
 import 'ajakan_pacaran/lesbian/idol_gf_bf/ajakan_pacaran_lesbian_staf_idol.dart';
 import 'ajakan_pacaran/lesbian/idol_gf_bf/ajakan_pacaran_lesbian_rekan_idol.dart';
-import 'ajakan_pacaran/hetero/idol_gf_bf/ajakan_pacaran_hetero_staf_idol.dart';
-import 'ajakan_pacaran/hetero/idol_gf_bf/ajakan_pacaran_hetero_rekan_idol.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/idol_gf_bf/ajakan_pacaran_hetero_perempuan_staf_idol.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/idol_gf_bf/ajakan_pacaran_hetero_perempuan_rekan_idol.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/idol_gf_bf/ajakan_pacaran_hetero_laki_staf_idol.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/idol_gf_bf/ajakan_pacaran_hetero_laki_rekan_idol.dart';
 import 'ajakan_pacaran/biseksual/idol_gf_bf/ajakan_pacaran_biseksual_staf_idol.dart';
 import 'ajakan_pacaran/biseksual/idol_gf_bf/ajakan_pacaran_biseksual_rekan_idol.dart';
 
@@ -67,8 +79,10 @@ import 'ajakan_makelove/gay/idol_makelove/ajakan_ml_gay_staf_idol.dart';
 import 'ajakan_makelove/gay/idol_makelove/ajakan_ml_gay_rekan_idol.dart';
 import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_staf_idol.dart';
 import 'ajakan_makelove/lesbian/idol_makelove/ajakan_ml_lesbian_rekan_idol.dart';
-import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_staf_idol.dart';
-import 'ajakan_makelove/hetero/idol_makelove/ajakan_ml_hetero_rekan_idol.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/idol_makelove/ajakan_ml_hetero_perempuan_staf_idol.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/idol_makelove/ajakan_ml_hetero_perempuan_rekan_idol.dart';
+import 'ajakan_makelove/hetero/hetero_laki/idol_makelove/ajakan_ml_hetero_laki_staf_idol.dart';
+import 'ajakan_makelove/hetero/hetero_laki/idol_makelove/ajakan_ml_hetero_laki_rekan_idol.dart';
 
 // Imports for biseksual ml
 import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
@@ -82,10 +96,12 @@ import 'ajakan_makelove/biseksual/BA_talent/ajakan_ml_biseksual_ba_talent.dart';
 
 // BA_talent sub-handlers
 import 'ajakan_makelove/gay/BA_talent/ajakan_ml_gay_ba_talent.dart';
-import 'ajakan_makelove/hetero/BA_talent/ajakan_ml_hetero_ba_talent.dart';
+import 'ajakan_makelove/hetero/hetero_perempuan/BA_talent/ajakan_ml_hetero_perempuan_ba_talent.dart';
+import 'ajakan_makelove/hetero/hetero_laki/BA_talent/ajakan_ml_hetero_laki_ba_talent.dart';
 import 'ajakan_makelove/lesbian/BA_talent/ajakan_ml_lesbian_ba_talent.dart';
 import 'ajakan_pacaran/gay/BA_talent/ajakan_pacaran_gay_ba_talent.dart';
-import 'ajakan_pacaran/hetero/BA_talent/ajakan_pacaran_hetero_ba_talent.dart';
+import 'ajakan_pacaran/hetero/hetero_perempuan/BA_talent/ajakan_pacaran_hetero_perempuan_ba_talent.dart';
+import 'ajakan_pacaran/hetero/hetero_laki/BA_talent/ajakan_pacaran_hetero_laki_ba_talent.dart';
 import 'ajakan_pacaran/lesbian/BA_talent/ajakan_pacaran_lesbian_ba_talent.dart';
 
 class AjakanHandler {
@@ -750,6 +766,9 @@ class AjakanHandler {
         final String userJob = character.jobName ?? '';
         final bool isEsport = userJob.startsWith('Pro Player Esport') || userJob.startsWith('Brand Ambassador Esport') || userJob.startsWith('Talent Esports');
 
+        final String myGenderLower = character.gender.trim().toLowerCase();
+        final bool isFemaleUser = myGenderLower == 'perempuan' || myGenderLower == 'female';
+
         if (isEsport) {
           if (isGay) {
             final pacaranProp = AjakanPacaranGayBaTalent.check(character, candidate, random);
@@ -760,8 +779,12 @@ class AjakanHandler {
             final mlProp = AjakanMlLesbianBaTalent.check(character, candidate, random);
             character.activeProposal = mlProp ?? pacaranProp;
           } else {
-            final pacaranProp = AjakanPacaranHeteroBaTalent.check(character, candidate, random);
-            final mlProp = AjakanMlHeteroBaTalent.check(character, candidate, random);
+            final pacaranProp = isFemaleUser
+                ? AjakanPacaranHeteroPerempuanBaTalent.check(character, candidate, random)
+                : AjakanPacaranHeteroLakiBaTalent.check(character, candidate, random);
+            final mlProp = isFemaleUser
+                ? AjakanMlHeteroPerempuanBaTalent.check(character, candidate, random)
+                : AjakanMlHeteroLakiBaTalent.check(character, candidate, random);
             character.activeProposal = mlProp ?? pacaranProp;
           }
         } else {
@@ -774,8 +797,12 @@ class AjakanHandler {
             final mlProp = AjakanMlLesbianCoworker.check(character, candidate, random);
             character.activeProposal = mlProp ?? pacaranProp;
           } else {
-            final pacaranProp = AjakanPacaranHeteroCoworker.check(character, candidate, random);
-            final mlProp = AjakanMlHeteroCoworker.check(character, candidate, random);
+            final pacaranProp = isFemaleUser
+                ? AjakanPacaranHeteroPerempuanCoworker.check(character, candidate, random)
+                : AjakanPacaranHeteroLakiCoworker.check(character, candidate, random);
+            final mlProp = isFemaleUser
+                ? AjakanMlHeteroPerempuanCoworker.check(character, candidate, random)
+                : AjakanMlHeteroLakiCoworker.check(character, candidate, random);
             character.activeProposal = mlProp ?? pacaranProp;
           }
         }
@@ -794,6 +821,8 @@ class AjakanHandler {
         }
       } else if (candRole == 'Keluarga' || candRole == 'Tiri') {
         final String rel = (candidate['relation'] ?? '').toString();
+        final String myGenderLower = character.gender.trim().toLowerCase();
+        final bool isFemaleUser = myGenderLower == 'perempuan' || myGenderLower == 'female';
 
         // Hitung jenis ajakan berdasarkan bobot persentase dinamis per-hubungan yang diatur oleh user
         final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
@@ -823,7 +852,9 @@ class AjakanHandler {
           } else if (isLesbian) {
             proposal = AjakanPacaranLesbianKeluarga.check(character, candidate, random);
           } else {
-            proposal = AjakanPacaranHeteroKeluarga.check(character, candidate, random);
+            proposal = isFemaleUser
+                ? AjakanPacaranHeteroPerempuanKeluarga.check(character, candidate, random)
+                : AjakanPacaranHeteroLakiKeluarga.check(character, candidate, random);
           }
           character.activeProposal = proposal ?? {
             'name': candidate['name'],
@@ -852,7 +883,9 @@ class AjakanHandler {
           } else if (isLesbian) {
             proposal = AjakanMlLesbianKeluarga.check(character, candidate, random);
           } else {
-            proposal = AjakanMlHeteroKeluarga.check(character, candidate, random);
+            proposal = isFemaleUser
+                ? AjakanMlHeteroPerempuanKeluarga.check(character, candidate, random)
+                : AjakanMlHeteroLakiKeluarga.check(character, candidate, random);
           }
           character.activeProposal = proposal ?? {
             'name': candidate['name'],
@@ -866,6 +899,8 @@ class AjakanHandler {
       } else {
         // Classmates, Teachers, Lecturers, Idols, Coworkers, BA Talent
         final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString();
+        final String myGenderLower = character.gender.trim().toLowerCase();
+        final bool isFemaleUser = myGenderLower == 'perempuan' || myGenderLower == 'female';
 
         final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
         final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender);
@@ -878,29 +913,63 @@ class AjakanHandler {
             Map<String, dynamic>? proposal;
             final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
             if (isBiseksual) {
-              if (candRole == 'Guru') proposal = AjakanPacaranBiseksualGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanPacaranBiseksualDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanPacaranBiseksualStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanPacaranBiseksualRekanIdol.check(character, candidate, random);
-              else proposal = AjakanPacaranBiseksualTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanPacaranBiseksualGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanPacaranBiseksualDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanPacaranBiseksualStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanPacaranBiseksualRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanPacaranBiseksualTemanSekolah.check(character, candidate, random);
+              }
             } else if (isGay) {
-              if (candRole == 'Guru') proposal = AjakanPacaranGayGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanPacaranGayDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanPacaranGayStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanPacaranGayRekanIdol.check(character, candidate, random);
-              else proposal = AjakanPacaranGayTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanPacaranGayGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanPacaranGayDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanPacaranGayStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanPacaranGayRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanPacaranGayTemanSekolah.check(character, candidate, random);
+              }
             } else if (isLesbian) {
-              if (candRole == 'Guru') proposal = AjakanPacaranLesbianGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanPacaranLesbianDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanPacaranLesbianStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanPacaranLesbianRekanIdol.check(character, candidate, random);
-              else proposal = AjakanPacaranLesbianTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanPacaranLesbianGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanPacaranLesbianDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanPacaranLesbianStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanPacaranLesbianRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanPacaranLesbianTemanSekolah.check(character, candidate, random);
+              }
             } else {
-              if (candRole == 'Guru') proposal = AjakanPacaranHeteroGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanPacaranHeteroDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanPacaranHeteroStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanPacaranHeteroRekanIdol.check(character, candidate, random);
-              else proposal = AjakanPacaranHeteroTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = isFemaleUser
+                    ? AjakanPacaranHeteroPerempuanGuruSekolah.check(character, candidate, random)
+                    : AjakanPacaranHeteroLakiGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = isFemaleUser
+                    ? AjakanPacaranHeteroPerempuanDosen.check(character, candidate, random)
+                    : AjakanPacaranHeteroLakiDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = isFemaleUser
+                    ? AjakanPacaranHeteroPerempuanStafIdol.check(character, candidate, random)
+                    : AjakanPacaranHeteroLakiStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = isFemaleUser
+                    ? AjakanPacaranHeteroPerempuanRekanIdol.check(character, candidate, random)
+                    : AjakanPacaranHeteroLakiRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = isFemaleUser
+                    ? AjakanPacaranHeteroPerempuanTemanSekolah.check(character, candidate, random)
+                    : AjakanPacaranHeteroLakiTemanSekolah.check(character, candidate, random);
+              }
             }
             character.activeProposal = proposal ?? {
               'name': candidate['name'],
@@ -923,29 +992,63 @@ class AjakanHandler {
             Map<String, dynamic>? proposal;
             final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
             if (isBiseksual) {
-              if (candRole == 'Guru') proposal = AjakanMlBiseksualGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanMlBiseksualDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanMlBiseksualStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanMlBiseksualRekanIdol.check(character, candidate, random);
-              else proposal = AjakanMlBiseksualTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanMlBiseksualGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanMlBiseksualDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanMlBiseksualStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanMlBiseksualRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanMlBiseksualTemanSekolah.check(character, candidate, random);
+              }
             } else if (isGay) {
-              if (candRole == 'Guru') proposal = AjakanMlGayGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanMlGayDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanMlGayStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanMlGayRekanIdol.check(character, candidate, random);
-              else proposal = AjakanMlGayTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanMlGayGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanMlGayDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanMlGayStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanMlGayRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanMlGayTemanSekolah.check(character, candidate, random);
+              }
             } else if (isLesbian) {
-              if (candRole == 'Guru') proposal = AjakanMlLesbianGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanMlLesbianDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanMlLesbianStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanMlLesbianRekanIdol.check(character, candidate, random);
-              else proposal = AjakanMlLesbianTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = AjakanMlLesbianGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = AjakanMlLesbianDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = AjakanMlLesbianStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = AjakanMlLesbianRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = AjakanMlLesbianTemanSekolah.check(character, candidate, random);
+              }
             } else {
-              if (candRole == 'Guru') proposal = AjakanMlHeteroGuruSekolah.check(character, candidate, random);
-              else if (candRole == 'Dosen') proposal = AjakanMlHeteroDosen.check(character, candidate, random);
-              else if (candRole == 'Staf Idol') proposal = AjakanMlHeteroStafIdol.check(character, candidate, random);
-              else if (candRole == 'Rekan Idol') proposal = AjakanMlHeteroRekanIdol.check(character, candidate, random);
-              else proposal = AjakanMlHeteroTemanSekolah.check(character, candidate, random);
+              if (candRole == 'Guru') {
+                proposal = isFemaleUser
+                    ? AjakanMlHeteroPerempuanGuruSekolah.check(character, candidate, random)
+                    : AjakanMlHeteroLakiGuruSekolah.check(character, candidate, random);
+              } else if (candRole == 'Dosen') {
+                proposal = isFemaleUser
+                    ? AjakanMlHeteroPerempuanDosen.check(character, candidate, random)
+                    : AjakanMlHeteroLakiDosen.check(character, candidate, random);
+              } else if (candRole == 'Staf Idol') {
+                proposal = isFemaleUser
+                    ? AjakanMlHeteroPerempuanStafIdol.check(character, candidate, random)
+                    : AjakanMlHeteroLakiStafIdol.check(character, candidate, random);
+              } else if (candRole == 'Rekan Idol') {
+                proposal = isFemaleUser
+                    ? AjakanMlHeteroPerempuanRekanIdol.check(character, candidate, random)
+                    : AjakanMlHeteroLakiRekanIdol.check(character, candidate, random);
+              } else {
+                proposal = isFemaleUser
+                    ? AjakanMlHeteroPerempuanTemanSekolah.check(character, candidate, random)
+                    : AjakanMlHeteroLakiTemanSekolah.check(character, candidate, random);
+              }
             }
             character.activeProposal = proposal ?? {
               'name': candidate['name'],

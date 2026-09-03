@@ -1,20 +1,34 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanMlHeteroCoworker {
+class AjakanMlHeteroLakiKeluarga {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = candidate['relation'].toString().toLowerCase();
 
-    if (rel.contains('bos') || rel.contains('atasan') || rel.contains('direktur')) {
+    if (rel.contains('ibu tiri')) {
+      return 60;
+    } else if (rel.contains('ibu mertua')) {
       return 30;
-    } else if (rel.contains('supervisor')) {
+    } else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') {
+      return 65;
+    } else if (rel.contains('keponakan')) {
+      return 30;
+    } else if (rel.contains('pasangan paman')) {
+      return 10;
+    } else if (rel.contains('bibi')) {
       return 25;
-    } else if (rel.contains('rekan kerja') || rel.contains('coworker')) {
+    } else if (rel.contains('ibu')) {
+      return character.custodyParent == 'Ibu' ? 45 : 10;
+    } else if (rel.contains('kakak perempuan')) {
       return 30;
-    } else if (rel.contains('anak magang') || rel.contains('intern')) {
-      return 20;
+    } else if (rel.contains('adik perempuan')) {
+      return 40;
+    } else if (rel.contains('sepupu')) {
+      return 40;
+    } else if (rel.contains('nenek')) {
+      return 10;
     }
-    return 25;
+    return 10;
   }
 
   static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {

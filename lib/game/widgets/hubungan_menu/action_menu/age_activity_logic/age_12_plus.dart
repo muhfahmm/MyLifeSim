@@ -11,7 +11,6 @@ import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/thr
 import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 
@@ -94,7 +93,6 @@ List<ActionItem> getAge12PlusActions(
   VoidCallback updateState,
 ) {
   final String relation = targetName.split(' ')[0];
-  final String myGender = character.gender.trim().toLowerCase();
   final String partnerGender = _getPartnerGender(targetName).toLowerCase();
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
   final bool isAlreadyPartner = character.partner != null && character.partner!['name'] == targetName;
@@ -411,7 +409,6 @@ List<ActionItem> getAge12PlusActions(
       onTap: () {
         int currentRel = _getCurrentRelationshipValue();
         bool accepted = false;
-        String targetNameLower = targetName.toLowerCase();
 
         // --- LOGIKA PERSENTASE AJAK BALIKAN (jika mantan) ---
         if (isExPartner) {

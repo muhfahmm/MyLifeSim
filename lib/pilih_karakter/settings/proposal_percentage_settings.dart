@@ -16,17 +16,29 @@ import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajaka
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
 
-// Imports for hetero handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/ajakan_pacaran_hetero_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/ajakan_ml_hetero_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/ajakan_pacaran_hetero_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/ajakan_ml_hetero_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/ajakan_pacaran_hetero_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/ajakan_ml_hetero_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/ajakan_pacaran_hetero_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/ajakan_ml_hetero_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/ajakan_pacaran_hetero_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/ajakan_ml_hetero_teman_sekolah.dart';
+// Imports for hetero perempuan handlers
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_teman_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_teman_sekolah.dart';
+
+// Imports for hetero laki handlers
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_keluarga.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_coworker.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_dosen.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_guru_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_teman_sekolah.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_teman_sekolah.dart';
 
 // Imports for gay handlers
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_keluarga.dart';
@@ -54,7 +66,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajaka
 
 /// Class untuk mengelola preferensi persentase ajakan NPC per-hubungan detail.
 /// HANYA mengelola toggle switch per-anggota, sedangkan DATA PERSENTASE DIBACA
-/// SECARA DINAMIS LANGSUNG DARI FOLDER `ajakan_pacaran_makelove` (Hetero, Gay, Lesbian, Biseksual)
+/// SECARA DINAMIS LANGSUNG DARI FOLDER `ajakan_pacaran_makelove` (Hetero Perempuan, Hetero Laki, Gay, Lesbian, Biseksual)
 /// SEBAGAI SINGLE SOURCE OF TRUTH.
 class ProposalPercentageSettings {
   // =========================================================
@@ -242,11 +254,11 @@ class ProposalPercentageSettings {
   }
 
   /// Membaca persentase DINAMIS LANGSUNG DARI FILE KODE FOLDER `ajakan_pacaran_makelove`
-  /// (Mendukung Biseksual, Gay, Lesbian, dan Hetero)
+  /// (Mendukung Biseksual, Gay, Lesbian, Hetero Perempuan, dan Hetero Laki)
   static double _getChanceFromAjakanFolder(String relation, String proposalType, {String? gender, String? sexuality}) {
     final String currentGender = (gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
     final bool isFemale = currentGender == 'perempuan' || currentGender == 'female';
-    final String effectiveSexuality = sexuality ?? (isFemale ? 'Lesbian' : 'Gay');
+    final String effectiveSexuality = (sexuality ?? GlobalSettings.userSexuality.value).trim();
 
     final dummyChar = Character(
       name: 'User',
@@ -344,29 +356,55 @@ class ProposalPercentageSettings {
         }
       }
     }
-    // 4. HETERO
+    // 4. HETERO (Dipisah menjadi hetero_perempuan dan hetero_laki)
     else {
-      if (t.contains('bercinta') || t.contains('love')) {
-        if (r.contains('guru') || r.contains('dosen')) {
-          if (r.contains('dosen')) return AjakanMlHeteroDosen.getChance(dummyChar, candidate).toDouble();
-          return AjakanMlHeteroGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
-          return AjakanMlHeteroTemanSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
-          return AjakanMlHeteroCoworker.getChance(dummyChar, candidate).toDouble();
+      if (isFemale) {
+        if (t.contains('bercinta') || t.contains('love')) {
+          if (r.contains('guru') || r.contains('dosen')) {
+            if (r.contains('dosen')) return AjakanMlHeteroPerempuanDosen.getChance(dummyChar, candidate).toDouble();
+            return AjakanMlHeteroPerempuanGuruSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+            return AjakanMlHeteroPerempuanTemanSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+            return AjakanMlHeteroPerempuanCoworker.getChance(dummyChar, candidate).toDouble();
+          } else {
+            return AjakanMlHeteroPerempuanKeluarga.getChance(dummyChar, candidate).toDouble();
+          }
         } else {
-          return AjakanMlHeteroKeluarga.getChance(dummyChar, candidate).toDouble();
+          if (r.contains('guru') || r.contains('dosen')) {
+            if (r.contains('dosen')) return AjakanPacaranHeteroPerempuanDosen.getChance(dummyChar, candidate).toDouble();
+            return AjakanPacaranHeteroPerempuanGuruSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+            return AjakanPacaranHeteroPerempuanTemanSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+            return AjakanPacaranHeteroPerempuanCoworker.getChance(dummyChar, candidate).toDouble();
+          } else {
+            return AjakanPacaranHeteroPerempuanKeluarga.getChance(dummyChar, candidate).toDouble();
+          }
         }
       } else {
-        if (r.contains('guru') || r.contains('dosen')) {
-          if (r.contains('dosen')) return AjakanPacaranHeteroDosen.getChance(dummyChar, candidate).toDouble();
-          return AjakanPacaranHeteroGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
-          return AjakanPacaranHeteroTemanSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
-          return AjakanPacaranHeteroCoworker.getChance(dummyChar, candidate).toDouble();
+        if (t.contains('bercinta') || t.contains('love')) {
+          if (r.contains('guru') || r.contains('dosen')) {
+            if (r.contains('dosen')) return AjakanMlHeteroLakiDosen.getChance(dummyChar, candidate).toDouble();
+            return AjakanMlHeteroLakiGuruSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+            return AjakanMlHeteroLakiTemanSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+            return AjakanMlHeteroLakiCoworker.getChance(dummyChar, candidate).toDouble();
+          } else {
+            return AjakanMlHeteroLakiKeluarga.getChance(dummyChar, candidate).toDouble();
+          }
         } else {
-          return AjakanPacaranHeteroKeluarga.getChance(dummyChar, candidate).toDouble();
+          if (r.contains('guru') || r.contains('dosen')) {
+            if (r.contains('dosen')) return AjakanPacaranHeteroLakiDosen.getChance(dummyChar, candidate).toDouble();
+            return AjakanPacaranHeteroLakiGuruSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+            return AjakanPacaranHeteroLakiTemanSekolah.getChance(dummyChar, candidate).toDouble();
+          } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
+            return AjakanPacaranHeteroLakiCoworker.getChance(dummyChar, candidate).toDouble();
+          } else {
+            return AjakanPacaranHeteroLakiKeluarga.getChance(dummyChar, candidate).toDouble();
+          }
         }
       }
     }

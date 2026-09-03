@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanMlHeteroStafIdol {
+class AjakanMlHeteroPerempuanStafIdol {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString().toLowerCase();
 

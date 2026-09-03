@@ -1,16 +1,18 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanPacaranHeteroStafIdol {
+class AjakanPacaranHeteroPerempuanRekanIdol {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString().toLowerCase();
 
-    if (rel.contains('produser') || rel.contains('director')) {
+    if (rel.contains('leader') || rel.contains('pemimpin')) {
+      return 37;
+    } else if (rel.contains('center') || rel.contains('main member') || rel.contains('utama')) {
       return 35;
-    } else if (rel.contains('manager') || rel.contains('gm')) {
+    } else if (rel.contains('rekan idol') || rel.contains('member')) {
       return 30;
-    } else if (rel.contains('operasional') || rel.contains('staf')) {
-      return 30;
+    } else if (rel.contains('trainee')) {
+      return 25;
     }
     return 30;
   }
@@ -19,12 +21,12 @@ class AjakanPacaranHeteroStafIdol {
     final int chance = getChance(character, candidate);
     if (rand.nextInt(100) < chance) {
       return {
-        'name': '${candidate['name']} (Staf ${candidate['role']})',
-        'relation': 'Staf Idol (${candidate['role']})',
+        'name': '${candidate['name']} (Rekan Idol)',
+        'relation': 'Rekan Idol',
         'type': 'Ajak Pacaran',
         'gender': candidate['gender'] ?? 'Laki-laki',
-        'age': candidate['age'] ?? '30',
-        'role': 'Staf Idol',
+        'age': candidate['age'] ?? '16',
+        'role': 'Rekan Idol',
       };
     }
     return null;

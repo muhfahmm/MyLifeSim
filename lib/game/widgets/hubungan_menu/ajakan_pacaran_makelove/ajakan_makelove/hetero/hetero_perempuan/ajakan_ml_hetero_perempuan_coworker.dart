@@ -1,20 +1,20 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanMlHeteroTemanSekolah {
+class AjakanMlHeteroPerempuanCoworker {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = candidate['relation'].toString().toLowerCase();
 
-    if (rel.contains('kakak kelas')) {
-      return 35;
-    } else if (rel.contains('teman sekelas')) {
-      return 35;
-    } else if (rel.contains('teman satu angkatan') || rel.contains('angkatan')) {
+    if (rel.contains('bos') || rel.contains('atasan') || rel.contains('direktur')) {
       return 30;
-    } else if (rel.contains('adik kelas')) {
+    } else if (rel.contains('supervisor')) {
+      return 25;
+    } else if (rel.contains('rekan kerja') || rel.contains('coworker')) {
       return 30;
+    } else if (rel.contains('anak magang') || rel.contains('intern')) {
+      return 20;
     }
-    return 35;
+    return 25;
   }
 
   static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {

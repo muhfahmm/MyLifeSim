@@ -12,6 +12,7 @@ import 'package:bitlife/pilih_karakter/customization/appearance_customization.da
 import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
 import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
+import 'package:bitlife/pilih_karakter/customization/country_picker_dialog.dart';
 import 'package:bitlife/pilih_karakter/settings/settings.dart'; // Tambahan Import
 import 'package:bitlife/main.dart';
 
@@ -335,129 +336,17 @@ class _KarakterScreenState extends State<KarakterScreen> {
       return;
     }
 
-    final Map<String, List<String>> continentMap = {
-      'Asia': ['afganistan', 'arab saudi', 'armenia', 'azerbaijan', 'bahrain', 'bangladesh', 'bhutan', 'brunei', 'china', 'filipina', 'georgia', 'hong kong', 'india', 'indonesia', 'irak', 'iran', 'israel', 'jepang', 'kamboja', 'kazakhstan', 'kirgizstan', 'korea selatan', 'korea utara', 'kuwait', 'laos', 'lebanon', 'makau', 'malaysia', 'maldives', 'mongolia', 'myanmar', 'nepal', 'oman', 'pakistan', 'palestina', 'qatar', 'singapura', 'siprus', 'sri lanka', 'suriah', 'tajikistan', 'thailand', 'timor leste', 'turkmenistan', 'uni emirat arab', 'uzbekistan', 'vietnam', 'yaman', 'yordania'],
-      'Afrika': ['afrika selatan', 'aljazair', 'angola', 'benin', 'botswana', 'burkina faso', 'burundi', 'chad', 'djibouti', 'eritrea', 'eswatini', 'ethiopia', 'gabon', 'gambia', 'ghana', 'guinea', 'guinea bissau', 'kamerun', 'kenya', 'komoro', 'kongo', 'lesotho', 'liberia', 'libya', 'madagaskar', 'malawi', 'mali', 'maroko', 'mauritania', 'mauritius', 'mesir', 'mozambik', 'namibia', 'niger', 'nigeria', 'pantai gading', 'republik afrika tengah', 'republik demokratik kongo', 'rwanda', 'senegal', 'seychelles', 'sierra leone', 'somalia', 'sudan', 'sudan selatan', 'tanjung verde', 'tanzania', 'togo', 'tunisia', 'uganda', 'zambia', 'zimbabwe'],
-      'Eropa': ['albania', 'andorra', 'austria', 'belanda', 'belarus', 'belgia', 'bosnia dan hercegovina', 'bulgaria', 'ceko', 'denmark', 'estonia', 'finlandia', 'gibraltar', 'greenland', 'hungaria', 'inggris', 'irlandia', 'islandia', 'italia', 'jerman', 'kosovo', 'kroasia', 'latvia', 'liechtenstein', 'lithuania', 'luksemburg', 'makedonia utara', 'malta', 'moldova', 'monako', 'montenegro', 'norwegia', 'polandia', 'portugal', 'prancis', 'republik rumania', 'republik serbia', 'rusia', 'san marino', 'slovenia', 'slowakia', 'spanyol', 'swedia', 'swiss', 'ukraina', 'vatikan', 'yunani'],
-      'Amerika Utara': ['amerika serikat', 'antigua dan barbuda', 'bahama', 'barbados', 'belize', 'bermuda', 'costa rica', 'curacao', 'dominika', 'el salvador', 'grenada', 'guatemala', 'haiti', 'honduras', 'jamaika', 'kanada', 'kuba', 'meksiko', 'nikaragua', 'panama', 'puerto rico', 'republik dominika', 'saint kitts dan nevis', 'saint lucia', 'saint vincent dan grenadine', 'trinidad dan tobago'],
-      'Amerika Selatan': ['argentina', 'bolivia', 'brazil', 'chile', 'ekuador', 'guyana', 'guiana prancis', 'kolombia', 'paraguay', 'peru', 'suriname', 'uruguay', 'venezuela'],
-      'Oseania': ['australia', 'fiji', 'guam', 'kiribati', 'kepulauan marshall', 'mikronesia', 'nauru', 'palau', 'papua nugini', 'samoa', 'samoa amerika', 'selandia baru', 'tahiti', 'tonga', 'tuvalu', 'vanuatu']
-    };
-
-    final Map<String, List<Map<String, dynamic>>> groupedCountries = {
-      'Asia': [], 'Afrika': [], 'Eropa': [], 'Amerika Utara': [], 'Amerika Selatan': [], 'Oseania': []
-    };
-    for (var country in _countriesList) {
-      String name = (country['name'] ?? '').toString().toLowerCase();
-      bool found = false;
-      for (var entry in continentMap.entries) {
-        if (entry.value.contains(name)) {
-          groupedCountries[entry.key]!.add(country);
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        groupedCountries['Asia']!.add(country);
-      }
-    }
-
-    final List<String> tabLabels = ['Asia', 'Afrika', 'Eropa', 'Amerika Utara', 'Amerika Selatan', 'Oseania'];
-
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        String searchQuery = '';
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              child: Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height * 0.8,
-                  maxWidth: 600,
-                ),
-                padding: const EdgeInsets.all(16.0),
-                child: DefaultTabController(
-                  length: tabLabels.length,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Text(
-                        'Pilih Negara Asal',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 12),
-                      TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Cari negara...',
-                          prefixIcon: const Icon(Icons.search),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        ),
-                        onChanged: (value) {
-                          setStateDialog(() {
-                            searchQuery = value;
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      TabBar(
-                        isScrollable: true,
-                        tabAlignment: TabAlignment.center,
-                        labelColor: Colors.blue,
-                        unselectedLabelColor: Colors.black54,
-                        indicatorColor: Colors.blue,
-                        indicatorSize: TabBarIndicatorSize.label,
-                        labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
-                        padding: EdgeInsets.zero,
-                        labelPadding: const EdgeInsets.symmetric(horizontal: 16.0),
-                        tabs: tabLabels.map((label) => Tab(text: label)).toList(),
-                      ),
-
-                      const SizedBox(height: 8),
-                      Expanded(
-                        child: TabBarView(
-                          children: tabLabels.map((continent) {
-                            List<Map<String, dynamic>> countriesInContinent = groupedCountries[continent] ?? [];
-                            if (searchQuery.isNotEmpty) {
-                              countriesInContinent = countriesInContinent.where((country) {
-                                final name = (country['name'] ?? '').toString().toLowerCase();
-                                return name.contains(searchQuery.toLowerCase());
-                              }).toList();
-                            }
-                            return countriesInContinent.isEmpty
-                                ? const Center(child: Text('Tidak ada negara ditemukan', style: TextStyle(color: Colors.grey)))
-                                : ListView.builder(
-                                    itemCount: countriesInContinent.length,
-                                    itemBuilder: (context, index) {
-                                      final country = countriesInContinent[index];
-                                      return ListTile(
-                                        leading: Text(
-                                          _countryCodeToEmoji(country['iso']),
-                                          style: const TextStyle(fontSize: 24),
-                                        ),
-                                        title: Text(country['name']),
-                                        onTap: () {
-                                          Navigator.pop(context);
-                                          setState(() {
-                                            _currentCountry = country['name'];
-                                            _currentCountryIso = country['iso'];
-                                          });
-                                          _loadNamesData();
-                                        },
-                                      );
-                                    },
-                                  );
-                          }).toList(),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            );
+        return CountryPickerDialog(
+          countriesList: _countriesList,
+          onCountrySelected: (country) {
+            setState(() {
+              _currentCountry = country['name'];
+              _currentCountryIso = country['iso'];
+            });
+            _loadNamesData();
           },
         );
       },

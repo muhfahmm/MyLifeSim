@@ -1,18 +1,18 @@
 import 'dart:math';
 import 'package:bitlife/pilih_karakter/character.dart';
 
-class AjakanMlHeteroBaTalent {
+class AjakanMlHeteroLakiRekanIdol {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final String rel = (candidate['relation'] ?? candidate['role'] ?? '').toString().toLowerCase();
 
-    if (rel.contains('ceo') || rel.contains('atasan')) {
+    if (rel.contains('leader') || rel.contains('pemimpin')) {
+      return 32;
+    } else if (rel.contains('center') || rel.contains('main member') || rel.contains('utama')) {
       return 30;
-    } else if (rel.contains('brand ambassador') || rel.contains('ba')) {
+    } else if (rel.contains('rekan idol') || rel.contains('member')) {
       return 25;
-    } else if (rel.contains('talent')) {
-      return 25;
-    } else if (rel.contains('pro player')) {
-      return 30;
+    } else if (rel.contains('trainee')) {
+      return 20;
     }
     return 25;
   }
@@ -21,12 +21,12 @@ class AjakanMlHeteroBaTalent {
     final int chance = getChance(character, candidate);
     if (rand.nextInt(100) < chance) {
       return {
-        'name': candidate['name'],
-        'relation': candidate['role'] ?? 'Rekan Esports',
+        'name': '${candidate['name']} (Rekan Idol)',
+        'relation': 'Rekan Idol',
         'type': 'Bercinta',
-        'gender': candidate['gender'] ?? 'Laki-laki',
-        'age': candidate['age'] ?? '18',
-        'role': candidate['role'] ?? 'BA_talent',
+        'gender': candidate['gender'] ?? 'Perempuan',
+        'age': candidate['age'] ?? '16',
+        'role': 'Rekan Idol',
       };
     }
     return null;
