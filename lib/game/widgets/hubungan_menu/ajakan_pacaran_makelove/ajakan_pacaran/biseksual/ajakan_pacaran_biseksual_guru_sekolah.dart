@@ -10,13 +10,13 @@ class AjakanPacaranBiseksualGuruSekolah {
     int chance;
     if (isBiseksual) {
       if (rel.contains('wali kelas')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('kepala sekolah')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('guru bk')) {
         chance = 50;
       } else if (rel.contains('guru')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }

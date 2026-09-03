@@ -10,9 +10,9 @@ class AjakanPacaranBiseksualStafIdol {
     int chance;
     if (isBiseksual) {
       if (rel.contains('produser') || rel.contains('director')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('manager') || rel.contains('gm')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('operasional') || rel.contains('staf')) {
         chance = 50;
       } else {

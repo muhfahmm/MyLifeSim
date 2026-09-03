@@ -10,13 +10,13 @@ class AjakanPacaranBiseksualCoworker {
     int chance;
     if (isBiseksual) {
       if (rel.contains('bos') || rel.contains('atasan') || rel.contains('direktur')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('supervisor')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('rekan kerja') || rel.contains('coworker')) {
         chance = 50;
       } else if (rel.contains('anak magang') || rel.contains('intern')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }

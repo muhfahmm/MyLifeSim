@@ -10,13 +10,13 @@ class AjakanPacaranBiseksualTemanSekolah {
     int chance;
     if (isBiseksual) {
       if (rel.contains('kakak kelas')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('teman sekelas')) {
         chance = 50;
       } else if (rel.contains('teman satu angkatan') || rel.contains('angkatan')) {
-        chance = 45;
+        chance = 50;
       } else if (rel.contains('adik kelas')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }

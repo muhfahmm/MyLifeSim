@@ -10,13 +10,13 @@ class AjakanMlBiseksualDosen {
     int chance;
     if (isBiseksual) {
       if (rel.contains('pembimbing') || rel.contains('skripsi')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('dekan') || rel.contains('kaprodi')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('penguji')) {
         chance = 50;
       } else if (rel.contains('dosen')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }

@@ -10,13 +10,13 @@ class AjakanMlBiseksualRekanIdol {
     int chance;
     if (isBiseksual) {
       if (rel.contains('leader') || rel.contains('pemimpin')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('center') || rel.contains('main member') || rel.contains('utama')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('rekan idol') || rel.contains('member')) {
         chance = 50;
       } else if (rel.contains('trainee')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }

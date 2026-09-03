@@ -10,13 +10,13 @@ class AjakanPacaranBiseksualBaTalent {
     int chance;
     if (isBiseksual) {
       if (rel.contains('ceo') || rel.contains('atasan')) {
-        chance = 60;
+        chance = 50;
       } else if (rel.contains('brand ambassador') || rel.contains('ba')) {
-        chance = 55;
+        chance = 50;
       } else if (rel.contains('talent')) {
         chance = 50;
       } else if (rel.contains('pro player')) {
-        chance = 45;
+        chance = 50;
       } else {
         chance = 50;
       }
