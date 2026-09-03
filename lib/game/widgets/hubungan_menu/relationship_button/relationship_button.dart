@@ -694,7 +694,23 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(name, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal)),
+                                  Row(
+                                    children: [
+                                      Icon(
+                                        character.gender.toLowerCase().contains('perempuan') ? Icons.female : Icons.male,
+                                        color: character.gender.toLowerCase().contains('perempuan') ? Colors.pink : Colors.blue,
+                                        size: 16,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Expanded(
+                                        child: Text(
+                                          name,
+                                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   const SizedBox(height: 2),
                                   Text('Umur: $age tahun', style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.black54)),
                                 ],
@@ -876,6 +892,76 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       );
                     })(),
                   ],
+                  // ============================================
+                  // 6. BAGIAN TEMAN (DENGAN TITLE TEMAN)
+                  // ============================================
+                  (() {
+                    final List<Map<String, String>> activeFriends = [];
+
+                    // Kumpulkan dari character.friends
+                    for (var f in character.friends) {
+                      if (f['isDeceased'] != 'true') {
+                        if (!activeFriends.any((e) => e['name'] == f['name'])) {
+                          activeFriends.add(f);
+                        }
+                      }
+                    }
+
+                    // Kumpulkan dari seluruh list NPC (classmates, univClassmates, coworkers, extendedFamily, siblings) yang bertanda isFriend == 'true'
+                    final List<List<Map<String, String>>> allNpcLists = [
+                      character.classmates,
+                      character.univClassmates,
+                      character.coworkers,
+                      character.extendedFamily,
+                      character.siblings,
+                    ];
+                    for (var list in allNpcLists) {
+                      for (var item in list) {
+                        if (item['isFriend'] == 'true' && item['isDeceased'] != 'true') {
+                          if (!activeFriends.any((e) => e['name'] == item['name'])) {
+                            activeFriends.add(item);
+                          }
+                        }
+                      }
+                    }
+
+                    if (activeFriends.isEmpty) return const SizedBox.shrink();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Divider(height: 32),
+                        const Text('👥 Teman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                        const SizedBox(height: 8),
+                        ...activeFriends.map((friend) {
+                          final String fName = friend['name'] ?? 'Teman';
+                          final String fGender = friend['gender'] ?? 'Perempuan';
+                          final int fRel = int.tryParse(friend['relationship'] ?? '70') ?? 70;
+                          final int fAge = int.tryParse(friend['age'] ?? '12') ?? 12;
+                          final bool isDeceased = friend['isDeceased'] == 'true';
+                          final bool isMale = fGender.toLowerCase().contains('laki');
+
+                          return _buildFamilyItem(
+                            context,
+                            icon: isMale ? Icons.male : Icons.female,
+                            label: isDeceased ? '$fName (Wafat)' : fName,
+                            status: 'Teman',
+                            color: isDeceased ? Colors.grey : Colors.blueAccent,
+                            relationshipValue: fRel,
+                            ageText: '$fAge tahun',
+                            isDeceased: isDeceased,
+                            gender: fGender,
+                            avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                              name: fName,
+                              gender: fGender,
+                              age: fAge,
+                              happiness: fRel,
+                            ),
+                          );
+                        }).toList(),
+                      ],
+                    );
+                  })(),
                   const Divider(height: 32),
                 ],
               );
@@ -920,6 +1006,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     bool isLivingTogether = false,
     String? extraBadgeText,
     Color? extraBadgeColor,
+    String? gender,
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
@@ -977,14 +1064,55 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        label,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDeceased ? Colors.grey.shade600 : null,
-                        ),
-                      ),
+                      (() {
+                        final String lowerGender = (gender ?? '').toLowerCase();
+                        final String lowerLabel = label.toLowerCase();
+                        final String lowerStatus = status.toLowerCase();
+                        final bool isFemale = lowerGender.contains('perempuan') ||
+                            icon == Icons.female ||
+                            lowerLabel.contains('ibu') ||
+                            lowerLabel.contains('nenek') ||
+                            lowerLabel.contains('bibi') ||
+                            lowerLabel.contains('istri') ||
+                            lowerStatus.contains('perempuan');
+                        final bool isMale = lowerGender.contains('laki') ||
+                            icon == Icons.male ||
+                            lowerLabel.contains('ayah') ||
+                            lowerLabel.contains('kakek') ||
+                            lowerLabel.contains('paman') ||
+                            lowerLabel.contains('suami') ||
+                            lowerStatus.contains('laki');
+
+                        IconData? genderIcon;
+                        Color? genderColor;
+                        if (isFemale) {
+                          genderIcon = Icons.female;
+                          genderColor = Colors.pink;
+                        } else if (isMale) {
+                          genderIcon = Icons.male;
+                          genderColor = Colors.blue;
+                        }
+
+                        return Row(
+                          children: [
+                            if (genderIcon != null) ...[
+                              Icon(genderIcon, color: genderColor, size: 16),
+                              const SizedBox(width: 4),
+                            ],
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDeceased ? Colors.grey.shade600 : null,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        );
+                      })(),
                       const SizedBox(height: 2),
                       Text(
                         'Umur: $ageText',
@@ -1160,17 +1288,44 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        label,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDeceased
-                              ? Colors.grey.shade600
-                              : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
-                          decoration: isDeceased ? TextDecoration.lineThrough : null,
-                        ),
-                      ),
+                      (() {
+                        final String lowerStatus = status.toLowerCase();
+                        final bool isFemale = icon == Icons.girl || lowerStatus.contains('perempuan');
+                        final bool isMale = icon == Icons.boy || lowerStatus.contains('laki');
+
+                        IconData? genderIcon;
+                        Color? genderColor;
+                        if (isFemale) {
+                          genderIcon = Icons.female;
+                          genderColor = Colors.pink;
+                        } else if (isMale) {
+                          genderIcon = Icons.male;
+                          genderColor = Colors.blue;
+                        }
+
+                        return Row(
+                          children: [
+                            if (genderIcon != null) ...[
+                              Icon(genderIcon, color: genderColor, size: 16),
+                              const SizedBox(width: 4),
+                            ],
+                            Expanded(
+                              child: Text(
+                                label,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: isDeceased
+                                      ? Colors.grey.shade600
+                                      : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
+                                  decoration: isDeceased ? TextDecoration.lineThrough : null,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        );
+                      })(),
                       const SizedBox(height: 2),
                       Text(
                         'Umur: $ageText',

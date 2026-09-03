@@ -121,6 +121,7 @@ class Character {
   List<Map<String, String>> extendedFamily = []; // Daftar kakek, nenek, paman, bibi, sepupu [{name: '...', gender: 'Laki-laki', relation: 'Kakek (dari Ayah)', relationship: '50', age: '70', isDeceased: 'false'}]
   List<Map<String, String>> classmates = []; // Daftar teman sekelas [{name: '...', gender: 'Laki-laki', relationship: '50', age: '12', isDeceased: 'false'}]
   List<Map<String, String>> univClassmates = []; // Daftar teman kuliah
+  List<Map<String, String>> friends = []; // Daftar teman dekat [{name: '...', gender: 'Laki-laki', relationship: '80', age: '12', isDeceased: 'false', relation: 'Teman'}]
   List<Map<String, String>> univLecturers = []; // Daftar dosen
   List<Map<String, String>> coworkers = []; // Daftar rekan kerja
   Map<String, String>? supervisor; // Supervisor / Atasan kerja

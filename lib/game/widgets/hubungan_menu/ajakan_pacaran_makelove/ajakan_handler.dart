@@ -238,8 +238,8 @@ class AjakanHandler {
         String? proposalType;
 
         if (isSuamiIstri) {
-          // Jika sudah menikah: peluang murni ajak bercinta 70% (khusus perempuan-laki), default 65%
-          int bercintaChance = (myGenderLower == 'perempuan' && partnerGender == 'laki-laki') ? 70 : 65;
+          // Jika sudah menikah (Suami/Istri): 40% peluang setiap hari pada mode harian (isDaily)
+          int bercintaChance = isDaily ? 40 : ((myGenderLower == 'perempuan' && partnerGender == 'laki-laki') ? 70 : 65);
           if (!differentCountry && random.nextInt(100) < bercintaChance) {
             proposalType = 'Bercinta';
           }

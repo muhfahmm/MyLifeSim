@@ -34,6 +34,7 @@ import 'package:bitlife/game/widgets/hubungan_menu/daftar_pasangan_hamil.dart';
 import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
 import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
 import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
+import 'package:bitlife/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -136,6 +137,17 @@ class _GameScreenState extends State<GameScreen> {
       _checkActiveProposal();
       return;
     }
+
+    // Panggil ajakan berteman dari teman kelas (60% chance)
+    final bool friendProposalTriggered = AjakanBertemanHandler.checkAndGenerateFriendProposal(
+      context: context,
+      character: _character,
+      random: random,
+      onComplete: () {
+        if (mounted) setState(() {});
+      },
+    );
+    if (friendProposalTriggered) return;
 
     // 15% peluang memicu kejadian harian acak biasa jika tidak ada proposal
     if (random.nextInt(100) < 15) {
@@ -3561,15 +3573,18 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Character Card Info
+                  // Character Card Info
                   Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                      child: Column(
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 12.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // Left: Avatar Icon
                           CircleAvatar(
-                            radius: 30,
+                            radius: 34,
                             backgroundColor: Colors.blue.shade50,
                             child: Image(
                               image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
@@ -3581,100 +3596,170 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                   child: CircularProgressIndicator(strokeWidth: 2),
                                 );
                               },
-                              width: 60,
-                              height: 60,
+                              width: 68,
+                              height: 68,
                             ),
                           ),
-                          const SizedBox(height: 4),
-                          // Display Tanggal Lahir & Tanggal Sekarang
-                          (() {
-                            final months = [
-                              'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-                              'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
-                            ];
-                            final birth = _character.birthDate ?? DateTime.now();
-                            final formattedBirth = "${birth.day} ${months[birth.month - 1]} ${birth.year}";
-                            return Padding(
-                              padding: const EdgeInsets.only(bottom: 2.0),
-                              child: Text(
-                                'Tanggal Lahir: $formattedBirth',
-                                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey),
-                              ),
-                            );
-                          })(),
-                          Text(_character.name, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                          (() {
-                            final String talent = _character.specialTalent;
-                            if (talent == 'None' || talent == 'Tidak Ada' || talent.isEmpty) {
-                              return const SizedBox.shrink();
-                            }
-                            String emoji = '✨';
-                            if (talent.contains('Akting')) emoji = '🎭';
-                            else if (talent.contains('Kriminalitas')) emoji = '🔫';
-                            else if (talent.contains('Pengedar')) emoji = '🌿';
-                            else if (talent.contains('Modeling')) emoji = '📸';
-                            else if (talent.contains('Musik')) emoji = '🎵';
-                            else if (talent.contains('Olahraga')) emoji = '🏀';
+                          const SizedBox(width: 14),
 
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 4.0, bottom: 4.0),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.orange.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(10),
-                                  border: Border.all(color: Colors.orange.withOpacity(0.35)),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
+                          // Right: Flex info sejajar dengan avatar
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                // Display Tanggal Lahir
+                                (() {
+                                  final months = [
+                                    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+                                    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+                                  ];
+                                  final birth = _character.birthDate ?? DateTime.now();
+                                  final formattedBirth = "${birth.day} ${months[birth.month - 1]} ${birth.year}";
+                                  return Text(
+                                    'Tanggal Lahir: $formattedBirth',
+                                    style: TextStyle(
+                                      fontSize: 11,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                                    ),
+                                  );
+                                })(),
+                                const SizedBox(height: 2),
+
+                                // Nama + Gender Icon (Pink / Blue)
+                                Row(
                                   children: [
-                                    Text(emoji, style: const TextStyle(fontSize: 12)),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Talenta: $talent',
-                                      style: const TextStyle(
-                                        fontSize: 11,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.orange,
+                                    Flexible(
+                                      child: Text(
+                                        _character.name,
+                                        style: TextStyle(
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : Colors.black87,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    Icon(
+                                      _character.gender.toLowerCase().contains('perempuan')
+                                          ? Icons.female
+                                          : Icons.male,
+                                      color: _character.gender.toLowerCase().contains('perempuan')
+                                          ? Colors.pink
+                                          : Colors.blue,
+                                      size: 20,
                                     ),
                                   ],
                                 ),
-                              ),
-                            );
-                          })(),
-                          Text('Gender: ${_character.gender} • ${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
-                          const SizedBox(height: 2),
-                          Text('Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.currentCity != null ? '${_character.currentCity}, ' : ''}${_character.location}', style: TextStyle(fontSize: 12, color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey, fontWeight: FontWeight.w500)),
-                          Text('Umur: ${_character.age} Tahun', style: TextStyle(fontSize: 14, color: isDark ? Colors.white54 : Colors.grey)),
-                          const SizedBox(height: 2),
-                          (() {
-                            if (_character.jobName != null) {
-                              return Text(
-                                'Pekerjaan: ${_character.jobName}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
-                              );
-                            } else if (_character.univMajor != null) {
-                              return Text(
-                                'Pendidikan: ${_character.univMajor!.split(" (").first}',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
-                              );
-                            } else if (_character.age >= 6 && _character.age < 18) {
-                              String school = 'SD';
-                              if (_character.age >= 12 && _character.age < 15) school = 'SMP';
-                              else if (_character.age >= 15) school = 'SMA';
-                              return Text(
-                                'Pendidikan: $school',
-                                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
-                              );
-                            } else if (_character.age >= 18) {
-                              return Text(
-                                'Status: Pengangguran',
-                                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isDark ? Colors.white54 : Colors.grey),
-                              );
-                            }
-                            return const SizedBox.shrink();
-                          }()),
+                                const SizedBox(height: 4),
+
+                                // Talenta (jika ada)
+                                (() {
+                                  final String talent = _character.specialTalent;
+                                  if (talent == 'None' || talent == 'Tidak Ada' || talent.isEmpty) {
+                                    return const SizedBox.shrink();
+                                  }
+                                  String emoji = '✨';
+                                  if (talent.contains('Akting')) emoji = '🎭';
+                                  else if (talent.contains('Kriminalitas')) emoji = '🔫';
+                                  else if (talent.contains('Pengedar')) emoji = '🌿';
+                                  else if (talent.contains('Modeling')) emoji = '📸';
+                                  else if (talent.contains('Musik')) emoji = '🎵';
+                                  else if (talent.contains('Olahraga')) emoji = '🏀';
+
+                                  return Padding(
+                                    padding: const EdgeInsets.only(bottom: 4.0),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.orange.withValues(alpha: 0.15),
+                                        borderRadius: BorderRadius.circular(10),
+                                        border: Border.all(color: Colors.orange.withValues(alpha: 0.35)),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(emoji, style: const TextStyle(fontSize: 11)),
+                                          const SizedBox(width: 4),
+                                          Text(
+                                            'Talenta: $talent',
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.orange,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                })(),
+
+                                Text(
+                                  '${_character.birthOrderLabel} (Anak ${_character.birthOrder == 1 ? 'Pertama' : 'ke-${_character.birthOrder}'})',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+
+                                Text(
+                                  'Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.currentCity != null ? '${_character.currentCity}, ' : ''}${_character.location}',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+
+                                Text(
+                                  'Umur: ${_character.age} Tahun',
+                                  style: TextStyle(
+                                    fontSize: 13,
+                                    color: isDark ? Colors.white54 : Colors.grey.shade700,
+                                  ),
+                                ),
+                                const SizedBox(height: 2),
+
+                                (() {
+                                  if (_character.jobName != null) {
+                                    return Text(
+                                      'Pekerjaan: ${_character.jobName}',
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
+                                    );
+                                  } else if (_character.univMajor != null) {
+                                    final String typeStr = _character.schoolType ?? 'Negeri';
+                                    return Text(
+                                      'Pendidikan: ${_character.univMajor!.split(" (").first} - ($typeStr)',
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                                    );
+                                  } else if (_character.age >= 6 && _character.age < 18) {
+                                    String school = 'SD';
+                                    if (_character.age >= 12 && _character.age < 15) school = 'SMP';
+                                    else if (_character.age >= 15) school = 'SMA';
+                                    final String typeStr = _character.schoolType ?? 'Negeri';
+                                    return Text(
+                                      'Pendidikan: $school - ($typeStr)',
+                                      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                                    );
+                                  } else if (_character.age >= 18) {
+                                    return Text(
+                                      'Status: Pengangguran',
+                                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.grey.shade700),
+                                    );
+                                  }
+                                  return Text(
+                                    'Status: Balita',
+                                    style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.grey.shade700),
+                                  );
+                                })(),
+                              ],
+                            ),
+                          ),
                         ],
                       ),
                     ),

@@ -474,11 +474,41 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
               color: Colors.teal,
               title: 'Berteman',
               onTap: () {
-                final change = 5 + Random().nextInt(11);
-                widget.classmate['relationship'] = (rel + change).clamp(0, 100).toString();
-                widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                widget.onRefresh();
-                _showOutcome('Berteman', 'Kamu mengajak $name untuk berteman dan dia merespon dengan hangat! Hubungan kalian meningkat!');
+                final int currentRel = int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
+                // 60% jika hubungannya >= 50, dan 40% jika di bawah 50
+                final int successChance = currentRel >= 50 ? 60 : 40;
+                final bool isAccepted = Random().nextInt(100) < successChance;
+
+                if (isAccepted) {
+                  final int change = 10 + Random().nextInt(11);
+                  widget.classmate['relationship'] = (currentRel + change).clamp(0, 100).toString();
+                  widget.classmate['isFriend'] = 'true';
+                  widget.classmate['relation'] = 'Teman';
+
+                  // Tambahkan ke daftar teman karakter (jika belum ada)
+                  final bool alreadyInFriends = widget.character.friends.any((f) => f['name'] == name);
+                  if (!alreadyInFriends) {
+                    widget.character.friends.add(widget.classmate);
+                  }
+
+                  widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+                  widget.character.inbox.add('🤝 Pertemanan Baru: $name menerima ajakan berteman darimu!');
+                  widget.onRefresh();
+                  _showOutcome(
+                    'Ajakan Berteman Diterima! 🤝',
+                    'Kamu mengajak $name untuk berteman dan dia merespon dengan hangat! $name sekarang telah menjadi teman dekatmu.',
+                  );
+                } else {
+                  final int change = 5 + Random().nextInt(6);
+                  widget.classmate['relationship'] = (currentRel - change).clamp(0, 100).toString();
+                  widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
+                  widget.character.inbox.add('💔 Pertemanan Ditolak: $name menolak ajakan berteman darimu.');
+                  widget.onRefresh();
+                  _showOutcome(
+                    'Ajakan Berteman Ditolak 💔',
+                    'Kamu mengajak $name untuk berteman, namun dia menolak ajakanmu secara halus. Hubungan kalian sedikit merenggang.',
+                  );
+                }
               },
             ),
 

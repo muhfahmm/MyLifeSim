@@ -85,51 +85,38 @@ class EyeTestLogic {
       return; // Sudah pakai kacamata
     }
     final int age = character.age;
-    if (age <= 0) {
-      onFinish();
-      return;
-    }
-
-    // Batasi tes hanya pada rentang usia 1-18 dan 40-60
-    if (age >= 1 && age <= 18) {
-      if (character.eyeTestsCountYoung >= 2) {
-        onFinish();
-        return;
-      }
-    } else if (age >= 40 && age <= 60) {
-      if (character.eyeTestsCountOld >= 2) {
-        onFinish();
-        return;
-      }
-    } else {
-      onFinish();
-      return; // Tidak ada tes di luar rentang usia tersebut
-    }
 
     int chance = 0;
-    if (age >= 1 && age <= 6) {
-      chance = 5;
-    } else if (age >= 7 && age <= 10) {
-      chance = 20;
-    } else if (age >= 11 && age <= 18) {
-      chance = 25;
-    } else if (age >= 40 && age <= 45) {
-      chance = 35;
-    } else if (age >= 46 && age <= 55) {
-      chance = 40;
-    } else if (age >= 56 && age <= 60) {
-      chance = 40;
+    String reasonText = 'Matamu terasa sedikit buram. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+
+    if (age >= 0 && age <= 5) {
+      chance = 1; // 1% (jika ada kelainan pada mata)
+      reasonText = 'Dokter mendeteksi adanya potensi kelainan pada mata. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age >= 6 && age <= 12) {
+      chance = 10; // 10% (akibat kegiatan gadget)
+      reasonText = 'Matamu terasa sedikit buram akibat kegiatan gadget. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age >= 13 && age <= 18) {
+      chance = 20; // 20% (akibat kegiatan gadget)
+      reasonText = 'Matamu terasa sedikit buram akibat intensnya kegiatan gadget. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age >= 19 && age <= 30) {
+      chance = 35; // 35% (akibat kegiatan gadget dan belajar)
+      reasonText = 'Matamu terasa sedikit buram akibat kegiatan gadget dan aktivitas belajar. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age >= 31 && age <= 50) {
+      chance = 55; // 55% (akibat usia)
+      reasonText = 'Matamu terasa sedikit buram akibat pengaruh usia. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age >= 50 && age <= 60) {
+      chance = 65; // 65% (akibat usia)
+      reasonText = 'Matamu semakin terasa buram akibat pengaruh faktor usia. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else if (age > 60) {
+      chance = 75; // 75% (akibat usia 60++)
+      reasonText = 'Penglihatanmu semakin mengabur akibat pengaruh faktor usia senja. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
     }
 
     if (Random().nextInt(100) < chance) {
-      if (age >= 1 && age <= 18) {
-        character.eyeTestsCountYoung++;
-      } else if (age >= 40 && age <= 60) {
-        character.eyeTestsCountOld++;
-      }
       showEyeTestMinigame(
         context: context,
         character: character,
+        reasonText: reasonText,
         onFinish: onFinish,
         onUpdateAvatar: onUpdateAvatar,
       );
@@ -142,6 +129,7 @@ class EyeTestLogic {
   static void showEyeTestMinigame({
     required BuildContext context,
     required Character character,
+    required String reasonText,
     required VoidCallback onFinish,
     required VoidCallback onUpdateAvatar,
   }) {
@@ -219,9 +207,9 @@ class EyeTestLogic {
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'Matamu terasa sedikit buram. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!',
-                      style: TextStyle(fontSize: 14),
+                    Text(
+                      reasonText,
+                      style: const TextStyle(fontSize: 14),
                     ),
                     const SizedBox(height: 16),
                     Container(
