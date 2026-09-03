@@ -260,12 +260,14 @@ class ProposalPercentageSettings {
     final bool isFemale = currentGender == 'perempuan' || currentGender == 'female';
     final String effectiveSexuality = (sexuality ?? GlobalSettings.userSexuality.value).trim();
 
+    final String rLower = relation.trim().toLowerCase();
     final dummyChar = Character(
       name: 'User',
       gender: isFemale ? 'Perempuan' : 'Laki-laki',
       location: 'Indonesia',
       sexuality: effectiveSexuality,
-    );
+    )..custodyParent = rLower.contains('ibu') ? 'Ibu' : 'Ayah'
+     ..age = 18;
     final candidate = {
       'name': relation,
       'relation': relation,

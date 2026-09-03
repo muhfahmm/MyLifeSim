@@ -8,7 +8,7 @@ class AjakanPacaranHeteroPerempuanKeluarga {
     if (rel.contains('ayah tiri')) {
       return 70;
     } else if (rel.contains('ayah mertua')) {
-      return 35;
+      return 45;
     } else if (rel.contains('anak') || rel == 'laki-laki' || rel == 'perempuan') {
       return 60;
     } else if (rel.contains('keponakan')) {
