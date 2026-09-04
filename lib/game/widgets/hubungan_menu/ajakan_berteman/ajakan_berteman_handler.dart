@@ -20,18 +20,26 @@ class AjakanBertemanHandler {
     // Peluang 60% untuk memicu ajakan berteman
     if (random.nextInt(100) >= 60) return false;
 
-    // Jika usia sekolah, pastikan daftar teman sekelas tersedia
-    if (character.age >= 6 && character.age < 25) {
+    // Cek status sekolah aktif
+    final bool isCurrentlyInSchool = (character.age >= 6 && character.age < 18) && 
+        (character.educationHistory['SD'] == 'Belum Lulus' || 
+         character.educationHistory['SMP'] == 'Belum Lulus' || 
+         character.educationHistory['SMA'] == 'Belum Lulus');
+
+    // Jika usia sekolah aktif, pastikan daftar teman sekelas tersedia
+    if (isCurrentlyInSchool) {
       SchoolGenerator.generateClassmatesIfEmpty(character);
     }
 
     // Kumpulkan seluruh kandidat yang belum berteman dan masih hidup
     final List<Map<String, dynamic>> candidates = [];
 
-    // 1. Teman Sekolah (SD / SMP / SMA)
-    for (var c in character.classmates) {
-      if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
-        candidates.add({'data': c, 'role': 'Teman Sekelas'});
+    // 1. Teman Sekolah (Hanya jika pemain masih aktif sekolah)
+    if (isCurrentlyInSchool) {
+      for (var c in character.classmates) {
+        if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
+          candidates.add({'data': c, 'role': 'Teman Sekelas'});
+        }
       }
     }
 
@@ -49,10 +57,18 @@ class AjakanBertemanHandler {
       }
     }
 
-    // 4. Keluarga / Sepupu
+    // 4. Sepupu / Keluarga Sejawat (Eksklusi Kakek, Nenek, Paman, Bibi, Ayah, Ibu)
     for (var c in character.extendedFamily) {
-      if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
-        candidates.add({'data': c, 'role': c['relation'] ?? 'Keluarga'});
+      final String relation = (c['relation'] ?? '').toLowerCase();
+      final String name = (c['name'] ?? '').toLowerCase();
+      final bool isSenior = relation.contains('kakek') || relation.contains('nenek') ||
+          relation.contains('paman') || relation.contains('bibi') ||
+          relation.contains('ayah') || relation.contains('ibu') ||
+          name.contains('kakek') || name.contains('nenek') ||
+          name.contains('paman') || name.contains('bibi');
+
+      if (!isSenior && c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
+        candidates.add({'data': c, 'role': c['relation'] ?? 'Sepupu'});
       }
     }
 

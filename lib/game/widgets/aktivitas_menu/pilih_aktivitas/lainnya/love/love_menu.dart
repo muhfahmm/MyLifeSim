@@ -1,6 +1,8 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/love/love_menu.dart
+import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 
 class LoveMenuHelper {
@@ -186,11 +188,22 @@ class DatingAppConfigPage extends StatefulWidget {
 class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
   String selectedGender = '';
   String selectedAgeRange = '18-25';
+  String selectedSexuality = 'Heteroseksual';
 
   @override
   void initState() {
     super.initState();
     selectedGender = widget.character.gender.toLowerCase() == 'laki-laki' ? 'Perempuan' : 'Laki-laki';
+    _updateSexualityDefault();
+  }
+
+  void _updateSexualityDefault() {
+    final bool sameGender = selectedGender.toLowerCase() == widget.character.gender.toLowerCase();
+    if (sameGender) {
+      selectedSexuality = widget.character.gender.toLowerCase() == 'laki-laki' ? 'Gay' : 'Lesbian';
+    } else {
+      selectedSexuality = 'Heteroseksual';
+    }
   }
 
   @override
@@ -224,14 +237,20 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
                   value: 'Laki-laki',
                   groupValue: selectedGender,
                   activeColor: Colors.pinkAccent,
-                  onChanged: (val) => setState(() => selectedGender = val!),
+                  onChanged: (val) => setState(() {
+                    selectedGender = val!;
+                    _updateSexualityDefault();
+                  }),
                 ),
                 Text('Laki-laki', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                 Radio<String>(
                   value: 'Perempuan',
                   groupValue: selectedGender,
                   activeColor: Colors.pinkAccent,
-                  onChanged: (val) => setState(() => selectedGender = val!),
+                  onChanged: (val) => setState(() {
+                    selectedGender = val!;
+                    _updateSexualityDefault();
+                  }),
                 ),
                 Text('Perempuan', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
               ],
@@ -259,6 +278,48 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
               }).toList(),
               onChanged: (val) => setState(() => selectedAgeRange = val!),
             ),
+            const SizedBox(height: 20),
+            Text(
+              'Pilih Tipe Seksualitas:',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 12,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 8),
+            DropdownButton<String>(
+              value: selectedSexuality,
+              isExpanded: true,
+              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              items: widget.character.gender.toLowerCase() == 'laki-laki'
+                  ? const [
+                      DropdownMenuItem(value: 'Heteroseksual', child: Text('Heteroseksual')),
+                      DropdownMenuItem(value: 'Gay', child: Text('Gay')),
+                      DropdownMenuItem(value: 'Biseksual', child: Text('Biseksual')),
+                    ]
+                  : const [
+                      DropdownMenuItem(value: 'Heteroseksual', child: Text('Heteroseksual')),
+                      DropdownMenuItem(value: 'Lesbian', child: Text('Lesbian')),
+                      DropdownMenuItem(value: 'Biseksual', child: Text('Biseksual')),
+                    ],
+              onChanged: (val) {
+                if (val == null) return;
+                setState(() {
+                  selectedSexuality = val;
+                  final String userGen = widget.character.gender.toLowerCase();
+                  if (val == 'Lesbian') {
+                    selectedGender = 'Perempuan';
+                  } else if (val == 'Gay') {
+                    selectedGender = 'Laki-laki';
+                  } else if (val == 'Heteroseksual') {
+                    selectedGender = userGen == 'laki-laki' ? 'Perempuan' : 'Laki-laki';
+                  }
+                  // Jika Biseksual, target gender tetap sesuai pilihan Radio/sebelumnya
+                });
+              },
+            ),
             const SizedBox(height: 32),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -266,55 +327,160 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
-              onPressed: () {
-                if (widget.character.money < 50000) {
-                  showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                      title: const Text('Uang Tidak Cukup'),
-                      content: const Text('Kamu butuh minimal \$50.000 untuk menggunakan aplikasi kencan.'),
-                      actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-                    ),
-                  );
-                  return;
-                }
-                widget.character.money -= 50000;
-                
-                final r = Random();
-                final List<String> boys = ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya', 'Rian', 'Fahmi', 'Aris'];
-                final List<String> girls = ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra', 'Keysha', 'Aurel', 'Santi', 'Putri', 'Sari', 'Indah', 'Dewi'];
-
-                final name = selectedGender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
-                
-                int age = 18;
-                if (selectedAgeRange == '18-25') age = 18 + r.nextInt(8);
-                else if (selectedAgeRange == '26-35') age = 26 + r.nextInt(10);
-                else age = 36 + r.nextInt(15);
-
-                final looks = 40 + r.nextInt(60);
-                final smart = 40 + r.nextInt(60);
-                final moneyValue = r.nextInt(100) < 50 ? 500000 + r.nextInt(2000000) : 3000000 + r.nextInt(15000000);
-
-                // Tampilkan dialog kandidat tanpa pindah halaman
-                _showCandidateDialog(
-                  context,
-                  widget.character,
-                  {
-                    'name': name,
-                    'gender': selectedGender,
-                    'age': age.toString(),
-                    'looks': looks.toString(),
-                    'smart': smart.toString(),
-                    'money': moneyValue.toString(),
-                  },
-                  widget.onComplete,
-                );
-              },
-              child: const Text('Cari Pasangan (\$50.000)', style: TextStyle(color: Colors.white)),
+              onPressed: _searchCandidate,
+              child: const Text('Cari Pasangan (\$50.000)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
       ),
+    );
+  }
+  static String _getContinentForIso(String? iso) {
+    if (iso == null) return 'asia';
+    const africaIsos = {'ZA', 'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'TD', 'DJ', 'ER', 'SZ', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML', 'MR', 'MU', 'EG', 'MZ', 'NA', 'NE', 'NG', 'CI', 'CF', 'CD', 'SD', 'TZ', 'UG', 'ZM', 'ZW', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'SS', 'TG', 'TN', 'CV', 'KM', 'CG', 'MA'};
+    const asiaIsos = {'AF', 'SA', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'CN', 'PH', 'GE', 'HK', 'IN', 'ID', 'IQ', 'IR', 'IL', 'JP', 'KH', 'KZ', 'KG', 'KR', 'KP', 'KW', 'LA', 'LB', 'MO', 'MY', 'MV', 'MN', 'MM', 'NP', 'OM', 'PK', 'PS', 'QA', 'TL', 'SG', 'CY', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE', 'JO'};
+    const eropaIsos = {'AL', 'AD', 'AT', 'NL', 'BY', 'BE', 'BA', 'BG', 'CZ', 'DK', 'EE', 'FI', 'GI', 'HU', 'GB', 'IE', 'IS', 'IT', 'DE', 'FO', 'XK', 'HR', 'LV', 'LI', 'LT', 'LU', 'MK', 'MT', 'MD', 'MC', 'ME', 'NO', 'PL', 'PT', 'FR', 'RO', 'RS', 'RU', 'SM', 'SI', 'SK', 'ES', 'SE', 'CH', 'UA', 'VA', 'GR'};
+    const naIsos = {'US', 'AG', 'BS', 'BB', 'BZ', 'BM', 'CR', 'CW', 'DM', 'SV', 'GL', 'GD', 'GT', 'HT', 'HN', 'JM', 'CA', 'CU', 'MX', 'NI', 'PA', 'PR', 'DO', 'KN', 'LC', 'VC', 'TT'};
+    const saIsos = {'AR', 'BO', 'BR', 'CL', 'EC', 'GF', 'GY', 'CO', 'PY', 'PE', 'SR', 'UY', 'VE'};
+    const oceaniaIsos = {'AU', 'FJ', 'GU', 'KI', 'MH', 'FM', 'NR', 'PW', 'PG', 'WS', 'AS', 'NZ', 'PF', 'TO', 'TV', 'VU'};
+
+    final isoUpper = iso.toUpperCase();
+    if (africaIsos.contains(isoUpper)) return 'afrika';
+    if (asiaIsos.contains(isoUpper)) return 'asia';
+    if (eropaIsos.contains(isoUpper)) return 'eropa';
+    if (naIsos.contains(isoUpper)) return 'na';
+    if (saIsos.contains(isoUpper)) return 'sa';
+    if (oceaniaIsos.contains(isoUpper)) return 'oceania';
+    return 'asia';
+  }
+
+  static Future<Map<String, String>> _generateCandidateName(String countryName, String gender) async {
+    final r = Random();
+    final String countryLower = countryName.toLowerCase().trim();
+    try {
+      final String response = await rootBundle.loadString('json/bendera_negara/countries.json');
+      final Map<String, dynamic> data = jsonDecode(response);
+      
+      String iso = '';
+      if (data.containsKey(countryLower)) {
+        iso = data[countryLower]['iso'] ?? '';
+      } else {
+        data.forEach((key, val) {
+          if (key.toLowerCase() == countryLower || (val['name'] ?? '').toString().toLowerCase() == countryLower) {
+            iso = val['iso'] ?? '';
+          }
+        });
+      }
+
+      final String continent = _getContinentForIso(iso);
+      final String genderFolder = gender == 'Laki-laki' ? 'male' : 'female';
+
+      final String firstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/$genderFolder/firstname.json');
+      final String lastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/$genderFolder/lastname.json');
+
+      final List<dynamic> firstList = jsonDecode(firstContent);
+      final List<dynamic> lastList = jsonDecode(lastContent);
+
+      if (firstList.isNotEmpty && lastList.isNotEmpty) {
+        final first = firstList[r.nextInt(firstList.length)].toString();
+        final last = lastList[r.nextInt(lastList.length)].toString();
+        return {'first': first, 'last': last, 'full': '$first $last'};
+      }
+    } catch (e) {
+      debugPrint('Error loading name JSON for $countryName: $e');
+    }
+
+    final List<String> defaultBoys = ['Alex', 'James', 'Michael', 'Daniel', 'David', 'Chris', 'Ryan'];
+    final List<String> defaultGirls = ['Emma', 'Sophia', 'Olivia', 'Ava', 'Isabella', 'Mia', 'Emily'];
+    final defaultFirst = gender == 'Laki-laki' ? defaultBoys[r.nextInt(defaultBoys.length)] : defaultGirls[r.nextInt(defaultGirls.length)];
+    return {'first': defaultFirst, 'last': 'Smith', 'full': '$defaultFirst Smith'};
+  }
+
+  void _searchCandidate() async {
+    if (widget.character.money < 50000) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          title: const Text('Uang Tidak Cukup'),
+          content: const Text('Kamu butuh minimal \$50.000 untuk menggunakan aplikasi kencan.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        ),
+      );
+      return;
+    }
+    widget.character.money -= 50000;
+
+    final r = Random();
+    final String userCountry = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');
+    final nameData = await _generateCandidateName(userCountry, selectedGender);
+    final String candidateName = nameData['full']!;
+
+    int age = 18;
+    if (selectedAgeRange == '18-25') age = 18 + r.nextInt(8);
+    else if (selectedAgeRange == '26-35') age = 26 + r.nextInt(10);
+    else age = 36 + r.nextInt(15);
+
+    // Generate Atribut Kepribadian & Seksual
+    final int health = 40 + r.nextInt(61); // 40 - 100
+    final int happiness = 40 + r.nextInt(61); // 40 - 100
+    final int smart = 40 + r.nextInt(61); // 40 - 100
+    final int discipline = 40 + r.nextInt(61); // 40 - 100
+
+    // Seksualitas kandidat disesuaikan dengan pilihan kriteria user di Dating App
+    final String sexuality = selectedSexuality;
+
+    // Generate Pekerjaan & Gaji NPC
+    final jobResult = widget.character.generateRandomNPCJobInfo(age);
+    final String candidateJob = jobResult['job'] as String;
+    final int candidateSalary = jobResult['salary'] as int;
+
+    // Perhitungan tabungan/kekayaan yang realistis berdasarkan gaji dan umur (bukan nilai acak puluhan juta)
+    int moneyValue = 0;
+    if (candidateSalary > 0) {
+      // Perkiraan tabungan = (Gaji bulanan * 12) * (umur - 18) * faktor tabungan acak (10% - 40%)
+      final int workingYears = max(1, age - 18);
+      final double savingsRate = 0.10 + (r.nextDouble() * 0.30); // 10% - 40%
+      moneyValue = ((candidateSalary * 12 * workingYears) * savingsRate).round();
+      if (moneyValue < 1000) moneyValue = 1000 + r.nextInt(5000);
+    } else {
+      // Jika pelajar / belum punya gaji
+      moneyValue = 500 + r.nextInt(3000);
+    }
+
+    final String userLocation = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');
+    final String userCity = widget.character.currentCity ?? 'Kota Utama';
+
+    // Generate Avatar NPC
+    final String avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: candidateName,
+      gender: selectedGender,
+      age: age,
+      happiness: happiness,
+    );
+
+    if (!mounted) return;
+
+    _showCandidateDialog(
+      context,
+      widget.character,
+      {
+        'name': candidateName,
+        'gender': selectedGender,
+        'age': age.toString(),
+        'health': health.toString(),
+        'happiness': happiness.toString(),
+        'smart': smart.toString(),
+        'discipline': discipline.toString(),
+        'sexuality': sexuality,
+        'money': moneyValue.toString(),
+        'job': candidateJob,
+        'salary': candidateSalary.toString(),
+        'avatarUrl': avatarUrl,
+        'location': userLocation,
+        'currentCity': userCity,
+        'city': userCity,
+      },
+      widget.onComplete,
     );
   }
 }
@@ -332,18 +498,66 @@ void _showCandidateDialog(
   final String name = c['name']!;
   final String gender = c['gender']!;
   final int age = int.tryParse(c['age'] ?? '18') ?? 18;
-  final int looks = int.tryParse(c['looks'] ?? '50') ?? 50;
-  final int smart = int.tryParse(c['smart'] ?? '50') ?? 50;
+  final int health = int.tryParse(c['health'] ?? '60') ?? 60;
+  final int happiness = int.tryParse(c['happiness'] ?? '60') ?? 60;
+  final int smart = int.tryParse(c['smart'] ?? '60') ?? 60;
+  final int discipline = int.tryParse(c['discipline'] ?? '60') ?? 60;
+  final String sexuality = c['sexuality'] ?? 'Heteroseksual';
   final int moneyValue = int.tryParse(c['money'] ?? '0') ?? 0;
+  final String job = c['job'] ?? 'Pengangguran';
+  final int salary = int.tryParse(c['salary'] ?? '0') ?? 0;
+  final String avatarUrl = c['avatarUrl'] ?? '';
+
+  Widget buildStatRow(String label, int val, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6.0),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 100,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
+            ),
+          ),
+          Expanded(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: val / 100,
+                color: color,
+                backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                minHeight: 10,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(
+            '$val%',
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   showDialog(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => AlertDialog(
       backgroundColor: isDark ? Colors.grey.shade900 : null,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
-          const Icon(Icons.favorite, color: Colors.pink),
+          const Icon(Icons.favorite, color: Colors.pinkAccent),
           const SizedBox(width: 8),
           Text('Kandidat Ditemukan!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
         ],
@@ -352,37 +566,62 @@ void _showCandidateDialog(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Nama: $name', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black87)),
-          Text('Gender: $gender', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
-          Text('Usia: $age tahun', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
-          const SizedBox(height: 8),
-          Row(children: [
-            Text('Penampilan: ', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-            Expanded(
-              child: LinearProgressIndicator(
-                value: looks / 100,
-                color: Colors.pinkAccent,
-                backgroundColor: isDark ? Colors.grey.shade700 : Colors.pink.shade50,
+          Center(
+            child: Container(
+              width: 72,
+              height: 72,
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.pink.shade50,
+                border: Border.all(color: Colors.pinkAccent.withValues(alpha: 0.5), width: 2),
+              ),
+              child: ClipOval(
+                child: Image.network(
+                  avatarUrl,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, err, stack) => Icon(
+                    gender == 'Perempuan' ? Icons.female : Icons.male,
+                    size: 36,
+                    color: gender == 'Perempuan' ? Colors.pink : Colors.blue,
+                  ),
+                ),
               ),
             ),
-            Text(' $looks%', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-          ]),
+          ),
+          Center(
+            child: Text(
+              name,
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: isDark ? Colors.white : Colors.black87),
+            ),
+          ),
           const SizedBox(height: 4),
-          Row(children: [
-            Text('Kecerdasan: ', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-            Expanded(
-              child: LinearProgressIndicator(
-                value: smart / 100,
-                color: Colors.blue,
-                backgroundColor: isDark ? Colors.grey.shade700 : Colors.blue.shade50,
-              ),
-            ),
-            Text(' $smart%', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-          ]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Gender: $gender', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
+              const Text(' • ', style: TextStyle(color: Colors.grey)),
+              Text('Usia: $age thn', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
+            ],
+          ),
+          Center(
+            child: Text('Seksualitas: $sexuality', style: TextStyle(color: isDark ? Colors.pinkAccent : Colors.pink, fontWeight: FontWeight.bold, fontSize: 12)),
+          ),
+          const SizedBox(height: 12),
+          
+          buildStatRow('Kesehatan:', health, Colors.green),
+          buildStatRow('Kebahagiaan:', happiness, Colors.amber),
+          buildStatRow('Kecerdasan:', smart, Colors.blue),
+          buildStatRow('Disiplin:', discipline, Colors.purple),
+
           const SizedBox(height: 8),
           Text(
-            'Perkiraan Uang/Gaji: \$${moneyValue.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}',
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+            salary > 0 ? 'Pekerjaan: $job (Gaji: \$${salary.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}/bln)' : 'Pekerjaan: $job',
+            style: TextStyle(color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold, fontSize: 12),
+          ),
+          Text(
+            'Kekayaan Tabungan: \$${moneyValue.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
           ),
         ],
       ),
@@ -391,7 +630,6 @@ void _showCandidateDialog(
           onPressed: () {
             Navigator.pop(ctx); // Tutup dialog kandidat
             onComplete();
-            // Kembali ke halaman love menu jika berasal dari config
             Navigator.pop(context); // Pop halaman config
           },
           child: Text('Abaikan', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
@@ -400,21 +638,29 @@ void _showCandidateDialog(
           style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
           onPressed: () {
             Navigator.pop(ctx); // Tutup dialog kandidat
-            // Proses ajakan
-            final chance = (looks + (character.appearance) + 20) ~/ 3;
+            final chance = (smart + happiness + 20) ~/ 3;
             final success = r.nextInt(100) < chance;
 
             String msg;
             if (success) {
-              final partnerMap = {
+              final Map<String, String> partnerMap = {
                 'name': name,
                 'gender': gender,
                 'relationship': '70',
                 'relation': 'Pacar',
                 'age': age.toString(),
-                'looks': looks.toString(),
+                'health': health.toString(),
+                'happiness': happiness.toString(),
                 'smart': smart.toString(),
+                'discipline': discipline.toString(),
+                'sexuality': sexuality,
                 'money': moneyValue.toString(),
+                'job': job,
+                'salary': salary.toString(),
+                'avatarUrl': avatarUrl,
+                'location': c['location'] ?? character.location,
+                'currentCity': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
+                'city': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
               };
               character.addPartnerToFreeSlot(partnerMap);
               msg = '🎉 Berhasil! $name menerima ajakan kencanmu. Sekarang kalian resmi berpacaran!';
@@ -425,7 +671,6 @@ void _showCandidateDialog(
             character.inbox.add(msg);
             onComplete();
 
-            // Tampilkan dialog hasil
             showDialog(
               context: context,
               builder: (ctx) => AlertDialog(
@@ -440,8 +685,7 @@ void _showCandidateDialog(
                   TextButton(
                     onPressed: () {
                       Navigator.pop(ctx);
-                      // Kembali ke halaman love menu
-                      Navigator.pop(context); // Pop halaman config
+                      Navigator.pop(context);
                     },
                     child: const Text('OK'),
                   )

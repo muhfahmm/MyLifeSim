@@ -2109,7 +2109,7 @@ class Character {
   }
 
   // --- LOGIKA PEKERJAAN & GAJI NPC ---
-  Map<String, dynamic> _generateRandomJob() {
+  Map<String, dynamic> generateRandomNPCJobInfo([int? age]) {
     final random = Random();
     final int roll = random.nextInt(100);
     List<String> categories;
@@ -2149,7 +2149,7 @@ class Character {
       ageVal = fatherAge ?? 40;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (fatherJob == null) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo();
         fatherJob = j['job'];
         fatherSalary = j['salary'];
       }
@@ -2159,7 +2159,7 @@ class Character {
       ageVal = motherAge ?? 38;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (motherJob == null) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo();
         motherJob = j['job'];
         motherSalary = j['salary'];
       }
@@ -2169,7 +2169,7 @@ class Character {
       ageVal = stepFatherAge ?? 40;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (stepFatherJob == null) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo();
         stepFatherJob = j['job'];
         stepFatherSalary = j['salary'];
       }
@@ -2179,7 +2179,7 @@ class Character {
       ageVal = stepMotherAge ?? 38;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (stepMotherJob == null) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo();
         stepMotherJob = j['job'];
         stepMotherSalary = j['salary'];
       }
@@ -2190,7 +2190,7 @@ class Character {
         ageVal = fatherInLawAge ?? 50;
         if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
         if (fatherInLawJob == null) {
-          final j = _generateRandomJob();
+          final j = generateRandomNPCJobInfo();
           fatherInLawJob = j['job'];
           fatherInLawSalary = j['salary'];
         }
@@ -2199,7 +2199,7 @@ class Character {
         ageVal = motherInLawAge ?? 48;
         if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
         if (motherInLawJob == null) {
-          final j = _generateRandomJob();
+          final j = generateRandomNPCJobInfo();
           motherInLawJob = j['job'];
           motherInLawSalary = j['salary'];
         }
@@ -2219,7 +2219,7 @@ class Character {
               item['job'] = jobName!;
               item['salary'] = (jobSalary ?? 2000).toString();
             } else {
-              final j = _generateRandomJob();
+              final j = generateRandomNPCJobInfo(targetAge);
               item['job'] = j['job'];
               item['salary'] = j['salary'].toString();
             }
@@ -2269,7 +2269,7 @@ class Character {
       int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
       if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (!partner!.containsKey('job')) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo(targetAge);
         partner!['job'] = j['job'];
         partner!['salary'] = j['salary'].toString();
       }
@@ -2283,7 +2283,7 @@ class Character {
       int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
       if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (!secondPartner!.containsKey('job')) {
-        final j = _generateRandomJob();
+        final j = generateRandomNPCJobInfo(targetAge);
         secondPartner!['job'] = j['job'];
         secondPartner!['salary'] = j['salary'].toString();
       }

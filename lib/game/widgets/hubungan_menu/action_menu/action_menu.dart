@@ -3518,6 +3518,142 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           act.label.toLowerCase().contains('make love') ||
           act.label.toLowerCase().contains('threesome') ||
           act.label.toLowerCase().contains('3some'));
+
+      final String targetLocName = widget.character.location;
+      actions.insert(
+        0,
+        ActionItem(
+          label: 'Ajak Pindah ke $targetLocName ✈️',
+          icon: Icons.flight_takeoff,
+          color: Colors.blueAccent,
+          onTap: () {
+            final String cleanRole = widget.targetRole.toLowerCase();
+            final String cleanName = widget.targetName.toLowerCase();
+            final bool isAdik = cleanRole.contains('adik') || cleanName.contains('adik');
+
+            if (isAdik && targetAge < 12) {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.block, color: Colors.orange),
+                      SizedBox(width: 8),
+                      Text('Belum Cukup Umur 👶', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  content: Text('Adikmu (${widget.targetName}) masih berusia $targetAge tahun. Adik harus berusia minimal 12 tahun untuk bisa diajak pindah ke luar negeri secara mandiri.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
+              return;
+            }
+
+            int chance = 50; // default chance
+            if (cleanRole.contains('ayah') || cleanRole.contains('ibu') || cleanName.contains('ayah') || cleanName.contains('ibu')) {
+              chance = 40;
+            } else if (isAdik) {
+              chance = 45;
+            } else if (cleanRole.contains('kakak') || cleanName.contains('kakak')) {
+              chance = 60;
+            } else if (isActivePartner || cleanRole.contains('pacar') || cleanRole.contains('suami') || cleanRole.contains('istri')) {
+              chance = 60;
+            }
+
+            final bool accept = _random.nextInt(100) < chance;
+
+            if (accept) {
+              if (currentPartnerMap != null) {
+                currentPartnerMap['location'] = widget.character.location;
+                if (widget.character.currentCity != null) {
+                  currentPartnerMap['currentCity'] = widget.character.currentCity!;
+                  currentPartnerMap['city'] = widget.character.currentCity!;
+                }
+              } else {
+                final Map<String, String> sibMap = widget.character.siblings.firstWhere(
+                  (sib) => '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName || sib['name']!.toLowerCase() == cleanName,
+                  orElse: () => <String, String>{},
+                );
+                if (sibMap.isNotEmpty) {
+                  sibMap['location'] = widget.character.location;
+                  if (widget.character.currentCity != null) {
+                    sibMap['currentCity'] = widget.character.currentCity!;
+                    sibMap['city'] = widget.character.currentCity!;
+                  }
+                } else {
+                  final Map<String, String> extMap = widget.character.extendedFamily.firstWhere(
+                    (ext) => ext['name'] == widget.targetName || widget.targetName.contains(ext['name'] ?? ''),
+                    orElse: () => <String, String>{},
+                  );
+                  if (extMap.isNotEmpty) {
+                    extMap['location'] = widget.character.location;
+                    if (widget.character.currentCity != null) {
+                      extMap['currentCity'] = widget.character.currentCity!;
+                      extMap['city'] = widget.character.currentCity!;
+                    }
+                  }
+                }
+              }
+
+              _updateRelationship(15);
+              final String userCityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
+              widget.character.inbox.add('✈️ ${widget.targetName} menerima ajakanmu dan resmi pindah ke $userCityStr${widget.character.location}!');
+
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.flight_land, color: Colors.green),
+                      SizedBox(width: 8),
+                      Text('Ajakan Diterima! ✈️', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  content: Text('${widget.targetName} setuju dan memutuskan untuk pindah tinggal bersamamu di $userCityStr${widget.character.location}! (+15% Hubungan)'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _updateState();
+                      },
+                      child: const Text('OK'),
+                    )
+                  ],
+                ),
+              );
+            } else {
+              _updateRelationship(-5);
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  title: const Row(
+                    children: [
+                      Icon(Icons.block, color: Colors.red),
+                      SizedBox(width: 8),
+                      Text('Ajakan Ditolak ❌', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  content: Text('${widget.targetName} menolak ajakanmu untuk pindah ke ${widget.character.location}. ${widget.targetName} memilih untuk tetap tinggal di tempat asalnya saat ini.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        _updateState();
+                      },
+                      child: const Text('OK'),
+                    )
+                  ],
+                ),
+              );
+            }
+          },
+        ),
+      );
     }
 
 
@@ -3649,14 +3785,45 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white : Colors.black87)),
                               const SizedBox(height: 2),
-                              Text(
-                                'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isDark ? Colors.white70 : Colors.black54,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
+                              Builder(builder: (context) {
+                                String npcLocation = widget.character.birthCountry ?? 'Indonesia';
+                                String? npcCity = widget.character.birthCity;
+                                
+                                if (currentPartnerMap != null && currentPartnerMap['location'] != null) {
+                                  npcLocation = currentPartnerMap['location']!;
+                                  npcCity = currentPartnerMap['currentCity'] ?? currentPartnerMap['city'];
+                                } else {
+                                  final String cName = widget.targetName.toLowerCase();
+                                  final Map<String, String> sibMap = widget.character.siblings.firstWhere(
+                                    (sib) => '${sib['name']} (${sib['relation']})'.toLowerCase() == cName || sib['name']!.toLowerCase() == cName,
+                                    orElse: () => <String, String>{},
+                                  );
+                                  if (sibMap.isNotEmpty) {
+                                    npcLocation = sibMap['location'] ?? widget.character.birthCountry ?? 'Indonesia';
+                                    npcCity = sibMap['currentCity'] ?? sibMap['city'] ?? widget.character.birthCity;
+                                  } else {
+                                    final Map<String, String> extMap = widget.character.extendedFamily.firstWhere(
+                                      (ext) => ext['name'] == widget.targetName || widget.targetName.contains(ext['name'] ?? ''),
+                                      orElse: () => <String, String>{},
+                                    );
+                                    if (extMap.isNotEmpty) {
+                                      npcLocation = extMap['location'] ?? widget.character.birthCountry ?? 'Indonesia';
+                                      npcCity = extMap['currentCity'] ?? extMap['city'] ?? widget.character.birthCity;
+                                    }
+                                  }
+                                }
+
+                                final String cityText = (npcCity != null && npcCity.isNotEmpty) ? '$npcCity, ' : '';
+
+                                return Text(
+                                  'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: $cityText$npcLocation',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white70 : Colors.black54,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
+                              }),
                               const SizedBox(height: 2),
                               Text(
                                 'Hubungan: ${_getDetailedRelationLabel()} | Gender: ${_getTargetGender()} | Umur: ${_getCurrentAgeValue()}',
@@ -3765,10 +3932,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
                       final jobInfo = widget.character.getNPCJobInfo(widget.targetName, widget.targetRole);
                       
-                      // Dapatkan detail level sekolah anak jika target adalah anak kandung
+                      // Dapatkan detail level sekolah/kuliah anggota keluarga
                       String detailSchool = 'Sekolah/Kuliah';
                       final String cleanRoleLower = widget.targetRole.toLowerCase();
                       final bool isChildTarget = cleanRoleLower == 'laki-laki' || cleanRoleLower == 'perempuan' || widget.targetRole == 'Anak';
+                      
                       if (isChildTarget) {
                         Map<String, String>? childData;
                         for (var c in widget.character.children) {
@@ -3793,7 +3961,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           if (schoolSMA != 'Belum Sekolah' && schoolSMA != '') {
                             detailSchool = 'SMA ($schoolSMA)';
                           }
-                           if (childAge >= 18) {
+                          if (childAge >= 18) {
                             if (choice18 == 'Biarkan' || choice18 == 'Belum' || choice18 == 'Suruh Nikah') {
                               detailSchool = 'Pengangguran';
                             } else if (choice18 == 'Suruh Kuliah') {
@@ -3803,11 +3971,34 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               detailSchool = 'Bekerja';
                             } else {
                               final String major = childData['univMajor'] ?? 'Umum';
-                              detailSchool = 'Kuliah/Lulus ($major)';
+                              detailSchool = 'Kuliah ($major)';
                             }
                           } else if (schoolSD == 'Belum Sekolah' && schoolSMP == 'Belum Sekolah' && schoolSMA == 'Belum Sekolah') {
                             detailSchool = 'Belum Sekolah';
                           }
+                        }
+                      } else {
+                        // Untuk Saudara/Keluarga (Ayah, Ibu, Adik, Kakak, Sepupu, dll)
+                        final int tAge = targetAge;
+                        final String schoolTypeStr = (widget.targetName.hashCode % 2 == 0) ? 'Negeri' : 'Swasta';
+                        
+                        if (tAge < 6) {
+                          detailSchool = 'Belum Sekolah';
+                        } else if (tAge >= 6 && tAge <= 11) {
+                          detailSchool = 'Sekolah Dasar ($schoolTypeStr)';
+                        } else if (tAge >= 12 && tAge <= 14) {
+                          detailSchool = 'SMP ($schoolTypeStr)';
+                        } else if (tAge >= 15 && tAge <= 17) {
+                          detailSchool = 'SMA ($schoolTypeStr)';
+                        } else if (tAge >= 18 && tAge <= 22) {
+                          final List<String> sampleMajors = [
+                            'Teknik Informatika', 'Manajemen', 'Ilmu Hukum', 'Akuntansi', 
+                            'Kedokteran', 'Psikologi', 'Ilmu Komunikasi', 'Teknik Sipil'
+                          ];
+                          final String majorName = sampleMajors[widget.targetName.hashCode.abs() % sampleMajors.length];
+                          detailSchool = 'Kuliah ($majorName)';
+                        } else {
+                          detailSchool = 'Pengangguran / Lulus';
                         }
                       }
 
