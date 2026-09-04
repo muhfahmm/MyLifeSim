@@ -218,9 +218,10 @@ class AjakanBertemanHandler {
               onPressed: () {
                 Navigator.pop(ctx);
                 // Tolak Ajakan Berteman
+                final int relPenalty = 5 + Random().nextInt(6); // 5 - 10
                 int rel = int.tryParse(targetData['relationship'] ?? '50') ?? 50;
-                targetData['relationship'] = (rel - 10).clamp(0, 100).toString();
-                character.inbox.add('💔 Tolak Pertemanan: Kamu menolak ajakan berteman dari $friendName.');
+                targetData['relationship'] = (rel - relPenalty).clamp(0, 100).toString();
+                character.inbox.add('💔 Tolak Pertemanan: Kamu menolak ajakan berteman dari $friendName (-$relPenalty% hubungan).');
                 
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(

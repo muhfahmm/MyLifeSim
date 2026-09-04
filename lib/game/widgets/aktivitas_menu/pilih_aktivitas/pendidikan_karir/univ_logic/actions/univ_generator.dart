@@ -18,10 +18,30 @@ class UnivGenerator {
   }
 
   static String generateRandomName(String gender, Character character) {
-    List<String> firstList = gender == 'Laki-laki' 
-        ? (character.maleFirstNames ?? []) 
-        : (character.femaleFirstNames ?? []);
-    List<String> lastList = character.lastNames ?? [];
+    // Tentukan rasio keaslian berdasarkan tempat tinggal karakter saat ini
+    final String currentLoc = character.location.isNotEmpty ? character.location : (character.birthCountry ?? 'Indonesia');
+    final String birthLoc = character.birthCountry ?? 'Indonesia';
+    final bool isAbroad = currentLoc.toLowerCase() != birthLoc.toLowerCase();
+
+    // Jika di luar negeri (misal China): 85% nama lokal (China), 15% nama pendatang/luar negeri.
+    // Jika di negara asal: 85% nama lokal negara asal, 15% nama pendatang luar negeri.
+    final bool useLocalName = _random.nextDouble() < (isAbroad ? 0.85 : 0.85);
+
+    List<String> firstList = [];
+    List<String> lastList = [];
+
+    if (useLocalName) {
+      firstList = gender == 'Laki-laki' 
+          ? (character.maleFirstNames ?? []) 
+          : (character.femaleFirstNames ?? []);
+      lastList = character.lastNames ?? [];
+    } else {
+      // 15% Pendatang / ekspatriat (menggunakan nama internasional dari global names)
+      firstList = gender == 'Laki-laki' 
+          ? Character.globalMaleFirstNames 
+          : Character.globalFemaleFirstNames;
+      lastList = Character.globalLastNames;
+    }
 
     if (firstList.isEmpty) {
       firstList = gender == 'Laki-laki' ? Character.globalMaleFirstNames : Character.globalFemaleFirstNames;
@@ -30,13 +50,24 @@ class UnivGenerator {
       lastList = Character.globalLastNames;
     }
 
+    if (firstList.isEmpty) {
+      firstList = gender == 'Laki-laki' ? ['Alex', 'David', 'Michael', 'Daniel', 'Ryan'] : ['Emma', 'Sophia', 'Olivia', 'Ava', 'Mia'];
+    }
+    if (lastList.isEmpty) {
+      lastList = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones'];
+    }
+
     final first = firstList[_random.nextInt(firstList.length)];
     final last = lastList[_random.nextInt(lastList.length)];
     return '$first $last';
   }
 
-  static void generateClassmatesIfEmpty(Character character) {
+  static Future<void> generateClassmatesIfEmpty(Character character) async {
     if (character.univClassmates.isNotEmpty) return;
+
+    if (character.maleFirstNames == null || character.maleFirstNames!.isEmpty) {
+      await character.updateLocationNamesData();
+    }
 
     final int count = 20 + _random.nextInt(11); // 20 to 30
     for (int i = 0; i < count; i++) {
@@ -58,8 +89,12 @@ class UnivGenerator {
     }
   }
 
-  static void generateLecturersIfEmpty(Character character) {
+  static Future<void> generateLecturersIfEmpty(Character character) async {
     if (character.univLecturers.isNotEmpty) return;
+
+    if (character.maleFirstNames == null || character.maleFirstNames!.isEmpty) {
+      await character.updateLocationNamesData();
+    }
 
     final List<String> subjects = [
       'Aljabar Linear',

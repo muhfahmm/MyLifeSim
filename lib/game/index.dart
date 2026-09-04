@@ -3155,6 +3155,51 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               onPressed: () {
                 Navigator.pop(context);
                 setState(() {
+                  final int relPenalty = 5 + Random().nextInt(6); // 5 - 10
+                  
+                  // Decrement relationship value
+                  if (_character.motherName != null && _character.motherName!.toLowerCase() == partnerName.toLowerCase()) {
+                    _character.motherRelationship = ((_character.motherRelationship ?? 50) - relPenalty).clamp(0, 100);
+                  }
+                  if (_character.fatherName != null && _character.fatherName!.toLowerCase() == partnerName.toLowerCase()) {
+                    _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - relPenalty).clamp(0, 100);
+                  }
+                  if (_character.stepMotherName != null && _character.stepMotherName!.toLowerCase() == partnerName.toLowerCase()) {
+                    _character.stepMotherRelationship = ((_character.stepMotherRelationship ?? 50) - relPenalty).clamp(0, 100);
+                  }
+                  if (_character.stepFatherName != null && _character.stepFatherName!.toLowerCase() == partnerName.toLowerCase()) {
+                    _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) - relPenalty).clamp(0, 100);
+                  }
+
+                  void decreaseInList(List<Map<String, String>> list) {
+                    for (var item in list) {
+                      if ((item['name'] ?? '').toLowerCase() == partnerName.toLowerCase()) {
+                        int cur = int.tryParse(item['relationship'] ?? '50') ?? 50;
+                        item['relationship'] = (cur - relPenalty).clamp(0, 100).toString();
+                      }
+                    }
+                  }
+
+                  decreaseInList(_character.siblings);
+                  decreaseInList(_character.friends);
+                  decreaseInList(_character.classmates);
+                  decreaseInList(_character.univClassmates);
+                  decreaseInList(_character.coworkers);
+
+                  void decreasePartner(Map<String, String>? p) {
+                    if (p != null && (p['name'] ?? '').toLowerCase() == partnerName.toLowerCase()) {
+                      int cur = int.tryParse(p['relationship'] ?? '50') ?? 50;
+                      p['relationship'] = (cur - relPenalty).clamp(0, 100).toString();
+                    }
+                  }
+
+                  decreasePartner(_character.partner);
+                  decreasePartner(_character.secondPartner);
+                  decreasePartner(_character.thirdPartner);
+                  decreasePartner(_character.fourthPartner);
+                  decreasePartner(_character.fifthPartner);
+                  decreaseInList(_character.secretPartners);
+
                   _character.addProposalHistory(
                     name: partnerName,
                     relation: relation,
@@ -3162,10 +3207,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     status: 'Ditolak',
                   );
                   if (type == 'Ajak 3some') {
-                    _character.inbox.add('📢 Tolak 3some: Kamu menolak ajakan 3some dari $partnerName.');
+                    _character.inbox.add('📢 Tolak 3some: Kamu menolak ajakan 3some dari $partnerName (-$relPenalty% hubungan).');
                   } else {
                     _character.inbox.add(
-                      '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName.'
+                      '💔 Penolakan: Kamu menolak ajakan ${type == "Ajak Pacaran" ? "pacaran" : "bercinta"} dari $partnerName (-$relPenalty% hubungan).'
                     );
                   }
                   

@@ -1,5 +1,7 @@
 // lib/pilih_karakter/character.dart
 import 'dart:math';
+import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
 import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:bitlife/avatar/skin_color_inheritance.dart';
@@ -757,6 +759,56 @@ class Character {
     // Default game date to real life DateTime
     birthDate ??= DateTime.now();
     currentDate ??= birthDate;
+  }
+
+  /// Memuat ulang database nama (depan & belakang) sesuai lokasi/negara tempat berada saat ini.
+  Future<void> updateLocationNamesData([String? targetCountry]) async {
+    final String countryName = targetCountry ?? (location.isNotEmpty ? location : (birthCountry ?? 'Indonesia'));
+    final String countryLower = countryName.toLowerCase().trim();
+    try {
+      final String response = await rootBundle.loadString('json/bendera_negara/countries.json');
+      final Map<String, dynamic> data = jsonDecode(response);
+      
+      String iso = '';
+      if (data.containsKey(countryLower)) {
+        iso = data[countryLower]['iso'] ?? '';
+      } else {
+        data.forEach((key, val) {
+          if (key.toLowerCase() == countryLower || (val['name'] ?? '').toString().toLowerCase() == countryLower) {
+            iso = val['iso'] ?? '';
+          }
+        });
+      }
+
+      const africaIsos = {'ZA', 'DZ', 'AO', 'BJ', 'BW', 'BF', 'BI', 'TD', 'DJ', 'ER', 'SZ', 'ET', 'GA', 'GM', 'GH', 'GN', 'GW', 'KE', 'LS', 'LR', 'LY', 'MG', 'MW', 'ML', 'MR', 'MU', 'EG', 'MZ', 'NA', 'NE', 'NG', 'CI', 'CF', 'CD', 'SD', 'TZ', 'UG', 'ZM', 'ZW', 'RW', 'ST', 'SN', 'SC', 'SL', 'SO', 'SS', 'TG', 'TN', 'CV', 'KM', 'CG', 'MA'};
+      const asiaIsos = {'AF', 'SA', 'AM', 'AZ', 'BH', 'BD', 'BT', 'BN', 'CN', 'PH', 'GE', 'HK', 'IN', 'ID', 'IQ', 'IR', 'IL', 'JP', 'KH', 'KZ', 'KG', 'KR', 'KP', 'KW', 'LA', 'LB', 'MO', 'MY', 'MV', 'MN', 'MM', 'NP', 'OM', 'PK', 'PS', 'QA', 'TL', 'SG', 'CY', 'LK', 'SY', 'TW', 'TJ', 'TH', 'TR', 'TM', 'AE', 'UZ', 'VN', 'YE', 'JO'};
+      const eropaIsos = {'AL', 'AD', 'AT', 'NL', 'BY', 'BE', 'BA', 'BG', 'CZ', 'DK', 'EE', 'FI', 'GI', 'HU', 'GB', 'IE', 'IS', 'IT', 'DE', 'FO', 'XK', 'HR', 'LV', 'LI', 'LT', 'LU', 'MK', 'MT', 'MD', 'MC', 'ME', 'NO', 'PL', 'PT', 'FR', 'RO', 'RS', 'RU', 'SM', 'SI', 'SK', 'ES', 'SE', 'CH', 'UA', 'VA', 'GR'};
+      const naIsos = {'US', 'AG', 'BS', 'BB', 'BZ', 'BM', 'CR', 'CW', 'DM', 'SV', 'GL', 'GD', 'GT', 'HT', 'HN', 'JM', 'CA', 'CU', 'MX', 'NI', 'PA', 'PR', 'DO', 'KN', 'LC', 'VC', 'TT'};
+      const saIsos = {'AR', 'BO', 'BR', 'CL', 'EC', 'GF', 'GY', 'CO', 'PY', 'PE', 'SR', 'UY', 'VE'};
+      const oceaniaIsos = {'AU', 'FJ', 'GU', 'KI', 'MH', 'FM', 'NR', 'PW', 'PG', 'WS', 'AS', 'NZ', 'PF', 'TO', 'TV', 'VU'};
+
+      final isoUpper = iso.toUpperCase();
+      String continent = 'asia';
+      if (africaIsos.contains(isoUpper)) continent = 'afrika';
+      if (asiaIsos.contains(isoUpper)) continent = 'asia';
+      if (eropaIsos.contains(isoUpper)) continent = 'eropa';
+      if (naIsos.contains(isoUpper)) continent = 'na';
+      if (saIsos.contains(isoUpper)) continent = 'sa';
+      if (oceaniaIsos.contains(isoUpper)) continent = 'oceania';
+
+      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/male/firstname.json');
+      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/female/firstname.json');
+      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/male/lastname.json');
+      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/female/lastname.json');
+
+      maleFirstNames = List<String>.from(jsonDecode(maleFirstContent));
+      femaleFirstNames = List<String>.from(jsonDecode(femaleFirstContent));
+      final mLast = List<String>.from(jsonDecode(maleLastContent));
+      final fLast = List<String>.from(jsonDecode(femaleLastContent));
+      lastNames = {...mLast, ...fLast}.toList();
+    } catch (e) {
+      // Fallback jika terjadi error
+    }
   }
 
   /// Menambahkan rahasia/hubungan terlarang yang memicu konsekuensi psikologis dan sosial.

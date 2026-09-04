@@ -532,7 +532,8 @@ class AjakanMasturbasiDialog {
     VoidCallback? onComplete,
   ) {
     character.addProposalHistory(name: viewerName, relation: relationType, type: 'Masturbasi', status: 'Ditolak');
-    _modifyRelativeRelationship(character, relationType, viewerName, -15);
+    final int relPenalty = 5 + Random().nextInt(6); // 5 - 10
+    _modifyRelativeRelationship(character, relationType, viewerName, -relPenalty);
 
     final parsed = _parseRelation(relationType);
     final String relationWithMu = _getRelationWithMu(parsed['main']!);
@@ -540,7 +541,7 @@ class AjakanMasturbasiDialog {
         ? '$relationWithMu (${parsed['detail']}), $viewerName'
         : '$relationWithMu, $viewerName';
 
-    character.inbox.add('💔 Penolakan: Kamu menolak ajakan hubungan intim dari $partnerDesc.');
+    character.inbox.add('💔 Penolakan: Kamu menolak ajakan hubungan intim dari $partnerDesc (-$relPenalty% Hubungan).');
 
     showDialog(
       context: context,
@@ -552,7 +553,7 @@ class AjakanMasturbasiDialog {
             style: TextStyle(color: isDark ? Colors.white : Colors.black87),
           ),
           content: Text(
-            'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-15% Hubungan).',
+            'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-$relPenalty% Hubungan).',
             style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
           ),
           actions: [

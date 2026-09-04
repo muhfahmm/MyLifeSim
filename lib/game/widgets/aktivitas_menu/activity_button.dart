@@ -144,7 +144,15 @@ class ActivityButton extends StatelessWidget {
                       minAge = 15;
                     } else {
                       label = 'Universitas (Kuliah)';
-                      subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
+                      if (character.univMajor != null) {
+                        final String majorName = character.univMajor!.split(' (').first;
+                        final String uName = character.univName != null && character.univName!.isNotEmpty
+                            ? character.univName!
+                            : 'Universitas';
+                        subtitle = '$uName • Jurusan $majorName';
+                      } else {
+                        subtitle = 'Menempuh pendidikan tinggi untuk karir profesional';
+                      }
                       color = Colors.indigo;
                       minAge = 18;
                     }

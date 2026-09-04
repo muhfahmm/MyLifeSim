@@ -1152,6 +1152,58 @@ class AjakanHandler {
           character.activeProposal = null;
         }
       }
+
+      // Filter Beda Negara: Jika NPC pengajak tidak tinggal di negara yang sama dengan user, ajakan dibatalkan
+      if (character.activeProposal != null) {
+        final String userLoc = character.location.toLowerCase();
+        final String propName = (character.activeProposal!['name'] ?? '').toString().toLowerCase();
+
+        String getNpcLocation(String nameLower) {
+          if (character.motherName != null && character.motherName!.toLowerCase() == nameLower) {
+            return (character.birthCountry ?? 'Indonesia').toLowerCase();
+          }
+          if (character.fatherName != null && character.fatherName!.toLowerCase() == nameLower) {
+            return (character.birthCountry ?? 'Indonesia').toLowerCase();
+          }
+          if (character.stepMotherName != null && character.stepMotherName!.toLowerCase() == nameLower) {
+            return (character.birthCountry ?? 'Indonesia').toLowerCase();
+          }
+          if (character.stepFatherName != null && character.stepFatherName!.toLowerCase() == nameLower) {
+            return (character.birthCountry ?? 'Indonesia').toLowerCase();
+          }
+
+          for (var p in [character.partner, character.secondPartner, character.thirdPartner, character.fourthPartner, character.fifthPartner]) {
+            if (p != null && (p['name'] ?? '').toLowerCase() == nameLower) {
+              return (p['location'] ?? character.birthCountry ?? 'Indonesia').toLowerCase();
+            }
+          }
+
+          for (var sp in character.secretPartners) {
+            if ((sp['name'] ?? '').toLowerCase() == nameLower) {
+              return (sp['location'] ?? character.birthCountry ?? 'Indonesia').toLowerCase();
+            }
+          }
+
+          for (var sib in character.siblings) {
+            if ((sib['name'] ?? '').toLowerCase() == nameLower) {
+              return (sib['location'] ?? character.birthCountry ?? 'Indonesia').toLowerCase();
+            }
+          }
+
+          for (var ext in character.extendedFamily) {
+            if ((ext['name'] ?? '').toLowerCase() == nameLower) {
+              return (ext['location'] ?? character.birthCountry ?? 'Indonesia').toLowerCase();
+            }
+          }
+
+          return (character.birthCountry ?? 'Indonesia').toLowerCase();
+        }
+
+        final String npcLoc = getNpcLocation(propName);
+        if (userLoc != npcLoc) {
+          character.activeProposal = null;
+        }
+      }
     }
 
     if (character.activeProposal != null) {

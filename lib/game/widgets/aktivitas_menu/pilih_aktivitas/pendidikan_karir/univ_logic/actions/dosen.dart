@@ -20,10 +20,21 @@ class DosenActionPage extends StatefulWidget {
 }
 
 class _DosenActionPageState extends State<DosenActionPage> {
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    UnivGenerator.generateLecturersIfEmpty(widget.character);
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await UnivGenerator.generateLecturersIfEmpty(widget.character);
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override

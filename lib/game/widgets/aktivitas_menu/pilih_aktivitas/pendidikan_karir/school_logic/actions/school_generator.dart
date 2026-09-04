@@ -18,13 +18,39 @@ class SchoolGenerator {
   }
 
   static String generateRandomName(String gender, Character character) {
-    List<String> firstList = gender == 'Laki-laki' 
-        ? (character.maleFirstNames ?? []) 
-        : (character.femaleFirstNames ?? []);
-    List<String> lastList = character.lastNames ?? [];
+    final String currentLoc = character.location.isNotEmpty ? character.location : (character.birthCountry ?? 'Indonesia');
+    final String birthLoc = character.birthCountry ?? 'Indonesia';
+    final bool isAbroad = currentLoc.toLowerCase() != birthLoc.toLowerCase();
 
-    final first = firstList[_random.nextInt(firstList.length)];
-    final last = lastList[_random.nextInt(lastList.length)];
+    // 85% nama lokal tempat berada (misal China), 15% nama pendatang/ekspatriat
+    final bool useLocalName = _random.nextDouble() < (isAbroad ? 0.85 : 0.85);
+
+    List<String> firstList = [];
+    List<String> lastList = [];
+
+    if (useLocalName) {
+      firstList = gender == 'Laki-laki' 
+          ? (character.maleFirstNames ?? []) 
+          : (character.femaleFirstNames ?? []);
+      lastList = character.lastNames ?? [];
+    } else {
+      firstList = gender == 'Laki-laki' 
+          ? Character.globalMaleFirstNames 
+          : Character.globalFemaleFirstNames;
+      lastList = Character.globalLastNames;
+    }
+
+    if (firstList.isEmpty) {
+      firstList = gender == 'Laki-laki' 
+          ? (character.maleFirstNames ?? Character.globalMaleFirstNames) 
+          : (character.femaleFirstNames ?? Character.globalFemaleFirstNames);
+    }
+    if (lastList.isEmpty) {
+      lastList = character.lastNames ?? Character.globalLastNames;
+    }
+
+    final first = firstList.isNotEmpty ? firstList[_random.nextInt(firstList.length)] : (gender == 'Laki-laki' ? 'Alex' : 'Emma');
+    final last = lastList.isNotEmpty ? lastList[_random.nextInt(lastList.length)] : 'Smith';
     return '$first $last';
   }
 

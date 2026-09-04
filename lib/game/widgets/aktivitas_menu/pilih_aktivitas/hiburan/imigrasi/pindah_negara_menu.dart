@@ -358,9 +358,14 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
 
                               widget.character.money -= (n['cost'] as int);
                               widget.character.location = capitalizedName;
+                              await widget.character.updateLocationNamesData(capitalizedName);
                               widget.character.happiness = (widget.character.happiness + (n['happiness'] as int)).clamp(0, 100);
                               
                               widget.character.resignJob();
+                              widget.character.coworkers.clear();
+                              widget.character.supervisor = null;
+                              widget.character.univClassmates.clear();
+                              widget.character.univLecturers.clear();
                               widget.character.idolTrainees.clear();
                               widget.character.idolMainMembers.clear();
                               widget.character.idolStaff.clear();

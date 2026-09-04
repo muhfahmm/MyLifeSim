@@ -3513,11 +3513,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     if (isDifferentCountry) {
-      actions.removeWhere((act) =>
-          act.label.toLowerCase().contains('bercinta') ||
-          act.label.toLowerCase().contains('make love') ||
-          act.label.toLowerCase().contains('threesome') ||
-          act.label.toLowerCase().contains('3some'));
+      actions.removeWhere((act) {
+        final String l = act.label.toLowerCase();
+        final bool isAllowed = l.contains('minta uang') ||
+            l.contains('pujian') ||
+            l.contains('percakapan') ||
+            l.contains('video call') ||
+            l.contains('menyinggung');
+        return !isAllowed;
+      });
 
       final String targetLocName = widget.character.location;
       actions.insert(

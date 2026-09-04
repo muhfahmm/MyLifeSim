@@ -41,27 +41,56 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
   }
 
-  void _generateCoworkersIfEmpty() {
+  Future<void> _generateCoworkersIfEmpty() async {
+    if (widget.character.maleFirstNames == null || widget.character.maleFirstNames!.isEmpty) {
+      await widget.character.updateLocationNamesData();
+    }
     final random = Random();
     final String job = widget.character.jobName ?? '';
     final bool isEsport = job.startsWith('Pro Player Esport') || job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
+
+    final String currentLoc = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');
+    final String birthLoc = widget.character.birthCountry ?? 'Indonesia';
+    final bool isAbroad = currentLoc.toLowerCase() != birthLoc.toLowerCase();
+
+    String getRandomName(String gender) {
+      final bool useLocalName = random.nextDouble() < (isAbroad ? 0.85 : 0.85);
+      List<String> firstList = [];
+      List<String> lastList = [];
+      if (useLocalName) {
+        firstList = gender == 'Laki-laki'
+            ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
+                ? widget.character.maleFirstNames!
+                : Character.globalMaleFirstNames)
+            : (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty
+                ? widget.character.femaleFirstNames!
+                : Character.globalFemaleFirstNames);
+        lastList = widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty
+            ? widget.character.lastNames!
+            : Character.globalLastNames;
+      } else {
+        firstList = gender == 'Laki-laki' ? Character.globalMaleFirstNames : Character.globalFemaleFirstNames;
+        lastList = Character.globalLastNames;
+      }
+      if (firstList.isEmpty) {
+        firstList = gender == 'Laki-laki'
+            ? (widget.character.maleFirstNames ?? Character.globalMaleFirstNames)
+            : (widget.character.femaleFirstNames ?? Character.globalFemaleFirstNames);
+      }
+      if (lastList.isEmpty) {
+        lastList = widget.character.lastNames ?? Character.globalLastNames;
+      }
+      final f = firstList.isNotEmpty ? firstList[random.nextInt(firstList.length)] : (gender == 'Laki-laki' ? 'Alex' : 'Emma');
+      final l = lastList.isNotEmpty ? lastList[random.nextInt(lastList.length)] : 'Smith';
+      return '$f $l';
+    }
 
     if (widget.character.supervisor == null) {
       String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
       if (isEsport) {
         gender = random.nextDouble() < 0.95 ? 'Laki-laki' : 'Perempuan';
       }
-      final firstList = gender == 'Laki-laki'
-          ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
-              ? widget.character.maleFirstNames!
-              : Character.globalMaleFirstNames)
-          : (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty
-              ? widget.character.femaleFirstNames!
-              : Character.globalFemaleFirstNames);
-      final lastList = widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty
-          ? widget.character.lastNames!
-          : Character.globalLastNames;
-      final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+      final name = getRandomName(gender);
       final ageVal = 30 + random.nextInt(31);
       String? subject;
       if (job.startsWith('Guru SD')) {
@@ -102,17 +131,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         gender = random.nextDouble() < 0.85 ? 'Perempuan' : 'Laki-laki';
       }
 
-      final firstList = gender == 'Laki-laki'
-          ? (widget.character.maleFirstNames != null && widget.character.maleFirstNames!.isNotEmpty
-              ? widget.character.maleFirstNames!
-              : Character.globalMaleFirstNames)
-          : (widget.character.femaleFirstNames != null && widget.character.femaleFirstNames!.isNotEmpty
-              ? widget.character.femaleFirstNames!
-              : Character.globalFemaleFirstNames);
-      final lastList = widget.character.lastNames != null && widget.character.lastNames!.isNotEmpty
-          ? widget.character.lastNames!
-          : Character.globalLastNames;
-      final name = '${firstList[random.nextInt(firstList.length)]} ${lastList[random.nextInt(lastList.length)]}';
+      final name = getRandomName(gender);
       int ageVal = 20 + random.nextInt(41);
       if (job.startsWith('Guru')) {
         final double roll = random.nextDouble();

@@ -877,13 +877,18 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
-                    Text(
-                      'Mahasiswa • Usia: ${character.age} tahun',
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.grey.shade600,
-                        fontSize: 14,
+                    if (character.univName != null && character.univName!.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        character.univName!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: isDark ? Colors.indigoAccent.shade100 : Colors.indigo.shade700,
+                        ),
                       ),
-                    ),
+                    ],
                     const SizedBox(height: 8),
                     Chip(
                       label: Text(

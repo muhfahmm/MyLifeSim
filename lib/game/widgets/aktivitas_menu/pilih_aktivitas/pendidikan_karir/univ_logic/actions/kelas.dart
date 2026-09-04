@@ -20,10 +20,21 @@ class KelasActionPage extends StatefulWidget {
 }
 
 class _KelasActionPageState extends State<KelasActionPage> {
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    UnivGenerator.generateClassmatesIfEmpty(widget.character);
+    _initData();
+  }
+
+  Future<void> _initData() async {
+    await UnivGenerator.generateClassmatesIfEmpty(widget.character);
+    if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   @override
