@@ -35,6 +35,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
       }
     }
   }
+
   void _resignOrGraduate() {
     final char = widget.character;
     final isMain = char.jobName == 'Idol (Main Performer)';
@@ -49,66 +50,71 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              final bool wasIdol = char.isIdol;
-              final bool wasMain = isMain;
-              final navigator = Navigator.of(context);
-              Navigator.pop(context); // Pop confirmation dialog
+      builder: (dialogContext) {
+        final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+        return AlertDialog(
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Text(title, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+          content: Text(content, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            ),
+            TextButton(
+              onPressed: () {
+                final bool wasIdol = char.isIdol;
+                final bool wasMain = isMain;
+                final navigator = Navigator.of(context);
+                Navigator.pop(dialogContext); // Pop confirmation dialog
 
-              setState(() {
-                if (wasIdol && wasMain) {
-                  widget.character.hasGraduatedIdol = true;
-                }
-                widget.character.resignJob();
-                widget.character.idolTrainees.clear();
-                widget.character.idolMainMembers.clear();
-                widget.character.idolStaff.clear();
-              });
-              widget.onRefresh();
+                setState(() {
+                  if (wasIdol && wasMain) {
+                    widget.character.hasGraduatedIdol = true;
+                  }
+                  widget.character.resignJob();
+                  widget.character.idolTrainees.clear();
+                  widget.character.idolMainMembers.clear();
+                  widget.character.idolStaff.clear();
+                });
+                widget.onRefresh();
 
-              DialogHelper.show(
-                context: context,
-                title: wasIdol 
-                    ? (wasMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
-                    : 'Resign Kerja 📢',
-                content: Text(
-                  wasIdol
-                      ? (wasMain
-                          ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
-                          : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
-                      : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
-                ),
-                actions: [
-                  Builder(
-                    builder: (btnContext) => TextButton(
-                      onPressed: () {
-                        Navigator.pop(btnContext); // Pop the dialog
-                        navigator.pop(); // Pop the IdolMenu screen
-                      },
-                      child: const Text('Mulai Langkah Baru'),
-                    ),
+                DialogHelper.show(
+                  context: context,
+                  title: wasIdol 
+                      ? (wasMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
+                      : 'Resign Kerja 📢',
+                  content: Text(
+                    wasIdol
+                        ? (wasMain
+                            ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
+                            : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
+                        : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
                   ),
-                ],
-              );
-            },
-            child: const Text('Ya, Lakukan', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
+                  actions: [
+                    Builder(
+                      builder: (btnContext) => TextButton(
+                        onPressed: () {
+                          Navigator.pop(btnContext); // Pop the dialog
+                          navigator.pop(); // Pop the IdolMenu screen
+                        },
+                        child: const Text('Mulai Langkah Baru'),
+                      ),
+                    ),
+                  ],
+                );
+              },
+              child: const Text('Ya, Lakukan', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final char = widget.character;
     final isMain = char.jobName == 'Idol (Main Performer)';
     final String roleTitle;
@@ -120,12 +126,18 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
       roleTitle = char.jobName ?? 'Staf';
     }
 
+    // Ganti nama Grup Idol menjadi lebih umum
     final String appBarTitle = char.isIdol 
         ? (isMain ? 'Tim Utama Idol ⭐' : 'Trainee Idol ⭐️')
-        : 'Grup Idol JKT48 🎤';
+        : 'Agensi Idol 🎤';
+
+    // PERBAIKAN ERROR: Model Character tidak memiliki getter 'salary'.
+    // Menggunakan properti 'money' yang sudah ada sebagai placeholder gaji bulanan.
+    // Jika nanti kamu menambahkan properti 'jobSalary' atau 'salary' di Character, ganti bagian ini.
+    final int currentSalary = char.money ?? 0; 
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF7F9FC),
+      backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF7F9FC),
       appBar: AppBar(
         title: Text(
           appBarTitle,
@@ -139,10 +151,10 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Profile Card (same layout as school screen image)
+            // Profile Card
             Card(
               elevation: 2,
-              color: Colors.white,
+              color: isDark ? Colors.grey.shade800 : Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
               child: Padding(
                 padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
@@ -156,12 +168,19 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                     const SizedBox(height: 12),
                     Text(
                       char.name,
-                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${char.isIdol ? 'Idol' : 'Staf'} ($roleTitle) • Usia: ${char.age} tahun',
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: isDark ? Colors.white70 : Colors.grey,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Row(
@@ -169,9 +188,12 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                       children: [
                         Column(
                           children: [
-                            const Text(
+                            Text(
                               'Kesehatan',
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white54 : Colors.grey,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -183,13 +205,16 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                         Container(
                           width: 1,
                           height: 30,
-                          color: Colors.grey.shade300,
+                          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                         ),
                         Column(
                           children: [
-                            const Text(
+                            Text(
                               'Kedisiplinan',
-                              style: TextStyle(fontSize: 12, color: Colors.grey),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white54 : Colors.grey,
+                              ),
                             ),
                             const SizedBox(height: 4),
                             Text(
@@ -204,11 +229,58 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                 ),
               ),
             ),
+
+            const SizedBox(height: 16),
+
+            // MENU GAJI / PENGHASILAN
+            Card(
+              elevation: 0,
+              margin: const EdgeInsets.only(bottom: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+              ),
+              color: isDark ? Colors.grey.shade800 : Colors.white,
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.green.withAlpha(26),
+                  child: const Icon(Icons.payments, color: Colors.green),
+                ),
+                title: Text(
+                  'Gaji Bulanan',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+                subtitle: Text(
+                  'Pendapatan yang kamu terima setiap bulan',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white70 : Colors.grey,
+                  ),
+                ),
+                trailing: Text(
+                  '\$${currentSalary.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}',
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: Colors.green,
+                  ),
+                ),
+              ),
+            ),
+
             const SizedBox(height: 24),
 
-            const Text(
+            Text(
               'Aktivitas Idol',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white70 : Colors.blueGrey,
+              ),
             ),
             const SizedBox(height: 12),
 
@@ -319,22 +391,40 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
     Widget? page,
     VoidCallback? onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
       ),
-      color: Colors.white,
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: color.withAlpha(26),
           child: Icon(icon, color: color),
         ),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        subtitle: Text(subtitle, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          subtitle,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? Colors.white70 : Colors.grey,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: () {
           if (page != null) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => page));

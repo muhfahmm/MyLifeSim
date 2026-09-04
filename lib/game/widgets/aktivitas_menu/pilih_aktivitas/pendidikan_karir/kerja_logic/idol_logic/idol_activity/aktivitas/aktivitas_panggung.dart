@@ -55,12 +55,14 @@ class _AktivitasPanggungPageState extends State<AktivitasPanggungPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Aktivitas Panggung & Latihan 🎭'),
         backgroundColor: Colors.pink.shade700,
         foregroundColor: Colors.white,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
@@ -89,18 +91,38 @@ class _AktivitasPanggungPageState extends State<AktivitasPanggungPage> {
     required String desc,
     required VoidCallback onTap,
   }) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.pink.shade100.withOpacity(0.5)),
+        side: BorderSide(
+          color: isDark ? Colors.pink.shade700 : Colors.pink.shade100.withOpacity(0.5),
+        ),
       ),
-      color: Colors.white,
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       child: ListTile(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-        subtitle: Text(desc, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 15,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Text(
+          desc,
+          style: TextStyle(
+            fontSize: 12,
+            color: isDark ? Colors.white70 : Colors.grey,
+          ),
+        ),
+        trailing: Icon(
+          Icons.arrow_forward_ios,
+          size: 14,
+          color: isDark ? Colors.white54 : Colors.grey,
+        ),
         onTap: onTap,
       ),
     );

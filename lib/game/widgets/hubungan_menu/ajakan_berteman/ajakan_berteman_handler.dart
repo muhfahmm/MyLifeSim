@@ -57,6 +57,27 @@ class AjakanBertemanHandler {
       }
     }
 
+    // 3b. Anggota Idol Trainee
+    for (var c in character.idolTrainees) {
+      if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
+        candidates.add({'data': c, 'role': 'Rekan Trainee Idol'});
+      }
+    }
+
+    // 3c. Anggota Idol Main Member
+    for (var c in character.idolMainMembers) {
+      if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
+        candidates.add({'data': c, 'role': 'Rekan Member Utama Idol'});
+      }
+    }
+
+    // 3d. Staf Idol Management
+    for (var c in character.idolStaff) {
+      if (c['isDeceased'] != 'true' && c['isFriend'] != 'true') {
+        candidates.add({'data': c, 'role': 'Staf Agensi Idol'});
+      }
+    }
+
     // 4. Sepupu / Keluarga Sejawat (Eksklusi Kakek, Nenek, Paman, Bibi, Ayah, Ibu)
     for (var c in character.extendedFamily) {
       final String relation = (c['relation'] ?? '').toLowerCase();

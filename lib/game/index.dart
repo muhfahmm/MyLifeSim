@@ -2696,6 +2696,9 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       else if (role == 'Teman Sekelas') labelWithMu = 'Teman Sekelasmu';
       else if (role == 'Teman Kuliah') labelWithMu = 'Teman Kuliahmu';
       else if (role == 'Rekan Kerja') labelWithMu = 'Rekan Kerjamu';
+      else if (role == 'Rekan Trainee Idol') labelWithMu = 'Rekan Trainee Idol-mu';
+      else if (role == 'Rekan Member Utama Idol') labelWithMu = 'Rekan Member Utama Idol-mu';
+      else if (role == 'Staf Agensi Idol') labelWithMu = 'Staf Agensi Idol-mu';
       else if (role == 'Brand Ambassador') labelWithMu = 'Brand Ambassador-mu';
       else if (role == 'Pro Player') labelWithMu = 'Rekan Pro Player-mu';
       else if (role == 'Talent Esports') labelWithMu = 'Rekan Talent-mu';
