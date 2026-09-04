@@ -205,7 +205,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     () {
                       final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
                       final String gender = widget.teacher['gender'] ?? 'Laki-laki';
-                      final currentYear = DateTime.now().year;
+                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                       final birthYear = currentYear - age;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

@@ -8,6 +8,7 @@ import 'actions/belajar.dart';
 import 'actions/kelas.dart';
 import 'actions/dosen.dart';
 import 'actions/pindah_universitas.dart';
+import 'major_recommender.dart';
 
 // ============================================================================
 // HALAMAN PILIH JURUSAN (tanpa emoji, pakai ikon)
@@ -463,37 +464,158 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       title: 'Pilih Universitas Swasta 🏢',
       univList: univList,
       onSelected: (chosenUniv) {
-        final parentRel = ((widget.character.fatherRelationship ?? 50) + (widget.character.motherRelationship ?? 50)) ~/ 2;
-        final bool success = Random().nextInt(100) < parentRel;
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+        final String currentLoc = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');
+        // Biaya per tahun dihitung dinamis berdasarkan negara dan jurusan
+        final int annualTuition = MajorRecommender.calculateTuitionFee(currentLoc, major);
+        final String fmtTuition = '\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun';
 
-        if (success) {
-          final String level = _determineCurrentRegisterLevel();
-          widget.character.univName = chosenUniv;
-          widget.character.univMajor = '$major ($level - Swasta)';
-          widget.character.educationHistory[level] = 'Belum Lulus';
-          widget.character.currentUnivStudyYears = 0;
-          widget.onRefresh();
-          if (Navigator.canPop(context)) Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: const Text('Pendaftaran Disetujui! 💸'),
-              content: Text('Orang tuamu menyetujui biaya pendaftaran kuliah di $chosenUniv untuk jenjang $level dengan jurusan $major.'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (payCtx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: Row(
+              children: [
+                const Icon(Icons.payments, color: Colors.amber, size: 28),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Metode Pembayaran Kuliah',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: const Text('Permintaan Ditolak 🚫'),
-              content: Text('Orang tuamu menolak membiayaimu masuk $chosenUniv karena keterbatasan finansial.'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Kamu mendaftar di $chosenUniv ($major).\nBiaya pendidikan: $fmtTuition.',
+                  style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'Pilih sumber dana pembayaran kuliahmu:',
+                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white54 : Colors.grey.shade700),
+                ),
+              ],
             ),
-          );
-        }
+            actions: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.amber.shade700,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: const Icon(Icons.family_restroom),
+                      label: const Text('Minta Orang Tua Membayar', style: TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        Navigator.pop(payCtx);
+                        _processParentPayment(context, chosenUniv, major, annualTuition);
+                      },
+                    ),
+                    const SizedBox(height: 8),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green.shade600,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                      ),
+                      icon: const Icon(Icons.account_balance_wallet),
+                      label: Text('Bayar Mandiri (\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")})', style: const TextStyle(fontWeight: FontWeight.bold)),
+                      onPressed: () {
+                        Navigator.pop(payCtx);
+                        _processSelfPayment(context, chosenUniv, major, annualTuition);
+                      },
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton(
+                      onPressed: () => Navigator.pop(payCtx),
+                      child: Text('Batal', style: TextStyle(color: isDark ? Colors.white54 : Colors.grey)),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
       },
     );
+  }
+
+  void _processParentPayment(BuildContext context, String chosenUniv, String major, int annualTuition) {
+    final parentRel = ((widget.character.fatherRelationship ?? 50) + (widget.character.motherRelationship ?? 50)) ~/ 2;
+    final bool success = Random().nextInt(100) < parentRel;
+    final String level = _determineCurrentRegisterLevel();
+
+    if (success) {
+      widget.character.univName = chosenUniv;
+      widget.character.univMajor = '$major ($level - Swasta)';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
+      widget.onRefresh();
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Pendaftaran Disetujui! 💸'),
+          content: Text('Orang tuamu menyetujui membiayai kuliahmu di $chosenUniv untuk jenjang $level jurusan $major dengan biaya \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Permintaan Ditolak 🚫'),
+          content: Text('Orang tuamu menolak membiayaimu masuk $chosenUniv karena keterbatasan finansial.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    }
+  }
+
+  void _processSelfPayment(BuildContext context, String chosenUniv, String major, int annualTuition) {
+    final String level = _determineCurrentRegisterLevel();
+    if (widget.character.money >= annualTuition) {
+      widget.character.money -= annualTuition;
+      widget.character.univName = chosenUniv;
+      widget.character.univMajor = '$major ($level - Swasta)';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
+      widget.onRefresh();
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Pendaftaran Berhasil! 🎓'),
+          content: Text('Kamu berhasil membayar biaya kuliah tahun pertama secara mandiri di $chosenUniv sebesar \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} untuk jenjang $level jurusan $major.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          title: const Text('Saldo Tidak Cukup 🚫'),
+          content: Text('Uangmu tidak mencukupi untuk membayar biaya kuliah tahun pertama di $chosenUniv (\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}). Saldomu saat ini: \$${widget.character.money.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}.'),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        ),
+      );
+    }
   }
 
   void _tryBeasiswa(BuildContext context, String major) async {
@@ -553,46 +675,105 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           children: [
             _buildCategoryFilter(),
             const SizedBox(height: 16),
-            Text(
-              'Pilih salah satu program studi yang ingin kamu tekuni:',
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Pilih salah satu program studi yang ingin kamu tekuni:',
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Expanded(
-              child: ListView.builder(
-                itemCount: _filteredMajors.length,
-                itemBuilder: (context, index) {
-                  final major = _filteredMajors[index];
-                  return Card(
-                    elevation: 1,
-                    margin: const EdgeInsets.symmetric(vertical: 4),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: ListTile(
-                      leading: Icon(
-                        _getIconForMajor(major),
-                        color: Colors.indigo,
+              child: () {
+                final String userCountry = widget.character.location.isNotEmpty 
+                    ? widget.character.location 
+                    : (widget.character.birthCountry ?? 'Indonesia');
+                final Map<String, String> recommendedMap = MajorRecommender.getRecommendationsForCountry(userCountry);
+
+                final List<String> sortedList = List<String>.from(_filteredMajors);
+                sortedList.sort((a, b) {
+                  final bool aRec = recommendedMap.containsKey(a);
+                  final bool bRec = recommendedMap.containsKey(b);
+                  if (aRec && !bRec) return -1;
+                  if (!aRec && bRec) return 1;
+                  return 0;
+                });
+
+                return ListView.builder(
+                  itemCount: sortedList.length,
+                  itemBuilder: (context, index) {
+                    final major = sortedList[index];
+                    final String? badgeLabel = recommendedMap[major];
+
+                    return Card(
+                      elevation: badgeLabel != null ? 2 : 1,
+                      margin: const EdgeInsets.symmetric(vertical: 4),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: badgeLabel != null 
+                            ? BorderSide(color: isDark ? Colors.amber.shade700 : Colors.amber.shade600, width: 1.2)
+                            : BorderSide.none,
                       ),
-                      title: Text(
-                        major,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
+                      child: ListTile(
+                        leading: Icon(
+                          _getIconForMajor(major),
+                          color: badgeLabel != null ? Colors.amber.shade700 : Colors.indigo,
                         ),
+                        title: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                major,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                            ),
+                            if (badgeLabel != null) ...[
+                              const SizedBox(width: 8),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.amber.shade900.withOpacity(0.5) : Colors.amber.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(
+                                    color: isDark ? Colors.amberAccent : Colors.amber.shade700,
+                                    width: 0.8,
+                                  ),
+                                ),
+                                child: Text(
+                                  badgeLabel,
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                        trailing: Icon(
+                          Icons.arrow_forward_ios, 
+                          size: 16, 
+                          color: isDark ? Colors.white54 : Colors.black54,
+                        ),
+                        onTap: () {
+                          _showAdmissionPathways(context, major);
+                        },
                       ),
-                      trailing: Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.black54),
-                      onTap: () {
-                        _showAdmissionPathways(context, major);
-                      },
-                    ),
-                  );
-                },
-              ),
+                    );
+                  },
+                );
+              }(),
             ),
           ],
         ),

@@ -151,7 +151,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     Builder(builder: (context) {
-                      final currentYear = DateTime.now().year;
+                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                       final birthYear = currentYear - age;
                       final bool isDark = Theme.of(context).brightness == Brightness.dark;
                       return Column(

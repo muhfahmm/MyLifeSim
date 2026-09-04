@@ -243,7 +243,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                         typeLabel = 'Supervisor / Atasan';
                       }
                       final String targetGender = widget.classmate['gender'] ?? 'Laki-laki';
-                      final currentYear = DateTime.now().year;
+                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                       final birthYear = currentYear - age;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

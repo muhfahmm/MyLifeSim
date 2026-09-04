@@ -430,7 +430,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     Builder(builder: (context) {
-                      final currentYear = DateTime.now().year;
+                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                       final birthYear = currentYear - age;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,

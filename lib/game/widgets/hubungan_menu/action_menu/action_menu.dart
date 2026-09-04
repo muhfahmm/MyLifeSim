@@ -48,6 +48,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     final String cleanRole = role.toLowerCase();
     final String cleanName = name.toLowerCase();
 
+    // Cek daftar teman (character.friends) terlebih dahulu jika cocok dengan nama
+    for (var f in widget.character.friends) {
+      if (f['name'] != null && (cleanName == f['name']!.toLowerCase() || cleanName.contains(f['name']!.toLowerCase()))) {
+        int fAge = int.tryParse(f['age'] ?? '0') ?? 0;
+        return '$fAge tahun';
+      }
+    }
+
     // Cek Nama Biologis & Tiri Terlebih Dahulu (Agar tidak peduli role apa pun yang di-passing)
     if (widget.character.fatherName != null &&
         (cleanName == widget.character.fatherName!.toLowerCase() ||
@@ -199,17 +207,47 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return sibAge < 0 ? 'Belum Lahir (Dalam Kandungan)' : '$sibAge tahun';
         }
       }
+      for (var f in widget.character.friends) {
+        if (f['name'] == name || (f['name'] != null && name.contains(f['name']!))) {
+          int fAge = int.tryParse(f['age'] ?? '0') ?? 0;
+          return '$fAge tahun';
+        }
+      }
       for (var cm in widget.character.classmates) {
         final String expectedLabel = '${cm['name']} (Teman Sekelas)';
-        if (expectedLabel == name || cm['name'] == name) {
+        if (expectedLabel == name || cm['name'] == name || (cm['name'] != null && name.contains(cm['name']!))) {
           int cmAge = int.tryParse(cm['age'] ?? '0') ?? 0;
           return '$cmAge tahun';
         }
       }
+      for (var ucm in widget.character.univClassmates) {
+        if (ucm['name'] == name || (ucm['name'] != null && name.contains(ucm['name']!))) {
+          int ucmAge = int.tryParse(ucm['age'] ?? '0') ?? 0;
+          return '$ucmAge tahun';
+        }
+      }
       for (var cw in widget.character.coworkers) {
-        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
+        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!))) {
           int cwAge = int.tryParse(cw['age'] ?? '0') ?? 0;
           return '$cwAge tahun';
+        }
+      }
+      for (var lec in widget.character.univLecturers) {
+        if (lec['name'] == name || (lec['name'] != null && name.contains(lec['name']!))) {
+          int lecAge = int.tryParse(lec['age'] ?? '0') ?? 0;
+          return '$lecAge tahun';
+        }
+      }
+      for (var t in [...widget.character.sdTeachers, ...widget.character.smpTeachers, ...widget.character.smaTeachers]) {
+        if (t['name'] == name || (t['name'] != null && name.contains(t['name']!))) {
+          int tAge = int.tryParse(t['age'] ?? '0') ?? 0;
+          return '$tAge tahun';
+        }
+      }
+      for (var idl in [...widget.character.idolTrainees, ...widget.character.idolMainMembers, ...widget.character.idolStaff]) {
+        if (idl['name'] == name || (idl['name'] != null && name.contains(idl['name']!))) {
+          int idlAge = int.tryParse(idl['age'] ?? '0') ?? 0;
+          return '$idlAge tahun';
         }
       }
     }
@@ -3748,6 +3786,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                   if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name']!.toLowerCase().contains(plainName)) {
                                     return widget.character.fifthPartner!['skinColor'];
                                   }
+                                  // Lookup NPC skinColor from lists
+                                  final List<List<Map<String, dynamic>>> allLists = [
+                                    widget.character.friends,
+                                    widget.character.classmates,
+                                    widget.character.univClassmates,
+                                    widget.character.coworkers,
+                                    widget.character.siblings,
+                                    widget.character.extendedFamily,
+                                    widget.character.children,
+                                    widget.character.idolTrainees,
+                                    widget.character.idolMainMembers,
+                                    widget.character.idolStaff,
+                                  ];
+                                  for (var list in allLists) {
+                                    for (var item in list) {
+                                      final String n = (item['name'] ?? '').toString().toLowerCase().trim();
+                                      if (n.isNotEmpty && (plainName.contains(n) || n.contains(plainName) || rawName.contains(n))) {
+                                        if (item['skinColor'] != null && item['skinColor'].toString().isNotEmpty) {
+                                          return item['skinColor'].toString();
+                                        }
+                                      }
+                                    }
+                                  }
                                   return null;
                                 }(),
                               ),
@@ -3771,7 +3832,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Builder(builder: (context) {
-                                final currentYear = DateTime.now().year;
+                                final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                                 final birthYear = currentYear - targetAge;
                                 return Text(
                                   'Tanggal Lahir: 4 September $birthYear',
