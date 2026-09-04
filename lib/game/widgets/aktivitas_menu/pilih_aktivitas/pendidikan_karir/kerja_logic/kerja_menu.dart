@@ -12,6 +12,7 @@ import 'esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/politik_logic/politik_menu.dart';
+import 'military_job_logic/army_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -503,6 +504,20 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             title: 'Pekerjaan Profesional (Butuh Gelar Sarjana)',
             subtitle: 'Lowongan posisi spesialis & eksekutif lulusan universitas',
             page: PekerjaanProfesionalMenuScreen(
+              character: character,
+              onRefresh: () {
+                if (mounted) setState(() {});
+                widget.onRefresh();
+              },
+            ),
+          ),
+          _buildMenuTile(
+            context: context,
+            icon: Icons.military_tech,
+            color: Colors.green.shade800,
+            title: 'Militer (TNI AD, AL, AU)',
+            subtitle: 'Bergabung dengan karir militer pertahanan negara',
+            page: ArmyMenuPage(
               character: character,
               onRefresh: () {
                 if (mounted) setState(() {});

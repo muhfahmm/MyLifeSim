@@ -24,7 +24,6 @@ import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_k
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/freelance/freelance_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/army_logic/army_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/pekerjaan_part_time_logic/part_time_menu.dart';
 
 class ActivityButton extends StatelessWidget {
@@ -98,15 +97,10 @@ class ActivityButton extends StatelessWidget {
           isNotification: false,
           content: StatefulBuilder(
             builder: (context, setStateDialog) {
-              final VoidCallback localRefresh = () {
+              void localRefresh() {
                 onRefresh();
                 setStateDialog(() {});
-              };
-              final bool isMilitaryJob = character.jobName != null &&
-                  (character.jobName!.contains('Angkatan Darat') ||
-                   character.jobName!.contains('Angkatan Laut') ||
-                   character.jobName!.contains('Angkatan Udara'));
-              final bool hasCivilianJob = character.jobName != null && !isMilitaryJob;
+              }
               return Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -185,10 +179,10 @@ class ActivityButton extends StatelessWidget {
                   // Item Bekerja (Pekerjaan Tetap)
                   _buildActivityTile(
                     context: context,
-                    label: hasCivilianJob
+                    label: character.jobName != null
                         ? 'Bekerja (${character.jobName})'
                         : 'Bekerja',
-                    subtitle: (hasCivilianJob && character.jobSalary != null)
+                    subtitle: (character.jobName != null && character.jobSalary != null)
                         ? '${character.jobName} - Gaji: \$${character.jobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
                         : 'Mulai bekerja untuk menghasilkan uang tunai',
                     icon: Icons.work,
@@ -222,32 +216,6 @@ class ActivityButton extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) => FreelanceMenuPage(
-                            character: character,
-                            onRefresh: localRefresh,
-                          ),
-                        ),
-                      );
-                    }),
-                  ),
-
-                  // Item Militer
-                  _buildActivityTile(
-                    context: context,
-                    label: isMilitaryJob
-                        ? 'Militer (${character.jobName})'
-                        : 'Militer',
-                    subtitle: (isMilitaryJob && character.jobSalary != null)
-                        ? '${character.jobName} - Gaji: \$${character.jobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
-                        : 'Bergabung dengan Angkatan Darat, Laut, atau Udara',
-                    icon: Icons.military_tech,
-                    color: Colors.green.shade800,
-                    minAge: 18,
-                    currentAge: age,
-                    onTap: () => _executeAction(context, () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ArmyMenuPage(
                             character: character,
                             onRefresh: localRefresh,
                           ),
