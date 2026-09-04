@@ -331,49 +331,79 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
             borderRadius: BorderRadius.circular(16),
             onTap: (isCurrentLocation || !canAfford)
                 ? null
-                : () async {
-                    widget.character.money -= (n['cost'] as int);
-                    widget.character.location = capitalizedName;
-                    widget.character.happiness = (widget.character.happiness + (n['happiness'] as int)).clamp(0, 100);
-                    
-                    widget.character.resignJob();
-                    widget.character.idolTrainees.clear();
-                    widget.character.idolMainMembers.clear();
-                    widget.character.idolStaff.clear();
-                    
-                    final msg = '✈️ Kamu pindah ke $capitalizedName! Karena berpindah negara, kamu otomatis mengundurkan diri dari pekerjaan lamamu. Kehidupan baru menanti! (+${n['happiness']}% Kebahagiaan)';
-                    widget.character.inbox.add(msg);
-                    
-                    final navigator = Navigator.of(context);
-                    final List<String> cities = await _fetchCities(capitalizedName);
-
-                    if (!mounted) return;
-
-                    navigator.pop();
-                    widget.onComplete();
-
+                : () {
                     showDialog(
-                      context: navigator.context,
-                      barrierDismissible: false,
-                      builder: (ctx) => AlertDialog(
+                      context: context,
+                      builder: (confirmCtx) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: const Row(
                           children: [
-                            Icon(Icons.check_circle, color: Colors.green),
+                            Icon(Icons.flight_takeoff, color: Colors.blue),
                             SizedBox(width: 8),
-                            Text('Imigrasi Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Text('Konfirmasi Imigrasi', style: TextStyle(fontWeight: FontWeight.bold)),
                           ],
                         ),
-                        content: Text(msg),
+                        content: Text(
+                          'Apakah kamu yakin ingin berimigrasi ke $capitalizedName dengan biaya \$${(n['cost'] as int).toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}?\n\nKamu akan mengundurkan diri dari pekerjaan lamamu.',
+                        ),
                         actions: [
                           TextButton(
-                            onPressed: () {
-                              Navigator.pop(ctx);
-                              if (cities.isNotEmpty) {
-                                _showSelectCityModal(navigator.context, capitalizedName, cities);
-                              }
+                            onPressed: () => Navigator.pop(confirmCtx),
+                            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+                            onPressed: () async {
+                              Navigator.pop(confirmCtx); // Tutup dialog konfirmasi
+
+                              widget.character.money -= (n['cost'] as int);
+                              widget.character.location = capitalizedName;
+                              widget.character.happiness = (widget.character.happiness + (n['happiness'] as int)).clamp(0, 100);
+                              
+                              widget.character.resignJob();
+                              widget.character.idolTrainees.clear();
+                              widget.character.idolMainMembers.clear();
+                              widget.character.idolStaff.clear();
+                              
+                              final msg = '✈️ Kamu pindah ke $capitalizedName! Karena berpindah negara, kamu otomatis mengundurkan diri dari pekerjaan lamamu. Kehidupan baru menanti! (+${n['happiness']}% Kebahagiaan)';
+                              widget.character.inbox.add(msg);
+                              
+                              final navigator = Navigator.of(context);
+                              final List<String> cities = await _fetchCities(capitalizedName);
+
+                              if (!mounted) return;
+
+                              navigator.pop();
+                              widget.onComplete();
+
+                              showDialog(
+                                context: navigator.context,
+                                barrierDismissible: false,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Row(
+                                    children: [
+                                      Icon(Icons.check_circle, color: Colors.green),
+                                      SizedBox(width: 8),
+                                      Text('Imigrasi Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                  content: Text(msg),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        if (cities.isNotEmpty) {
+                                          _showSelectCityModal(navigator.context, capitalizedName, cities);
+                                        }
+                                      },
+                                      child: const Text('OK'),
+                                    )
+                                  ],
+                                ),
+                              );
                             },
-                            child: const Text('OK'),
-                          )
+                            child: const Text('Ya, Pindah ✈️'),
+                          ),
                         ],
                       ),
                     );

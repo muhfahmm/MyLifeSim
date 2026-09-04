@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
 import 'ujian_lisensi_page.dart';
 import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
+import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
 
 class LisensiMenuHelper {
   static void showLisensiMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -175,6 +176,19 @@ class _LisensiPageState extends State<LisensiPage> {
                                   onPressed: () => Navigator.pop(ctx),
                                   child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
+                                if (name.contains('Paspor'))
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.blue,
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.pop(ctx);
+                                      Navigator.pop(context);
+                                      ImigrasimMenuHelper.showImigrasimMenu(context, widget.character, widget.onComplete);
+                                    },
+                                    child: const Text('Ke Imigrasi ✈️', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
                               ],
                             ),
                           );
