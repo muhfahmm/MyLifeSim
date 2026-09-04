@@ -35,6 +35,7 @@ import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.d
 import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
 import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
 import 'package:bitlife/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
+import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -3778,8 +3779,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   _buildStatRow('Disiplin', _character.discipline, Colors.purple),
                   const SizedBox(height: 10),
                   _buildSexualityRow('Seksualitas', _character.sexuality),
-                  const SizedBox(height: 10),
-                  _buildProposalStatsCard(),
+                  if (AdultFeatures.isPremiumUnlocked) ...[
+                    const SizedBox(height: 10),
+                    _buildProposalStatsCard(),
+                  ],
                   const SizedBox(height: 10),
                   InboxButton(
                     character: _character,

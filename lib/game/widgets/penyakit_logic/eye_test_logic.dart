@@ -90,29 +90,46 @@ class EyeTestLogic {
     String reasonText = 'Matamu terasa sedikit buram. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
 
     if (age >= 0 && age <= 5) {
+      if (character.eyeTestsCountYoung > 0) {
+        onFinish();
+        return;
+      }
       chance = 1; // 1% (jika ada kelainan pada mata)
       reasonText = 'Dokter mendeteksi adanya potensi kelainan pada mata. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
     } else if (age >= 6 && age <= 12) {
+      if (character.eyeTestsCountYoung > 0) {
+        onFinish();
+        return;
+      }
       chance = 10; // 10% (akibat kegiatan gadget)
       reasonText = 'Matamu terasa sedikit buram akibat kegiatan gadget. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
-    } else if (age >= 13 && age <= 18) {
-      chance = 20; // 20% (akibat kegiatan gadget)
-      reasonText = 'Matamu terasa sedikit buram akibat intensnya kegiatan gadget. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
-    } else if (age >= 19 && age <= 30) {
-      chance = 35; // 35% (akibat kegiatan gadget dan belajar)
-      reasonText = 'Matamu terasa sedikit buram akibat kegiatan gadget dan aktivitas belajar. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
-    } else if (age >= 31 && age <= 50) {
-      chance = 55; // 55% (akibat usia)
-      reasonText = 'Matamu terasa sedikit buram akibat pengaruh usia. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
     } else if (age >= 50 && age <= 60) {
+      if (character.eyeTestsCountOld > 0) {
+        onFinish();
+        return;
+      }
       chance = 65; // 65% (akibat usia)
       reasonText = 'Matamu semakin terasa buram akibat pengaruh faktor usia. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
-    } else if (age > 60) {
-      chance = 75; // 75% (akibat usia 60++)
+    } else if (age >= 61 && age <= 75) {
+      if (character.eyeTestsCountOld > 0) {
+        onFinish();
+        return;
+      }
+      chance = 75; // 75% (akibat usia 61-75)
       reasonText = 'Penglihatanmu semakin mengabur akibat pengaruh faktor usia senja. Dokter meminta untuk menemukan dan menekan LANGSUNG huruf/angka yang berbeda di kotak berikut dalam 5 detik!';
+    } else {
+      // Usia 13-49 dan >75 tidak ada tes mata
+      onFinish();
+      return;
     }
 
     if (Random().nextInt(100) < chance) {
+      if (age <= 12) {
+        character.eyeTestsCountYoung++;
+      } else {
+        character.eyeTestsCountOld++;
+      }
+
       showEyeTestMinigame(
         context: context,
         character: character,

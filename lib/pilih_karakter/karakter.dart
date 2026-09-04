@@ -192,6 +192,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
   @override
   void initState() {
     super.initState();
+    _randomizeAttributes();
     _loadCountries().then((_) => _loadNamesData());
 
     final bool isMale = widget.gender == 'male' || widget.gender == 'laki-laki';
@@ -205,8 +206,35 @@ class _KarakterScreenState extends State<KarakterScreen> {
     _selectedSkinColor = AvatarGenerator.skinColors.values.first;
   }
 
+  void _randomizeAttributes() {
+    final random = Random();
+    const sexualityOptions = ['Heteroseksual', 'Biseksual', 'Homoseksual'];
+    final newHealth = 50 + random.nextInt(31);
+    final newHappiness = 50 + random.nextInt(31);
+    final newSmarts = 40 + random.nextInt(21); // 40 to 60
+    final newDiscipline = 50 + random.nextInt(31);
+    final newSexuality = sexualityOptions[random.nextInt(sexualityOptions.length)];
+
+    if (mounted) {
+      setState(() {
+        _health = newHealth;
+        _happiness = newHappiness;
+        _smarts = newSmarts;
+        _discipline = newDiscipline;
+        _sexuality = newSexuality;
+      });
+    } else {
+      _health = newHealth;
+      _happiness = newHappiness;
+      _smarts = newSmarts;
+      _discipline = newDiscipline;
+      _sexuality = newSexuality;
+    }
+  }
+
   void _randomizeAll() {
     _generateRandomName();
+    _randomizeAttributes();
   }
 
   void _generateRandomName() {
