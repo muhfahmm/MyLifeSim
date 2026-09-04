@@ -21,6 +21,8 @@ class GuruActionPage extends StatefulWidget {
 }
 
 class _GuruActionPageState extends State<GuruActionPage> {
+  String _searchQuery = '';
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +45,16 @@ class _GuruActionPageState extends State<GuruActionPage> {
       teachersList = widget.character.smaTeachers;
     }
 
+    final query = _searchQuery.toLowerCase();
+    final bool showHead = headmaster != null && ((headmaster['name'] ?? '').toLowerCase().contains(query) || 'kepala sekolah'.contains(query));
+    final bool showBk = bkTeacher != null && ((bkTeacher['name'] ?? '').toLowerCase().contains(query) || 'bimbingan konseling'.contains(query));
+
+    final filteredTeachers = teachersList.where((t) {
+      final name = (t['name'] ?? '').toLowerCase();
+      final subject = (t['subject'] ?? '').toLowerCase();
+      return name.contains(query) || subject.contains(query);
+    }).toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Guru & Staf Sekolah'),
@@ -50,37 +62,64 @@ class _GuruActionPageState extends State<GuruActionPage> {
         foregroundColor: Colors.white,
       ),
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
-      body: ListView(
-        padding: const EdgeInsets.all(16),
+      body: Column(
         children: [
-          // Kepala Sekolah Card
-          if (headmaster != null) ...[
-            _buildStaffCard(headmaster, 'Kepala Sekolah 🏫', isDark),
-            const SizedBox(height: 12),
-          ],
-
-          // Guru BK Card
-          if (bkTeacher != null) ...[
-            _buildStaffCard(bkTeacher, 'Guru Bimbingan Konseling (BK) 🧑‍🏫', isDark),
-            const SizedBox(height: 12),
-          ],
-
-          const Divider(height: 32),
-          Text(
-            'Daftar Guru Mata Pelajaran',
-            style: TextStyle(
-              fontSize: 16, 
-              fontWeight: FontWeight.bold, 
-              color: isDark ? Colors.white70 : Colors.blueGrey,
+          Container(
+            padding: const EdgeInsets.all(12),
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            child: TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                hintText: 'Cari nama guru / mata pelajaran...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                isDense: true,
+                filled: true,
+                fillColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
+              ),
             ),
           ),
-          const SizedBox(height: 12),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Kepala Sekolah Card
+                if (showHead) ...[
+                  _buildStaffCard(headmaster!, 'Kepala Sekolah 🏫', isDark),
+                  const SizedBox(height: 12),
+                ],
 
-          // Guru Mapel
-          ...teachersList.map((t) {
-            final subject = t['subject'] ?? 'Guru';
-            return _buildStaffCard(t, 'Guru $subject 📖', isDark);
-          }),
+                // Guru BK Card
+                if (showBk) ...[
+                  _buildStaffCard(bkTeacher!, 'Guru Bimbingan Konseling (BK) 🧑‍🏫', isDark),
+                  const SizedBox(height: 12),
+                ],
+
+                if (filteredTeachers.isNotEmpty) ...[
+                  const Divider(height: 32),
+                  Text(
+                    'Daftar Guru Mata Pelajaran',
+                    style: TextStyle(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.bold, 
+                      color: isDark ? Colors.white70 : Colors.blueGrey,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Guru Mapel
+                  ...filteredTeachers.map((t) {
+                    final subject = t['subject'] ?? 'Guru';
+                    return _buildStaffCard(t, 'Guru $subject 📖', isDark);
+                  }),
+                ],
+              ],
+            ),
+          ),
         ],
       ),
     );

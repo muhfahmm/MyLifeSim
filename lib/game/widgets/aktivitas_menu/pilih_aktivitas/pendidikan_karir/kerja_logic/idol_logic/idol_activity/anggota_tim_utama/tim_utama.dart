@@ -3,7 +3,6 @@ import 'package:bitlife/pilih_karakter/character.dart';
 import 'package:bitlife/avatar/avatar_age_rules.dart';
 import 'package:bitlife/avatar/avatar_generator.dart';
 import '../0_interactions_pages/idols_interaction_page.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
 
 class TimUtamaPage extends StatefulWidget {
   final Character character;
@@ -20,31 +19,62 @@ class TimUtamaPage extends StatefulWidget {
 }
 
 class _TimUtamaPageState extends State<TimUtamaPage> {
+  String _searchQuery = '';
+
   @override
   Widget build(BuildContext context) {
-    final members = widget.character.idolMainMembers;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final query = _searchQuery.toLowerCase();
+    final members = widget.character.idolMainMembers.where((m) {
+      final name = (m['name'] ?? '').toLowerCase();
+      return name.contains(query);
+    }).toList();
 
     final isUserInTeam = widget.character.jobName == 'Idol (Main Performer)';
-    final membersCount = members.length + (isUserInTeam ? 1 : 0);
+    final bool showUser = isUserInTeam && widget.character.name.toLowerCase().contains(query);
+    final membersCount = members.length + (showUser ? 1 : 0);
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
       appBar: AppBar(
         title: const Text('Anggota Tim Utama ⭐'),
         backgroundColor: Colors.pink.shade700,
         foregroundColor: Colors.white,
       ),
-      body: members.isEmpty && !isUserInTeam
-          ? const Center(
-              child: Text(
-                'Tidak ada anggota tim utama.',
-                style: TextStyle(color: Colors.grey),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            child: TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                hintText: 'Cari nama member utama...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                isDense: true,
+                filled: true,
+                fillColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-            )
-          : ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: membersCount,
-              itemBuilder: (context, index) {
-                if (isUserInTeam && index == 0) {
+            ),
+          ),
+          Expanded(
+            child: members.isEmpty && !showUser
+                ? Center(
+                    child: Text(
+                      'Tidak ada anggota tim utama ditemukan.',
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.all(16),
+                    itemCount: membersCount,
+                    itemBuilder: (context, index) {
+                      if (showUser && index == 0) {
                   final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(widget.character, happiness: widget.character.happiness);
                   return Card(
                     elevation: 0,
@@ -94,7 +124,7 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                   );
                 }
 
-                final memberIndex = isUserInTeam ? index - 1 : index;
+                final memberIndex = showUser ? index - 1 : index;
                 final member = members[memberIndex];
                 final String name = member['name'] ?? '';
                 final String gender = member['gender'] ?? 'Perempuan';
@@ -184,6 +214,9 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                 );
               },
             ),
+          ),
+        ],
+      ),
     );
   }
 }

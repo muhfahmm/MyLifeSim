@@ -19,6 +19,8 @@ class StafManajemenPage extends StatefulWidget {
 }
 
 class _StafManajemenPageState extends State<StafManajemenPage> {
+  String _searchQuery = '';
+
   // --- BADGE CONFIGS: role → (text, color) ---
   static const Map<String, Map<String, dynamic>> _badgeConfigs = {
     'General Manager':             {'text': 'GM 👑',              'color': 0xFF7B1FA2},
@@ -260,33 +262,34 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final query = _searchQuery.toLowerCase();
     final staffList = widget.character.idolStaff;
     final isUserStaff = widget.character.isIdolStaff;
     final userJob = widget.character.jobName ?? '';
+
+    final filteredStaffList = staffList.where((staff) {
+      final name = (staff['name'] ?? '').toLowerCase();
+      final role = (staff['role'] ?? '').toLowerCase();
+      final dept = (staff['department'] ?? '').toLowerCase();
+      return name.contains(query) || role.contains(query) || dept.contains(query);
+    }).toList();
 
     // Group staff by department
     final Map<String, List<Map<String, String>>> byDept = {};
     for (final dept in _deptOrder) {
       byDept[dept] = [];
     }
-    for (final staff in staffList) {
+    for (final staff in filteredStaffList) {
       final dept = staff['department'] ?? 'Manajemen Puncak & Admin';
       byDept.putIfAbsent(dept, () => []);
       byDept[dept]!.add(staff);
     }
 
-    // Figure out which dept the user belongs to (based on role string)
-    String userDept = 'Manajemen Puncak & Admin';
-    if (userJob.contains('Staf Operasional') || userJob == 'Staf Operasional Idol') {
-      // legacy – could be any dept; default to Manajemen
-      userDept = 'Manajemen Puncak & Admin';
-    } else if (userJob.contains('General Manager')) {
-      userDept = 'Manajemen Puncak & Admin';
-    }
-
-    final totalStaff = staffList.length + (isUserStaff ? 1 : 0);
+    final totalStaff = filteredStaffList.length + (isUserStaff && widget.character.name.toLowerCase().contains(query) ? 1 : 0);
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
       appBar: AppBar(
         title: const Text('Staf & Manajemen 👥'),
         backgroundColor: Colors.pink.shade700,
@@ -304,17 +307,42 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
           ),
         ),
       ),
-      body: staffList.isEmpty && !isUserStaff
-          ? const Center(
-              child: Text(
-                'Tidak ada staf atau manajemen tersedia.',
-                style: TextStyle(color: Colors.grey),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            color: isDark ? Colors.grey.shade800 : Colors.white,
+            child: TextField(
+              onChanged: (val) => setState(() => _searchQuery = val),
+              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              decoration: InputDecoration(
+                hintText: 'Cari nama staf, jabatan, atau divisi...',
+                prefixIcon: const Icon(Icons.search, size: 20),
+                isDense: true,
+                filled: true,
+                fillColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: BorderSide.none,
+                ),
               ),
-            )
-          : ListView(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-              children: _buildAllSections(context, byDept, isUserStaff),
             ),
+          ),
+          Expanded(
+            child: filteredStaffList.isEmpty && (!isUserStaff || !widget.character.name.toLowerCase().contains(query))
+                ? Center(
+                    child: Text(
+                      'Tidak ada staf atau manajemen ditemukan.',
+                      style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
+                    ),
+                  )
+                : ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+                    children: _buildAllSections(context, byDept, isUserStaff && widget.character.name.toLowerCase().contains(query)),
+                  ),
+          ),
+        ],
+      ),
     );
   }
 
