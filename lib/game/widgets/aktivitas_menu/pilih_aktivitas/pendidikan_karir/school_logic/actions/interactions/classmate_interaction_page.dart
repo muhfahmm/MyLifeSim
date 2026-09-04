@@ -243,12 +243,37 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                         typeLabel = 'Supervisor / Atasan';
                       }
                       final String targetGender = widget.classmate['gender'] ?? 'Laki-laki';
-                      return Text(
-                        '$typeLabel • Gender: $targetGender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: isDark ? Colors.white70 : Colors.black54,
-                        ),
+                      final currentYear = DateTime.now().year;
+                      final birthYear = currentYear - age;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tanggal Lahir: 4 September $birthYear',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$typeLabel • Gender: $targetGender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ],
                       );
                     }(),
                     const SizedBox(height: 16),

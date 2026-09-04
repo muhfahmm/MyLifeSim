@@ -150,10 +150,38 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      '$role • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $relationship%',
-                      style: const TextStyle(fontSize: 14, color: Colors.black54),
-                    ),
+                    Builder(builder: (context) {
+                      final currentYear = DateTime.now().year;
+                      final birthYear = currentYear - age;
+                      final bool isDark = Theme.of(context).brightness == Brightness.dark;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tanggal Lahir: 4 September $birthYear',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            '$role • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $relationship%',
+                            style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54),
+                          ),
+                        ],
+                      );
+                    }),
                     const SizedBox(height: 16),
                     Row(
                       children: [

@@ -429,13 +429,40 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                       ],
                     ),
                     const SizedBox(height: 4),
-                    Text(
-                      'Penerima Donor Sperma • Gender: Perempuan • Umur: $age tahun • Hubungan: $relationship%',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.white70 : Colors.black54,
-                      ),
-                    ),
+                    Builder(builder: (context) {
+                      final currentYear = DateTime.now().year;
+                      final birthYear = currentYear - age;
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Tanggal Lahir: 4 September $birthYear',
+                            style: TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            'Penerima Donor Sperma • Gender: Perempuan • Umur: $age tahun • Hubungan: $relationship%',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                     const SizedBox(height: 4),
                     Text(
                       'Melahirkan anak Anda: $childName 👶',

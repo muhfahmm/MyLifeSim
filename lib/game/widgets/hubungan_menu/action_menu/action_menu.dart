@@ -3630,16 +3630,38 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              Builder(builder: (context) {
+                                final currentYear = DateTime.now().year;
+                                final birthYear = currentYear - targetAge;
+                                return Text(
+                                  'Tanggal Lahir: 4 September $birthYear',
+                                  style: TextStyle(
+                                    fontSize: 11,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 2),
                               Text(widget.targetName,
                                   style: TextStyle(
-                                      fontSize: 18,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white : Colors.black87)),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: isDark ? Colors.white70 : Colors.black54,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
                               Text(
                                 'Hubungan: ${_getDetailedRelationLabel()} | Gender: ${_getTargetGender()} | Umur: ${_getCurrentAgeValue()}',
                                 style: TextStyle(
-                                    fontSize: 14,
+                                    fontSize: 12,
                                     color: isDark ? Colors.white60 : Colors.black54),
                               ),
                             ],
