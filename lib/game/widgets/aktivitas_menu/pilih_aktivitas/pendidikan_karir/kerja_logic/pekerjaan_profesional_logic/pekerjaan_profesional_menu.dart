@@ -1,7 +1,7 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/pekerjaan_profesional_menu.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart
 import 'package:flutter/material.dart';
 import 'package:bitlife/pilih_karakter/character.dart';
-import 'database_nama_pekerjaan.dart';
+import '../database_nama_pekerjaan.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 
 

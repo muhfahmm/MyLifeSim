@@ -9,8 +9,8 @@ import 'idol_logic/idol_menu.dart';
 import 'database_nama_pekerjaan.dart';
 import 'esport_logic/proplayer/esport_roster_page.dart';
 import 'esport_logic/esport_activities_page.dart';
-import 'pekerjaan_umum_menu.dart';
-import 'pekerjaan_profesional_menu.dart';
+import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
+import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
 import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/politik_logic/politik_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
