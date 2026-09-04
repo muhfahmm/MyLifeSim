@@ -86,6 +86,8 @@ class Character {
   int countAjakanPacaran = 0;
   int countAjakanMakeLove = 0;
   int countAjakanMasturbasi = 0;
+  List<String> traits = [];
+  bool hasEstrangedReunionTriggered = false;
   List<Map<String, dynamic>> proposalHistory = [];
 
   void addProposalHistory({

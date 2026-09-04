@@ -68,17 +68,274 @@ class _GameScreenState extends State<GameScreen> {
       _character,
       happiness: _character.happiness,
     );
-    // Tampilkan pilihan hak asuh saat game baru dimulai jika orang tua sudah cerai
-    if ((_character.isFatherDivorced || _character.isMotherDivorced) &&
-        _character.custodyParent == null &&
-        _character.fatherName != null &&
-        _character.motherName != null) {
+    final bool isDivorced = _character.isFatherDivorced || _character.isMotherDivorced;
+    final bool isOneParentDeceased = _character.isFatherDeceased || _character.isMotherDeceased;
+
+    if ((isDivorced || isOneParentDeceased) && _character.age == 0) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          _showCustodySelectionDialog(context, _character.fatherName!, _character.motherName!);
+          _showInitialFamilyBackgroundModal();
+        }
+      });
+    } else if (isDivorced && _character.custodyParent == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _showCustodySelectionDialog(context, _character.fatherName ?? 'Ayah', _character.motherName ?? 'Ibu');
         }
       });
     }
+  }
+
+  Widget _buildFamilyAvatarIcon({
+    required String avatarUrl,
+    required bool isDeceased,
+    required bool isFemale,
+  }) {
+    return CircleAvatar(
+      radius: 20,
+      backgroundColor: isDeceased ? Colors.grey.shade400 : (isFemale ? Colors.pink.shade100 : Colors.blue.shade100),
+      child: ClipOval(
+        child: Image(
+          image: AvatarImageCache.getImageProvider(avatarUrl),
+          width: 40,
+          height: 40,
+          fit: BoxFit.cover,
+          errorBuilder: (ctx, err, stack) => Text(isDeceased ? '🪦' : (isFemale ? '👩' : '👨'), style: const TextStyle(fontSize: 18)),
+        ),
+      ),
+    );
+  }
+
+  void _showInitialFamilyBackgroundModal() {
+    final bool isDivorced = _character.isFatherDivorced || _character.isMotherDivorced;
+    final bool fatherDeceased = _character.isFatherDeceased;
+    final bool motherDeceased = _character.isMotherDeceased;
+
+    // Jika cerai dan belum ada hak asuh saat usia 0, tetapkan otomatis sesuai persentase
+    if (isDivorced && _character.custodyParent == null && _character.age == 0) {
+      final bool isFemale = _character.gender.toLowerCase().contains('perempuan') || _character.gender.toLowerCase().contains('female');
+      final int roll = Random().nextInt(100);
+      final String autoChoice = isFemale 
+          ? (roll < 65 ? 'Ayah' : 'Ibu')
+          : (roll < 45 ? 'Ayah' : 'Ibu');
+      _applyCustodyChoice(autoChoice);
+    }
+
+    final String fatherName = _character.fatherName ?? 'Ayah';
+    final String motherName = _character.motherName ?? 'Ibu';
+    final int fatherAge = _character.fatherAge ?? 30;
+    final int motherAge = _character.motherAge ?? 28;
+    final String fatherJob = _character.fatherJob ?? 'Pengangguran';
+    final String motherJob = _character.motherJob ?? 'Pengangguran';
+
+    final String custodyLabel = _character.custodyParent == 'Ayah' 
+        ? 'Ayahmu ($fatherName)' 
+        : (_character.custodyParent == 'Ibu' ? 'Ibumu ($motherName)' : 'Orang Tuamu');
+
+    String familyStatusText = '';
+    if (isDivorced) {
+      familyStatusText = '💔 Status Orang Tua: Bercerai. Kedua orang tuamu telah berpisah saat kamu lahir.\n\n🏡 Hak Asuh: Kamu tinggal & diasuh oleh $custodyLabel.';
+    } else if (fatherDeceased && motherDeceased) {
+      familyStatusText = '🪦 Status Keluarga: Kedua orang tuamu telah meninggal dunia saat kamu lahir.';
+    } else if (fatherDeceased) {
+      familyStatusText = '👴 Status Keluarga: Ayahmu ($fatherName) telah meninggal dunia. Kamu dibesarkan oleh Ibumu ($motherName) sebagai orang tua tunggal.';
+    } else if (motherDeceased) {
+      familyStatusText = '👵 Status Keluarga: Ibumu ($motherName) telah meninggal dunia. Kamu dibesarkan oleh Ayahmu ($fatherName) sebagai orang tua tunggal.';
+    }
+
+    // Generate Avatar URL untuk masing-masing anggota keluarga
+    final String fatherAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: fatherName,
+      gender: 'Laki-laki',
+      age: fatherAge,
+      happiness: fatherDeceased ? 0 : (_character.fatherRelationship ?? 50),
+      forcedSkinColor: _character.fatherSkinColor,
+    );
+
+    final String motherAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: motherName,
+      gender: 'Perempuan',
+      age: motherAge,
+      happiness: motherDeceased ? 0 : (_character.motherRelationship ?? 50),
+      forcedSkinColor: _character.motherSkinColor,
+    );
+
+    final String? stepFatherAvatarUrl = _character.stepFatherName != null
+        ? AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+            name: _character.stepFatherName!,
+            gender: 'Laki-laki',
+            age: _character.stepFatherAge ?? 35,
+            happiness: _character.stepFatherRelationship ?? 50,
+            forcedSkinColor: _character.stepFatherSkinColor,
+          )
+        : null;
+
+    final String? stepMotherAvatarUrl = _character.stepMotherName != null
+        ? AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+            name: _character.stepMotherName!,
+            gender: 'Perempuan',
+            age: _character.stepMotherAge ?? 35,
+            happiness: _character.stepMotherRelationship ?? 50,
+            forcedSkinColor: _character.stepMotherSkinColor,
+          )
+        : null;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          title: const Row(
+            children: [
+              Icon(Icons.family_restroom, color: Colors.blue, size: 28),
+              SizedBox(width: 10),
+              Text('Silsilah Keluarga 👪', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    familyStatusText,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.blue.shade900,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const Text('📊 Data Anggota Keluarga:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 8),
+
+                // Data Ayah
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: _buildFamilyAvatarIcon(
+                    avatarUrl: fatherAvatarUrl,
+                    isDeceased: fatherDeceased,
+                    isFemale: false,
+                  ),
+                  title: Text(
+                    '$fatherName ${fatherDeceased ? "(Meninggal)" : "($fatherAge th)"}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      decoration: fatherDeceased ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  subtitle: Text(fatherDeceased ? 'Telah Wafat' : 'Pekerjaan: $fatherJob ${isDivorced ? (_character.custodyParent == "Ayah" ? "• (Tinggal Bersama)" : "• (Terpisah)") : ""}'),
+                ),
+
+                // Data Ibu
+                ListTile(
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                  leading: _buildFamilyAvatarIcon(
+                    avatarUrl: motherAvatarUrl,
+                    isDeceased: motherDeceased,
+                    isFemale: true,
+                  ),
+                  title: Text(
+                    '$motherName ${motherDeceased ? "(Meninggal)" : "($motherAge th)"}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      decoration: motherDeceased ? TextDecoration.lineThrough : null,
+                    ),
+                  ),
+                  subtitle: Text(motherDeceased ? 'Telah Wafat' : 'Pekerjaan: $motherJob ${isDivorced ? (_character.custodyParent == "Ibu" ? "• (Tinggal Bersama)" : "• (Terpisah)") : ""}'),
+                ),
+
+                if (_character.stepFatherName != null && stepFatherAvatarUrl != null) ...[
+                  ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: _buildFamilyAvatarIcon(
+                      avatarUrl: stepFatherAvatarUrl,
+                      isDeceased: false,
+                      isFemale: false,
+                    ),
+                    title: Text('${_character.stepFatherName} (Ayah Tiri)'),
+                    subtitle: Text('Pekerjaan: ${_character.stepFatherJob ?? "Bekerja"}'),
+                  ),
+                ],
+
+                if (_character.stepMotherName != null && stepMotherAvatarUrl != null) ...[
+                  ListTile(
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                    leading: _buildFamilyAvatarIcon(
+                      avatarUrl: stepMotherAvatarUrl,
+                      isDeceased: false,
+                      isFemale: true,
+                    ),
+                    title: Text('${_character.stepMotherName} (Ibu Tiri)'),
+                    subtitle: Text('Pekerjaan: ${_character.stepMotherJob ?? "Bekerja"}'),
+                  ),
+                ],
+
+                if (_character.siblings.isNotEmpty) ...[
+                  const Divider(),
+                  const Text('👧👦 Saudara:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const SizedBox(height: 8),
+                  ..._character.siblings.map((sib) {
+                    final String sName = sib['name'] ?? 'Saudara';
+                    final String sRel = sib['relation'] ?? 'Saudara';
+                    final String sAge = sib['age'] ?? '0';
+                    final String sGender = sib['gender'] ?? (sRel.toLowerCase().contains('perempuan') ? 'Perempuan' : 'Laki-laki');
+                    final bool sIsFemale = sGender.toLowerCase().contains('perempuan');
+                    final int sAgeVal = int.tryParse(sAge) ?? 0;
+
+                    final String sibAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                      name: sName,
+                      gender: sGender,
+                      age: sAgeVal > 0 ? sAgeVal : 1,
+                      happiness: int.tryParse(sib['relationship'] ?? '70') ?? 70,
+                      forcedSkinColor: _character.getFamilyMemberSkinColor(sName) ?? sib['skinColor'],
+                    );
+
+                    return ListTile(
+                      dense: true,
+                      contentPadding: EdgeInsets.zero,
+                      leading: _buildFamilyAvatarIcon(
+                        avatarUrl: sibAvatarUrl,
+                        isDeceased: false,
+                        isFemale: sIsFemale,
+                      ),
+                      title: Text('$sName ($sRel)'),
+                      subtitle: Text('Umur: $sAge tahun'),
+                    );
+                  }),
+                ],
+              ],
+            ),
+          ),
+          actions: [
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('Lanjutkan', style: TextStyle(fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   // --- LOGIKA RESET ---
@@ -100,9 +357,9 @@ class _GameScreenState extends State<GameScreen> {
     );
   }
 
-  // --- LOGIKA TES KESEHATAN MATA ---
+  // --- LOGIKA TES KESEHATAN MATA & REUNI ORANG TUA ---
   void _checkGlassesNeed([VoidCallback? onFinish]) {
-    final VoidCallback done = onFinish ?? _finishAgeUp;
+    final VoidCallback done = () => _checkEstrangedParentReunion(onFinish ?? _finishAgeUp);
     EyeTestLogic.checkGlassesNeed(
       context: context,
       character: _character,
@@ -118,6 +375,83 @@ class _GameScreenState extends State<GameScreen> {
         _showCustodySelectionDialog(ctx, fName, mName, callback);
       },
     );
+  }
+
+  void _checkEstrangedParentReunion([VoidCallback? onDone]) {
+    final VoidCallback done = onDone ?? _finishAgeUp;
+
+    if (_character.custodyParent != null && 
+        !_character.hasEstrangedReunionTriggered && 
+        _character.age >= 13 && 
+        _character.age <= 25) {
+      
+      final bool nonChosenIsFather = _character.custodyParent == 'Ibu';
+      final String? nonChosenName = nonChosenIsFather ? _character.fatherName : _character.motherName;
+      final bool isDeceased = nonChosenIsFather ? _character.isFatherDeceased : _character.isMotherDeceased;
+      final bool isImprisoned = nonChosenIsFather ? _character.isFatherImprisoned : _character.isMotherImprisoned;
+      final String label = nonChosenIsFather ? 'Ayahmu' : 'Ibumu';
+
+      if (nonChosenName != null && !isDeceased && !isImprisoned) {
+        final bool shouldTrigger = _character.age == 15 || Random().nextInt(100) < 20;
+        if (shouldTrigger) {
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+              title: const Row(
+                children: [
+                  Icon(Icons.family_restroom, color: Colors.blue),
+                  SizedBox(width: 8),
+                  Text('Pertemuan Kembali 👪', style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
+              ),
+              content: Text(
+                '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.\n\nApakah kamu ingin menemuinya?',
+                style: const TextStyle(fontSize: 14),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    setState(() {
+                      _character.hasEstrangedReunionTriggered = true;
+                      if (nonChosenIsFather) {
+                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) + 40).clamp(0, 100);
+                      } else {
+                        _character.motherRelationship = ((_character.motherRelationship ?? 20) + 40).clamp(0, 100);
+                      }
+                      _character.inbox.add('❤️ Pertemuan Kembali: Kamu bertemu dengan $nonChosenName. Hubungan kalian membaik secara signifikan (+40).');
+                    });
+                    done();
+                  },
+                  child: const Text('Temui', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    setState(() {
+                      _character.hasEstrangedReunionTriggered = true;
+                      if (nonChosenIsFather) {
+                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) - 20).clamp(0, 100);
+                      } else {
+                        _character.motherRelationship = ((_character.motherRelationship ?? 20) - 20).clamp(0, 100);
+                      }
+                      _character.inbox.add('💔 Menolak Bertemu: Kamu memilih untuk tidak menemui $nonChosenName (-20 Hubungan).');
+                    });
+                    done();
+                  },
+                  child: const Text('Tolak', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                ),
+              ],
+            ),
+          );
+          return;
+        }
+      }
+    }
+
+    done();
   }
 
   // --- LOGIKA TAMBAH HARI ---
@@ -2960,6 +3294,80 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
+  void _applyCustodyChoice(String choice, [VoidCallback? onDone]) {
+    final bool fatherAliveAndFree = _character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned;
+    final String fatherOrStepFatherLabel = fatherAliveAndFree ? (_character.fatherName ?? 'Ayah') : (_character.stepFatherName ?? 'Ayah Tiri');
+    final String motherLabel = _character.motherName ?? 'Ibu';
+
+    setState(() {
+      if (choice == 'Ayah') {
+        _character.custodyParent = 'Ayah';
+
+        // 1. Hubungan: Ayah +50, Ibu -30
+        if (fatherAliveAndFree) {
+          _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 50).clamp(0, 100);
+        } else {
+          _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 50).clamp(0, 100);
+        }
+        _character.motherRelationship = ((_character.motherRelationship ?? 50) - 30).clamp(0, 100);
+
+        // 2. Status Ekonomi & Geografis (Waris status kekayaan Ayah)
+        int fatherBonusMoney = ((_character.fatherWealth ?? 50000) ~/ 10).clamp(500, 50000);
+        if (_character.fatherSalary != null && _character.fatherSalary! > 0) {
+          fatherBonusMoney += _character.fatherSalary! ~/ 2;
+        }
+        _character.money += fatherBonusMoney;
+
+        // 3. Dampak Atribut: Disiplin +10, Tekad +5
+        _character.discipline = (_character.discipline + 10).clamp(0, 100);
+        _character.willpower = (_character.willpower + 5).clamp(0, 100);
+
+        // Potensi Trait: Pemberani, Mandiri, atau Sombong
+        final potentialTraits = ['Pemberani', 'Mandiri', 'Sombong'];
+        final chosenTrait = potentialTraits[Random().nextInt(potentialTraits.length)];
+        if (!_character.traits.contains(chosenTrait)) {
+          _character.traits.add(chosenTrait);
+        }
+
+        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh $fatherOrStepFatherLabel. Hubungan dengan $fatherOrStepFatherLabel (+50), Ibu (-30), Disiplin (+10), Tekad (+5), Trait: "$chosenTrait", Keuangan (+\$$fatherBonusMoney).';
+        _character.inbox.add(msg);
+      } else {
+        _character.custodyParent = 'Ibu';
+
+        // 1. Hubungan: Ibu +50, Ayah -30
+        _character.motherRelationship = ((_character.motherRelationship ?? 50) + 50).clamp(0, 100);
+        if (fatherAliveAndFree) {
+          _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 30).clamp(0, 100);
+        } else {
+          _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) - 30).clamp(0, 100);
+        }
+
+        // 2. Status Ekonomi & Geografis (Waris status kekayaan Ibu)
+        int motherBonusMoney = ((_character.motherWealth ?? 50000) ~/ 10).clamp(500, 50000);
+        if (_character.motherSalary != null && _character.motherSalary! > 0) {
+          motherBonusMoney += _character.motherSalary! ~/ 2;
+        }
+        _character.money += motherBonusMoney;
+
+        // 3. Dampak Atribut: Kebahagiaan +10, Kesehatan +5
+        _character.happiness = (_character.happiness + 10).clamp(0, 100);
+        _character.health = (_character.health + 5).clamp(0, 100);
+
+        // Potensi Trait: Pemalu, Baik Hati, atau Cemas
+        final potentialTraits = ['Pemalu', 'Baik Hati', 'Cemas'];
+        final chosenTrait = potentialTraits[Random().nextInt(potentialTraits.length)];
+        if (!_character.traits.contains(chosenTrait)) {
+          _character.traits.add(chosenTrait);
+        }
+
+        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh Ibumu ($motherLabel). Hubungan dengan Ibu (+50), Ayah (-30), Kebahagiaan (+10), Kesehatan (+5), Trait: "$chosenTrait", Keuangan (+\$$motherBonusMoney).';
+        _character.inbox.add(msg);
+      }
+    });
+
+    _checkGlassesNeed(onDone);
+  }
+
   void _showCustodySelectionDialog(BuildContext context, String fatherName, String motherName, [VoidCallback? onDone]) {
     final bool fatherAliveAndFree = _character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned;
     final bool stepFatherAliveAndFree = _character.stepFatherName != null && !_character.isStepFatherDeceased;
@@ -2971,8 +3379,18 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       return;
     }
 
-    // Kasus 1: Keduanya (ayah kandung/tiri dan ibu kandung) hidup bebas
-    // User bisa memilih. Pilihan ayah adalah Ayah Kandung (jika ada) atau Ayah Tiri.
+    // Kasus Usia 0: Otomatis ditentukan tanpa dialog pilihan!
+    if (_character.age == 0) {
+      final bool isFemale = _character.gender.toLowerCase().contains('perempuan') || _character.gender.toLowerCase().contains('female');
+      final int roll = Random().nextInt(100);
+      final String autoChoice = isFemale 
+          ? (roll < 65 ? 'Ayah' : 'Ibu')  // Perempuan: 65% Ayah, 35% Ibu
+          : (roll < 45 ? 'Ayah' : 'Ibu'); // Laki-laki: 45% Ayah, 55% Ibu
+
+      _applyCustodyChoice(autoChoice, onDone);
+      return;
+    }
+
     final String fatherOrStepFatherLabel = fatherAliveAndFree ? fatherName : (_character.stepFatherName ?? 'Ayah Tiri');
     final bool hasFatherOption = fatherAliveAndFree || stepFatherAliveAndFree;
     final bool hasMotherOption = motherAliveAndFree;
@@ -3033,17 +3451,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {
-                  if (fatherAliveAndFree) {
-                    _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
-                    _character.custodyParent = 'Ayah';
-                  } else {
-                    _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 20).clamp(0, 100);
-                    _character.custodyParent = 'Ayah Tiri';
-                  }
-                  _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan $fatherOrStepFatherLabel.');
-                });
-                _checkGlassesNeed(onDone);
+                _applyCustodyChoice('Ayah', onDone);
               },
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -3073,12 +3481,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                setState(() {
-                  _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
-                  _character.custodyParent = 'Ibu';
-                  _character.inbox.add('🏡 Hak Asuh: Hak asuhmu jatuh ke tangan Ibumu ($motherName).');
-                });
-                _checkGlassesNeed(onDone);
+                _applyCustodyChoice('Ibu', onDone);
               },
               child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
@@ -3108,34 +3511,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                if (fatherAliveAndFree) {
-                  _character.fatherRelationship = ((_character.fatherRelationship ?? 50) + 20).clamp(0, 100);
-                  _character.custodyParent = 'Ayah';
-                } else {
-                  _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) + 20).clamp(0, 100);
-                  _character.custodyParent = 'Ayah Tiri';
-                }
-                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama $fatherOrStepFatherLabel.');
-              });
-              _checkGlassesNeed(onDone);
+              _applyCustodyChoice('Ayah', onDone);
             },
             child: Text('Ikut Ayah ($fatherOrStepFatherLabel)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              setState(() {
-                _character.motherRelationship = ((_character.motherRelationship ?? 50) + 20).clamp(0, 100);
-                if (fatherAliveAndFree) {
-                  _character.fatherRelationship = ((_character.fatherRelationship ?? 50) - 15).clamp(0, 100);
-                } else {
-                  _character.stepFatherRelationship = ((_character.stepFatherRelationship ?? 50) - 15).clamp(0, 100);
-                }
-                _character.custodyParent = 'Ibu';
-                _character.inbox.add('🏡 Hak Asuh: Kamu memilih untuk ikut tinggal bersama Ibumu ($motherName).');
-              });
-              _checkGlassesNeed(onDone);
+              _applyCustodyChoice('Ibu', onDone);
             },
             child: Text('Ikut Ibu ($motherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
           ),
