@@ -9,6 +9,7 @@ import 'actions/kelas.dart';
 import 'actions/dosen.dart';
 import 'actions/pindah_universitas.dart';
 import 'major_recommender.dart';
+import 'unniv_negeri_tes_seleksi/tes_seleksi_runner_page.dart';
 
 // ============================================================================
 // HALAMAN PILIH JURUSAN (tanpa emoji, pakai ikon)
@@ -427,32 +428,26 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       title: 'Pilih Universitas Negeri 🏛️',
       univList: univList,
       onSelected: (chosenUniv) {
-        if (widget.character.intelligence >= 60) {
-          final String level = _determineCurrentRegisterLevel();
-          widget.character.univName = chosenUniv;
-          widget.character.univMajor = '$major ($level - Negeri)';
-          widget.character.educationHistory[level] = 'Belum Lulus';
-          widget.character.currentUnivStudyYears = 0;
-          widget.onRefresh();
-          if (Navigator.canPop(context)) Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: const Text('Lolos Seleksi Negeri! 🎉'),
-              content: Text('Selamat! Kamu berhasil lolos tes masuk di $chosenUniv untuk jenjang $level dengan jurusan $major.'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+        final String level = _determineCurrentRegisterLevel();
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TesSeleksiRunnerPage(
+              character: widget.character,
+              chosenUniv: chosenUniv,
+              major: major,
+              level: level,
+              onPassSuccess: () {
+                widget.character.univName = chosenUniv;
+                widget.character.univMajor = '$major ($level - Negeri)';
+                widget.character.educationHistory[level] = 'Belum Lulus';
+                widget.character.currentUnivStudyYears = 0;
+                widget.onRefresh();
+                if (Navigator.canPop(context)) Navigator.pop(context);
+              },
             ),
-          );
-        } else {
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              title: const Text('Gagal Tes Masuk 🚫'),
-              content: Text('Kecerdasanmu tidak mencukupi untuk lolos tes masuk di $chosenUniv. Coba tingkatkan kecerdasanmu!'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
-            ),
-          );
-        }
+          ),
+        );
       },
     );
   }
