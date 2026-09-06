@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'tes_seleksi_model.dart';
 
 import 'stem_teknik/stem_teknik_resolver.dart';
@@ -11,37 +12,42 @@ import 'tes_general_questions.dart';
 
 List<QuestionItem> getQuestionsForMajor(String majorName) {
   final String m = majorName.toLowerCase();
+  List<QuestionItem> pool;
 
   // 1. STEM & TEKNIK
   if (m.contains('teknik') || m.contains('sistem informasi') || m.contains('komputer') || m.contains('arsitektur')) {
-    return getStemTeknikQuestions(majorName);
+    pool = getStemTeknikQuestions(majorName);
   }
   // 2. KESEHATAN
   else if (m.contains('kedokteran') || m.contains('dokter') || m.contains('farmasi') || m.contains('perawat') || m.contains('gizi')) {
-    return getKesehatanQuestions(majorName);
+    pool = getKesehatanQuestions(majorName);
   }
   // 3. BISNIS & EKONOMI
   else if (m.contains('manajemen') || m.contains('akuntansi') || m.contains('ekonomi') || m.contains('keuangan') || m.contains('pemasaran')) {
-    return getBisnisEkonomiQuestions(majorName);
+    pool = getBisnisEkonomiQuestions(majorName);
   }
   // 4. HUKUM & SOSIAL
   else if (m.contains('hukum') || m.contains('psikologi') || m.contains('komunikasi') || m.contains('hubungan') || m.contains('publik') || m.contains('kriminologi')) {
-    return getHukumSosialQuestions(majorName);
+    pool = getHukumSosialQuestions(majorName);
   }
   // 5. PENDIDIKAN & BAHASA
   else if (m.contains('sastra') || m.contains('bahasa') || m.contains('pendidikan') || m.contains('pgsd')) {
-    return getPendidikanBahasaQuestions(majorName);
+    pool = getPendidikanBahasaQuestions(majorName);
   }
   // 6. KREATIF & SENI
   else if (m.contains('desain') || m.contains('dkv') || m.contains('film') || m.contains('musik') || m.contains('seni')) {
-    return getKreatifSeniQuestions(majorName);
+    pool = getKreatifSeniQuestions(majorName);
   }
   // 7. PERTANIAN & LAINNYA
   else if (m.contains('agroteknologi') || m.contains('pertanian') || m.contains('perhotelan') || m.contains('pangan')) {
-    return getPertanianLainnyaQuestions(majorName);
+    pool = getPertanianLainnyaQuestions(majorName);
   }
   // Fallback
   else {
-    return getGeneralQuestionsForMajor(majorName);
+    pool = getGeneralQuestionsForMajor(majorName);
   }
+
+  // Acak urutan dan ambil 10 soal unik secara acak
+  final List<QuestionItem> shuffled = List<QuestionItem>.from(pool)..shuffle(Random());
+  return shuffled.take(10).toList();
 }
