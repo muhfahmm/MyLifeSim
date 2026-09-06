@@ -71,10 +71,14 @@ class KemewahanItem extends StatelessWidget {
           children: [
             Icon(Icons.diamond, color: isUnlocked ? Colors.purple : Colors.grey, size: 28),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Kemewahan',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isUnlocked ? Colors.purple : Colors.grey,
+                ),
               ),
             ),
             Text(

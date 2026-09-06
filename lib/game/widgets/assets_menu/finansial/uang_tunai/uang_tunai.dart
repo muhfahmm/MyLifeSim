@@ -92,26 +92,30 @@ class UangTunaiItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: Colors.green.withOpacity(0.05),
+          color: isUnlocked ? Colors.green.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.green.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.green.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
         ),
         child: Row(
           children: [
-            const Icon(Icons.monetization_on, color: Colors.green, size: 28),
+            Icon(Icons.monetization_on, color: isUnlocked ? Colors.green : Colors.grey, size: 28),
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
                 'Uang Tunai',
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: isUnlocked ? Colors.green : Colors.grey,
+                ),
               ),
             ),
             Text(
               '\$${formatRupiah(character.money)}',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.green,
+                color: isUnlocked ? Colors.green : Colors.grey,
               ),
             ),
             const SizedBox(width: 8),
