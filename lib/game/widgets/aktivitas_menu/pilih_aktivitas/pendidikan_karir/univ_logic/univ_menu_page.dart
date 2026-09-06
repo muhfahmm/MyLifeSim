@@ -9,6 +9,7 @@ import 'actions/kelas.dart';
 import 'actions/dosen.dart';
 import 'actions/pindah_universitas.dart';
 import 'major_recommender.dart';
+import 'pilih_bahasa_sastra_modal.dart';
 import 'unniv_negeri_tes_seleksi/tes_seleksi_runner_page.dart';
 
 // ============================================================================
@@ -218,6 +219,18 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
   }
 
   void _showAdmissionPathways(BuildContext context, String major) {
+    if (major == 'Sastra & Bahasa') {
+      showDialog(
+        context: context,
+        builder: (dialogCtx) => PilihBahasaSastraModal(
+          onSelectLanguage: (selectedMajor) {
+            _showAdmissionPathways(context, selectedMajor);
+          },
+        ),
+      );
+      return;
+    }
+
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
@@ -762,7 +775,18 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                           color: isDark ? Colors.white54 : Colors.black54,
                         ),
                         onTap: () {
-                          _showAdmissionPathways(context, major);
+                          if (major == 'Sastra & Bahasa') {
+                            showDialog(
+                              context: context,
+                              builder: (dialogCtx) => PilihBahasaSastraModal(
+                                onSelectLanguage: (selectedMajor) {
+                                  _showAdmissionPathways(context, selectedMajor);
+                                },
+                              ),
+                            );
+                          } else {
+                            _showAdmissionPathways(context, major);
+                          }
                         },
                       ),
                     );
