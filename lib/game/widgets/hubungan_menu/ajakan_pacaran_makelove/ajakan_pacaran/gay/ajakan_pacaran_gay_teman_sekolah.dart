@@ -3,18 +3,16 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 
 class AjakanPacaranGayTemanSekolah {
   static int getChance(Character character, Map<String, dynamic> candidate) {
-    final String rel = candidate['relation'].toString().toLowerCase();
-
-    if (rel.contains('kakak kelas')) {
-      return 35;
-    } else if (rel.contains('teman sekelas')) {
-      return 35;
-    } else if (rel.contains('teman satu angkatan') || rel.contains('angkatan')) {
-      return 30;
-    } else if (rel.contains('adik kelas')) {
-      return 30;
+    final int age = character.age;
+    if (character.univMajor != null || age >= 18) {
+      return 65; // Kuliah / Universitas
+    } else if (age >= 15) {
+      return 50; // SMA
+    } else if (age >= 12) {
+      return 40; // SMP
+    } else {
+      return 30; // SD
     }
-    return 35;
   }
 
   static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
