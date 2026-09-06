@@ -1,6 +1,6 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class BerbelanjaMenuHelper {
   static void showBerbelanjaMenu(BuildContext context, Character character, VoidCallback onComplete) {

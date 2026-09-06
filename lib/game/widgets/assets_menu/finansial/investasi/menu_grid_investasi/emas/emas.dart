@@ -1,5 +1,5 @@
 // lib/game/widgets/assets_menu/finansial/investasi/menu_grid_investasi/emas/emas.dart
-part of 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
+part of 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 
 // ============================================================
 // HALAMAN EMAS

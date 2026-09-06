@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/freelance/freelance_menu.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'freelance_database.dart';
 
 class FreelanceMenuPage extends StatefulWidget {

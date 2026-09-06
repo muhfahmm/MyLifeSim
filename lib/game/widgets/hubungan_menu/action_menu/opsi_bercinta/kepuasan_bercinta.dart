@@ -1,7 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 
 class KepuasanBercintaHelper {
   /// Mengecek apakah pasangan bersedia bercinta berdasarkan tingkat kepuasan hubungan (0-100).

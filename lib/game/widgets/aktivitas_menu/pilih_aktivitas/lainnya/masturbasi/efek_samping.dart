@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/efek_samping.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'persentase_efek_samping/wanita.dart';
 import 'persentase_efek_samping/pria.dart';
 import 'beritahu_orang_tua.dart';

@@ -1,6 +1,6 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/daftar_aksesoris/kacamata_sunglasses/kacamata_sunglasses_page.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'kacamata_sunglasses_products_page.dart';
 
 class KacamataSunglassesBrandPage extends StatefulWidget {

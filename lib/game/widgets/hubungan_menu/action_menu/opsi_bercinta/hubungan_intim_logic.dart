@@ -1,7 +1,7 @@
 // lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 
 class HubunganIntimLogic {
   /// Mengambil jenis kelamin pasangan/target berdasarkan nama

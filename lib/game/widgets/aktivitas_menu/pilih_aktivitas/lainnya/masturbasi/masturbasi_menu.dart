@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbasi_menu.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'risiko_masturbasi.dart'; // Import file risiko
 import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog

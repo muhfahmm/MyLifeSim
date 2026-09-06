@@ -1,8 +1,8 @@
 // lib/game/widgets/aktivitas_menu/school_logic/actions/pindah_sekolah.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'dart:math';
 
 class PindahSekolahActionPage extends StatelessWidget {

@@ -11,8 +11,8 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/store_page/store_page.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 
 class AnakSakitEvent {
   // ================================================================

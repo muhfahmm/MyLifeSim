@@ -1,8 +1,8 @@
 // lib/game/widgets/aktivitas_menu/school_logic/sd_menu.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class SdMenu {
   static void showMenu(BuildContext parentContext, Character character, VoidCallback onRefresh) {

@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/actions/pindah_universitas.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'dart:math';
 
 class PindahUnivActionPage extends StatelessWidget {

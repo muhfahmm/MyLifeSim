@@ -1,5 +1,5 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_efek_samping/wanita.dart
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class PersentaseEfekSampingWanita {
   /// Mendapatkan persentase peluang terjadinya efek samping untuk perempuan

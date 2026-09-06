@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/proposal_percentage_settings.dart';
 
 class Akses18PlusPage extends StatelessWidget {
   const Akses18PlusPage({super.key});

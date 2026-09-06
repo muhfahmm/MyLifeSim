@@ -1,5 +1,5 @@
 // lib/game/widgets/assets_menu/finansial/kemewahan/menu_kemewahan/perhiasan/perhiasan_mewah.dart
-part of 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
+part of 'package:mylifesim/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
 
 // ============================================================
 // HALAMAN PERHIASAN & AKSESORI MEWAH

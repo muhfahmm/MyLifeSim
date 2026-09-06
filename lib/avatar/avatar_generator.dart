@@ -1,7 +1,7 @@
 // lib/avatar/avatar_generator.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class AvatarGenerator {
   // --- OPTIONS DATA ---

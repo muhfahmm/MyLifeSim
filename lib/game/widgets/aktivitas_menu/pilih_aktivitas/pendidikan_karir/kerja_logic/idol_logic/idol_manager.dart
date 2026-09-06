@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 
 class IdolManager {
   static String _generateName(String gender, Random rand, Character character) {

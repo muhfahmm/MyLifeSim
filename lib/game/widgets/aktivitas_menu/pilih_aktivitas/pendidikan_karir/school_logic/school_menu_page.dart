@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'dart:math';
 import 'actions/belajar.dart';
 import 'actions/kelas.dart';

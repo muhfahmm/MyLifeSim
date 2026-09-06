@@ -1,6 +1,6 @@
 import 'dart:math';
 import '../../../../../../../../pilih_karakter/character.dart';
-import 'package:bitlife/store_page/store_page.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 import 'penyakit_ringan.dart';
 import 'penyakit_berat.dart';
 

@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class AjakanMlHeteroLakiCoworker {
   static int getChance(Character character, Map<String, dynamic> candidate) {

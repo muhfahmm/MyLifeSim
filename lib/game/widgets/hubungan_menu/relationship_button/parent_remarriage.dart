@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/skin_color_inheritance.dart';
 
 class ParentRemarriage {
   static void checkAndApplyRemarriage(Character character, Random random, List<String> events) {

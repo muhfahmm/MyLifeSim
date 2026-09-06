@@ -1,7 +1,7 @@
 // lib/game/widgets/assets_menu/aset_premium/kasino/kasino.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 part 'menu_kasino/slot_machine.dart';
 part 'menu_kasino/blackjack.dart';

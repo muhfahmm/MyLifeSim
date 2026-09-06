@@ -1,6 +1,6 @@
 // lib/game/paused_menu/darkmode.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/main.dart'; // import themeNotifier
+import 'package:mylifesim/main.dart'; // import themeNotifier
 
 class DarkModeButton extends StatelessWidget {
   const DarkModeButton({super.key});

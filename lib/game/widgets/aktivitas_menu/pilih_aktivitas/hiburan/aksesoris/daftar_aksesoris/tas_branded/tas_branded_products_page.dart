@@ -1,6 +1,6 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/daftar_aksesoris/tas_branded/tas_branded_products_page.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class TasBrandedProductsPage extends StatefulWidget {
   final Character character;

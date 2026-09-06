@@ -1,6 +1,6 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/salon_spa/salon_spa_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class SalonSpaMenuHelper {
   static void showSalonSpaMenu(BuildContext context, Character character, VoidCallback onComplete) {

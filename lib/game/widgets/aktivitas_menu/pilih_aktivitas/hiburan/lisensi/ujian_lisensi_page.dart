@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/menu_dokter/dokter_utils.dart'; // we can use fmt
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/menu_dokter/dokter_utils.dart'; // we can use fmt
 
 class UjianLisensiPage extends StatefulWidget {
   final Character character;

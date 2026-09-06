@@ -1,5 +1,5 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/actions/univ_generator.dart
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'dart:math';
 
 class UnivGenerator {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 
 class InboxButton extends StatelessWidget {
   final Character character;

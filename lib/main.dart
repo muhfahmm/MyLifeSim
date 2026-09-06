@@ -1,8 +1,8 @@
 // lib/main.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_gender/gender.dart';
-import 'package:bitlife/intro_animation.dart';
-import 'package:bitlife/store_page/store_page.dart';
+import 'package:mylifesim/pilih_gender/gender.dart';
+import 'package:mylifesim/intro_animation.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 
 // Global theme mode notifier
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
       valueListenable: themeNotifier,
       builder: (context, currentMode, _) {
         return MaterialApp(
-          title: 'BitLife Clone',
+          title: 'MyLifeSim Clone',
           debugShowCheckedModeBanner: false,
           themeMode: currentMode,
           theme: _lightTheme,
@@ -86,7 +86,7 @@ class HomePage extends StatelessWidget {
                 const Icon(Icons.favorite_rounded, size: 80, color: Colors.blue),
                 const SizedBox(height: 16),
                 Text(
-                  'BITLIFE',
+                  'MYLIFESIM',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 36,
@@ -155,7 +155,7 @@ class HomePage extends StatelessWidget {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     icon: const Icon(Icons.storefront),
-                    label: const Text('TOKO BITLIFE', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                    label: const Text('TOKO MYLIFESIM', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
                   ),
                 ),
               ],

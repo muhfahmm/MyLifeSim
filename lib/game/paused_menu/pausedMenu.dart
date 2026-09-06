@@ -1,10 +1,10 @@
 // lib/game/paused_menu/paused_menu.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/store_page/store_page.dart';
-import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
-import 'package:bitlife/pilih_karakter/settings/settings.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/main.dart'; // Untuk mengakses themeNotifier
+import 'package:mylifesim/pilih_karakter/settings/settings.dart';
 
 class PausedMenu extends StatefulWidget {
   final Character? character;

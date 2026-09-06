@@ -1,4 +1,4 @@
-package com.example.bitlife
+package com.example.mylifesim
 
 import io.flutter.embedding.android.FlutterActivity
 

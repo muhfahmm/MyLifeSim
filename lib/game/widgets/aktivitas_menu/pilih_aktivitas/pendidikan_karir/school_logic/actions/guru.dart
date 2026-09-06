@@ -1,8 +1,8 @@
 // lib/game/widgets/aktivitas_menu/school_logic/actions/guru.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'school_generator.dart';
 import 'interactions/teacher_interaction_page.dart';
 

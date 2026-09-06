@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 // Import database pekerjaan agar daftar orang tua dinamis mengikuti daftar pekerjaan game
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/database_nama_pekerjaan.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/database_nama_pekerjaan.dart';
 
 class FamilyCustomizationScreen extends StatefulWidget {
   final List<String> maleFirstNames;

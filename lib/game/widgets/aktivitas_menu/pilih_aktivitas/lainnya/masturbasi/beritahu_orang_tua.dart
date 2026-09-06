@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/beritahu_orang_tua.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class BeriTahuOrangTua {
   /// Memulai dialog interaktif beri tahu orang tua tentang cedera efek samping masturbasi.

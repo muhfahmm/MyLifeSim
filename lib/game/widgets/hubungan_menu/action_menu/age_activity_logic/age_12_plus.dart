@@ -1,18 +1,18 @@
 // lib/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 
 /// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {

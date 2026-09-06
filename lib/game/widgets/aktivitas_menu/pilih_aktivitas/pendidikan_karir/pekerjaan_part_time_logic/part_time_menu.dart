@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/pekerjaan_part_time_logic/part_time_menu.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'database_part_time.dart';
 
 class PartTimeMenuPage extends StatefulWidget {

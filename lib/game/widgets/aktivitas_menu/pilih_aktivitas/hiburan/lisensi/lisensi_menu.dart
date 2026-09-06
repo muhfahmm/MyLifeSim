@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'ujian_lisensi_page.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
+import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
 
 class LisensiMenuHelper {
   static void showLisensiMenu(BuildContext context, Character character, VoidCallback onComplete) {

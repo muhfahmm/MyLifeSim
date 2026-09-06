@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/action_menu.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 /// Screen untuk menampilkan silsilah keluarga dari perspektif anggota keluarga terpilih (Saudara, Paman, Bibi, Sepupu, Kakek, Nenek, dll).
 class SiblingFamilyViewScreen extends StatefulWidget {
   final Character character;

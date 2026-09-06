@@ -1,8 +1,8 @@
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/proposal_percentage_settings.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 
 // Imports for gay dating
 import 'ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';

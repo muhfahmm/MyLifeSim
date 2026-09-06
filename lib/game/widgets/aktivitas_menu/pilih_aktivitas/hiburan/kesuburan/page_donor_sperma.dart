@@ -1,12 +1,13 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/utils/country_helper.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 
 class PageDonorSperma extends StatefulWidget {
   final Character character;
@@ -444,14 +445,23 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                             ),
                           ),
                           const SizedBox(height: 2),
-                          Text(
-                            'Kebangsaan: ${widget.character.birthCountry ?? widget.character.location} • Tinggal di: ${widget.character.currentCity != null ? '${widget.character.currentCity}, ' : ''}${widget.character.location}',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: isDark ? Colors.white70 : Colors.black54,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
+                          (() {
+                            final String bCountry = widget.character.birthCountry ?? widget.character.location;
+                            final String bFlag = CountryHelper.getFlagEmoji(bCountry);
+                            final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
+                            final String lCountry = widget.character.location;
+                            final String lFlag = CountryHelper.getFlagEmoji(lCountry);
+                            final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
+                            final String cityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
+                            return Text(
+                              'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: isDark ? Colors.white70 : Colors.black54,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            );
+                          })(),
                           const SizedBox(height: 2),
                           Text(
                             'Penerima Donor Sperma • Gender: Perempuan • Umur: $age tahun • Hubungan: $relationship%',

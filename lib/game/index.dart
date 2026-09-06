@@ -1,41 +1,42 @@
 // lib/game/index.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/paused_menu/pausedMenu.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/utils/country_helper.dart';
+import 'package:mylifesim/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
 import 'dart:async';
-import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 
 // Import widget-widget UI
-import 'package:bitlife/game/widgets/kategori_usia/age_category_button.dart';
-import 'package:bitlife/game/widgets/assets_menu/assets_button.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/relationship_button.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/activity_button.dart';
-import 'package:bitlife/game/widgets/kategori_usia/age_up_button.dart';
-import 'package:bitlife/game/widgets/kategori_usia/kurangi_umur_button.dart';
-import 'package:bitlife/store_page/store_page.dart';
-import 'package:bitlife/game/widgets/kategori_usia/next_day_button.dart';
-import 'package:bitlife/game/widgets/inbox_menu/inbox_button.dart';
-import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
-import 'package:bitlife/game/widgets/penyakit_logic/eye_test_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/npc_family_view.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/daftar_pasangan_hamil.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
-import 'package:bitlife/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
-import 'package:bitlife/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/game/widgets/kategori_usia/age_category_button.dart';
+import 'package:mylifesim/game/widgets/assets_menu/assets_button.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/relationship_button.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/activity_button.dart';
+import 'package:mylifesim/game/widgets/kategori_usia/age_up_button.dart';
+import 'package:mylifesim/game/widgets/kategori_usia/kurangi_umur_button.dart';
+import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/game/widgets/kategori_usia/next_day_button.dart';
+import 'package:mylifesim/game/widgets/inbox_menu/inbox_button.dart';
+import 'package:mylifesim/game/widgets/penyakit_logic/std_logic.dart';
+import 'package:mylifesim/game/widgets/penyakit_logic/eye_test_logic.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/daftar_pasangan_hamil.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_pacaran.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_makelove.dart';
+import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -3942,7 +3943,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('BitLife'),
+        title: const Text('MyLifeSim'),
         centerTitle: true,
         backgroundColor: theme.scaffoldBackgroundColor,
         foregroundColor: theme.colorScheme.onSurface,
@@ -4138,14 +4139,23 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                 ),
                                 const SizedBox(height: 2),
 
-                                Text(
-                                  'Kebangsaan: ${_character.birthCountry ?? _character.location} • Tinggal di: ${_character.currentCity != null ? '${_character.currentCity}, ' : ''}${_character.location}',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                (() {
+                                  final String bCountry = _character.birthCountry ?? _character.location;
+                                  final String bFlag = CountryHelper.getFlagEmoji(bCountry);
+                                  final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
+                                  final String lCountry = _character.location;
+                                  final String lFlag = CountryHelper.getFlagEmoji(lCountry);
+                                  final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
+                                  final String cityStr = _character.currentCity != null ? '${_character.currentCity}, ' : '';
+                                  return Text(
+                                    'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  );
+                                })(),
                                 const SizedBox(height: 2),
 
                                 Text(

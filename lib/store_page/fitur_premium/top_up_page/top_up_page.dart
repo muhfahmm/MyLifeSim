@@ -1,7 +1,7 @@
 // lib/store_page/fitur_premium/top_up_page/top_up_page.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class TopUpPage extends StatefulWidget {
   final Character? character;

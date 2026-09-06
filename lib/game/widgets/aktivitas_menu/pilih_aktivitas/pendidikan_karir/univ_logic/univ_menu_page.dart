@@ -1,7 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'actions/belajar.dart';

@@ -1,9 +1,9 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/pekerjaan_umum_logic/pekerjaan_umum_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'dart:math';
 import '../database_nama_pekerjaan.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../idol_logic/idol_manager.dart';
 import '../esport_logic/tim_esport.dart';
 import '../esport_logic/BA/ba_esport_percentage.dart';

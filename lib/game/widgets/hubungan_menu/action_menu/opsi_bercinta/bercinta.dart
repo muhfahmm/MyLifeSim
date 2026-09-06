@@ -1,14 +1,14 @@
 // lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/penyakit_logic/std_logic.dart';
-import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/penyakit_logic/std_logic.dart';
+import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;

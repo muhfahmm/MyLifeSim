@@ -1,9 +1,9 @@
 // lib/pilih_karakter/customization/settings.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/main.dart'; // Untuk mengakses themeNotifier
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/store_page/store_page.dart'; // Tambahkan Import ini
+import 'package:mylifesim/main.dart'; // Untuk mengakses themeNotifier
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart'; // Tambahkan Import ini
 import 'kategori_persentase/keluarga/keluarga_settings_page.dart';
 import 'kategori_persentase/teman_sekolah/teman_sekolah_settings_page.dart';
 import 'kategori_persentase/teman_kerja/teman_kerja_settings_page.dart';

@@ -4,7 +4,7 @@
 // Hanya untuk karakter perempuan berusia 10–15 tahun.
 // Base chance: 25% – 40% tergantung atribut karakter.
 
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class PersentaseTawaranIdol {
   // ================================================================

@@ -184,7 +184,7 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
 
                   const SizedBox(height: 24),
 
-                  // Teks BITLIFE dengan Efek Shimmer (Gradient Bergerak)
+                  // Teks MYLIFESIM dengan Efek Shimmer (Gradient Bergerak)
                   FadeTransition(
                     opacity: _titleOpacity,
                     child: SlideTransition(
@@ -207,7 +207,7 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
                             },
                             blendMode: BlendMode.srcATop,
                             child: const Text(
-                              'BITLIFE',
+                              'MYLIFESIM',
                               style: TextStyle(
                                 fontSize: 42,
                                 fontWeight: FontWeight.w900,

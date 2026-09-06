@@ -1,6 +1,6 @@
 // lib/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class BeritahuKehamilanHelper {
   static Future<void> showTellOrNotDialog({

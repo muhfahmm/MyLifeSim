@@ -1,6 +1,6 @@
 // lib/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class InterograsiPacarHelper {
   /// Membuka dialog interograsi/konfrontasi ketika pacar mengetahui rencana selingkuh dari pembocor (informant).

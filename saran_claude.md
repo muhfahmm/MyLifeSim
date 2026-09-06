@@ -131,7 +131,7 @@ Karena kamu ingin mengimplementasikan fitur online (Lomba), logika Militer ini j
 *   Ini juga menciptakan cerita yang sangat berbeda: Pemain yang lulus dari militer bisa memiliki akses ke pekerjaan khusus (seperti "Tentara Bayaran" atau "Polisi Militer") dengan gaji tinggi di fitur online nanti.
 
 **Bonus Saran:**
-Untuk membuat lebih mirip BitLife, kamu bisa menambahkan pilihan ketiga: **"Alasan Medis / Pura-pura Sakit"**. Ini akan sangat bergantung pada atribut `Kesehatan` dan `Kecerdasan` (untuk memalsukan surat dokter). Jika gagal, mereka tetap dipaksa militer dan mendapatkan penalti tambahan!
+Untuk membuat lebih mirip MyLifeSim, kamu bisa menambahkan pilihan ketiga: **"Alasan Medis / Pura-pura Sakit"**. Ini akan sangat bergantung pada atribut `Kesehatan` dan `Kecerdasan` (untuk memalsukan surat dokter). Jika gagal, mereka tetap dipaksa militer dan mendapatkan penalti tambahan!
 
 Apakah kamu ingin saya buatkan file contoh lengkap untuk `military_service.dart` yang bisa langsung kamu copy-paste ke dalam proyek?
 

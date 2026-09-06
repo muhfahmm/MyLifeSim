@@ -1,5 +1,5 @@
 // lib/game/widgets/assets_menu/finansial/kemewahan/menu_kemewahan/properti_eksklusif/properti_eksklusif.dart
-part of 'package:bitlife/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
+part of 'package:mylifesim/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
 
 // ============================================================
 // HALAMAN PROPERTI EKSKLUSIF

@@ -4,17 +4,17 @@ import 'dart:convert';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:bitlife/pilih_karakter/character.dart'; // Model utama
+import 'package:mylifesim/pilih_karakter/character.dart'; // Model utama
 import '../game/index.dart'; // Halaman game
-import 'package:bitlife/pilih_karakter/logic/family_generator.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/pilih_karakter/customization/appearance_customization.dart';
-import 'package:bitlife/pilih_karakter/customization/attributes_customization.dart';
-import 'package:bitlife/pilih_karakter/customization/special_talent_customization.dart';
-import 'package:bitlife/pilih_karakter/customization/family_customization.dart';
-import 'package:bitlife/pilih_karakter/customization/country_picker_dialog.dart';
-import 'package:bitlife/pilih_karakter/settings/settings.dart'; // Tambahan Import
-import 'package:bitlife/main.dart';
+import 'package:mylifesim/pilih_karakter/logic/family_generator.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/pilih_karakter/customization/appearance_customization.dart';
+import 'package:mylifesim/pilih_karakter/customization/attributes_customization.dart';
+import 'package:mylifesim/pilih_karakter/customization/special_talent_customization.dart';
+import 'package:mylifesim/pilih_karakter/customization/family_customization.dart';
+import 'package:mylifesim/pilih_karakter/customization/country_picker_dialog.dart';
+import 'package:mylifesim/pilih_karakter/settings/settings.dart'; // Tambahan Import
+import 'package:mylifesim/main.dart';
 
 class KarakterScreen extends StatefulWidget {
   final String gender;
@@ -208,7 +208,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
   void _randomizeAttributes() {
     final random = Random();
-    const sexualityOptions = ['Heteroseksual', 'Biseksual', 'Homoseksual'];
+    final String gStr = widget.gender.toLowerCase();
+    final bool isFemale = gStr.contains('perempuan') || gStr.contains('female') || gStr.contains('wanita');
+    final sexualityOptions = ['Heteroseksual', 'Biseksual', isFemale ? 'Lesbian' : 'Gay'];
     final newHealth = 50 + random.nextInt(31);
     final newHappiness = 50 + random.nextInt(31);
     final newSmarts = 40 + random.nextInt(21); // 40 to 60
@@ -784,10 +786,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
                       side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                     ),
                     child: ListTile(
-                      leading: const Icon(Icons.flash_on, color: Colors.amber),
-                      title: Text('⚡ Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                      leading: const Icon(Icons.tune_rounded, color: Colors.amber),
+                      title: Text('Atribut Kepribadian', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                       subtitle: Text(
-                        // BAGIAN YANG DIUBAH
                         'Kesehatan: $_health% | Kebahagiaan: $_happiness% | Kecerdasan: $_smarts%',
                         style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
                       ),
@@ -797,6 +798,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => AttributesCustomizationScreen(
+                              gender: widget.gender,
                               initialAttributes: {
                                 'discipline': _discipline,
                                 'fertility': _fertility,

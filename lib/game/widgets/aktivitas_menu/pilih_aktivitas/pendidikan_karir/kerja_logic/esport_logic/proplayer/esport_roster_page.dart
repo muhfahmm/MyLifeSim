@@ -1,9 +1,9 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/esport_logic/esport_roster_page.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
 import 'esport_roster.dart';
 
 class EsportRosterPage extends StatefulWidget {

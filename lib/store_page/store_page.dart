@@ -2,12 +2,12 @@
 
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 // IMPOR FILE BARU
-import 'package:bitlife/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
-import 'package:bitlife/store_page/fitur_premium/god_mode/god_mode_page.dart';
-import 'package:bitlife/store_page/fitur_premium/top_up_page/top_up_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
+import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -233,7 +233,7 @@ class _StorePageState extends State<StorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toko BitLife', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Toko MyLifeSim', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

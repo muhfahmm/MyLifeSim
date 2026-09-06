@@ -1,7 +1,7 @@
 // lib/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_6_11.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'age_base.dart';
 
 List<ActionItem> getAge6to11Actions(

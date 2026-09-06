@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/interactions/classmate_interaction_page.dart';
 
 class RekanKerjaPage extends StatefulWidget {
   final Character character;

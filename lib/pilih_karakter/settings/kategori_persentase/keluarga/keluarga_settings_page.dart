@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/proposal_percentage_settings.dart';
 
 class KeluargaSettingsPage extends StatelessWidget {
   const KeluargaSettingsPage({super.key});

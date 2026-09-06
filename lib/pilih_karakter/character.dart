@@ -2,37 +2,37 @@
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
-import 'package:bitlife/game/widgets/penyakit_logic/incest_logic.dart';
-import 'package:bitlife/avatar/skin_color_inheritance.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
+import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
+import 'package:mylifesim/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/idol_logic/idol_manager.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 
 // Import Atribut Karakter yang Dipisah
-import 'package:bitlife/pilih_karakter/atribut_karakter/disiplin.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/kesuburan.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/kebahagiaan.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/kesehatan.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/karma.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/penampilan.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/seksualitas.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/kecerdasan.dart';
-import 'package:bitlife/pilih_karakter/atribut_karakter/tekad.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/disiplin.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/kesuburan.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/kebahagiaan.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/kesehatan.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/karma.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/penampilan.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/seksualitas.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/kecerdasan.dart';
+import 'package:mylifesim/pilih_karakter/atribut_karakter/tekad.dart';
 
 // Export agar file lain yang mengimpor character.dart tetap mendapatkan ekstensi atribut
-export 'package:bitlife/pilih_karakter/atribut_karakter/disiplin.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/kesuburan.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/kebahagiaan.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/kesehatan.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/karma.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/penampilan.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/seksualitas.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/kecerdasan.dart';
-export 'package:bitlife/pilih_karakter/atribut_karakter/tekad.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/disiplin.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/kesuburan.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/kebahagiaan.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/kesehatan.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/karma.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/penampilan.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/seksualitas.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/kecerdasan.dart';
+export 'package:mylifesim/pilih_karakter/atribut_karakter/tekad.dart';
 
 int fatherWealth = 1000000;
 int motherWealth = 1000000;

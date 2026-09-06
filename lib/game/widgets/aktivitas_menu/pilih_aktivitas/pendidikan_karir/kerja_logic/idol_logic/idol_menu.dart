@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'idol_manager.dart';
 
 import 'idol_activity/staff_manajemen/staf_manajemen.dart';

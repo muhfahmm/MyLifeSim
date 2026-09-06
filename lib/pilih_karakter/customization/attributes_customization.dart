@@ -4,10 +4,12 @@ import 'package:flutter/material.dart';
 
 class AttributesCustomizationScreen extends StatefulWidget {
   final Map<String, dynamic> initialAttributes;
+  final String? gender;
 
   const AttributesCustomizationScreen({
     super.key,
     required this.initialAttributes,
+    this.gender,
   });
 
   @override
@@ -21,9 +23,10 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
   late double _health;
   late double _karma;
   late double _looks;
-  late double _sexualityVal; // 0 = Heteroseksual, 1 = Biseksual, 2 = Homoseksual
+  late double _sexualityVal; // 0 = Heteroseksual, 1 = Biseksual, 2 = Gay/Lesbian
   late double _smarts;
   late double _willpower;
+  late bool _isFemale;
 
   @override
   void initState() {
@@ -35,10 +38,13 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
     _karma = (widget.initialAttributes['karma'] ?? 50).toDouble();
     _looks = (widget.initialAttributes['looks'] ?? 50).toDouble();
     
+    final String genderStr = (widget.gender ?? widget.initialAttributes['gender'] ?? '').toString().toLowerCase();
+    _isFemale = genderStr.contains('perempuan') || genderStr.contains('female') || genderStr.contains('wanita');
+
     final String initialSex = widget.initialAttributes['sexuality'] ?? 'Heteroseksual';
     if (initialSex == 'Biseksual') {
       _sexualityVal = 1;
-    } else if (initialSex == 'Homoseksual' || initialSex == 'Gay') {
+    } else if (initialSex == 'Homoseksual' || initialSex == 'Gay' || initialSex == 'Lesbian') {
       _sexualityVal = 2;
     } else {
       _sexualityVal = 0;
@@ -51,7 +57,7 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
   String _getSexualityLabel(double val) {
     if (val < 0.5) return 'Heteroseksual';
     if (val < 1.5) return 'Biseksual';
-    return 'Homoseksual';
+    return _isFemale ? 'Lesbian' : 'Gay';
   }
 
   @override
@@ -96,28 +102,32 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
                       context: context,
                       label: 'Kesehatan',
                       value: _health,
-                      emoji: '❤️',
+                      icon: Icons.favorite_rounded,
+                      iconColor: Colors.redAccent,
                       onChanged: (val) => setState(() => _health = val),
                     ),
                     _buildAttributeSlider(
                       context: context,
                       label: 'Kebahagiaan',
                       value: _happiness,
-                      emoji: '😀',
+                      icon: Icons.sentiment_very_satisfied_rounded,
+                      iconColor: Colors.amber.shade700,
                       onChanged: (val) => setState(() => _happiness = val),
                     ),
                     _buildAttributeSlider(
                       context: context,
                       label: 'Kecerdasan',
                       value: _smarts,
-                      emoji: '🧠',
+                      icon: Icons.psychology_rounded,
+                      iconColor: Colors.blueAccent,
                       onChanged: (val) => setState(() => _smarts = val),
                     ),
                     _buildAttributeSlider(
                       context: context,
                       label: 'Disiplin',
                       value: _discipline,
-                      emoji: '🥋',
+                      icon: Icons.fitness_center_rounded,
+                      iconColor: Colors.orangeAccent,
                       onChanged: (val) => setState(() => _discipline = val),
                     ),
                     _buildSexualitySlider(context),
@@ -174,7 +184,8 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
     required BuildContext context,
     required String label,
     required double value,
-    required String emoji,
+    required IconData icon,
+    required Color iconColor,
     required ValueChanged<double> onChanged,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -186,17 +197,23 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '$emoji $label',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+              Row(
+                children: [
+                  Icon(icon, size: 18, color: iconColor),
+                  const SizedBox(width: 8),
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
               ),
               Text(
                 '${value.toInt()}%',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,
@@ -236,17 +253,23 @@ class _AttributesCustomizationScreenState extends State<AttributesCustomizationS
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '🌈 Seksualitas',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+              Row(
+                children: [
+                  Icon(Icons.favorite_outline_rounded, size: 18, color: Colors.purple.shade400),
+                  const SizedBox(width: 8),
+                  Text(
+                    'Seksualitas',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ],
               ),
               Text(
                 _getSexualityLabel(_sexualityVal),
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.blue,

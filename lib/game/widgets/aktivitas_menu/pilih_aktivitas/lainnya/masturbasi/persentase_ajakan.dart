@@ -1,5 +1,5 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class PersentaseAjakan {
   /// Mendapatkan persentase keberhasilan ajakan (rayuan) saat ketahuan bermasturbasi

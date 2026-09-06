@@ -1,11 +1,11 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/sosial_media_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 // Import halaman dashboard sosial media
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/medsos_dashboard/medsos_dashboard.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/medsos_dashboard/medsos_dashboard.dart';
 
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/batasan_sosmed_logic/batasan_sosmed_logic.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/batasan_sosmed_logic/batasan_sosmed_logic.dart';
 
 class SocialMediaMenuHelper {
   static const List<Map<String, dynamic>> platforms = [

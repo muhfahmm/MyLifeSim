@@ -1,7 +1,7 @@
 // lib/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 // ============================================================
 // PART FILES

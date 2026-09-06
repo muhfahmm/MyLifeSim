@@ -1,7 +1,7 @@
 // lib/pilih_karakter/logic/family_generator.dart
 import 'dart:math';
 import '../character.dart';
-import 'package:bitlife/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/avatar/skin_color_inheritance.dart';
 
 class FamilyGenerator {
   static final Random _random = Random();

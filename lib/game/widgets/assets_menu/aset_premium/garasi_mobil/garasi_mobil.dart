@@ -1,8 +1,8 @@
 // lib/game/widgets/assets_menu/aset_premium/garasi_mobil/garasi_mobil.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 
 // ============================================================
 // PART FILES

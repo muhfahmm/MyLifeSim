@@ -1,9 +1,9 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/school_logic/actions/school_generator.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 
 class AjakanBertemanHandler {
   /// Memeriksa dan menampilkan ajakan berteman dari teman sekelas (peluang 60%).

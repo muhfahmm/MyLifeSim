@@ -1,9 +1,9 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/pilih_anak/pilih_anak_page.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
-import 'package:bitlife/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 
 class PilihAnakPage extends StatefulWidget {
   final Character character;

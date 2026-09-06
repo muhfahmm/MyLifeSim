@@ -1,68 +1,68 @@
 // lib/pilih_karakter/settings/proposal_percentage_settings.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/settings/global_settings.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 // Imports for biseksual handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
 
 // Imports for hetero perempuan handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_perempuan/ajakan_pacaran_hetero_perempuan_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_perempuan/ajakan_ml_hetero_perempuan_teman_sekolah.dart';
 
 // Imports for hetero laki handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/hetero/hetero_laki/ajakan_ml_hetero_laki_teman_sekolah.dart';
 
 // Imports for gay handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/gay/ajakan_pacaran_gay_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/gay/ajakan_ml_gay_teman_sekolah.dart';
 
 // Imports for lesbian handlers
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_keluarga.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_coworker.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_dosen.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_guru_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_teman_sekolah.dart';
-import 'package:bitlife/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_keluarga.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_coworker.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_dosen.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_guru_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_pacaran/lesbian/ajakan_pacaran_lesbian_teman_sekolah.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_makelove/lesbian/ajakan_ml_lesbian_teman_sekolah.dart';
 
 /// Class untuk mengelola preferensi persentase ajakan NPC per-hubungan detail.
 /// HANYA mengelola toggle switch per-anggota, sedangkan DATA PERSENTASE DIBACA

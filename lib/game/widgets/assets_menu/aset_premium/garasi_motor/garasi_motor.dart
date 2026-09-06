@@ -1,8 +1,8 @@
 // lib/game/widgets/assets_menu/aset_premium/garasi_motor/garasi_motor.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/assets_menu/aset_premium/garasi_motor/database_motor.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_motor/database_motor.dart';
 
 part 'menu_garasi_motor/koleksi_motor.dart';
 part 'menu_garasi_motor/jual_beli_motor.dart';

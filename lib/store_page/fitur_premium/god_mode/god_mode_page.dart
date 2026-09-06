@@ -2,10 +2,10 @@
 
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/skin_color_inheritance.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/database_nama_pekerjaan.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/univ_logic/univ_menu_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/database_nama_pekerjaan.dart';
 
 class GodModePage extends StatefulWidget {
   final Character character;
@@ -56,7 +56,9 @@ class _GodModePageState extends State<GodModePage> {
   String _getSexualityLabel(double val) {
     if (val < 0.5) return 'Heteroseksual';
     if (val < 1.5) return 'Biseksual';
-    return 'Homoseksual';
+    final String gStr = widget.character.gender.toLowerCase();
+    final bool isFemale = gStr.contains('perempuan') || gStr.contains('female') || gStr.contains('wanita');
+    return isFemale ? 'Lesbian' : 'Gay';
   }
 
   void _showToast(String message, {bool isSuccess = true}) {

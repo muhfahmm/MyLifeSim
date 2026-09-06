@@ -1,6 +1,6 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/kerja_menu.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'dart:math';
 import 'actions/rekan_kerja.dart';
 import 'actions/bekerja_keras.dart';
@@ -11,7 +11,7 @@ import 'esport_logic/proplayer/esport_roster_page.dart';
 import 'esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
-import 'package:bitlife/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/politik_logic/politik_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/kerja_logic/politik_logic/politik_menu.dart';
 import 'military_job_logic/army_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {

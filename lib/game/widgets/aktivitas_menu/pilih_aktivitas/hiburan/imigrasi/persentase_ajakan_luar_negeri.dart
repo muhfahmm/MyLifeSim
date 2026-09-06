@@ -8,7 +8,7 @@
 //
 // Referensi: saran_deepseek.md
 
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 class PersentaseAjakanLuarNegeri {
   // ================================================================

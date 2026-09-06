@@ -1,4 +1,4 @@
-# bitlife
+# mylifesim
 
 A new Flutter project.
 

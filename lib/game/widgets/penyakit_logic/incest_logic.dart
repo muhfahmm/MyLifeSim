@@ -1,7 +1,7 @@
 // lib/game/widgets/penyakit_logic/incest_logic.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 // ==============================================================
 // TABEL 1: Peluang Cacat Genetik per Hubungan

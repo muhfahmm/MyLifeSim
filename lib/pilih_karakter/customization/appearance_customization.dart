@@ -1,7 +1,7 @@
 // lib/pilih_karakter/customization/appearance_customization.dart
 
 import 'package:flutter/material.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 
 class AppearanceCustomizationScreen extends StatefulWidget {
   final String gender;

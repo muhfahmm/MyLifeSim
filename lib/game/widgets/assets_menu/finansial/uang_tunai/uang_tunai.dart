@@ -1,7 +1,7 @@
 // lib/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/game/widgets/assets_menu/finansial/investasi/investasi.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:flutter/services.dart';
 
 // ============================================================

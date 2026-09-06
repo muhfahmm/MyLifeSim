@@ -1,5 +1,5 @@
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/avatar/avatar_generator.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 
 class AvatarAgeRules {
   /// Mendapatkan URL avatar PNG yang disesuaikan secara dinamis berdasarkan usia karakter

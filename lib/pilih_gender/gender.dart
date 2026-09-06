@@ -1,7 +1,7 @@
 // lib/pilih_gender/gender.dart
 import 'package:flutter/material.dart';
-import 'package:bitlife/pilih_karakter/karakter.dart';
-import 'package:bitlife/main.dart';
+import 'package:mylifesim/pilih_karakter/karakter.dart';
+import 'package:mylifesim/main.dart';
 
 class GenderScreen extends StatelessWidget {
   const GenderScreen({super.key});

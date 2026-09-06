@@ -1,6 +1,6 @@
 import 'dart:math';
-import 'package:bitlife/pilih_karakter/character.dart';
-import 'package:bitlife/pilih_karakter/settings/proposal_percentage_settings.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/proposal_percentage_settings.dart';
 
 class AjakanMlBiseksualStafIdol {
   static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
