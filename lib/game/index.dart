@@ -1915,6 +1915,7 @@ class _GameScreenState extends State<GameScreen> {
 
     final int age = _character.age;
     if (age == 6 || age == 12 || age == 15) {
+      _character.schoolType = null;
       String schoolLevel = '';
       if (age == 6) schoolLevel = 'Sekolah Dasar (SD)';
       if (age == 12) schoolLevel = 'Sekolah Menengah Pertama (SMP)';
@@ -4174,7 +4175,13 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
                                     );
                                   } else if (_character.univMajor != null) {
-                                    final String typeStr = _character.schoolType ?? 'Negeri';
+                                    final String? typeStr = _character.schoolType;
+                                    if (typeStr == null || typeStr.isEmpty) {
+                                      return const Text(
+                                        'Pendidikan:',
+                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                                      );
+                                    }
                                     return Text(
                                       'Pendidikan: ${_character.univMajor!.split(" (").first} - ($typeStr)',
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
@@ -4183,7 +4190,13 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                     String school = 'SD';
                                     if (_character.age >= 12 && _character.age < 15) school = 'SMP';
                                     else if (_character.age >= 15) school = 'SMA';
-                                    final String typeStr = _character.schoolType ?? 'Negeri';
+                                    final String? typeStr = _character.schoolType;
+                                    if (typeStr == null || typeStr.isEmpty) {
+                                      return const Text(
+                                        'Pendidikan:',
+                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
+                                      );
+                                    }
                                     return Text(
                                       'Pendidikan: $school - ($typeStr)',
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
