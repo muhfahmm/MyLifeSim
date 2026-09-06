@@ -39,7 +39,8 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
     if (_userAnswers.length < _questions.length) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Harap jawab semua ${_questions.length} soal sebelum mengumpulkan tes!'),
+          content: Text(
+              'Harap jawab semua ${_questions.length} soal sebelum mengumpulkan tes!'),
           backgroundColor: Colors.orangeAccent,
         ),
       );
@@ -166,14 +167,16 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
               padding: const EdgeInsets.only(right: 16.0),
               child: Center(
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.blue.withOpacity(0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     'Terjawab: ${_userAnswers.length}/${_questions.length}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
               ),
@@ -210,14 +213,18 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                             ),
                           ),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.orange.withOpacity(0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
                               'Passing Grade: 8/10',
-                              style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 11),
+                              style: TextStyle(
+                                  color: Colors.orange,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 11),
                             ),
                           ),
                         ],
@@ -227,7 +234,8 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                       // Card Pertanyaan
                       Card(
                         elevation: 2,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Text(
@@ -245,7 +253,8 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                       // Choices List
                       ...List.generate(currentQ.options.length, (optIndex) {
                         final bool isSelected = selectedOption == optIndex;
-                        final String optionLabel = String.fromCharCode(65 + optIndex); // A, B, C, D
+                        final String optionLabel =
+                            String.fromCharCode(65 + optIndex); // A, B, C, D
 
                         return Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
@@ -259,13 +268,22 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                                   },
                             borderRadius: BorderRadius.circular(10),
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 14),
                               decoration: BoxDecoration(
                                 color: isSelected
-                                    ? (isDark ? Colors.blue.withOpacity(0.3) : Colors.blue.shade50)
-                                    : (isDark ? Colors.grey[850] : Colors.grey[100]),
+                                    ? (isDark
+                                        ? Colors.blue.withOpacity(0.3)
+                                        : Colors.blue.shade50)
+                                    : (isDark
+                                        ? Colors.grey[850]
+                                        : Colors.grey[100]),
                                 border: Border.all(
-                                  color: isSelected ? Colors.blue : (isDark ? Colors.grey[700]! : Colors.grey[300]!),
+                                  color: isSelected
+                                      ? Colors.blue
+                                      : (isDark
+                                          ? Colors.grey[700]!
+                                          : Colors.grey[300]!),
                                   width: isSelected ? 2 : 1,
                                 ),
                                 borderRadius: BorderRadius.circular(10),
@@ -274,11 +292,19 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                                 children: [
                                   CircleAvatar(
                                     radius: 14,
-                                    backgroundColor: isSelected ? Colors.blue : (isDark ? Colors.grey[700] : Colors.grey[300]),
+                                    backgroundColor: isSelected
+                                        ? Colors.blue
+                                        : (isDark
+                                            ? Colors.grey[700]
+                                            : Colors.grey[300]),
                                     child: Text(
                                       optionLabel,
                                       style: TextStyle(
-                                        color: isSelected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+                                        color: isSelected
+                                            ? Colors.white
+                                            : (isDark
+                                                ? Colors.white70
+                                                : Colors.black87),
                                         fontWeight: FontWeight.bold,
                                         fontSize: 12,
                                       ),
@@ -290,7 +316,9 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                                       currentQ.options[optIndex],
                                       style: TextStyle(
                                         fontSize: 14,
-                                        fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                                        fontWeight: isSelected
+                                            ? FontWeight.bold
+                                            : FontWeight.normal,
                                       ),
                                     ),
                                   ),
@@ -333,7 +361,6 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                       )
                     else
                       const SizedBox.shrink(),
-
                     if (_currentIndex < _questions.length - 1)
                       ElevatedButton.icon(
                         style: ElevatedButton.styleFrom(
@@ -355,11 +382,13 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.green,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 12),
                         ),
                         onPressed: isCurrentAnswered ? _submitExam : null,
                         icon: const Icon(Icons.send),
-                        label: const Text('Kumpulkan Tes', style: TextStyle(fontWeight: FontWeight.bold)),
+                        label: const Text('Kumpulkan Tes',
+                            style: TextStyle(fontWeight: FontWeight.bold)),
                       ),
                   ],
                 ),

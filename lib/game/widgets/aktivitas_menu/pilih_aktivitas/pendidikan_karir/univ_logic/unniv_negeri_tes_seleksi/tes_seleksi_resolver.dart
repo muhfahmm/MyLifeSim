@@ -8,7 +8,6 @@ import 'hukum_sosial/hukum_sosial_resolver.dart';
 import 'pendidikan_bahasa/pendidikan_bahasa_resolver.dart';
 import 'kreatif_seni/kreatif_seni_resolver.dart';
 import 'pertanian_lainnya/pertanian_lainnya_resolver.dart';
-import 'tes_general_questions.dart';
 
 List<QuestionItem> getQuestionsForMajor(String majorName) {
   final String m = majorName.toLowerCase();
@@ -39,12 +38,8 @@ List<QuestionItem> getQuestionsForMajor(String majorName) {
     pool = getKreatifSeniQuestions(majorName);
   }
   // 7. PERTANIAN & LAINNYA
-  else if (m.contains('agroteknologi') || m.contains('pertanian') || m.contains('perhotelan') || m.contains('pangan')) {
-    pool = getPertanianLainnyaQuestions(majorName);
-  }
-  // Fallback
   else {
-    pool = getGeneralQuestionsForMajor(majorName);
+    pool = getPertanianLainnyaQuestions(majorName);
   }
 
   // Acak urutan dan ambil 10 soal unik secara acak
