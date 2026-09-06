@@ -9,7 +9,9 @@ import 'actions/kelas.dart';
 import 'actions/dosen.dart';
 import 'actions/pindah_universitas.dart';
 import 'major_recommender.dart';
-import 'pilih_bahasa_sastra_modal.dart';
+import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_bahasa_sastra_modal.dart';
+import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_pendidikan_modal.dart';
+import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_pendidikan_agama_modal.dart';
 import 'unniv_negeri_tes_seleksi/tes_seleksi_runner_page.dart';
 
 // ============================================================================
@@ -224,6 +226,30 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         context: context,
         builder: (dialogCtx) => PilihBahasaSastraModal(
           onSelectLanguage: (selectedMajor) {
+            _showAdmissionPathways(context, selectedMajor);
+          },
+        ),
+      );
+      return;
+    }
+
+    if (major == 'Pendidikan / PGSD') {
+      showDialog(
+        context: context,
+        builder: (dialogCtx) => PilihPendidikanModal(
+          onSelectSubject: (selectedMajor) {
+            _showAdmissionPathways(context, selectedMajor);
+          },
+        ),
+      );
+      return;
+    }
+
+    if (major == 'Pendidikan Agama') {
+      showDialog(
+        context: context,
+        builder: (dialogCtx) => PilihPendidikanAgamaModal(
+          onSelectReligion: (selectedMajor) {
             _showAdmissionPathways(context, selectedMajor);
           },
         ),
