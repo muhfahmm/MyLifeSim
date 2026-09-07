@@ -13,6 +13,7 @@ import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_bahasa_sastra_modal.dar
 import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_pendidikan_modal.dart';
 import 'unniv_negeri_tes_seleksi/pendidikan_bahasa/pilih_pendidikan_agama_modal.dart';
 import 'unniv_negeri_tes_seleksi/tes_seleksi_runner_page.dart';
+import 'country_education_rules.dart';
 
 // ============================================================================
 // HALAMAN PILIH JURUSAN (tanpa emoji, pakai ikon)
@@ -80,59 +81,17 @@ class UnivMajorSelectionPage extends StatefulWidget {
 }
 
 class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
-  // Daftar jurusan tanpa emoji
-  static const Map<String, List<String>> _categoryMajors = {
-    'STEM & TEKNIK': [
-      'Teknik Informatika',
-      'Sistem Informasi',
-      'Teknik Sipil',
-      'Teknik Elektro',
-      'Teknik Mesin',
-      'Teknik Kimia',
-      'Arsitektur',
-    ],
-    'KESEHATAN': [
-      'Kedokteran',
-      'Kedokteran Gigi',
-      'Farmasi',
-      'Keperawatan',
-      'Gizi & Ilmu Pangan',
-    ],
-    'BISNIS & EKONOMI': [
-      'Manajemen',
-      'Akuntansi',
-      'Ekonomi Pembangunan',
-      'Perbankan & Keuangan',
-      'Pemasaran Digital',
-    ],
-    'HUKUM & SOSIAL': [
-      'Hukum',
-      'Hubungan Internasional',
-      'Ilmu Komunikasi',
-      'Psikologi',
-      'Administrasi Publik',
-      'Kriminologi',
-    ],
-    'PENDIDIKAN & BAHASA': [
-      'Sastra & Bahasa',
-      'Pendidikan / PGSD',
-      'Pendidikan Agama',
-    ],
-    'KREATIF & SENI': [
-      'Desain Komunikasi Visual (DKV)',
-      'Desain Mode',
-      'Film & Televisi',
-      'Seni Musik',
-    ],
-    'PERTANIAN & LAINNYA': [
-      'Agroteknologi',
-      'Manajemen Perhotelan',
-    ],
-  };
-
-  static final List<String> _categories = _categoryMajors.keys.toList();
   String? _selectedCategory;
   final ScrollController _scrollController = ScrollController();
+
+  Map<String, List<String>> get _categoryMajors {
+    final String userCountry = widget.character.location.isNotEmpty
+        ? widget.character.location
+        : (widget.character.birthCountry ?? 'Indonesia');
+    return CountryEducationRules.getCategoryMajorsForCountry(userCountry);
+  }
+
+  List<String> get _categories => _categoryMajors.keys.toList();
 
   List<String> get _filteredMajors {
     if (_selectedCategory == null) {
@@ -197,6 +156,11 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         return Icons.school;
       case 'Pendidikan Agama':
         return Icons.mosque;
+      case 'Pendidikan Ideologi & Politik':
+      case 'Studi Revolusioner & Ideologi Juche':
+      case 'Studi Syariah & Doktrin Negara':
+      case 'Pendidikan Kewarganegaraan & Ideologi':
+        return Icons.policy;
       case 'Desain Komunikasi Visual (DKV)':
         return Icons.brush;
       case 'Desain Mode':
@@ -221,6 +185,10 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
   }
 
   void _showAdmissionPathways(BuildContext context, String major) {
+    final String userCountry = widget.character.location.isNotEmpty
+        ? widget.character.location
+        : (widget.character.birthCountry ?? 'Indonesia');
+
     if (major == 'Sastra & Bahasa') {
       showDialog(
         context: context,
@@ -246,15 +214,35 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     }
 
     if (major == 'Pendidikan Agama') {
-      showDialog(
-        context: context,
-        builder: (dialogCtx) => PilihPendidikanAgamaModal(
-          onSelectReligion: (selectedMajor) {
-            _showAdmissionPathways(context, selectedMajor);
+      if (CountryEducationRules.isStrictStateCountry(userCountry)) {
+        CountryEducationRules.handleSecretReligiousStudyAttempt(
+          context: context,
+          character: widget.character,
+          onResult: (successToProceed) {
+            if (successToProceed) {
+              showDialog(
+                context: context,
+                builder: (dialogCtx) => PilihPendidikanAgamaModal(
+                  onSelectReligion: (selectedMajor) {
+                    _showAdmissionPathways(context, selectedMajor);
+                  },
+                ),
+              );
+            }
           },
-        ),
-      );
-      return;
+        );
+        return;
+      } else {
+        showDialog(
+          context: context,
+          builder: (dialogCtx) => PilihPendidikanAgamaModal(
+            onSelectReligion: (selectedMajor) {
+              _showAdmissionPathways(context, selectedMajor);
+            },
+          ),
+        );
+        return;
+      }
     }
 
     final bool isDark = Theme.of(context).brightness == Brightness.dark;

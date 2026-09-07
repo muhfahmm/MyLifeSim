@@ -69,6 +69,11 @@ List<QuestionItem> getPendidikanBahasaQuestions(String major) {
     return agamaPool;
   }
 
+  // Kategori Pendidikan Ideologi & Politik (Negara Ketat)
+  if (m.contains('ideologi') || m.contains('politik') || m.contains('revolusioner') || m.contains('juche') || m.contains('syariah')) {
+    return getTesPgsdKarakterWargaNegaraQuestions();
+  }
+
   // Kategori Pendidikan / PGSD (Kombinasi 7 Sub-Mata Pelajaran)
   if (m.contains('pgsd') || m.contains('pendidikan / pgsd')) {
     final List<QuestionItem> pgsdPool = [
