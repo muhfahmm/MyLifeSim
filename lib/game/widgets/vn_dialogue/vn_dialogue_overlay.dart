@@ -444,25 +444,82 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       case VNBackgroundType.restaurant:
         return '📍 Restoran Mewah';
       case VNBackgroundType.cafe:
-      default:
         return '📍 Kafe Romantis';
     }
   }
 
+  SpeakerType _getSpeakerType(VNDialogueNode node) {
+    final nameLower = node.speakerName.trim().toLowerCase();
+    if (nameLower == 'narasi' || nameLower == 'narrator' || nameLower == 'sistem' || nameLower == 'system') {
+      return SpeakerType.narrator;
+    }
+
+    String speakerGender = '';
+    if (node.isPlayerSpeaking) {
+      speakerGender = widget.player.gender;
+    } else {
+      speakerGender = widget.npc['gender']?.toString() ?? '';
+    }
+
+    speakerGender = speakerGender.toLowerCase();
+    if (speakerGender.contains('laki') || speakerGender == 'male' || speakerGender == 'pria') {
+      return SpeakerType.male;
+    } else if (speakerGender.contains('perempuan') || speakerGender.contains('wanita') || speakerGender == 'female') {
+      return SpeakerType.female;
+    }
+
+    return node.isPlayerSpeaking ? SpeakerType.male : SpeakerType.female;
+  }
+
+  SpeakerStyle _getSpeakerStyle(SpeakerType type) {
+    switch (type) {
+      case SpeakerType.narrator:
+        return SpeakerStyle(
+          badgeBgColor: const Color(0xFFB45309), // Warm Amber/Gold
+          badgeBorderColor: const Color(0xFFFBBF24), // Bright Gold Accent
+          textColor: Colors.white,
+          boxBorderColor: const Color(0xFFFBBF24).withValues(alpha: 0.7),
+          icon: Icons.auto_stories,
+        );
+      case SpeakerType.male:
+        return SpeakerStyle(
+          badgeBgColor: const Color(0xFF1D4ED8), // Royal Blue
+          badgeBorderColor: const Color(0xFF38BDF8), // Cyan Accent
+          textColor: Colors.white,
+          boxBorderColor: const Color(0xFF38BDF8).withValues(alpha: 0.7),
+          icon: Icons.male,
+        );
+      case SpeakerType.female:
+        return SpeakerStyle(
+          badgeBgColor: const Color(0xFFBE185D), // Deep Rose/Pink
+          badgeBorderColor: const Color(0xFFF472B6), // Rose Accent
+          textColor: Colors.white,
+          boxBorderColor: const Color(0xFFF472B6).withValues(alpha: 0.7),
+          icon: Icons.female,
+        );
+    }
+  }
+
   Widget _buildDialogueBox(VNDialogueNode node) {
-    final bool isPlayer = node.isPlayerSpeaking;
+    final speakerType = _getSpeakerType(node);
+    final style = _getSpeakerStyle(speakerType);
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.85),
+        color: Colors.black.withValues(alpha: 0.88),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isPlayer ? Colors.amber.withValues(alpha: 0.6) : Colors.indigo.withValues(alpha: 0.6),
-          width: 1.5,
+          color: style.boxBorderColor,
+          width: 1.8,
         ),
-        boxShadow: const [
+        boxShadow: [
           BoxShadow(
+            color: style.badgeBorderColor.withValues(alpha: 0.25),
+            blurRadius: 12,
+            spreadRadius: 1,
+          ),
+          const BoxShadow(
             color: Colors.black54,
             blurRadius: 10,
           ),
@@ -474,18 +531,40 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         children: [
           // Speaker Name Tag Banner
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             decoration: BoxDecoration(
-              color: isPlayer ? Colors.amber.shade700 : Colors.indigo.shade600,
+              color: style.badgeBgColor,
               borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              node.speakerName,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 13,
+              border: Border.all(
+                color: style.badgeBorderColor,
+                width: 1.2,
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: style.badgeBorderColor.withValues(alpha: 0.4),
+                  blurRadius: 6,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  style.icon,
+                  size: 14,
+                  color: style.textColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  node.speakerName,
+                  style: TextStyle(
+                    color: style.textColor,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    letterSpacing: 0.4,
+                  ),
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 10),
@@ -507,7 +586,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
               (_currentIndex >= widget.nodes.length - 1)
                   ? Icons.check_circle
                   : Icons.arrow_drop_down_circle,
-              color: isPlayer ? Colors.amber : Colors.indigoAccent,
+              color: style.badgeBorderColor,
               size: 20,
             ),
           ),
@@ -647,23 +726,49 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                   itemCount: _historyLog.length,
                   itemBuilder: (context, idx) {
                     final item = _historyLog[idx];
+                    final dummyNode = VNDialogueNode(
+                      speakerName: item.speakerName,
+                      dialogueText: item.text,
+                      isPlayerSpeaking: item.speakerName.trim().toLowerCase() == widget.player.name.trim().toLowerCase(),
+                    );
+                    final speakerType = _getSpeakerType(dummyNode);
+                    final style = _getSpeakerStyle(speakerType);
+
                     return Padding(
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            item.speakerName,
-                            style: const TextStyle(
-                              color: Colors.indigoAccent,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: style.badgeBgColor,
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: style.badgeBorderColor, width: 1),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(style.icon, size: 12, color: style.textColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  item.speakerName,
+                                  style: TextStyle(
+                                    color: style.textColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 11,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 2),
-                          Text(
-                            item.text,
-                            style: const TextStyle(color: Colors.white70, fontSize: 13),
+                          const SizedBox(height: 4),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 4),
+                            child: Text(
+                              item.text,
+                              style: const TextStyle(color: Colors.white70, fontSize: 13),
+                            ),
                           ),
                         ],
                       ),
@@ -702,4 +807,22 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       specialTalent: '',
     );
   }
+}
+
+enum SpeakerType { narrator, male, female }
+
+class SpeakerStyle {
+  final Color badgeBgColor;
+  final Color badgeBorderColor;
+  final Color textColor;
+  final Color boxBorderColor;
+  final IconData icon;
+
+  const SpeakerStyle({
+    required this.badgeBgColor,
+    required this.badgeBorderColor,
+    required this.textColor,
+    required this.boxBorderColor,
+    required this.icon,
+  });
 }

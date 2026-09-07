@@ -40,14 +40,12 @@ class DialogUserLakiMakeLove {
         onSelect: (p, n) {
           onChoiceSelected(25, 2);
         },
-        nextNodeIndex: 1,
       ),
       VNChoiceOption(
         text: '💋 "Memeluk erat dan memberikan kehangatan..."',
         onSelect: (p, n) {
           onChoiceSelected(20, 1);
         },
-        nextNodeIndex: 1,
       ),
     ];
   }

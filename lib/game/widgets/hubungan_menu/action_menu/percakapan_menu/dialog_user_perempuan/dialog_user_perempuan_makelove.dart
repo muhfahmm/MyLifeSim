@@ -40,14 +40,12 @@ class DialogUserPerempuanMakeLove {
         onSelect: (p, n) {
           onChoiceSelected(25, 2);
         },
-        nextNodeIndex: 1,
       ),
       VNChoiceOption(
         text: '🔥 "Membiarkannya memegang tanganmu dengan lembut..."',
         onSelect: (p, n) {
           onChoiceSelected(20, 1);
         },
-        nextNodeIndex: 1,
       ),
     ];
   }
