@@ -82,6 +82,8 @@ class UnivMajorSelectionPage extends StatefulWidget {
 
 class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
   String? _selectedCategory;
+  String _searchQuery = '';
+  final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
   Map<String, List<String>> get _categoryMajors {
@@ -94,11 +96,17 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
   List<String> get _categories => _categoryMajors.keys.toList();
 
   List<String> get _filteredMajors {
+    List<String> list;
     if (_selectedCategory == null) {
-      return _categoryMajors.values.expand((list) => list).toList();
+      list = _categoryMajors.values.expand((l) => l).toList();
     } else {
-      return _categoryMajors[_selectedCategory] ?? [];
+      list = _categoryMajors[_selectedCategory] ?? [];
     }
+    if (_searchQuery.trim().isNotEmpty) {
+      final q = _searchQuery.toLowerCase().trim();
+      list = list.where((m) => m.toLowerCase().contains(q)).toList();
+    }
+    return list;
   }
 
   // ---------- Mapping jurusan ke ikon ----------
@@ -180,6 +188,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
 
   @override
   void dispose() {
+    _searchController.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -680,6 +689,56 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     );
   }
 
+  Widget _buildSearchInput() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12.0),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+        ),
+      ),
+      child: TextField(
+        controller: _searchController,
+        onChanged: (val) {
+          setState(() {
+            _searchQuery = val;
+          });
+        },
+        style: TextStyle(
+          color: isDark ? Colors.white : Colors.black87,
+          fontSize: 14,
+        ),
+        decoration: InputDecoration(
+          hintText: 'Cari nama jurusan / program studi...',
+          hintStyle: TextStyle(
+            color: isDark ? Colors.white38 : Colors.grey.shade500,
+            fontSize: 14,
+          ),
+          prefixIcon: Icon(
+            Icons.search,
+            color: isDark ? Colors.lightBlueAccent : Colors.indigo,
+          ),
+          suffixIcon: _searchQuery.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear, size: 18),
+                  onPressed: () {
+                    _searchController.clear();
+                    setState(() {
+                      _searchQuery = '';
+                    });
+                  },
+                )
+              : null,
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -695,8 +754,9 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _buildSearchInput(),
             _buildCategoryFilter(),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Row(
               children: [
                 Expanded(
@@ -727,6 +787,38 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                   if (!aRec && bRec) return 1;
                   return 0;
                 });
+
+                if (sortedList.isEmpty) {
+                  return Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.search_off, size: 48, color: isDark ? Colors.white38 : Colors.grey),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Jurusan tidak ditemukan',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white70 : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Coba kata kunci lain atau pilih kategori lain.',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: isDark ? Colors.white38 : Colors.grey.shade600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                }
 
                 return ListView.builder(
                   itemCount: sortedList.length,
@@ -876,22 +968,38 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     required VoidCallback onTap,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    return FilterChip(
-      label: Text(
-        label,
-        style: TextStyle(
-          color: isSelected
-              ? (isDark ? Colors.white : Colors.indigo)
-              : (isDark ? Colors.white70 : Colors.grey.shade700),
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
-      ),
-      selected: isSelected,
-      onSelected: (_) => onTap(),
-      backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
-      selectedColor: isDark ? Colors.indigo.shade700 : Colors.indigo.shade100,
-      checkmarkColor: isDark ? Colors.white : Colors.indigo,
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+    return Builder(
+      builder: (chipContext) {
+        return FilterChip(
+          label: Text(
+            label,
+            style: TextStyle(
+              color: isSelected
+                  ? (isDark ? Colors.white : Colors.indigo)
+                  : (isDark ? Colors.white70 : Colors.grey.shade700),
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+            ),
+          ),
+          selected: isSelected,
+          onSelected: (_) {
+            onTap();
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (chipContext.mounted) {
+                Scrollable.ensureVisible(
+                  chipContext,
+                  alignment: 0.5,
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                );
+              }
+            });
+          },
+          backgroundColor: isDark ? Colors.grey.shade800 : Colors.white,
+          selectedColor: isDark ? Colors.indigo.shade700 : Colors.indigo.shade100,
+          checkmarkColor: isDark ? Colors.white : Colors.indigo,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        );
+      },
     );
   }
 }
