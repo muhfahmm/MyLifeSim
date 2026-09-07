@@ -239,6 +239,48 @@ class Character {
 
   // --- STATUS KEHAMILAN KARAKTER ---
   bool isPregnant = false;
+  bool motherWillTryForBaby = false;
+  int? parentsDivorceYearsLeft; // Menyimpan sisa tahun sampai orang tua bercrai (2-3 tahun jika 'memikirkan')
+  bool? pendingDivorceResult; // true jika cerai, false jika batal cerai setelah masa pertimbangan
+  bool parentsReconciled = false; // true jika orang tua batal bercerai (damai kembali)
+  int parentArgumentCount = 0; // jumlah kali pertengkaran orang tua terjadi
+  Map<String, String>? pendingParentArgumentEvent; // info keributan orang tua {fatherName, motherName, relation}
+  int fatherDivorceYearsSince = 0; // berapa tahun sejak ayah cerai (untuk jeda menikah lagi)
+  int motherDivorceYearsSince = 0; // berapa tahun sejak ibu cerai (untuk jeda menikah lagi)
+
+  void checkParentArgumentTrigger(Random random, int chancePercentage) {
+    final String? fName = fatherName ?? stepFatherName;
+    final String? mName = motherName ?? stepMotherName;
+    final bool fAlive = (fatherName != null && !isFatherDeceased) || (stepFatherName != null && !isStepFatherDeceased);
+    final bool mAlive = (motherName != null && !isMotherDeceased) || (stepMotherName != null && !isStepMotherDeceased);
+    final bool notDivorced = !isFatherDivorced && !isMotherDivorced;
+    // Jika sudah ada jeda cerai pending, jangan tambah argumen baru
+    if (parentsDivorceYearsLeft != null) return;
+
+    if (fName != null && mName != null && fAlive && mAlive && notDivorced) {
+      final int effectiveChance = parentsReconciled ? (chancePercentage - 5).clamp(0, 100) : chancePercentage;
+      if (parentArgumentCount < 2 && random.nextInt(100) < effectiveChance) {
+        parentArgumentCount++;
+        pendingParentArgumentEvent = {
+          'fatherName': fName,
+          'motherName': mName,
+          'fatherRole': fatherName != null ? 'Ayah' : 'Ayah Tiri',
+          'motherRole': motherName != null ? 'Ibu' : 'Ibu Tiri',
+          'count': parentArgumentCount.toString(),
+        };
+        final String argMsg = '💥 Keributan Orang Tua (Ke-$parentArgumentCount): Kamu mendengar pertengkaran sengit antara $fName dan $mName di rumah!';
+        inbox.add(argMsg);
+
+        // Jika sudah mencapai batas 2 pertengkaran, segera masukkan ke masa pertimbangan
+        if (parentArgumentCount >= 2 && parentsDivorceYearsLeft == null) {
+          final int years = 1 + random.nextInt(2); // 1-2 tahun pertimbangan
+          parentsDivorceYearsLeft = years;
+          final String decisionMsg = '🤔 Orang tuamu mulai memikirkan hubungan mereka... ($years tahun ke depan akan ada keputusan)';
+          inbox.add(decisionMsg);
+        }
+      }
+    }
+  }
 
   // --- STATUS KEHAMILAN PASANGAN (Jika Karakter Utama Laki-laki) ---
   bool partnerIsPregnant = false; 
@@ -664,7 +706,6 @@ class Character {
   bool isFatherPersuadedNotToRemarry = false;
   bool isStepFatherDeceased = false;
   bool isStepMotherDeceased = false;
-  bool motherWillTryForBaby = false;
   bool isMotherImprisoned = false;
   int motherPrisonYears = 0;
   bool isFatherImprisoned = false;
@@ -1395,26 +1436,47 @@ class Character {
       }
     }
 
-    // --- LOGIKA CERAI TENGAH GAME (MID-GAME DIVORCE) ---
-    if (fatherName != null && !isFatherDeceased && fatherAge != null &&
-        motherName != null && !isMotherDeceased && motherAge != null &&
-        !isFatherDivorced && !isMotherDivorced) {
-      if (fatherAge! >= 30 && fatherAge! <= 50 && motherAge! >= 30 && motherAge! <= 50) {
-        bool isUserAgeEligible = (age >= 5 && age <= 10) || 
-                                 (age >= 11 && age <= 20) || 
-                                 (age >= 25 && age <= 35);
-        if (isUserAgeEligible) {
-          // Peluang tahunan 1.0% menghasilkan peluang akumulatif ~24% (dalam rentang 10-25%)
-          // selama total 27 tahun usia yang memenuhi syarat.
-          if (random.nextDouble() < 0.01) {
+    // --- LOGIKA CERAI BERTAHAP / TUNDA (PENDING DIVORCE COUNTDOWN) ---
+    if (parentsDivorceYearsLeft != null && parentsDivorceYearsLeft! > 0) {
+      parentsDivorceYearsLeft = parentsDivorceYearsLeft! - 1;
+      if (parentsDivorceYearsLeft! <= 0) {
+        parentsDivorceYearsLeft = null;
+        final bool fAlive = (fatherName != null && !isFatherDeceased) || (stepFatherName != null && !isStepFatherDeceased);
+        final bool mAlive = (motherName != null && !isMotherDeceased) || (stepMotherName != null && !isStepMotherDeceased);
+        if (fAlive && mAlive && !isFatherDivorced && !isMotherDivorced) {
+          // 75% damai (25% cerai) – setelah max 2 pertengkaran
+          final bool divorceSuccess = random.nextInt(100) < 25;
+          pendingDivorceResult = divorceSuccess;
+          if (divorceSuccess) {
             isFatherDivorced = true;
             isMotherDivorced = true;
-            custodyParent = null; // Reset agar memicu dialog hak asuh jika masih di bawah 18 tahun
-            events.add('💔 Perceraian: Kedua orang tuamu memutuskan untuk bercerai setelah sekian lama bersama.');
+            custodyParent = null;
+            fatherDivorceYearsSince = 0;
+            motherDivorceYearsSince = 0;
+            final String eventMsg = '💔 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan resmi bercerai!';
+            events.add(eventMsg);
+            inbox.add(eventMsg);
+          } else {
+            parentsReconciled = true;
+            parentArgumentCount = 0; // reset counter jika damai kembali
+            final String eventMsg = '💖 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan memutuskan untuk BATAL bercerai!';
+            events.add(eventMsg);
+            inbox.add(eventMsg);
           }
         }
       }
     }
+
+    // --- TAMBAH TAHUN SEJAK CERAI (untuk jeda menikah lagi) ---
+    if (isFatherDivorced && stepMotherName == null) {
+      fatherDivorceYearsSince++;
+    }
+    if (isMotherDivorced && stepFatherName == null) {
+      motherDivorceYearsSince++;
+    }
+
+    // --- LOGIKA KERIBUTAN ORANG TUA (10% PELUANG SAAT TAMBAH UMUR) ---
+    checkParentArgumentTrigger(random, 10);
 
     // --- LOGIKA REMARRY: DELEGASI KE PARENT_REMARRIAGE ---
     ParentRemarriage.checkAndApplyRemarriage(this, random, events);

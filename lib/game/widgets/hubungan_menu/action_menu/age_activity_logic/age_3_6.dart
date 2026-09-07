@@ -2,60 +2,58 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
 import 'age_base.dart';
 
 List<ActionItem> getAge3to6Actions(
+  BuildContext context,
   Character character,
   String targetName,
   String targetRole,
   Random random,
   Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialog,
   Function(int change) updateRelationship,
-  VoidCallback updateState,
-) {
-  final String relation = targetName.split(' ')[0];
+  VoidCallback updateState, {
+  String? targetAvatarUrl,
+  String? playerAvatarUrl,
+  int? targetAge,
+  String? targetGender,
+}) {
+  void triggerVN(String actionType) {
+    PercakapanDispatcher.dispatchAction(
+      context: context,
+      character: character,
+      targetName: targetName,
+      targetRole: targetRole,
+      targetAge: targetAge != null ? '$targetAge tahun' : '3-6 tahun',
+      targetRealAge: targetAge,
+      targetGender: targetGender,
+      targetAvatarUrl: targetAvatarUrl,
+      playerAvatarUrl: playerAvatarUrl,
+      relationshipValue: 70,
+      actionType: actionType,
+      onActionComplete: updateState,
+    );
+  }
 
-  return [
+  final String cleanRole = targetRole.toLowerCase();
+  final String cleanName = targetName.toLowerCase();
+  final bool isSiblingTarget = character.siblings.any((sib) =>
+          '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) ||
+      cleanRole.contains('saudara') ||
+      cleanRole.contains('kandung') ||
+      cleanRole.contains('tiri') ||
+      cleanName.contains('adik');
+
+  final List<ActionItem> actions = [
     // 1. Minta Mainan
     ActionItem(
       label: 'Minta Mainan',
       icon: Icons.toys,
       color: Colors.orange,
-      onTap: () {
-        // Tentukan persentase keberhasilan berdasarkan target
-        int successRate;
-        if (relation == 'Ayah') {
-          successRate = 70;
-        } else if (relation == 'Ibu') {
-          successRate = 70;
-        } else {
-          successRate = 50; // default untuk target lain (kakak, nenek, dll)
-        }
-
-        if (random.nextInt(100) < successRate) {
-          int relBonus = random.nextInt(6) + 5;
-          showDialog(
-            'Minta Mainan Sukses!',
-            '$relation membelikanmu mainan baru! Kamu sangat senang (+$relBonus% hubungan).',
-            Icons.toys, Colors.orange, () {
-              character.happiness = (character.happiness + 20).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(6) + 5;
-          showDialog(
-            'Minta Mainan Gagal',
-            '$relation menolak membelikan mainan untukmu. Hubunganmu merenggang (-$relPenalty%).',
-            Icons.block, Colors.red, () {
-              character.happiness = (character.happiness - 5).clamp(0, 100);
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
-      },
+      onTap: () => triggerVN('minta mainan'),
     ),
 
     // 2. Minta Pelukan
@@ -63,41 +61,7 @@ List<ActionItem> getAge3to6Actions(
       label: 'Minta Pelukan',
       icon: Icons.face,
       color: Colors.pinkAccent,
-      onTap: () {
-        // Tentukan persentase keberhasilan berdasarkan target
-        int successRate;
-        if (relation == 'Ayah' || relation == 'Ibu') {
-          successRate = 70;
-        } else if (relation == 'Kakek' || relation == 'Nenek') {
-          successRate = 60;
-        } else {
-          successRate = 50; // Paman, Bibi, atau target lainnya
-        }
-
-        if (random.nextInt(100) < successRate) {
-          int relBonus = random.nextInt(4) + 3;
-          showDialog(
-            'Dipenuhi Kasih Sayang',
-            '$relation memberimu pelukan hangat yang membuatmu merasa sangat dicintai! (+$relBonus% hubungan)',
-            Icons.face, Colors.pinkAccent, () {
-              character.happiness = (character.happiness + 15).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(5) + 1; // 1-5%
-          showDialog(
-            'Pelukan Ditolak',
-            '$relation sedang sibuk dan menolak pelukanmu. Kamu merasa sedikit sedih (-$relPenalty%).',
-            Icons.sentiment_dissatisfied, Colors.grey, () {
-              character.happiness = (character.happiness - 2).clamp(0, 100);
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
-      },
+      onTap: () => triggerVN('minta pelukan'),
     ),
 
     // 3. Pergi ke Bioskop Bersama
@@ -105,18 +69,7 @@ List<ActionItem> getAge3to6Actions(
       label: 'Pergi ke Bioskop Bersama',
       icon: Icons.movie,
       color: Colors.deepPurple,
-      onTap: () {
-        int relBonus = random.nextInt(6) + 10;
-        showDialog(
-          'Pergi ke Bioskop',
-          'Kamu pergi ke bioskop menonton film anak-anak bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan, +18% kebahagiaan)',
-          Icons.movie, Colors.deepPurple, () {
-            character.happiness = (character.happiness + 18).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      },
+      onTap: () => triggerVN('pergi ke bioskop bersama'),
     ),
 
     // 4. Habiskan Waktu Bersama
@@ -124,18 +77,50 @@ List<ActionItem> getAge3to6Actions(
       label: 'Habiskan Waktu Bersama',
       icon: Icons.people,
       color: Colors.blueAccent,
-      onTap: () {
-        int relBonus = random.nextInt(5) + 8;
-        showDialog(
-          'Habiskan Waktu',
-          'Kamu menghabiskan waktu bermain bersama $relation sepanjang hari! (+$relBonus% hubungan, +12% kebahagiaan)',
-          Icons.people, Colors.blueAccent, () {
-            character.happiness = (character.happiness + 12).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      },
+      onTap: () => triggerVN('habiskan waktu bersama'),
     ),
   ];
+
+  final bool isYoungerSiblingTarget = character.siblings.any((sib) =>
+          ('${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) &&
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) ||
+      cleanName.contains('adik') ||
+      cleanRole.contains('adik');
+
+  final bool isOlderSiblingTarget = character.siblings.any((sib) =>
+          ('${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('kakak') ?? false)) &&
+          (sib['relation']?.toLowerCase().contains('kakak') ?? false)) ||
+      cleanName.contains('kakak') ||
+      cleanRole.contains('kakak');
+
+  if (isSiblingTarget) {
+    if (character.age < 10 && isYoungerSiblingTarget) {
+      actions.removeWhere((item) =>
+          item.label == 'Minta Mainan' ||
+          item.label.contains('Minta Uang') ||
+          item.label.contains('Minta Uang Saku') ||
+          item.label.contains('Bioskop'));
+    }
+
+    // Ubah "Minta Pelukan" menjadi "Berikan Pelukan" jika berinteraksi dengan adik,
+    // dan tetap "Minta Pelukan" jika berinteraksi dengan kakak.
+    for (int i = 0; i < actions.length; i++) {
+      if (actions[i].label == 'Minta Pelukan' || actions[i].label == 'Berikan Pelukan') {
+        final String labelText = isOlderSiblingTarget ? 'Minta Pelukan' : (isYoungerSiblingTarget ? 'Berikan Pelukan' : actions[i].label);
+        final String actionTypeValue = labelText.toLowerCase();
+        actions[i] = ActionItem(
+          label: labelText,
+          icon: Icons.face,
+          color: Colors.pinkAccent,
+          onTap: () => triggerVN(actionTypeValue),
+        );
+      }
+    }
+  }
+
+  return actions;
 }

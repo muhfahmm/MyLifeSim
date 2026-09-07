@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'efek_samping.dart';
 import 'masturbate_enjoyment.dart';
+import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
 
 // ============================================================
 // MODEL DATA LOKASI & WAKTU
@@ -513,13 +515,39 @@ class AjakanMasturbasiDialog {
       partnerRelation: partnerRelation,
       additionalText: resultMsg + '\n\n📈 Efek: +15% Kebahagiaan, -$healthLoss% Kesehatan, +20% Hubungan',
       onComplete: () {
-        EfekSampingMasturbasi.checkPartnerEffect(
-          context, character, relationType, viewerName, onComplete,
-          acceptanceHealthLoss: healthLoss,
+        final Map<String, dynamic> npcMap = {
+          'name': viewerName,
+          'role': relationType,
+          'gender': 'Perempuan',
+          'age': '10Tahun',
+          'relationship': '50',
+        };
+
+
+
+        final vnNodes = AjakMasturbateDialogue.getDialogue(
+          player: character,
+          npc: npcMap,
+          chosenLocation: lokasi,
+          chosenTime: waktu,
+        );
+
+        VNDialogueOverlay.show(
+          context: context,
+          player: character,
+          npc: npcMap,
+          nodes: vnNodes,
+          onFinished: () {
+            EfekSampingMasturbasi.checkPartnerEffect(
+              context, character, relationType, viewerName, onComplete,
+              acceptanceHealthLoss: healthLoss,
+            );
+          },
         );
       },
     );
   }
+
 
   // ============================================================
   // LOGIKA AKSI: TOLAK BIASA

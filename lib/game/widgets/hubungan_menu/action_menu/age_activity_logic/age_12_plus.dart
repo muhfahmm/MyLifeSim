@@ -13,6 +13,109 @@ import 'age_base.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
+
+// ──────────────────────────────────────────────
+// HELPER: Tampilkan pilihan sebelum VN dialogue
+// ──────────────────────────────────────────────
+
+void _showPickerBottomSheet({
+  required BuildContext context,
+  required String title,
+  required IconData titleIcon,
+  required Color titleColor,
+  required List<Map<String, dynamic>> options, // {label, icon, color, value}
+  required void Function(String value) onPicked,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      return Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E2E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.white24,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Icon(titleIcon, color: titleColor, size: 22),
+                const SizedBox(width: 10),
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: titleColor,
+                    fontSize: 17,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Flexible(
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 3.2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
+                ),
+                itemCount: options.length,
+                itemBuilder: (_, i) {
+                  final opt = options[i];
+                  final Color c = opt['color'] as Color? ?? Colors.blue;
+                  return InkWell(
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      onPicked(opt['value'] as String);
+                    },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: c.withAlpha(30),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: c.withAlpha(80)),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(
+                        children: [
+                          Icon(opt['icon'] as IconData? ?? Icons.circle, color: c, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              opt['label'] as String,
+                              style: TextStyle(color: c, fontSize: 13, fontWeight: FontWeight.w600),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
 
 /// Fungsi helper untuk menentukan gender target berdasarkan nama target.
 String _getPartnerGender(String targetName) {
@@ -90,8 +193,12 @@ List<ActionItem> getAge12PlusActions(
   Random random,
   Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback,
   Function(int change) updateRelationship,
-  VoidCallback updateState,
-) {
+  VoidCallback updateState, {
+  String? targetAvatarUrl,
+  String? playerAvatarUrl,
+  int? targetAge,
+  String? targetGender,
+}) {
   final String relation = targetName.split(' ')[0];
   final String partnerGender = _getPartnerGender(targetName).toLowerCase();
   final bool isPartnerRole = targetRole == 'Pacar' || targetRole == 'Tunangan' || targetRole == 'Suami' || targetRole == 'Istri';
@@ -116,40 +223,6 @@ List<ActionItem> getAge12PlusActions(
   // Helper untuk mendapatkan nilai hubungan saat ini
   int _getCurrentRelationshipValue() {
     return int.tryParse(character.partner?['relationship'] ?? '50') ?? 50;
-  }
-
-  // --- Helper untuk meminta barang (sama seperti di age_6_11) ---
-  void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
-    final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-        character.fatherName != null &&
-        targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-        character.isAnyPartnerNameMatching(targetName);
-
-    final int actualRate = isDatingFather ? 90 : successRate;
-
-    if (random.nextInt(100) < actualRate) {
-      int relBonus = relationshipGain + random.nextInt(4);
-      showDialogCallback(
-        'Berhasil Mendapatkan $itemName!',
-        '$relation membelikanmu $itemName yang kamu inginkan. Kamu sangat senang! (+${relBonus.abs()}% hubungan)',
-        Icons.check_circle, Colors.green, () {
-          character.happiness = (character.happiness + happinessGain).clamp(0, 100);
-          updateRelationship(relBonus);
-          updateState();
-        }
-      );
-    } else {
-      int relPenalty = random.nextInt(6) + 5; // 5–10%
-      showDialogCallback(
-        'Permintaan Ditolak',
-        '$relation menolak membelikan $itemName untukmu. Hubunganmu merenggang (-$relPenalty%).',
-        Icons.block, Colors.red, () {
-          character.happiness = (character.happiness - 5).clamp(0, 100);
-          updateRelationship(-relPenalty);
-          updateState();
-        }
-      );
-    }
   }
 
   List<ActionItem> actions = [];
@@ -327,25 +400,7 @@ List<ActionItem> getAge12PlusActions(
       },
     ));
 
-    // 10. Percakapan
-    actions.add(ActionItem(
-      label: 'Percakapan',
-      icon: Icons.chat,
-      color: Colors.teal,
-      onTap: () {
-        int relBonus = random.nextInt(5) + 5;
-        showDialogCallback(
-          'Percakapan dengan Anak',
-          'Kamu duduk bersama $targetName dan mengobrol tentang kesehariannya serta impian masa depannya. (+$relBonus% hubungan)',
-          Icons.chat,
-          Colors.teal,
-          () {
-            updateRelationship(relBonus);
-            updateState();
-          },
-        );
-      },
-    ));
+
 
     return actions; // Kembali lebih awal karena target adalah anak.
   }
@@ -688,91 +743,23 @@ List<ActionItem> getAge12PlusActions(
 
   // 5. Minta Uang
   actions.add(ActionItem(
-    label: 'Minta Uang',
+    label: 'Minta Uang Saku',
     icon: Icons.monetization_on,
     color: Colors.amber,
     onTap: () {
-      final String cleanName = targetName.toLowerCase();
-      final String cleanRole = targetRole.toLowerCase();
-      final bool isParent = cleanName.startsWith('ayah') ||
-                            cleanName.startsWith('ibu') ||
-                            cleanRole.contains('kandung') ||
-                            cleanRole.contains('tiri') ||
-                            cleanRole.contains('cerai') ||
-                            (character.fatherName != null && cleanName.contains(character.fatherName!.toLowerCase())) ||
-                            (character.motherName != null && cleanName.contains(character.motherName!.toLowerCase())) ||
-                            (character.stepFatherName != null && cleanName.contains(character.stepFatherName!.toLowerCase())) ||
-                            (character.stepMotherName != null && cleanName.contains(character.stepMotherName!.toLowerCase()));
-
-      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-          character.fatherName != null &&
-          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-          character.isAnyPartnerNameMatching(targetName);
-
-      int gotMoney = 0;
-      if (isParent) {
-        if (character.age >= 6 && character.age <= 11) {
-          gotMoney = random.nextInt(10) + 1; // 1-10 $
-        } else if (character.age >= 12 && character.age <= 14) {
-          gotMoney = random.nextInt(31) + 20; // 20-50 $
-        } else if (character.age >= 15 && character.age <= 18) {
-          gotMoney = random.nextInt(101) + 100; // 100-200 $
-        } else {
-          gotMoney = random.nextInt(20) + 20; // fallback
-        }
-      } else {
-        // Cek jika target adalah kakak (saudara kandung/tiri/dll) yang sudah dewasa/kerja (>18)
-        bool isKakakAdult = false;
-        int targetAgeVal = 0;
-        for (var sib in character.siblings) {
-          final String expectedLabel = '${sib['name']} (${sib['relation']})';
-          if (expectedLabel == targetName || sib['name'] == targetName) {
-            targetAgeVal = int.tryParse(sib['age'] ?? '0') ?? 0;
-            if (targetAgeVal > 18 && (sib['relation'] ?? '').toLowerCase().contains('kakak')) {
-              isKakakAdult = true;
-            }
-            break;
-          }
-        }
-        
-        if (isKakakAdult) {
-          int kakakWealth = character.getTargetWealth(targetName, targetRole);
-          gotMoney = (kakakWealth * 0.05).clamp(10, 100).toInt() + random.nextInt(21);
-        } else {
-          gotMoney = random.nextInt(20) + 20; // fallback umum
-        }
-      }
-
-      if (isDatingFather) {
-        gotMoney = (gotMoney * 1.5).round(); // uang naik 50%
-      }
-
-      final bool accepted = isDatingFather ? (random.nextInt(100) < 90) : random.nextBool();
-
-      if (accepted) {
-        int relBonus = random.nextInt(6) + 5;
-        showDialogCallback(
-          'Minta Uang Sukses!',
-          '$relation memberimu uang tunai sebesar \$$gotMoney! Uang dimasukkan ke saldo tunai (+$relBonus% hubungan, +10% kebahagiaan).',
-          Icons.monetization_on, Colors.green, () {
-            character.money += gotMoney;
-            character.happiness = (character.happiness + 10).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      } else {
-        int relPenalty = random.nextInt(5) + 1;
-        showDialogCallback(
-          'Minta Uang Gagal',
-          '$relation menggelengkan kepala. Hubunganmu merenggang (-$relPenalty%).',
-          Icons.money_off, Colors.red, () {
-            character.happiness = (character.happiness - 2).clamp(0, 100);
-            updateRelationship(-relPenalty);
-            updateState();
-          }
-        );
-      }
+      PercakapanDispatcher.dispatchAction(
+        context: context,
+        character: character,
+        targetName: targetName,
+        targetRole: targetRole,
+        targetAge: targetAge != null ? '$targetAge' : '$age',
+        relationshipValue: _getCurrentRelationshipValue(),
+        actionType: 'Minta Uang Saku',
+        onActionComplete: updateState,
+        targetAvatarUrl: targetAvatarUrl,
+        playerAvatarUrl: playerAvatarUrl,
+        targetGender: targetGender,
+      );
     },
   ));
 
@@ -889,33 +876,36 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.thumb_up,
     color: Colors.blueAccent,
     onTap: () {
-      int relBonus = random.nextInt(5) + 8;
-      showDialogCallback(
-        'Berikan Pujian',
-        'Kamu memberikan pujian yang tulus kepada $relation. Dia terlihat sangat senang! (+$relBonus% hubungan)',
-        Icons.thumb_up, Colors.blueAccent, () {
-          updateRelationship(relBonus);
-          updateState();
-        }
-      );
-    },
-  ));
-
-  // 7. Percakapan
-  actions.add(ActionItem(
-    label: 'Percakapan',
-    icon: Icons.chat,
-    color: Colors.teal,
-    onTap: () {
-      int relBonus = random.nextInt(4) + 2;
-      showDialogCallback(
-        'Bercakap-cakap',
-        'Kamu mengobrol santai dengan $relation tentang hobi dan kesehariannya. (+$relBonus% hubungan)',
-        Icons.chat, Colors.teal, () {
-          character.happiness = (character.happiness + 5).clamp(0, 100);
-          updateRelationship(relBonus);
-          updateState();
-        }
+      _showPickerBottomSheet(
+        context: context,
+        title: 'Pilih Topik Pujian',
+        titleIcon: Icons.thumb_up,
+        titleColor: Colors.blueAccent,
+        options: [
+          {'label': 'Penampilan', 'icon': Icons.face_retouching_natural, 'color': Colors.pink, 'value': 'Penampilan'},
+          {'label': 'Kepribadian', 'icon': Icons.psychology, 'color': Colors.purple, 'value': 'Kepribadian'},
+          {'label': 'Prestasi', 'icon': Icons.emoji_events, 'color': Colors.amber, 'value': 'Prestasi'},
+          {'label': 'Kerja Keras', 'icon': Icons.fitness_center, 'color': Colors.orange, 'value': 'Kerja Keras'},
+          {'label': 'Kecerdasan', 'icon': Icons.lightbulb, 'color': Colors.yellow, 'value': 'Kecerdasan'},
+          {'label': 'Humor', 'icon': Icons.sentiment_very_satisfied, 'color': Colors.green, 'value': 'Humor'},
+          {'label': 'Kebaikan', 'icon': Icons.favorite, 'color': Colors.red, 'value': 'Kebaikan'},
+          {'label': 'Gaya Hidup', 'icon': Icons.stars, 'color': Colors.cyan, 'value': 'Gaya Hidup'},
+        ],
+        onPicked: (topik) {
+          PercakapanDispatcher.dispatchAction(
+            context: context,
+            character: character,
+            targetName: targetName,
+            targetRole: targetRole,
+            targetAge: targetAge != null ? '$targetAge' : '$age',
+            relationshipValue: _getCurrentRelationshipValue(),
+            actionType: 'Pujian - $topik',
+            onActionComplete: updateState,
+            targetAvatarUrl: targetAvatarUrl,
+            playerAvatarUrl: playerAvatarUrl,
+            targetGender: targetGender,
+          );
+        },
       );
     },
   ));
@@ -926,15 +916,36 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.sentiment_very_dissatisfied,
     color: Colors.red,
     onTap: () {
-      int relPenalty = random.nextInt(11) + 5;
-      showDialogCallback(
-        'Menyinggung Perasaan',
-        'Kamu melontarkan lelucon kasar yang menyinggung perasaan $relation. Hubungan menjadi canggung (-$relPenalty% hubungan).',
-        Icons.sentiment_very_dissatisfied, Colors.red, () {
-          character.happiness = (character.happiness - 15).clamp(0, 100);
-          updateRelationship(-relPenalty);
-          updateState();
-        }
+      _showPickerBottomSheet(
+        context: context,
+        title: 'Pilih Cara Menyinggung',
+        titleIcon: Icons.sentiment_very_dissatisfied,
+        titleColor: Colors.red,
+        options: [
+          {'label': 'Penampilan', 'icon': Icons.face, 'color': Colors.pink, 'value': 'Penampilan'},
+          {'label': 'Kepribadian', 'icon': Icons.psychology, 'color': Colors.purple, 'value': 'Kepribadian'},
+          {'label': 'Pekerjaan', 'icon': Icons.work_off, 'color': Colors.orange, 'value': 'Pekerjaan'},
+          {'label': 'Kecerdasan', 'icon': Icons.lightbulb_outline, 'color': Colors.amber, 'value': 'Kecerdasan'},
+          {'label': 'Kebiasaan', 'icon': Icons.loop, 'color': Colors.brown, 'value': 'Kebiasaan'},
+          {'label': 'Keluarga', 'icon': Icons.family_restroom, 'color': Colors.indigo, 'value': 'Keluarga'},
+          {'label': 'Masa Lalu', 'icon': Icons.history, 'color': Colors.grey, 'value': 'Masa Lalu'},
+          {'label': 'Fisik', 'icon': Icons.fitness_center, 'color': Colors.red, 'value': 'Fisik'},
+        ],
+        onPicked: (topik) {
+          PercakapanDispatcher.dispatchAction(
+            context: context,
+            character: character,
+            targetName: targetName,
+            targetRole: targetRole,
+            targetAge: targetAge != null ? '$targetAge' : '$age',
+            relationshipValue: _getCurrentRelationshipValue(),
+            actionType: 'Menyinggung - $topik',
+            onActionComplete: updateState,
+            targetAvatarUrl: targetAvatarUrl,
+            playerAvatarUrl: playerAvatarUrl,
+            targetGender: targetGender,
+          );
+        },
       );
     },
   ));
@@ -945,34 +956,19 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.movie,
     color: Colors.deepPurple,
     onTap: () {
-      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-          character.fatherName != null &&
-          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-          character.isAnyPartnerNameMatching(targetName);
-
-      final double rate = isDatingFather ? 0.80 : 0.75;
-      if (random.nextDouble() < rate) {
-        int relBonus = random.nextInt(6) + 10;
-        showDialogCallback(
-          'Menonton Bioskop',
-          'Kamu mengajak $relation pergi menonton film di bioskop terdekat. (+$relBonus% hubungan, +18% kebahagiaan)',
-          Icons.movie, Colors.deepPurple, () {
-            character.happiness = (character.happiness + 18).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      } else {
-        int relPenalty = random.nextInt(6) + 5;
-        showDialogCallback(
-          'Ajakan Ditolak',
-          '$relation menolak ajakan menonton bioskop kali ini (-$relPenalty% hubungan).',
-          Icons.block, Colors.red, () {
-            updateRelationship(-relPenalty);
-            updateState();
-          }
-        );
-      }
+      PercakapanDispatcher.dispatchAction(
+        context: context,
+        character: character,
+        targetName: targetName,
+        targetRole: targetRole,
+        targetAge: targetAge != null ? '$targetAge' : '$age',
+        relationshipValue: _getCurrentRelationshipValue(),
+        actionType: 'Pergi ke Bioskop Bersama',
+        onActionComplete: updateState,
+        targetAvatarUrl: targetAvatarUrl,
+        playerAvatarUrl: playerAvatarUrl,
+        targetGender: targetGender,
+      );
     },
   ));
 
@@ -982,34 +978,37 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.people,
     color: Colors.indigo,
     onTap: () {
-      final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-          character.fatherName != null &&
-          targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-          character.isAnyPartnerNameMatching(targetName);
-
-      final double rate = isDatingFather ? 0.80 : 0.80; // set 80%
-      if (random.nextDouble() < rate) {
-        int relBonus = random.nextInt(5) + 8;
-        showDialogCallback(
-          'Habiskan Waktu',
-          'Kamu menghabiskan sore yang santai bersama $relation untuk mengobrol dan berjalan-jalan. (+$relBonus% hubungan, +12% kebahagiaan)',
-          Icons.people, Colors.indigo, () {
-            character.happiness = (character.happiness + 12).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      } else {
-        int relPenalty = random.nextInt(6) + 5;
-        showDialogCallback(
-          'Ajakan Ditolak',
-          '$relation menolak diajak menghabiskan waktu bersama (-$relPenalty% hubungan).',
-          Icons.block, Colors.red, () {
-            updateRelationship(-relPenalty);
-            updateState();
-          }
-        );
-      }
+      _showPickerBottomSheet(
+        context: context,
+        title: 'Pilih Aktivitas',
+        titleIcon: Icons.people,
+        titleColor: Colors.indigo,
+        options: [
+          {'label': 'Masak Bersama', 'icon': Icons.lunch_dining, 'color': Colors.orange, 'value': 'Masak Bersama'},
+          {'label': 'Main Game', 'icon': Icons.videogame_asset, 'color': Colors.blue, 'value': 'Main Game'},
+          {'label': 'Jalan-Jalan', 'icon': Icons.directions_walk, 'color': Colors.green, 'value': 'Jalan-Jalan'},
+          {'label': 'Nonton TV', 'icon': Icons.tv, 'color': Colors.purple, 'value': 'Nonton TV'},
+          {'label': 'Olahraga', 'icon': Icons.sports_soccer, 'color': Colors.red, 'value': 'Olahraga'},
+          {'label': 'Berkebun', 'icon': Icons.local_florist, 'color': Colors.teal, 'value': 'Berkebun'},
+          {'label': 'Baca Buku', 'icon': Icons.menu_book, 'color': Colors.amber, 'value': 'Baca Buku'},
+          {'label': 'Santai', 'icon': Icons.spa, 'color': Colors.cyan, 'value': 'Santai'},
+        ],
+        onPicked: (aktivitas) {
+          PercakapanDispatcher.dispatchAction(
+            context: context,
+            character: character,
+            targetName: targetName,
+            targetRole: targetRole,
+            targetAge: targetAge != null ? '$targetAge' : '$age',
+            relationshipValue: _getCurrentRelationshipValue(),
+            actionType: 'Habiskan Waktu Bersama - $aktivitas',
+            onActionComplete: updateState,
+            targetAvatarUrl: targetAvatarUrl,
+            playerAvatarUrl: playerAvatarUrl,
+            targetGender: targetGender,
+          );
+        },
+      );
     },
   ));
 
@@ -1019,72 +1018,38 @@ List<ActionItem> getAge12PlusActions(
     icon: Icons.shopping_bag,
     color: Colors.purple,
     onTap: () {
-      showDialog(
+      _showPickerBottomSheet(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Pilih Barang yang Diinginkan'),
-          content: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.shopping_bag, color: Colors.blue),
-                  title: const Text('Tas'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Tas', 70, 15, 5);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.directions_walk, color: Colors.orange),
-                  title: const Text('Sepatu'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Sepatu', 65, 10, 6);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.checkroom, color: Colors.purple),
-                  title: const Text('Jaket'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Jaket', 55, 12, 4);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.face, color: Colors.green),
-                  title: const Text('Topi'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Topi', 80, 8, 3);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.watch, color: Colors.amber),
-                  title: const Text('Jam Tangan'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Jam Tangan', 40, 20, 8);
-                  },
-                ),
-                ListTile(
-                  leading: const Icon(Icons.account_balance_wallet, color: Colors.brown),
-                  title: const Text('Dompet'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    _requestItem('Dompet', 60, 10, 5);
-                  },
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('Batal'),
-            ),
-          ],
-        ),
+        title: 'Pilih Barang yang Diminta',
+        titleIcon: Icons.shopping_bag,
+        titleColor: Colors.purple,
+        options: [
+          {'label': 'Smartphone', 'icon': Icons.smartphone, 'color': Colors.blue, 'value': 'Smartphone'},
+          {'label': 'Laptop', 'icon': Icons.laptop, 'color': Colors.indigo, 'value': 'Laptop'},
+          {'label': 'Pakaian Baru', 'icon': Icons.checkroom, 'color': Colors.pink, 'value': 'Pakaian Baru'},
+          {'label': 'Sepatu', 'icon': Icons.backpack, 'color': Colors.brown, 'value': 'Sepatu'},
+          {'label': 'Game Console', 'icon': Icons.videogame_asset, 'color': Colors.purple, 'value': 'Game Console'},
+          {'label': 'Headphone', 'icon': Icons.headphones, 'color': Colors.teal, 'value': 'Headphone'},
+          {'label': 'Jam Tangan', 'icon': Icons.watch, 'color': Colors.amber, 'value': 'Jam Tangan'},
+          {'label': 'Tas Baru', 'icon': Icons.shopping_bag, 'color': Colors.orange, 'value': 'Tas Baru'},
+          {'label': 'Uang Lebih', 'icon': Icons.attach_money, 'color': Colors.green, 'value': 'Uang Lebih'},
+          {'label': 'Kamera', 'icon': Icons.camera_alt, 'color': Colors.red, 'value': 'Kamera'},
+        ],
+        onPicked: (barang) {
+          PercakapanDispatcher.dispatchAction(
+            context: context,
+            character: character,
+            targetName: targetName,
+            targetRole: targetRole,
+            targetAge: targetAge != null ? '$targetAge' : '$age',
+            relationshipValue: _getCurrentRelationshipValue(),
+            actionType: 'Minta Barang - $barang',
+            onActionComplete: updateState,
+            targetAvatarUrl: targetAvatarUrl,
+            playerAvatarUrl: playerAvatarUrl,
+            targetGender: targetGender,
+          );
+        },
       );
     },
   ));

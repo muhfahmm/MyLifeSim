@@ -22,6 +22,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/t
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -855,6 +856,83 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     return (HubunganIntimLogic.getFertilityRate(age, gender) * 100).toInt();
   }
 
+  String? _getTargetSkinColor() {
+    final String plainName = AvatarAgeRules.getCleanNPCName(widget.targetName).toLowerCase().trim();
+    final String rawName = widget.targetName.toLowerCase().trim();
+    if (widget.character.motherName != null) {
+      final String mName = widget.character.motherName!.toLowerCase().trim();
+      if (plainName.contains(mName) || rawName.contains(mName) || mName.contains(plainName)) {
+        return widget.character.motherSkinColor;
+      }
+    }
+    if (widget.character.fatherName != null) {
+      final String fName = widget.character.fatherName!.toLowerCase().trim();
+      if (plainName.contains(fName) || rawName.contains(fName) || fName.contains(plainName)) {
+        return widget.character.fatherSkinColor;
+      }
+    }
+    if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
+      return widget.character.partner!['skinColor'];
+    }
+    if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
+      return widget.character.secondPartner!['skinColor'];
+    }
+    if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name']!.toLowerCase().contains(plainName)) {
+      return widget.character.thirdPartner!['skinColor'];
+    }
+    if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name']!.toLowerCase().contains(plainName)) {
+      return widget.character.fourthPartner!['skinColor'];
+    }
+    if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name']!.toLowerCase().contains(plainName)) {
+      return widget.character.fifthPartner!['skinColor'];
+    }
+    final List<List<Map<String, dynamic>>> allLists = [
+      widget.character.friends,
+      widget.character.classmates,
+      widget.character.univClassmates,
+      widget.character.coworkers,
+      widget.character.siblings,
+      widget.character.extendedFamily,
+      widget.character.children,
+      widget.character.idolTrainees,
+      widget.character.idolMainMembers,
+      widget.character.idolStaff,
+    ];
+    for (var list in allLists) {
+      for (var item in list) {
+        final String n = (item['name'] ?? '').toString().toLowerCase().trim();
+        if (n.isNotEmpty && (plainName.contains(n) || n.contains(plainName) || rawName.contains(n))) {
+          if (item['skinColor'] != null && item['skinColor'].toString().isNotEmpty) {
+            return item['skinColor'].toString();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  String _getTargetAvatarUrl([int? customHappiness]) {
+    final String ageString = _getCurrentAgeValue();
+    int targetAge = 0;
+    if (ageString.contains('tahun')) {
+      targetAge = int.tryParse(ageString.replaceAll(' tahun', '').trim()) ?? 0;
+    }
+    return AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: AvatarAgeRules.getCleanNPCName(widget.targetName),
+      gender: _getTargetGender(),
+      age: targetAge,
+      happiness: customHappiness ?? _getCurrentRelationshipValue(),
+      forcedSkinColor: _getTargetSkinColor(),
+    );
+  }
+
+  String _getPlayerAvatarUrl([int? customHappiness]) {
+    return AvatarAgeRules.getAgeBasedAvatarUrl(
+      widget.character,
+      happiness: customHappiness ?? widget.character.happiness,
+    );
+  }
+
   // Fungsi update state yang dikirim ke file usia
   void _updateState() {
     setState(() {});
@@ -1228,6 +1306,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       } else if (minAge >= 3 && minAge < 6) {
         actions = getAge3to6Actions(
+          context,
           widget.character,
           widget.targetName,
           widget.targetRole,
@@ -1235,10 +1314,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _showResultDialog,
           _updateRelationship,
           _updateState,
+          targetAvatarUrl: _getTargetAvatarUrl(),
+          playerAvatarUrl: _getPlayerAvatarUrl(),
+          targetAge: targetAge,
+          targetGender: _getTargetGender(),
         );
       } else if (minAge >= 6 && minAge < 12) {
         actions = getAge6to11Actions(
-          context, // ← tambahkan context di sini
+          context,
           widget.character,
           widget.targetName,
           widget.targetRole,
@@ -1246,6 +1329,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _showResultDialog,
           _updateRelationship,
           _updateState,
+          targetAvatarUrl: _getTargetAvatarUrl(),
+          playerAvatarUrl: _getPlayerAvatarUrl(),
+          targetAge: targetAge,
+          targetGender: _getTargetGender(),
         );
       } else {
         actions = getAge12PlusActions(
@@ -1258,6 +1345,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           _showResultDialog,
           _updateRelationship,
           _updateState,
+          targetAvatarUrl: _getTargetAvatarUrl(),
+          playerAvatarUrl: _getPlayerAvatarUrl(),
+          targetAge: targetAge,
+          targetGender: _getTargetGender(),
         );
       }
     }
@@ -1461,66 +1552,22 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 () {},
               );
             } else {
-              final bool cannotHaveChild = widget.character.isMotherDivorced &&
-                  (widget.character.stepFatherName == null ||
-                      widget.character.isStepFatherDeceased);
-              if (cannotHaveChild) {
-                _showResultDialog(
-                  'Minta Adik Baru',
-                  'Ibumu mengelus rambutmu dan berkata, "Ibu tidak memiliki pasangan saat ini untuk memberimu adik baru, sayang."',
-                  Icons.baby_changing_station,
-                  Colors.grey,
-                  () {},
-                );
-              } else {
-                final int biologicalSiblings = widget.character.siblings.where((sib) {
-                  final String rel = sib['relation'] ?? '';
-                  return !rel.toLowerCase().contains('tiri');
-                }).length;
-                final int totalChildren = 1 + biologicalSiblings;
-                String childrenWord = '$totalChildren anak';
-                if (totalChildren == 1) {
-                  childrenWord = 'satu anak';
-                } else if (totalChildren == 2) {
-                  childrenWord = 'dua anak';
-                } else if (totalChildren == 3) {
-                  childrenWord = 'tiga anak';
-                } else if (totalChildren == 4) {
-                  childrenWord = 'empat anak';
-                } else if (totalChildren == 5) {
-                  childrenWord = 'lima anak';
-                }
-                final String capitalizedChildren = '${childrenWord[0].toUpperCase()}${childrenWord.substring(1)}';
-
-                if (_random.nextBool()) {
-                  _showResultDialog(
-                    'Permintaan Disetujui!',
-                    'Ibumu tersenyum hangat dan berkata, "Wah, ide yang bagus! Ibu akan membicarakannya dengan Ayahmu. Semoga kita segera mendapat adik baru!" Hubunganmu membaik dan kamu merasa senang. (+10% Hubungan, +15% Kebahagiaan)',
-                    Icons.favorite,
-                    Colors.green,
-                    () {
-                      widget.character.motherWillTryForBaby = true;
-                      widget.character.happiness =
-                          (widget.character.happiness + 15).clamp(0, 100);
-                      _updateRelationship(10);
-                      _updateState();
-                    },
-                  );
-                } else {
-                  _showResultDialog(
-                    'Permintaan Ditolak',
-                    'Ibumu tertawa kecil dan berkata, "$capitalizedChildren saja sudah membuat Ibu cukup sibuk saat ini, sayang. Mungkin nanti ya!" Hubunganmu tetap baik. (+2% Hubungan)',
-                    Icons.sentiment_neutral,
-                    Colors.orange,
-                    () {
-                      _updateRelationship(2);
-                      _updateState();
-                    },
-                  );
-                }
-              }
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge',
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'Minta Adik Baru',
+                onActionComplete: _updateState,
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                targetGender: _getTargetGender(),
+              );
             }
           },
+
         );
 
         final int sepedaIndex = actions.indexWhere((act) => act.label == 'Minta Sepeda');
@@ -1557,62 +1604,25 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               icon: Icons.heart_broken,
               color: Colors.redAccent,
               onTap: () {
-                final screenContext = context;
-                showDialog(
-                  context: screenContext,
-                  builder: (confirmContext) => AlertDialog(
-                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $stepMotherName?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(confirmContext),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(confirmContext);
-                          final bool success = _random.nextInt(100) < 40;
-                          if (success) {
-                            widget.character.stepMotherName = null;
-                            widget.character.stepMotherAge = null;
-                            widget.character.stepMotherRelationship = null;
-
-                            final String msg = '💔 Ayahmu memutuskan untuk menceraikan $stepMotherName atas permintaanmu!';
-                            widget.character.inbox.add(msg);
-                            _updateRelationship(15);
-                            _updateState();
-
-                            _showResultDialog(
-                              'Sukses 💔',
-                              'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $stepMotherName.',
-                              Icons.done,
-                              Colors.green,
-                              () {
-                                Navigator.pop(screenContext);
-                              }
-                            );
-                          } else {
-                            _updateRelationship(-15);
-                            _updateState();
-                            _showResultDialog(
-                              'Ditolak 🚫',
-                              'Ayahmu menolak untuk menceraikan $stepMotherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
-                              Icons.block,
-                              Colors.red,
-                              () {}
-                            );
-                          }
-                        },
-                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge',
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'Minta Cerai',
+                  onActionComplete: _updateState,
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  targetGender: _getTargetGender(),
                 );
               },
+
             ));
           }
-        } else if (isStillMarriedToMother && myGenderLower == 'perempuan') {
-          // Jika masih bersuami-istri dengan Ibu Kandung dan player adalah Perempuan
+        } else if (isStillMarriedToMother) {
+          // Jika masih bersuami-istri dengan Ibu Kandung
           final String motherName = widget.character.motherName!;
           final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
           if (!hasMintaCerai) {
@@ -1621,61 +1631,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               icon: Icons.heart_broken,
               color: Colors.redAccent,
               onTap: () {
-                final screenContext = context;
-                showDialog(
-                  context: screenContext,
-                  builder: (confirmContext) => AlertDialog(
-                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin meminta Ayahmu untuk menceraikan $motherName?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(confirmContext),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(confirmContext);
-                          final bool success = _random.nextInt(100) < 40;
-                          if (success) {
-                            // Hapus ibu kandung karena mereka bercerai
-                            widget.character.motherName = null;
-                            widget.character.motherAge = null;
-                            widget.character.motherRelationship = null;
-                            widget.character.isFatherDivorced = true;
-                            widget.character.isMotherDivorced = true;
-
-                            final String msg = '💔 Ayahmu memutuskan untuk menceraikan $motherName atas permintaanmu!';
-                            widget.character.inbox.add(msg);
-                            _updateRelationship(15);
-                            _updateState();
-
-                            _showResultDialog(
-                              'Sukses 💔',
-                              'Ayahmu menyetujui permintaanmu dan kini resmi menceraikan $motherName.',
-                              Icons.done,
-                              Colors.green,
-                              () {
-                                Navigator.pop(screenContext);
-                              }
-                            );
-                          } else {
-                            _updateRelationship(-15);
-                            _updateState();
-                            _showResultDialog(
-                              'Ditolak 🚫',
-                              'Ayahmu menolak untuk menceraikan $motherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
-                              Icons.block,
-                              Colors.red,
-                              () {}
-                            );
-                          }
-                        },
-                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge',
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'Minta Cerai',
+                  onActionComplete: _updateState,
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  targetGender: _getTargetGender(),
                 );
               },
+
             ));
           }
         } else if (!hasStepMother && !isStillMarriedToMother) {
@@ -1755,62 +1725,24 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               icon: Icons.heart_broken,
               color: Colors.redAccent,
               onTap: () {
-                final screenContext = context;
-                showDialog(
-                  context: screenContext,
-                  builder: (confirmContext) => AlertDialog(
-                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin meminta Ibumu untuk menceraikan $stepFatherName?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(confirmContext),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(confirmContext);
-                          final bool success = _random.nextInt(100) < 40;
-                          if (success) {
-                            widget.character.stepFatherName = null;
-                            widget.character.stepFatherAge = null;
-                            widget.character.stepFatherRelationship = null;
-
-                            final String msg = '💔 Ibumu memutuskan untuk menceraikan $stepFatherName atas permintaanmu!';
-                            widget.character.inbox.add(msg);
-                            _updateRelationship(15);
-                            _updateState();
-
-                            _showResultDialog(
-                              'Sukses 💔',
-                              'Ibumu menyetujui permintaanmu dan kini resmi menceraikan $stepFatherName.',
-                              Icons.done,
-                              Colors.green,
-                              () {
-                                Navigator.pop(screenContext);
-                              }
-                            );
-                          } else {
-                            _updateRelationship(-15);
-                            _updateState();
-                            _showResultDialog(
-                              'Ditolak 🚫',
-                              'Ibumu menolak untuk menceraikan $stepFatherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
-                              Icons.block,
-                              Colors.red,
-                              () {}
-                            );
-                          }
-                        },
-                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge',
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'Minta Cerai',
+                  onActionComplete: _updateState,
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  targetGender: _getTargetGender(),
                 );
               },
             ));
           }
-        } else if (isStillMarriedToFather && myGenderLower == 'laki-laki') {
-          // Jika masih bersuami-istri dengan Ayah Kandung dan player adalah Laki-laki
+        } else if (isStillMarriedToFather) {
+          // Jika masih bersuami-istri dengan Ayah Kandung
           final String fatherName = widget.character.fatherName!;
           final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
           if (!hasMintaCerai) {
@@ -1819,59 +1751,18 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               icon: Icons.heart_broken,
               color: Colors.redAccent,
               onTap: () {
-                final screenContext = context;
-                showDialog(
-                  context: screenContext,
-                  builder: (confirmContext) => AlertDialog(
-                    title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin meminta Ibumu untuk menceraikan $fatherName?'),
-                    actions: [
-                      TextButton(
-                        onPressed: () => Navigator.pop(confirmContext),
-                        child: const Text('Batal'),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(confirmContext);
-                          final bool success = _random.nextInt(100) < 40;
-                          if (success) {
-                            // Hapus ayah kandung karena mereka bercerai
-                            widget.character.fatherName = null;
-                            widget.character.fatherAge = null;
-                            widget.character.fatherRelationship = null;
-                            widget.character.isFatherDivorced = true;
-                            widget.character.isMotherDivorced = true;
-
-                            final String msg = '💔 Ibumu memutuskan untuk menceraikan $fatherName atas permintaanmu!';
-                            widget.character.inbox.add(msg);
-                            _updateRelationship(15);
-                            _updateState();
-
-                            _showResultDialog(
-                              'Sukses 💔',
-                              'Ibumu menyetujui permintaanmu dan kini resmi menceraikan $fatherName.',
-                              Icons.done,
-                              Colors.green,
-                              () {
-                                Navigator.pop(screenContext);
-                              }
-                            );
-                          } else {
-                            _updateRelationship(-15);
-                            _updateState();
-                            _showResultDialog(
-                              'Ditolak 🚫',
-                              'Ibumu menolak untuk menceraikan $fatherName. Ia berkata bahwa ia mencintaimu, namun tidak bisa menceraikan pasangannya.',
-                              Icons.block,
-                              Colors.red,
-                              () {}
-                            );
-                          }
-                        },
-                        child: const Text('Ya, Minta', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                      ),
-                    ],
-                  ),
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge',
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'Minta Cerai',
+                  onActionComplete: _updateState,
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  targetGender: _getTargetGender(),
                 );
               },
             ));
@@ -3751,69 +3642,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           backgroundColor: Colors.blue.shade100,
                           radius: 28,
                           child: Image(
-                            image: AvatarImageCache.getImageProvider(
-                              AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
-                                name: _getPlainTargetName(),
-                                gender: _getTargetGender(),
-                                age: targetAge,
-                                happiness: relationshipVal,
-                                forcedSkinColor: () {
-                                  final String plainName = _getPlainTargetName().toLowerCase().trim();
-                                  final String rawName = widget.targetName.toLowerCase().trim();
-                                  if (widget.character.motherName != null) {
-                                    final String mName = widget.character.motherName!.toLowerCase().trim();
-                                    if (plainName.contains(mName) || rawName.contains(mName) || mName.contains(plainName)) {
-                                      return widget.character.motherSkinColor;
-                                    }
-                                  }
-                                  if (widget.character.fatherName != null) {
-                                    final String fName = widget.character.fatherName!.toLowerCase().trim();
-                                    if (plainName.contains(fName) || rawName.contains(fName) || fName.contains(plainName)) {
-                                      return widget.character.fatherSkinColor;
-                                    }
-                                  }
-                                  if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-                                    return widget.character.partner!['skinColor'];
-                                  }
-                                  if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-                                    return widget.character.secondPartner!['skinColor'];
-                                  }
-                                  if (widget.character.thirdPartner != null && widget.character.thirdPartner!['name']!.toLowerCase().contains(plainName)) {
-                                    return widget.character.thirdPartner!['skinColor'];
-                                  }
-                                  if (widget.character.fourthPartner != null && widget.character.fourthPartner!['name']!.toLowerCase().contains(plainName)) {
-                                    return widget.character.fourthPartner!['skinColor'];
-                                  }
-                                  if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name']!.toLowerCase().contains(plainName)) {
-                                    return widget.character.fifthPartner!['skinColor'];
-                                  }
-                                  // Lookup NPC skinColor from lists
-                                  final List<List<Map<String, dynamic>>> allLists = [
-                                    widget.character.friends,
-                                    widget.character.classmates,
-                                    widget.character.univClassmates,
-                                    widget.character.coworkers,
-                                    widget.character.siblings,
-                                    widget.character.extendedFamily,
-                                    widget.character.children,
-                                    widget.character.idolTrainees,
-                                    widget.character.idolMainMembers,
-                                    widget.character.idolStaff,
-                                  ];
-                                  for (var list in allLists) {
-                                    for (var item in list) {
-                                      final String n = (item['name'] ?? '').toString().toLowerCase().trim();
-                                      if (n.isNotEmpty && (plainName.contains(n) || n.contains(plainName) || rawName.contains(n))) {
-                                        if (item['skinColor'] != null && item['skinColor'].toString().isNotEmpty) {
-                                          return item['skinColor'].toString();
-                                        }
-                                      }
-                                    }
-                                  }
-                                  return null;
-                                }(),
-                              ),
-                            ),
+                            image: AvatarImageCache.getImageProvider(_getTargetAvatarUrl()),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return const SizedBox(

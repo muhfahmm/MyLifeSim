@@ -4,6 +4,82 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'age_base.dart';
 
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
+
+// Gunakan helper yang sama dari age_12_plus
+void _showPickerBottomSheet6({
+  required BuildContext context,
+  required String title,
+  required IconData titleIcon,
+  required Color titleColor,
+  required List<Map<String, dynamic>> options,
+  required void Function(String value) onPicked,
+}) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) {
+      return Container(
+        decoration: const BoxDecoration(
+          color: Color(0xFF1E1E2E),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        ),
+        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40, height: 4,
+              decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+            ),
+            const SizedBox(height: 16),
+            Row(children: [
+              Icon(titleIcon, color: titleColor, size: 22),
+              const SizedBox(width: 10),
+              Text(title, style: TextStyle(color: titleColor, fontSize: 17, fontWeight: FontWeight.bold)),
+            ]),
+            const SizedBox(height: 16),
+            Flexible(
+              child: GridView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: 3.2,
+                  crossAxisSpacing: 10, mainAxisSpacing: 10,
+                ),
+                itemCount: options.length,
+                itemBuilder: (_, i) {
+                  final opt = options[i];
+                  final Color c = opt['color'] as Color? ?? Colors.blue;
+                  return InkWell(
+                    onTap: () { Navigator.pop(ctx); onPicked(opt['value'] as String); },
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: c.withAlpha(30), borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: c.withAlpha(80)),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      child: Row(children: [
+                        Icon(opt['icon'] as IconData? ?? Icons.circle, color: c, size: 18),
+                        const SizedBox(width: 8),
+                        Expanded(child: Text(opt['label'] as String,
+                          style: TextStyle(color: c, fontSize: 13, fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis)),
+                      ]),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
+}
+
 List<ActionItem> getAge6to11Actions(
   BuildContext context,
   Character character,
@@ -12,347 +88,199 @@ List<ActionItem> getAge6to11Actions(
   Random random,
   Function(String title, String message, IconData icon, Color color, VoidCallback onConfirm) showDialogCallback,
   Function(int change) updateRelationship,
-  VoidCallback updateState,
-) {
-  final String relation = targetName.split(' ')[0];
-
-  // --- Helper untuk meminta barang ---
-  void _requestItem(String itemName, int successRate, int happinessGain, int relationshipGain) {
-    final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-        character.fatherName != null &&
-        targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-        character.isAnyPartnerNameMatching(targetName);
-
-    final int actualRate = isDatingFather ? 90 : successRate;
-
-    if (random.nextInt(100) < actualRate) {
-      int relBonus = relationshipGain + random.nextInt(4);
-      showDialogCallback(
-        'Berhasil Mendapatkan $itemName!',
-        '$relation membelikanmu $itemName yang kamu inginkan. Kamu sangat senang! (+${relBonus.abs()}% hubungan)',
-        Icons.check_circle, Colors.green, () {
-          character.happiness = (character.happiness + happinessGain).clamp(0, 100);
-          updateRelationship(relBonus);
-          updateState();
-        }
-      );
-    } else {
-      int relPenalty = random.nextInt(6) + 5; // 5–10%
-      showDialogCallback(
-        'Permintaan Ditolak',
-        '$relation menolak membelikan $itemName untukmu. Hubunganmu merenggang (-$relPenalty%).',
-        Icons.block, Colors.red, () {
-          character.happiness = (character.happiness - 5).clamp(0, 100);
-          updateRelationship(-relPenalty);
-          updateState();
-        }
-      );
-    }
+  VoidCallback updateState, {
+  String? targetAvatarUrl,
+  String? playerAvatarUrl,
+  int? targetAge,
+  String? targetGender,
+}) {
+  void triggerVN(String actionType) {
+    PercakapanDispatcher.dispatchAction(
+      context: context,
+      character: character,
+      targetName: targetName,
+      targetRole: targetRole,
+      targetAge: targetAge != null ? '$targetAge tahun' : '6Tahun',
+      targetRealAge: targetAge,
+      targetGender: targetGender,
+      targetAvatarUrl: targetAvatarUrl,
+      playerAvatarUrl: playerAvatarUrl,
+      relationshipValue: 50,
+      actionType: actionType,
+      onActionComplete: updateState,
+    );
   }
 
-  // --- Daftar aksi interaksi (menu yang sudah ada tetap dipertahankan) ---
-  return [
-    // 1. Minta Uang Saku
+  final String cleanRole = targetRole.toLowerCase();
+  final String cleanName = targetName.toLowerCase();
+  final bool isSiblingTarget = character.siblings.any((sib) =>
+          '${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) ||
+      cleanRole.contains('saudara') ||
+      cleanRole.contains('kandung') ||
+      cleanRole.contains('tiri') ||
+      cleanName.contains('adik');
+
+  final List<ActionItem> actions = [
     ActionItem(
       label: 'Minta Uang Saku',
       icon: Icons.monetization_on,
       color: Colors.amber,
-      onTap: () {
-        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-            character.fatherName != null &&
-            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-            character.isAnyPartnerNameMatching(targetName);
-
-        final bool accepted = isDatingFather ? (random.nextInt(100) < 90) : random.nextBool();
-
-        if (accepted) {
-          int gotMoney = random.nextInt(10) + 1; // 1-10 $
-          if (isDatingFather) {
-            gotMoney = (gotMoney * 1.5).round(); // uangnya naik 50%
-          }
-          int relBonus = random.nextInt(6) + 5;
-          showDialogCallback(
-            'Dapat Uang Saku!',
-            '$relation memberimu uang saku sebesar \$$gotMoney! (+$relBonus% hubungan, +10% kebahagiaan).',
-            Icons.monetization_on, Colors.green, () {
-              character.money += gotMoney;
-              character.happiness = (character.happiness + 10).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(5) + 1;
-          showDialogCallback(
-            'Uang Saku Ditolak',
-            '$relation tidak memberimu uang saku kali ini. Hubunganmu merenggang (-$relPenalty%).',
-            Icons.money_off, Colors.red, () {
-              character.happiness = (character.happiness - 2).clamp(0, 100);
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
-      },
+      onTap: () => triggerVN('Minta Uang Saku'),
     ),
-
-    // 2. Minta Sepeda
     ActionItem(
       label: 'Minta Sepeda',
       icon: Icons.directions_bike,
       color: Colors.green,
-      onTap: () {
-        if (random.nextBool()) {
-          int relBonus = random.nextInt(6) + 10;
-          showDialogCallback(
-            'Minta Sepeda Sukses!',
-            '$relation membelikanmu sepeda baru! Hubunganmu membaik (+$relBonus%, +20% kebahagiaan).',
-            Icons.directions_bike, Colors.green, () {
-              character.happiness = (character.happiness + 20).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(4) + 2;
-          showDialogCallback(
-            'Minta Sepeda Gagal',
-            '$relation menolak permintaanmu. Hubunganmu merenggang (-$relPenalty%).',
-            Icons.block, Colors.red, () {
-              character.happiness = (character.happiness - 10).clamp(0, 100);
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
-      },
+      onTap: () => triggerVN('Minta Sepeda'),
     ),
-
-    // 3. Pujian
     ActionItem(
       label: 'Pujian',
       icon: Icons.thumb_up,
       color: Colors.blue,
       onTap: () {
-        int relBonus = random.nextInt(6) + 5;
-        showDialogCallback(
-          'Memberi Pujian',
-          'Kamu memuji $relation. Hubungan kalian menjadi lebih hangat! (+$relBonus% hubungan)',
-          Icons.thumb_up, Colors.blue, () {
-            character.happiness = (character.happiness + 10).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
+        _showPickerBottomSheet6(
+          context: context,
+          title: 'Pilih Topik Pujian',
+          titleIcon: Icons.thumb_up,
+          titleColor: Colors.blue,
+          options: [
+            {'label': 'Penampilan', 'icon': Icons.star, 'color': Colors.amber, 'value': 'Penampilan'},
+            {'label': 'Kebaikan', 'icon': Icons.thumb_up, 'color': Colors.blue, 'value': 'Kebaikan'},
+            {'label': 'Kepintaran', 'icon': Icons.psychology, 'color': Colors.purple, 'value': 'Kepintaran'},
+            {'label': 'Prestasi', 'icon': Icons.emoji_events, 'color': Colors.orange, 'value': 'Prestasi'},
+          ],
+          onPicked: (topik) => triggerVN('Pujian - $topik'),
         );
       },
     ),
-
-    // 4. Percakapan
-    ActionItem(
-      label: 'Percakapan',
-      icon: Icons.chat,
-      color: Colors.teal,
-      onTap: () {
-        int relBonus = random.nextInt(4) + 2;
-        showDialogCallback(
-          'Bercakap-cakap',
-          'Kamu mengobrol dengan $relation. Percakapan berjalan menyenangkan! (+$relBonus% hubungan)',
-          Icons.chat, Colors.teal, () {
-            character.happiness = (character.happiness + 5).clamp(0, 100);
-            character.intelligence = (character.intelligence + 2).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
-        );
-      },
-    ),
-
-    // 5. Hadiah
     ActionItem(
       label: 'Hadiah',
       icon: Icons.card_giftcard,
       color: Colors.pink,
       onTap: () {
-        int relBonus = random.nextInt(8) + 5;
-        showDialogCallback(
-          'Memberi Hadiah',
-          'Kamu memberikan hadiah kecil buatan sendiri. $relation sangat tersentuh! (+$relBonus% hubungan, +15% kebahagiaan)',
-          Icons.card_giftcard, Colors.pink, () {
-            character.happiness = (character.happiness + 15).clamp(0, 100);
-            updateRelationship(relBonus);
-            updateState();
-          }
+        _showPickerBottomSheet6(
+          context: context,
+          title: 'Pilih Hadiah',
+          titleIcon: Icons.card_giftcard,
+          titleColor: Colors.pink,
+          options: [
+            {'label': 'Lukisan', 'icon': Icons.brush, 'color': Colors.orange, 'value': 'Lukisan'},
+            {'label': 'Camilan', 'icon': Icons.cake, 'color': Colors.pink, 'value': 'Camilan'},
+            {'label': 'Kerajinan', 'icon': Icons.card_giftcard, 'color': Colors.purple, 'value': 'Kerajinan'},
+          ],
+          onPicked: (hadiah) => triggerVN('Hadiah - $hadiah'),
         );
       },
     ),
-
-    // 6. Menyinggung
     ActionItem(
       label: 'Menyinggung',
       icon: Icons.sentiment_very_dissatisfied,
       color: Colors.red,
       onTap: () {
-        int relPenalty = random.nextInt(11) + 5;
-        showDialogCallback(
-          'Menyinggung',
-          'Kamu mengatakan sesuatu yang kasar kepada $relation. Hubungan menjadi tegang (-$relPenalty% hubungan).',
-          Icons.sentiment_very_dissatisfied, Colors.red, () {
-            character.happiness = (character.happiness - 15).clamp(0, 100);
-            updateRelationship(-relPenalty);
-            updateState();
-          }
+        _showPickerBottomSheet6(
+          context: context,
+          title: 'Pilih Cara Menyinggung',
+          titleIcon: Icons.sentiment_very_dissatisfied,
+          titleColor: Colors.red,
+          options: [
+            {'label': 'Penampilan', 'icon': Icons.face, 'color': Colors.pink, 'value': 'Penampilan'},
+            {'label': 'Kepribadian', 'icon': Icons.psychology, 'color': Colors.purple, 'value': 'Kepribadian'},
+            {'label': 'Kebiasaan', 'icon': Icons.loop, 'color': Colors.brown, 'value': 'Kebiasaan'},
+            {'label': 'Nilai Sekolah', 'icon': Icons.school, 'color': Colors.orange, 'value': 'Nilai Sekolah'},
+          ],
+          onPicked: (topik) => triggerVN('Menyinggung - $topik'),
         );
       },
     ),
-
-    // 7. Pergi ke Bioskop Bersama
     ActionItem(
       label: 'Pergi ke Bioskop Bersama',
       icon: Icons.movie,
       color: Colors.deepPurple,
-      onTap: () {
-        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-            character.fatherName != null &&
-            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-            character.isAnyPartnerNameMatching(targetName);
-
-        final double rate = isDatingFather ? 0.80 : 0.75;
-        if (random.nextDouble() < rate) {
-          int relBonus = random.nextInt(6) + 10;
-          showDialogCallback(
-            'Menonton Bioskop',
-            'Kamu pergi menonton film bersama $relation. Sangat menyenangkan! (+$relBonus% hubungan, +18% kebahagiaan)',
-            Icons.movie, Colors.green, () {
-              character.happiness = (character.happiness + 18).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(6) + 5;
-          showDialogCallback(
-            'Ajakan Ditolak',
-            '$relation menolak ajakan menonton karena sedang sibuk (-$relPenalty% hubungan).',
-            Icons.block, Colors.red, () {
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
-      },
+      onTap: () => triggerVN('Pergi ke Bioskop Bersama'),
     ),
-
-    // 8. Habiskan Waktu Bersama
     ActionItem(
       label: 'Habiskan Waktu Bersama',
       icon: Icons.family_restroom,
       color: Colors.orange,
       onTap: () {
-        final bool isDatingFather = character.gender.toLowerCase() == 'perempuan' &&
-            character.fatherName != null &&
-            targetName.toLowerCase().contains(character.fatherName!.toLowerCase()) &&
-            character.isAnyPartnerNameMatching(targetName);
-
-        final double rate = isDatingFather ? 0.80 : 0.80; // set 80%
-        if (random.nextDouble() < rate) {
-          int relBonus = random.nextInt(5) + 8;
-          showDialogCallback(
-            'Bermain Bersama',
-            'Kamu bermain board game di ruang tamu bersama $relation (+$relBonus% hubungan, +12% kebahagiaan).',
-            Icons.family_restroom, Colors.orange, () {
-              character.happiness = (character.happiness + 12).clamp(0, 100);
-              updateRelationship(relBonus);
-              updateState();
-            }
-          );
-        } else {
-          int relPenalty = random.nextInt(6) + 5;
-          showDialogCallback(
-            'Ajakan Ditolak',
-            '$relation menolak diajak bermain (-$relPenalty% hubungan).',
-            Icons.block, Colors.red, () {
-              updateRelationship(-relPenalty);
-              updateState();
-            }
-          );
-        }
+        _showPickerBottomSheet6(
+          context: context,
+          title: 'Pilih Aktivitas Bersama',
+          titleIcon: Icons.family_restroom,
+          titleColor: Colors.orange,
+          options: [
+            {'label': 'Bermain di Taman', 'icon': Icons.sports_soccer, 'color': Colors.green, 'value': 'Bermain di Taman'},
+            {'label': 'Mewarnai', 'icon': Icons.palette, 'color': Colors.pink, 'value': 'Mewarnai'},
+            {'label': 'Dongeng', 'icon': Icons.menu_book, 'color': Colors.blue, 'value': 'Dongeng'},
+            {'label': 'Masak Bersama', 'icon': Icons.lunch_dining, 'color': Colors.orange, 'value': 'Masak Bersama'},
+          ],
+          onPicked: (aktivitas) => triggerVN('Habiskan Waktu Bersama - $aktivitas'),
+        );
       },
     ),
-
-    // ★ MENU BARU: Minta Barang (gunakan showDialog bawaan Flutter)
     ActionItem(
       label: 'Minta Barang',
       icon: Icons.shopping_bag,
       color: Colors.purple,
       onTap: () {
-        showDialog(
+        _showPickerBottomSheet6(
           context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Pilih Barang yang Diinginkan'),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  ListTile(
-                    leading: const Icon(Icons.shopping_bag, color: Colors.blue),
-                    title: const Text('Tas'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Tas', 70, 15, 5);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.directions_walk, color: Colors.orange),
-                    title: const Text('Sepatu'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Sepatu', 65, 10, 6);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.checkroom, color: Colors.purple),
-                    title: const Text('Jaket'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Jaket', 55, 12, 4);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.face, color: Colors.green),
-                    title: const Text('Topi'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Topi', 80, 8, 3);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.watch, color: Colors.amber),
-                    title: const Text('Jam Tangan'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Jam Tangan', 40, 20, 8);
-                    },
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.account_balance_wallet, color: Colors.brown),
-                    title: const Text('Dompet'),
-                    onTap: () {
-                      Navigator.pop(context);
-                      _requestItem('Dompet', 60, 10, 5);
-                    },
-                  ),
-                ],
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('Batal'),
-              ),
-            ],
-          ),
+          title: 'Pilih Barang yang Diminta',
+          titleIcon: Icons.shopping_bag,
+          titleColor: Colors.purple,
+          options: [
+            {'label': 'Tas', 'icon': Icons.shopping_bag, 'color': Colors.blue, 'value': 'Tas'},
+            {'label': 'Sepatu', 'icon': Icons.directions_walk, 'color': Colors.orange, 'value': 'Sepatu'},
+            {'label': 'Jaket', 'icon': Icons.checkroom, 'color': Colors.purple, 'value': 'Jaket'},
+            {'label': 'Topi', 'icon': Icons.face, 'color': Colors.green, 'value': 'Topi'},
+            {'label': 'Jam Tangan', 'icon': Icons.watch, 'color': Colors.amber, 'value': 'Jam Tangan'},
+            {'label': 'Dompet', 'icon': Icons.account_balance_wallet, 'color': Colors.brown, 'value': 'Dompet'},
+          ],
+          onPicked: (barang) => triggerVN('Minta Barang - $barang'),
         );
       },
     ),
   ];
-}
+
+  final bool isYoungerSiblingTarget = character.siblings.any((sib) =>
+          ('${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) &&
+          (sib['relation']?.toLowerCase().contains('adik') ?? false)) ||
+      cleanName.contains('adik') ||
+      cleanRole.contains('adik');
+
+  final bool isOlderSiblingTarget = character.siblings.any((sib) =>
+          ('${sib['name']} (${sib['relation']})'.toLowerCase() == cleanName ||
+          sib['name']!.toLowerCase() == cleanName ||
+          (sib['relation']?.toLowerCase().contains('kakak') ?? false)) &&
+          (sib['relation']?.toLowerCase().contains('kakak') ?? false)) ||
+      cleanName.contains('kakak') ||
+      cleanRole.contains('kakak');
+
+  if (isSiblingTarget) {
+    if (character.age < 10 && isYoungerSiblingTarget) {
+      actions.removeWhere((item) =>
+          item.label == 'Minta Mainan' ||
+          item.label.contains('Minta Uang') ||
+          item.label.contains('Minta Uang Saku') ||
+          item.label.contains('Bioskop'));
+    }
+
+    for (int i = 0; i < actions.length; i++) {
+      if (actions[i].label == 'Minta Pelukan' || actions[i].label == 'Berikan Pelukan') {
+        final String labelText = isOlderSiblingTarget ? 'Minta Pelukan' : (isYoungerSiblingTarget ? 'Berikan Pelukan' : actions[i].label);
+        actions[i] = ActionItem(
+          label: labelText,
+          icon: Icons.face,
+          color: Colors.pinkAccent,
+          onTap: () => triggerVN(labelText),
+        );
+      }
+    }
+  }
+
+  return actions;
+}

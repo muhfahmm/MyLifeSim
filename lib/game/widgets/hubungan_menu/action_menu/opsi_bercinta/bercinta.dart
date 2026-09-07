@@ -9,6 +9,8 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/p
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
+import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -282,9 +284,13 @@ class _BercintaScreenState extends State<BercintaScreen> {
     final bool isChild = widget.targetRole == 'Laki-laki' || widget.targetRole == 'Perempuan';
     final String partnerGender = _getPartnerGender().trim().toLowerCase();
 
-    int relationChange = 0;
-
     // --- LOGIKA KETAHUAN BERCINTA (SUPER KETAT) ---
+
+
+
+
+
+
     // Di Rumah: Pagi (50%), Siang (55%), Malam (20%)
     // Di Hotel: 20%
     if (success) {
@@ -310,8 +316,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       if (caughtChance > 0 && _random.nextInt(100) < caughtChance) {
         // Gagal karena ketahuan!
         success = false;
-        // Pinalti hubungan dengan target
-        relationChange = -(_random.nextInt(15) + 15); // -15% s/d -30%
+        int relationChange = -(_random.nextInt(15) + 15); // -15% s/d -30%
         // Buat detail penolakan khusus
         final String firstPartnerName = widget.character.partner?['name'] ?? 'pasanganmu';
         final String informantDesc = _chosenLocation.contains('Rumah') ? 'keluarga/tetangga' : 'petugas hotel';
@@ -324,7 +329,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
         // Pinalti hubungan dengan pacar utama jika ada dan tidak sedang berhubungan dengan pacar utama
         if (widget.character.partner != null && !isWithMainPartner) {
           int rel = int.tryParse(widget.character.partner!['relationship'] ?? '50') ?? 50;
-          widget.character.partner!['relationship'] = (rel - 25).clamp(0, 100).toString();
+          widget.character.partner!['relationship'] = (rel + relationChange).clamp(0, 100).toString();
         }
         widget.character.happiness = (widget.character.happiness - 20).clamp(0, 100);
         if (isWithMainPartner) {
@@ -366,27 +371,16 @@ class _BercintaScreenState extends State<BercintaScreen> {
         return; // Hentikan eksekusi make love lebih lanjut
       }
     }
-
-    relationChange = success
-        ? _random.nextInt(11) + 10
-        : -(_random.nextInt(5) + 1);
-
-    String title, message;
-    IconData icon;
-    Color color;
-    // Hanya perubahan state (happiness), TIDAK termasuk onActionComplete
-    // supaya screen tidak di-pop sebelum dialog kehamilan selesai
-    VoidCallback applyStateChange;
-
     final String relation = widget.targetName.split(' ')[0];
 
-    if (success) {
-      title = 'Momen Mesra';
-      message = '$relation menerima ajakanmu dengan hangat dan penuh gairah. Kalian menghabiskan waktu yang sangat intim $_chosenLocation pada waktu $_chosenTime! (+${relationChange.abs()}% hubungan)';
-      icon = Icons.favorite;
-      color = Colors.pink;
 
+
+    VoidCallback applyStateChange = () {};
+
+
+    if (success) {
       // Inbox log
+
       if (isChild) {
         widget.character.inbox.add(
           '📢 Aktivitas Real-time: Kamu baru saja melakukan hubungan intim (Make Love) dengan anakmu, ${widget.targetName} $_chosenLocation pada waktu $_chosenTime.'
@@ -509,43 +503,73 @@ class _BercintaScreenState extends State<BercintaScreen> {
       additionalText: addText.isNotEmpty ? addText : null,
       onComplete: () async {
         applyStateChange();
-        if (isPregnant || isPartnerPregnant) {
-          BeritahuKehamilanHelper.showTellOrNotDialog(
+
+        // Tampilkan Visual Novel Dialogue khusus Make Love
+        final Map<String, dynamic> npcMap = {
+          'name': widget.targetName,
+          'role': widget.targetRole,
+          'gender': partnerGender,
+          'age': '10Tahun',
+          'relationship': relationshipValue.toString(),
+        };
+
+        final vnNodes = AjakMakeLoveDialogue.getDialogue(
+          player: widget.character,
+          npc: npcMap,
+          chosenLocation: _chosenLocation,
+          chosenTime: _chosenTime,
+          useCondom: _useCondom ?? false,
+          isAccepted: success,
+        );
+
+        if (context.mounted) {
+          VNDialogueOverlay.show(
             context: context,
-            character: widget.character,
-            partnerName: widget.targetName,
-            partnerRole: widget.targetRole,
-            onComplete: () async {
-              if (_useCondom == false) {
-                final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
-                if (rel != null && rel.geneticRisk > 0 && context.mounted) {
-                  await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
+            player: widget.character,
+            npc: npcMap,
+            nodes: vnNodes,
+            onFinished: () async {
+              if (isPregnant || isPartnerPregnant) {
+                BeritahuKehamilanHelper.showTellOrNotDialog(
+                  context: context,
+                  character: widget.character,
+                  partnerName: widget.targetName,
+                  partnerRole: widget.targetRole,
+                  onComplete: () async {
+                    if (_useCondom == false) {
+                      final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
+                      if (rel != null && rel.geneticRisk > 0 && context.mounted) {
+                        await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
+                      }
+                    }
+
+                    if (success && _useCondom == false && context.mounted) {
+                      await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+                    }
+
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                    widget.onActionComplete.call();
+                  },
+                );
+              } else {
+                if (success && _useCondom == false && context.mounted) {
+                  await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
                 }
-              }
 
-              if (success && _useCondom == false && context.mounted) {
-                await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+                if (context.mounted) {
+                  Navigator.of(context).pop();
+                }
+                widget.onActionComplete.call();
               }
-
-              if (context.mounted) {
-                Navigator.of(context).pop();
-              }
-              widget.onActionComplete.call();
             },
           );
-        } else {
-          if (success && _useCondom == false && context.mounted) {
-            await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
-          }
-
-          if (context.mounted) {
-            Navigator.of(context).pop();
-          }
-          widget.onActionComplete.call();
         }
       },
     );
   }
+
 
   int _getTargetRelationship() {
     int currentSatisfaction = 50; // default fallback

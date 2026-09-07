@@ -37,6 +37,10 @@ import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_makelov
 import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_masturbasi.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
+import 'package:mylifesim/game/widgets/character_progression/character_progression_page.dart';
+import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -467,6 +471,15 @@ class _GameScreenState extends State<GameScreen> {
     });
 
     final random = Random();
+    // 35% peluang memicu keributan orang tua saat tambah hari (isDaily)
+    _character.checkParentArgumentTrigger(random, 35);
+    if (_character.pendingParentArgumentEvent != null) {
+      _checkParentArgumentEvent(() {
+        if (mounted) setState(() {});
+      });
+      return;
+    }
+
     // Panggil checkAndGenerateProposal dengan mode harian (isDaily: true)
     AjakanHandler.checkAndGenerateProposal(_character, random, isDaily: true);
     if (_character.activeProposal != null) {
@@ -519,14 +532,157 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _checkParentArgumentEvent(VoidCallback onDone) {
+    if (_character.pendingParentArgumentEvent != null) {
+      final info = Map<String, String>.from(_character.pendingParentArgumentEvent!);
+      _character.pendingParentArgumentEvent = null;
+
+      // Usia 0-5 tahun belum mengerti keributan orang tua, jadi lewati modalnya
+      if (_character.age <= 5) {
+        onDone();
+        return;
+      }
+
+      final String fName = info['fatherName'] ?? 'Ayah';
+      final String mName = info['motherName'] ?? 'Ibu';
+      final String fRole = info['fatherRole'] ?? 'Ayah';
+      final String mRole = info['motherRole'] ?? 'Ibu';
+      final int argCount = _character.parentArgumentCount;
+
+      final List<String> dialogOpenings = [
+        'Kamu mendengar pertengkaran sengit antara $fName ($fRole) dan $mName ($mRole) di rumah! Suasana rumah menjadi sangat panas.',
+        'Pertengkaran kembali pecah antara $fName ($fRole) dan $mName ($mRole)! Piring pecah dan bentakan terdengar hingga kamar.',
+        'Untuk kesekian kalinya (Ke-$argCount), $fName dan $mName berdebat hebat masalah rumah tangga di ruang tamu.',
+        'Suasana dingin dan saling sindir antara $fName dan $mName akhirnya meledak menjadi pertengkaran terbuka di rumah!',
+        'Keributan besar ke-$argCount melanda rumah! $fName dan $mName saling menyalahkan tanpa ada yang mau mengalah.',
+      ];
+
+      final String currentOpening = dialogOpenings[(argCount - 1).clamp(0, dialogOpenings.length - 1)];
+
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogCtx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
+              const SizedBox(width: 8),
+              Text('Keributan Orang Tua (#$argCount)! 💥', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
+          content: Text(
+            '$currentOpening\n\nApakah kamu ingin mencoba bicara dengan salah satu dari mereka?',
+            style: const TextStyle(fontSize: 14),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogCtx);
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: _character,
+                  targetName: fName,
+                  targetRole: fRole,
+                  targetAge: '${_character.fatherAge ?? 40}',
+                  relationshipValue: _character.fatherRelationship ?? 50,
+                  actionType: 'Minta Cerai',
+                  onActionComplete: () {
+                    if (mounted) setState(() {});
+                    onDone();
+                  },
+                );
+              },
+              child: Text('Bicara dengan $fRole ($fName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogCtx);
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: _character,
+                  targetName: mName,
+                  targetRole: mRole,
+                  targetAge: '${_character.motherAge ?? 38}',
+                  relationshipValue: _character.motherRelationship ?? 50,
+                  actionType: 'Minta Cerai',
+                  onActionComplete: () {
+                    if (mounted) setState(() {});
+                    onDone();
+                  },
+                );
+              },
+              child: Text('Bicara dengan $mRole ($mName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogCtx);
+                onDone();
+              },
+              child: const Text('Abaikan', style: TextStyle(color: Colors.grey)),
+            ),
+          ],
+        ),
+      );
+    } else {
+      onDone();
+    }
+  }
+
+  void _checkPendingDivorceFeedback(VoidCallback onDone) {
+    if (_character.pendingDivorceResult != null) {
+      final bool isDivorced = _character.pendingDivorceResult!;
+      _character.pendingDivorceResult = null; // Clear trigger after showing
+
+      if (isDivorced) {
+        // Langsung tampilkan modal hak asuh (pilih tinggal dengan siapa) TANPA DIALOG VN SAMA SEKALI!
+        final String fatherName = _character.fatherName ?? 'Ayah';
+        final String motherName = _character.motherName ?? 'Ibu';
+        _showCustodySelectionDialog(context, fatherName, motherName, onDone);
+      } else {
+        // Jika batal cerai, tampilkan pemberitahuan VN bahwa orang tua batal bercerai
+        final String parentName = _character.fatherName ?? _character.motherName ?? _character.stepFatherName ?? _character.stepMotherName ?? 'Orang Tua';
+        final Map<String, dynamic> npcMap = {
+          'name': parentName,
+          'role': 'Orang Tua',
+          'gender': 'Perempuan',
+          'relationship': (_character.motherRelationship ?? _character.fatherRelationship ?? 50).toString(),
+        };
+
+        final nodes = MintaCeraiDialogue.getDecisionDialogue(
+          player: _character,
+          npc: npcMap,
+          isDivorced: false,
+        );
+
+        VNDialogueOverlay.show(
+          context: context,
+          player: _character,
+          npc: npcMap,
+          nodes: nodes,
+          onFinished: () {
+            if (mounted) setState(() {});
+            onDone();
+          },
+        );
+      }
+    } else {
+      onDone();
+    }
+  }
+
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
   void _runAgeUpSequence(List<String> sicknessEvents, VoidCallback onFinish) {
     _handleSicknessSequence(sicknessEvents, () {
-      _checkAdikRequestMoney(() {
-        _checkSchoolEnrollmentOptions(() {
-          _checkChildrenEvents(() {
-            _checkGraduationOptions(() {
-              _checkEsportPromotion(onFinish);
+      _checkParentArgumentEvent(() {
+        _checkPendingDivorceFeedback(() {
+          _checkAdikRequestMoney(() {
+            _checkSchoolEnrollmentOptions(() {
+              _checkChildrenEvents(() {
+                _checkGraduationOptions(() {
+                  _checkEsportPromotion(onFinish);
+                });
+              });
             });
           });
         });
@@ -4248,6 +4404,30 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                         );
                       });
                     },
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => CharacterProgressionPage(character: _character),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.person_pin, color: Colors.amber),
+                    label: const Text(
+                      'Detail & Perkembangan Karakter 👤✨',
+                      style: TextStyle(fontWeight: FontWeight.bold),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo.shade900,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
                   ),
 
                   // --- STATUS KEHAMILAN (PERBAIKAN) ---
