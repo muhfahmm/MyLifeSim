@@ -1,8 +1,11 @@
 // lib/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart
 
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/dialog_user_laki/dialog_user_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/dialog_user_perempuan/dialog_user_perempuan_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/dialog_npc_laki/dialog_npc_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/dialog_npc_perempuan/dialog_npc_perempuan_makelove.dart';
 
 class AjakMakeLoveDialogue {
   static List<VNDialogueNode> getDialogue({
@@ -13,77 +16,110 @@ class AjakMakeLoveDialogue {
     bool useCondom = false,
     bool isAccepted = true,
   }) {
-    final String npcName = npc['name'] ?? 'Target';
-    final String condomInfo = useCondom ? ' (memakai pengaman/kondom)' : ' (tanpa pengaman)';
+    final bool isMalePlayer = player.gender.trim().toLowerCase() == 'laki-laki';
+    final String npcGender = (npc['gender'] ?? 'Perempuan').toString().trim().toLowerCase();
+    final bool isMaleNPC = npcGender == 'laki-laki';
 
+    // 1. Dialog Pembuka User
+    final List<VNDialogueNode> userOpeningNodes = isMalePlayer
+        ? DialogUserLakiMakeLove.getOpeningNodes(
+            player: player,
+            npc: npc,
+            chosenLocation: chosenLocation,
+            chosenTime: chosenTime,
+            useCondom: useCondom,
+          )
+        : DialogUserPerempuanMakeLove.getOpeningNodes(
+            player: player,
+            npc: npc,
+            chosenLocation: chosenLocation,
+            chosenTime: chosenTime,
+            useCondom: useCondom,
+          );
+
+    // 2. Jika ditolak oleh NPC
     if (!isAccepted) {
+      final VNDialogueNode rejectionNode = isMaleNPC
+          ? DialogNpcLakiMakeLove.getRejectionNode(
+              npc: npc,
+              chosenLocation: chosenLocation,
+              chosenTime: chosenTime,
+            )
+          : DialogNpcPerempuanMakeLove.getRejectionNode(
+              npc: npc,
+              chosenLocation: chosenLocation,
+              chosenTime: chosenTime,
+            );
+
       return [
-        VNDialogueNode(
-          speakerName: player.name,
-          dialogueText: '$npcName, maukah kita menghabiskan waktu berdua di $chosenLocation pada waktu $chosenTime$condomInfo? 🔥❤️',
-          emotion: VNEmotionType.blush,
-          isPlayerSpeaking: true,
-          outfit: VNOutfitType.casual,
-          background: VNBackgroundType.bedroom,
-        ),
-        VNDialogueNode(
-          speakerName: npcName,
-          dialogueText: 'Maaf ya... Sepertinya saat ini suasananya belum tepat untuk kita berhubungan di $chosenLocation saat $chosenTime. 😔',
-          emotion: VNEmotionType.sad,
-          outfit: VNOutfitType.casual,
-          background: VNBackgroundType.bedroom,
-          choices: [
-            VNChoiceOption(
-              text: '😔 "Baiklah, tidak apa-apa..."',
-              onSelect: (p, n) {
-                p.happiness = (p.happiness - 5).clamp(0, 100);
-              },
-            ),
-          ],
-        ),
+        ...userOpeningNodes,
+        rejectionNode,
       ];
     }
 
+    // 3. Pilihan Interaksi Keintiman User
+    void onChoiceSelected(int happinessBonus, int healthBonus) {
+      player.happiness = (player.happiness + happinessBonus).clamp(0, 100);
+      player.health = (player.health + healthBonus).clamp(0, 100);
+    }
+
+    final List<VNChoiceOption> intimacyChoices = isMalePlayer
+        ? DialogUserLakiMakeLove.getIntimacyChoices(
+            player: player,
+            npc: npc,
+            onChoiceSelected: onChoiceSelected,
+          )
+        : DialogUserPerempuanMakeLove.getIntimacyChoices(
+            player: player,
+            npc: npc,
+            onChoiceSelected: onChoiceSelected,
+          );
+
+    // 4. Node Penerimaan NPC
+    final VNDialogueNode npcAcceptanceNode = isMaleNPC
+        ? DialogNpcLakiMakeLove.getAcceptanceNode(
+            npc: npc,
+            chosenLocation: chosenLocation,
+            chosenTime: chosenTime,
+            intimacyChoices: intimacyChoices,
+          )
+        : DialogNpcPerempuanMakeLove.getAcceptanceNode(
+            npc: npc,
+            chosenLocation: chosenLocation,
+            chosenTime: chosenTime,
+            intimacyChoices: intimacyChoices,
+          );
+
+    // 5. Node Desahan User
+    final List<VNDialogueNode> playerMoanNodes = isMalePlayer
+        ? DialogUserLakiMakeLove.getMoanNodes(player: player, npc: npc)
+        : DialogUserPerempuanMakeLove.getMoanNodes(player: player, npc: npc);
+
+    // 6. Node Intim & Fade to Black NPC
+    final List<VNDialogueNode> intimacyNodes = isMaleNPC
+        ? DialogNpcLakiMakeLove.getIntimacyNodes(
+            player: player,
+            npc: npc,
+            playerMoanNodes: playerMoanNodes,
+          )
+        : DialogNpcPerempuanMakeLove.getIntimacyNodes(
+            player: player,
+            npc: npc,
+            playerMoanNodes: playerMoanNodes,
+          );
+
+    // 7. Node Aftercare NPC
+    final VNDialogueNode aftercareNode = isMaleNPC
+        ? DialogNpcLakiMakeLove.getAftercareNode(npc: npc)
+        : DialogNpcPerempuanMakeLove.getAftercareNode(npc: npc);
+
     return [
-      VNDialogueNode(
-        speakerName: player.name,
-        dialogueText: '$npcName, maukah kita menghabiskan waktu berdua di $chosenLocation pada waktu $chosenTime$condomInfo? 🔥❤️',
-        emotion: VNEmotionType.blush,
-        isPlayerSpeaking: true,
-        outfit: VNOutfitType.casual,
-        background: VNBackgroundType.bedroom,
-      ),
-      VNDialogueNode(
-        speakerName: npcName,
-        dialogueText: 'Aww... Tentu saja sayang. Pilihan waktu dan tempat di $chosenLocation saat $chosenTime sungguh pas. Mari kita nikmati momen ini bersama... 🔥💕',
-        emotion: VNEmotionType.blush,
-        outfit: VNOutfitType.casual,
-        background: VNBackgroundType.bedroom,
-        choices: [
-          VNChoiceOption(
-            text: '🔥 "Bercinta dengan mesra dan romantis..."',
-            onSelect: (p, n) {
-              p.happiness = (p.happiness + 25).clamp(0, 100);
-              p.health = (p.health + 2).clamp(0, 100);
-            },
-            nextNodeIndex: 2,
-          ),
-          VNChoiceOption(
-            text: '❤️ "Bermanja-manja dan berpelukan hangat..."',
-            onSelect: (p, n) {
-              p.happiness = (p.happiness + 20).clamp(0, 100);
-            },
-            nextNodeIndex: 2,
-          ),
-        ],
-      ),
-      VNDialogueNode(
-        speakerName: npcName,
-        dialogueText: 'Momen berdua di $chosenLocation tadi sungguh luar biasa dan membuat hubungan kita semakin erat! ❤️✨',
-        emotion: VNEmotionType.happy,
-        outfit: VNOutfitType.casual,
-        background: VNBackgroundType.bedroom,
-      ),
+      ...userOpeningNodes,
+      npcAcceptanceNode,
+      ...intimacyNodes,
+      aftercareNode,
     ];
   }
 }
+
+
