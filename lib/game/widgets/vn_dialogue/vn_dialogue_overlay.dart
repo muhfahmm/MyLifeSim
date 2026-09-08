@@ -159,7 +159,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
 
     final currentNode = widget.nodes[_currentIndex];
 
-    // Jika sedang ada pilihan jawaban, tidak bisa next otomatis dengan tap
+    // Hanya blokir jika ada PILIHAN BIASA (choices), bukan persistent dropdown
     if (currentNode.choices != null && currentNode.choices!.isNotEmpty) {
       return;
     }
@@ -169,7 +169,12 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     } else if (_currentIndex + 1 < widget.nodes.length) {
       _loadNode(_currentIndex + 1);
     } else {
-      _finishDialogue();
+      // Loop kembali dari siklus keintiman jika belum diakhiri user
+      if (widget.nodes.length > 2) {
+        _loadNode(2);
+      } else {
+        _finishDialogue();
+      }
     }
   }
 
@@ -199,6 +204,12 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
   Widget build(BuildContext context) {
     final currentNode = widget.nodes[_currentIndex];
     final bool hasChoices = currentNode.choices != null && currentNode.choices!.isNotEmpty;
+    final bool hasPersistentActions = 
+        (currentNode.persistentCiumChoices != null && currentNode.persistentCiumChoices!.isNotEmpty) ||
+        (currentNode.persistentPenetrasiChoices != null && currentNode.persistentPenetrasiChoices!.isNotEmpty) ||
+        (currentNode.persistentPosisiChoices != null && currentNode.persistentPosisiChoices!.isNotEmpty) ||
+        (currentNode.persistentOralChoices != null && currentNode.persistentOralChoices!.isNotEmpty) ||
+        (currentNode.persistentEjakulasiChoices != null && currentNode.persistentEjakulasiChoices!.isNotEmpty);
 
     return Material(
       color: Colors.black,
@@ -207,7 +218,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           // 1. Dynamic Background Layer
           _buildBackground(currentNode.background),
 
-          // 2. Fullscreen Tap Handler for Dialogue Progression (only active when no choices)
+          // 2. Fullscreen Tap Handler (aktif HANYA jika tidak ada choices biasa yang memblokir)
           if (!hasChoices)
             Positioned.fill(
               child: GestureDetector(
@@ -257,13 +268,22 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
 
-          // 5. Choice Decision Card Overlay (Jika ada Pilihan Jawaban)
+          // 5. Panel Dropdown Aksi Persisten (Ciuman & Penetrasi) - TIDAK memblokir Selanjutnya
+          if (hasPersistentActions)
+            Positioned(
+              top: 100,
+              left: 20,
+              right: 20,
+              child: _buildPersistentActionPanel(currentNode),
+            ),
+
+          // 5b. Choice Decision Card biasa (jika ada choices yang memblokir)
           if (hasChoices)
             Positioned(
               top: 100,
               left: 20,
               right: 20,
-              child: _buildChoiceCard(currentNode.choices!),
+              child: _buildChoiceCard(currentNode),
             ),
 
           // 6. Dialogue Box Bottom Component (Clickable to advance/finish dialogue)
@@ -271,16 +291,13 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             bottom: 0,
             left: 0,
             right: 0,
-            child: IgnorePointer(
-              ignoring: hasChoices,
-              child: SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: GestureDetector(
-                    onTap: _nextDialogue,
-                    behavior: HitTestBehavior.opaque,
-                    child: _buildDialogueBox(currentNode),
-                  ),
+            child: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: GestureDetector(
+                  onTap: _nextDialogue,
+                  behavior: HitTestBehavior.opaque,
+                  child: _buildDialogueBox(currentNode),
                 ),
               ),
             ),
@@ -350,6 +367,13 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                           _scheduleAutoNext();
                         }
                       },
+                    ),
+                    const SizedBox(width: 8),
+                    _buildControlButton(
+                      icon: Icons.check_circle_outline,
+                      label: 'Selesai',
+                      isActive: true,
+                      onTap: _finishDialogue,
                     ),
                     const SizedBox(width: 8),
                     _buildControlButton(
@@ -529,43 +553,82 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Speaker Name Tag Banner
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: style.badgeBgColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: style.badgeBorderColor,
-                width: 1.2,
+          // Speaker Name Tag Banner & Tombol Selanjutnya
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: style.badgeBgColor,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: style.badgeBorderColor,
+                    width: 1.2,
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: style.badgeBorderColor.withValues(alpha: 0.4),
+                      blurRadius: 6,
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      style.icon,
+                      size: 14,
+                      color: style.textColor,
+                    ),
+                    const SizedBox(width: 6),
+                    Text(
+                      node.speakerName,
+                      style: TextStyle(
+                        color: style.textColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                        letterSpacing: 0.4,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: style.badgeBorderColor.withValues(alpha: 0.4),
-                  blurRadius: 6,
-                ),
-              ],
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  style.icon,
-                  size: 14,
-                  color: style.textColor,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  node.speakerName,
-                  style: TextStyle(
-                    color: style.textColor,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    letterSpacing: 0.4,
+              // Tombol Selanjutnya di samping Badge Narasi
+              InkWell(
+                onTap: _nextDialogue,
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.shade800,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.amber, width: 1.2),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Selanjutnya',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                      SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                    ],
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
           const SizedBox(height: 10),
           // Typewriter Dialogue Text
@@ -595,17 +658,323 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     );
   }
 
-  Widget _buildChoiceCard(List<VNChoiceOption> choices) {
+  /// Panel Dropdown PERSISTEN: Ciuman & Penetrasi
+  /// Panel ini selalu tampil tapi TIDAK memblokir tombol Selanjutnya.
+  Widget _buildPersistentActionPanel(VNDialogueNode node) {
+    final ciumChoices = node.persistentCiumChoices ?? [];
+    final penetrasiChoices = node.persistentPenetrasiChoices ?? [];
+    final posisiChoices = node.persistentPosisiChoices ?? [];
+    final oralChoices = node.persistentOralChoices ?? [];
+    final ejakulasiChoices = node.persistentEjakulasiChoices ?? [];
+    String? selectedCiumText;
+    String? selectedPenetrasiText;
+    String? selectedPosisiText;
+    String? selectedOralText;
+    String? selectedEjakulasiText;
+
+    return StatefulBuilder(
+      builder: (context, setStatePanel) {
+        return Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1E1E2E).withValues(alpha: 0.93),
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.6), width: 1.5),
+            boxShadow: const [
+              BoxShadow(color: Colors.black87, blurRadius: 14, spreadRadius: 1),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.touch_app, color: Colors.purpleAccent, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'Aksi Intim, Posisi & Ejakulasi:',
+                    style: TextStyle(
+                      color: Colors.purpleAccent,
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // --- Dropdown Ciuman ---
+              if (ciumChoices.isNotEmpty) ...[
+                const Text(
+                  '💋 Ciuman:',
+                  style: TextStyle(color: Colors.pinkAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.indigo.shade900,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.pinkAccent.withValues(alpha: 0.7), width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedCiumText,
+                      hint: const Text(
+                        '-- Pilih bagian untuk dicium --',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      dropdownColor: const Color(0xFF181825),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.pinkAccent),
+                      items: ciumChoices.map((c) {
+                        return DropdownMenuItem<String>(
+                          value: c.text,
+                          child: Text(
+                            c.text,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val == null) return;
+                        setStatePanel(() { selectedCiumText = val; });
+                        final chosen = ciumChoices.firstWhere((e) => e.text == val);
+                        if (chosen.onSelect != null) {
+                          chosen.onSelect!(widget.player, widget.npc);
+                        }
+                        if (chosen.nextNodeIndex != null) {
+                          _loadNode(chosen.nextNodeIndex!);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+
+              // --- Dropdown Oral Seks ---
+              if (oralChoices.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  '👅 Oral Seks:',
+                  style: TextStyle(color: Colors.purpleAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.shade900.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.7), width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedOralText,
+                      hint: const Text(
+                        '-- Pilih Aksi Oral Seks 👅 --',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      dropdownColor: const Color(0xFF181825),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.purpleAccent),
+                      items: oralChoices.map((c) {
+                        return DropdownMenuItem<String>(
+                          value: c.text,
+                          child: Text(
+                            c.text,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val == null) return;
+                        setStatePanel(() { selectedOralText = val; });
+                        final chosen = oralChoices.firstWhere((e) => e.text == val);
+                        if (chosen.onSelect != null) {
+                          chosen.onSelect!(widget.player, widget.npc);
+                        }
+                        if (chosen.nextNodeIndex != null) {
+                          _loadNode(chosen.nextNodeIndex!);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+
+              // --- Dropdown Penetrasi ---
+              if (penetrasiChoices.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  '🔥 Penetrasi:',
+                  style: TextStyle(color: Colors.orangeAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.deepOrange.shade900.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.orangeAccent.withValues(alpha: 0.7), width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedPenetrasiText,
+                      hint: const Text(
+                        '-- Pilih jalur penetrasi --',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      dropdownColor: const Color(0xFF181825),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.orangeAccent),
+                      items: penetrasiChoices.map((c) {
+                        return DropdownMenuItem<String>(
+                          value: c.text,
+                          child: Text(
+                            c.text,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val == null) return;
+                        setStatePanel(() { selectedPenetrasiText = val; });
+                        final chosen = penetrasiChoices.firstWhere((e) => e.text == val);
+                        if (chosen.onSelect != null) {
+                          chosen.onSelect!(widget.player, widget.npc);
+                        }
+                        if (chosen.nextNodeIndex != null) {
+                          _loadNode(chosen.nextNodeIndex!);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+
+              // --- Dropdown Posisi Seks (Khusus User Laki-laki) ---
+              if (posisiChoices.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  '🛌 Posisi Seks:',
+                  style: TextStyle(color: Colors.tealAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.teal.shade900.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.tealAccent.withValues(alpha: 0.7), width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedPosisiText,
+                      hint: const Text(
+                        '-- Pilih Posisi Seks 🛌 --',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      dropdownColor: const Color(0xFF181825),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.tealAccent),
+                      items: posisiChoices.map((c) {
+                        return DropdownMenuItem<String>(
+                          value: c.text,
+                          child: Text(
+                            c.text,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val == null) return;
+                        setStatePanel(() { selectedPosisiText = val; });
+                        final chosen = posisiChoices.firstWhere((e) => e.text == val);
+                        if (chosen.onSelect != null) {
+                          chosen.onSelect!(widget.player, widget.npc);
+                        }
+                        if (chosen.nextNodeIndex != null) {
+                          _loadNode(chosen.nextNodeIndex!);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+
+              // --- Dropdown Ejakulasi / Klimaks (Khusus User Laki-laki) ---
+              if (ejakulasiChoices.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                const Text(
+                  '💦 Lokasi Ejakulasi / Klimaks:',
+                  style: TextStyle(color: Colors.lightBlueAccent, fontSize: 11, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 4),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: Colors.lightBlue.shade900.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.lightBlueAccent.withValues(alpha: 0.7), width: 1),
+                  ),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<String>(
+                      value: selectedEjakulasiText,
+                      hint: const Text(
+                        '-- Pilih Lokasi Pengeluaran Ejakulasi 💦 --',
+                        style: TextStyle(color: Colors.white60, fontSize: 11),
+                      ),
+                      dropdownColor: const Color(0xFF181825),
+                      isExpanded: true,
+                      icon: const Icon(Icons.arrow_drop_down, color: Colors.lightBlueAccent),
+                      items: ejakulasiChoices.map((c) {
+                        return DropdownMenuItem<String>(
+                          value: c.text,
+                          child: Text(
+                            c.text,
+                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 11),
+                          ),
+                        );
+                      }).toList(),
+                      onChanged: (val) {
+                        if (val == null) return;
+                        setStatePanel(() { selectedEjakulasiText = val; });
+                        final chosen = ejakulasiChoices.firstWhere((e) => e.text == val);
+                        if (chosen.onSelect != null) {
+                          chosen.onSelect!(widget.player, widget.npc);
+                        }
+                        if (chosen.nextNodeIndex != null) {
+                          _loadNode(chosen.nextNodeIndex!);
+                        }
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildChoiceCard(VNDialogueNode node) {
+    final choices = node.choices ?? [];
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade900.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(16),
+        color: const Color(0xFF1E1E2E).withValues(alpha: 0.96),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.amber, width: 2),
         boxShadow: const [
           BoxShadow(
             color: Colors.black87,
-            blurRadius: 15,
+            blurRadius: 16,
+            spreadRadius: 2,
           ),
         ],
       ),
@@ -613,61 +982,64 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Pilih Pilihan Jawabanmu:',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.amber,
-              fontSize: 13,
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
+          const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.touch_app, color: Colors.amber, size: 20),
+              SizedBox(width: 8),
+              Text(
+                'Pilih Aksi / Tindakan Intim:',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.amber,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 1.1,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 12),
-          ...choices.map((c) => Padding(
-                padding: const EdgeInsets.only(bottom: 8.0),
-                child: GestureDetector(
-                  onTap: () {
-                    if (c.onSelect != null) {
-                      c.onSelect!(widget.player, widget.npc);
-                    }
-                    if (c.nextNodeIndex != null) {
-                      _loadNode(c.nextNodeIndex!);
-                    } else {
-                      _finishDialogue();
-                    }
-                  },
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.indigo.shade800,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: Colors.amber.withValues(alpha: 0.8), width: 1.5),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Colors.black45,
-                          blurRadius: 4,
-                          offset: Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Text(
-                      c.text,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+          const SizedBox(height: 14),
+          ...choices.map((c) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 10.0),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF312E81),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: const BorderSide(color: Colors.amber, width: 1.2),
+                  ),
+                  elevation: 4,
+                ),
+                onPressed: () {
+                  if (c.onSelect != null) {
+                    c.onSelect!(widget.player, widget.npc);
+                  }
+                  if (c.nextNodeIndex != null) {
+                    _loadNode(c.nextNodeIndex!);
+                  } else {
+                    _nextDialogue();
+                  }
+                },
+                child: Text(
+                  c.text,
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
                   ),
                 ),
-              )),
+              ),
+            );
+          }),
         ],
       ),
     );
   }
+
 
   Widget _buildControlButton({
     required IconData icon,

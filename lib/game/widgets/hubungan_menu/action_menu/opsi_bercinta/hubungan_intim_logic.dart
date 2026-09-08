@@ -4,6 +4,36 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 
 class HubunganIntimLogic {
+  /// Mengambil tingkat kepuasan / hubungan saat ini dengan target
+  static int getRelationshipValue(Character character, String targetName) {
+    if (character.partner != null && character.partner!['name'] == targetName) {
+      return int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
+    }
+    if (character.secondPartner != null && character.secondPartner!['name'] == targetName) {
+      return int.tryParse(character.secondPartner!['relationship'] ?? '50') ?? 50;
+    }
+    if (character.thirdPartner != null && character.thirdPartner!['name'] == targetName) {
+      return int.tryParse(character.thirdPartner!['relationship'] ?? '50') ?? 50;
+    }
+    if (character.fourthPartner != null && character.fourthPartner!['name'] == targetName) {
+      return int.tryParse(character.fourthPartner!['relationship'] ?? '50') ?? 50;
+    }
+    if (character.fifthPartner != null && character.fifthPartner!['name'] == targetName) {
+      return int.tryParse(character.fifthPartner!['relationship'] ?? '50') ?? 50;
+    }
+    for (var sib in character.siblings) {
+      if (sib['name'] == targetName || '${sib['name']} (${sib['relation']})' == targetName) {
+        return int.tryParse(sib['relationship'] ?? '50') ?? 50;
+      }
+    }
+    for (var ext in character.extendedFamily) {
+      if (ext['name'] == targetName) {
+        return int.tryParse(ext['relationship'] ?? '50') ?? 50;
+      }
+    }
+    return 50;
+  }
+
   /// Mengambil jenis kelamin pasangan/target berdasarkan nama
   static String getPartnerGender(String targetName) {
     if (targetName.startsWith('Ayah')) return 'Laki-laki';
@@ -42,27 +72,28 @@ class HubunganIntimLogic {
   }
 
   /// Memeriksa kesediaan awal (willingness) berdasarkan status kepuasan hubungan (satisfaction)
-  /// Mengembalikan Map yang berisi 'isWilling' (bool) dan 'rejectReason' (String)
+  /// Jika hubungan > 60%, NPC otomatis mau dan tidak boleh menolak.
   static Map<String, dynamic> checkInitialWillingness({
     required String myGender,
     required String partnerGender,
     required int satisfaction,
     required Random random,
   }) {
+    // Jika tingkat hubungan 60% ke atas, otomatis mau!
+    if (satisfaction >= 60) {
+      return {
+        'isWilling': true,
+        'rejectReason': '',
+      };
+    }
+
     final bool isHetero = myGender != partnerGender;
     bool isWilling = true;
     String rejectReason = '';
 
     if (isHetero) {
       final int roll = random.nextInt(100);
-      if (satisfaction >= 60) {
-        if (roll < 70) {
-          isWilling = true;
-        } else {
-          isWilling = false;
-          rejectReason = 'sedang tidak dalam mood yang baik meskipun hubungan kalian cukup dekat ($satisfaction%).';
-        }
-      } else if (satisfaction >= 50) {
+      if (satisfaction >= 50) {
         if (roll < 50) {
           isWilling = true;
         } else {
@@ -89,6 +120,7 @@ class HubunganIntimLogic {
   }
 
   /// Menghitung keberhasilan aksi berhubungan seksual berdasarkan relasi keluarga / tipe hubungan
+  /// Jika hubungan > 60%, NPC otomatis mau dan tidak boleh menolak.
   static bool calculateMakeLoveSuccess({
     required Character character,
     required String myGender,
@@ -101,6 +133,13 @@ class HubunganIntimLogic {
     String? custodyParent,
     bool isAlreadyPartner = false,
   }) {
+    final int satisfaction = getRelationshipValue(character, targetName);
+    
+    // Jika tingkat hubungan > 60%, otomatis mau (100% penerimaan)!
+    if (satisfaction > 60 || (satisfaction >= 60)) {
+      return true;
+    }
+
     // Jika sudah menjadi pacar → 80% penerimaan
     if (isAlreadyPartner) {
       return random.nextInt(100) < 80;

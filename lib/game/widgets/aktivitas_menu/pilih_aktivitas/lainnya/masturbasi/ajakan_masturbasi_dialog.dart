@@ -5,7 +5,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'efek_samping.dart';
 import 'masturbate_enjoyment.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
 
 // ============================================================
 // MODEL DATA LOKASI & WAKTU

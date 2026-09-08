@@ -32,8 +32,22 @@ class VNDialogueNode {
   final VNOutfitType outfit;
   final bool isPlayerSpeaking;
   final VNBackgroundType background;
+  /// Pilihan yang MEMBLOKIR tombol selanjutnya (misal: pilihan cerita biasa)
   final List<VNChoiceOption>? choices;
+  /// [Deprecated gunakan persistentCiumChoices / persistentPenetrasiChoices]
+  final List<VNChoiceOption>? secondaryChoices;
   final int? nextIndex;
+
+  /// Dropdown Ciuman yang PERSISTEN (tidak memblokir tombol selanjutnya)
+  final List<VNChoiceOption>? persistentCiumChoices;
+  /// Dropdown Penetrasi yang PERSISTEN (tidak memblokir tombol selanjutnya)
+  final List<VNChoiceOption>? persistentPenetrasiChoices;
+  /// Dropdown Posisi Seks yang PERSISTEN (khusus User Laki-laki)
+  final List<VNChoiceOption>? persistentPosisiChoices;
+  /// Dropdown Oral Seks yang PERSISTEN (Cunnilingus untuk Laki-laki, Fellatio untuk Perempuan)
+  final List<VNChoiceOption>? persistentOralChoices;
+  /// Dropdown Ejakulasi / Klimaks yang PERSISTEN (khusus User Laki-laki)
+  final List<VNChoiceOption>? persistentEjakulasiChoices;
 
   VNDialogueNode({
     required this.speakerName,
@@ -43,7 +57,13 @@ class VNDialogueNode {
     this.isPlayerSpeaking = false,
     this.background = VNBackgroundType.cafe,
     this.choices,
+    this.secondaryChoices,
     this.nextIndex,
+    this.persistentCiumChoices,
+    this.persistentPenetrasiChoices,
+    this.persistentPosisiChoices,
+    this.persistentOralChoices,
+    this.persistentEjakulasiChoices,
   });
 }
 

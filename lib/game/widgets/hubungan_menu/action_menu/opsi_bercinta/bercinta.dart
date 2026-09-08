@@ -10,7 +10,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/kepuasan_bercinta.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -494,78 +494,80 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
     final int relationshipValue = _getTargetRelationship();
 
-    MLEnjoymentModal.show(
+    final Map<String, dynamic> npcMap = {
+      'name': widget.targetName,
+      'role': widget.targetRole,
+      'gender': partnerGender,
+      'age': '10Tahun',
+      'relationship': relationshipValue.toString(),
+    };
+
+    final vnNodes = AjakMakeLoveDialogue.getDialogue(
+      player: widget.character,
+      npc: npcMap,
+      chosenLocation: _chosenLocation,
+      chosenTime: _chosenTime,
+      useCondom: _useCondom ?? false,
+      isAccepted: success,
+    );
+
+    // Tampilkan Visual Novel Dialogue terlebih dahulu
+    VNDialogueOverlay.show(
       context: context,
-      character: widget.character,
-      partnerName: widget.targetName,
-      partnerRelation: widget.targetRole,
-      relationshipValue: relationshipValue,
-      additionalText: addText.isNotEmpty ? addText : null,
-      onComplete: () async {
-        applyStateChange();
+      player: widget.character,
+      npc: npcMap,
+      nodes: vnNodes,
+      onFinished: () async {
+        if (!context.mounted) return;
 
-        // Tampilkan Visual Novel Dialogue khusus Make Love
-        final Map<String, dynamic> npcMap = {
-          'name': widget.targetName,
-          'role': widget.targetRole,
-          'gender': partnerGender,
-          'age': '10Tahun',
-          'relationship': relationshipValue.toString(),
-        };
+        // Tampilkan Hasil Hubungan Intim SETELAH user menekan Selesai
+        MLEnjoymentModal.show(
+          context: context,
+          character: widget.character,
+          partnerName: widget.targetName,
+          partnerRelation: widget.targetRole,
+          relationshipValue: relationshipValue,
+          additionalText: addText.isNotEmpty ? addText : null,
+          onComplete: () async {
+            applyStateChange();
 
-        final vnNodes = AjakMakeLoveDialogue.getDialogue(
-          player: widget.character,
-          npc: npcMap,
-          chosenLocation: _chosenLocation,
-          chosenTime: _chosenTime,
-          useCondom: _useCondom ?? false,
-          isAccepted: success,
-        );
-
-        if (context.mounted) {
-          VNDialogueOverlay.show(
-            context: context,
-            player: widget.character,
-            npc: npcMap,
-            nodes: vnNodes,
-            onFinished: () async {
-              if (isPregnant || isPartnerPregnant) {
-                BeritahuKehamilanHelper.showTellOrNotDialog(
-                  context: context,
-                  character: widget.character,
-                  partnerName: widget.targetName,
-                  partnerRole: widget.targetRole,
-                  onComplete: () async {
-                    if (_useCondom == false) {
-                      final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
-                      if (rel != null && rel.geneticRisk > 0 && context.mounted) {
-                        await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
-                      }
+            if (isPregnant || isPartnerPregnant) {
+              if (!context.mounted) return;
+              BeritahuKehamilanHelper.showTellOrNotDialog(
+                context: context,
+                character: widget.character,
+                partnerName: widget.targetName,
+                partnerRole: widget.targetRole,
+                onComplete: () async {
+                  if (_useCondom == false) {
+                    final rel = detectIncestRelation(widget.character, widget.targetRole, widget.targetName);
+                    if (rel != null && rel.geneticRisk > 0 && context.mounted) {
+                      await showIncestGeneticModal(context, widget.targetName, widget.targetRole, rel.geneticRisk);
                     }
+                  }
 
-                    if (success && _useCondom == false && context.mounted) {
-                      await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
-                    }
+                  if (success && _useCondom == false && context.mounted) {
+                    await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
+                  }
 
-                    if (context.mounted) {
-                      Navigator.of(context).pop();
-                    }
-                    widget.onActionComplete.call();
-                  },
-                );
-              } else {
-                if (success && _useCondom == false && context.mounted) {
-                  await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
-                }
-
-                if (context.mounted) {
-                  Navigator.of(context).pop();
-                }
-                widget.onActionComplete.call();
+                  if (context.mounted) {
+                    Navigator.of(context).pop();
+                  }
+                  widget.onActionComplete.call();
+                },
+              );
+            } else {
+              if (success && _useCondom == false && context.mounted) {
+                await handleSTDCheck(context, widget.character, widget.targetRole, widget.targetName, _random);
               }
-            },
-          );
-        }
+
+              if (context.mounted) {
+                Navigator.of(context).pop();
+              }
+              widget.onActionComplete.call();
+            }
+          },
+        );
       },
     );
   }

@@ -39,8 +39,8 @@ import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_berteman/ajakan_bert
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/character_progression/character_progression_page.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/percakapan_menu/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
