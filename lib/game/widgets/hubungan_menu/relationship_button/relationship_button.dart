@@ -647,7 +647,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   // ============================================
                   const Text('👫 Saudara & Diri Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
-                  ...childrenList.map((child) {
+                  ...childrenList.where((child) => (child['age'] as int) >= 0).map((child) {
                     final bool isPlayer = child['isPlayer'] as bool;
                     final String name = child['name'] as String;
                     final String gender = child['gender'] as String;

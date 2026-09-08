@@ -293,7 +293,11 @@ class _GameScreenState extends State<GameScreen> {
                   const Divider(),
                   const Text('👧👦 Saudara:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                   const SizedBox(height: 8),
-                  ..._character.siblings.map((sib) {
+                  ..._character.siblings.where((sib) {
+                    final String sAge = sib['age'] ?? '0';
+                    final int sAgeVal = int.tryParse(sAge) ?? 0;
+                    return sAgeVal >= 0;
+                  }).map((sib) {
                     final String sName = sib['name'] ?? 'Saudara';
                     final String sRel = sib['relation'] ?? 'Saudara';
                     final String sAge = sib['age'] ?? '0';
@@ -309,7 +313,7 @@ class _GameScreenState extends State<GameScreen> {
                       forcedSkinColor: _character.getFamilyMemberSkinColor(sName) ?? sib['skinColor'],
                     );
 
-                    final String ageDisplay = sAgeVal < 0 ? 'Belum lahir' : 'Umur: $sAgeVal tahun';
+                    final String ageDisplay = 'Umur: $sAgeVal tahun';
                     return ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
