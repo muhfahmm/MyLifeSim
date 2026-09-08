@@ -293,6 +293,9 @@ class Character {
   // Hanya true jika user memilih ejakulasi 'vagina_dalam' tanpa kondom.
   bool didCreampieThisSession = false;
 
+  // --- POSISI SEKS AKTIF (Sesi Bercinta) ---
+  String? currentPosisiSeks;
+
   // --- DAFTAR ANAK ---
   List<Map<String, String>> children = []; // [{name: '...', gender: 'Laki-laki', relationship: '80', age: '0', father: '...', mother: '...', isDeceased: 'false'}]
 

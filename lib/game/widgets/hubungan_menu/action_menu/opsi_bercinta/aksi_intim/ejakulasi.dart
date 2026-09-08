@@ -50,6 +50,7 @@ class EjakulasiHelper {
     String targetRole = 'Pasangan',
   }) {
     final bool isPlayerMale = character.gender.trim().toLowerCase() == 'laki-laki';
+    final bool isGay = isPlayerMale && (targetGender.trim().toLowerCase() == 'laki-laki');
     final String maleName = isPlayerMale ? character.name : targetName;
     final String femaleName = isPlayerMale ? targetName : character.name;
 
@@ -79,10 +80,13 @@ class EjakulasiHelper {
 
     switch (ejakulasiId) {
       case 'vagina_dalam':
+        final String targetIntimDesc = isGay ? 'anus' : 'vagina';
+        final String targetIntimName = isGay ? 'saluran anusmu' : 'vaginamu';
+        final String targetIntimInside = isGay ? 'bagian anus' : 'bagian dalam vagina';
         nodes = [
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: '($maleName mengerang keras, mendorong sekuat tenaga hingga ke dasar vagina $femaleName dan melepaskan semburan benih hangatnya di dalam...) 💦',
+            dialogueText: '($maleName mengerang keras, mendorong sekuat tenaga hingga ke dasar $targetIntimDesc $femaleName dan melepaskan semburan benih hangatnya di dalam...) 💦',
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,
@@ -90,7 +94,7 @@ class EjakulasiHelper {
           ),
           VNDialogueNode(
             speakerName: maleName,
-            dialogueText: 'Ughhh... hah... hah... hangat sekali di dalam sana! Aku keluar sepenuhnya di dalam vaginamu $callFromMale... 🔥',
+            dialogueText: 'Ughhh... hah... hah... hangat sekali di dalam sana! Aku keluar sepenuhnya di dalam $targetIntimName $callFromMale... 🔥',
             emotion: VNEmotionType.happy,
             isPlayerSpeaking: isPlayerMale,
             outfit: VNOutfitType.casual,
@@ -106,7 +110,7 @@ class EjakulasiHelper {
           ),
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: '(Sensasi kehangatan cairan di dalam vagina memberikan kepuasan puncaknya bagi kedua pasangan...) ✨',
+            dialogueText: '(Sensasi kehangatan cairan di dalam $targetIntimInside memberikan kepuasan puncaknya bagi kedua pasangan...) ✨',
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,

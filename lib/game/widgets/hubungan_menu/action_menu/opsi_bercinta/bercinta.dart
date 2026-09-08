@@ -105,18 +105,17 @@ class _BercintaScreenState extends State<BercintaScreen> {
   void _showCondomDialog() {
     final String myGender = widget.character.gender.trim().toLowerCase();
     final String partnerGender = _getPartnerGender().trim().toLowerCase();
-    final bool isHetero = myGender != partnerGender; // Berbeda gender
+    final bool isHetero = myGender != partnerGender;
+    final bool isGay = myGender == 'laki-laki' && partnerGender == 'laki-laki';
 
     String riskInfo = '';
-    String whoGetsPregnant = '';
-    int ageMin = 0, ageMax = 0;
 
     if (isHetero) {
-      if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
-        whoGetsPregnant = 'Kamu hamil';
-        ageMin = 8; ageMax = 45;
-      } else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
-        whoGetsPregnant = 'Pasanganmu hamil';
+      final String whoGetsPregnant = myGender == 'perempuan' ? 'kamu hamil' : 'pasanganmu hamil';
+      int ageMin = 13, ageMax = 50;
+      if (myGender == 'perempuan') {
+        ageMin = 10; ageMax = 55;
+      } else {
         ageMin = 9; ageMax = 65;
       }
 
@@ -128,6 +127,8 @@ class _BercintaScreenState extends State<BercintaScreen> {
       } else {
         riskInfo = 'Jika TIDAK memakai pengaman: Risiko 0% karena usia saat ini (${widget.character.age} tahun) berada di luar masa subur. (Syarat: Minimal $ageMin - Maksimal $ageMax tahun)';
       }
+    } else if (isGay) {
+      riskInfo = '⚠️ Peringatan Kesehatan (Gay): Jika TIDAK memakai pengaman (kondom), terdapat 40% risiko terkena Penyakit Infeksi Menular Seksual (IMS) seperti HIV/AIDS, Sifilis, Gonore, atau HPV!';
     } else {
       riskInfo = 'Kombinasi gender: Kamu ($myGender) dan Pasangan ($partnerGender) -> Risiko hamil 0% (Tidak memungkinkan secara biologis).';
     }
@@ -136,20 +137,22 @@ class _BercintaScreenState extends State<BercintaScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Row(
+        title: Row(
           children: [
-            Icon(Icons.health_and_safety, color: Colors.blue, size: 28),
-            SizedBox(width: 8),
-            Text('Gunakan Pengaman?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Icon(Icons.health_and_safety, color: isGay ? Colors.redAccent : Colors.blue, size: 28),
+            const SizedBox(width: 8),
+            Text(isGay ? 'Gunakan Pengaman (IMS)?' : 'Gunakan Pengaman?', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Apa kamu ingin menggunakan kondom untuk mencegah kehamilan?',
-              style: TextStyle(fontSize: 14),
+            Text(
+              isGay
+                  ? 'Apakah kamu ingin menggunakan pengaman (kondom) untuk melindungi diri dari Infeksi Menular Seksual (IMS)?'
+                  : 'Apa kamu ingin menggunakan kondom untuk mencegah kehamilan?',
+              style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 12),
             Text(
@@ -160,13 +163,13 @@ class _BercintaScreenState extends State<BercintaScreen> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.blue.shade50,
+                color: isGay ? Colors.red.shade50 : Colors.blue.shade50,
                 borderRadius: BorderRadius.circular(8),
-                border: Border.all(color: Colors.blue.shade200),
+                border: Border.all(color: isGay ? Colors.red.shade300 : Colors.blue.shade200),
               ),
               child: Text(
                 riskInfo,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: Colors.blue),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isGay ? Colors.red.shade900 : Colors.blue),
               ),
             ),
           ],
@@ -478,6 +481,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
     // Ambil dan langsung reset flag agar tidak bocor ke sesi berikutnya
     final bool didCreampie = widget.character.didCreampieThisSession;
     widget.character.didCreampieThisSession = false;
+    widget.character.currentPosisiSeks = null;
 
     if (success && myGender != partnerGender && didCreampie) {
       if (_useCondom == true) {

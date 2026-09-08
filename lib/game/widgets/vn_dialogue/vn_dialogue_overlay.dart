@@ -1038,37 +1038,206 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           ),
           const SizedBox(height: 14),
           ...choices.map((c) {
+            String displayText = c.text;
+            if (displayText.contains('4. Posisi Seks') || displayText.contains('4. Pilih Posisi Seks')) {
+              final activePos = widget.player.currentPosisiSeks;
+              if (activePos != null && activePos.isNotEmpty) {
+                displayText = '4. Pilih Posisi Seks [$activePos] 🔄 (Ganti Posisi)';
+              }
+            }
+
+            final bool isGantiPosisi = displayText.contains('(Ganti Posisi)');
+            final String? activePos = widget.player.currentPosisiSeks?.toLowerCase();
+            bool isDisabledByPosisi = false;
+            String disabledReason = '';
+
+            if (activePos != null && activePos.isNotEmpty) {
+              final bool isCiuman = c.text.contains('1. Ciuman');
+              final bool isOral = c.text.contains('2. Oral Seks');
+              final bool isAskStimulasi = c.text.contains('5.');
+              final bool isDoStimulasi = c.text.contains('6.');
+              final bool isPayudara = c.text.contains('7.') && c.text.contains('payudara');
+
+              // 1. Doggy Style (Dari Belakang)
+              if (activePos.contains('doggy') || activePos.contains('belakang')) {
+                if (isCiuman) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Posisi membelakangi)';
+                } else if (isOral) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Wajah pasangan di belakang)';
+                } else if (isDoStimulasi) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Tidak terjangkau dari posisi Doggy)';
+                }
+              }
+              // 2. Face Sitting (Duduk di Wajah)
+              else if (activePos.contains('face sitting') || activePos.contains('duduk di wajah') || activePos.contains('wajah')) {
+                if (isCiuman) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Wajah sedang diduduki)';
+                } else if (isPayudara) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Dada tidak terjangkau)';
+                }
+              }
+              // 3. Posisi 69 (Oral Saling Berhadapan / Bersamaan)
+              else if (activePos.contains('69')) {
+                if (isCiuman) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Posisi kepala berbalik arah)';
+                } else if (isPayudara) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Kepala berada di area kemaluan)';
+                }
+              }
+              // 4. Scissoring (Gunting - Lesbian)
+              else if (activePos.contains('scissoring') || activePos.contains('gunting')) {
+                if (isCiuman) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Kaki saling mengunci)';
+                } else if (isOral) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Area intim sedang bergesekan)';
+                }
+              }
+              // 5. Tribadism / Saling Menindih
+              else if (activePos.contains('tribadism') || activePos.contains('menindih')) {
+                if (isOral) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Panggul saling menindih rapat)';
+                }
+              }
+              // 6. Reverse Cowgirl / Membelakangi
+              else if (activePos.contains('reverse') || activePos.contains('membelakangi')) {
+                if (isCiuman) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Membelakangi wajah pasangan)';
+                } else if (isPayudara) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Membelakangi dada pasangan)';
+                } else if (isDoStimulasi) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Membelakangi posisi pasangan)';
+                }
+              }
+              // 7. Cowgirl (Wanita di Atas - Menghadap Depan)
+              else if (activePos.contains('cowgirl') || activePos.contains('wanita di atas') || activePos.contains('duduk di atas')) {
+                if (isOral) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Sedang menunggangi)';
+                } else if (isDoStimulasi) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses saat Cowgirl)';
+                } else if (isPayudara) {
+                  final textLower = c.text.toLowerCase();
+                  if (textLower.contains('jilat') || textLower.contains('hisap') || textLower.contains('gigit')) {
+                    isDisabledByPosisi = true;
+                    disabledReason = ' 🚫 (Wajah terlalu jauh dari puting saat Cowgirl)';
+                  }
+                }
+              }
+              // 8. Standing / Against Wall (Berdiri / Menempel Dinding)
+              else if (activePos.contains('standing') || activePos.contains('dinding')) {
+                if (isDoStimulasi) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Tangan menopang tubuh)';
+                }
+              }
+              // 9. Spooning (Sendok / Menyamping)
+              else if (activePos.contains('spooning') || activePos.contains('sendok')) {
+                if (isOral) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses: Berbaring menyamping)';
+                } else if (isDoStimulasi) {
+                  isDisabledByPosisi = true;
+                  disabledReason = ' 🚫 (Tidak dapat diakses saat Spooning)';
+                } else if (isPayudara) {
+                  final textLower = c.text.toLowerCase();
+                  if (textLower.contains('jilat') || textLower.contains('hisap') || textLower.contains('gigit')) {
+                    isDisabledByPosisi = true;
+                    disabledReason = ' 🚫 (Posisi menyamping: Mulut tidak dapat menjangkau puting)';
+                  }
+                }
+              }
+            }
+
+            if (isDisabledByPosisi) {
+              displayText += disabledReason;
+            }
+
             return Padding(
               padding: const EdgeInsets.only(bottom: 10.0),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF312E81),
-                  foregroundColor: Colors.white,
+                  backgroundColor: isDisabledByPosisi
+                      ? Colors.grey.shade900.withValues(alpha: 0.7)
+                      : isGantiPosisi
+                          ? const Color(0xFF4C1D95)
+                          : const Color(0xFF312E81),
+                  foregroundColor: isDisabledByPosisi ? Colors.redAccent.shade100 : Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
-                    side: const BorderSide(color: Colors.amber, width: 1.2),
+                    side: BorderSide(
+                      color: isDisabledByPosisi
+                          ? Colors.red.shade900.withValues(alpha: 0.6)
+                          : isGantiPosisi
+                              ? Colors.pinkAccent
+                              : Colors.amber,
+                      width: isGantiPosisi ? 1.8 : 1.2,
+                    ),
                   ),
-                  elevation: 4,
+                  alignment: Alignment.centerLeft,
+                  elevation: isDisabledByPosisi ? 0 : 4,
                 ),
-                onPressed: () {
-                  if (c.onSelect != null) {
-                    c.onSelect!(widget.player, widget.npc);
-                  }
-                  if (c.nextNodeIndex != null) {
-                    _loadNode(c.nextNodeIndex!);
-                  } else {
-                    // nextNodeIndex == null means this is a terminal choice → finish
-                    _finishDialogue();
-                  }
-                },
-                child: Text(
-                  c.text,
-                  style: const TextStyle(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
+                onPressed: isDisabledByPosisi
+                    ? null
+                    : () {
+                        if (c.onSelect != null) {
+                          c.onSelect!(widget.player, widget.npc);
+                        }
+
+                        // Jika menekan tombol penetrasi (nomor 3) namun posisi seks belum dipilih:
+                        // Redirect terlebih dahulu ke Node 4 (Menu Pilih Posisi Seks)
+                        int? targetIndex = c.nextNodeIndex;
+                        final bool isPenetrasiOption = c.text.contains('3.') || c.text.contains('Penetrasi');
+                        if (isPenetrasiOption) {
+                          final bool hasSelectedPos = widget.player.currentPosisiSeks != null && widget.player.currentPosisiSeks!.isNotEmpty;
+                          if (!hasSelectedPos) {
+                            targetIndex = 4; // Index Node 4 adalah Menu Posisi Seks
+                          }
+                        }
+
+                        if (targetIndex != null) {
+                          _loadNode(targetIndex);
+                        } else {
+                          // nextNodeIndex == null means this is a terminal choice → finish
+                          _finishDialogue();
+                        }
+                      },
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _getChoiceIconWidget(c.text, isDisabledByPosisi),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _stripEmojiPrefix(displayText),
+                        textAlign: TextAlign.left,
+                        style: TextStyle(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                          color: isDisabledByPosisi
+                              ? Colors.redAccent.shade100
+                              : isGantiPosisi
+                                  ? Colors.amberAccent
+                                  : Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             );
@@ -1078,6 +1247,33 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     );
   }
 
+
+  Widget _getChoiceIconWidget(String rawText, bool isDisabled) {
+    final Color iconColor = isDisabled ? Colors.redAccent.shade100 : Colors.amber;
+    if (rawText.contains('1.') || rawText.toLowerCase().contains('ciuman')) {
+      return Icon(Icons.favorite, size: 18, color: iconColor);
+    } else if (rawText.contains('2.') || rawText.toLowerCase().contains('oral')) {
+      return Icon(Icons.record_voice_over, size: 18, color: iconColor);
+    } else if (rawText.contains('3.') || rawText.toLowerCase().contains('penetrasi')) {
+      return Icon(Icons.flash_on, size: 18, color: iconColor);
+    } else if (rawText.contains('4.') || rawText.toLowerCase().contains('posisi')) {
+      return Icon(Icons.accessibility_new, size: 18, color: iconColor);
+    } else if (rawText.contains('5.') || rawText.toLowerCase().contains('stimulasi')) {
+      return Icon(Icons.front_hand, size: 18, color: iconColor);
+    } else if (rawText.contains('6.') || rawText.toLowerCase().contains('onani') || rawText.toLowerCase().contains('fingering')) {
+      return Icon(Icons.touch_app, size: 18, color: iconColor);
+    } else if (rawText.contains('7.') && (rawText.toLowerCase().contains('payudara') || rawText.toLowerCase().contains('dada'))) {
+      return Icon(Icons.favorite_border, size: 18, color: iconColor);
+    } else if (rawText.contains('8.') || rawText.toLowerCase().contains('ejakulasi') || rawText.toLowerCase().contains('klimaks')) {
+      return Icon(Icons.water_drop, size: 18, color: iconColor);
+    }
+    return Icon(Icons.play_arrow, size: 18, color: iconColor);
+  }
+
+  String _stripEmojiPrefix(String text) {
+    // Strip common emojis at the start of text options
+    return text.replaceAll(RegExp(r'^[\u{1F300}-\u{1F9FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\s]+', unicode: true), '').trim();
+  }
 
   Widget _buildControlButton({
     required IconData icon,

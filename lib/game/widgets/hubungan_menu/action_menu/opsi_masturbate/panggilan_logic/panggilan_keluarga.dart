@@ -246,6 +246,14 @@ class PanggilanKeluarga {
       }
     }
 
+    final bool isUserFemale = (userGender ?? '').toLowerCase().contains('perempuan') || (userGender ?? '').toLowerCase().contains('female');
+    final bool isTargetFemale = (targetGender ?? '').toLowerCase().contains('perempuan') || (targetGender ?? '').toLowerCase().contains('female');
+    final bool isWLW = isUserFemale && isTargetFemale;
+
+    if (isWLW) {
+      pool.removeWhere((p) => p.toLowerCase().contains('teteh'));
+    }
+
     if (pool.isEmpty) return isSpeakerPlayer ? targetName : uName;
     return pool[_random.nextInt(pool.length)];
   }

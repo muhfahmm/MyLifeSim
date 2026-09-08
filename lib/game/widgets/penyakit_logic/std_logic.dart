@@ -141,9 +141,9 @@ Future<void> handleSTDCheck(
   late String sexTypeLabel;
 
   if (isGay) {
-    hivChance = 5;      // 5% HIV
-    sFilisChance = 12;  // 12% Sifilis & Gonore
-    hpvChance = 6;      // 6% HPV
+    hivChance = 12;     // 12% HIV
+    sFilisChance = 18;  // 18% Sifilis & Gonore
+    hpvChance = 10;     // 10% HPV (Total risiko IMS = 40%)
     sexTypeLabel = 'sesama jenis (Gay)';
   } else if (isLesbian) {
     hivChance = 1;      // 1% HIV
@@ -253,7 +253,7 @@ void handleSTDCheckNoContext(
   String sexTypeLabel;
 
   if (isGay) {
-    hivChance = 5; sFilisChance = 12; hpvChance = 6;
+    hivChance = 12; sFilisChance = 18; hpvChance = 10; // Total 40% risiko IMS
     sexTypeLabel = 'sesama jenis (Gay)';
   } else if (isLesbian) {
     hivChance = 1; sFilisChance = 5; hpvChance = 8;
