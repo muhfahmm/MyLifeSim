@@ -27,6 +27,10 @@ class PanggilanKeluarga {
     final bool isUserMale = (userGender ?? '').toLowerCase().contains('laki') || (userGender ?? '').toLowerCase().contains('male');
     final List<String> pool = [];
 
+    // Jika panggilan terdeteksi sebagai 'Sayang' atau sejenisnya, batasi peluangnya ke 30% saja untuk hubungan non-pacar.
+    // 70% sisanya menggunakan panggilan kekeluargaan standar/biasa.
+    final bool usePetName = _random.nextDouble() < 0.30;
+
     if (isSpeakerPlayer) {
       // USER BERBICARA KEPADA NPC (User panggil NPC berdasarkan peran NPC)
       switch (key) {
@@ -95,7 +99,9 @@ class PanggilanKeluarga {
         case 'Anak Kandung':
         case 'Anak Angkat':
         case 'Keponakan':
-          pool.addAll(['Anakku', 'Keponakanku', targetName, 'Nak', 'Sayang']);
+          pool.addAll(usePetName 
+              ? ['Anakku', 'Keponakanku', targetName, 'Nak', 'Sayang']
+              : ['Anakku', 'Keponakanku', targetName, 'Nak']);
           break;
 
         case 'Cucu':
@@ -119,7 +125,7 @@ class PanggilanKeluarga {
           } else if (lower.contains('anak') || lower.contains('keponakan')) {
             pool.addAll(['Nak', targetName, 'Anakku']);
           } else {
-            pool.addAll([targetName, 'Sayang']);
+            pool.addAll(usePetName ? [targetName, 'Sayang'] : [targetName]);
           }
           break;
       }
@@ -135,7 +141,9 @@ class PanggilanKeluarga {
         case 'Ibu Mertua':
         case 'Ibu':
           // NPC adalah Orang Tua -> User adalah ANAK
-          pool.addAll(['Nak', 'Anakku', uName, 'Sayang']);
+          pool.addAll(usePetName 
+              ? ['Nak', 'Anakku', uName, 'Sayang'] 
+              : ['Nak', 'Anakku', uName]);
           break;
 
         case 'Kakak Laki-laki':
@@ -146,18 +154,26 @@ class PanggilanKeluarga {
         case 'Mbak':
         case 'Abang':
           // NPC adalah Kakak -> User adalah ADIK (Laki-laki/Perempuan)
-          pool.addAll(['Dek', 'Dek $uName', 'Adik', 'Adikku']);
+          pool.addAll(usePetName 
+              ? ['Dek', 'Dek $uName', 'Adik', 'Adikku', 'Sayang']
+              : ['Dek', 'Dek $uName', 'Adik', 'Adikku']);
           break;
 
         case 'Adik Laki-laki':
         case 'Adik Perempuan':
+        case 'Adik Laki-laki Kandung':
+        case 'Adik Perempuan Kandung':
         case 'Adik':
         case 'Dek':
           // NPC adalah Adik -> User adalah KAKAK (Laki-laki/Perempuan)
           if (isUserMale) {
-            pool.addAll(['Kak $uName', 'Kakak', 'Mas $uName', 'Abang $uName', 'Kak', 'Mas', 'Abang']);
+            pool.addAll(usePetName
+                ? ['Kak $uName', 'Kakak', 'Kak', 'Sayang']
+                : ['Kak $uName', 'Kakak', 'Kak']);
           } else {
-            pool.addAll(['Kak $uName', 'Kakak', 'Mbak $uName', 'Teteh $uName', 'Kak', 'Mbak', 'Teteh']);
+            pool.addAll(usePetName
+                ? ['Kak $uName', 'Kakak', 'Mbak $uName', 'Kak', 'Mbak', 'Sayang']
+                : ['Kak $uName', 'Kakak', 'Mbak $uName', 'Kak', 'Mbak']);
           }
           break;
 
@@ -167,12 +183,16 @@ class PanggilanKeluarga {
         case 'Bibi':
         case 'Tante':
           // NPC adalah Paman/Bibi -> User adalah KEPONAKAN
-          pool.addAll(['Keponakanku', 'Nak', uName, 'Sayang']);
+          pool.addAll(usePetName 
+              ? ['Keponakanku', 'Nak', uName, 'Sayang']
+              : ['Keponakanku', 'Nak', uName]);
           break;
 
         case 'Sepupu':
           // NPC adalah Sepupu -> User adalah Sepupu
-          pool.addAll(['Sepupuku', uName, 'Dek $uName', 'Kak $uName', 'Mas $uName', 'Mbak $uName']);
+          pool.addAll(usePetName
+              ? ['Sepupuku', uName, 'Dek $uName', 'Kak $uName', 'Sayang']
+              : ['Sepupuku', uName, 'Dek $uName', 'Kak $uName', 'Mas $uName', 'Mbak $uName']);
           break;
 
         case 'Kakek':
@@ -180,7 +200,9 @@ class PanggilanKeluarga {
         case 'Nenek':
         case 'Oma':
           // NPC adalah Kakek/Nenek -> User adalah CUCU
-          pool.addAll(['Cucuku', 'Cu', uName, 'Sayang']);
+          pool.addAll(usePetName 
+              ? ['Cucuku', 'Cu', uName, 'Sayang']
+              : ['Cucuku', 'Cu', uName]);
           break;
 
         case 'Anak / Keponakan':
@@ -208,17 +230,17 @@ class PanggilanKeluarga {
         default:
           final String lower = key.toLowerCase();
           if (lower.contains('kakak') || lower.contains('mas') || lower.contains('mbak') || lower.contains('abang')) {
-            pool.addAll(['Dek', 'Dek $uName', 'Adikku', 'Adik']);
+            pool.addAll(usePetName ? ['Dek', 'Dek $uName', 'Adikku', 'Sayang'] : ['Dek', 'Dek $uName', 'Adikku', 'Adik']);
           } else if (lower.contains('adik') || lower.contains('dek')) {
-            pool.addAll([isUserMale ? 'Mas $uName' : 'Mbak $uName', 'Kak $uName', 'Kakak']);
+            pool.addAll(usePetName ? [isUserMale ? 'Kak $uName' : 'Mbak $uName', 'Kakak', 'Kak', 'Sayang'] : [isUserMale ? 'Kak $uName' : 'Mbak $uName', 'Kakak', 'Kak']);
           } else if (lower.contains('ayah') || lower.contains('ibu') || lower.contains('bapak') || lower.contains('mama')) {
-            pool.addAll(['Nak', 'Anakku', uName]);
+            pool.addAll(usePetName ? ['Nak', 'Anakku', uName, 'Sayang'] : ['Nak', 'Anakku', uName]);
           } else if (lower.contains('paman') || lower.contains('bibi') || lower.contains('om') || lower.contains('tante')) {
-            pool.addAll(['Keponakanku', 'Nak', uName]);
+            pool.addAll(usePetName ? ['Keponakanku', 'Nak', uName, 'Sayang'] : ['Keponakanku', 'Nak', uName]);
           } else if (lower.contains('anak') || lower.contains('keponakan')) {
             pool.addAll([isUserMale ? 'Ayah' : 'Ibu', isUserMale ? 'Papa' : 'Mama', isUserMale ? 'Om' : 'Tante']);
           } else {
-            pool.addAll([uName, 'Sayang']);
+            pool.addAll(usePetName ? [uName, 'Sayang'] : [uName]);
           }
           break;
       }

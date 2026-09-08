@@ -1353,96 +1353,101 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    // --- PREMIUM: Tombol dewasa untuk ANAK usia >= 12 tahun ---
-    if (isChild && targetAge >= 12 && AdultFeatures.isPremiumUnlocked) {
-      // 1. Bercinta / Make Love
-      final bool hasBercintaAlready = actions.any((a) =>
-          a.label.toLowerCase().contains('bercinta') ||
-          a.label.toLowerCase().contains('make love'));
-      if (!hasBercintaAlready) {
-        actions.insert(0, ActionItem(
-          label: 'Bercinta / Make Love',
-          icon: Icons.favorite,
-          color: Colors.pink,
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => BercintaScreen(
-                  character: widget.character,
-                  targetName: widget.targetName,
-                  targetRole: widget.targetRole,
-                  onActionComplete: () {
-                    _updateState();
-                  },
-                ),
-              ),
-            );
-          },
-        ));
-      }
-
-      // 2. Ajak Masturbasi Bersama
-      final bool hasMasturbasiAlready = actions.any((a) =>
-          a.label.toLowerCase().contains('masturbasi'));
-      if (!hasMasturbasiAlready) {
-        actions.insert(1, _buildAjakMasturbasiAction());
-      }
-
-      // 3. Ajak Pacaran (atau Selingkuh jika sudah punya pasangan)
-      final bool isAlreadyChildPartner = widget.character.isAnyPartnerNameMatching(widget.targetName);
-      if (!isAlreadyChildPartner) {
-        final bool hasPacaranAlready = actions.any((a) =>
-            a.label.toLowerCase().contains('pacaran') ||
-            a.label.toLowerCase().contains('balikan'));
-        if (!hasPacaranAlready) {
-          final bool hasPartner = widget.character.partner != null;
-          actions.insert(2, ActionItem(
-            label: hasPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
-            icon: hasPartner ? Icons.heart_broken : Icons.favorite_border,
-            color: hasPartner ? Colors.deepOrange : Colors.redAccent,
+    // --- PREMIUM: Tombol dewasa untuk ANAK / SAUDARA (Hanya jika Player berusia >= 12 tahun) ---
+    if (age >= 12 && AdultFeatures.isPremiumUnlocked) {
+      if (isChild && targetAge >= 10) {
+        // 1. Bercinta / Make Love
+        final bool hasBercintaAlready = actions.any((a) =>
+            a.label.toLowerCase().contains('bercinta') ||
+            a.label.toLowerCase().contains('make love'));
+        if (!hasBercintaAlready) {
+          actions.insert(0, ActionItem(
+            label: 'Bercinta / Make Love',
+            icon: Icons.favorite,
+            color: Colors.pink,
             onTap: () {
-              final bool accepted = _random.nextInt(100) < 50;
-              if (accepted) {
-                _showResultDialog(
-                  'Pacaran Baru! ❤️',
-                  'Ajakanmu diterima oleh ${widget.targetName}! Kalian kini menjadi sepasang kekasih.',
-                  Icons.favorite,
-                  Colors.pinkAccent,
-                  () {
-                    final String childGender = _getTargetGender();
-                    final partnerMap = {
-                      'name': widget.targetName,
-                      'relation': 'Pacar',
-                      'gender': childGender,
-                      'age': targetAge.toString(),
-                      'relationship': '80',
-                      'isDeceased': 'false',
-                    };
-                    if (widget.character.partner == null) {
-                      widget.character.partner = partnerMap;
-                    } else {
-                      widget.character.secondPartner = partnerMap;
-                      widget.character.isHavingAffair = true;
-                    }
-                    _updateRelationship(20);
-                    _updateState();
-                  },
-                );
-              } else {
-                _showResultDialog(
-                  'Ajakan Ditolak 💔',
-                  '${widget.targetName} menolak ajakanmu untuk berpacaran. Hubungan menjadi sedikit canggung (-10% hubungan).',
-                  Icons.block,
-                  Colors.red,
-                  () {
-                    _updateRelationship(-10);
-                    _updateState();
-                  },
-                );
-              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => BercintaScreen(
+                    character: widget.character,
+                    targetName: widget.targetName,
+                    targetRole: widget.targetRole,
+                    onActionComplete: () {
+                      _updateState();
+                    },
+                  ),
+                ),
+              );
             },
           ));
+        }
+
+        // 2. Ajak Masturbasi Bersama
+        final bool hasMasturbasiAlready = actions.any((a) =>
+            a.label.toLowerCase().contains('masturbasi'));
+        if (!hasMasturbasiAlready) {
+          actions.insert(1, _buildAjakMasturbasiAction());
+        }
+      }
+
+      final bool isAlreadyChildPartner = widget.character.isAnyPartnerNameMatching(widget.targetName);
+
+      if (isChild && targetAge >= 9) {
+        // 3. Ajak Pacaran (atau Selingkuh jika sudah punya pasangan)
+        if (!isAlreadyChildPartner) {
+          final bool hasPacaranAlready = actions.any((a) =>
+              a.label.toLowerCase().contains('pacaran') ||
+              a.label.toLowerCase().contains('balikan'));
+          if (!hasPacaranAlready) {
+            final bool hasPartner = widget.character.partner != null;
+            actions.add(ActionItem(
+              label: hasPartner ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
+              icon: hasPartner ? Icons.heart_broken : Icons.favorite_border,
+              color: hasPartner ? Colors.deepOrange : Colors.redAccent,
+              onTap: () {
+                final bool accepted = _random.nextInt(100) < 50;
+                if (accepted) {
+                  _showResultDialog(
+                    'Pacaran Baru! ❤️',
+                    'Ajakanmu diterima oleh ${widget.targetName}! Kalian kini menjadi sepasang kekasih.',
+                    Icons.favorite,
+                    Colors.pinkAccent,
+                    () {
+                      final String childGender = _getTargetGender();
+                      final partnerMap = {
+                        'name': widget.targetName,
+                        'relation': 'Pacar',
+                        'gender': childGender,
+                        'age': targetAge.toString(),
+                        'relationship': '80',
+                        'isDeceased': 'false',
+                      };
+                      if (widget.character.partner == null) {
+                        widget.character.partner = partnerMap;
+                      } else {
+                        widget.character.secondPartner = partnerMap;
+                        widget.character.isHavingAffair = true;
+                      }
+                      _updateRelationship(20);
+                      _updateState();
+                    },
+                  );
+                } else {
+                  _showResultDialog(
+                    'Ajakan Ditolak 💔',
+                    '${widget.targetName} menolak ajakanmu untuk berpacaran. Hubungan menjadi sedikit canggung (-10% hubungan).',
+                    Icons.block,
+                    Colors.red,
+                    () {
+                      _updateRelationship(-10);
+                      _updateState();
+                    },
+                  );
+                }
+              },
+            ));
+          }
         }
       }
 
@@ -1782,8 +1787,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
-    // --- TAMBAHAN LOGIKA KHUSUS USIA >= 7 TAHUN UNTUK ADIK/KAKAK DENGAN LAWAN JENIS ---
-    if (age >= 7) {
+    // --- TAMBAHAN LOGIKA KHUSUS USIA >= 12 TAHUN UNTUK ADIK/KAKAK DENGAN LAWAN JENIS ---
+    if (age >= 12) {
       final String myGender = widget.character.gender.trim().toLowerCase();
       final String cleanName = widget.targetName.toLowerCase();
       final String cleanRole = widget.targetRole.toLowerCase();

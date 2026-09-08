@@ -7,12 +7,12 @@ class AdultFeatures {
   /// Memeriksa apakah user diizinkan pacaran dengan relasi tertentu.
   ///
   /// Aturan:
-  /// - Usia minimum 12 tahun (untuk semua user, premium maupun tidak).
+  /// - Usia minimum 9 tahun (untuk NPC maupun player).
   /// - Pacaran dengan Guru, Dosen, dan peran sejenis HANYA untuk premium (karena sensitif).
-  /// - Selain itu, pacaran bebas (open untuk non-premium) — tidak perlu premium hanya untuk pacaran biasa.
+  /// - Selain itu, pacaran bebas (open untuk non-premium).
   static bool canProposeDating(String role, String relation, {int userAge = 18}) {
-    // Cek usia minimum absolut (10 tahun)
-    if (userAge < 10) return false;
+    // Cek usia minimum absolut (9 tahun)
+    if (userAge < 9) return false;
 
     final rLower = '$role $relation'.toLowerCase();
 

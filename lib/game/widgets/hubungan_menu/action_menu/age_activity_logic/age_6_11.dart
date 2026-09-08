@@ -5,6 +5,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'age_base.dart';
 
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
 
 // Gunakan helper yang sama dari age_12_plus
 void _showPickerBottomSheet6({
@@ -95,6 +96,11 @@ List<ActionItem> getAge6to11Actions(
   String? targetGender,
 }) {
   void triggerVN(String actionType) {
+    final int currentRel = NpcRelationshipHelper.getCurrentRelationship(
+      character: character,
+      targetName: targetName,
+      targetRole: targetRole,
+    );
     PercakapanDispatcher.dispatchAction(
       context: context,
       character: character,
@@ -105,7 +111,7 @@ List<ActionItem> getAge6to11Actions(
       targetGender: targetGender,
       targetAvatarUrl: targetAvatarUrl,
       playerAvatarUrl: playerAvatarUrl,
-      relationshipValue: 50,
+      relationshipValue: currentRel,
       actionType: actionType,
       onActionComplete: updateState,
     );

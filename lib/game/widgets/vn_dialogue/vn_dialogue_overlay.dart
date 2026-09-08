@@ -14,6 +14,7 @@ class VNDialogueOverlay extends StatefulWidget {
   final VoidCallback? onFinished;
   final String? playerAvatarUrl;
   final String? npcAvatarUrl;
+  final String? customLocation;
 
   const VNDialogueOverlay({
     super.key,
@@ -23,6 +24,7 @@ class VNDialogueOverlay extends StatefulWidget {
     this.onFinished,
     this.playerAvatarUrl,
     this.npcAvatarUrl,
+    this.customLocation,
   });
 
   static Future<void> show({
@@ -33,6 +35,7 @@ class VNDialogueOverlay extends StatefulWidget {
     VoidCallback? onFinished,
     String? playerAvatarUrl,
     String? npcAvatarUrl,
+    String? customLocation,
   }) {
     return showGeneralDialog(
       context: context,
@@ -48,6 +51,7 @@ class VNDialogueOverlay extends StatefulWidget {
           onFinished: onFinished,
           playerAvatarUrl: playerAvatarUrl,
           npcAvatarUrl: npcAvatarUrl ?? npc['avatarUrl']?.toString(),
+          customLocation: customLocation,
         );
       },
     );
@@ -94,7 +98,8 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
   }
 
   void _loadNode(int index) {
-    if (index >= widget.nodes.length) {
+    // -1 is a sentinel value meaning "finish the dialogue"
+    if (index == -1 || index >= widget.nodes.length) {
       _finishDialogue();
       return;
     }
@@ -169,12 +174,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     } else if (_currentIndex + 1 < widget.nodes.length) {
       _loadNode(_currentIndex + 1);
     } else {
-      // Loop kembali dari siklus keintiman jika belum diakhiri user
-      if (widget.nodes.length > 2) {
-        _loadNode(2);
-      } else {
-        _finishDialogue();
-      }
+      _finishDialogue();
     }
   }
 
@@ -211,6 +211,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         (currentNode.persistentOralChoices != null && currentNode.persistentOralChoices!.isNotEmpty) ||
         (currentNode.persistentEjakulasiChoices != null && currentNode.persistentEjakulasiChoices!.isNotEmpty);
 
+    final SpeakerType speakerType = _getSpeakerType(currentNode);
+    final bool isNarratorNode = speakerType == SpeakerType.narrator;
+
     return Material(
       color: Colors.black,
       child: Stack(
@@ -241,9 +244,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                       // Player Standee (Left)
                       VNCharacterView(
                         character: widget.player,
-                        isActiveSpeaker: currentNode.isPlayerSpeaking,
+                        isActiveSpeaker: isNarratorNode ? false : currentNode.isPlayerSpeaking,
                         customName: widget.player.name,
-                        emotion: currentNode.isPlayerSpeaking ? currentNode.emotion : VNEmotionType.neutral,
+                        emotion: (currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.playerAvatarUrl ?? AvatarAgeRules.getAgeBasedAvatarUrl(widget.player, happiness: widget.player.happiness),
                         width: 170,
@@ -253,9 +256,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                       // NPC Standee (Right)
                       VNCharacterView(
                         character: _createDummyNPCCharacter(widget.npc),
-                        isActiveSpeaker: !currentNode.isPlayerSpeaking,
+                        isActiveSpeaker: isNarratorNode ? false : !currentNode.isPlayerSpeaking,
                         customName: widget.npc['name'] ?? 'NPC',
-                        emotion: !currentNode.isPlayerSpeaking ? currentNode.emotion : VNEmotionType.neutral,
+                        emotion: (!currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.npcAvatarUrl ?? widget.npc['avatarUrl']?.toString(),
                         width: 170,
@@ -321,7 +324,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                         border: Border.all(color: Colors.white24),
                       ),
                       child: Text(
-                        _getBackgroundTitle(currentNode.background),
+                        _getFormattedLocation(currentNode.background),
                         style: const TextStyle(
                           color: Colors.white70,
                           fontSize: 12,
@@ -470,6 +473,25 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       case VNBackgroundType.cafe:
         return '📍 Kafe Romantis';
     }
+  }
+
+  String _getFormattedLocation(VNBackgroundType background) {
+    if (widget.customLocation != null && widget.customLocation!.isNotEmpty) {
+      String loc = widget.customLocation!.trim();
+      if (loc.startsWith('📍')) {
+        return loc;
+      }
+      if (loc.contains('Ruangan:')) {
+        final roomPart = loc.split('Ruangan:').last.replaceAll(')', '').trim();
+        if (loc.contains('Pemilik:')) {
+          final ownerPart = loc.split('Pemilik:').last.split('|').first.trim();
+          return '📍 $roomPart (Rumah $ownerPart)';
+        }
+        return '📍 $roomPart';
+      }
+      return '📍 $loc';
+    }
+    return _getBackgroundTitle(background);
   }
 
   SpeakerType _getSpeakerType(VNDialogueNode node) {
@@ -964,6 +986,21 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
   Widget _buildChoiceCard(VNDialogueNode node) {
     final choices = node.choices ?? [];
 
+    // Menentukan judul card pilihan secara dinamis
+    final bool isIntimateAction = choices.any((c) {
+      final t = c.text.toLowerCase();
+      return t.contains('ciuman') ||
+          t.contains('oral') ||
+          t.contains('penetrasi') ||
+          t.contains('posisi') ||
+          t.contains('ejakulasi') ||
+          t.contains('stimulasi');
+    });
+
+    final String cardTitle = isIntimateAction
+        ? 'Pilih Aksi / Tindakan Intim:'
+        : 'Pilih Tanggapan / Keputusan:';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -982,15 +1019,15 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Row(
+          Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.touch_app, color: Colors.amber, size: 20),
-              SizedBox(width: 8),
+              const Icon(Icons.touch_app, color: Colors.amber, size: 20),
+              const SizedBox(width: 8),
               Text(
-                'Pilih Aksi / Tindakan Intim:',
+                cardTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   color: Colors.amber,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
@@ -1021,7 +1058,8 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                   if (c.nextNodeIndex != null) {
                     _loadNode(c.nextNodeIndex!);
                   } else {
-                    _nextDialogue();
+                    // nextNodeIndex == null means this is a terminal choice → finish
+                    _finishDialogue();
                   }
                 },
                 child: Text(

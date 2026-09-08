@@ -11,6 +11,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/k
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 
 class BercintaScreen extends StatefulWidget {
   final Character character;
@@ -403,62 +404,84 @@ class _BercintaScreenState extends State<BercintaScreen> {
     }
 
     // --- LOGIKA KEHAMILAN DINAMIS ---
+    // Kehamilan HANYA terjadi jika:
+    // 1. Sesi berhasil (success)
+    // 2. Tidak pakai kondom (_useCondom == false)
+    // 3. User memilih Ejakulasi "Di Dalam Vagina" (didCreampieThisSession == true)
     bool isPregnant = false;
     bool isPartnerPregnant = false;
     String additionalMessage = '';
 
-    if (success && _useCondom == false && myGender != partnerGender) {
-      
-      // Ambil kesuburan berdasarkan usia dan gender
-      double myFertility = _getFertilityRate(widget.character.age, myGender);
-      
-      if (myGender == 'perempuan' && partnerGender == 'laki-laki') {
-        if (widget.character.isPregnant) {
-          additionalMessage = 'Kamu sudah dalam kondisi hamil.';
-        } else {
-          if (myFertility > 0) {
-            double finalChance = widget.character.birthControlActive ? 0.05 : myFertility;
-            if (_random.nextDouble() < finalChance) {
-              isPregnant = true;
-              widget.character.isPregnant = true;
-              widget.character.pregnantByPartnerName = widget.targetName;
-              widget.character.pregnantByPartnerRole = widget.targetRole;
-              
-              widget.character.inbox.add(
-                '🍼 Kabar Kehamilan: Kamu hamil dari hasil hubungan intim dengan $relation!'
-              );
-            } else {
-              additionalMessage = widget.character.birthControlActive
-                  ? 'Kontrol kehamilan (KB) aktif melindungimu dari kehamilan.'
-                  : 'Kali ini belum berhasil hamil. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
-            }
+    // Ambil dan langsung reset flag agar tidak bocor ke sesi berikutnya
+    final bool didCreampie = widget.character.didCreampieThisSession;
+    widget.character.didCreampieThisSession = false;
+
+    if (success && myGender != partnerGender && didCreampie) {
+      if (_useCondom == true) {
+        // Penggunaan pengaman (kondom) melindung dari kehamilan 100%
+        additionalMessage = '🛡️ Penggunaan pengaman (kondom) melindungimu dari kehamilan (0% risiko hamil).';
+      } else {
+        // Tanpa pengaman: Risiko kehamilan bergantung pada tingkat kesuburan perempuan
+        double femaleFertility = 0.0;
+        int femaleAge = 0;
+
+        if (myGender == 'perempuan') {
+          femaleAge = widget.character.age;
+          femaleFertility = _getFertilityRate(femaleAge, 'perempuan');
+
+          if (widget.character.isPregnant) {
+            additionalMessage = 'Kamu sudah dalam kondisi hamil.';
           } else {
-            additionalMessage = 'Usia kamu ${widget.character.age} tahun. Kamu sudah melewati masa subur (8-45 tahun).';
+            if (femaleFertility > 0) {
+              double finalChance = widget.character.birthControlActive ? 0.05 : femaleFertility;
+              if (_random.nextDouble() < finalChance) {
+                isPregnant = true;
+                widget.character.isPregnant = true;
+                widget.character.pregnantByPartnerName = widget.targetName;
+                widget.character.pregnantByPartnerRole = widget.targetRole;
+                
+                widget.character.inbox.add(
+                  '🍼 Kabar Kehamilan: Kamu hamil dari hasil hubungan intim dengan $relation!'
+                );
+              } else {
+                additionalMessage = widget.character.birthControlActive
+                    ? 'Kontrol kehamilan (KB) aktif melindungimu dari kehamilan.'
+                    : 'Kali ini belum berhasil hamil. (Kesuburan saat ini: ${(femaleFertility * 100).toInt()}%)';
+              }
+            } else {
+              additionalMessage = 'Usia kamu $femaleAge tahun. Berada di luar masa subur (8-45 tahun).';
+            }
           }
-        }
-      } 
-      else if (myGender == 'laki-laki' && partnerGender == 'perempuan') {
-        if (widget.character.partnerIsPregnant) {
-          additionalMessage = 'Pasanganmu sudah dalam kondisi hamil.';
-        } else {
-          if (myFertility > 0) {
-            if (_random.nextDouble() < myFertility) {
-              isPartnerPregnant = true;
-              widget.character.partnerIsPregnant = true;
-              widget.character.pregnantByPartnerName = widget.targetName;
-              widget.character.pregnantByPartnerRole = widget.targetRole;
-              
-              widget.character.inbox.add(
-                '👶 Kabar Kehamilan: Pasangan/keluargamu, $relation, hamil dari hasil hubungan intim denganmu!'
-              );
-            } else {
-              additionalMessage = 'Kali ini belum berhasil menghamili. (Kesuburan saat ini: ${(myFertility * 100).toInt()}%)';
-            }
+        } else if (partnerGender == 'perempuan') {
+          // Cari usia partner jika tersedia
+          femaleAge = 22; // default usia subur partner
+          femaleFertility = _getFertilityRate(femaleAge, 'perempuan');
+
+          if (widget.character.partnerIsPregnant) {
+            additionalMessage = 'Pasanganmu sudah dalam kondisi hamil.';
           } else {
-            additionalMessage = 'Usia kamu ${widget.character.age} tahun. Kamu sudah melewati masa subur (9-65 tahun).';
+            if (femaleFertility > 0) {
+              if (_random.nextDouble() < femaleFertility) {
+                isPartnerPregnant = true;
+                widget.character.partnerIsPregnant = true;
+                widget.character.pregnantByPartnerName = widget.targetName;
+                widget.character.pregnantByPartnerRole = widget.targetRole;
+                
+                widget.character.inbox.add(
+                  '👶 Kabar Kehamilan: Pasangan/keluargamu, $relation, hamil dari hasil hubungan intim denganmu!'
+                );
+              } else {
+                additionalMessage = 'Kali ini belum berhasil menghamili. (Kesuburan pasangan: ${(femaleFertility * 100).toInt()}%)';
+              }
+            } else {
+              additionalMessage = 'Pasanganmu berada di luar masa subur.';
+            }
           }
         }
       }
+    } else if (success && myGender != partnerGender && !didCreampie && _useCondom != true) {
+      // Tidak ejakulasi di dalam → aman dari kehamilan
+      additionalMessage = '✅ Tidak ada risiko kehamilan (tidak ada ejakulasi di dalam vagina).';
     }
 
     // Pemicu pengecekan penyakit menular seksual (STD) dipindahkan ke akhir aliran dialog (pada tombol OK hasil bercinta)
@@ -493,13 +516,40 @@ class _BercintaScreenState extends State<BercintaScreen> {
     }
 
     final int relationshipValue = _getTargetRelationship();
+    final String plainName = AvatarAgeRules.getCleanNPCName(widget.targetName);
+    int realTargetAge = 18;
+    for (var sib in widget.character.siblings) {
+      if (sib['name'] == plainName || widget.targetName.contains(sib['name'] ?? '')) {
+        realTargetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
+        break;
+      }
+    }
+    if (realTargetAge == 18) {
+      for (var child in widget.character.children) {
+        if (child['name'] == plainName || widget.targetName.contains(child['name'] ?? '')) {
+          realTargetAge = int.tryParse(child['age'] ?? '18') ?? 18;
+          break;
+        }
+      }
+    }
+    final String? skinColor = widget.character.getFamilyMemberSkinColor(widget.targetName);
+    final String npcAvatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: plainName,
+      gender: partnerGender,
+      age: realTargetAge,
+      happiness: relationshipValue,
+      forcedSkinColor: skinColor,
+    );
 
     final Map<String, dynamic> npcMap = {
       'name': widget.targetName,
+      'plainName': plainName,
       'role': widget.targetRole,
       'gender': partnerGender,
-      'age': '10Tahun',
+      'age': '$realTargetAge tahun',
       'relationship': relationshipValue.toString(),
+      'avatarUrl': npcAvatarUrl,
+      'skinColor': skinColor,
     };
 
     final vnNodes = AjakMakeLoveDialogue.getDialogue(
@@ -517,6 +567,8 @@ class _BercintaScreenState extends State<BercintaScreen> {
       player: widget.character,
       npc: npcMap,
       nodes: vnNodes,
+      npcAvatarUrl: npcAvatarUrl,
+      customLocation: _chosenLocation,
       onFinished: () async {
         if (!context.mounted) return;
 

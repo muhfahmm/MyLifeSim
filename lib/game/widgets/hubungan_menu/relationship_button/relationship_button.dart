@@ -760,7 +760,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         context,
                         icon: isMale ? Icons.male : Icons.female,
                         label: isDeceased ? '$name ($relation) (Wafat)' : '$name ($relation)',
-                        status: 'Kandung',
+                        status: relation,
                         color: isDeceased ? Colors.grey : (isMale ? Colors.indigo : Colors.purple),
                         relationshipValue: child['relationship'] as int,
                         ageText: '$age tahun',

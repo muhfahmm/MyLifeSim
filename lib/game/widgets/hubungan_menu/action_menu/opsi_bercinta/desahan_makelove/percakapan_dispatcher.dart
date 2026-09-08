@@ -31,6 +31,8 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_lo
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
 
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
+
 class PercakapanDispatcher {
   /// Membuka Layar Percakapan Visual Novel Secara Otomatis Sesuai Aksi Menu Interaksi
   static void dispatchAction({
@@ -112,6 +114,10 @@ class PercakapanDispatcher {
     };
 
     List<VNDialogueNode> nodes;
+    int calculatedDelta = 0;
+    String displayActionTitle = actionType;
+
+    final Random random = Random();
 
     // Pemetaan Aksi Usia 10 Tahun, Usia 6 Tahun & Usia 3 Tahun
     if (cleanAction.contains('ajak pacaran') || cleanAction.contains('pacaran')) {
@@ -126,7 +132,7 @@ class PercakapanDispatcher {
         acceptanceChance -= 20;
       }
       acceptanceChance = acceptanceChance.clamp(10, 95);
-      final bool isAccepted = (Random().nextInt(100)) < acceptanceChance;
+      final bool isAccepted = (random.nextInt(100)) < acceptanceChance;
       
       if (isAccepted && character.partner == null) {
         character.partner = {
@@ -135,6 +141,8 @@ class PercakapanDispatcher {
           'gender': npcGender,
         };
       }
+      calculatedDelta = isAccepted ? 20 : -10;
+      displayActionTitle = 'Ajak Pacaran (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = AjakPacaranDialogue.getDialogue(player: character, npc: npcMap, isAccepted: isAccepted);
     } else if (cleanAction.contains('make love') || cleanAction.contains('bercinta') || cleanAction.contains('makelove')) {
       nodes = AjakMakeLoveDialogue.getDialogue(player: character, npc: npcMap);
@@ -150,6 +158,8 @@ class PercakapanDispatcher {
           isAccepted = parts[2].toLowerCase() == 'true';
         }
       }
+      calculatedDelta = isAccepted ? (random.nextInt(10) + 1) : -(random.nextInt(5) + 1);
+      displayActionTitle = 'Minta Uang Saku (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = MintaUangSakuDialogue.getDialogue(
         player: character,
         npc: npcMap,
@@ -167,46 +177,84 @@ class PercakapanDispatcher {
         consentChance -= 20;
       }
       consentChance = consentChance.clamp(15, 85);
-      final bool isAccepted = (Random().nextInt(100)) < consentChance;
+      final bool isAccepted = (random.nextInt(100)) < consentChance;
+      // Minta Sepeda: Diterima (+1 s/d +15%), Ditolak (-1 s/d -10%)
+      calculatedDelta = isAccepted ? (random.nextInt(15) + 1) : -(random.nextInt(10) + 1);
+      displayActionTitle = 'Minta Sepeda (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = MintaSepedaDialogue.getDialogue(player: character, npc: npcMap, isAccepted: isAccepted);
     } else if (cleanAction.contains('pujian')) {
-      // Ekstrak topik jika ada (format: 'Pujian - Topik')
       String? topik;
       if (actionType.contains(' - ')) {
         topik = actionType.split(' - ').last;
       }
+      // Pujian: Naik +1 s/d +15%
+      calculatedDelta = random.nextInt(15) + 1;
+      displayActionTitle = topik != null ? 'Pujian ($topik)' : 'Berikan Pujian';
       nodes = BerikanPujianDialogue.getDialogue(player: character, npc: npcMap, topik: topik);
     } else if (cleanAction.contains('hadiah')) {
+      String? hadiah;
+      if (actionType.contains(' - ')) {
+        hadiah = actionType.split(' - ').last;
+      }
+      // Hadiah: Naik +1 s/d +5%
+      calculatedDelta = random.nextInt(5) + 1;
+      displayActionTitle = hadiah != null ? 'Hadiah ($hadiah)' : 'Berikan Hadiah';
       nodes = BerikanHadiahDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanAction.contains('menyinggung') || cleanAction.contains('singgung')) {
-      // Ekstrak topik jika ada (format: 'Menyinggung - Topik')
       String? topik;
       if (actionType.contains(' - ')) {
         topik = actionType.split(' - ').last;
       }
+      // Menyinggung: Turun -1 s/d -20%
+      calculatedDelta = -(random.nextInt(20) + 1);
+      displayActionTitle = topik != null ? 'Menyinggung ($topik)' : 'Menyinggung Dia';
       nodes = SinggungDiaDialogue.getDialogue(player: character, npc: npcMap, topik: topik);
     } else if (cleanAction.contains('minta adik')) {
       nodes = MintaAdikBaruDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanAction.contains('minta cerai') || cleanAction.contains('cerai')) {
       nodes = MintaCeraiDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanAction.contains('bioskop')) {
+      calculatedDelta = random.nextInt(10) + 5;
+      displayActionTitle = 'Pergi ke Bioskop Bersama';
       nodes = PergiKeBioskopDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanAction.contains('habiskan waktu')) {
-      // Ekstrak aktivitas jika ada (format: 'Habiskan Waktu Bersama - Aktivitas')
       String? aktivitas;
       if (actionType.contains(' - ')) {
         aktivitas = actionType.split(' - ').last;
       }
+      // Habiskan Waktu Bersama: Naik +1 s/d +20%
+      calculatedDelta = random.nextInt(20) + 1;
+      displayActionTitle = aktivitas != null ? 'Habiskan Waktu ($aktivitas)' : 'Habiskan Waktu Bersama';
       nodes = HabiskanWaktu3TahunDialogue.getDialogue(player: character, npc: npcMap, aktivitas: aktivitas);
     } else if (cleanAction.contains('minta barang')) {
       String? item;
       if (actionType.contains(' - ')) {
         item = actionType.split(' - ').last;
       }
-      nodes = MintaBarangDialogue6Tahun.getDialogue(player: character, npc: npcMap, requestedItem: item);
+      final int relVal = int.tryParse(relationshipValue.toString()) ?? 50;
+      int consentChance = 50;
+      if (relVal >= 80) {
+        consentChance += 25;
+      } else if (relVal >= 60) {
+        consentChance += 10;
+      } else if (relVal < 40) {
+        consentChance -= 20;
+      }
+      consentChance = consentChance.clamp(15, 85);
+      final bool isAccepted = (random.nextInt(100)) < consentChance;
+      // Minta Barang: Diterima (+1 s/d +25%), Ditolak (-1 s/d -10%)
+      calculatedDelta = isAccepted ? (random.nextInt(25) + 1) : -(random.nextInt(10) + 1);
+      displayActionTitle = item != null ? 'Minta Barang ($item - ${isAccepted ? "Diterima" : "Ditolak"})' : 'Minta Barang (${isAccepted ? "Diterima" : "Ditolak"})';
+      nodes = MintaBarangDialogue6Tahun.getDialogue(player: character, npc: npcMap, requestedItem: item, isGranted: isAccepted);
     } else if (cleanAction.contains('minta mainan')) {
+      final int relVal = int.tryParse(relationshipValue.toString()) ?? 50;
+      final bool isAccepted = (random.nextInt(100)) < (relVal >= 60 ? 70 : 40);
+      calculatedDelta = isAccepted ? (random.nextInt(10) + 1) : -(random.nextInt(5) + 1);
+      displayActionTitle = 'Minta Mainan (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = MintaMainanDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanAction.contains('minta pelukan') || cleanAction.contains('pelukan')) {
+      calculatedDelta = random.nextInt(8) + 3;
+      displayActionTitle = 'Pelukan';
       nodes = MintaPelukanDialogue.getDialogue(player: character, npc: npcMap);
     } else if (cleanRole.contains('pacar') || cleanRole.contains('pasangan') || cleanRole.contains('suami') || cleanRole.contains('istri')) {
       nodes = VNDialoguePreset.getDatingDialogue(player: character, npc: npcMap);
@@ -223,7 +271,27 @@ class PercakapanDispatcher {
       player: character,
       npc: npcMap,
       nodes: nodes,
-      onFinished: onActionComplete,
+      onFinished: () {
+        if (calculatedDelta != 0) {
+          final result = NpcRelationshipHelper.applyRelationshipChange(
+            character: character,
+            targetName: targetName,
+            targetRole: targetRole,
+            delta: calculatedDelta,
+          );
+          HubunganProgressModal.show(
+            context: context,
+            actionTitle: displayActionTitle,
+            targetName: targetName,
+            oldVal: result['oldVal']!,
+            newVal: result['newVal']!,
+            delta: calculatedDelta,
+            onComplete: onActionComplete,
+          );
+        } else {
+          onActionComplete();
+        }
+      },
       playerAvatarUrl: effectivePlayerAvatarUrl,
       npcAvatarUrl: effectiveTargetAvatarUrl,
     );

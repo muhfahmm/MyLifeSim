@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
 import 'age_base.dart';
 
 List<ActionItem> getAge3to6Actions(
@@ -20,6 +21,11 @@ List<ActionItem> getAge3to6Actions(
   String? targetGender,
 }) {
   void triggerVN(String actionType) {
+    final int currentRel = NpcRelationshipHelper.getCurrentRelationship(
+      character: character,
+      targetName: targetName,
+      targetRole: targetRole,
+    );
     PercakapanDispatcher.dispatchAction(
       context: context,
       character: character,
@@ -30,7 +36,7 @@ List<ActionItem> getAge3to6Actions(
       targetGender: targetGender,
       targetAvatarUrl: targetAvatarUrl,
       playerAvatarUrl: playerAvatarUrl,
-      relationshipValue: 70,
+      relationshipValue: currentRel,
       actionType: actionType,
       onActionComplete: updateState,
     );

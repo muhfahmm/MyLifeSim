@@ -66,21 +66,23 @@ class OralSeksHelper {
     final String maleName = isPlayerMale ? character.name : targetName;
     final String femaleName = isPlayerMale ? targetName : character.name;
 
+    // callFromFemale: NPC Perempuan berbicara kepada Player (isSpeakerPlayer=false)
     final String callFromFemale = PanggilanManager.getPanggilan(
       targetName: isPlayerMale ? targetName : character.name,
       targetRole: targetRole,
       targetGender: isPlayerMale ? targetGender : character.gender,
-      isSpeakerPlayer: !isPlayerMale,
+      isSpeakerPlayer: false,
       userName: character.name,
       userGender: character.gender,
       isIntimate: true,
     );
 
+    // callFromMale: Player Laki-laki berbicara kepada NPC (isSpeakerPlayer=true)
     final String callFromMale = PanggilanManager.getPanggilan(
       targetName: isPlayerMale ? targetName : character.name,
       targetRole: targetRole,
       targetGender: isPlayerMale ? character.gender : targetGender,
-      isSpeakerPlayer: isPlayerMale,
+      isSpeakerPlayer: true,
       userName: character.name,
       userGender: character.gender,
       isIntimate: true,

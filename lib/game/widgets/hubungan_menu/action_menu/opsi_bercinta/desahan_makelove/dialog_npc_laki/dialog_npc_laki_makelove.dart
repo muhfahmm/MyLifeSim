@@ -258,11 +258,11 @@ class DialogNpcLakiMakeLove {
           moanWithCall = "$rawMoan, $callNpcToPlayer";
           break;
         case 2:
-          moanWithCall = "$rawMoan, ${player.name}...";
+          moanWithCall = "$rawMoan, $callNpcToPlayer...";
           break;
         case 3:
         default:
-          moanWithCall = "Hah... ${player.name}... $rawMoan";
+          moanWithCall = "Hah... $callNpcToPlayer... $rawMoan";
           break;
       }
 

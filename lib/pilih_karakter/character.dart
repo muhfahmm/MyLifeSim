@@ -289,6 +289,10 @@ class Character {
   String? pregnantByPartnerName;
   String? pregnantByPartnerRole;
 
+  // --- FLAG EJAKULASI DALAM VAGINA (reset setelah sesi bercinta selesai) ---
+  // Hanya true jika user memilih ejakulasi 'vagina_dalam' tanpa kondom.
+  bool didCreampieThisSession = false;
+
   // --- DAFTAR ANAK ---
   List<Map<String, String>> children = []; // [{name: '...', gender: 'Laki-laki', relationship: '80', age: '0', father: '...', mother: '...', isDeceased: 'false'}]
 

@@ -65,10 +65,15 @@ class TempatBercintaHelper {
     required int userAge,
     required int targetAge,
   }) async {
-    // Saring lokasi berdasarkan aturan: jika user berusia 12 tahun dan target kurang dari 18 tahun, sembunyikan Mobil.
-    final bool hideCar = (userAge == 12 && targetAge < 18);
+    // Saring lokasi berdasarkan usia user:
+    // - Usia 12 - 16 tahun: Hanya "Di Rumah"
+    // - Usia 17 tahun: "Di Rumah" dan "Di Mobil"
+    // - Usia 18+ tahun: "Di Rumah", "Di Mobil", dan "Di Hotel"
     final List<LocationOption> filteredLocations = mainLocations.where((loc) {
-      if (loc.name == 'Di Mobil' && hideCar) {
+      if (userAge < 17 && loc.name != 'Di Rumah') {
+        return false;
+      }
+      if (userAge < 18 && loc.name == 'Di Hotel') {
         return false;
       }
       return true;

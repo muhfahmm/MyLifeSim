@@ -47,6 +47,9 @@ class VNCharacterView extends StatelessWidget {
         params['eyes'] = AvatarGenerator.getEyeType(synthHappiness);
         params['eyebrows'] = AvatarGenerator.getEyebrowType(synthHappiness);
         params['mouth'] = AvatarGenerator.getMouthType(synthHappiness);
+        params.remove('bkg');
+        params.remove('backgroundColor');
+        params['backgroundColor'] = 'transparent';
         avatarUrl = uri.replace(queryParameters: params).toString();
       } catch (_) {
         avatarUrl = customAvatarUrl!;
@@ -56,6 +59,14 @@ class VNCharacterView extends StatelessWidget {
         character,
         happiness: synthHappiness,
       );
+      try {
+        final uri = Uri.parse(avatarUrl);
+        final params = Map<String, String>.from(uri.queryParameters);
+        params.remove('bkg');
+        params.remove('backgroundColor');
+        params['backgroundColor'] = 'transparent';
+        avatarUrl = uri.replace(queryParameters: params).toString();
+      } catch (_) {}
     }
 
     final isMale = character.gender.toLowerCase() == 'laki-laki' ||
