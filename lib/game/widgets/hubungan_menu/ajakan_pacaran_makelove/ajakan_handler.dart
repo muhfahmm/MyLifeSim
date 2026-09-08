@@ -34,7 +34,6 @@ import 'ajakan_pacaran/hetero/hetero_laki/ajakan_pacaran_hetero_laki_keluarga.da
 import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_teman_sekolah.dart';
 import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_guru_sekolah.dart';
 import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_dosen.dart';
-import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_coworker.dart';
 import 'ajakan_pacaran/biseksual/ajakan_pacaran_biseksual_keluarga.dart';
 
 // Imports for gay ml
@@ -88,11 +87,9 @@ import 'ajakan_makelove/hetero/hetero_laki/idol_makelove/ajakan_ml_hetero_laki_r
 import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_teman_sekolah.dart';
 import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_guru_sekolah.dart';
 import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_dosen.dart';
-import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_coworker.dart';
 import 'ajakan_makelove/biseksual/ajakan_ml_biseksual_keluarga.dart';
 import 'ajakan_makelove/biseksual/idol_makelove/ajakan_ml_biseksual_staf_idol.dart';
 import 'ajakan_makelove/biseksual/idol_makelove/ajakan_ml_biseksual_rekan_idol.dart';
-import 'ajakan_makelove/biseksual/BA_talent/ajakan_ml_biseksual_ba_talent.dart';
 
 // BA_talent sub-handlers
 import 'ajakan_makelove/gay/BA_talent/ajakan_ml_gay_ba_talent.dart';
@@ -652,13 +649,30 @@ class AjakanHandler {
     familyCandidates = familyCandidates.where(isCandidateActive).toList();
     schoolCandidates = schoolCandidates.where(isCandidateActive).toList();
 
-    // Tentukan pool kandidat terpilih dari seluruh kandidat aktif
-    List<Map<String, dynamic>> selectedPool = [...familyCandidates, ...schoolCandidates];
+    // Determine target pool by choosing between Family and School/Work category.
+    // If family candidates are available, roll a category check (50% base chance to evaluate family first,
+    // or weighted by active settings) so family members aren't diluted by 30+ classmates/teachers.
+    List<Map<String, dynamic>> selectedPool = [];
+    bool pickedFamilyGroup = false;
+
+    if (familyCandidates.isNotEmpty && schoolCandidates.isNotEmpty) {
+      // 50% chance to prioritize family pool evaluation
+      if (random.nextInt(100) < 50) {
+        selectedPool = familyCandidates;
+        pickedFamilyGroup = true;
+      } else {
+        selectedPool = schoolCandidates;
+      }
+    } else if (familyCandidates.isNotEmpty) {
+      selectedPool = familyCandidates;
+      pickedFamilyGroup = true;
+    } else {
+      selectedPool = schoolCandidates;
+    }
 
     // --- PRIORITAS KHUSUS GURU/DOSEN ---
-    // Agar guru lebih dominan dibanding teman sekelas (karena jumlah teman sekelas jauh lebih banyak di pool),
-    // kita beri peluang 60% untuk memotong pool hanya menyisakan Guru/Dosen jika kandidat Guru/Dosen tersedia.
-    if (selectedPool.isNotEmpty) {
+    // Jika memilih dari pool Sekolah/Kerja, berikan peluang 60% untuk memotong pool menyisakan Guru/Dosen jika ada.
+    if (!pickedFamilyGroup && selectedPool.isNotEmpty) {
       final List<Map<String, dynamic>> guruDosenPool = selectedPool.where((c) {
         final r = c['role'] ?? '';
         return r == 'Guru' || r == 'Dosen';
@@ -727,6 +741,26 @@ class AjakanHandler {
           candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
         } else {
           candidate = selectedPool[random.nextInt(selectedPool.length)];
+        }
+      }
+
+      // Fallback: If family pool was picked but no valid candidate was found (e.g., due to sexuality match), fallback to school pool
+      if (candidate == null && pickedFamilyGroup && schoolCandidates.isNotEmpty) {
+        selectedPool = schoolCandidates;
+        sameSexCandidates.clear();
+        oppositeSexCandidates.clear();
+        for (var c in selectedPool) {
+          final String candGender = (c['gender'] ?? 'Laki-laki').trim().toLowerCase();
+          if (candGender == myGenderLower) {
+            sameSexCandidates.add(c);
+          } else {
+            oppositeSexCandidates.add(c);
+          }
+        }
+        if (oppositeSexCandidates.isNotEmpty) {
+          candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+        } else if (sameSexCandidates.isNotEmpty) {
+          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
         }
       }
 

@@ -257,8 +257,27 @@ class Character {
     // Jika sudah ada jeda cerai pending, jangan tambah argumen baru
     if (parentsDivorceYearsLeft != null) return;
 
+    // Hitung persentase peluang keributan berdasarkan kelompok usia user:
+    // 0-10 tahun = 25%
+    // 11-20 tahun = 20%
+    // 21-30 tahun = 15%
+    // 31-40 tahun = 5%
+    // >40 tahun = 0%
+    int baseChance = 0;
+    if (age <= 10) {
+      baseChance = 25;
+    } else if (age <= 20) {
+      baseChance = 20;
+    } else if (age <= 30) {
+      baseChance = 15;
+    } else if (age <= 40) {
+      baseChance = 5;
+    } else {
+      baseChance = 0;
+    }
+
     if (fName != null && mName != null && fAlive && mAlive && notDivorced) {
-      final int effectiveChance = parentsReconciled ? (chancePercentage - 5).clamp(0, 100) : chancePercentage;
+      final int effectiveChance = parentsReconciled ? (baseChance - 5).clamp(0, 100) : baseChance;
       if (parentArgumentCount < 2 && random.nextInt(100) < effectiveChance) {
         parentArgumentCount++;
         pendingParentArgumentEvent = {
