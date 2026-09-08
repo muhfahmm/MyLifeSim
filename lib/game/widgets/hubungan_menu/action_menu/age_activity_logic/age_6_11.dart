@@ -21,18 +21,33 @@ void _showPickerBottomSheet6({
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
     builder: (ctx) {
+      final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+      final Color bgColor = isDark ? const Color(0xFF1E1E2E) : Colors.white;
+      final Color handleColor = isDark ? Colors.white24 : Colors.grey.shade300;
+      final Color cardBgColor = isDark ? const Color(0xFF2A2A3D) : Colors.grey.shade100;
+
       return Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF1E1E2E),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        decoration: BoxDecoration(
+          color: bgColor,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          boxShadow: isDark
+              ? null
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
         ),
         padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(color: handleColor, borderRadius: BorderRadius.circular(2)),
             ),
             const SizedBox(height: 16),
             Row(children: [
@@ -46,28 +61,42 @@ void _showPickerBottomSheet6({
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 3.2,
-                  crossAxisSpacing: 10, mainAxisSpacing: 10,
+                  crossAxisCount: 2,
+                  childAspectRatio: 3.2,
+                  crossAxisSpacing: 10,
+                  mainAxisSpacing: 10,
                 ),
                 itemCount: options.length,
                 itemBuilder: (_, i) {
                   final opt = options[i];
                   final Color c = opt['color'] as Color? ?? Colors.blue;
                   return InkWell(
-                    onTap: () { Navigator.pop(ctx); onPicked(opt['value'] as String); },
+                    onTap: () {
+                      Navigator.pop(ctx);
+                      onPicked(opt['value'] as String);
+                    },
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: c.withAlpha(30), borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: c.withAlpha(80)),
+                        color: isDark ? c.withValues(alpha: 0.15) : cardBgColor,
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: isDark ? c.withValues(alpha: 0.4) : c.withValues(alpha: 0.6)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Row(children: [
                         Icon(opt['icon'] as IconData? ?? Icons.circle, color: c, size: 18),
                         const SizedBox(width: 8),
-                        Expanded(child: Text(opt['label'] as String,
-                          style: TextStyle(color: c, fontSize: 13, fontWeight: FontWeight.w600),
-                          overflow: TextOverflow.ellipsis)),
+                        Expanded(
+                          child: Text(
+                            opt['label'] as String,
+                            style: TextStyle(
+                              color: isDark ? c : (c == Colors.amber ? Colors.amber.shade900 : c),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ]),
                     ),
                   );

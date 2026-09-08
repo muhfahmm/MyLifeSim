@@ -300,17 +300,80 @@ class _BercintaScreenState extends State<BercintaScreen> {
       final bool isSpouse = trLower == 'istri' || trLower == 'suami' || trLower == 'pasangan';
 
       if (!isSpouse) {
-        if (_chosenLocation.contains('Rumah')) {
-          final String t = _chosenTime.toLowerCase();
-          if (t.contains('pagi')) {
-            caughtChance = 50;
-          } else if (t.contains('siang') || t.contains('sore')) {
-            caughtChance = 55;
-          } else if (t.contains('malam')) {
+        final String locLower = _chosenLocation.toLowerCase();
+        final String tLower = _chosenTime.toLowerCase();
+
+        if (locLower.contains('kamar tidur')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 60;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 35;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 40;
+          } else if (tLower.contains('malam')) {
             caughtChance = 15;
           }
-        } else if (_chosenLocation.contains('Hotel')) {
-          caughtChance = 20;
+        } else if (locLower.contains('kamar mandi')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 60;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 30;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 40;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 10;
+          }
+        } else if (locLower.contains('ruang tamu')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 80;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 45;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 30;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 40;
+          }
+        } else if (locLower.contains('dapur')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 40;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 30;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 65;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 30;
+          }
+        } else if (locLower.contains('rumah')) {
+          // Fallback umum jika ruangan tidak terdeteksi spesifik
+          if (tLower.contains('pagi')) {
+            caughtChance = 50;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 35;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 40;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 15;
+          }
+        } else if (locLower.contains('mobil')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 60;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 60;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 50;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 30;
+          }
+        } else if (locLower.contains('hotel')) {
+          if (tLower.contains('pagi')) {
+            caughtChance = 15;
+          } else if (tLower.contains('siang')) {
+            caughtChance = 20;
+          } else if (tLower.contains('sore')) {
+            caughtChance = 10;
+          } else if (tLower.contains('malam')) {
+            caughtChance = 5;
+          }
         }
       }
 

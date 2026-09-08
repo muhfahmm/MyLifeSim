@@ -156,6 +156,11 @@ class HubunganProgressModal {
     final bool isPositive = delta >= 0;
     final Color mainColor = isPositive ? const Color(0xFF10B981) : const Color(0xFFEF4444);
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color cardBgColor = isDark ? const Color(0xFF383848) : Colors.grey.shade100;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color progressBgColor = isDark ? Colors.white10 : Colors.grey.shade300;
+
     return DialogHelper.show(
       context: context,
       title: isPositive ? '📈 Status Hubungan' : '📉 Status Hubungan',
@@ -168,8 +173,9 @@ class HubunganProgressModal {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF383848),
+              color: cardBgColor,
               borderRadius: BorderRadius.circular(16),
+              border: isDark ? null : Border.all(color: Colors.grey.shade300),
             ),
             child: Row(
               children: [
@@ -180,7 +186,7 @@ class HubunganProgressModal {
                     isPositive
                         ? 'Aksi "$actionTitle" membuat $targetName merasa senang dan lebih dekat denganmu!'
                         : 'Aksi "$actionTitle" membuat $targetName merasa kurang nyaman.',
-                    style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.3),
+                    style: TextStyle(color: textColor, fontSize: 13, height: 1.3),
                   ),
                 ),
               ],
@@ -192,8 +198,9 @@ class HubunganProgressModal {
             width: double.infinity,
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: const Color(0xFF383848),
+              color: cardBgColor,
               borderRadius: BorderRadius.circular(16),
+              border: isDark ? null : Border.all(color: Colors.grey.shade300),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,8 +211,8 @@ class HubunganProgressModal {
                     Expanded(
                       child: Text(
                         targetName,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: textColor,
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
@@ -229,7 +236,7 @@ class HubunganProgressModal {
                   child: LinearProgressIndicator(
                     value: (newVal.clamp(0, 100)) / 100.0,
                     minHeight: 10,
-                    backgroundColor: Colors.white10,
+                    backgroundColor: progressBgColor,
                     valueColor: AlwaysStoppedAnimation<Color>(mainColor),
                   ),
                 ),
