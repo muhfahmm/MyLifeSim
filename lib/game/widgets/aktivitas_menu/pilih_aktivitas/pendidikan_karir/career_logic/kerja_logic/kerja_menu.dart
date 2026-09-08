@@ -12,8 +12,7 @@ import 'esport_logic/proplayer/esport_roster_page.dart';
 import 'esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/politik_logic/politik_menu.dart';
-import 'military_job_logic/army_menu.dart';
+import 'special_carrier/pekerjaan_spesial_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -533,34 +532,17 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           ),
           _buildMenuTile(
             context: context,
-            icon: Icons.military_tech,
-            color: Colors.green.shade800,
-            title: 'Militer (TNI AD, AL, AU)',
-            subtitle: 'Bergabung dengan karir militer pertahanan negara',
-            page: ArmyMenuPage(
+            icon: Icons.star_outline,
+            color: Colors.amber.shade800,
+            title: 'Karir Spesial (Militer & Politik) 🌟',
+            subtitle: 'Pilihan karir khusus militer dan jalur kepemimpinan politik',
+            page: PekerjaanSpesialMenuScreen(
               character: character,
               onRefresh: () {
                 if (mounted) setState(() {});
                 widget.onRefresh();
               },
             ),
-          ),
-          _buildMenuTile(
-            context: context,
-            icon: Icons.account_balance,
-            color: Colors.amber.shade800,
-            title: 'Karier Politik 🏛️',
-            subtitle: 'Jalur kekuasaan: Dewan, Walikota, Gubernur hingga Presiden (Butuh Gelar & Modal Kampanye)',
-            onTap: () {
-              PolitikMenuHelper.showPolitikMenu(
-                context,
-                character,
-                () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              );
-            },
           ),
         ],
       ),

@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/army_logic/army_menu.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/military_job_logic/army_menu.dart
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
