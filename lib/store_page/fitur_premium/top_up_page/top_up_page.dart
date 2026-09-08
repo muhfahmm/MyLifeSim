@@ -207,7 +207,7 @@ class _TopUpPageState extends State<TopUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final character = widget.character;
 
     return Scaffold(

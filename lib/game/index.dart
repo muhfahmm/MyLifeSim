@@ -309,6 +309,7 @@ class _GameScreenState extends State<GameScreen> {
                       forcedSkinColor: _character.getFamilyMemberSkinColor(sName) ?? sib['skinColor'],
                     );
 
+                    final String ageDisplay = sAgeVal < 0 ? 'Belum lahir' : 'Umur: $sAgeVal tahun';
                     return ListTile(
                       dense: true,
                       contentPadding: EdgeInsets.zero,
@@ -318,7 +319,7 @@ class _GameScreenState extends State<GameScreen> {
                         isFemale: sIsFemale,
                       ),
                       title: Text('$sName ($sRel)'),
-                      subtitle: Text('Umur: $sAge tahun'),
+                      subtitle: Text(ageDisplay),
                     );
                   }),
                 ],

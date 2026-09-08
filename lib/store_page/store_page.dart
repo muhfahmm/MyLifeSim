@@ -103,7 +103,7 @@ class _StorePageState extends State<StorePage> {
     bool isUnlocked = false,
     VoidCallback? onActiveTap, // PARAMETER BARU
   }) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       elevation: 2,
@@ -228,7 +228,7 @@ class _StorePageState extends State<StorePage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final character = widget.character;
 
     return Scaffold(
@@ -356,7 +356,7 @@ class _StorePageState extends State<StorePage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => GodModePage(character: character!),
+                      builder: (context) => GodModePage(character: character),
                     ),
                   );
                 } else {
@@ -464,7 +464,7 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
       backgroundColor: isDark ? Colors.grey.shade900 : null,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),

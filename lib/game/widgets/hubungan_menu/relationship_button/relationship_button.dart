@@ -763,7 +763,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         status: relation,
                         color: isDeceased ? Colors.grey : (isMale ? Colors.indigo : Colors.purple),
                         relationshipValue: child['relationship'] as int,
-                        ageText: '$age tahun',
+                        ageText: age < 0 ? 'Belum lahir' : '$age tahun',
                         isDeceased: isDeceased,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: name,

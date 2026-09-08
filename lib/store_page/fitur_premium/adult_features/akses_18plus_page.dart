@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
-import 'package:mylifesim/pilih_karakter/settings/proposal_percentage_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/kategori_persentase/keluarga/keluarga_settings_page.dart';
+import 'package:mylifesim/pilih_karakter/settings/kategori_persentase/teman_sekolah/teman_sekolah_settings_page.dart';
+import 'package:mylifesim/pilih_karakter/settings/kategori_persentase/teman_kerja/teman_kerja_settings_page.dart';
 
 class Akses18PlusPage extends StatelessWidget {
   const Akses18PlusPage({super.key});
@@ -213,14 +215,14 @@ class Akses18PlusPage extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            // HEADER PERSENTASE PER ANGGOTA
+            // HEADER PERSENTASE PER ANGGOTA (DENGAN GROUPING KATEGORI)
             Padding(
               padding: const EdgeInsets.only(left: 4, top: 12, bottom: 6, right: 4),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'PENGATURAN PERSENTASE ANGGOTA KELUARGA & NON-KELUARGA',
+                    'PENGATURAN PERSENTASE AJAKAN PACARAN, MAKE LOVE & MASTURBASI',
                     style: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.bold,
@@ -257,121 +259,85 @@ class Akses18PlusPage extends StatelessWidget {
                 ],
               ),
             ),
+            const SizedBox(height: 8),
 
-            // LIST KELUARGA DETAIL (Dinamis Sesuai Gender Pengguna)
-            const RelationPercentageGroupCard(
-              title: 'Ayah Kandung',
-              icon: Icons.person,
-              iconColor: Colors.blue,
-              relationKey: 'Ayah Kandung',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Ayah Tiri',
-              icon: Icons.person_outline,
-              iconColor: Colors.lightBlue,
-              relationKey: 'Ayah Tiri',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Ayah Mertua',
-              icon: Icons.person_add_alt_1,
-              iconColor: Colors.cyan,
-              relationKey: 'Ayah Mertua',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Ibu Kandung',
-              icon: Icons.face,
-              iconColor: Colors.pink,
-              relationKey: 'Ibu Kandung',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Ibu Tiri',
-              icon: Icons.face_retouching_natural,
-              iconColor: Colors.pinkAccent,
-              relationKey: 'Ibu Tiri',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Ibu Mertua',
-              icon: Icons.face_3,
-              iconColor: Colors.purpleAccent,
-              relationKey: 'Ibu Mertua',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Kakak Laki-laki',
-              icon: Icons.escalator_warning,
-              iconColor: Colors.orange,
-              relationKey: 'Kakak Laki-laki',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Kakak Perempuan',
-              icon: Icons.person_3,
-              iconColor: Colors.deepOrange,
-              relationKey: 'Kakak Perempuan',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Adik Laki-laki',
-              icon: Icons.child_care,
-              iconColor: Colors.teal,
-              relationKey: 'Adik Laki-laki',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Adik Perempuan',
-              icon: Icons.face_6,
-              iconColor: Colors.greenAccent,
-              relationKey: 'Adik Perempuan',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Paman',
-              icon: Icons.record_voice_over,
-              iconColor: Colors.indigo,
-              relationKey: 'Paman',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Pasangan Paman',
-              icon: Icons.people_outline,
-              iconColor: Colors.indigoAccent,
-              relationKey: 'Pasangan Paman',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Bibi',
-              icon: Icons.woman,
-              iconColor: Colors.purple,
-              relationKey: 'Bibi',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Sepupu',
-              icon: Icons.people_alt,
-              iconColor: Colors.amber,
-              relationKey: 'Sepupu',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Kakek',
-              icon: Icons.elderly,
-              iconColor: Colors.brown,
-              relationKey: 'Kakek',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Nenek',
-              icon: Icons.elderly_woman,
-              iconColor: Colors.deepOrange,
-              relationKey: 'Nenek',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Anak / Keponakan',
-              icon: Icons.child_friendly,
-              iconColor: Colors.lightGreen,
-              relationKey: 'Anak / Keponakan',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Guru / Dosen',
-              icon: Icons.school,
-              iconColor: Colors.blueGrey,
-              relationKey: 'Guru / Dosen',
-            ),
-            const RelationPercentageGroupCard(
-              title: 'Teman Sekolah / Rekan Kerja / Idols',
-              icon: Icons.groups,
-              iconColor: Colors.cyan,
-              relationKey: 'Teman Sekolah / Rekan Kerja / Idols',
+            // CARD NAVIGATION BUTTONS UNTUK 3 KATEGORI PERSENTASE (GROUPING)
+            Card(
+              elevation: 1,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              color: isDark ? Colors.grey.shade800 : Colors.white,
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: const Icon(Icons.family_restroom, color: Colors.blueAccent, size: 28),
+                    title: Text(
+                      'Keluarga',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Atur persentase ajakan untuk Ayah, Ibu, Kakak, Adik, Paman, Sepupu, dll.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const KeluargaSettingsPage()),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.school, color: Colors.amber, size: 28),
+                    title: Text(
+                      'Teman Sekolah',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Atur persentase ajakan untuk Guru, Dosen, dan Teman Sekelas/Sekolah.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TemanSekolahSettingsPage()),
+                      );
+                    },
+                  ),
+                  const Divider(height: 1),
+                  ListTile(
+                    leading: const Icon(Icons.work, color: Colors.deepPurpleAccent, size: 28),
+                    title: Text(
+                      'Teman Kerja',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    subtitle: const Text(
+                      'Atur persentase ajakan untuk Bos, Atasan, Supervisor, dan Rekan Kerja.',
+                      style: TextStyle(fontSize: 12),
+                    ),
+                    trailing: const Icon(Icons.chevron_right),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const TemanKerjaSettingsPage()),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         ),

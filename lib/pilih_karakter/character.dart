@@ -278,7 +278,7 @@ class Character {
 
     if (fName != null && mName != null && fAlive && mAlive && notDivorced) {
       final int effectiveChance = parentsReconciled ? (baseChance - 5).clamp(0, 100) : baseChance;
-      if (parentArgumentCount < 2 && random.nextInt(100) < effectiveChance) {
+      if (parentArgumentCount < 1 && random.nextInt(100) < effectiveChance) {
         parentArgumentCount++;
         pendingParentArgumentEvent = {
           'fatherName': fName,
@@ -290,8 +290,8 @@ class Character {
         final String argMsg = '💥 Keributan Orang Tua (Ke-$parentArgumentCount): Kamu mendengar pertengkaran sengit antara $fName dan $mName di rumah!';
         inbox.add(argMsg);
 
-        // Jika sudah mencapai batas 2 pertengkaran, segera masukkan ke masa pertimbangan
-        if (parentArgumentCount >= 2 && parentsDivorceYearsLeft == null) {
+        // Jika sudah terjadi 1 kali pertengkaran, masukkan ke masa pertimbangan perceraian (1-2 tahun)
+        if (parentsDivorceYearsLeft == null) {
           final int years = 1 + random.nextInt(2); // 1-2 tahun pertimbangan
           parentsDivorceYearsLeft = years;
           final String decisionMsg = '🤔 Orang tuamu mulai memikirkan hubungan mereka... ($years tahun ke depan akan ada keputusan)';

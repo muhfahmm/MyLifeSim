@@ -397,7 +397,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      _buildSectionTitle('Pengaturan Persentase Per-Anggota', isDark),
+                      _buildSectionTitle('Pengaturan Persentase Ajakan Pacaran, Make Love & Mastrubasi Per-Anggota', isDark),
                       ValueListenableBuilder<String>(
                         valueListenable: GlobalSettings.userGender,
                         builder: (context, genderVal, _) {
