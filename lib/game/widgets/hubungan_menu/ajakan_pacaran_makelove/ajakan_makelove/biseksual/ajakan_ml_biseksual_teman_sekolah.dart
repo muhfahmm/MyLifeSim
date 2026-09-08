@@ -3,22 +3,6 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 
 class AjakanMlBiseksualTemanSekolah {
   static int getChance(Character character, Map<String, dynamic> candidate) {
-    final String rel = candidate['relation'].toString().toLowerCase();
-    final bool isBiseksual = character.sexuality.trim().toLowerCase() == 'biseksual';
-
-    if (isBiseksual) {
-      if (rel.contains('kakak kelas')) {
-        return 50;
-      } else if (rel.contains('teman sekelas')) {
-        return 50;
-      } else if (rel.contains('teman satu angkatan') || rel.contains('angkatan')) {
-        return 50;
-      } else if (rel.contains('adik kelas')) {
-        return 50;
-      } else {
-        return 50;
-      }
-    }
     return 50;
   }
 
@@ -37,3 +21,4 @@ class AjakanMlBiseksualTemanSekolah {
     return null;
   }
 }
+

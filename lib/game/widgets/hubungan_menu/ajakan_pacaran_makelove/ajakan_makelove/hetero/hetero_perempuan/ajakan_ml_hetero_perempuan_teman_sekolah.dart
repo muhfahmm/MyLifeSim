@@ -3,17 +3,6 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 
 class AjakanMlHeteroPerempuanTemanSekolah {
   static int getChance(Character character, Map<String, dynamic> candidate) {
-    final String rel = candidate['relation'].toString().toLowerCase();
-
-    if (rel.contains('kakak kelas')) {
-      return 35;
-    } else if (rel.contains('teman sekelas')) {
-      return 35;
-    } else if (rel.contains('teman satu angkatan') || rel.contains('angkatan')) {
-      return 30;
-    } else if (rel.contains('adik kelas')) {
-      return 30;
-    }
     return 35;
   }
 

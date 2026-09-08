@@ -15,7 +15,8 @@ class AjakanPacaranHeteroLakiTemanSekolah {
     }
   }
 
-  static Map<String, dynamic>? check(Character character, Map<String, dynamic> candidate, Random rand) {
+  static Map<String, dynamic>? check(
+      Character character, Map<String, dynamic> candidate, Random rand) {
     final int chance = getChance(character, candidate);
     if (rand.nextInt(100) < chance) {
       return {
