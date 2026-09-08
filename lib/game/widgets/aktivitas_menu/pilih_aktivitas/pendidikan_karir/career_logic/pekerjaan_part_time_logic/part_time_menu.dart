@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'database_part_time.dart';
 
 class PartTimeMenuPage extends StatefulWidget {
@@ -226,7 +227,7 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Gaji: \$$salary/tahun',
+                        'Gaji: ${CurrencySettings.format(salary)}/tahun',
                         style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.teal, fontSize: 13),
                       ),
                     ],

@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/pikiran_tubuh/pikiran_tubuh_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class PikiranTubuhMenuHelper {
   static void showPikiranTubuhMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -52,7 +53,7 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeAktivitas(BuildContext context, Map<String, dynamic> a) {
@@ -63,25 +64,23 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
       widget.character.health = (widget.character.health + (a['health'] as int)).clamp(0, 100);
     });
 
-    final msg = '${a['name']} selesai! Kamu merasa lebih tenang dan fokus. (+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)';
-    widget.character.inbox.add(msg);
+    widget.character.inbox.add('🧘 Pikiran & Tubuh: Kamu melakukan ${a['name']} (+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan)');
+    widget.onComplete();
+
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Sesi Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
+        title: Text('${a['name']} Selesai 🎉', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+        content: Text('Kamu merasa lebih tenang dan sehat setelah melakukan ${a['name']}.\n'
+            '(+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+          ),
         ],
       ),
     );
@@ -92,10 +91,17 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pikiran & Tubuh 🧘', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Pikiran & Tubuh 🧘', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF00695C), Color(0xFF004D40)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -109,7 +115,7 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -148,7 +154,7 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: \$${_fmt(a['cost'] as int)}"}',
+                          '${a['desc']}\n${a['cost'] == 0 ? "Gratis ✅" : "Biaya: ${_fmt(a['cost'] as int)}"}',
                           style: TextStyle(
                             color: canAfford ? (isDark ? Colors.white70 : Colors.black54) : (isDark ? Colors.white38 : Colors.grey),
                           ),

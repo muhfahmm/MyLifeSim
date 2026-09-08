@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class EsportActivitiesPage extends StatefulWidget {
   final Character character;
@@ -61,7 +62,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
     if (widget.character.money < 100) {
       _showResultDialog(
         title: 'Uang Kurang 💸',
-        content: 'Kamu membutuhkan \$100 untuk biaya transportasi dan akomodasi acara Meet & Greet.',
+        content: 'Kamu membutuhkan ${CurrencySettings.format(100)} untuk biaya transportasi dan akomodasi acara Meet & Greet.',
         icon: Icons.money_off,
         color: Colors.red,
       );
@@ -81,7 +82,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
           '• Kebahagiaan: +20%\n'
           '• Penampilan: +10%\n'
           '• Kesehatan: -10% (Capek bertemu banyak orang)\n'
-          '• Biaya: -\$100',
+          '• Biaya: -${CurrencySettings.format(100)}',
       icon: Icons.photo_camera,
       color: Colors.pinkAccent,
     );
@@ -99,7 +100,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
       _showResultDialog(
         title: 'Skandal Endorse! ⚠️',
         content: 'Produk yang kamu iklankan ternyata bermasalah dan merusak reputasimu!\n\n'
-            '• Uang diterima: +\$500\n'
+            '• Uang diterima: +${CurrencySettings.format(500)}\n'
             '• Penampilan: -10%\n'
             '• Kebahagiaan: -10%',
         icon: Icons.warning,
@@ -113,7 +114,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
       _showResultDialog(
         title: 'Sponsorship Sukses! 💰',
         content: 'Iklan berjalan dengan lancar dan brand sangat puas dengan performamu.\n\n'
-            '• Uang diterima: +\$500\n'
+            '• Uang diterima: +${CurrencySettings.format(500)}\n'
             '• Kebahagiaan: +10%',
         icon: Icons.monetization_on,
         color: Colors.green,
@@ -148,7 +149,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
       _showResultDialog(
         title: 'Negosiasi Sukses! 📑',
         content: 'Manajemen menyetujui kinerjamu yang luar biasa dan menaikkan gajimu!\n\n'
-            '• Gaji Tahunan Permanen: +\$300/tahun',
+            '• Gaji Tahunan Permanen: +${CurrencySettings.format(300)}/tahun',
         icon: Icons.assignment_turned_in,
         color: Colors.green,
       );
@@ -246,7 +247,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
       _showResultDialog(
         title: 'Juara Turnamen! 🏆',
         content: 'Kerja keras tim berbuah hasil manis! Kalian memenangkan trofi juara!\n\n'
-            '• Hadiah turnamen: +\$1,000\n'
+            '• Hadiah turnamen: +${CurrencySettings.format(1000)}\n'
             '• Kebahagiaan: +30%',
         icon: Icons.emoji_events,
         color: Colors.amber,
@@ -322,7 +323,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
     _showResultDialog(
       title: 'Live Streaming Pribadi 📱',
       content: 'Melakukan siaran langsung bermain game dan menyapa penggemar.\n\n'
-          '• Donasi diterima: +\$100\n'
+          '• Donasi diterima: +${CurrencySettings.format(100)}\n'
           '• Kebahagiaan: +10%',
       icon: Icons.live_tv,
       color: Colors.redAccent,
@@ -376,7 +377,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'Status Uangmu: \$${widget.character.money}',
+                            'Status Uangmu: ${CurrencySettings.format(widget.character.money)}',
                             style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -404,7 +405,7 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
                 icon: Icons.photo_camera,
                 color: Colors.pink,
                 title: 'Event Meet & Greet / Fansign',
-                desc: 'Menguras Kesehatan tetapi meningkatkan Kebahagiaan dan Penampilan. Biaya: \$100.',
+                desc: 'Menguras Kesehatan tetapi meningkatkan Kebahagiaan dan Penampilan. Biaya: ${CurrencySettings.format(100)}.',
                 onTap: _doMeetAndGreet,
               ),
               _buildActivityButton(

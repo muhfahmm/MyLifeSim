@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'freelance_database.dart';
 
 class FreelanceMenuPage extends StatefulWidget {
@@ -42,7 +43,7 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
     setState(() {
       widget.character.money += payout;
       widget.character.happiness = (widget.character.happiness + 2).clamp(0, 100);
-      widget.character.inbox.add('💻 Freelance: Kamu menyelesaikan proyek "${gig['title']}" dan mendapatkan bayaran sebesar \$$payout!');
+      widget.character.inbox.add('💻 Freelance: Kamu menyelesaikan proyek "${gig['title']}" dan mendapatkan bayaran sebesar ${CurrencySettings.format(payout)}!');
     });
 
     widget.onRefresh();
@@ -58,7 +59,7 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
             const Text('Proyek Selesai! 🎉'),
           ],
         ),
-        content: Text('Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar \$$payout.'),
+        content: Text('Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar ${CurrencySettings.format(payout)}.'),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
@@ -139,7 +140,7 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
                     Row(
                       children: [
                         Text(
-                          'Bayaran: \$$payout',
+                          'Bayaran: ${CurrencySettings.format(payout)}',
                           style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13),
                         ),
                         const SizedBox(width: 12),

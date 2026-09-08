@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/daftar_aksesoris/tas_branded/tas_branded_products_page.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class TasBrandedProductsPage extends StatefulWidget {
   final Character character;
@@ -22,7 +23,7 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
   late final List<Map<String, dynamic>> products;
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   @override
@@ -67,7 +68,7 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
                   ),
                 ],
@@ -107,7 +108,7 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
                         child: Text(
                           isOwned
                               ? '${p['desc']}\nStatus: Sudah Dimiliki'
-                              : '${p['desc']}\nHarga: \$${_fmt(price)}',
+                              : '${p['desc']}\nHarga: ${_fmt(price)}',
                           style: TextStyle(
                             color: isOwned
                                 ? Colors.green.shade700
@@ -134,7 +135,7 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
                             'desc': p['desc'],
                           });
                         });
-                        final msg = '🛍️ Kamu membeli ${p['name']}! (-\$${_fmt(price)}, +${p['happiness']}% Kebahagiaan)';
+                        final msg = '🛍️ Kamu membeli ${p['name']}! (-${_fmt(price)}, +${p['happiness']}% Kebahagiaan)';
                         widget.character.inbox.add(msg);
                         showDialog(
                           context: context,

@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 
@@ -3910,7 +3911,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
                       final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
                           ? 'Status Pendidikan: $detailSchool'
-                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: \$${jobInfo['salary']}/bln)';
+                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
 
                       // --- Status Hubungan Anak ---
                       String? childPartnerName;
@@ -3952,7 +3953,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                '\$$wealthVal',
+                                CurrencySettings.format(wealthVal),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,

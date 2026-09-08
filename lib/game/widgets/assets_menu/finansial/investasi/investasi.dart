@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 // ============================================================
 // PART FILES (setiap menu akan menjadi part)
@@ -47,20 +48,11 @@ class RupiahInputFormatter extends TextInputFormatter {
 }
 
 int parseRupiah(String value) {
-  return int.tryParse(value.replaceAll(',', '').trim()) ?? 0;
+  return int.tryParse(value.replaceAll(',', '').replaceAll('.', '').trim()) ?? 0;
 }
 
 String formatRupiah(num value) {
-  final parts = value.round().abs().toString().split('');
-  final buffer = StringBuffer();
-  for (int i = 0; i < parts.length; i++) {
-    if (i > 0 && (parts.length - i) % 3 == 0) {
-      buffer.write(',');
-    }
-    buffer.write(parts[i]);
-  }
-  final formatted = buffer.toString();
-  return value < 0 ? '-$formatted' : formatted;
+  return CurrencySettings.formatValue(value);
 }
 
 Widget _buildCashHeader(BuildContext context, _InvestasiPageState state, {String? assetType}) {
@@ -102,7 +94,7 @@ Widget _buildCashHeader(BuildContext context, _InvestasiPageState state, {String
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text('Uang Tunai:', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-            Text('\$${formatRupiah(state.character.money)}', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
+            Text(CurrencySettings.format(state.character.money), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green)),
           ],
         ),
         if (showReturn) ...[
@@ -510,11 +502,11 @@ class _InvestasiPageState extends State<InvestasiPage> {
                   children: [
                     Text('Total Kekayaan', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey)),
                     Text(
-                      '\$${formatRupiah(totalKekayaan)}',
+                      CurrencySettings.format(totalKekayaan),
                       style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.blue),
                     ),
                     const SizedBox(height: 8),
-                    Text('Uang Tunai: \$${formatRupiah(character.money)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                    Text('Uang Tunai: ${CurrencySettings.format(character.money)}', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
                   ],
                 ),
               ),

@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/adopsi_anak/adopsi_anak_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'pilih_anak/pilih_anak_page.dart'; // import halaman pilih anak
 
 class AdopsiAnakMenuHelper {
@@ -96,7 +97,7 @@ class _AdopsiAnakPageState extends State<AdopsiAnakPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold, 
                       fontSize: 16, 
@@ -136,7 +137,7 @@ class _AdopsiAnakPageState extends State<AdopsiAnakPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${cat['desc']}\nBiaya: \$${_fmt(cost)}',
+                          '${cat['desc']}\nBiaya: ${CurrencySettings.format(cost)}',
                           style: TextStyle(
                             color: isDark ? Colors.white70 : Colors.black54,
                           ),

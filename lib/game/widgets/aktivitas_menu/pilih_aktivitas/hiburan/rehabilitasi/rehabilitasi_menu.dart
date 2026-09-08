@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/rehabilitasi/rehabilitasi_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class RehabilitasiMenuHelper {
   static void showRehabilitasiMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -51,7 +52,7 @@ class _RehabilitasiPageState extends State<RehabilitasiPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeRehab(BuildContext context, Map<String, dynamic> p) {
@@ -107,7 +108,7 @@ class _RehabilitasiPageState extends State<RehabilitasiPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -146,7 +147,7 @@ class _RehabilitasiPageState extends State<RehabilitasiPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${p['desc']}\nBiaya: \$${_fmt(p['cost'] as int)} | Durasi: ${p['duration']} hari',
+                          '${p['desc']}\nBiaya: ${_fmt(p['cost'] as int)} | Durasi: ${p['duration']} hari',
                           style: TextStyle(
                             color: canAfford ? (isDark ? Colors.white70 : Colors.black54) : (isDark ? Colors.white38 : Colors.grey),
                           ),

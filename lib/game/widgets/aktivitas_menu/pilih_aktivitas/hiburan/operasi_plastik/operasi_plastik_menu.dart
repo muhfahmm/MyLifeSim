@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class OperasiPlastikMenuHelper {
   static void showOperasiPlastikMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -123,7 +124,7 @@ class _OperasiPlastikPageState extends State<OperasiPlastikPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold, 
                       fontSize: 16, 
@@ -190,7 +191,7 @@ class _OperasiPlastikPageState extends State<OperasiPlastikPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${o['desc']}\nBiaya: \$${_fmt(o['cost'] as int)} | Risiko: ${o['risk']}%',
+                          '${o['desc']}\nBiaya: ${CurrencySettings.format(o['cost'] as int)} | Risiko: ${o['risk']}%',
                           style: TextStyle(
                             color: canAfford 
                                 ? (isDark ? Colors.white70 : Colors.black54)

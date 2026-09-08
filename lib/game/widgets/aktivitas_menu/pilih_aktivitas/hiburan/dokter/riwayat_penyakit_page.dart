@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'menu_dokter/dokter_utils.dart';
 import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
 import 'menu_dokter/tes_darah/tes_darah_page.dart';
@@ -99,7 +100,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Text('Pengobatan Berhasil 🎉', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-            content: Text('Dokter berhasil mengobati penyakitmu ($diseaseName).\nKesehatanmu meningkat +25% (\$150 uang berkurang).', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            content: Text('Dokter berhasil mengobati penyakitmu ($diseaseName).\nKesehatanmu meningkat +25% (${CurrencySettings.format(costPerTreatment)} uang berkurang).', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
             actions: [
               TextButton(
                 onPressed: () {
@@ -123,7 +124,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Text('Pengobatan Gagal 😔', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-            content: Text('Dokter telah berusaha semaksimal mungkin, namun penyakitmu ($diseaseName) belum berhasil disembuhkan.\nBiaya pengobatan sebesar \$150 tetap ditagihkan.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            content: Text('Dokter telah berusaha semaksimal mungkin, namun penyakitmu ($diseaseName) belum berhasil disembuhkan.\nBiaya pengobatan sebesar ${CurrencySettings.format(costPerTreatment)} tetap ditagihkan.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
             actions: [
               TextButton(
                 onPressed: () {
@@ -486,7 +487,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                       const Text('💰', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 8),
                       Text(
-                        'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                        'Saldo Anda: ${DokterUtils.fmt(widget.character.money)}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
                           fontSize: 16, 

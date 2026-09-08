@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class AgeCategoryButton extends StatelessWidget {
   final Character character;
@@ -376,9 +377,11 @@ class AgeCategoryButton extends StatelessWidget {
   Widget _buildStatChip(BuildContext context, IconData icon, String label, int value, Color color, {bool isMoney = false}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Chip(
-      avatar: Icon(icon, size: 16, color: color),
+      avatar: isMoney
+          ? CurrencySettings.buildCurrencyIcon(color: color, size: 16)
+          : Icon(icon, size: 16, color: color),
       label: Text(
-        isMoney ? '\$$value' : '$value%',
+        isMoney ? CurrencySettings.format(value) : '$value%',
         style: TextStyle(
           fontSize: 12, 
           fontWeight: FontWeight.bold, 

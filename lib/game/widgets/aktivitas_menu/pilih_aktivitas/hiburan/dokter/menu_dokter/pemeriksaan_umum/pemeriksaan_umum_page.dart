@@ -46,7 +46,7 @@ class _PemeriksaanUmumPageState extends State<PemeriksaanUmumPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                    'Saldo Anda: ${DokterUtils.fmt(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

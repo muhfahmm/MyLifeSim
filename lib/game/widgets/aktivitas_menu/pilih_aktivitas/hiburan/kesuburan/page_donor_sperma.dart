@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
@@ -72,11 +73,11 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
       });
 
       title = 'Donor Sperma Berhasil! 🧬';
-      content = 'Penerima: Ibu $ibuNama\nBayi lahir: $anakGender bernama $anakNama.\n\nAnda mendapatkan \$5.000 atas kontribusi ini!';
+      content = 'Penerima: Ibu $ibuNama\nBayi lahir: $anakGender bernama $anakNama.\n\nAnda mendapatkan ${CurrencySettings.format(5000)} atas kontribusi ini!';
       widget.character.inbox.add('🧬 Donor Sperma Berhasil! Ibu $ibuNama melahirkan bayi $anakGender bernama $anakNama dari sperma Anda.');
     } else {
       title = 'Donor Sperma Tersimpan 🧪';
-      content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima \$5.000!';
+      content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(5000)}!';
       widget.character.inbox.add('🧬 Donor Sperma: Sperma Anda berhasil disimpan di bank sperma.');
     }
 
@@ -136,7 +137,7 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Setiap kali mendonorkan sperma yang layak, Anda akan menerima imbalan \$5.000.',
+                  'Setiap kali mendonorkan sperma yang layak, Anda akan menerima imbalan ${CurrencySettings.format(5000)}.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
@@ -729,14 +730,14 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
               title: 'Ajak Nonton Bioskop',
               onTap: () {
                 if (widget.character.money < 30) {
-                  _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki uang (\$30) untuk membeli tiket bioskop.');
+                  _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki uang (${CurrencySettings.format(30)}) untuk membeli tiket bioskop.');
                   return;
                 }
                 widget.character.money -= 30;
                 final change = 12 + _random.nextInt(9);
                 _updateRelationship(change);
                 widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
-                _showOutcome('Nonton Bioskop 🎬', 'Kamu membelikan tiket bioskop (\$30) untuk Ibu $name. Kalian menikmati film komedi romantis bersama.');
+                _showOutcome('Nonton Bioskop 🎬', 'Kamu membelikan tiket bioskop (${CurrencySettings.format(30)}) untuk Ibu $name. Kalian menikmati film komedi romantis bersama.');
               },
             ),
 
@@ -754,7 +755,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
             _buildActionTile(
               icon: Icons.card_giftcard,
               color: Colors.purple,
-              title: 'Beri Hadiah (\$20)',
+              title: 'Beri Hadiah (${CurrencySettings.format(20)})',
               onTap: () {
                 if (widget.character.money < 20) {
                   _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki cukup uang.');

@@ -1,7 +1,7 @@
 // lib/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 // ============================================================
 // PART FILES
@@ -15,20 +15,8 @@ part 'menu_kemewahan/filantropi/filantropi.dart';
 part 'menu_kemewahan/koleksi_digital_nft/nft.dart';
 part 'menu_kemewahan/layanan_pribadi/layanan_pribadi.dart';
 
-// ============================================================
-// UTILITY FORMAT RUPIAH
-// ============================================================
 String formatRupiah(num value) {
-  final parts = value.round().abs().toString().split('');
-  final buffer = StringBuffer();
-  for (int i = 0; i < parts.length; i++) {
-    if (i > 0 && (parts.length - i) % 3 == 0) {
-      buffer.write('.');
-    }
-    buffer.write(parts[i]);
-  }
-  final formatted = buffer.toString();
-  return value < 0 ? '-$formatted' : formatted;
+  return CurrencySettings.formatValue(value);
 }
 
 // ============================================================
@@ -82,7 +70,7 @@ class KemewahanItem extends StatelessWidget {
               ),
             ),
             Text(
-              '\$${formatRupiah(character.money)}',
+              CurrencySettings.format(character.money),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -441,9 +429,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     const Text('Total Aset Kemewahan', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                    Text('\$${formatRupiah(totalNilaiKemewahan)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
+                    Text(CurrencySettings.format(totalNilaiKemewahan), style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.purple)),
                     const SizedBox(height: 8),
-                    Text('Uang Tunai: \$${formatRupiah(character.money)}'),
+                    Text('Uang Tunai: ${CurrencySettings.format(character.money)}'),
                     Text('Penghargaan: ${penghargaan.length}'),
                   ],
                 ),

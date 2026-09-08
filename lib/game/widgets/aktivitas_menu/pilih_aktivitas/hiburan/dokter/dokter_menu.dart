@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
 import 'menu_dokter/tes_darah/tes_darah_page.dart';
 import 'menu_dokter/operasi_kecil/operasi_kecil_page.dart';
@@ -92,8 +93,7 @@ class _DokterPageState extends State<DokterPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    // SEKARANG KODE INI SUDAH MENGENAL DokterUtils
-                    'Saldo Anda: \$${DokterUtils.fmt(widget.character.money)}',
+                    'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold, 
                       fontSize: 16, 

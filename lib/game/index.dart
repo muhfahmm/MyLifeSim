@@ -1,6 +1,7 @@
 // lib/game/index.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
@@ -4884,7 +4885,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ],
             ),
-            Text(isMoney ? '\$$value' : '$value%', style: const TextStyle(fontSize: 12)),
+            Text(isMoney ? CurrencySettings.format(value) : '$value%', style: const TextStyle(fontSize: 12)),
           ],
         ),
         const SizedBox(height: 4),

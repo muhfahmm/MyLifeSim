@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'idol_manager.dart';
 
@@ -134,7 +135,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
     // PERBAIKAN ERROR: Model Character tidak memiliki getter 'salary'.
     // Menggunakan properti 'money' yang sudah ada sebagai placeholder gaji bulanan.
     // Jika nanti kamu menambahkan properti 'jobSalary' atau 'salary' di Character, ganti bagian ini.
-    final int currentSalary = char.money ?? 0; 
+    final int currentSalary = char.money; 
 
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF7F9FC),
@@ -262,7 +263,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                   ),
                 ),
                 trailing: Text(
-                  '\$${currentSalary.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}',
+                  CurrencySettings.format(currentSalary),
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,

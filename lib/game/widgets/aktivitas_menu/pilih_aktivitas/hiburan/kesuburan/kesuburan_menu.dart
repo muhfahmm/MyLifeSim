@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'page_donor_sperma.dart';
 
 class KesuburanMenuHelper {
@@ -67,7 +68,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
       layanan.add({
         'name': 'Donor Sperma 🧬',
         'cost': 0,
-        'desc': 'Donorkan sperma Anda ke bank sperma untuk membantu orang lain (Dapat uang \$5.000)',
+        'desc': 'Donorkan sperma Anda ke bank sperma untuk membantu orang lain (Dapat uang ${CurrencySettings.format(5000)})',
       });
     } else {
       layanan.add({
@@ -81,9 +82,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
   }
 
   static String _fmt(int amount) {
-    // Menghindari minus uang saat donor sperma (cost: 0)
-    final absVal = amount.abs();
-    return absVal.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeLayanan(BuildContext context, Map<String, dynamic> l, int kesuburan) {
@@ -124,9 +123,9 @@ class _KesuburanPageState extends State<KesuburanPage> {
           'isDeceased': 'false',
         });
 
-        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan \$5.000 untuk kontribusi ini!';
+        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan ${CurrencySettings.format(5000)} untuk kontribusi ini!';
       } else {
-        msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan \$5.000 untuk donor ini!';
+        msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan ${CurrencySettings.format(5000)} untuk donor ini!';
       }
     } else if (l['name'].toString().contains('Kontrol Kehamilan') || l['name'].toString().contains('KB')) {
       setState(() {
@@ -198,7 +197,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
                       const Text('💰', style: TextStyle(fontSize: 18)),
                       const SizedBox(width: 8),
                       Text(
-                        'Saldo Anda: \$${_fmt(widget.character.money)}',
+                        'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
                           fontSize: 14, 
@@ -257,7 +256,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${l['desc']}\nBiaya: \$${_fmt(l['cost'] as int)}',
+                          '${l['desc']}\nBiaya: ${CurrencySettings.format(l['cost'] as int)}',
                           style: TextStyle(
                             color: canAfford 
                                 ? (isDark ? Colors.white70 : Colors.black54)

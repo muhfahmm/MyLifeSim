@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'dart:math';
 import 'actions/rekan_kerja.dart';
 import 'actions/bekerja_keras.dart';
@@ -277,7 +278,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               ),
               const SizedBox(height: 4),
               Text(
-                'Gaji: \$${character.jobSalary}/tahun',
+                'Gaji: ${CurrencySettings.format(character.jobSalary!)}/tahun',
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,

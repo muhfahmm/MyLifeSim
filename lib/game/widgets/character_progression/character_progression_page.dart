@@ -4,6 +4,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_preset.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class CharacterProgressionPage extends StatefulWidget {
   final Character character;
@@ -263,7 +264,7 @@ class _CharacterProgressionPageState extends State<CharacterProgressionPage> wit
             title: 'Keuangan & Sosial',
             icon: Icons.account_balance_wallet,
             items: [
-              _buildInfoRow('Saldo Kas Dompet', '\$${char.money}'),
+              _buildInfoRow('Saldo Kas Dompet', CurrencySettings.format(char.money)),
               _buildInfoRow('Jumlah Pengikut / Followers', '${char.followers} Orang'),
               _buildInfoRow('Jumlah Teman Dekat', '${char.friends.length} Orang'),
               _buildInfoRow('Jumlah Riwayat Notifikasi Inbox', '${char.inbox.length} Pesan'),
@@ -288,7 +289,7 @@ class _CharacterProgressionPageState extends State<CharacterProgressionPage> wit
             icon: Icons.gavel,
             items: [
               _buildInfoRow('Pernah Dipenjara?', char.isImprisoned ? 'Ya (${char.remainingJailYears} Thn Sisa)' : 'Tidak'),
-              _buildInfoRow('Hasil Kejahatan Terakhir', '\$${char.lastCrimeLoot}'),
+              _buildInfoRow('Hasil Kejahatan Terakhir', CurrencySettings.format(char.lastCrimeLoot)),
               _buildInfoRow('Kontrol KB Aktif?', char.birthControlActive ? 'Ya' : 'Tidak'),
             ],
           ),

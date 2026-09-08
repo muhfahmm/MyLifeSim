@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/pekerjaan_umum_logic/pekerjaan_umum_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'dart:math';
 import '../database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
@@ -249,8 +250,8 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
         title: const Text('Lamaran Diterima! 🎉💼'),
         content: Text(
           isGraduatedRedirect
-              ? 'Karena kamu sudah pernah melangsungkan kelulusan sebagai Idol, manajemen merekrutmu sebagai Staf Operasional Idol dengan gaji \$500/tahun!'
-              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle$teamText dengan gaji \$$finalSalary/tahun.',
+              ? 'Karena kamu sudah pernah melangsungkan kelulusan sebagai Idol, manajemen merekrutmu sebagai Staf Operasional Idol dengan gaji ${CurrencySettings.format(500)}/tahun!'
+              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle$teamText dengan gaji ${CurrencySettings.format(finalSalary)}/tahun.',
         ),
         actions: [
           TextButton(
@@ -335,7 +336,7 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Gaji: \$${(job['salary'] * _salaryMultiplier).round()}/tahun • ${job['category']}',
+                          'Gaji: ${CurrencySettings.format((job['salary'] * _salaryMultiplier).round())}/tahun • ${job['category']}',
                           style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
                         ),
                         Text(

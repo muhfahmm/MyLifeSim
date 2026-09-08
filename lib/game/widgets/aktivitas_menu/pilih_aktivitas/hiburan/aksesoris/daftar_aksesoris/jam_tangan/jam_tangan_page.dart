@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/daftar_aksesoris/jam_tangan/jam_tangan_page.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'jam_tangan_products_page.dart';
 
 class JamTanganBrandPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class JamTanganBrandPage extends StatefulWidget {
 
 class _JamTanganBrandPageState extends State<JamTanganBrandPage> {
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   @override
@@ -116,7 +117,7 @@ class _JamTanganBrandPageState extends State<JamTanganBrandPage> {
                             title: Text(item['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 4),
-                              child: Text('Merek: ${item['brand']}\nHarga: \$${_fmt(price)}', style: const TextStyle(color: Colors.black54)),
+                              child: Text('Merek: ${item['brand']}\nHarga: ${_fmt(price)}', style: const TextStyle(color: Colors.black54)),
                             ),
                             trailing: const Icon(Icons.check_circle, color: Colors.green),
                           ),

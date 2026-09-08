@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/aksesoris_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'daftar_aksesoris/jam_tangan/jam_tangan_page.dart';
 import 'daftar_aksesoris/kacamata_sunglasses/kacamata_sunglasses_page.dart';
 import 'daftar_aksesoris/tas_branded/tas_branded_page.dart';
@@ -95,7 +96,7 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_formatMoney(widget.character.money)}',
+                    'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,

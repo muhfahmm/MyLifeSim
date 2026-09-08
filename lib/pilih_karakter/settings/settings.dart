@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/main.dart'; // Untuk mengakses themeNotifier
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/store_page/store_page.dart'; // Tambahkan Import ini
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'kategori_persentase/keluarga/keluarga_settings_page.dart';
 import 'kategori_persentase/teman_sekolah/teman_sekolah_settings_page.dart';
 import 'kategori_persentase/teman_kerja/teman_kerja_settings_page.dart';
@@ -72,32 +73,63 @@ class _SettingsPageState extends State<SettingsPage> {
               borderRadius: BorderRadius.circular(12),
               side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
             ),
-            child: ValueListenableBuilder<ThemeMode>(
-              valueListenable: themeNotifier,
-              builder: (context, mode, _) {
-                final bool isDarkMode = mode == ThemeMode.dark;
-                return SwitchListTile(
-                  secondary: Icon(
-                    isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                    color: isDarkMode ? Colors.yellow.shade700 : Colors.blue,
-                  ),
-                  title: Text(
-                    'Mode Gelap (Dark Mode)',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.black87,
-                    ),
-                  ),
-                  subtitle: Text(
-                    isDarkMode ? 'Mode gelap aktif' : 'Mode terang aktif',
-                    style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
-                  ),
-                  value: isDarkMode,
-                  onChanged: (val) {
-                    themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
+            child: Column(
+              children: [
+                ValueListenableBuilder<ThemeMode>(
+                  valueListenable: themeNotifier,
+                  builder: (context, mode, _) {
+                    final bool isDarkMode = mode == ThemeMode.dark;
+                    return SwitchListTile(
+                      secondary: Icon(
+                        isDarkMode ? Icons.dark_mode : Icons.light_mode,
+                        color: isDarkMode ? Colors.yellow.shade700 : Colors.blue,
+                      ),
+                      title: Text(
+                        'Mode Gelap (Dark Mode)',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      subtitle: Text(
+                        isDarkMode ? 'Mode gelap aktif' : 'Mode terang aktif',
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
+                      ),
+                      value: isDarkMode,
+                      onChanged: (val) {
+                        themeNotifier.value = val ? ThemeMode.dark : ThemeMode.light;
+                      },
+                    );
                   },
-                );
-              },
+                ),
+                const Divider(height: 1),
+                ValueListenableBuilder<CurrencyModel>(
+                  valueListenable: CurrencySettings.selectedCurrency,
+                  builder: (context, curr, _) {
+                    return ListTile(
+                      leading: Text(curr.flag, style: const TextStyle(fontSize: 22)),
+                      title: Text(
+                        'Mata Uang Game',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
+                      ),
+                      subtitle: Text(
+                        '${curr.name} (${curr.code} / ${curr.symbol})',
+                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
+                      ),
+                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => const CurrencySettingsPage()),
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
           ),
           const SizedBox(height: 8),

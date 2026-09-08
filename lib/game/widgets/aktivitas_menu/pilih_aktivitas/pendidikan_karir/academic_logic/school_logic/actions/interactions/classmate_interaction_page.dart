@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
@@ -363,7 +364,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       final jobInfo = widget.character.getNPCJobInfo(name, targetRole);
                       final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
                           ? 'Status: Sekolah/Kuliah'
-                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: \$${jobInfo['salary']}/bln)';
+                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -391,7 +392,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                               ),
                               const SizedBox(width: 12),
                               Text(
-                                '\$$wealthVal',
+                                CurrencySettings.format(wealthVal),
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,

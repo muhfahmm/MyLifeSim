@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 
@@ -98,7 +99,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
   }
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _showAdoptionDialog(Map<String, dynamic> child) {
@@ -106,7 +107,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Konfirmasi Adopsi', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Apakah Anda yakin ingin mengadopsi ${child['name']} (${child['gender']}, ${child['age']} tahun) dengan biaya \$${_fmt(child['cost'] as int)}?'),
+        content: Text('Apakah Anda yakin ingin mengadopsi ${child['name']} (${child['gender']}, ${child['age']} tahun) dengan biaya ${_fmt(child['cost'] as int)}?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -171,7 +172,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
 
     // Kirim pesan ke inbox
     final String msg = '👨‍👩‍👧 Kamu berhasil mengadopsi ${child['name']} (${child['gender']}, ${child['age']} tahun)!'
-        ' (+20% Kebahagiaan, -\$${_fmt(child['cost'] as int)})';
+        ' (+20% Kebahagiaan, -${_fmt(child['cost'] as int)})';
     widget.character.inbox.add(msg);
 
     // Tampilkan dialog sukses
@@ -223,7 +224,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
                   ),
                 ],
@@ -281,7 +282,7 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          'Umur: ${child['age']} tahun\n${child['desc']}\nBiaya: \$${_fmt(cost)}',
+                          'Umur: ${child['age']} tahun\n${child['desc']}\nBiaya: ${_fmt(cost)}',
                           style: const TextStyle(color: Colors.black54),
                         ),
                       ),

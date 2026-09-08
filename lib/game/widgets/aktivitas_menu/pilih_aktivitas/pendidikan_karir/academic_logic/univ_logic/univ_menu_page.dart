@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'dart:math';
 import 'dart:convert';
 import 'actions/belajar.dart';
@@ -499,7 +500,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         final String currentLoc = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');
         // Biaya per tahun dihitung dinamis berdasarkan negara dan jurusan
         final int annualTuition = MajorRecommender.calculateTuitionFee(currentLoc, major);
-        final String fmtTuition = '\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun';
+        final String fmtTuition = '${CurrencySettings.format(annualTuition)} / tahun';
 
         showDialog(
           context: context,

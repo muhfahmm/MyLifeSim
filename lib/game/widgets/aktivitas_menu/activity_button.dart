@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbasi_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/love/love_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/sosial_media/sosial_media_menu.dart';
@@ -191,7 +192,7 @@ class ActivityButton extends StatelessWidget {
                         ? 'Bekerja (${character.jobName})'
                         : 'Bekerja',
                     subtitle: (character.jobName != null && character.jobSalary != null)
-                        ? '${character.jobName} - Gaji: \$${character.jobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
+                        ? '${character.jobName} - Gaji: ${CurrencySettings.format(character.jobSalary!)}/tahun'
                         : 'Mulai bekerja untuk menghasilkan uang tunai',
                     icon: Icons.work,
                     color: Colors.green,
@@ -239,7 +240,7 @@ class ActivityButton extends StatelessWidget {
                         ? 'Pekerjaan Part Time (${character.partTimeJobName})'
                         : 'Pekerjaan Part Time',
                     subtitle: (character.partTimeJobName != null && character.partTimeJobSalary != null)
-                        ? '${character.partTimeJobName} - Gaji: \$${character.partTimeJobSalary.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]},')}/tahun'
+                        ? '${character.partTimeJobName} - Gaji: ${CurrencySettings.format(character.partTimeJobSalary!)}/tahun'
                         : 'Kerja paruh waktu sampingan untuk penghasilan tambahan',
                     icon: Icons.access_time_filled_rounded,
                     color: Colors.teal,

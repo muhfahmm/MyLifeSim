@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class ArmyMenuPage extends StatefulWidget {
   final Character character;
@@ -110,7 +111,7 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                     r['rank'],
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                   ),
-                  subtitle: Text('Gaji: \$$salary/tahun | Min Intel: $minIntel%', style: const TextStyle(fontSize: 12)),
+                  subtitle: Text('Gaji: ${CurrencySettings.format(salary)}/tahun | Min Intel: $minIntel%', style: const TextStyle(fontSize: 12)),
                   trailing: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: isEligible ? (branchData['color'] as Color) : Colors.grey,

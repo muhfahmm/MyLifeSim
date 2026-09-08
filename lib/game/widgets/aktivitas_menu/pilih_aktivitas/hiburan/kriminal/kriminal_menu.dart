@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class KriminalMenuHelper {
   static void showKriminalMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -52,7 +53,7 @@ class _KriminalPageState extends State<KriminalPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeCrime(BuildContext context, Map<String, dynamic> crime) {
@@ -80,7 +81,7 @@ class _KriminalPageState extends State<KriminalPage> {
       });
       msg = '🚔 TERTANGKAP! Kamu ditangkap polisi saat ${crime['name']} dan dihukum $jailYears tahun penjara! (-40% Kebahagiaan, -10% Kesehatan)';
       if (confiscatedAmount > 0) {
-        msg += '\n👮 Polisi menyita uang hasil kriminal terakhirmu sebesar \$${_fmt(confiscatedAmount)}!';
+        msg += '\n👮 Polisi menyita uang hasil kriminal terakhirmu sebesar ${_fmt(confiscatedAmount)}!';
       }
     } else {
       setState(() {
@@ -89,7 +90,7 @@ class _KriminalPageState extends State<KriminalPage> {
         widget.character.lastCrimeLoot = gain;
         widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
       });
-      msg = '😈 BERHASIL! Kamu berhasil melakukan ${crime['name']} dan mendapatkan \$${_fmt(crime['gain'] as int)}! (+10% Kebahagiaan)';
+      msg = '😈 BERHASIL! Kamu berhasil melakukan ${crime['name']} dan mendapatkan ${_fmt(crime['gain'] as int)}! (+10% Kebahagiaan)';
     }
 
     widget.character.inbox.add(msg);
@@ -190,7 +191,7 @@ class _KriminalPageState extends State<KriminalPage> {
                       ),
                       isThreeLine: true,
                       trailing: Text(
-                        '+\$${_fmt(crime['gain'] as int)}',
+                        '+${_fmt(crime['gain'] as int)}',
                         style: TextStyle(
                           color: isDark ? Colors.greenAccent : Colors.green, 
                           fontWeight: FontWeight.bold, 

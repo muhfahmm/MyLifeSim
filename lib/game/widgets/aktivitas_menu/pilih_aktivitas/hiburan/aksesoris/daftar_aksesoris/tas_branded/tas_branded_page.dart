@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/aksesoris/daftar_aksesoris/tas_branded/tas_branded_page.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'tas_branded_products_page.dart';
 
 class TasBrandedBrandPage extends StatefulWidget {
@@ -19,7 +20,7 @@ class TasBrandedBrandPage extends StatefulWidget {
 
 class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   @override
@@ -115,7 +116,7 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
                             title: Text(item['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 4),
-                              child: Text('Merek: ${item['brand']}\nHarga: \$${_fmt(price)}', style: const TextStyle(color: Colors.black54)),
+                              child: Text('Merek: ${item['brand']}\nHarga: ${_fmt(price)}', style: const TextStyle(color: Colors.black54)),
                             ),
                             trailing: const Icon(Icons.check_circle, color: Colors.green),
                           ),

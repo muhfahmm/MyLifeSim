@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
@@ -843,7 +844,7 @@ List<ActionItem> getAge12PlusActions(
         if (affordableCars.isEmpty) {
           showDialogCallback(
             'Permintaan Ditolak',
-            'Uang $relation tidak cukup untuk membeli kendaraan saat ini! (Saldo Kekayaan mereka: \$${parentWealth.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")})',
+            'Uang $relation tidak cukup untuk membeli kendaraan saat ini! (Saldo Kekayaan mereka: ${CurrencySettings.format(parentWealth)})',
             Icons.block, Colors.red, () {
               character.happiness = (character.happiness - 5).clamp(0, 100);
               updateRelationship(-random.nextInt(6) - 5);
@@ -869,7 +870,7 @@ List<ActionItem> getAge12PlusActions(
         if (accepted) {
           showDialogCallback(
             'Minta Kendaraan Sukses! 🚗',
-            'Hebat! $relation mengabulkan permintaanmu dan membelikanmu kendaraan ${chosenCar['nama']} seharga \$${chosenCar['harga'].toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}!',
+            'Hebat! $relation mengabulkan permintaanmu dan membelikanmu kendaraan ${chosenCar['nama']} seharga ${CurrencySettings.format(carPrice)}!',
             Icons.check_circle, Colors.green, () {
               character.addCarToGarage(chosenCar, character.age);
               character.setTargetWealth(targetName, targetRole, parentWealth - carPrice);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class LoveMenuHelper {
   static void showLoveMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -103,7 +104,7 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
                   ),
                 ),
                 subtitle: Text(
-                  'Cari pasangan ideal berdasarkan kriteria umur (Biaya: \$50.000)',
+                  'Cari pasangan ideal berdasarkan kriteria umur (Biaya: ${CurrencySettings.format(50000)})',
                   style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
                 ),
                 trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
@@ -328,7 +329,7 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               onPressed: _searchCandidate,
-              child: const Text('Cari Pasangan (\$50.000)', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Cari Pasangan (${CurrencySettings.format(50000)})', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -402,7 +403,7 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Uang Tidak Cukup'),
-          content: const Text('Kamu butuh minimal \$50.000 untuk menggunakan aplikasi kencan.'),
+          content: Text('Kamu butuh minimal ${CurrencySettings.format(50000)} untuk menggunakan aplikasi kencan.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );
@@ -616,11 +617,11 @@ void _showCandidateDialog(
 
           const SizedBox(height: 8),
           Text(
-            salary > 0 ? 'Pekerjaan: $job (Gaji: \$${salary.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}/bln)' : 'Pekerjaan: $job',
+            salary > 0 ? 'Pekerjaan: $job (Gaji: ${CurrencySettings.format(salary)}/bln)' : 'Pekerjaan: $job',
             style: TextStyle(color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold, fontSize: 12),
           ),
           Text(
-            'Kekayaan Tabungan: \$${moneyValue.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}',
+            'Kekayaan Tabungan: ${CurrencySettings.format(moneyValue)}',
             style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
           ),
         ],

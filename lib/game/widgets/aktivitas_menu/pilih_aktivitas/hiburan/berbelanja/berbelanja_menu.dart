@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class BerbelanjaMenuHelper {
   static void showBerbelanjaMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -73,7 +74,7 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   @override
@@ -97,7 +98,7 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
                   ),
                 ],
@@ -127,7 +128,7 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
                           contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                           title: Text(item['name'] as String, style: TextStyle(
                               fontSize: 13, color: canAfford ? Colors.black87 : Colors.grey)),
-                          subtitle: Text('\$${_fmt(item['cost'] as int)}',
+                          subtitle: Text(CurrencySettings.format(item['cost'] as int),
                               style: TextStyle(fontSize: 12, color: canAfford ? Colors.green : Colors.grey)),
                           trailing: Icon(canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
                               size: 18, color: canAfford ? Colors.orangeAccent : Colors.grey),
@@ -142,7 +143,7 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
                                 widget.character.health = (widget.character.health + (item['health'] as int)).clamp(0, 100);
                               }
                             });
-                            final msg = '🛍️ Kamu membeli ${item['name']} seharga \$${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
+                            final msg = '🛍️ Kamu membeli ${item['name']} seharga ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
                             widget.character.inbox.add(msg);
                             showDialog(
                               context: context,

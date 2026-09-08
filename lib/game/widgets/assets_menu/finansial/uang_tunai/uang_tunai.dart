@@ -1,6 +1,7 @@
 // lib/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:flutter/services.dart';
 
@@ -45,20 +46,11 @@ class RupiahInputFormatter extends TextInputFormatter {
 }
 
 int parseRupiah(String value) {
-  return int.tryParse(value.replaceAll(',', '').trim()) ?? 0;
+  return int.tryParse(value.replaceAll(',', '').replaceAll('.', '').trim()) ?? 0;
 }
 
 String formatRupiah(num value) {
-  final parts = value.round().abs().toString().split('');
-  final buffer = StringBuffer();
-  for (int i = 0; i < parts.length; i++) {
-    if (i > 0 && (parts.length - i) % 3 == 0) {
-      buffer.write(',');
-    }
-    buffer.write(parts[i]);
-  }
-  final formatted = buffer.toString();
-  return value < 0 ? '-$formatted' : formatted;
+  return CurrencySettings.formatValue(value);
 }
 
 // ============================================================
@@ -98,7 +90,10 @@ class UangTunaiItem extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(Icons.monetization_on, color: isUnlocked ? Colors.green : Colors.grey, size: 28),
+            CurrencySettings.buildCurrencyIcon(
+              color: isUnlocked ? Colors.green : Colors.grey,
+              size: 28,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
@@ -111,7 +106,7 @@ class UangTunaiItem extends StatelessWidget {
               ),
             ),
             Text(
-              '\$${formatRupiah(character.money)}',
+              CurrencySettings.format(character.money),
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
@@ -255,7 +250,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                     style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                   Text(
-                    '\$${formatRupiah(widget.character.money)}',
+                    CurrencySettings.format(widget.character.money),
                     style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
@@ -272,7 +267,7 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '\$${netChange >= 0 ? '+' : ''}${formatRupiah(netChange.abs())}',
+                        '${netChange >= 0 ? '+' : '-'}${CurrencySettings.format(netChange.abs())}',
                         style: TextStyle(
                           fontSize: 14,
                           color: netChange >= 0 ? Colors.green : Colors.red,

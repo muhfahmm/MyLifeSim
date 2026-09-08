@@ -2,15 +2,16 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class PeliharaanMenuHelper {
   static void showPeliharaanMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    if (character.age < 10) {
+    if (character.age < 8) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 10 tahun untuk memelihara hewan.'),
+          content: const Text('Kamu harus berusia minimal 8 tahun untuk mengadopsi peliharaan.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );
@@ -45,8 +46,8 @@ class PeliharaanPage extends StatefulWidget {
 
 class _PeliharaanPageState extends State<PeliharaanPage> {
   final List<Map<String, dynamic>> hewan = [
-    {'name': 'Anjing 🐕', 'cost': 2000000, 'happiness': 20, 'desc': 'Sahabat setia yang selalu ada'},
-    {'name': 'Kucing 🐈', 'cost': 1500000, 'happiness': 15, 'desc': 'Hewan mandiri yang menggemaskan'},
+    {'name': 'Kucing 🐱', 'cost': 1500000, 'happiness': 15, 'desc': 'Teman berbulu yang menggemaskan'},
+    {'name': 'Anjing 🐶', 'cost': 2500000, 'happiness': 20, 'desc': 'Teman setia yang aktif'},
     {'name': 'Burung 🦜', 'cost': 500000, 'happiness': 10, 'desc': 'Hewan cantik yang bisa bernyanyi'},
     {'name': 'Ikan 🐠', 'cost': 200000, 'happiness': 8, 'desc': 'Hewan tenang dan menenangkan'},
     {'name': 'Kelinci 🐇', 'cost': 800000, 'happiness': 12, 'desc': 'Hewan lucu dan jinak'},
@@ -54,7 +55,7 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeAdopsi(BuildContext context, Map<String, dynamic> h) {
@@ -64,7 +65,7 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
     });
     final names = ['Buddy', 'Luna', 'Max', 'Bella', 'Charlie', 'Mochi'];
     final petName = names[Random().nextInt(names.length)];
-    final msg = '🐾 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -\$${_fmt(h['cost'] as int)})';
+    final msg = '🐾 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(h['cost'] as int)})';
     widget.character.inbox.add(msg);
     showDialog(
       context: context,
@@ -110,7 +111,7 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -149,7 +150,7 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${h['desc']}\nHarga: \$${_fmt(h['cost'] as int)}',
+                          '${h['desc']}\nHarga: ${_fmt(h['cost'] as int)}',
                           style: TextStyle(
                             color: canAfford ? (isDark ? Colors.white70 : Colors.black54) : (isDark ? Colors.white38 : Colors.grey),
                           ),

@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/salon_spa/salon_spa_menu.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class SalonSpaMenuHelper {
   static void showSalonSpaMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -54,7 +55,7 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeLayanan(BuildContext context, Map<String, dynamic> l) {
@@ -112,7 +113,7 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${_fmt(widget.character.money)}',
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
                   ),
                 ],
@@ -142,7 +143,7 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
                       )),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${l['desc']}\nHarga: \$${_fmt(l['cost'] as int)}',
+                        child: Text('${l['desc']}\nHarga: ${_fmt(l['cost'] as int)}',
                           style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
                       ),
                       isThreeLine: true,

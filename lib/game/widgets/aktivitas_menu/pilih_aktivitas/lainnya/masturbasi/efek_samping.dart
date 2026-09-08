@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'persentase_efek_samping/wanita.dart';
 import 'persentase_efek_samping/pria.dart';
 import 'beritahu_orang_tua.dart';
@@ -369,7 +370,7 @@ class EfekSampingMasturbasi {
               Navigator.pop(ctx);
               _goToDoctor(context, character, hDelta, onComplete);
             },
-            child: const Text('Pergi ke dokter (\$150)', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+            child: Text('Pergi ke dokter (${CurrencySettings.format(150)})', style: const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
@@ -396,11 +397,11 @@ class EfekSampingMasturbasi {
       character.money -= doctorCost;
       final int healAmount = originalHealthLoss.abs();
       character.health = (character.health + healAmount).clamp(0, 100);
-      msg = 'Dokter memberikan resep obat dan salep khusus. Kesehatanmu pulih sepenuhnya dari cedera ini (-\$$doctorCost uang, +$healAmount% Kesehatan).';
+      msg = 'Dokter memberikan resep obat dan salep khusus. Kesehatanmu pulih sepenuhnya dari cedera ini (-${CurrencySettings.format(doctorCost)} uang, +$healAmount% Kesehatan).';
       character.inbox.add('🏥 Pergi ke dokter: $msg');
     } else {
       character.happiness = (character.happiness - 10).clamp(0, 100);
-      msg = 'Uang saku kamu tidak cukup untuk membayar biaya dokter sebesar \$$doctorCost! Kamu terpaksa pulang dengan rasa perih (-10% Kebahagiaan).';
+      msg = 'Uang saku kamu tidak cukup untuk membayar biaya dokter sebesar ${CurrencySettings.format(doctorCost)}! Kamu terpaksa pulang dengan rasa perih (-10% Kebahagiaan).';
       character.inbox.add('🏥 Pergi ke dokter gagal: Uang tidak cukup.');
     }
 

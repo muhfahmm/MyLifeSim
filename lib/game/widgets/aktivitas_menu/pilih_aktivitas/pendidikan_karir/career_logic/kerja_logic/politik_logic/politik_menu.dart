@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'politik_career.dart';
 
 class PolitikMenuHelper {
@@ -300,8 +301,8 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                             spacing: 12,
                             runSpacing: 4,
                             children: [
-                              Text('💰 Biaya: \$${_fmt(level.campaignCost)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: canAfford ? (isDark ? Colors.greenAccent : Colors.green.shade700) : Colors.red)),
-                              Text('💵 Gaji: \$${_fmt(level.baseSalary)}/thn', style: TextStyle(fontSize: 11, color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold)),
+                              Text('💰 Biaya: ${CurrencySettings.format(level.campaignCost)}', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: canAfford ? (isDark ? Colors.greenAccent : Colors.green.shade700) : Colors.red)),
+                              Text('💵 Gaji: ${CurrencySettings.format(level.baseSalary)}/thn', style: TextStyle(fontSize: 11, color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold)),
                               Text('🎂 Min Usia: ${level.minAge} thn', style: TextStyle(fontSize: 11, color: canAge ? (isDark ? Colors.white70 : Colors.black54) : Colors.red)),
                             ],
                           ),

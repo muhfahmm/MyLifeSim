@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class MedSosDashboard extends StatefulWidget {
   final String platformName;
@@ -223,7 +224,7 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Uang Tidak Cukup'),
-          content: const Text('Kamu butuh minimal \$1.000.000 untuk membeli pengikut bot.'),
+          content: Text('Kamu butuh minimal ${CurrencySettings.format(1000000)} untuk membeli pengikut bot.'),
           actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
         ),
       );

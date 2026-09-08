@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 
 class PindahNegaraMenuPage extends StatefulWidget {
@@ -44,10 +45,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
   }
 
   String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (m) => '${m[1]}.',
-    );
+    return CurrencySettings.format(amount);
   }
 
   String _capitalizeName(String rawName) {
@@ -344,7 +342,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                           ],
                         ),
                         content: Text(
-                          'Apakah kamu yakin ingin berimigrasi ke $capitalizedName dengan biaya \$${(n['cost'] as int).toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}?\n\nKamu akan mengundurkan diri dari pekerjaan lamamu.',
+                          'Apakah kamu yakin ingin berimigrasi ke $capitalizedName dengan biaya ${_fmt(n['cost'] as int)}?\n\nKamu akan mengundurkan diri dari pekerjaan lamamu.',
                         ),
                         actions: [
                           TextButton(
@@ -467,7 +465,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                         if (!isCurrentLocation) ...[
                           const SizedBox(height: 6),
                           Text(
-                            'Biaya: \$${_fmt(n['cost'] as int)}',
+                            'Biaya: ${_fmt(n['cost'] as int)}',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -590,7 +588,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                   ),
                   const SizedBox(height: 6),
                   _buildReqRow(label: 'Tinggal di negara ini saat ini', passed: livesHere),
-                  _buildReqRow(label: 'Biaya Administrasi: \$${_fmt(processingFee)}', passed: canAfford),
+                  _buildReqRow(label: 'Biaya Administrasi: ${_fmt(processingFee)}', passed: canAfford),
                   _buildReqRow(label: 'Ujian Integrasi & Wawasan Kebangsaan (Kecerdasan ≥ 70%)', passed: hasIntelligence),
                   _buildReqRow(label: 'Catatan Kelakuan Baik (Karma ≥ 50%)', passed: hasKarma),
                   

@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'ujian_lisensi_page.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
@@ -79,7 +80,7 @@ class _LisensiPageState extends State<LisensiPage> {
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
-                    'Saldo Anda: \$${_fmt(widget.character.money)}',
+                    'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -156,7 +157,7 @@ class _LisensiPageState extends State<LisensiPage> {
                         child: Text(
                           isPilotLocked 
                               ? '${l['desc']}\nLisensi Terkunci 🔒 Butuh [Kecerdasan 80+] & Umur 21 thn.'
-                              : '${l['desc']}\nBiaya: \$${_fmt(cost)} | Min. usia: $minAge thn',
+                              : '${l['desc']}\nBiaya: ${CurrencySettings.format(cost)} | Min. usia: $minAge thn',
                           style: TextStyle(color: subtitleColor),
                         ),
                       ),
