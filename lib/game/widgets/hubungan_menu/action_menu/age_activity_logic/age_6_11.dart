@@ -69,7 +69,6 @@ void _showPickerBottomSheet6({
                 itemCount: options.length,
                 itemBuilder: (_, i) {
                   final opt = options[i];
-                  final Color c = opt['color'] as Color? ?? Colors.blue;
                   return InkWell(
                     onTap: () {
                       Navigator.pop(ctx);
@@ -78,19 +77,19 @@ void _showPickerBottomSheet6({
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? c.withValues(alpha: 0.15) : cardBgColor,
+                        color: isDark ? titleColor.withValues(alpha: 0.15) : cardBgColor,
                         borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: isDark ? c.withValues(alpha: 0.4) : c.withValues(alpha: 0.6)),
+                        border: Border.all(color: isDark ? titleColor.withValues(alpha: 0.4) : titleColor.withValues(alpha: 0.6)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Row(children: [
-                        Icon(opt['icon'] as IconData? ?? Icons.circle, color: c, size: 18),
+                        Icon(opt['icon'] as IconData? ?? Icons.circle, color: titleColor, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             opt['label'] as String,
                             style: TextStyle(
-                              color: isDark ? c : (c == Colors.amber ? Colors.amber.shade900 : c),
+                              color: isDark ? titleColor : (titleColor == Colors.amber ? Colors.amber.shade900 : titleColor),
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                             ),

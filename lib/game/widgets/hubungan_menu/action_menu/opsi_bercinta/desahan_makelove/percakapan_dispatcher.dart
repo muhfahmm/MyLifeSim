@@ -273,12 +273,14 @@ class PercakapanDispatcher {
       nodes: nodes,
       onFinished: () {
         if (calculatedDelta != 0) {
+          // Langsung update perubahan hubungan ke data karakter secara permanen
           final result = NpcRelationshipHelper.applyRelationshipChange(
             character: character,
             targetName: targetName,
             targetRole: targetRole,
             delta: calculatedDelta,
           );
+          
           HubunganProgressModal.show(
             context: context,
             actionTitle: displayActionTitle,
@@ -288,9 +290,8 @@ class PercakapanDispatcher {
             delta: calculatedDelta,
             onComplete: onActionComplete,
           );
-        } else {
-          onActionComplete();
         }
+        onActionComplete();
       },
       playerAvatarUrl: effectivePlayerAvatarUrl,
       npcAvatarUrl: effectiveTargetAvatarUrl,

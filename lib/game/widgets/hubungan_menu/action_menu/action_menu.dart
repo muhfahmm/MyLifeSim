@@ -12,6 +12,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_lo
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/age_12_plus.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_intim_logic.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/masturbate.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/extended_family_view.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/sibling_family_view.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
@@ -4171,11 +4172,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return;
         }
 
+        int currentRel = _getCurrentRelationshipValue();
         int successChance = PersentaseAjakan.getSuccessChance(
           character: widget.character,
           relationType: widget.targetRole,
           viewerName: widget.targetName,
         );
+
+        // Jika tingkat hubungan 60% atau lebih, NPC otomatis menyetujui (100% mau)
+        if (currentRel >= 60) {
+          successChance = 100;
+        }
 
         // Aturan khusus untuk user perempuan: auto-accept berdasarkan happiness
         final String myGenderLower = widget.character.gender.trim().toLowerCase();
@@ -4193,16 +4200,18 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
 
         if (success) {
-          AjakanMasturbasiDialog.show(
-            context: context,
-            character: widget.character,
-            relationType: widget.targetRole,
-            viewerName: widget.targetName,
-            targetGender: _getTargetGender(),
-            isUserInitiated: true,
-            onComplete: () {
-              _updateState();
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MasturbateScreen(
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                onActionComplete: () {
+                  _updateState();
+                },
+              ),
+            ),
           );
         } else {
           if (isParent) {
@@ -4228,13 +4237,15 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               ),
             );
           } else {
-            _updateRelationship(-20);
-            widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+            final int relDrop = _random.nextInt(15) + 1; // 1-15%
+            final int hapDrop = _random.nextInt(5) + 1;  // 1-5%
+            _updateRelationship(-relDrop);
+            widget.character.happiness = (widget.character.happiness - hapDrop).clamp(0, 100);
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Ajakan Ditolak ❌'),
-                content: Text('${widget.targetName} menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-20% Hubungan, -15% Kebahagiaan).'),
+                content: Text('${widget.targetName} menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).'),
                 actions: [
                   TextButton(
                     onPressed: () {

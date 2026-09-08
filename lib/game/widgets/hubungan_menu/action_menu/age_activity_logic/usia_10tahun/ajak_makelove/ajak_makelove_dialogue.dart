@@ -164,27 +164,29 @@ class AjakMakeLoveDialogue {
       );
     }).toList();
 
-    // Button Utama awal (7 Tombol: Ciuman, Oral, Penetrasi, Posisi, Fingering, Stimulasi Payudara, Stimulasi Manual)
+    // Button Utama awal (8 Tombol: Ciuman, Oral, Penetrasi, Posisi, Stimulasi Manual, Fingering, Stimulasi Payudara, Selesai)
     final List<VNChoiceOption> initialMainActionButtons = [
       VNChoiceOption(text: '💋 1. Ciuman', nextNodeIndex: 1),
       VNChoiceOption(text: '👅 2. Oral Seks', nextNodeIndex: 2),
       VNChoiceOption(text: '🌸 3. Penetrasi', nextNodeIndex: 3),
       VNChoiceOption(text: '👩‍❤️‍👨 4. Posisi Seks', nextNodeIndex: 4),
       VNChoiceOption(text: '🖐️ 5. Minta $partnerName lakukan stimulasi manual', nextNodeIndex: 82),
-      VNChoiceOption(text: '👆 6. Fingering (Stimulasi Wanita)', nextNodeIndex: 87),
+      VNChoiceOption(text: '👆 6. Lakukan fingering ke $partnerName', nextNodeIndex: 87),
       VNChoiceOption(text: '🍑 7. Stimulasi Payudara', nextNodeIndex: 104),
+      VNChoiceOption(text: '🏁 8. Selesai', nextNodeIndex: -1),
     ];
 
-    // Button Utama unlocked (8 Tombol: + Ejakulasi / Klimaks)
+    // Button Utama unlocked (9 Tombol: + Ejakulasi / Klimaks + Selesai)
     final List<VNChoiceOption> unlockedMainActionButtons = [
       VNChoiceOption(text: '💋 1. Ciuman', nextNodeIndex: 1),
       VNChoiceOption(text: '👅 2. Oral Seks', nextNodeIndex: 2),
       VNChoiceOption(text: '🌸 3. Penetrasi', nextNodeIndex: 3),
       VNChoiceOption(text: '👩‍❤️‍👨 4. Posisi Seks', nextNodeIndex: 4),
       VNChoiceOption(text: '🖐️ 5. Minta $partnerName lakukan stimulasi manual', nextNodeIndex: 82),
-      VNChoiceOption(text: '👆 6. Fingering (Stimulasi Wanita)', nextNodeIndex: 87),
+      VNChoiceOption(text: '👆 6. Lakukan fingering ke $partnerName', nextNodeIndex: 87),
       VNChoiceOption(text: '🍑 7. Stimulasi Payudara', nextNodeIndex: 104),
       VNChoiceOption(text: '💦 8. Ejakulasi / Klimaks', nextNodeIndex: 5),
+      VNChoiceOption(text: '🏁 9. Selesai', nextNodeIndex: -1),
     ];
 
     // NODE 0: Narasi Pertama (Menampilkan 5 Button Utama awal dengan Stimulasi Manual menggantikan Ejakulasi)
@@ -411,7 +413,8 @@ class AjakMakeLoveDialogue {
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
           background: n.background,
-          nextIndex: isLast ? -1 : null,
+          // Ejakulasi -> kembali ke menu unlocked (node 86) agar pemain dapat memilih aksi lain atau menekan Selesai
+          nextIndex: isLast ? 86 : null,
           choices: null,
         ));
       }

@@ -79,7 +79,7 @@ class HubunganIntimLogic {
     required int satisfaction,
     required Random random,
   }) {
-    // Jika tingkat hubungan 60% ke atas, otomatis mau!
+    // Jika tingkat hubungan 60% ke atas, otomatis mau! (Sama seperti bercinta/makelove)
     if (satisfaction >= 60) {
       return {
         'isWilling': true,
@@ -94,18 +94,23 @@ class HubunganIntimLogic {
     if (isHetero) {
       final int roll = random.nextInt(100);
       if (satisfaction >= 50) {
-        if (roll < 50) {
+        if (roll < 60) { // 60% peluang mau
           isWilling = true;
         } else {
           isWilling = false;
           rejectReason = 'merasa hubungan kalian kurang hangat untuk melakukan itu ($satisfaction%).';
         }
       } else {
-        isWilling = false;
-        rejectReason = 'menolak mentah-mentah karena tingkat kepuasan hubungannya terlalu rendah ($satisfaction%).';
+        if (roll < 60) { // 60% peluang mau
+          isWilling = true;
+        } else {
+          isWilling = false;
+          rejectReason = 'menolak mentah-mentah karena tingkat kepuasan hubungannya terlalu rendah ($satisfaction%).';
+        }
       }
     } else {
-      if (satisfaction <= 40) {
+      final int roll = random.nextInt(100);
+      if (satisfaction <= 40 && roll >= 60) {
         isWilling = false;
         rejectReason = 'menolak ajakanmu untuk berhubungan intim karena tingkat kepuasan hubungannya saat ini terlalu rendah ($satisfaction%).';
       } else {

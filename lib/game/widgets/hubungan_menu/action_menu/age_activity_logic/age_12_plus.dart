@@ -5,6 +5,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/masturbate.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
@@ -14,6 +15,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/aja
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
 
 // ──────────────────────────────────────────────
 // HELPER: Tampilkan pilihan sebelum VN dialogue
@@ -92,7 +94,6 @@ void _showPickerBottomSheet({
                 itemCount: options.length,
                 itemBuilder: (_, i) {
                   final opt = options[i];
-                  final Color c = opt['color'] as Color? ?? Colors.blue;
                   return InkWell(
                     onTap: () {
                       Navigator.pop(ctx);
@@ -101,25 +102,25 @@ void _showPickerBottomSheet({
                     borderRadius: BorderRadius.circular(14),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? c.withValues(alpha: 0.15) : cardBgColor,
+                        color: isDark ? titleColor.withValues(alpha: 0.15) : cardBgColor,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(
-                            color: isDark ? c.withValues(alpha: 0.4) : c.withValues(alpha: 0.6)),
+                            color: isDark ? titleColor.withValues(alpha: 0.4) : titleColor.withValues(alpha: 0.6)),
                       ),
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                       child: Row(
                         children: [
-                          Icon(opt['icon'] as IconData? ?? Icons.circle, color: c, size: 18),
+                          Icon(opt['icon'] as IconData? ?? Icons.circle, color: titleColor, size: 18),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               opt['label'] as String,
                               style: TextStyle(
                                 color: isDark
-                                    ? c
-                                    : (c == Colors.amber
+                                    ? titleColor
+                                    : (titleColor == Colors.amber
                                         ? Colors.amber.shade900
-                                        : c),
+                                        : titleColor),
                                 fontSize: 13,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -1108,11 +1109,22 @@ List<ActionItem> getAge12PlusActions(
           return;
         }
 
+        final int currentRel = NpcRelationshipHelper.getCurrentRelationship(
+          character: character,
+          targetName: targetName,
+          targetRole: targetRole,
+        );
+
         int successChance = PersentaseAjakan.getSuccessChance(
           character: character,
           relationType: targetRole,
           viewerName: targetName,
         );
+
+        // Jika tingkat hubungan 60% atau lebih, NPC otomatis menyetujui (100% mau)
+        if (currentRel >= 60) {
+          successChance = 100;
+        }
 
         // Aturan khusus untuk user perempuan: auto-accept berdasarkan happiness
         final String myGenderLow = character.gender.trim().toLowerCase();
@@ -1130,16 +1142,18 @@ List<ActionItem> getAge12PlusActions(
         final bool isParent = relLower == 'ayah' || relLower == 'ibu' || relLower == 'ayah tiri' || relLower == 'ibu tiri';
 
         if (success) {
-          AjakanMasturbasiDialog.show(
-            context: context,
-            character: character,
-            relationType: targetRole,
-            viewerName: targetName,
-            targetGender: _getNPCGender(character, targetName, targetRole),
-            isUserInitiated: true,
-            onComplete: () {
-              updateState();
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => MasturbateScreen(
+                character: character,
+                targetName: targetName,
+                targetRole: targetRole,
+                onActionComplete: () {
+                  updateState();
+                },
+              ),
+            ),
           );
         } else {
           if (isParent) {
@@ -1165,13 +1179,15 @@ List<ActionItem> getAge12PlusActions(
               ),
             );
           } else {
-            updateRelationship(-20);
-            character.happiness = (character.happiness - 15).clamp(0, 100);
+            final int relDrop = random.nextInt(15) + 1; // 1-15%
+            final int hapDrop = random.nextInt(5) + 1;  // 1-5%
+            updateRelationship(-relDrop);
+            character.happiness = (character.happiness - hapDrop).clamp(0, 100);
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
                 title: const Text('Ajakan Ditolak ❌'),
-                content: Text('$targetName menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-20% Hubungan, -15% Kebahagiaan).'),
+                content: Text('$targetName menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).'),
                 actions: [
                   TextButton(
                     onPressed: () {
