@@ -295,6 +295,7 @@ class AjakanResolver {
         result['type'] ?? 'Ajak Pacaran',
         gender: character.gender,
         sexuality: character.sexuality,
+        character: character,
       );
 
       if (chanceValue <= 0.0) return null;

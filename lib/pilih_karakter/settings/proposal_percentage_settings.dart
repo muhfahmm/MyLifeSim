@@ -255,19 +255,32 @@ class ProposalPercentageSettings {
 
   /// Membaca persentase DINAMIS LANGSUNG DARI FILE KODE FOLDER `ajakan_pacaran_makelove`
   /// (Mendukung Biseksual, Gay, Lesbian, Hetero Perempuan, dan Hetero Laki)
-  static double _getChanceFromAjakanFolder(String relation, String proposalType, {String? gender, String? sexuality}) {
-    final String currentGender = (gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
+  static double _getChanceFromAjakanFolder(String relation, String proposalType, {Character? character, String? gender, String? sexuality}) {
+    final String currentGender = (character?.gender ?? gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
     final bool isFemale = currentGender == 'perempuan' || currentGender == 'female';
-    final String effectiveSexuality = (sexuality ?? GlobalSettings.userSexuality.value).trim();
+    final String effectiveSexuality = (character?.sexuality ?? sexuality ?? GlobalSettings.userSexuality.value).trim();
 
     final String rLower = relation.trim().toLowerCase();
-    final dummyChar = Character(
+    int targetAge = 18;
+    if (rLower.contains('sd')) {
+      targetAge = 10;
+    } else if (rLower.contains('smp')) {
+      targetAge = 14;
+    } else if (rLower.contains('sma')) {
+      targetAge = 17;
+    } else if (rLower.contains('kuliah') || rLower.contains('univ')) {
+      targetAge = 20;
+    } else if (character != null) {
+      targetAge = character.age;
+    }
+
+    final dummyChar = character ?? (Character(
       name: 'User',
       gender: isFemale ? 'Perempuan' : 'Laki-laki',
       location: 'Indonesia',
       sexuality: effectiveSexuality,
     )..custodyParent = rLower.contains('ibu') ? 'Ibu' : 'Ayah'
-     ..age = 18;
+     ..age = targetAge);
     final candidate = {
       'name': relation,
       'relation': relation,
@@ -280,13 +293,30 @@ class ProposalPercentageSettings {
     final String r = relation.trim().toLowerCase();
     final String s = effectiveSexuality.trim().toLowerCase();
 
+    // 0. MASTURBASI (Default 30.0%)
+    if (t.contains('masturbasi')) {
+      return 30.0;
+    }
+
+    // Helper match untuk Teman Sekolah / Sekelas / Non-Keluarga
+    bool isSchoolFriend(String relStr) {
+      return relStr.contains('teman') ||
+          relStr.contains('sekolah') ||
+          relStr.contains('sekelas') ||
+          relStr.contains('non-keluarga') ||
+          relStr.contains('sd') ||
+          relStr.contains('smp') ||
+          relStr.contains('sma') ||
+          relStr.contains('kuliah');
+    }
+
     // 1. BISEKSUAL
     if (s == 'biseksual') {
       if (t.contains('bercinta') || t.contains('love')) {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanMlBiseksualDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanMlBiseksualGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanMlBiseksualTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanMlBiseksualCoworker.getChance(dummyChar, candidate).toDouble();
@@ -297,7 +327,7 @@ class ProposalPercentageSettings {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanPacaranBiseksualDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanPacaranBiseksualGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanPacaranBiseksualTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanPacaranBiseksualCoworker.getChance(dummyChar, candidate).toDouble();
@@ -312,7 +342,7 @@ class ProposalPercentageSettings {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanMlGayDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanMlGayGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanMlGayTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanMlGayCoworker.getChance(dummyChar, candidate).toDouble();
@@ -323,7 +353,7 @@ class ProposalPercentageSettings {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanPacaranGayDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanPacaranGayGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanPacaranGayTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanPacaranGayCoworker.getChance(dummyChar, candidate).toDouble();
@@ -338,7 +368,7 @@ class ProposalPercentageSettings {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanMlLesbianDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanMlLesbianGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanMlLesbianTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanMlLesbianCoworker.getChance(dummyChar, candidate).toDouble();
@@ -349,7 +379,7 @@ class ProposalPercentageSettings {
         if (r.contains('guru') || r.contains('dosen')) {
           if (r.contains('dosen')) return AjakanPacaranLesbianDosen.getChance(dummyChar, candidate).toDouble();
           return AjakanPacaranLesbianGuruSekolah.getChance(dummyChar, candidate).toDouble();
-        } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+        } else if (isSchoolFriend(r)) {
           return AjakanPacaranLesbianTemanSekolah.getChance(dummyChar, candidate).toDouble();
         } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
           return AjakanPacaranLesbianCoworker.getChance(dummyChar, candidate).toDouble();
@@ -365,7 +395,7 @@ class ProposalPercentageSettings {
           if (r.contains('guru') || r.contains('dosen')) {
             if (r.contains('dosen')) return AjakanMlHeteroPerempuanDosen.getChance(dummyChar, candidate).toDouble();
             return AjakanMlHeteroPerempuanGuruSekolah.getChance(dummyChar, candidate).toDouble();
-          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+          } else if (isSchoolFriend(r)) {
             return AjakanMlHeteroPerempuanTemanSekolah.getChance(dummyChar, candidate).toDouble();
           } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
             return AjakanMlHeteroPerempuanCoworker.getChance(dummyChar, candidate).toDouble();
@@ -376,7 +406,7 @@ class ProposalPercentageSettings {
           if (r.contains('guru') || r.contains('dosen')) {
             if (r.contains('dosen')) return AjakanPacaranHeteroPerempuanDosen.getChance(dummyChar, candidate).toDouble();
             return AjakanPacaranHeteroPerempuanGuruSekolah.getChance(dummyChar, candidate).toDouble();
-          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+          } else if (isSchoolFriend(r)) {
             return AjakanPacaranHeteroPerempuanTemanSekolah.getChance(dummyChar, candidate).toDouble();
           } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
             return AjakanPacaranHeteroPerempuanCoworker.getChance(dummyChar, candidate).toDouble();
@@ -389,7 +419,7 @@ class ProposalPercentageSettings {
           if (r.contains('guru') || r.contains('dosen')) {
             if (r.contains('dosen')) return AjakanMlHeteroLakiDosen.getChance(dummyChar, candidate).toDouble();
             return AjakanMlHeteroLakiGuruSekolah.getChance(dummyChar, candidate).toDouble();
-          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+          } else if (isSchoolFriend(r)) {
             return AjakanMlHeteroLakiTemanSekolah.getChance(dummyChar, candidate).toDouble();
           } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
             return AjakanMlHeteroLakiCoworker.getChance(dummyChar, candidate).toDouble();
@@ -400,7 +430,7 @@ class ProposalPercentageSettings {
           if (r.contains('guru') || r.contains('dosen')) {
             if (r.contains('dosen')) return AjakanPacaranHeteroLakiDosen.getChance(dummyChar, candidate).toDouble();
             return AjakanPacaranHeteroLakiGuruSekolah.getChance(dummyChar, candidate).toDouble();
-          } else if (r.contains('teman') || r.contains('sekolah') || r.contains('sekelas')) {
+          } else if (isSchoolFriend(r)) {
             return AjakanPacaranHeteroLakiTemanSekolah.getChance(dummyChar, candidate).toDouble();
           } else if (r.contains('bos') || r.contains('atasan') || r.contains('rekan kerja') || r.contains('supervisor')) {
             return AjakanPacaranHeteroLakiCoworker.getChance(dummyChar, candidate).toDouble();
@@ -413,11 +443,11 @@ class ProposalPercentageSettings {
   }
 
   /// Helper untuk mengambil Notifier persentase slider spesifik (Membaca langsung dari folder ajakan_pacaran_makelove)
-  static ValueNotifier<double> getNotifier(String relation, String proposalType, {String? gender, String? sexuality}) {
-    final String currentGender = (gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
-    final String cacheKey = '${relation.trim()}_${proposalType.trim()}_$currentGender';
+  static ValueNotifier<double> getNotifier(String relation, String proposalType, {Character? character, String? gender, String? sexuality}) {
+    final String currentGender = (character?.gender ?? gender ?? GlobalSettings.userGender.value).trim().toLowerCase();
+    final String cacheKey = '${relation.trim()}_${proposalType.trim()}_${currentGender}_${character?.age ?? 18}';
 
-    final double chanceFromCode = _getChanceFromAjakanFolder(relation, proposalType, gender: gender, sexuality: sexuality);
+    final double chanceFromCode = _getChanceFromAjakanFolder(relation, proposalType, character: character, gender: gender, sexuality: sexuality);
 
     if (!_dynamicNotifiers.containsKey(cacheKey)) {
       _dynamicNotifiers[cacheKey] = ValueNotifier<double>(chanceFromCode);
@@ -429,9 +459,9 @@ class ProposalPercentageSettings {
   }
 
   /// Helper untuk mengambil nilai persentase numerik langsung (Memperhatikan toggle switch & GlobalSettings)
-  static double getChance(String relation, String proposalType, {String? gender, String? sexuality}) {
+  static double getChance(String relation, String proposalType, {Character? character, String? gender, String? sexuality}) {
     // 1. Cek apakah hubungan ini secara individual dinonaktifkan oleh switch per-anggota
-    if (!getRelationEnabledNotifier(relation, gender: gender).value) {
+    if (!getRelationEnabledNotifier(relation, gender: gender ?? character?.gender).value) {
       return 0.0;
     }
 
@@ -451,7 +481,7 @@ class ProposalPercentageSettings {
       if (!isFam && GlobalSettings.disableMakeLoveNonFamily.value) return 0.0;
     }
 
-    return getNotifier(relation, proposalType, gender: gender, sexuality: sexuality).value;
+    return getNotifier(relation, proposalType, character: character, gender: gender, sexuality: sexuality).value;
   }
 
   /// Reset semua toggle switch
@@ -649,9 +679,14 @@ class RelationPercentageGroupCard extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isFam = _isKeluarga(relationKey);
 
-    return ValueListenableBuilder<String>(
-      valueListenable: GlobalSettings.userGender,
-      builder: (context, genderVal, _) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        GlobalSettings.userGender,
+        GlobalSettings.userSexuality,
+      ]),
+      builder: (context, _) {
+        final String genderVal = GlobalSettings.userGender.value;
+        final String sexualityVal = GlobalSettings.userSexuality.value;
         final ValueNotifier<bool> relationEnabledNotifier = ProposalPercentageSettings.getRelationEnabledNotifier(relationKey, gender: genderVal);
 
         return ValueListenableBuilder<bool>(
@@ -668,9 +703,9 @@ class RelationPercentageGroupCard extends StatelessWidget {
                       builder: (context, disableMakeLove, _) {
                         final bool allDisabled = !relationEnabled || (disablePacaran && disableMasturbation && disableMakeLove);
 
-                        final ValueNotifier<double> pacaranNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Ajak Pacaran', gender: genderVal);
-                        final ValueNotifier<double> masturbationNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Masturbasi', gender: genderVal);
-                        final ValueNotifier<double> makeLoveNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Bercinta', gender: genderVal);
+                        final ValueNotifier<double> pacaranNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Ajak Pacaran', gender: genderVal, sexuality: sexualityVal);
+                        final ValueNotifier<double> masturbationNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Masturbasi', gender: genderVal, sexuality: sexualityVal);
+                        final ValueNotifier<double> makeLoveNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Bercinta', gender: genderVal, sexuality: sexualityVal);
 
                         return Container(
                           margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
@@ -764,3 +799,4 @@ class RelationPercentageGroupCard extends StatelessWidget {
     );
   }
 }
+

@@ -4,14 +4,14 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 class AjakanPacaranGayTemanSekolah {
   static int getChance(Character character, Map<String, dynamic> candidate) {
     final int age = character.age;
-    if (character.univMajor != null || age >= 18) {
-      return 65; // Kuliah / Universitas
-    } else if (age >= 15) {
-      return 50; // SMA
+    if (character.univMajor != null || age > 18) {
+      return 65; // Kuliah / Universitas (> 18 thn)
+    } else if (age >= 16) {
+      return 50; // SMA (16 - 18 thn)
     } else if (age >= 12) {
-      return 40; // SMP
+      return 40; // SMP (12 - 15 thn)
     } else {
-      return 30; // SD
+      return 30; // SD (6 - 11 thn)
     }
   }
 

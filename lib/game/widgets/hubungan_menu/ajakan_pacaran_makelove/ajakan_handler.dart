@@ -634,15 +634,14 @@ class AjakanHandler {
         });
       }
     }
-
     // Filter kandidat hanya yang diaktifkan oleh switch per-anggota dan persentasenya > 0
     bool isCandidateActive(Map<String, dynamic> c) {
       final String rel = (c['relation'] ?? c['role'] ?? '').toString();
       final bool enabled = ProposalPercentageSettings.getRelationEnabledNotifier(rel, gender: character.gender).value;
       if (!enabled) return false;
-      final double totalChance = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender) +
-          ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender) +
-          ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender);
+      final double totalChance = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender, character: character) +
+          ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender, character: character) +
+          ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender, character: character);
       return totalChance > 0;
     }
 
@@ -847,9 +846,9 @@ class AjakanHandler {
         final bool isFemaleUser = myGenderLower == 'perempuan' || myGenderLower == 'female';
 
         // Hitung jenis ajakan berdasarkan bobot persentase dinamis per-hubungan yang diatur oleh user
-        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
-        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender);
-        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender);
+        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender, character: character);
+        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender, character: character);
+        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender, character: character);
         final double totalWeight = pacaranWeight + masturbationWeight + makeLoveWeight;
 
         if (totalWeight <= 0) return;
@@ -931,9 +930,9 @@ class AjakanHandler {
         final String myGenderLower = character.gender.trim().toLowerCase();
         final bool isFemaleUser = myGenderLower == 'perempuan' || myGenderLower == 'female';
 
-        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender);
-        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender);
-        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender);
+        final double pacaranWeight = ProposalPercentageSettings.getChance(rel, 'Ajak Pacaran', gender: character.gender, character: character);
+        final double masturbationWeight = ProposalPercentageSettings.getChance(rel, 'Masturbasi', gender: character.gender, character: character);
+        final double makeLoveWeight = ProposalPercentageSettings.getChance(rel, 'Bercinta', gender: character.gender, character: character);
         final double totalWeight = pacaranWeight + masturbationWeight + makeLoveWeight;
 
         if (totalWeight > 0) {
