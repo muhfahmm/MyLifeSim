@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import '../special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
 
 class RekanKerjaPage extends StatefulWidget {
   final Character character;
@@ -28,6 +29,21 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final String jobNameStr = widget.character.jobName ?? '';
+    final bool isAthlete = jobNameStr.contains('Striker') ||
+        jobNameStr.contains('Gelandang') ||
+        jobNameStr.contains('Bek') ||
+        jobNameStr.contains('Kiper') ||
+        jobNameStr.contains('Pemain Olahraga') ||
+        jobNameStr.contains('Atlet') ||
+        jobNameStr.contains('Atlit');
+    if (isAthlete) {
+      return RekanTimPage(
+        character: widget.character,
+        onRefresh: widget.onRefresh,
+      );
+    }
+
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final coworkers = widget.character.coworkers;
     final supervisor = widget.character.supervisor;

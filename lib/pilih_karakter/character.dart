@@ -136,6 +136,7 @@ class Character {
   List<Map<String, String>> univLecturers = []; // Daftar dosen
   List<Map<String, String>> coworkers = []; // Daftar rekan kerja
   Map<String, String>? supervisor; // Supervisor / Atasan kerja
+  Map<String, String>? assistantCoach; // Asisten Pelatih untuk Atlit
   String? smaMajor; // Jurusan SMA ('IPA', 'IPS', 'Bahasa', atau null)
   String? schoolType; // Jenis sekolah ('Negeri' atau 'Swasta')
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
@@ -1014,6 +1015,7 @@ class Character {
     jobName = null;
     jobSalary = null;
     supervisor = null;
+    assistantCoach = null;
     coworkers = [];
   }
 
@@ -1078,6 +1080,21 @@ class Character {
         'isDeceased': 'false',
         'sexuality': 'Heteroseksual',
         'intelligence': (60 + random.nextInt(31)).toString(),
+      };
+    }
+
+    if (assistantCoach == null && isAthlete) {
+      final String asstGender = gender;
+      final name = getRandomName(asstGender);
+      final ageVal = 30 + random.nextInt(20);
+      assistantCoach = {
+        'name': name,
+        'gender': asstGender,
+        'relationship': (50 + random.nextInt(21)).toString(),
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': 'Heteroseksual',
+        'intelligence': (55 + random.nextInt(31)).toString(),
       };
     }
 
@@ -1346,6 +1363,10 @@ class Character {
     if (supervisor != null && supervisor!['age'] != null) {
       final currentAge = int.tryParse(supervisor!['age']!) ?? 0;
       supervisor!['age'] = (currentAge + 1).toString();
+    }
+    if (assistantCoach != null && assistantCoach!['age'] != null) {
+      final currentAge = int.tryParse(assistantCoach!['age']!) ?? 0;
+      assistantCoach!['age'] = (currentAge + 1).toString();
     }
 
     // Check supervisor retirement (retired age: 60-65)
@@ -2539,7 +2560,17 @@ class Character {
       int targetAge = int.tryParse(supervisor!['age'] ?? '35') ?? 35;
       if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (!supervisor!.containsKey('job')) {
-        final String supJob = 'Supervisor (${jobName ?? "Perusahaan"})';
+        final bool isAthlete = jobName != null &&
+            (jobName!.contains('Striker') ||
+                jobName!.contains('Gelandang') ||
+                jobName!.contains('Bek') ||
+                jobName!.contains('Kiper') ||
+                jobName!.contains('Pemain Olahraga') ||
+                jobName!.contains('Atlet') ||
+                jobName!.contains('Atlit'));
+        final String supJob = isAthlete
+            ? 'Pelatih Utama'
+            : 'Supervisor (${jobName ?? "Perusahaan"})';
         final int supSalary = (jobSalary ?? 2000) * 2;
         supervisor!['job'] = supJob;
         supervisor!['salary'] = supSalary.toString();
@@ -2548,6 +2579,22 @@ class Character {
         'status': 'Bekerja',
         'job': supervisor!['job'],
         'salary': int.tryParse(supervisor!['salary'] ?? '0') ?? 0
+      };
+    }
+
+    if (assistantCoach != null && assistantCoach!['name'] == targetName) {
+      int targetAge = int.tryParse(assistantCoach!['age'] ?? '35') ?? 35;
+      if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
+      if (!assistantCoach!.containsKey('job')) {
+        final String asstJob = 'Asisten Pelatih';
+        final int asstSalary = ((jobSalary ?? 2000) * 1.5).round();
+        assistantCoach!['job'] = asstJob;
+        assistantCoach!['salary'] = asstSalary.toString();
+      }
+      return {
+        'status': 'Bekerja',
+        'job': assistantCoach!['job'],
+        'salary': int.tryParse(assistantCoach!['salary'] ?? '0') ?? 0
       };
     }
 

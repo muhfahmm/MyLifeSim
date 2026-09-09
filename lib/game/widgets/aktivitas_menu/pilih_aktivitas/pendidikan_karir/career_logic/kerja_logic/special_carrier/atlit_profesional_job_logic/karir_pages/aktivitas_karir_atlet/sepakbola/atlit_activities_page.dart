@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/actions/rekan_kerja.dart';
+import 'action_menu/rekan_tim/rekan_tim_page.dart';
 
 // Import action files per modul/folder
 import 'action_menu/latihan_kondisi_fisik/finishing_drill_action.dart';
@@ -436,7 +436,7 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => RekanKerjaPage(
+                  builder: (context) => RekanTimPage(
                     character: widget.character,
                     onRefresh: _triggerRefresh,
                   ),

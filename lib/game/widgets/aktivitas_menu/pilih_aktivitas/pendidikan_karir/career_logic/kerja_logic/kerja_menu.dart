@@ -523,8 +523,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               context: context,
               icon: Icons.group,
               color: Colors.orange,
-              title: 'Rekan Kerja',
-              subtitle: 'Berinteraksi dengan rekan sekerja',
+              title: isAthlete ? 'Rekan Tim' : 'Rekan Kerja',
+              subtitle: isAthlete ? 'Berinteraksi dengan rekan tim & pelatih' : 'Berinteraksi dengan rekan sekerja',
               page: RekanKerjaPage(
                 character: character,
                 onRefresh: () {

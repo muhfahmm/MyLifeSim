@@ -237,12 +237,22 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     () {
                       final String sexuality = widget.classmate['sexuality'] ?? 'Heteroseksual';
                       String typeLabel = 'Teman Sekelas';
+                      final bool isAthlete = widget.character.jobName != null &&
+                          (widget.character.jobName!.contains('Striker') ||
+                              widget.character.jobName!.contains('Gelandang') ||
+                              widget.character.jobName!.contains('Bek') ||
+                              widget.character.jobName!.contains('Kiper') ||
+                              widget.character.jobName!.contains('Pemain Olahraga') ||
+                              widget.character.jobName!.contains('Atlet') ||
+                              widget.character.jobName!.contains('Atlit'));
                       if (widget.character.univClassmates.any((e) => e['name'] == name)) {
                         typeLabel = 'Teman Kuliah';
                       } else if (widget.character.coworkers.any((e) => e['name'] == name)) {
-                        typeLabel = 'Rekan Kerja';
+                        typeLabel = isAthlete ? (widget.classmate['role'] ?? 'Rekan Tim') : 'Rekan Kerja';
                       } else if (widget.character.supervisor != null && widget.character.supervisor!['name'] == name) {
-                        typeLabel = 'Supervisor / Atasan';
+                        typeLabel = isAthlete ? 'Pelatih Utama' : 'Supervisor / Atasan';
+                      } else if (widget.character.assistantCoach != null && widget.character.assistantCoach!['name'] == name) {
+                        typeLabel = 'Asisten Pelatih';
                       }
                       final String targetGender = widget.classmate['gender'] ?? 'Laki-laki';
                       final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
@@ -344,12 +354,22 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     const SizedBox(height: 12),
                     Builder(builder: (context) {
                       String targetRole = 'Teman Sekelas';
+                      final bool isAthlete = widget.character.jobName != null &&
+                          (widget.character.jobName!.contains('Striker') ||
+                              widget.character.jobName!.contains('Gelandang') ||
+                              widget.character.jobName!.contains('Bek') ||
+                              widget.character.jobName!.contains('Kiper') ||
+                              widget.character.jobName!.contains('Pemain Olahraga') ||
+                              widget.character.jobName!.contains('Atlet') ||
+                              widget.character.jobName!.contains('Atlit'));
                       if (widget.character.univClassmates.any((e) => e['name'] == name)) {
                         targetRole = 'Teman Kuliah';
                       } else if (widget.character.coworkers.any((e) => e['name'] == name)) {
-                        targetRole = 'Rekan Kerja';
+                        targetRole = isAthlete ? 'Rekan Tim' : 'Rekan Kerja';
                       } else if (widget.character.supervisor != null && widget.character.supervisor!['name'] == name) {
-                        targetRole = 'Supervisor';
+                        targetRole = isAthlete ? 'Pelatih Utama' : 'Supervisor';
+                      } else if (widget.character.assistantCoach != null && widget.character.assistantCoach!['name'] == name) {
+                        targetRole = 'Asisten Pelatih';
                       }
 
                       final int wealthVal = widget.character.getTargetWealth(name, targetRole);
