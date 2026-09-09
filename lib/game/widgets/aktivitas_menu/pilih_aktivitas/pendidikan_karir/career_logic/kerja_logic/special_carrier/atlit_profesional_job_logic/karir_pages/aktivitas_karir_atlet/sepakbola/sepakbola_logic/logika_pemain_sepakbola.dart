@@ -8,28 +8,41 @@ class LogikaPemainSepakbola {
   static int hitungPeluangDiterimaKontrak({
     required int usia,
     required int durasiKontrakTahun,
+    bool isMelamarBaru = false,
   }) {
+    if (isMelamarBaru && usia > 25) {
+      return 10;
+    }
+
     if (usia >= 13 && usia <= 15) {
       if (durasiKontrakTahun == 5) return 75;
       if (durasiKontrakTahun == 4) return 80;
       if (durasiKontrakTahun == 3) return 90;
+      if (durasiKontrakTahun == 2) return 95;
+      if (durasiKontrakTahun == 1) return 95;
     } else if (usia >= 16 && usia <= 20) {
       if (durasiKontrakTahun == 5) return 85;
       if (durasiKontrakTahun == 4) return 80;
       if (durasiKontrakTahun == 3) return 90;
+      if (durasiKontrakTahun == 2) return 95;
+      if (durasiKontrakTahun == 1) return 95;
     } else if (usia >= 21 && usia <= 25) {
       if (durasiKontrakTahun == 5) return 70;
       if (durasiKontrakTahun == 4) return 80;
       if (durasiKontrakTahun == 3) return 90;
+      if (durasiKontrakTahun == 2) return 95;
+      if (durasiKontrakTahun == 1) return 95;
     } else if (usia >= 26 && usia <= 30) {
       if (durasiKontrakTahun == 5) return 55;
       if (durasiKontrakTahun == 4) return 80;
       if (durasiKontrakTahun == 3) return 90;
+      if (durasiKontrakTahun == 2) return 95;
+      if (durasiKontrakTahun == 1) return 95;
     } else if (usia >= 31) {
       if (durasiKontrakTahun == 5) return 25;
       if (durasiKontrakTahun == 4) return 30;
       if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 60;
+      if (durasiKontrakTahun == 2) return 90;
       if (durasiKontrakTahun == 1) return 80;
     }
     return 80;
@@ -37,10 +50,13 @@ class LogikaPemainSepakbola {
 
   /// Opsi durasi kontrak yang tersedia berdasarkan usia pemain
   static List<int> getOpsiDurasiKontrak(int usia) {
-    if (usia >= 31) {
-      return [5, 4, 3, 2, 1];
-    }
-    return [5, 4, 3];
+    return [5, 4, 3, 2, 1];
+  }
+
+  /// Mengecek apakah sisa masa kontrak pemain masih panjang (>= 4 tahun)
+  static bool isKontrakMasihPanjang(int? sisaKontrakTahun) {
+    if (sisaKontrakTahun == null) return false;
+    return sisaKontrakTahun >= 4;
   }
 
   /// Mendapatkan persentase rasio penampilan dasar berdasarkan usia:

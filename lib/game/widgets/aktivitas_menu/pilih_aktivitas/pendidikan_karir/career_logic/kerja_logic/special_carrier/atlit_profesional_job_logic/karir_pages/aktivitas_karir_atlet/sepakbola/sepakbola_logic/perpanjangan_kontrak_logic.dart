@@ -1,7 +1,6 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/perpanjangan_kontrak_logic.dart
-
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'gaji_pemain_sepakbola.dart';
 
 class PerpanjanganKontrakLogic {
   /// Memeriksa dan menguji evaluasi perpanjangan kontrak saat durasi kontrak habis.
@@ -38,14 +37,20 @@ class PerpanjanganKontrakLogic {
 
     if (getContractExtension) {
       final int extensionYears = 2 + rand.nextInt(3); // 2 s/d 4 Tahun Kontrak Baru
-      final int raisePercent = 5 + rand.nextInt(16); // 5% s/d 20% kenaikan gaji
-      final int offeredSalary = ((character.jobSalary ?? 8000) * (1 + (raisePercent / 100))).round();
+      final int currentSalary = character.jobSalary ?? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: character.age, rand: rand);
+      
+      final int offeredSalary = GajiPemainSepakbolaLogic.hitungTawaranGajiBaru(
+        currentSalary: currentSalary,
+        usia: character.age,
+        rating: careerAvgRating,
+        rand: rand,
+      );
 
       character.pendingContractOffer = {
         'teamName': teamName,
         'offeredYears': extensionYears,
         'offeredSalary': offeredSalary,
-        'currentSalary': character.jobSalary ?? 8000,
+        'currentSalary': currentSalary,
         'jobTitle': jobTitle,
       };
     } else {

@@ -5,6 +5,9 @@ import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/actions/rekan_kerja.dart';
+import 'contract_modals.dart';
+import 'sepakbola_logic/gaji_pemain_sepakbola.dart';
+import 'sepakbola_logic/logika_pemain_sepakbola.dart';
 
 class AtlitActivitiesPage extends StatefulWidget {
   final Character character;
@@ -117,19 +120,84 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
 
   // 3. NEGOSIASI KONTRAK & AGEN
   void _negotiateContract() {
-    final bool success = _random.nextInt(100) < 65;
-    if (success) {
-      final int raise = (widget.character.jobSalary! * 0.25).round();
-      widget.character.jobSalary = widget.character.jobSalary! + raise;
-      widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
-      setState(() {});
-      widget.onRefresh();
-
+    // Cek jika sisa kontrak masih panjang (misal 5 atau 4 tahun)
+    final int? remainingContract = widget.character.athleteContractYears;
+    if (LogikaPemainSepakbola.isKontrakMasihPanjang(remainingContract)) {
       _showResult(
-        'Negosiasi Sukses! 📝💰',
-        'Manajemen klub menyetujui kenaikan gajimu sebesar 25%! Gaji barumu kini ${CurrencySettings.format(widget.character.jobSalary!)}/tahun.',
-        Icons.verified,
-        Colors.green,
+        'Negosiasi Ditolak 🚫',
+        'Manajemen klub menolak tawaranmu! Masa kontrakmu saat ini masih cukup panjang ($remainingContract tahun tersisa). Manajemen tidak ingin memperbarui kontrak di saat kontrak lama masih berlaku lama.',
+        Icons.cancel,
+        Colors.red,
+      );
+      return;
+    }
+
+    // 1. Cek Cooldown 1 Tahun sejak meneken/memperbarui kontrak terakhir
+    if (widget.character.lastContractSignedAge != null &&
+        widget.character.age <= widget.character.lastContractSignedAge!) {
+      _showResult(
+        'Kontrak Baru Aktif ⏳',
+        'Kamu baru saja menandatangani/memperbarui kontrak! Kamu harus menunggu minimal 1 tahun (musim berikutnya) sebelum bisa mengajukan negosiasi perpanjangan kontrak lagi.',
+        Icons.timer_outlined,
+        Colors.orange,
+      );
+      return;
+    }
+
+    // 2. Hitung rata-rata rating karir dari statistik musim
+    double totalRatingSum = 0.0;
+    int ratingCount = 0;
+    for (var s in widget.character.athleteSeasonStats) {
+      final r = s['rating'];
+      if (r is num) {
+        totalRatingSum += r.toDouble();
+        ratingCount++;
+      } else if (r != null) {
+        final parsedR = double.tryParse(r.toString());
+        if (parsedR != null) {
+          totalRatingSum += parsedR;
+          ratingCount++;
+        }
+      }
+    }
+    final double careerAvgRating = ratingCount > 0 ? (totalRatingSum / ratingCount) : 7.0;
+    final int persuadeChance = (careerAvgRating * 10).round().clamp(10, 90);
+
+    final bool success = _random.nextInt(100) < persuadeChance;
+
+    if (success) {
+      String teamName = 'Klub Usia Muda';
+      final String title = widget.character.jobName ?? 'Atlet';
+      if (title.contains(' - ')) {
+        teamName = title.split(' - ').last.trim();
+      }
+
+      final int currentSalary = widget.character.jobSalary ?? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: widget.character.age, rand: _random);
+      final int offeredYears = 2 + _random.nextInt(3);
+      final int offeredSalary = GajiPemainSepakbolaLogic.hitungTawaranGajiBaru(
+        currentSalary: currentSalary,
+        usia: widget.character.age,
+        rating: careerAvgRating,
+        rand: _random,
+      );
+
+      final Map<String, dynamic> offerData = {
+        'teamName': teamName,
+        'offeredYears': offeredYears,
+        'offeredSalary': offeredSalary,
+        'currentSalary': currentSalary,
+        'jobTitle': title,
+      };
+
+      // Tampilkan modal penawaran perpanjangan kontrak (sama seperti saat kontrak habis)
+      ContractModal.showContractOffer(
+        context,
+        character: widget.character,
+        offerData: offerData,
+        onDone: () {
+          setState(() {});
+          widget.onRefresh();
+        },
       );
     } else {
       widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
@@ -137,8 +205,8 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
       widget.onRefresh();
 
       _showResult(
-        'Negosiasi Ulet 🚫',
-        'Klub menolak menaikkan gaji saat ini. Mereka meminta bukti performa yang lebih konsisten di lapangan.',
+        'Manajemen Menolak 🚫',
+        'Manajemen klub menolak membicarakan perpanjangan kontrak saat ini. Mereka meminta bukti performa yang lebih konsisten di lapangan.',
         Icons.cancel,
         Colors.red,
       );

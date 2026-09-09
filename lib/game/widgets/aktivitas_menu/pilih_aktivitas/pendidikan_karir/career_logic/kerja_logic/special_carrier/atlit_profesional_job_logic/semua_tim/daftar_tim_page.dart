@@ -7,6 +7,7 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../daftar_tim/database_tim_olahraga.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
+import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/gaji_pemain_sepakbola.dart';
 
 class DaftarTimPage extends StatefulWidget {
   final Character character;
@@ -42,6 +43,22 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     super.dispose();
   }
 
+  int _getPositionBaseSalary(Map<String, dynamic> pos) {
+    final String posTitle = pos['title'].toString();
+    final bool isSoccer = posTitle.contains('Striker') ||
+        posTitle.contains('Gelandang') ||
+        posTitle.contains('Bek') ||
+        posTitle.contains('Kiper');
+
+    if (isSoccer) {
+      return GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(
+        usia: widget.character.age,
+        rand: Random(widget.character.age * 37 + posTitle.hashCode),
+      );
+    }
+    return pos['baseSalary'] as int? ?? 5000;
+  }
+
   void _applyJob(Map<String, dynamic> positionItem, Map<String, String> teamItem, int contractYears) {
     final character = widget.character;
     final int minHealth = positionItem['minHealth'] ?? 0;
@@ -75,6 +92,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     final int successChance = LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
       usia: age,
       durasiKontrakTahun: contractYears,
+      isMelamarBaru: true,
     );
 
     final int roll = Random().nextInt(100);
@@ -106,13 +124,22 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
       return;
     }
 
-    final int baseSalary = positionItem['baseSalary'] as int;
+    final String posTitle = positionItem['title'].toString();
+    final bool isSoccer = posTitle.contains('Striker') ||
+        posTitle.contains('Gelandang') ||
+        posTitle.contains('Bek') ||
+        posTitle.contains('Kiper');
+
+    final int baseSalary = isSoccer
+        ? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: character.age)
+        : (positionItem['baseSalary'] as int);
     final int finalSalary = (baseSalary * _salaryMultiplier).round();
     final String fullJobTitle = "${positionItem['title']} - ${teamItem['name']}";
 
     setState(() {
       character.setJob(fullJobTitle, finalSalary);
       character.athleteContractYears = contractYears;
+      character.lastContractSignedAge = character.age;
     });
     widget.onRefresh();
 
@@ -188,7 +215,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             final bool meetsIntel = widget.character.intelligence >= minIntel;
             final bool isQualified = meetsHealth && meetsDiscipline && meetsIntel;
 
-            final int baseSal = selectedPosition['baseSalary'] as int;
+            final int baseSal = _getPositionBaseSalary(selectedPosition);
             final int finalSalary = (baseSal * _salaryMultiplier).round();
 
             final int age = widget.character.age;
@@ -201,6 +228,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
               return LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
                 usia: age,
                 durasiKontrakTahun: yrs,
+                isMelamarBaru: true,
               );
             }
 
@@ -270,7 +298,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                           borderRadius: BorderRadius.circular(14),
                           icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.green, size: 28),
                           items: positions.map((pos) {
-                            final int sal = ((pos['baseSalary'] as int) * _salaryMultiplier).round();
+                            final int sal = (_getPositionBaseSalary(pos) * _salaryMultiplier).round();
                             return DropdownMenuItem<Map<String, dynamic>>(
                               value: pos,
                               child: Row(

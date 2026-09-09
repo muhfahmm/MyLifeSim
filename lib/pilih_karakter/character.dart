@@ -195,6 +195,7 @@ class Character {
   String? jobName;
   int? jobSalary;
   int athleteContractYears = 3; // Kontrak atlet default 3 tahun
+  int? lastContractSignedAge; // Usia saat terakhir kali meneken/memperbarui kontrak atlet
   String? partTimeJobName;
   int? partTimeJobSalary;
   bool bypassDegreeRequirement = false;

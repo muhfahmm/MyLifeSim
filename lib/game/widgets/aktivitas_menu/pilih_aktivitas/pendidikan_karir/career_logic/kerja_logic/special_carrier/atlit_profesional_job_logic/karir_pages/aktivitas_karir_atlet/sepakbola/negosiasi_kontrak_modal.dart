@@ -80,6 +80,7 @@ class _NegosiasiDialogWidgetState extends State<_NegosiasiDialogWidget> {
       // BERHASIL NEGOSIASI
       widget.character.jobSalary = _demandedSalary;
       widget.character.athleteContractYears = _selectedYears;
+      widget.character.lastContractSignedAge = widget.character.age;
 
       final String successMsg = '📝 Negosiasi Kontrak Berhasil!\n'
           'Manajemen $teamName menyetujui tuntutanmu. Kontrak resmi diperpanjang selama $_selectedYears tahun dengan gaji baru ${CurrencySettings.format(_demandedSalary)}/tahun!';

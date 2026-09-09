@@ -122,6 +122,7 @@ class ContractModal {
                     Navigator.pop(ctx);
                     character.jobSalary = offeredSalary;
                     character.athleteContractYears = offeredYears;
+                    character.lastContractSignedAge = character.age;
                     character.inbox.add('📝 Kamu menyetujui kontrak baru di $teamName selama $offeredYears tahun dengan gaji ${CurrencySettings.format(offeredSalary)}/tahun.');
                     onDone();
                   },
