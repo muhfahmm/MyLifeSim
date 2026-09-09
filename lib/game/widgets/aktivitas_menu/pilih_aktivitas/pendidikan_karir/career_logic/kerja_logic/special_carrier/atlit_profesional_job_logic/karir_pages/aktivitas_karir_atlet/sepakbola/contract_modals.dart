@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'negosiasi_kontrak_modal.dart';
+import 'tim_tertarik_modal.dart';
 
 class ContractModal {
   /// Modal khusus untuk penawaran perpanjangan kontrak (Terima, Negosiasi, Tolak)
@@ -79,16 +80,37 @@ class ContractModal {
               ),
             ),
           ),
-          actionsAlignment: MainAxisAlignment.spaceBetween,
           actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                character.resignJob();
-                character.inbox.add('⚠️ Kamu menolak perpanjangan kontrak dari $teamName dan kini berstatus Bebas Transfer (Free Agent).');
-                onDone();
-              },
-              child: const Text('Tolak & Resign', style: TextStyle(color: Colors.red, fontSize: 12)),
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    character.inbox.add('⚠️ Kamu menolak tawaran perpanjangan kontrak dari $teamName.');
+                    onDone();
+                  },
+                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
+                ),
+                const SizedBox(width: 4),
+                OutlinedButton.icon(
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: Colors.blue.shade700,
+                    side: BorderSide(color: Colors.blue.shade400),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    TimTertarikModal.show(
+                      context: context,
+                      character: character,
+                      onDone: onDone,
+                    );
+                  },
+                  icon: const Icon(Icons.swap_horiz, size: 16),
+                  label: const Text('Pilih Tim Lain', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                ),
+              ],
             ),
             Row(
               mainAxisSize: MainAxisSize.min,
@@ -98,6 +120,7 @@ class ContractModal {
                     foregroundColor: Colors.amber.shade800,
                     side: BorderSide(color: Colors.amber.shade700),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
@@ -109,14 +132,15 @@ class ContractModal {
                     );
                   },
                   icon: const Icon(Icons.handshake_outlined, size: 16),
-                  label: const Text('Negosiasi', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('Negosiasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 6),
                 ElevatedButton.icon(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade700,
                     foregroundColor: Colors.white,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
@@ -127,7 +151,7 @@ class ContractModal {
                     onDone();
                   },
                   icon: const Icon(Icons.check, size: 16),
-                  label: const Text('Terima', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('Terima', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
               ],
             ),

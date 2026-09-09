@@ -8,6 +8,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan
 import 'contract_modals.dart';
 import 'sepakbola_logic/gaji_pemain_sepakbola.dart';
 import 'sepakbola_logic/logika_pemain_sepakbola.dart';
+import 'tim_tertarik_modal.dart';
 
 class AtlitActivitiesPage extends StatefulWidget {
   final Character character;
@@ -214,11 +215,13 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
   }
 
   void _consultAgent() {
-    _showResult(
-      'Konsultasi Agen 💼',
-      'Agenmu melaporkan bahwa 2 klub besar sedang memantau perkembanganmu untuk bursa transfer mendatang. Jaga performamu tetap tinggi!',
-      Icons.record_voice_over,
-      Colors.purple,
+    TimTertarikModal.show(
+      context: context,
+      character: widget.character,
+      onDone: () {
+        setState(() {});
+        widget.onRefresh();
+      },
     );
   }
 
