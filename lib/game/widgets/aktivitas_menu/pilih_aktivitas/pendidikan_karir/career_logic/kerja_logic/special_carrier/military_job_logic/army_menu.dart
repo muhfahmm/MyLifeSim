@@ -154,6 +154,8 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                           backgroundColor: Colors.green.shade700,
                         ),
                       );
+
+                      Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
                     },
                     child: const Text('Daftar'),
                   ),
@@ -172,6 +174,14 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
     );
   }
 
+  void _handleBack() {
+    if (widget.character.jobName != null) {
+      Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -180,20 +190,30 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
             widget.character.jobName!.contains('Angkatan Laut') ||
             widget.character.jobName!.contains('Angkatan Udara'));
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Karir Militer 🪖', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBack,
+          ),
+          title: const Text('Karir Militer 🪖', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF1B5E20), Color(0xFF2E7D32)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
           ),
+          iconTheme: const IconThemeData(color: Colors.white),
         ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: ListView(
@@ -310,6 +330,7 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

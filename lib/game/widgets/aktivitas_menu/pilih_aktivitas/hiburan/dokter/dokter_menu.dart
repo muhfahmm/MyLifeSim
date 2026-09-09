@@ -10,8 +10,8 @@ import 'menu_dokter/dokter_utils.dart';
 import 'riwayat_penyakit_page.dart';
 
 class DokterMenuHelper {
-  static void showDokterMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    Navigator.push(
+  static Future<dynamic> showDokterMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => DokterPage(

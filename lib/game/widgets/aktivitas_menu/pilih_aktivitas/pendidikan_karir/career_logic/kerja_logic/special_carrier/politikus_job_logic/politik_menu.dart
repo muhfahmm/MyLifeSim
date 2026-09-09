@@ -126,6 +126,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
               onPressed: () {
                 Navigator.pop(ctx);
                 setState(() {});
+                Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
               },
               child: const Text('OK'),
             ),
@@ -182,17 +183,35 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
     );
   }
 
+  void _handleBack() {
+    if (widget.character.jobName != null) {
+      Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Karier Politik 🏛️'),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
-      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBack,
+          ),
+          title: const Text('Karier Politik 🏛️'),
+          backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+          foregroundColor: isDark ? Colors.white : Colors.black87,
+          elevation: 0.5,
+        ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
@@ -328,6 +347,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }

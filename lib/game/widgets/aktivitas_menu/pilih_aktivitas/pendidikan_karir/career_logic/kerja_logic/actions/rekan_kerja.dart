@@ -19,6 +19,14 @@ class RekanKerjaPage extends StatefulWidget {
 
 class _RekanKerjaPageState extends State<RekanKerjaPage> {
   @override
+  void initState() {
+    super.initState();
+    if (widget.character.jobName != null && widget.character.coworkers.isEmpty) {
+      widget.character.generateCoworkersIfEmpty();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final coworkers = widget.character.coworkers;
@@ -238,87 +246,168 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                 ),
               ),
             )
-          else
-            ...coworkers.map((cm) {
-              final String name = cm['name']!;
-              final String gender = cm['gender']!;
-              final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
-              final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-              final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
-                name: name,
-                gender: gender,
-                age: age,
-                schoolLevel: 'SMA',
-                happiness: rel,
-              );
+          else ...[
+            (() {
+              final bool hasTeamCategories = coworkers.any((cm) => cm.containsKey('teamCategory'));
 
-              return Card(
-                elevation: 0,
-                margin: const EdgeInsets.only(bottom: 8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                ),
-                child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.transparent,
-                    backgroundImage: NetworkImage(avatarUrl),
+              Widget buildCoworkerCard(Map<String, String> cm) {
+                final String name = cm['name']!;
+                final String gender = cm['gender']!;
+                final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
+                final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
+                final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
+                  name: name,
+                  gender: gender,
+                  age: age,
+                  schoolLevel: 'SMA',
+                  happiness: rel,
+                );
+
+                final String? category = cm['teamCategory'];
+
+                return Card(
+                  elevation: 0,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                   ),
-                  title: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          name,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black87,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      (() {
-                        final String? relStr = widget.character.getPartnerRelation(name);
-                        if (relStr == null) return const SizedBox.shrink();
-                        return Container(
-                          margin: const EdgeInsets.only(left: 8),
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: Colors.pink,
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            relStr,
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                          ),
-                        );
-                      }()),
-                    ],
-                  ),
-                   subtitle: Text(
-                    '${cm['subject'] != null ? 'Guru ${cm['subject']} 📚 • ' : ''}Rekan Kerja • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
-                    style: TextStyle(
-                      color: isDark ? Colors.white70 : Colors.black54,
+                  child: ListTile(
+                    leading: CircleAvatar(
+                      backgroundColor: Colors.transparent,
+                      backgroundImage: NetworkImage(avatarUrl),
                     ),
-                  ),
-                  trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.black87),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ClassmateInteractionPage(
-                          classmate: cm,
-                          character: widget.character,
-                          onRefresh: () {
-                            setState(() {});
-                            widget.onRefresh();
-                          },
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
+                        if (category != null)
+                          Container(
+                            margin: const EdgeInsets.only(left: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: category == 'Tim Utama' ? Colors.green.shade700 : Colors.orange.shade700,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              category,
+                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        (() {
+                          final String? relStr = widget.character.getPartnerRelation(name);
+                          if (relStr == null) return const SizedBox.shrink();
+                          return Container(
+                            margin: const EdgeInsets.only(left: 8),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: Colors.pink,
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              relStr,
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          );
+                        }()),
+                      ],
+                    ),
+                    subtitle: Text(
+                      '${cm['subject'] != null ? 'Guru ${cm['subject']} 📚 • ' : ''}${cm['role'] ?? 'Rekan Kerja'} • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.black54,
                       ),
-                    );
-                  },
-                ),
+                    ),
+                    trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.black87),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ClassmateInteractionPage(
+                            classmate: cm,
+                            character: widget.character,
+                            onRefresh: () {
+                              setState(() {});
+                              widget.onRefresh();
+                            },
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+
+              if (!hasTeamCategories) {
+                return Column(
+                  children: coworkers.map((cm) => buildCoworkerCard(cm)).toList(),
+                );
+              }
+
+              final mainTeam = coworkers.where((cm) => cm['teamCategory'] == 'Tim Utama').toList();
+              final subTeam = coworkers.where((cm) => cm['teamCategory'] == 'Tim Cadangan').toList();
+              final otherTeam = coworkers.where((cm) => cm['teamCategory'] != 'Tim Utama' && cm['teamCategory'] != 'Tim Cadangan').toList();
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (mainTeam.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.star, color: Colors.amber, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Tim Utama (${mainTeam.length} Pemain)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: isDark ? Colors.green.shade300 : Colors.green.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...mainTeam.map((cm) => buildCoworkerCard(cm)),
+                  ],
+                  if (subTeam.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.groups, color: Colors.orange, size: 18),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Tim Cadangan (${subTeam.length} Pemain)',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                              color: isDark ? Colors.orange.shade300 : Colors.orange.shade800,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    ...subTeam.map((cm) => buildCoworkerCard(cm)),
+                  ],
+                  if (otherTeam.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    ...otherTeam.map((cm) => buildCoworkerCard(cm)),
+                  ],
+                ],
               );
-            }),
+            }()),
+          ],
         ],
       ),
     );

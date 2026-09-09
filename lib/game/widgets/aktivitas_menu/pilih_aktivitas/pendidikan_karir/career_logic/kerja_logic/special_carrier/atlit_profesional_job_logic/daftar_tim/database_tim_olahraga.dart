@@ -8,48 +8,73 @@ import 'sepakbola/italia.dart';
 import 'sepakbola/prancis.dart';
 import 'basket/indonesia.dart';
 import 'basket/amerika.dart';
-import 'bulutangkis/indonesia.dart';
 import 'balap/internasional.dart';
 import 'tinju_mma/internasional.dart';
 import 'tenis/internasional.dart';
 import 'renang/internasional.dart';
-import 'catur/internasional.dart';
 
 class TimOlahragaDatabase {
   static List<Map<String, String>> getTeamsBySport(String sportName) {
-    switch (sportName.toLowerCase()) {
-      case 'sepakbola':
-        return [
-          ...TimSepakbolaIndonesia.teams,
-          ...TimSepakbolaInggris.teams,
-          ...TimSepakbolaSpanyol.teams,
-          ...TimSepakbolaJerman.teams,
-          ...TimSepakbolaItalia.teams,
-          ...TimSepakbolaPrancis.teams,
-        ];
-      case 'basket':
-        return [
-          ...TimBasketIndonesia.teams,
-          ...TimBasketAmerika.teams,
-        ];
-      case 'bulu tangkis':
-        return TimBuluTangkisIndonesia.teams;
-      case 'balap motor & mobil':
-        return TimBalapInternasional.teams;
-      case 'tinju & mma':
-        return TimTinjuMMAInternasional.teams;
-      case 'tenis':
-        return TimTenisInternasional.teams;
-      case 'renang':
-        return TimRenangInternasional.teams;
-      case 'catur':
-        return TimCaturInternasional.teams;
-      default:
-        return [
-          {'name': 'Klub Profesional Nasional', 'origin': 'Indonesia', 'league': 'Liga Nasional'},
-          {'name': 'Klub Profesional Internasional', 'origin': 'Internasional', 'league': 'Liga Dunia'},
-        ];
+    final String s = sportName.toLowerCase();
+    if (s.contains('sepakbola')) {
+      return [
+        ...TimSepakbolaIndonesia.teams,
+        ...TimSepakbolaInggris.teams,
+        ...TimSepakbolaSpanyol.teams,
+        ...TimSepakbolaJerman.teams,
+        ...TimSepakbolaItalia.teams,
+        ...TimSepakbolaPrancis.teams,
+      ];
+    } else if (s.contains('basket')) {
+      return [
+        ...TimBasketIndonesia.teams,
+        ...TimBasketAmerika.teams,
+      ];
+    } else if (s.contains('balap')) {
+      return TimBalapInternasional.teams;
+    } else if (s.contains('tinju') || s.contains('mma')) {
+      return TimTinjuMMAInternasional.teams;
+    } else if (s.contains('tenis')) {
+      return TimTenisInternasional.teams;
+    } else if (s.contains('renang')) {
+      return TimRenangInternasional.teams;
+    } else {
+      return [
+        {'name': 'Klub Profesional Nasional', 'origin': 'Indonesia', 'league': 'Liga Nasional'},
+        {'name': 'Klub Profesional Internasional', 'origin': 'Internasional', 'league': 'Liga Dunia'},
+      ];
     }
+  }
+
+  static int getLeagueTeamCount(String teamName) {
+    final allTeams = [
+      ...TimSepakbolaIndonesia.teams,
+      ...TimSepakbolaInggris.teams,
+      ...TimSepakbolaSpanyol.teams,
+      ...TimSepakbolaJerman.teams,
+      ...TimSepakbolaItalia.teams,
+      ...TimSepakbolaPrancis.teams,
+      ...TimBasketIndonesia.teams,
+      ...TimBasketAmerika.teams,
+      ...TimBalapInternasional.teams,
+      ...TimTinjuMMAInternasional.teams,
+      ...TimTenisInternasional.teams,
+      ...TimRenangInternasional.teams,
+    ];
+
+    final matchedTeam = allTeams.firstWhere(
+      (t) => (t['name'] ?? '').toLowerCase() == teamName.toLowerCase(),
+      orElse: () => {},
+    );
+
+    if (matchedTeam.isNotEmpty && matchedTeam['league'] != null) {
+      final String league = matchedTeam['league']!;
+      final int leagueTeams = allTeams.where((t) => t['league'] == league).length;
+      if (leagueTeams > 1) {
+        return leagueTeams;
+      }
+    }
+    return 8; // Default 8 tim
   }
 
   static List<String> getLeaguesBySport(String sportName) {

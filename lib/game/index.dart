@@ -28,6 +28,8 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu
 import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/univ_logic/univ_menu_page.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/contract_modals.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/season_stats_modal.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/dokter_menu.dart';
@@ -477,14 +479,7 @@ class _GameScreenState extends State<GameScreen> {
     });
 
     final random = Random();
-    // 35% peluang memicu keributan orang tua saat tambah hari (isDaily)
-    _character.checkParentArgumentTrigger(random, 35);
-    if (_character.pendingParentArgumentEvent != null) {
-      _checkParentArgumentEvent(() {
-        if (mounted) setState(() {});
-      });
-      return;
-    }
+    _character.pendingParentArgumentEvent = null;
 
     // Panggil checkAndGenerateProposal dengan mode harian (isDaily: true)
     AjakanHandler.checkAndGenerateProposal(_character, random, isDaily: true);
@@ -539,100 +534,8 @@ class _GameScreenState extends State<GameScreen> {
   }
 
   void _checkParentArgumentEvent(VoidCallback onDone) {
-    if (_character.pendingParentArgumentEvent != null) {
-      final info = Map<String, String>.from(_character.pendingParentArgumentEvent!);
-      _character.pendingParentArgumentEvent = null;
-
-      // Usia 0-5 tahun belum mengerti keributan orang tua, jadi lewati modalnya
-      if (_character.age <= 5) {
-        onDone();
-        return;
-      }
-
-      final String fName = info['fatherName'] ?? 'Ayah';
-      final String mName = info['motherName'] ?? 'Ibu';
-      final String fRole = info['fatherRole'] ?? 'Ayah';
-      final String mRole = info['motherRole'] ?? 'Ibu';
-      final int argCount = _character.parentArgumentCount;
-
-      final List<String> dialogOpenings = [
-        'Kamu mendengar pertengkaran sengit antara $fName ($fRole) dan $mName ($mRole) di rumah! Suasana rumah menjadi sangat panas.',
-        'Pertengkaran kembali pecah antara $fName ($fRole) dan $mName ($mRole)! Piring pecah dan bentakan terdengar hingga kamar.',
-        'Untuk kesekian kalinya (Ke-$argCount), $fName dan $mName berdebat hebat masalah rumah tangga di ruang tamu.',
-        'Suasana dingin dan saling sindir antara $fName dan $mName akhirnya meledak menjadi pertengkaran terbuka di rumah!',
-        'Keributan besar ke-$argCount melanda rumah! $fName dan $mName saling menyalahkan tanpa ada yang mau mengalah.',
-      ];
-
-      final String currentOpening = dialogOpenings[(argCount - 1).clamp(0, dialogOpenings.length - 1)];
-
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogCtx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: Row(
-            children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 28),
-              const SizedBox(width: 8),
-              Text('Keributan Orang Tua (#$argCount)! 💥', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-            ],
-          ),
-          content: Text(
-            '$currentOpening\n\nApakah kamu ingin mencoba bicara dengan salah satu dari mereka?',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogCtx);
-                PercakapanDispatcher.dispatchAction(
-                  context: context,
-                  character: _character,
-                  targetName: fName,
-                  targetRole: fRole,
-                  targetAge: '${_character.fatherAge ?? 40}',
-                  relationshipValue: _character.fatherRelationship ?? 50,
-                  actionType: 'Minta Cerai',
-                  onActionComplete: () {
-                    if (mounted) setState(() {});
-                    onDone();
-                  },
-                );
-              },
-              child: Text('Bicara dengan $fRole ($fName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogCtx);
-                PercakapanDispatcher.dispatchAction(
-                  context: context,
-                  character: _character,
-                  targetName: mName,
-                  targetRole: mRole,
-                  targetAge: '${_character.motherAge ?? 38}',
-                  relationshipValue: _character.motherRelationship ?? 50,
-                  actionType: 'Minta Cerai',
-                  onActionComplete: () {
-                    if (mounted) setState(() {});
-                    onDone();
-                  },
-                );
-              },
-              child: Text('Bicara dengan $mRole ($mName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogCtx);
-                onDone();
-              },
-              child: const Text('Abaikan', style: TextStyle(color: Colors.grey)),
-            ),
-          ],
-        ),
-      );
-    } else {
-      onDone();
-    }
+    _character.pendingParentArgumentEvent = null;
+    onDone();
   }
 
   void _checkPendingDivorceFeedback(VoidCallback onDone) {
@@ -646,32 +549,48 @@ class _GameScreenState extends State<GameScreen> {
         final String motherName = _character.motherName ?? 'Ibu';
         _showCustodySelectionDialog(context, fatherName, motherName, onDone);
       } else {
-        // Jika batal cerai, tampilkan pemberitahuan VN bahwa orang tua batal bercerai
-        final String parentName = _character.fatherName ?? _character.motherName ?? _character.stepFatherName ?? _character.stepMotherName ?? 'Orang Tua';
-        final Map<String, dynamic> npcMap = {
-          'name': parentName,
-          'role': 'Orang Tua',
-          'gender': 'Perempuan',
-          'relationship': (_character.motherRelationship ?? _character.fatherRelationship ?? 50).toString(),
-        };
-
-        final nodes = MintaCeraiDialogue.getDecisionDialogue(
-          player: _character,
-          npc: npcMap,
-          isDivorced: false,
-        );
-
-        VNDialogueOverlay.show(
-          context: context,
-          player: _character,
-          npc: npcMap,
-          nodes: nodes,
-          onFinished: () {
-            if (mounted) setState(() {});
-            onDone();
-          },
-        );
+        onDone();
       }
+    } else {
+      onDone();
+    }
+  }
+
+  void _checkAthleteSeasonNotice(VoidCallback onDone) {
+    if (_character.pendingAthleteSeasonNotice != null) {
+      final String noticeText = _character.pendingAthleteSeasonNotice!;
+      _character.pendingAthleteSeasonNotice = null;
+
+      SeasonStatsModal.show(
+        context,
+        noticeText: noticeText,
+        onDone: onDone,
+      );
+    } else {
+      onDone();
+    }
+  }
+
+  void _checkAthleteContractNotice(VoidCallback onDone) {
+    if (_character.pendingContractOffer != null) {
+      final Map<String, dynamic> offerData = Map<String, dynamic>.from(_character.pendingContractOffer!);
+      _character.pendingContractOffer = null;
+
+      ContractModal.showContractOffer(
+        context,
+        character: _character,
+        offerData: offerData,
+        onDone: onDone,
+      );
+    } else if (_character.pendingAthleteContractNotice != null) {
+      final String noticeText = _character.pendingAthleteContractNotice!;
+      _character.pendingAthleteContractNotice = null;
+
+      ContractModal.showContractNotice(
+        context,
+        noticeText: noticeText,
+        onDone: onDone,
+      );
     } else {
       onDone();
     }
@@ -680,13 +599,17 @@ class _GameScreenState extends State<GameScreen> {
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
   void _runAgeUpSequence(List<String> sicknessEvents, VoidCallback onFinish) {
     _handleSicknessSequence(sicknessEvents, () {
-      _checkParentArgumentEvent(() {
-        _checkPendingDivorceFeedback(() {
-          _checkAdikRequestMoney(() {
-            _checkSchoolEnrollmentOptions(() {
-              _checkChildrenEvents(() {
-                _checkGraduationOptions(() {
-                  _checkEsportPromotion(onFinish);
+      _checkAthleteSeasonNotice(() {
+        _checkAthleteContractNotice(() {
+          _checkParentArgumentEvent(() {
+            _checkPendingDivorceFeedback(() {
+              _checkAdikRequestMoney(() {
+                _checkSchoolEnrollmentOptions(() {
+                  _checkChildrenEvents(() {
+                    _checkGraduationOptions(() {
+                      _checkEsportPromotion(onFinish);
+                    });
+                  });
                 });
               });
             });
@@ -811,28 +734,30 @@ class _GameScreenState extends State<GameScreen> {
                     Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: otherEvents.map((e) {
-                    final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
-                    String displayText = e;
-                    if (isSameSexEvent) {
-                      if (displayText.startsWith('💬')) {
-                        displayText = '🏳️‍🌈' + displayText.substring(1);
-                      } else if (displayText.startsWith('💍')) {
-                        displayText = '🏳️‍🌈' + displayText.substring(1);
-                      } else if (displayText.startsWith('🎉')) {
-                        displayText = '🏳️‍🌈' + displayText.substring(1);
-                      } else if (!displayText.startsWith('🏳️‍🌈')) {
-                        displayText = '🏳️‍🌈 ' + displayText;
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: otherEvents.map((e) {
+                      final bool isSameSexEvent = e.toLowerCase().contains('gay') || e.toLowerCase().contains('lesbian') || e.contains('🏳️‍🌈');
+                      String displayText = e;
+                      if (isSameSexEvent) {
+                        if (displayText.startsWith('💬')) {
+                          displayText = '🏳️‍🌈' + displayText.substring(1);
+                        } else if (displayText.startsWith('💍')) {
+                          displayText = '🏳️‍🌈' + displayText.substring(1);
+                        } else if (displayText.startsWith('🎉')) {
+                          displayText = '🏳️‍🌈' + displayText.substring(1);
+                        } else if (!displayText.startsWith('🏳️‍🌈')) {
+                          displayText = '🏳️‍🌈 ' + displayText;
+                        }
                       }
-                    }
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: 8.0),
-                      child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
-                    );
-                  }).toList(),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 8.0),
+                        child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                      );
+                    }).toList(),
+                  ),
                 ),
                 actions: [
                   TextButton(
@@ -919,9 +844,11 @@ class _GameScreenState extends State<GameScreen> {
                 ),
                 onPressed: () {
                   Navigator.pop(ctx);
-                  // Buka DokterPage
+                  // Buka DokterPage dan pastikan callback onDone dipanggil ketika menutup/kembali dari DokterPage
                   DokterMenuHelper.showDokterMenu(context, _character, () {
-                    setState(() {});
+                    if (mounted) setState(() {});
+                  }).then((_) {
+                    if (mounted) setState(() {});
                     onDone();
                   });
                 },
@@ -2240,6 +2167,7 @@ class _GameScreenState extends State<GameScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
+                    settings: const RouteSettings(name: 'KerjaMenuScreen'),
                     builder: (context) => KerjaMenuScreen(
                       character: _character,
                       onRefresh: () => setState(() {}),
@@ -2345,6 +2273,7 @@ class _GameScreenState extends State<GameScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
+                        settings: const RouteSettings(name: 'KerjaMenuScreen'),
                         builder: (context) => KerjaMenuScreen(
                           character: _character,
                           onRefresh: () => setState(() {}),

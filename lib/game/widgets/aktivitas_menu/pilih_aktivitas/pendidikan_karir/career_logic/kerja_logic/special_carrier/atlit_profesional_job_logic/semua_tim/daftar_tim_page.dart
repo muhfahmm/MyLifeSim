@@ -1,10 +1,12 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/semua_tim/daftar_tim_page.dart
 
 import 'package:flutter/material.dart';
+import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../daftar_tim/database_tim_olahraga.dart';
+import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
 
 class DaftarTimPage extends StatefulWidget {
   final Character character;
@@ -40,7 +42,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     super.dispose();
   }
 
-  void _applyJob(Map<String, dynamic> positionItem, Map<String, String> teamItem) {
+  void _applyJob(Map<String, dynamic> positionItem, Map<String, String> teamItem, int contractYears) {
     final character = widget.character;
     final int minHealth = positionItem['minHealth'] ?? 0;
     final int minDiscipline = positionItem['minDiscipline'] ?? 0;
@@ -68,12 +70,49 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
       return;
     }
 
+    // Persentase peluang diterima berdasarkan Usia dan Durasi Kontrak
+    final int age = character.age;
+    final int successChance = LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
+      usia: age,
+      durasiKontrakTahun: contractYears,
+    );
+
+    final int roll = Random().nextInt(100);
+    final bool isAccepted = roll < successChance;
+
+    if (!isAccepted) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+          title: const Row(
+            children: [
+              Icon(Icons.cancel, color: Colors.red, size: 28),
+              SizedBox(width: 8),
+              Text('Penawaran Ditolak 🚫', style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
+          ),
+          content: Text(
+            'Manajemen ${teamItem['name']} menolak pengajuan kontrak selama $contractYears tahun untuk posisimu (Peluang diterima: $successChance%).\n\nCoba ajukan durasi kontrak yang lebih pendek atau coba lagi!',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Tutup'),
+            ),
+          ],
+        ),
+      );
+      return;
+    }
+
     final int baseSalary = positionItem['baseSalary'] as int;
     final int finalSalary = (baseSalary * _salaryMultiplier).round();
     final String fullJobTitle = "${positionItem['title']} - ${teamItem['name']}";
 
     setState(() {
       character.setJob(fullJobTitle, finalSalary);
+      character.athleteContractYears = contractYears;
     });
     widget.onRefresh();
 
@@ -82,15 +121,13 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
       builder: (context) => AlertDialog(
         title: const Text('Kontrak Diterima! 🎉🏆'),
         content: Text(
-          'Selamat! Kamu resmi bergabung sebagai $fullJobTitle asal ${teamItem['origin']} (${teamItem['league']}) dengan nilai kontrak ${CurrencySettings.format(finalSalary)}/tahun.',
+          'Selamat! Manajemen ${teamItem['name']} menyetujui pengajuan kontrakmu selama $contractYears Tahun!\n\n'
+          'Kamu resmi bergabung sebagai $fullJobTitle asal ${teamItem['origin']} (${teamItem['league']}) dengan nilai kontrak ${CurrencySettings.format(finalSalary)}/tahun.',
         ),
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Tutup dialog sukses
-              Navigator.pop(context); // Tutup modal posisi
-              Navigator.pop(context); // Kembali dari DaftarTimPage ke menu cabang
-              Navigator.pop(context); // Kembali ke menu utama pekerjaan
+              Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
             },
             child: const Text('Luar Biasa!'),
           ),
@@ -135,6 +172,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     final List<Map<String, dynamic>> positions = List<Map<String, dynamic>>.from(widget.sportItem['positions']);
 
     Map<String, dynamic> selectedPosition = positions.first;
+    int selectedContractYears = 3;
 
     showDialog(
       context: context,
@@ -152,6 +190,19 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
 
             final int baseSal = selectedPosition['baseSalary'] as int;
             final int finalSalary = (baseSal * _salaryMultiplier).round();
+
+            final int age = widget.character.age;
+            final List<int> availableContractOptions = LogikaPemainSepakbola.getOpsiDurasiKontrak(age);
+            if (!availableContractOptions.contains(selectedContractYears)) {
+              selectedContractYears = 3;
+            }
+
+            int getChance(int yrs) {
+              return LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
+                usia: age,
+                durasiKontrakTahun: yrs,
+              );
+            }
 
             return AlertDialog(
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -266,6 +317,77 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                         ),
                       ),
                     ),
+                    const SizedBox(height: 14),
+
+                    // Custom Dropdown Durasi Kontrak
+                    Text(
+                      'PILIH DURASI KONTRAK:',
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: isDark ? Colors.white54 : Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: isDark ? Colors.grey.shade800 : Colors.blue.shade50.withValues(alpha: 0.5),
+                        borderRadius: BorderRadius.circular(14),
+                        border: Border.all(color: Colors.blue.shade600, width: 1.5),
+                      ),
+                      child: DropdownButtonHideUnderline(
+                        child: DropdownButton<int>(
+                          value: selectedContractYears,
+                          isExpanded: true,
+                          dropdownColor: isDark ? Colors.grey.shade900 : Colors.white,
+                          borderRadius: BorderRadius.circular(14),
+                          icon: const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blue, size: 28),
+                          items: availableContractOptions.map((yrs) {
+                            final int ch = getChance(yrs);
+                            return DropdownMenuItem<int>(
+                              value: yrs,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Kontrak $yrs Tahun',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: isDark ? Colors.white : Colors.blue.shade900,
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    decoration: BoxDecoration(
+                                      color: ch >= 80 ? Colors.green.withValues(alpha: 0.15) : (ch >= 50 ? Colors.amber.withValues(alpha: 0.15) : Colors.red.withValues(alpha: 0.15)),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: Text(
+                                      'Peluang Diterima: $ch%',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: ch >= 80 ? Colors.green : (ch >= 50 ? Colors.amber.shade900 : Colors.red),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                          onChanged: (val) {
+                            if (val != null) {
+                              setModalState(() {
+                                selectedContractYears = val;
+                              });
+                            }
+                          },
+                        ),
+                      ),
+                    ),
                     const SizedBox(height: 16),
 
                     // Detail Kartu Posisi Terpilih
@@ -351,7 +473,10 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
-                  onPressed: () => _applyJob(selectedPosition, teamItem),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _applyJob(selectedPosition, teamItem, selectedContractYears);
+                  },
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
@@ -381,7 +506,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     final List<Map<String, String>> allTeams = TimOlahragaDatabase.getTeamsBySport(sportName);
 
     return PopScope(
-      canPop: _selectedLeague == null,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
         if (_selectedLeague != null) {
@@ -390,6 +515,10 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             _searchController.clear();
             _searchQuery = '';
           });
+        } else if (widget.character.jobName != null) {
+          Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+        } else {
+          Navigator.pop(context);
         }
       },
       child: Scaffold(
@@ -403,6 +532,8 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                   _searchController.clear();
                   _searchQuery = '';
                 });
+              } else if (widget.character.jobName != null) {
+                Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
               } else {
                 Navigator.pop(context);
               }

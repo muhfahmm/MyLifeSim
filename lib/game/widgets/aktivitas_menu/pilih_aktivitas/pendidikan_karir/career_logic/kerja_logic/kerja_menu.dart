@@ -13,6 +13,14 @@ import 'esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
 import 'special_carrier/pekerjaan_spesial_menu.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/balap/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/basket/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/bulutangkis/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/catur/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/renang/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/tenis/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/tinju_mma/atlit_activities_page.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -39,6 +47,31 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     if (widget.character.jobName != null) {
       _generateCoworkersIfEmpty();
     }
+  }
+
+  Widget _buildAthleteActivitiesPage(Character character) {
+    void refresh() {
+      if (mounted) setState(() {});
+      widget.onRefresh();
+    }
+
+    final String job = character.jobName ?? '';
+    if (job.contains('Pebalap')) {
+      return AtlitBalapActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Basket') || job.contains('Point Guard') || job.contains('Shooting Guard') || job.contains('Center')) {
+      return AtlitBasketActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Bulutangkis')) {
+      return AtlitBulutangkisActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Catur')) {
+      return AtlitCaturActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Renang')) {
+      return AtlitRenangActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Petenis')) {
+      return AtlitTenisActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('MMA') || job.contains('Petinju')) {
+      return AtlitTinjuMmaActivitiesPage(character: character, onRefresh: refresh);
+    }
+    return AtlitActivitiesPage(character: character, onRefresh: refresh);
   }
 
   Future<void> _generateCoworkersIfEmpty() async {
@@ -117,6 +150,70 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     final bool isProPlayer = job.startsWith('Pro Player Esport');
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
+
+    final bool isAthlete = job.contains('Striker') ||
+        job.contains('Gelandang') ||
+        job.contains('Bek') ||
+        job.contains('Kiper') ||
+        job.contains('Point Guard') ||
+        job.contains('Shooting Guard') ||
+        job.contains('Center') ||
+        job.contains('Pebalap') ||
+        job.contains('Petenis') ||
+        job.contains('MMA') ||
+        job.contains('Petinju') ||
+        job.contains('Renang');
+
+    if (isAthlete) {
+      // Tentukan jumlah pemain utama & cadangan
+      final bool isSoccer = job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper');
+      final bool isBasketball = job.contains('Guard') || job.contains('Center');
+
+      final int mainTeamCount = isSoccer ? 10 : (isBasketball ? 4 : 4);
+      final int subTeamCount = isSoccer ? (7 + random.nextInt(4)) : (isBasketball ? (5 + random.nextInt(4)) : (3 + random.nextInt(3)));
+      final String teamGender = widget.character.gender; // Gender disesuaikan dengan tim/kategori user
+
+      // Generate Tim Utama
+      for (int i = 0; i < mainTeamCount; i++) {
+        final name = getRandomName(teamGender);
+        final ageVal = 18 + random.nextInt(15);
+        final double sexRoll = random.nextDouble();
+        final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+        widget.character.coworkers.add({
+          'name': name,
+          'gender': teamGender,
+          'relationship': (45 + random.nextInt(21)).toString(),
+          'age': ageVal.toString(),
+          'isDeceased': 'false',
+          'sexuality': coworkerSexuality,
+          'intelligence': (40 + random.nextInt(51)).toString(),
+          'teamCategory': 'Tim Utama',
+          'role': 'Pemain Utama',
+        });
+      }
+
+      // Generate Tim Cadangan
+      for (int i = 0; i < subTeamCount; i++) {
+        final name = getRandomName(teamGender);
+        final ageVal = 17 + random.nextInt(12);
+        final double sexRoll = random.nextDouble();
+        final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+        widget.character.coworkers.add({
+          'name': name,
+          'gender': teamGender,
+          'relationship': (35 + random.nextInt(21)).toString(),
+          'age': ageVal.toString(),
+          'isDeceased': 'false',
+          'sexuality': coworkerSexuality,
+          'intelligence': (35 + random.nextInt(51)).toString(),
+          'teamCategory': 'Tim Cadangan',
+          'role': 'Pemain Cadangan',
+        });
+      }
+      return;
+    }
 
     int count = 5 + random.nextInt(6);
     if (isProPlayer) {
@@ -367,6 +464,19 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         team = jobTitle.substring(jobTitle.indexOf('(') + 1, jobTitle.indexOf(')'));
       }
 
+      final bool isAthlete = jobTitle.contains('Striker') ||
+          jobTitle.contains('Gelandang') ||
+          jobTitle.contains('Bek') ||
+          jobTitle.contains('Kiper') ||
+          jobTitle.contains('Point Guard') ||
+          jobTitle.contains('Shooting Guard') ||
+          jobTitle.contains('Center') ||
+          jobTitle.contains('Pebalap') ||
+          jobTitle.contains('Petenis') ||
+          jobTitle.contains('MMA') ||
+          jobTitle.contains('Petinju') ||
+          jobTitle.contains('Renang');
+
       return Scaffold(
         appBar: AppBar(
           title: const Text('Pekerjaan & Karir 💼'),
@@ -386,6 +496,15 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
               ),
             ),
             const SizedBox(height: 12),
+            if (isAthlete)
+              _buildMenuTile(
+                context: context,
+                icon: Icons.sports_soccer,
+                color: Colors.green.shade700,
+                title: 'Aktivitas Karir Atlet ⚽🏆',
+                subtitle: 'Latihan, Pertandingan, Kontrak, Media & Hubungan Tim',
+                page: _buildAthleteActivitiesPage(character),
+              ),
             _buildMenuTile(
               context: context,
               icon: Icons.trending_up,

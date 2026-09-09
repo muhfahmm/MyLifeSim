@@ -1602,60 +1602,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             widget.character.isFatherDivorced == false &&
             widget.character.isMotherDivorced == false;
 
-        if (hasStepMother) {
-          final String stepMotherName = widget.character.stepMotherName!;
-          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
-          if (!hasMintaCerai) {
-            actions.add(ActionItem(
-              label: 'Minta Cerai dengan $stepMotherName',
-              icon: Icons.heart_broken,
-              color: Colors.redAccent,
-              onTap: () {
-                PercakapanDispatcher.dispatchAction(
-                  context: context,
-                  character: widget.character,
-                  targetName: widget.targetName,
-                  targetRole: widget.targetRole,
-                  targetAge: '$targetAge',
-                  relationshipValue: _getCurrentRelationshipValue(),
-                  actionType: 'Minta Cerai',
-                  onActionComplete: _updateState,
-                  targetAvatarUrl: _getTargetAvatarUrl(),
-                  playerAvatarUrl: _getPlayerAvatarUrl(),
-                  targetGender: _getTargetGender(),
-                );
-              },
-
-            ));
-          }
-        } else if (isStillMarriedToMother) {
-          // Jika masih bersuami-istri dengan Ibu Kandung
-          final String motherName = widget.character.motherName!;
-          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
-          if (!hasMintaCerai) {
-            actions.add(ActionItem(
-              label: 'Minta Cerai dengan $motherName',
-              icon: Icons.heart_broken,
-              color: Colors.redAccent,
-              onTap: () {
-                PercakapanDispatcher.dispatchAction(
-                  context: context,
-                  character: widget.character,
-                  targetName: widget.targetName,
-                  targetRole: widget.targetRole,
-                  targetAge: '$targetAge',
-                  relationshipValue: _getCurrentRelationshipValue(),
-                  actionType: 'Minta Cerai',
-                  onActionComplete: _updateState,
-                  targetAvatarUrl: _getTargetAvatarUrl(),
-                  playerAvatarUrl: _getPlayerAvatarUrl(),
-                  targetGender: _getTargetGender(),
-                );
-              },
-
-            ));
-          }
-        } else if (!hasStepMother && !isStillMarriedToMother) {
+        if (!hasStepMother && !isStillMarriedToMother) {
           // Hanya tampilkan Minta Tidak Menikah Lagi jika Ayah benar-benar duda (tidak beristri)
           if (!widget.character.isFatherPersuadedNotToRemarry && widget.character.age >= 10) {
             final bool hasMintaTidakNikah = actions.any((act) => act.label == 'Minta Tidak Menikah Lagi');
@@ -1715,61 +1662,119 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
 
-      // --- IBU ---
-      else if (parentIsMother && widget.character.motherName != null && widget.character.isMotherDeceased == false) {
-        final bool hasStepFather = widget.character.stepFatherName != null && widget.character.isStepFatherDeceased == false;
-        final bool isStillMarriedToFather = widget.character.fatherName != null &&
-            widget.character.isFatherDeceased == false &&
-            widget.character.isFatherDivorced == false &&
-            widget.character.isMotherDivorced == false;
+      // --- FITUR PINDAH TINGGAL BERSAMA ORANG TUA (COOLDOWN 5 TAHUN) ---
+      final bool isParentsSeparated = widget.character.isFatherDivorced || widget.character.isMotherDivorced || (widget.character.custodyParent != null);
+      if (isParentsSeparated && widget.character.age < 18) {
+        if (parentIsFather && widget.character.fatherName != null && widget.character.isFatherDeceased == false && widget.character.isFatherImprisoned == false) {
+          final bool isCurrentlyLivingWithFather = widget.character.custodyParent == 'Ayah';
+          if (!isCurrentlyLivingWithFather) {
+            final int? lastMove = widget.character.lastCustodyMoveAge;
+            final int currentAge = widget.character.age;
+            final int yearsLeft = (lastMove != null) ? 5 - (currentAge - lastMove) : 0;
+            final bool canMove = lastMove == null || yearsLeft <= 0;
 
-        if (hasStepFather) {
-          final String stepFatherName = widget.character.stepFatherName!;
-          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
-          if (!hasMintaCerai) {
             actions.add(ActionItem(
-              label: 'Minta Cerai dengan $stepFatherName',
-              icon: Icons.heart_broken,
-              color: Colors.redAccent,
+              label: canMove ? 'Pindah Tinggal Bersama Ayah' : 'Pindah Tinggal ($yearsLeft th lagi)',
+              icon: Icons.home_work,
+              color: canMove ? Colors.blueAccent : Colors.grey,
               onTap: () {
-                PercakapanDispatcher.dispatchAction(
+                if (!canMove) {
+                  _showResultDialog(
+                    'Belum Bisa Pindah ⏳',
+                    'Kamu baru saja berpindah tempat tinggal. Kamu harus menunggu $yearsLeft tahun lagi (di tahun ke-6 setelah pindah) untuk dapat berpindah tempat tinggal lagi.',
+                    Icons.timer,
+                    Colors.orange,
+                    () {},
+                  );
+                  return;
+                }
+
+                showDialog(
                   context: context,
-                  character: widget.character,
-                  targetName: widget.targetName,
-                  targetRole: widget.targetRole,
-                  targetAge: '$targetAge',
-                  relationshipValue: _getCurrentRelationshipValue(),
-                  actionType: 'Minta Cerai',
-                  onActionComplete: _updateState,
-                  targetAvatarUrl: _getTargetAvatarUrl(),
-                  playerAvatarUrl: _getPlayerAvatarUrl(),
-                  targetGender: _getTargetGender(),
+                  builder: (confirmCtx) => AlertDialog(
+                    title: const Text('Pindah Tinggal Bersama Ayah 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ayahmu (${widget.character.fatherName})?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmCtx),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmCtx);
+                          widget.character.custodyParent = 'Ayah';
+                          widget.character.lastCustodyMoveAge = widget.character.age;
+                          _updateRelationship(10);
+                          _updateState();
+                          _showResultDialog(
+                            'Berhasil Pindah 🏡',
+                            'Kamu sekarang resmi tinggal dan menetap bersama Ayahmu!',
+                            Icons.check_circle,
+                            Colors.green,
+                            () {},
+                          );
+                        },
+                        child: const Text('Pindah', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 );
               },
             ));
           }
-        } else if (isStillMarriedToFather) {
-          // Jika masih bersuami-istri dengan Ayah Kandung
-          final String fatherName = widget.character.fatherName!;
-          final bool hasMintaCerai = actions.any((act) => act.label.contains('Minta Cerai'));
-          if (!hasMintaCerai) {
+        } else if (parentIsMother && widget.character.motherName != null && widget.character.isMotherDeceased == false && widget.character.isMotherImprisoned == false) {
+          final bool isCurrentlyLivingWithMother = widget.character.custodyParent == 'Ibu';
+          if (!isCurrentlyLivingWithMother) {
+            final int? lastMove = widget.character.lastCustodyMoveAge;
+            final int currentAge = widget.character.age;
+            final int yearsLeft = (lastMove != null) ? 5 - (currentAge - lastMove) : 0;
+            final bool canMove = lastMove == null || yearsLeft <= 0;
+
             actions.add(ActionItem(
-              label: 'Minta Cerai dengan $fatherName',
-              icon: Icons.heart_broken,
-              color: Colors.redAccent,
+              label: canMove ? 'Pindah Tinggal Bersama Ibu' : 'Pindah Tinggal ($yearsLeft th lagi)',
+              icon: Icons.home_work,
+              color: canMove ? Colors.pinkAccent : Colors.grey,
               onTap: () {
-                PercakapanDispatcher.dispatchAction(
+                if (!canMove) {
+                  _showResultDialog(
+                    'Belum Bisa Pindah ⏳',
+                    'Kamu baru saja berpindah tempat tinggal. Kamu harus menunggu $yearsLeft tahun lagi (di tahun ke-6 setelah pindah) untuk dapat berpindah tempat tinggal lagi.',
+                    Icons.timer,
+                    Colors.orange,
+                    () {},
+                  );
+                  return;
+                }
+
+                showDialog(
                   context: context,
-                  character: widget.character,
-                  targetName: widget.targetName,
-                  targetRole: widget.targetRole,
-                  targetAge: '$targetAge',
-                  relationshipValue: _getCurrentRelationshipValue(),
-                  actionType: 'Minta Cerai',
-                  onActionComplete: _updateState,
-                  targetAvatarUrl: _getTargetAvatarUrl(),
-                  playerAvatarUrl: _getPlayerAvatarUrl(),
-                  targetGender: _getTargetGender(),
+                  builder: (confirmCtx) => AlertDialog(
+                    title: const Text('Pindah Tinggal Bersama Ibu 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
+                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ibumu (${widget.character.motherName})?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(confirmCtx),
+                        child: const Text('Batal'),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(confirmCtx);
+                          widget.character.custodyParent = 'Ibu';
+                          widget.character.lastCustodyMoveAge = widget.character.age;
+                          _updateRelationship(10);
+                          _updateState();
+                          _showResultDialog(
+                            'Berhasil Pindah 🏡',
+                            'Kamu sekarang resmi tinggal dan menetap bersama Ibumu!',
+                            Icons.check_circle,
+                            Colors.green,
+                            () {},
+                          );
+                        },
+                        child: const Text('Pindah', style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+                      ),
+                    ],
+                  ),
                 );
               },
             ));

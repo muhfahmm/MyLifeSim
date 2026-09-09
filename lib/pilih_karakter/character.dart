@@ -1,7 +1,7 @@
-// lib/pilih_karakter/character.dart
 import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/services.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
@@ -99,16 +99,6 @@ class Character {
   int businessModal = 0;
   int businessAnnualProfit = 0;
 
-  void processAnnualBusinessProfit() {
-    if (hasBusiness && businessAnnualProfit > 0) {
-      money += businessAnnualProfit;
-    }
-  }
-
-
-
-
-
   void addProposalHistory({
     required String name,
     required String relation,
@@ -204,10 +194,12 @@ class Character {
   // --- FIELD PEKERJAAN ---
   String? jobName;
   int? jobSalary;
+  int athleteContractYears = 3; // Kontrak atlet default 3 tahun
   String? partTimeJobName;
   int? partTimeJobSalary;
   bool bypassDegreeRequirement = false;
   String? custodyParent; // 'Ayah' atau 'Ibu' setelah cerai
+  int? lastCustodyMoveAge; // Usia saat terakhir kali pindah tempat tinggal orang tua (cooldown 5 tahun)
 
   bool get isUnivGraduated {
     if (educationHistory['S1'] == 'Lulus' ||
@@ -229,6 +221,11 @@ class Character {
   List<Map<String, String>> idolStaff = [];
   List<String> idolNews = [];
   bool hasGraduatedIdol = false;
+
+  // --- STATISTIK ATLET & LIGA PERSISTEN ---
+  List<Map<String, dynamic>> athleteSeasonStats = []; // History tiap musim per usia
+  Map<String, dynamic>? currentAthleteStats; // Stats musim berjalan
+  List<Map<String, dynamic>> leagueLeaderboard = []; // Klasemen & Top Scorer/Assister Liga
 
   // --- FINANSIAL TRANSAKSI & PINJAMAN ---
   List<Map<String, dynamic>> cashTransactions = [];
@@ -259,6 +256,9 @@ class Character {
   bool motherWillTryForBaby = false;
   int? parentsDivorceYearsLeft; // Menyimpan sisa tahun sampai orang tua bercrai (2-3 tahun jika 'memikirkan')
   bool? pendingDivorceResult; // true jika cerai, false jika batal cerai setelah masa pertimbangan
+  String? pendingAthleteContractNotice; // Notifikasi pembaruan/berakhirnya kontrak atlet untuk modal terpisah
+  String? pendingAthleteSeasonNotice; // Notifikasi statistik musim atlet untuk modal terpisah
+  Map<String, dynamic>? pendingContractOffer; // Data tawaran perpanjangan kontrak atlet untuk negosiasi/persetujuan
   bool parentsReconciled = false; // true jika orang tua batal bercerai (damai kembali)
   int parentArgumentCount = 0; // jumlah kali pertengkaran orang tua terjadi
   Map<String, String>? pendingParentArgumentEvent; // info keributan orang tua {fatherName, motherName, relation}
@@ -266,56 +266,8 @@ class Character {
   int motherDivorceYearsSince = 0; // berapa tahun sejak ibu cerai (untuk jeda menikah lagi)
 
   void checkParentArgumentTrigger(Random random, int chancePercentage) {
-    final String? fName = fatherName ?? stepFatherName;
-    final String? mName = motherName ?? stepMotherName;
-    final bool fAlive = (fatherName != null && !isFatherDeceased) || (stepFatherName != null && !isStepFatherDeceased);
-    final bool mAlive = (motherName != null && !isMotherDeceased) || (stepMotherName != null && !isStepMotherDeceased);
-    final bool notDivorced = !isFatherDivorced && !isMotherDivorced;
-    // Jika sudah ada jeda cerai pending, jangan tambah argumen baru
-    if (parentsDivorceYearsLeft != null) return;
-
-    // Hitung persentase peluang keributan berdasarkan kelompok usia user:
-    // 0-10 tahun = 25%
-    // 11-20 tahun = 20%
-    // 21-30 tahun = 15%
-    // 31-40 tahun = 5%
-    // >40 tahun = 0%
-    int baseChance = 0;
-    if (age <= 10) {
-      baseChance = 25;
-    } else if (age <= 20) {
-      baseChance = 20;
-    } else if (age <= 30) {
-      baseChance = 15;
-    } else if (age <= 40) {
-      baseChance = 5;
-    } else {
-      baseChance = 0;
-    }
-
-    if (fName != null && mName != null && fAlive && mAlive && notDivorced) {
-      final int effectiveChance = parentsReconciled ? (baseChance - 5).clamp(0, 100) : baseChance;
-      if (parentArgumentCount < 1 && random.nextInt(100) < effectiveChance) {
-        parentArgumentCount++;
-        pendingParentArgumentEvent = {
-          'fatherName': fName,
-          'motherName': mName,
-          'fatherRole': fatherName != null ? 'Ayah' : 'Ayah Tiri',
-          'motherRole': motherName != null ? 'Ibu' : 'Ibu Tiri',
-          'count': parentArgumentCount.toString(),
-        };
-        final String argMsg = '💥 Keributan Orang Tua (Ke-$parentArgumentCount): Kamu mendengar pertengkaran sengit antara $fName dan $mName di rumah!';
-        inbox.add(argMsg);
-
-        // Jika sudah terjadi 1 kali pertengkaran, masukkan ke masa pertimbangan perceraian (1-2 tahun)
-        if (parentsDivorceYearsLeft == null) {
-          final int years = 1 + random.nextInt(2); // 1-2 tahun pertimbangan
-          parentsDivorceYearsLeft = years;
-          final String decisionMsg = '🤔 Orang tuamu mulai memikirkan hubungan mereka... ($years tahun ke depan akan ada keputusan)';
-          inbox.add(decisionMsg);
-        }
-      }
-    }
+    // Fitur keributan / dialog orang tua dihapus
+    return;
   }
 
   // --- STATUS KEHAMILAN PASANGAN (Jika Karakter Utama Laki-laki) ---
@@ -1015,6 +967,21 @@ class Character {
   void setJob(String name, int salary) {
     jobName = name;
     jobSalary = salary;
+    final bool isAthleteJob = name.contains('Striker') ||
+        name.contains('Gelandang') ||
+        name.contains('Bek') ||
+        name.contains('Kiper') ||
+        name.contains('Point Guard') ||
+        name.contains('Shooting Guard') ||
+        name.contains('Center') ||
+        name.contains('Pebalap') ||
+        name.contains('Petenis') ||
+        name.contains('MMA') ||
+        name.contains('Petinju') ||
+        name.contains('Renang');
+    if (isAthleteJob) {
+      athleteContractYears = 3;
+    }
     final bool alreadyInHistory = jobHistory.any((j) => j['title'] == name && j['endAge'] == null);
     if (!alreadyInHistory) {
       jobHistory.add({
@@ -1024,6 +991,7 @@ class Character {
         'endAge': null,
       });
     }
+    generateCoworkersIfEmpty();
   }
 
   void resignJob() {
@@ -1039,6 +1007,151 @@ class Character {
     jobSalary = null;
     supervisor = null;
     coworkers = [];
+  }
+
+  void generateCoworkersIfEmpty() {
+    if (jobName == null || coworkers.isNotEmpty) return;
+
+    final random = Random();
+    final String job = jobName!;
+
+    final bool isProPlayer = job.startsWith('Pro Player Esport');
+    final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
+    final bool isEsport = isProPlayer || isBAOrTalent;
+
+    final bool isAthlete = job.contains('Striker') ||
+        job.contains('Gelandang') ||
+        job.contains('Bek') ||
+        job.contains('Kiper') ||
+        job.contains('Point Guard') ||
+        job.contains('Shooting Guard') ||
+        job.contains('Center') ||
+        job.contains('Pebalap') ||
+        job.contains('Petenis') ||
+        job.contains('MMA') ||
+        job.contains('Petinju') ||
+        job.contains('Renang');
+
+    String getRandomName(String gen) {
+      final List<String> fList = gen == 'Laki-laki'
+          ? ((maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : Character.globalMaleFirstNames)
+          : ((femaleFirstNames != null && femaleFirstNames!.isNotEmpty) ? femaleFirstNames! : Character.globalFemaleFirstNames);
+      final List<String> lList = (lastNames != null && lastNames!.isNotEmpty) ? lastNames! : Character.globalLastNames;
+      final f = fList[random.nextInt(fList.length)];
+      final l = lList[random.nextInt(lList.length)];
+      return '$f $l';
+    }
+
+    if (supervisor == null && !isAthlete) {
+      String supGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      if (isEsport) {
+        supGender = random.nextDouble() < 0.95 ? 'Laki-laki' : 'Perempuan';
+      }
+      final name = getRandomName(supGender);
+      final ageVal = 30 + random.nextInt(31);
+      supervisor = {
+        'name': name,
+        'gender': supGender,
+        'relationship': (40 + random.nextInt(21)).toString(),
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': 'Heteroseksual',
+        'intelligence': (50 + random.nextInt(41)).toString(),
+      };
+    } else if (supervisor == null && isAthlete) {
+      final String supGender = gender;
+      final name = getRandomName(supGender);
+      final ageVal = 38 + random.nextInt(20);
+      supervisor = {
+        'name': name,
+        'gender': supGender,
+        'relationship': (50 + random.nextInt(21)).toString(),
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': 'Heteroseksual',
+        'intelligence': (60 + random.nextInt(31)).toString(),
+      };
+    }
+
+    if (isAthlete) {
+      final bool isSoccer = job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper');
+      final bool isBasketball = job.contains('Guard') || job.contains('Center');
+
+      final int mainTeamCount = isSoccer ? 10 : (isBasketball ? 4 : 4);
+      final int subTeamCount = isSoccer ? (7 + random.nextInt(4)) : (isBasketball ? (5 + random.nextInt(4)) : (3 + random.nextInt(3)));
+      final String teamGender = gender;
+
+      // Tim Utama
+      for (int i = 0; i < mainTeamCount; i++) {
+        final name = getRandomName(teamGender);
+        final ageVal = 18 + random.nextInt(15);
+        final double sexRoll = random.nextDouble();
+        final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+        coworkers.add({
+          'name': name,
+          'gender': teamGender,
+          'relationship': (45 + random.nextInt(21)).toString(),
+          'age': ageVal.toString(),
+          'isDeceased': 'false',
+          'sexuality': coworkerSexuality,
+          'intelligence': (40 + random.nextInt(51)).toString(),
+          'teamCategory': 'Tim Utama',
+          'role': 'Pemain Utama',
+        });
+      }
+
+      // Tim Cadangan
+      for (int i = 0; i < subTeamCount; i++) {
+        final name = getRandomName(teamGender);
+        final ageVal = 17 + random.nextInt(12);
+        final double sexRoll = random.nextDouble();
+        final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+        coworkers.add({
+          'name': name,
+          'gender': teamGender,
+          'relationship': (35 + random.nextInt(21)).toString(),
+          'age': ageVal.toString(),
+          'isDeceased': 'false',
+          'sexuality': coworkerSexuality,
+          'intelligence': (35 + random.nextInt(51)).toString(),
+          'teamCategory': 'Tim Cadangan',
+          'role': 'Pemain Cadangan',
+        });
+      }
+      return;
+    }
+
+    int count = 5 + random.nextInt(6);
+    if (isProPlayer) {
+      count = 3 + random.nextInt(3);
+    } else if (isBAOrTalent) {
+      count = 10 + random.nextInt(6);
+    }
+
+    for (int i = 0; i < count; i++) {
+      String gen = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+      if (isBAOrTalent) {
+        gen = random.nextDouble() < 0.85 ? 'Perempuan' : 'Laki-laki';
+      }
+
+      final name = getRandomName(gen);
+      final ageVal = 20 + random.nextInt(41);
+      final double sexRoll = random.nextDouble();
+      final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+      coworkers.add({
+        'name': name,
+        'gender': gen,
+        'relationship': (40 + random.nextInt(21)).toString(),
+        'age': ageVal.toString(),
+        'isDeceased': 'false',
+        'sexuality': coworkerSexuality,
+        'intelligence': (30 + random.nextInt(61)).toString(),
+        'role': 'Rekan Kerja',
+      });
+    }
   }
 
   void handlePartnerBreakupOnArrest(List<String> eventsList) {
@@ -1314,9 +1427,17 @@ class Character {
       inbox.add(notice);
     }
 
+    // Tambah keuntungan bisnis tahunan jika ada
+    if (!isImprisoned && hasBusiness && businessAnnualProfit > 0) {
+      money += businessAnnualProfit;
+      final String notice = '💼 Keuntungan Bisnis: Bisnismu "$businessName" memberikan keuntungan bersih tahunan sebesar \$$businessAnnualProfit.';
+      inbox.add(notice);
+    }
+
     // Update karir Idol jika ada
     if (!isImprisoned) {
       IdolManager.ageUpIdol(this, events, inbox);
+      LogikaPemainSepakbola.jalankanSimulasiMusim(this, events);
     }
 
     if (age == 12) {

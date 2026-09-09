@@ -202,6 +202,7 @@ class ActivityButton extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
+                          settings: const RouteSettings(name: 'KerjaMenuScreen'),
                           builder: (context) => KerjaMenuScreen(
                             character: character,
                             onRefresh: localRefresh,

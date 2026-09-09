@@ -42,6 +42,14 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
     );
   }
 
+  void _handleBack() {
+    if (widget.character.jobName != null) {
+      Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -49,16 +57,13 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
     final bool isAthlete = character.jobName != null &&
         (character.jobName!.contains('Sepakbola') ||
             character.jobName!.contains('Basket') ||
-            character.jobName!.contains('Bulu Tangkis') ||
             character.jobName!.contains('Pebalap') ||
             character.jobName!.contains('Petenis') ||
-            character.jobName!.contains('Binaraga') ||
             character.jobName!.contains('MMA') ||
             character.jobName!.contains('Petinju') ||
-            character.jobName!.contains('Renang') ||
-            character.jobName!.contains('Grandmaster'));
+            character.jobName!.contains('Renang'));
 
-    final List<Map<String, dynamic>> filteredSports = OlahragaDatabase.sports.where((sport) {
+    final List<Map<String, dynamic>> filteredSports = OlahragaDatabase.getSportsForCharacter(character.gender).where((sport) {
       if (_searchQuery.isEmpty) return true;
       final query = _searchQuery.toLowerCase();
       final name = (sport['name'] as String).toLowerCase();
@@ -68,12 +73,22 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
       return name.contains(query) || desc.contains(query) || hasMatchingPos;
     }).toList();
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Atlit Profesional ⚽'),
-        backgroundColor: Colors.green.shade700,
-        foregroundColor: Colors.white,
-      ),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        _handleBack();
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: _handleBack,
+          ),
+          title: const Text('Atlit Profesional ⚽'),
+          backgroundColor: Colors.green.shade700,
+          foregroundColor: Colors.white,
+        ),
       body: Column(
         children: [
           // Filter & Search Header
@@ -260,6 +275,7 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
