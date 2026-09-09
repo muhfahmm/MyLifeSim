@@ -35,6 +35,15 @@ class AtlitActivitiesPage extends StatefulWidget {
 }
 
 class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
+  String _formatFollowers(int number) {
+    if (number >= 1000000) {
+      return '${(number / 1000000).toStringAsFixed(1)}M';
+    } else if (number >= 1000) {
+      return '${(number / 1000).toStringAsFixed(1)}K';
+    }
+    return number.toString();
+  }
+
   void _showResult(String title, String message, IconData icon, Color color) {
     showDialog(
       context: context,
@@ -177,6 +186,58 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
                       backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
                       valueColor: AlwaysStoppedAnimation<Color>(fitnessVal >= 70 ? Colors.green : (fitnessVal >= 40 ? Colors.amber : Colors.red)),
                     ),
+                  ),
+                  const SizedBox(height: 12),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.verified_user_rounded, size: 14, color: Colors.blue),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Kepercayaan Publik: ${widget.character.publicTrust}%',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.blue),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.psychology_alt_rounded, size: 14, color: Colors.deepOrange),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Tekanan: ${widget.character.pressure}%',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.people_alt_rounded, size: 14, color: Colors.amber),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Followers: ${_formatFollowers(widget.character.followers)}',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.amber),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          const Icon(Icons.star_rounded, size: 14, color: Colors.purple),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Popularitas: ${widget.character.popularity}%',
+                            style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.purple),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
 
                   // BADGE STATUS CEDERA (Tampil di bawah bar kebugaran jika mengalami cedera)

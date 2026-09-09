@@ -199,6 +199,10 @@ class Character {
   bool athleteIsInjured = false; // Status cedera atlet
   String? athleteInjuryType; // Jenis/nama cedera atlet
   int athleteTrainingCountInTurn = 0; // Jumlah kali latihan intensif dalam 1 giliran (tahun/umur)
+  int publicTrust = 70; // Kepercayaan publik (0 - 100)
+  int pressure = 20; // Tingkat tekanan / stress atlet (0 - 100)
+  int popularity = 50; // Popularitas publik (0 - 100)
+  int engagementRate = 25; // Tingkat interaksi pengikut di sosmed (0 - 100%)
   String? partTimeJobName;
   int? partTimeJobSalary;
   bool bypassDegreeRequirement = false;

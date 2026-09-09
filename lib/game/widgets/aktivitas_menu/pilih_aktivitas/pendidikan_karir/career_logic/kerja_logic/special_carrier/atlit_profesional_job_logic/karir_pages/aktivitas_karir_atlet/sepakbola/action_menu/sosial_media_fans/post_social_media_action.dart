@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'sosial_media_logic/social_media_dialog.dart';
 
 class PostSocialMediaAction {
   static void execute({
@@ -10,14 +11,10 @@ class PostSocialMediaAction {
     required VoidCallback onRefresh,
     required Function(String title, String message, IconData icon, Color color) showResult,
   }) {
-    character.happiness = (character.happiness + 4).clamp(0, 100);
-    onRefresh();
-
-    showResult(
-      'Unggahan Sosial Media 📲',
-      'Kamu mengunggah foto latihan hari ini. Ribuan likes dan komentar dukungan dari suporter membanjiri akunmu!',
-      Icons.thumb_up,
-      Colors.lightBlue,
+    SocialMediaDialog.show(
+      context: context,
+      character: character,
+      onDone: onRefresh,
     );
   }
 }

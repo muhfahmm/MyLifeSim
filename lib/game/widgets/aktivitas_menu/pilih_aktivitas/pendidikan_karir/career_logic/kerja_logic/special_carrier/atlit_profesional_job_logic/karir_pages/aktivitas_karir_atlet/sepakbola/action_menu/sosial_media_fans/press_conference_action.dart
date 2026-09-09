@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'press_conference_logic/press_conference_models.dart';
+import 'press_conference_logic/press_conference_events.dart';
+import 'press_conference_logic/press_conference_dialog.dart';
 
 class PressConferenceAction {
   static void execute({
@@ -11,25 +14,17 @@ class PressConferenceAction {
     required VoidCallback onRefresh,
     required Function(String title, String message, IconData icon, Color color) showResult,
   }) {
+    final events = PressConferenceEvents.getAllEvents();
     final Random random = Random();
-    final bool positiveRep = random.nextBool();
 
-    if (positiveRep) {
-      character.happiness = (character.happiness + 5).clamp(0, 100);
-      showResult(
-        'Konferensi Pers 🎙️✨',
-        'Jawabanmu yang rendah hati dipuji oleh wartawan dan pelatih. Kepercayaan publik meningkat!',
-        Icons.mic,
-        Colors.blue,
-      );
-    } else {
-      showResult(
-        'Konferensi Pers 🎙️🔥',
-        'Pernyataanmu memicu perdebatan panas di media olahraga. Fans menantikan pembuktianmu di pertandingan!',
-        Icons.campaign,
-        Colors.orange,
-      );
-    }
-    onRefresh();
+    // Pilih event konferensi pers secara acak / dinamis
+    final PressEvent chosenEvent = events[random.nextInt(events.length)];
+
+    PressConferenceDialog.show(
+      context: context,
+      character: character,
+      pressEvent: chosenEvent,
+      onDone: onRefresh,
+    );
   }
 }
