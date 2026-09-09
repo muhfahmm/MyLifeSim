@@ -196,6 +196,9 @@ class Character {
   int? jobSalary;
   int athleteContractYears = 3; // Kontrak atlet default 3 tahun
   int? lastContractSignedAge; // Usia saat terakhir kali meneken/memperbarui kontrak atlet
+  bool athleteIsInjured = false; // Status cedera atlet
+  String? athleteInjuryType; // Jenis/nama cedera atlet
+  int athleteTrainingCountInTurn = 0; // Jumlah kali latihan intensif dalam 1 giliran (tahun/umur)
   String? partTimeJobName;
   int? partTimeJobSalary;
   bool bypassDegreeRequirement = false;

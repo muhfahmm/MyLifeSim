@@ -1,14 +1,24 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/daftar_tim/sepakbola/aktivitas_karir_atlet/atlit_activities_page.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/atlit_activities_page.dart
 
 import 'package:flutter/material.dart';
-import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/actions/rekan_kerja.dart';
-import 'contract_modals.dart';
-import 'sepakbola_logic/gaji_pemain_sepakbola.dart';
-import 'sepakbola_logic/logika_pemain_sepakbola.dart';
-import 'tim_tertarik_modal.dart';
+
+// Import action files per modul/folder
+import 'action_menu/latihan_kondisi_fisik/finishing_drill_action.dart';
+import 'action_menu/latihan_kondisi_fisik/physical_drill_action.dart';
+import 'action_menu/latihan_kondisi_fisik/rest_recovery_action.dart';
+import 'action_menu/latihan_kondisi_fisik/physio_consultation_action.dart';
+
+import 'action_menu/kontrak_manajemen/negotiate_contract_action.dart';
+import 'action_menu/kontrak_manajemen/consult_agent_action.dart';
+
+import 'action_menu/pertandingan_statistik/career_history_modal.dart';
+
+import 'action_menu/sosial_media_fans/press_conference_action.dart';
+import 'action_menu/sosial_media_fans/post_social_media_action.dart';
+
+import 'action_menu/rekan_tim/team_dinner_action.dart';
 
 class AtlitActivitiesPage extends StatefulWidget {
   final Character character;
@@ -25,9 +35,6 @@ class AtlitActivitiesPage extends StatefulWidget {
 }
 
 class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
-  final Random _random = Random();
-
-  // Custom helper for showing result modal
   void _showResult(String title, String message, IconData icon, Color color) {
     showDialog(
       context: context,
@@ -56,415 +63,9 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
     );
   }
 
-  // 1. MENU LATIHAN & KONDISI FISIK
-  void _doFinishingDrill() {
-    widget.character.discipline = (widget.character.discipline + 4).clamp(0, 100);
-    widget.character.health = (widget.character.health + 2).clamp(0, 100);
-    setState(() {});
+  void _triggerRefresh() {
+    if (mounted) setState(() {});
     widget.onRefresh();
-
-    _showResult(
-      'Latihan Finishing & Tembakan ⚽🎯',
-      'Kamu menghabiskan 2 jam melatih penyelesaian akhir, volley, dan tendangan penalti. Akurasi tembakanmu meningkat! (+4 Kedisiplinan, +2 Kesehatan).',
-      Icons.sports_soccer,
-      Colors.green,
-    );
-  }
-
-  void _doPhysicalDrill() {
-    widget.character.health = (widget.character.health + 5).clamp(0, 100);
-    widget.character.discipline = (widget.character.discipline + 3).clamp(0, 100);
-    widget.character.happiness = (widget.character.happiness - 2).clamp(0, 100);
-    setState(() {});
-    widget.onRefresh();
-
-    _showResult(
-      'Latihan Sprint & Ketahanan 🏃‍♂️⚡',
-      'Latihan fisik intensif bersama pelatih kebugaran. Fisikmu makin prima dan cepat! (+5 Kesehatan, +3 Kedisiplinan).',
-      Icons.fitness_center,
-      Colors.orange,
-    );
-  }
-
-  void _doRestRecovery() {
-    widget.character.health = (widget.character.health + 8).clamp(0, 100);
-    widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-    setState(() {});
-    widget.onRefresh();
-
-    _showResult(
-      'Istirahat & Pemulihan 🛀🌱',
-      'Kamu melakukan mandi es, pijat otot, dan tidur nyenyak. Tubuhmu merasa sangat segar! (+8 Kesehatan, +5 Kebahagiaan).',
-      Icons.hot_tub,
-      Colors.teal,
-    );
-  }
-
-  void _doPhysioConsultation() {
-    if (widget.character.money < 200) {
-      _showResult('Uang Tidak Cukup 💵', 'Kamu butuh \$200 untuk konsultasi fisioterapis pribadi.', Icons.warning, Colors.red);
-      return;
-    }
-
-    widget.character.money -= 200;
-    widget.character.health = (widget.character.health + 10).clamp(0, 100);
-    setState(() {});
-    widget.onRefresh();
-
-    _showResult(
-      'Sesi Fisioterapi 🩺✨',
-      'Fisioterapis memeriksa persendian dan merawat otot kaki. Ototmu bebas dari ketegangan cedera! (- \$200, +10 Kesehatan).',
-      Icons.medical_services,
-      Colors.blue,
-    );
-  }
-
-  // 3. NEGOSIASI KONTRAK & AGEN
-  void _negotiateContract() {
-    // Cek jika sisa kontrak masih panjang (misal 5 atau 4 tahun)
-    final int? remainingContract = widget.character.athleteContractYears;
-    if (LogikaPemainSepakbola.isKontrakMasihPanjang(remainingContract)) {
-      _showResult(
-        'Negosiasi Ditolak 🚫',
-        'Manajemen klub menolak tawaranmu! Masa kontrakmu saat ini masih cukup panjang ($remainingContract tahun tersisa). Manajemen tidak ingin memperbarui kontrak di saat kontrak lama masih berlaku lama.',
-        Icons.cancel,
-        Colors.red,
-      );
-      return;
-    }
-
-    // 1. Cek Cooldown 1 Tahun sejak meneken/memperbarui kontrak terakhir
-    if (widget.character.lastContractSignedAge != null &&
-        widget.character.age <= widget.character.lastContractSignedAge!) {
-      _showResult(
-        'Kontrak Baru Aktif ⏳',
-        'Kamu baru saja menandatangani/memperbarui kontrak! Kamu harus menunggu minimal 1 tahun (musim berikutnya) sebelum bisa mengajukan negosiasi perpanjangan kontrak lagi.',
-        Icons.timer_outlined,
-        Colors.orange,
-      );
-      return;
-    }
-
-    // 2. Hitung rata-rata rating karir dari statistik musim
-    double totalRatingSum = 0.0;
-    int ratingCount = 0;
-    for (var s in widget.character.athleteSeasonStats) {
-      final r = s['rating'];
-      if (r is num) {
-        totalRatingSum += r.toDouble();
-        ratingCount++;
-      } else if (r != null) {
-        final parsedR = double.tryParse(r.toString());
-        if (parsedR != null) {
-          totalRatingSum += parsedR;
-          ratingCount++;
-        }
-      }
-    }
-    final double careerAvgRating = ratingCount > 0 ? (totalRatingSum / ratingCount) : 7.0;
-    final int persuadeChance = (careerAvgRating * 10).round().clamp(10, 90);
-
-    final bool success = _random.nextInt(100) < persuadeChance;
-
-    if (success) {
-      String teamName = 'Klub Usia Muda';
-      final String title = widget.character.jobName ?? 'Atlet';
-      if (title.contains(' - ')) {
-        teamName = title.split(' - ').last.trim();
-      }
-
-      final int currentSalary = widget.character.jobSalary ?? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: widget.character.age, rand: _random);
-      final int offeredYears = 2 + _random.nextInt(3);
-      final int offeredSalary = GajiPemainSepakbolaLogic.hitungTawaranGajiBaru(
-        currentSalary: currentSalary,
-        usia: widget.character.age,
-        rating: careerAvgRating,
-        rand: _random,
-      );
-
-      final Map<String, dynamic> offerData = {
-        'teamName': teamName,
-        'offeredYears': offeredYears,
-        'offeredSalary': offeredSalary,
-        'currentSalary': currentSalary,
-        'jobTitle': title,
-      };
-
-      // Tampilkan modal penawaran perpanjangan kontrak (sama seperti saat kontrak habis)
-      ContractModal.showContractOffer(
-        context,
-        character: widget.character,
-        offerData: offerData,
-        onDone: () {
-          setState(() {});
-          widget.onRefresh();
-        },
-      );
-    } else {
-      widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-      setState(() {});
-      widget.onRefresh();
-
-      _showResult(
-        'Manajemen Menolak 🚫',
-        'Manajemen klub menolak membicarakan perpanjangan kontrak saat ini. Mereka meminta bukti performa yang lebih konsisten di lapangan.',
-        Icons.cancel,
-        Colors.red,
-      );
-    }
-  }
-
-  void _consultAgent() {
-    TimTertarikModal.show(
-      context: context,
-      character: widget.character,
-      onDone: () {
-        setState(() {});
-        widget.onRefresh();
-      },
-    );
-  }
-
-  void _showCareerHistoryModal() {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final history = widget.character.athleteSeasonStats;
-
-    int totalAppearances = 0;
-    int totalGoals = 0;
-    int totalAssists = 0;
-    double sumRating = 0.0;
-    int countRating = 0;
-
-    for (var item in history) {
-      final app = item['appearances'];
-      final g = item['goals'];
-      final a = item['assists'];
-      final r = item['rating'];
-
-      if (app is int) {
-        totalAppearances += app;
-      } else if (app != null) {
-        totalAppearances += int.tryParse(app.toString()) ?? 0;
-      }
-
-      if (g is int) {
-        totalGoals += g;
-      } else if (g != null) {
-        totalGoals += int.tryParse(g.toString()) ?? 0;
-      }
-
-      if (a is int) {
-        totalAssists += a;
-      } else if (a != null) {
-        totalAssists += int.tryParse(a.toString()) ?? 0;
-      }
-
-      if (r is num) {
-        sumRating += r.toDouble();
-        countRating++;
-      } else if (r != null) {
-        final parsedR = double.tryParse(r.toString());
-        if (parsedR != null) {
-          sumRating += parsedR;
-          countRating++;
-        }
-      }
-    }
-
-    final double avgCareerRating = countRating > 0 ? (sumRating / countRating) : 0.0;
-    final String avgRatingText = countRating > 0 ? '${avgCareerRating.toStringAsFixed(1)} ⭐' : '0.0 ⭐';
-
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (ctx) {
-        return Container(
-          padding: const EdgeInsets.all(20),
-          height: MediaQuery.of(ctx).size.height * 0.75,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.history, color: Colors.purple, size: 28),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Riwayat Karir & Statistik Musim 📜',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 14),
-
-              // CARD TOTAL KARIER KESELURUHAN
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.purple.shade50,
-                  borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: isDark ? Colors.purple.shade700 : Colors.purple.shade200),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        const Icon(Icons.workspace_premium, size: 16, color: Colors.purple),
-                        const SizedBox(width: 6),
-                        Text(
-                          'TOTAL KARIR KESELURUHAN',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.purple.shade400,
-                            letterSpacing: 0.5,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildTotalStatItem('Total Main', '$totalAppearances Laga', Icons.sports_soccer, Colors.blue, isDark),
-                        _buildTotalStatItem('Total Gol', '$totalGoals ⚽', Icons.sports_score, Colors.green, isDark),
-                        _buildTotalStatItem('Total Assist', '$totalAssists 👟', Icons.handshake, Colors.orange, isDark),
-                        _buildTotalStatItem('Rating Karir', avgRatingText, Icons.star, Colors.amber, isDark),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              if (history.isEmpty)
-                Expanded(
-                  child: Center(
-                    child: Text(
-                      'Belum ada statistik musim lalu.\nStatistik otomatis berjalan saat kamu bertambah umur (1 tahun)! ⏳',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: isDark ? Colors.white54 : Colors.grey, fontSize: 13),
-                    ),
-                  ),
-                )
-              else
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: history.length,
-                    itemBuilder: (ctx, index) {
-                      final item = history[index];
-                      return Card(
-                        margin: const EdgeInsets.only(bottom: 10),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        color: isDark ? Colors.grey.shade800 : Colors.purple.shade50.withValues(alpha: 0.5),
-                        child: ListTile(
-                          title: Text(
-                            'Musim Usia ${item['age']} Tahun - ${item['team']}',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.purple),
-                          ),
-                          subtitle: Text(
-                            '• Main: ${item['appearances']} Laga | Gol: ${item['goals']} ⚽ | Assist: ${item['assists']} 👟\n'
-                            '• Performa Rating Rata-rata: ${item['rating']} / 10.0',
-                            style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildTotalStatItem(String label, String value, IconData icon, Color color, bool isDark) {
-    return Column(
-      children: [
-        CircleAvatar(
-          radius: 18,
-          backgroundColor: color.withValues(alpha: 0.15),
-          child: Icon(icon, size: 18, color: color),
-        ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 14,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(fontSize: 11, color: isDark ? Colors.white60 : Colors.grey.shade700),
-        ),
-      ],
-    );
-  }
-
-  // 4. MEDIA & MEDIA SOSIAL
-  void _pressConference() {
-    final bool positiveRep = _random.nextBool();
-    if (positiveRep) {
-      widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-      _showResult(
-        'Konferensi Pers 🎙️✨',
-        'Jawabanmu yang rendah hati dipuji oleh wartawan dan pelatih. Kepercayaan publik meningkat!',
-        Icons.mic,
-        Colors.blue,
-      );
-    } else {
-      _showResult(
-        'Konferensi Pers 🎙️🔥',
-        'Pernyataanmu memicu perdebatan panas di media olahraga. Fans menantikan pembuktianmu di pertandingan!',
-        Icons.campaign,
-        Colors.orange,
-      );
-    }
-    setState(() {});
-    widget.onRefresh();
-  }
-
-  void _postSocialMedia() {
-    widget.character.happiness = (widget.character.happiness + 4).clamp(0, 100);
-    setState(() {});
-    widget.onRefresh();
-
-    _showResult(
-      'Unggahan Sosial Media 📲',
-      'Kamu mengunggah foto latihan hari ini. Ribuan likes dan komentar dukungan dari suporter membanjiri akunmu!',
-      Icons.thumb_up,
-      Colors.lightBlue,
-    );
-  }
-
-  // 5. HUBUNGAN TIM & BONDING
-  void _teamDinner() {
-    if (widget.character.money < 300) {
-      _showResult('Uang Tidak Cukup 💵', 'Kamu butuh \$300 untuk mentraktir makan malam tim.', Icons.warning, Colors.red);
-      return;
-    }
-
-    widget.character.money -= 300;
-    widget.character.happiness = (widget.character.happiness + 8).clamp(0, 100);
-    for (var cw in widget.character.coworkers) {
-      int r = int.tryParse(cw['relationship'] ?? '50') ?? 50;
-      cw['relationship'] = (r + 10).clamp(0, 100).toString();
-    }
-    setState(() {});
-    widget.onRefresh();
-
-    _showResult(
-      'Makan Malam Tim 🥩🍷',
-      'Kamu mengajak tim utama & cadangan makan malam bersama. Kekompakan dan suasana ruang ganti semakin solid! (+10% Hubungan Rekan Tim).',
-      Icons.restaurant,
-      Colors.amber.shade800,
-    );
   }
 
   @override
@@ -577,6 +178,43 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
                       valueColor: AlwaysStoppedAnimation<Color>(fitnessVal >= 70 ? Colors.green : (fitnessVal >= 40 ? Colors.amber : Colors.red)),
                     ),
                   ),
+
+                  // BADGE STATUS CEDERA (Tampil di bawah bar kebugaran jika mengalami cedera)
+                  if (widget.character.athleteIsInjured) ...[
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade900.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade400),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: Colors.red.shade600,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.healing, color: Colors.white, size: 14),
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'STATUS: CEDERA (${widget.character.athleteInjuryType ?? "Cedera Otot"}) 🚑',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -590,7 +228,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Melatih penyelesaian akhir, sepakan insting, dan volley',
             icon: Icons.sports_soccer,
             color: Colors.green,
-            onTap: _doFinishingDrill,
+            onTap: () => FinishingDrillAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -598,7 +241,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Meningkatkan ketahanan otot dan kecepatan sprint',
             icon: Icons.speed,
             color: Colors.orange,
-            onTap: _doPhysicalDrill,
+            onTap: () => PhysicalDrillAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -606,7 +254,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Memulihkan stamina dan mencegah kelelahan otot',
             icon: Icons.hot_tub,
             color: Colors.teal,
-            onTap: _doRestRecovery,
+            onTap: () => RestRecoveryAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -614,7 +267,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Merawat persendian dan mencegah kecenderungan cedera (\$200)',
             icon: Icons.medical_services,
             color: Colors.blue,
-            onTap: _doPhysioConsultation,
+            onTap: () => PhysioConsultationAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           const SizedBox(height: 20),
@@ -626,7 +284,10 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Lihat perjalanan gol, assist, dan rating per perambahan usia',
             icon: Icons.history,
             color: Colors.purple,
-            onTap: _showCareerHistoryModal,
+            onTap: () => CareerHistoryModal.show(
+              context: context,
+              character: widget.character,
+            ),
             isDark: isDark,
           ),
           const SizedBox(height: 20),
@@ -638,7 +299,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Minta kenaikan nilai gaji tahunan kepada manajemen klub',
             icon: Icons.monetization_on,
             color: Colors.purple,
-            onTap: _negotiateContract,
+            onTap: () => NegotiateContractAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -646,7 +312,11 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Membahas peluang bursa transfer dan minat klub lain',
             icon: Icons.record_voice_over,
             color: Colors.deepPurple,
-            onTap: _consultAgent,
+            onTap: () => ConsultAgentAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+            ),
             isDark: isDark,
           ),
           const SizedBox(height: 20),
@@ -658,7 +328,12 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Berikan pernyataan pers setelah sesi latihan/pertandingan',
             icon: Icons.mic,
             color: Colors.lightBlue,
-            onTap: _pressConference,
+            onTap: () => PressConferenceAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -666,19 +341,29 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             subtitle: 'Berinteraksi dengan penggemar dan meningkatkan popularitas',
             icon: Icons.thumb_up,
             color: Colors.blueAccent,
-            onTap: _postSocialMedia,
+            onTap: () => PostSocialMediaAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           const SizedBox(height: 20),
 
           // KATEGORI 5: TIM & BONDING
-          _buildCategoryHeader('KEKOMPAKAN & REKAN TIM', Icons.group, Colors.amber.shade800),
+          _buildCategoryHeader('KEKOMPAKAN & REKAN TIM', Icons.groups, Colors.amber.shade800),
           _buildActionCard(
             title: 'Makan Malam Bersama Tim 🥩',
             subtitle: 'Mentraktir rekan tim utama & cadangan (\$300)',
             icon: Icons.restaurant,
             color: Colors.amber.shade800,
-            onTap: _teamDinner,
+            onTap: () => TeamDinnerAction.execute(
+              context: context,
+              character: widget.character,
+              onRefresh: _triggerRefresh,
+              showResult: _showResult,
+            ),
             isDark: isDark,
           ),
           _buildActionCard(
@@ -692,10 +377,7 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
                 MaterialPageRoute(
                   builder: (context) => RekanKerjaPage(
                     character: widget.character,
-                    onRefresh: () {
-                      if (mounted) setState(() {});
-                      widget.onRefresh();
-                    },
+                    onRefresh: _triggerRefresh,
                   ),
                 ),
               );

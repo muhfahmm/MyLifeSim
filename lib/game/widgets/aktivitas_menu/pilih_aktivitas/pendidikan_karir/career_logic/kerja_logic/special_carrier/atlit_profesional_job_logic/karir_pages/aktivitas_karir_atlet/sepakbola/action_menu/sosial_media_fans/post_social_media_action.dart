@@ -1,0 +1,23 @@
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/action_menu/sosial_media_fans/post_social_media_action.dart
+
+import 'package:flutter/material.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
+
+class PostSocialMediaAction {
+  static void execute({
+    required BuildContext context,
+    required Character character,
+    required VoidCallback onRefresh,
+    required Function(String title, String message, IconData icon, Color color) showResult,
+  }) {
+    character.happiness = (character.happiness + 4).clamp(0, 100);
+    onRefresh();
+
+    showResult(
+      'Unggahan Sosial Media 📲',
+      'Kamu mengunggah foto latihan hari ini. Ribuan likes dan komentar dukungan dari suporter membanjiri akunmu!',
+      Icons.thumb_up,
+      Colors.lightBlue,
+    );
+  }
+}

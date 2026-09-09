@@ -86,10 +86,8 @@ class ContractModal {
                 TextButton(
                   onPressed: () {
                     Navigator.pop(ctx);
-                    character.inbox.add('⚠️ Kamu menolak tawaran perpanjangan kontrak dari $teamName.');
-                    onDone();
                   },
-                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
+                  child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13)),
                 ),
                 const SizedBox(width: 4),
                 OutlinedButton.icon(
