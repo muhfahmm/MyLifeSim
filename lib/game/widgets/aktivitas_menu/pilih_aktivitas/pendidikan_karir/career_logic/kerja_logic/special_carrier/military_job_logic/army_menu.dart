@@ -68,7 +68,7 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
   ];
 
   void _showBranchDetail(Map<String, dynamic> branchData) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final List<Map<String, dynamic>> ranks = branchData['ranks'];
 
     showDialog(
@@ -174,7 +174,7 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bool hasMilitaryJob = widget.character.jobName != null &&
         (widget.character.jobName!.contains('Angkatan Darat') ||
             widget.character.jobName!.contains('Angkatan Laut') ||

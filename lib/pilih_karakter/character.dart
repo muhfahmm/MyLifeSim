@@ -92,6 +92,23 @@ class Character {
   bool hasEstrangedReunionTriggered = false;
   List<Map<String, dynamic>> proposalHistory = [];
 
+  // --- KARIR BISNIS ---
+  bool hasBusiness = false;
+  String? businessName;
+  String? businessLocation;
+  int businessModal = 0;
+  int businessAnnualProfit = 0;
+
+  void processAnnualBusinessProfit() {
+    if (hasBusiness && businessAnnualProfit > 0) {
+      money += businessAnnualProfit;
+    }
+  }
+
+
+
+
+
   void addProposalHistory({
     required String name,
     required String relation,

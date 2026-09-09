@@ -2,8 +2,10 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'daftar_olahraga/database_olahraga.dart';
+import 'semua_tim/daftar_tim_page.dart';
 
-class AtlitProfesionalMenuPage extends StatelessWidget {
+class AtlitProfesionalMenuPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
 
@@ -14,83 +16,249 @@ class AtlitProfesionalMenuPage extends StatelessWidget {
   });
 
   @override
+  State<AtlitProfesionalMenuPage> createState() => _AtlitProfesionalMenuPageState();
+}
+
+class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _openTeamPage(Map<String, dynamic> sportItem) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => DaftarTimPage(
+          character: widget.character,
+          sportItem: sportItem,
+          onRefresh: widget.onRefresh,
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final character = widget.character;
+    final bool isAthlete = character.jobName != null &&
+        (character.jobName!.contains('Sepakbola') ||
+            character.jobName!.contains('Basket') ||
+            character.jobName!.contains('Bulu Tangkis') ||
+            character.jobName!.contains('Pebalap') ||
+            character.jobName!.contains('Petenis') ||
+            character.jobName!.contains('Binaraga') ||
+            character.jobName!.contains('MMA') ||
+            character.jobName!.contains('Petinju') ||
+            character.jobName!.contains('Renang') ||
+            character.jobName!.contains('Grandmaster'));
+
+    final List<Map<String, dynamic>> filteredSports = OlahragaDatabase.sports.where((sport) {
+      if (_searchQuery.isEmpty) return true;
+      final query = _searchQuery.toLowerCase();
+      final name = (sport['name'] as String).toLowerCase();
+      final desc = (sport['desc'] as String).toLowerCase();
+      final positions = List<Map<String, dynamic>>.from(sport['positions']);
+      final hasMatchingPos = positions.any((pos) => (pos['title'] as String).toLowerCase().contains(query));
+      return name.contains(query) || desc.contains(query) || hasMatchingPos;
+    }).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Atlit Profesional ⚽', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFE65100), Color(0xFFBF360C)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+        title: const Text('Atlit Profesional ⚽'),
+        backgroundColor: Colors.green.shade700,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          // Filter & Search Header
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                // Status Atlit Card
+                Card(
+                  elevation: 0,
+                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.emoji_events_rounded, color: Colors.amber, size: 30),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Status Pekerjaan Saat Ini',
+                                style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.grey),
+                              ),
+                              Text(
+                                character.jobName ?? 'Belum Bekerja',
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: isAthlete ? Colors.green : (isDark ? Colors.white : Colors.black87),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                // Search Field (Samakan persis dengan Pekerjaan Umum)
+                TextField(
+                  controller: _searchController,
+                  onChanged: (val) {
+                    setState(() {
+                      _searchQuery = val.trim();
+                    });
+                  },
+                  style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                  decoration: InputDecoration(
+                    hintText: 'Cari Cabang Olahraga...',
+                    hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.grey),
+                    prefixIcon: const Icon(Icons.search, color: Colors.green),
+                    suffixIcon: _searchQuery.isNotEmpty
+                        ? IconButton(
+                            icon: Icon(Icons.clear, size: 20, color: isDark ? Colors.white70 : Colors.grey),
+                            onPressed: () {
+                              setState(() {
+                                _searchController.clear();
+                                _searchQuery = '';
+                              });
+                            },
+                          )
+                        : null,
+                    filled: true,
+                    fillColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: const BorderSide(color: Colors.green, width: 2),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                ),
+              ],
             ),
           ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-      ),
-      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.deepOrange.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.sports_soccer_rounded, size: 72, color: Colors.deepOrange),
-              ),
-              const SizedBox(height: 20),
-              Text(
-                'Karir Atlit Profesional',
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 10),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.amber.shade900.withValues(alpha: 0.3) : Colors.amber.shade100,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: Colors.amber.shade700),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.construction_rounded, size: 18, color: Colors.amber.shade700),
-                    const SizedBox(width: 8),
+
+          // Sub-header Hasil
+          if (filteredSports.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Cabang Olahraga (${filteredSports.length}):',
+                    style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                  ),
+                  if (_searchQuery.isNotEmpty)
                     Text(
-                      'Halaman sedang dalam pengembangan 🚧',
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
-                      ),
+                      'Filter: "$_searchQuery"',
+                      style: TextStyle(fontSize: 12, color: Colors.green.shade600),
                     ),
-                  ],
-                ),
+                ],
               ),
-              const SizedBox(height: 16),
-              Text(
-                'Fitur untuk berlatih cabang olahraga, mengikuti turnamen internasional, dan memenangkan medali akan segera hadir!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark ? Colors.white60 : Colors.grey.shade600,
-                ),
-              ),
-            ],
+            ),
+
+          // List Cabang Olahraga
+          Expanded(
+            child: filteredSports.isEmpty
+                ? Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.search_off_rounded, size: 48, color: isDark ? Colors.white38 : Colors.grey),
+                        const SizedBox(height: 8),
+                        Text(
+                          'Tidak ditemukan cabang olahraga untuk "$_searchQuery"',
+                          style: TextStyle(color: isDark ? Colors.white60 : Colors.grey),
+                        ),
+                      ],
+                    ),
+                  )
+                : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    itemCount: filteredSports.length,
+                    itemBuilder: (context, index) {
+                      final sport = filteredSports[index];
+
+                      return Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        ),
+                        color: isDark ? Colors.grey.shade800 : null,
+                        child: ListTile(
+                          leading: CircleAvatar(
+                            backgroundColor: (sport['color'] as Color).withValues(alpha: 0.1),
+                            child: Icon(sport['icon'] as IconData, color: sport['color']),
+                          ),
+                          title: Text(
+                            sport['name'],
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          subtitle: Text(
+                            sport['desc'],
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white70 : Colors.black54,
+                            ),
+                          ),
+                          trailing: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.green.shade600,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            onPressed: () => _openTeamPage(sport),
+                            child: const Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  'Lihat Tim',
+                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                ),
+                                SizedBox(width: 4),
+                                Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                              ],
+                            ),
+                          ),
+                          onTap: () => _openTeamPage(sport),
+                        ),
+                      );
+                    },
+                  ),
           ),
-        ),
+        ],
       ),
     );
   }
