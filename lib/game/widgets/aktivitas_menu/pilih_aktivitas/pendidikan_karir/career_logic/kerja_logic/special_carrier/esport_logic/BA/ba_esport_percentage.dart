@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/esport_logic/BA/ba_esport_percentage.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/esport_logic/BA/ba_esport_percentage.dart
 class BaEsportPercentage {
   /// Peluang diterima saat MENDAFTAR SENDIRI (Manual Apply) sebagai Brand Ambassador E-Sport:
   /// 75% untuk wanita dan 25% untuk pria. Naik 15% jika memiliki riwayat pekerjaan sebagai Idol.

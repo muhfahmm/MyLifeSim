@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 
 class IdolManager {
@@ -278,10 +279,12 @@ class IdolManager {
 
       if (getPromoted) {
         final double salaryMult = getCountrySalaryMultiplier(character.location);
-        final int finalSal = ((1333 + rand.nextInt(1335)) * salaryMult).round();
+        // Gaji Tim Utama Idol: $2000 - $3000 USD / bulan
+        final int monthlySalaryUSD = 2000 + rand.nextInt(1001); // $2000 - $3000
+        final int finalSal = (monthlySalaryUSD * salaryMult).round();
         character.setJob('Idol (Main Performer)', finalSal);
         
-        final String notice = '✨ Promosi Idol: Selamat! Setelah berjuang sebagai Trainee, kamu resmi dipromosikan menjadi anggota tim utama (Main Team) dengan gaji \$${character.jobSalary}/tahun! 🎤🌟';
+        final String notice = '✨ Promosi Idol: Selamat! Setelah berjuang sebagai Trainee, kamu resmi dipromosikan menjadi anggota tim utama (Main Team) dengan gaji ${CurrencySettings.format(finalSal)}/bulan! 🎤🌟';
         events.add(notice);
         inbox.add(notice);
       }

@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/esport_logic/tim_esport.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/esport_logic/tim_esport.dart
 class EsportsTeams {
   static const List<String> list = [
     'EVOS Esports',

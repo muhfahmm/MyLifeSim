@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/esport_logic/proplayer/esport_roster.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/esport_logic/proplayer/esport_roster.dart
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 

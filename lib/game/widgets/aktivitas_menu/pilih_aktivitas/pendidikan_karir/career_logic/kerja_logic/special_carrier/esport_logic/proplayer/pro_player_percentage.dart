@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/esport_logic/proplayer/pro_player_percentage.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/esport_logic/proplayer/pro_player_percentage.dart
 class ProPlayerPercentage {
   /// Peluang diterima saat MENDAFTAR SENDIRI (Manual Apply) sebagai Pro Player E-Sport:
   /// - Normal: Laki-laki 75%, Perempuan 25% (kebalikan dari BA Esport)

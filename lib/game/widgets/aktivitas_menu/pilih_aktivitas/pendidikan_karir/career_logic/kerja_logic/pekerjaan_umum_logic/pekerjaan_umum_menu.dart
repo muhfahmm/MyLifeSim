@@ -5,11 +5,13 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'dart:math';
 import '../database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
-import '../idol_logic/idol_manager.dart';
-import '../esport_logic/tim_esport.dart';
-import '../esport_logic/BA/ba_esport_percentage.dart';
-import '../esport_logic/proplayer/pro_player_percentage.dart';
-import '../esport_logic/talent/talent_esport_percentage.dart';
+import '../special_carrier/idol_logic/idol_manager.dart';
+import '../special_carrier/idol_logic/syarat_ketentuan_idol_modal.dart';
+import '../special_carrier/esport_logic/tim_esport.dart';
+import '../special_carrier/esport_logic/BA/ba_esport_percentage.dart';
+import '../special_carrier/esport_logic/proplayer/pro_player_percentage.dart';
+import '../special_carrier/esport_logic/talent/talent_esport_percentage.dart';
+import '../special_carrier/esport_logic/syarat_ketentuan_esport_modal.dart';
 
 class PekerjaanUmumMenuScreen extends StatefulWidget {
   final Character character;
@@ -101,50 +103,24 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
   void _applyJob(Map<String, dynamic> job) {
     final character = widget.character;
 
-    if (job['title'] == 'Idol (Trainee)') {
-      if (character.hasGraduatedIdol) {
-        if (character.age < 18) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Lamaran Ditolak 🚫'),
-              content: Text(
-                'Kamu sudah pernah melangsungkan kelulusan (graduation) sebagai JKT48 Idol.\n\n'
-                'Untuk bekerja kembali di manajemen sebagai Staf, kamu harus berusia minimal 18 tahun!\n'
-                '(Usiamu saat ini: ${character.age} tahun)',
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            ),
-          );
-          return;
-        }
-      }
-      if (character.health < 80 || character.discipline < 75) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Lamaran Ditolak 🚫'),
-            content: Text(
-              'Persyaratan menjadi Idol tidak terpenuhi.\n\n'
-              '• Kesehatan minimal: 80% (Kesehatanmu: ${character.health}%)\n'
-              '• Kedisiplinan minimal: 75% (Kedisiplinanmu: ${character.discipline}%)',
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-    } else if (character.intelligence < (job['minIntel'] ?? 0)) {
+    if (job['title'] == 'Idol (Trainee)' || job['title'] == 'Staf Operasional Idol') {
+      SyaratKetentuanIdolModal.show(
+        context: context,
+        character: character,
+        onRefresh: widget.onRefresh,
+      );
+      return;
+    }
+
+    if (job['title'] == 'Brand Ambassador Esport' || job['title'] == 'Pro Player Esport' || job['title'] == 'Talent Esports') {
+      SyaratKetentuanEsportModal.show(
+        context: context,
+        character: character,
+        onRefresh: widget.onRefresh,
+      );
+      return;
+    }
+    if (character.intelligence < (job['minIntel'] ?? 0)) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(

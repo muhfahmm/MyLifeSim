@@ -7,7 +7,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/idol_logic/idol_manager.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/idol_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart';

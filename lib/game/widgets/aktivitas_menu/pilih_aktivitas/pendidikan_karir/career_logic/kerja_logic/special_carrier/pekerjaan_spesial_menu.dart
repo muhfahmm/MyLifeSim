@@ -10,6 +10,10 @@ import 'atlit_profesional_job_logic/atlit_profesional_menu.dart';
 import 'aktor_film_job_logic/aktor_film_menu.dart';
 import 'astronot_job_logic/astronot_menu.dart';
 import 'models_job_logic/models_menu.dart';
+import 'idol_logic/idol_menu.dart';
+import 'idol_logic/syarat_ketentuan_idol_modal.dart';
+import 'esport_logic/esport_activities_page.dart';
+import 'esport_logic/syarat_ketentuan_esport_modal.dart';
 
 class PekerjaanSpesialMenuScreen extends StatefulWidget {
   final Character character;
@@ -166,6 +170,75 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
                   widget.onRefresh();
                 },
               ),
+            ),
+            _buildMenuTile(
+              context: context,
+              icon: Icons.mic,
+              color: Colors.pinkAccent.shade400,
+              title: 'Idol 🎤',
+              subtitle: 'Latihan vokal & dance, konser panggung, dan agensi entertainment',
+              minAge: 10,
+              onTap: () async {
+                if (character.isIdol || character.isIdolStaff) {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => IdolMenuScreen(
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
+                      ),
+                    ),
+                  );
+                  if (mounted) setState(() {});
+                } else {
+                  SyaratKetentuanIdolModal.show(
+                    context: context,
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  );
+                }
+              },
+            ),
+            _buildMenuTile(
+              context: context,
+              icon: Icons.sports_esports,
+              color: Colors.teal.shade700,
+              title: 'E-Sports 🎮',
+              subtitle: 'Pro Player, Talent, dan Brand Ambassador tim esports terkenal',
+              minAge: 12,
+              onTap: () async {
+                final String j = character.jobName ?? '';
+                if (j.contains('Esport') || j.contains('E-Sport')) {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => EsportActivitiesPage(
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
+                      ),
+                    ),
+                  );
+                  if (mounted) setState(() {});
+                } else {
+                  SyaratKetentuanEsportModal.show(
+                    context: context,
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  );
+                }
+              },
             ),
           ],
         ),

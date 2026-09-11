@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/idol/persentase_tawaran_idol.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/persentase_tawaran_idol.dart
 //
 // Menghitung probabilitas kemunculan event tawaran menjadi idol dari General Manager.
 // Hanya untuk karakter perempuan berusia 10–15 tahun.
@@ -71,6 +71,30 @@ class PersentaseTawaranIdol {
   /// Cek apakah event harus muncul berdasarkan roll acak.
   static bool apakahEventMuncul(Character character, int random0to99) {
     return random0to99 < hitungProbabilitas(character);
+  }
+
+  /// Menghitung persentase kelulusan saat pendaftaran manual/audisi (0–100%).
+  static int hitungProbabilitasLamaran(Character character) {
+    double base = 35.0;
+
+    double healthBonus = (character.health.clamp(0, 100) / 100.0) * 15.0;
+    double disciplineBonus = (character.discipline.clamp(0, 100) / 100.0) * 15.0;
+    double intelBonus = (character.intelligence.clamp(0, 100) / 100.0) * 15.0;
+    double happyBonus = (character.happiness.clamp(0, 100) / 100.0) * 15.0;
+
+    double ageBonus = 0.0;
+    if (character.age >= 12 && character.age <= 14) {
+      ageBonus = 10.0;
+    } else if (character.age >= 10 && character.age <= 17) {
+      ageBonus = 5.0;
+    }
+
+    double total = base + healthBonus + disciplineBonus + intelBonus + happyBonus + ageBonus;
+    if (character.ownedLicenses.contains('Idol') || character.hasGraduatedIdol) {
+      total += 10.0;
+    }
+
+    return total.clamp(5, 95).round();
   }
 
   // ================================================================

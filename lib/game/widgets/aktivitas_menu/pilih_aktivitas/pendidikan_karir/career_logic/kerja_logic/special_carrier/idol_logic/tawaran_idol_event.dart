@@ -1,4 +1,4 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/idol/tawaran_idol_event.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/tawaran_idol_event.dart
 //
 // Event: General Manager Idol menawarkan kontrak kepada karakter perempuan usia 10–15.
 // Cara pakai:
@@ -7,6 +7,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'persentase_tawaran_idol.dart';
 
 class TawaranIdolEvent {
@@ -26,8 +27,8 @@ class TawaranIdolEvent {
     {'nama': 'Crystal Star Management', 'emoji': '✨'},
   ];
 
-  // Gaji kontrak (per bulan, dalam satuan game money)
-  static const int gajiKontrak = 2500000;
+  // Gaji kontrak (per bulan, Trainee: 1000 - 2000 USD)
+  static const int gajiKontrak = 1000;
 
   // ================================================================
   // ENTRY POINT
@@ -115,7 +116,7 @@ class TawaranIdolEvent {
               const SizedBox(height: 6),
               _buildBadge(
                 icon: Icons.attach_money,
-                label: 'Gaji: Rp ${_fmt(gajiKontrak)} / bulan',
+                label: 'Gaji: ${CurrencySettings.format(gajiKontrak)} / bulan',
                 color: Colors.green,
                 isDark: isDark,
               ),
