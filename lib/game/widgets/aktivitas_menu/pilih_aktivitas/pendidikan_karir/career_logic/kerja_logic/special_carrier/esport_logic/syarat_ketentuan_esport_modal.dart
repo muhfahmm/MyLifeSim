@@ -9,7 +9,6 @@ import 'tim_esport.dart';
 import 'BA/ba_esport_percentage.dart';
 import 'proplayer/pro_player_percentage.dart';
 import 'talent/talent_esport_percentage.dart';
-import 'esport_activities_page.dart';
 
 class SyaratKetentuanEsportModal extends StatefulWidget {
   final Character character;
@@ -551,17 +550,10 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
           actions: [
             TextButton(
               onPressed: () {
+                final nav = Navigator.of(context);
                 Navigator.pop(dialogCtx); // Pop alert dialog
-                Navigator.pop(context); // Pop SyaratKetentuanEsportModal
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EsportActivitiesPage(
-                      character: widget.character,
-                      onRefresh: widget.onRefresh,
-                    ),
-                  ),
-                );
+                Navigator.pop(context);   // Pop SyaratKetentuanEsportModal
+                nav.pop();                // Pop PekerjaanSpesialMenuScreen (returns to Pekerjaan & Karir)
               },
               child: const Text('Buka HQ Esport 🚀', style: TextStyle(fontWeight: FontWeight.bold)),
             ),

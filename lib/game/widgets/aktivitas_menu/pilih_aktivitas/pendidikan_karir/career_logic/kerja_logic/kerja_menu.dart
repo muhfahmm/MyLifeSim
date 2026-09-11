@@ -339,6 +339,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         },
       );
     }
+
+    if (character.isEsport) {
+      return EsportActivitiesPage(
+        character: character,
+        onRefresh: () {
+          if (mounted) setState(() {});
+          widget.onRefresh();
+        },
+      );
+    }
     final hasJob = character.jobName != null;
 
     String currentCategory = '';

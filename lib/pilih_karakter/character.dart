@@ -226,6 +226,7 @@ class Character {
   bool get isIdol => jobName == 'Idol (Trainee)' || jobName == 'Idol (Main Performer)';
   bool get isIdolStaff => jobName == 'General Manager Idol' || jobName == 'Deputy General Manager Idol' || jobName == 'Staf Operasional Idol';
   bool get isIdolRelated => isIdol || isIdolStaff;
+  bool get isEsport => (jobName ?? '').contains('Esport') || (jobName ?? '').contains('E-Sport');
   int yearsInTrainee = 0;
   List<Map<String, String>> idolTrainees = [];
   List<Map<String, String>> idolMainMembers = [];

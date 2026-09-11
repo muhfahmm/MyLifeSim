@@ -132,10 +132,8 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
         ? (isMain ? 'Tim Utama Idol ⭐' : 'Trainee Idol ⭐️')
         : 'Agensi Idol 🎤';
 
-    // PERBAIKAN ERROR: Model Character tidak memiliki getter 'salary'.
-    // Menggunakan properti 'money' yang sudah ada sebagai placeholder gaji bulanan.
-    // Jika nanti kamu menambahkan properti 'jobSalary' atau 'salary' di Character, ganti bagian ini.
-    final int currentSalary = char.money; 
+    // Menggunakan properti jobSalary karakter
+    final int currentSalary = char.jobSalary ?? (isMain ? 2000 : 1000); 
 
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFF7F9FC),
