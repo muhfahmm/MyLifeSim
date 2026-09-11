@@ -17,7 +17,7 @@ class NegotiateContractAction {
     final Random random = Random();
 
     // 1. Cek jika sisa kontrak masih panjang (misal 5 atau 4 tahun)
-    final int? remainingContract = character.athleteContractYears;
+    final int remainingContract = character.athleteContractYears;
     if (LogikaPemainSepakbola.isKontrakMasihPanjang(remainingContract)) {
       showResult(
         'Negosiasi Ditolak 🚫',

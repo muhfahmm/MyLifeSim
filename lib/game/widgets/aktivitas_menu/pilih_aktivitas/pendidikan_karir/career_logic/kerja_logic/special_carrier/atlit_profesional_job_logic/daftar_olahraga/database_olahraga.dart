@@ -20,6 +20,7 @@ class OlahragaDatabase {
         'desc': soccerDesc,
         'icon': Icons.sports_soccer,
         'color': Colors.green,
+        'minAge': 6,
         'positions': [
           {
             'title': 'ST',
@@ -108,6 +109,7 @@ class OlahragaDatabase {
         'desc': basketballDesc,
         'icon': Icons.sports_basketball,
         'color': Colors.orange,
+        'minAge': 6,
         'positions': [
           {
             'title': 'Point Guard (Basket Pro)',
@@ -140,6 +142,7 @@ class OlahragaDatabase {
         'desc': 'Adu kecepatan di lintasan balap kelas dunia.',
         'icon': Icons.sports_motorsports,
         'color': Colors.red,
+        'minAge': 12,
         'positions': [
           {
             'title': 'Pebalap Moto2 / Moto3',
@@ -164,6 +167,7 @@ class OlahragaDatabase {
         'desc': 'Berkompetisi di ajang turnamen Grand Slam dunia.',
         'icon': Icons.sports_tennis,
         'color': Colors.lightGreen,
+        'minAge': 10,
         'positions': [
           {
             'title': 'Petenis Tunggal Pro (ATP/WTA)',
@@ -180,6 +184,7 @@ class OlahragaDatabase {
         'desc': 'Seni bela diri campuran dan petinju di ring kejuaraan.',
         'icon': Icons.sports_mma,
         'color': Colors.brown,
+        'minAge': 16,
         'positions': [
           {
             'title': 'Petarung MMA Profesional',
@@ -204,6 +209,7 @@ class OlahragaDatabase {
         'desc': 'Menjadi atlet renang tercepat di berbagai gaya perlombaan.',
         'icon': Icons.pool,
         'color': Colors.blue,
+        'minAge': 6,
         'positions': [
           {
             'title': 'Perenang Atlet Profesional',

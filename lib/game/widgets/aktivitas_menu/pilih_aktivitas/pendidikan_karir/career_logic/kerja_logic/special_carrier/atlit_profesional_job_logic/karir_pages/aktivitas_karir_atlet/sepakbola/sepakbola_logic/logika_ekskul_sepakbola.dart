@@ -8,7 +8,10 @@ class LogikaEkskulSepakbola {
   /// Mengecek apakah karakter sedang atau pernah mengikuti Ekstrakurikuler Sepakbola di sekolah
   static bool apakahIkutEkskulSepakbola(Character character) {
     return character.joinedExtracurriculars.any(
-      (ext) => ext.toLowerCase().contains('sepakbola'),
+      (ext) {
+        final l = ext.toLowerCase();
+        return l.contains('sepakbola') || l.contains('soccer') || l.contains('football') || l == 'olahraga';
+      },
     );
   }
 

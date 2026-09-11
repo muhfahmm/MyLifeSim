@@ -9,6 +9,15 @@ import '../daftar_tim/database_tim_olahraga.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/gaji_pemain_sepakbola.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_ekskul_sepakbola.dart';
+import '../karir_pages/aktivitas_karir_atlet/basket/basket_logic/logika_pemain_basket.dart';
+import '../karir_pages/aktivitas_karir_atlet/basket/basket_logic/logika_ekskul_basket.dart';
+import '../karir_pages/aktivitas_karir_atlet/balap/balap_logic/logika_pemain_balap.dart';
+import '../karir_pages/aktivitas_karir_atlet/bulutangkis/bulutangkis_logic/logika_pemain_bulutangkis.dart';
+import '../karir_pages/aktivitas_karir_atlet/bulutangkis/bulutangkis_logic/logika_ekskul_bulutangkis.dart';
+import '../karir_pages/aktivitas_karir_atlet/renang/renang_logic/logika_pemain_renang.dart';
+import '../karir_pages/aktivitas_karir_atlet/renang/renang_logic/logika_ekskul_renang.dart';
+import '../karir_pages/aktivitas_karir_atlet/tenis/tenis_logic/logika_pemain_tenis.dart';
+import '../karir_pages/aktivitas_karir_atlet/tinju_mma/tinju_mma_logic/logika_pemain_tinju_mma.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/ekstrakurikuler.dart';
 
 class DaftarTimPage extends StatefulWidget {
@@ -43,6 +52,34 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _showAgeConstraintDialog({required String title, required String message}) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+        title: Row(
+          children: [
+            const Icon(Icons.access_time_filled, color: Colors.orange, size: 28),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
   }
 
   int _getPositionBaseSalary(Map<String, dynamic> pos) {
@@ -102,20 +139,90 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
 
     // Persentase peluang diterima berdasarkan Usia, Durasi Kontrak, dan Ekstrakurikuler
     final int age = character.age;
-    final int successChance = LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
-      usia: age,
-      durasiKontrakTahun: contractYears,
-      isMelamarBaru: true,
-      character: character,
-    );
+    final String sportName = (widget.sportItem['name'] ?? '').toString().toLowerCase();
+    final bool isBasket = sportName.contains('basket');
+    final bool isBalap = sportName.contains('balap');
+    final bool isBulutangkis = sportName.contains('bulutangkis') || sportName.contains('badminton');
+    final bool isRenang = sportName.contains('renang');
+    final bool isTenis = sportName.contains('tenis');
+    final bool isTinjuMMA = sportName.contains('tinju') || sportName.contains('mma');
+    final bool isSepakbola = sportName.contains('sepakbola');
+
+    // Pengecekan apakah olahraga ini tersedia di menu Ekstrakurikuler Sekolah
+    // Olahraga yang tersedia di ekskul sekolah: Sepakbola, Basket, Badminton (Bulutangkis), Renang
+    final bool adaDiEkskulSekolah = isSepakbola || isBasket || isBulutangkis || isRenang;
+
+    // JIKA TIDAK ADA DI EKSKUL SEKOLAH -> GUNAKAN LOGIKA PERSYARATAN UMUR TERLEBIH DAHULU:
+    if (!adaDiEkskulSekolah) {
+      if (isBalap && age < 12) {
+        _showAgeConstraintDialog(
+          title: 'Usia Belum Cukup 🏎️',
+          message: 'Untuk melamar ke profesi Balap Motor & Mobil, kamu harus berusia minimal 12 tahun!\n\n(Usiamu saat ini: $age tahun).',
+        );
+        return;
+      }
+      if (isTinjuMMA && age < 16) {
+        _showAgeConstraintDialog(
+          title: 'Usia Belum Cukup 🥊',
+          message: 'Untuk melamar ke profesi atlet Tinju & MMA, kamu harus berusia minimal 16 tahun!\n\n(Usiamu saat ini: $age tahun).',
+        );
+        return;
+      }
+      if (isTenis && age < 10) {
+        _showAgeConstraintDialog(
+          title: 'Usia Belum Cukup 🎾',
+          message: 'Untuk melamar ke profesi Petenis Profesional, kamu harus berusia minimal 10 tahun!\n\n(Usiamu saat ini: $age tahun).',
+        );
+        return;
+      }
+    }
+
+    int successChance = 80;
+    if (isBalap) {
+      successChance = LogikaPemainBalap.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else if (isBasket) {
+      successChance = LogikaPemainBasket.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else if (isBulutangkis) {
+      successChance = LogikaPemainBulutangkis.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else if (isRenang) {
+      successChance = LogikaPemainRenang.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else if (isTenis) {
+      successChance = LogikaPemainTenis.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else if (isTinjuMMA) {
+      successChance = LogikaPemainTinjuMMA.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    } else {
+      successChance = LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(usia: age, durasiKontrakTahun: contractYears, isMelamarBaru: true, character: character);
+    }
 
     final int roll = Random().nextInt(100);
     final bool isAccepted = roll < successChance;
 
     if (!isAccepted) {
-      final bool ikutEkskul = LogikaEkskulSepakbola.apakahIkutEkskulSepakbola(character);
-      final String ekskulNote = !ikutEkskul
-          ? '\n\n💡 Petunjuk: Kamu belum/tidak mengikuti Ekstrakurikuler Sepakbola di sekolah, sehingga peluang diterimamu hanya 30%!'
+      bool ikutEkskul = false;
+      String sportTitle = 'Olahraga';
+      IconData sportIcon = Icons.sports;
+
+      if (isBasket) {
+        ikutEkskul = LogikaEkskulBasket.apakahIkutEkskulBasket(character);
+        sportTitle = 'Basket';
+        sportIcon = Icons.sports_basketball;
+      } else if (isBulutangkis) {
+        ikutEkskul = LogikaEkskulBulutangkis.apakahIkutEkskulBulutangkis(character);
+        sportTitle = 'Badminton';
+        sportIcon = Icons.sports_tennis;
+      } else if (isRenang) {
+        ikutEkskul = LogikaEkskulRenang.apakahIkutEkskulRenang(character);
+        sportTitle = 'Renang';
+        sportIcon = Icons.pool;
+      } else if (isSepakbola) {
+        ikutEkskul = LogikaEkskulSepakbola.apakahIkutEkskulSepakbola(character);
+        sportTitle = 'Sepakbola';
+        sportIcon = Icons.sports_soccer;
+      }
+
+      // Catatan ekskul hanya ditampilkan jika olahraga ini memang ada di menu ekskul sekolah
+      final String ekskulNote = (adaDiEkskulSekolah && !ikutEkskul)
+          ? '\n\n💡 Petunjuk: Kamu belum/tidak mengikuti Ekstrakurikuler $sportTitle di sekolah, sehingga peluang diterimamu hanya 30%!'
           : '';
 
       showDialog(
@@ -133,15 +240,15 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             'Manajemen ${teamItem['name']} menolak pengajuan kontrak selama $contractYears tahun untuk posisimu (Peluang diterima: $successChance%).$ekskulNote\n\nCoba ajukan durasi kontrak yang lebih pendek atau coba lagi!',
           ),
           actions: [
-            if (!ikutEkskul)
+            if (adaDiEkskulSekolah && !ikutEkskul)
               ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange.shade700,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
-                icon: const Icon(Icons.sports_soccer, size: 18),
-                label: const Text('Buka Ekstrakurikuler ⚽'),
+                icon: Icon(sportIcon, size: 18),
+                label: const Text('Buka Ekstrakurikuler 🏆'),
                 onPressed: () {
                   Navigator.pop(context);
                   Navigator.push(

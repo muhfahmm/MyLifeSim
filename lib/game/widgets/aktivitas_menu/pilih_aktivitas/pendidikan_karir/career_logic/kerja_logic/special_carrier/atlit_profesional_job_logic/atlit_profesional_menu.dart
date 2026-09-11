@@ -217,6 +217,44 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
                     itemCount: filteredSports.length,
                     itemBuilder: (context, index) {
                       final sport = filteredSports[index];
+                      final int minAge = sport['minAge'] as int? ?? 6;
+                      final bool isUnlocked = character.age >= minAge;
+                      final Color sportColor = isUnlocked ? (sport['color'] as Color) : Colors.grey;
+
+                      void handleTap() {
+                        if (isUnlocked) {
+                          _openTeamPage(sport);
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                              title: const Row(
+                                children: [
+                                  Icon(Icons.lock, color: Colors.orange, size: 28),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Cabor Terkunci 🔒',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text(
+                                'Kamu harus berusia minimal $minAge tahun untuk bisa membuka dan mendaftar di cabang olahraga ${sport['name']}!\n\n'
+                                '(Usiamu saat ini: ${character.age} tahun).',
+                              ),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('OK'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      }
 
                       return Card(
                         elevation: 0,
@@ -225,49 +263,64 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                         ),
-                        color: isDark ? Colors.grey.shade800 : null,
+                        color: isUnlocked
+                            ? (isDark ? Colors.grey.shade800 : null)
+                            : (isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.grey.shade100),
                         child: ListTile(
                           leading: CircleAvatar(
-                            backgroundColor: (sport['color'] as Color).withValues(alpha: 0.1),
-                            child: Icon(sport['icon'] as IconData, color: sport['color']),
+                            backgroundColor: sportColor.withValues(alpha: 0.1),
+                            child: Icon(sport['icon'] as IconData, color: sportColor),
                           ),
                           title: Text(
                             sport['name'],
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
+                              color: isUnlocked
+                                  ? (isDark ? Colors.white : Colors.black87)
+                                  : Colors.grey.shade600,
                             ),
                           ),
                           subtitle: Text(
                             sport['desc'],
                             style: TextStyle(
                               fontSize: 12,
-                              color: isDark ? Colors.white70 : Colors.black54,
+                              color: isUnlocked
+                                  ? (isDark ? Colors.white70 : Colors.black54)
+                                  : Colors.grey.shade500,
                             ),
                           ),
-                          trailing: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.green.shade600,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            onPressed: () => _openTeamPage(sport),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Lihat Tim',
-                                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                          trailing: isUnlocked
+                              ? ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.green.shade600,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                  onPressed: handleTap,
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        'Lihat Tim',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                                      ),
+                                      SizedBox(width: 4),
+                                      Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
+                                    ],
+                                  ),
+                                )
+                              : Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: Icon(
+                                    Icons.lock_outline,
+                                    size: 20,
+                                    color: isDark ? Colors.white54 : Colors.grey.shade500,
+                                  ),
                                 ),
-                                SizedBox(width: 4),
-                                Icon(Icons.arrow_forward_ios, size: 12, color: Colors.white),
-                              ],
-                            ),
-                          ),
-                          onTap: () => _openTeamPage(sport),
+                          onTap: handleTap,
                         ),
                       );
                     },
