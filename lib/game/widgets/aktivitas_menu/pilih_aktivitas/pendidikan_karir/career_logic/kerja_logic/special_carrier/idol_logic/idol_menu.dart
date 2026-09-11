@@ -246,7 +246,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                   child: const Icon(Icons.payments, color: Colors.green),
                 ),
                 title: Text(
-                  'Gaji Bulanan',
+                  'Gaji Tahunan',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
@@ -254,7 +254,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                   ),
                 ),
                 subtitle: Text(
-                  'Pendapatan yang kamu terima setiap bulan',
+                  'Pendapatan yang kamu terima setiap tahun',
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? Colors.white70 : Colors.grey,
