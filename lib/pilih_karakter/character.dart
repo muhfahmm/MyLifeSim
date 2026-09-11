@@ -2,6 +2,8 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/database_formasi_pelatih.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
@@ -1029,7 +1031,18 @@ class Character {
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
     final bool isEsport = isProPlayer || isBAOrTalent;
 
-    final bool isAthlete = job.contains('Striker') ||
+    final String jUpper = job.toUpperCase();
+    final bool isAthlete = jUpper.contains('ST') ||
+        jUpper.contains('LW') ||
+        jUpper.contains('RW') ||
+        jUpper.contains('CAM') ||
+        jUpper.contains('CM') ||
+        jUpper.contains('CDM') ||
+        jUpper.contains('CB') ||
+        jUpper.contains('LB') ||
+        jUpper.contains('RB') ||
+        jUpper.contains('GK') ||
+        job.contains('Striker') ||
         job.contains('Gelandang') ||
         job.contains('Bek') ||
         job.contains('Kiper') ||
@@ -1099,17 +1112,95 @@ class Character {
     }
 
     if (isAthlete) {
-      final bool isSoccer = job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper');
+      final bool isSoccer = jUpper.contains('ST') ||
+          jUpper.contains('LW') ||
+          jUpper.contains('RW') ||
+          jUpper.contains('CAM') ||
+          jUpper.contains('CM') ||
+          jUpper.contains('CDM') ||
+          jUpper.contains('CB') ||
+          jUpper.contains('LB') ||
+          jUpper.contains('RB') ||
+          jUpper.contains('GK') ||
+          job.contains('Striker') ||
+          job.contains('Gelandang') ||
+          job.contains('Bek') ||
+          job.contains('Kiper');
       final bool isBasketball = job.contains('Guard') || job.contains('Center');
 
-      final int mainTeamCount = isSoccer ? 10 : (isBasketball ? 4 : 4);
-      final int subTeamCount = isSoccer ? (7 + random.nextInt(4)) : (isBasketball ? (5 + random.nextInt(4)) : (3 + random.nextInt(3)));
       final String teamGender = gender;
+      final String teamCat = LogikaUsiaRekanTim.getKategoriTimBerdasarkanUsia(usia: age);
+
+      if (isSoccer) {
+        final FormasiPelatih formasi = FormasiPelatihDatabase.getRandomFormasi(rand: random);
+        if (supervisor != null) {
+          supervisor!['formation'] = formasi.code;
+        }
+        final List<String> mainPositions = FormasiPelatihDatabase.generateKomposisiPemainUtama(
+          formasi: formasi,
+          userPosition: job,
+        );
+
+        // Tim Utama (Sesuai Formasi Pelatih)
+        for (int i = 0; i < mainPositions.length; i++) {
+          final name = getRandomName(teamGender);
+          final ageVal = LogikaUsiaRekanTim.generateUsiaRekanTim(userAge: age, rand: random);
+          final double sexRoll = random.nextDouble();
+          final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+
+          coworkers.add({
+            'name': name,
+            'gender': teamGender,
+            'relationship': (45 + random.nextInt(21)).toString(),
+            'age': ageVal.toString(),
+            'isDeceased': 'false',
+            'sexuality': coworkerSexuality,
+            'intelligence': (40 + random.nextInt(51)).toString(),
+            'teamCategory': teamCat,
+            'role': 'Pemain Utama',
+            'position': mainPositions[i],
+          });
+        }
+
+        // Tim Cadangan (GK, CB, LB/RB, CM, ST)
+        final int subTeamCount = 7 + random.nextInt(4);
+        final List<String> subPositions = [
+          'GK',
+          'CB',
+          'LB/RB',
+          'CM',
+          'ST',
+        ];
+        for (int i = 0; i < subTeamCount; i++) {
+          final name = getRandomName(teamGender);
+          final ageVal = LogikaUsiaRekanTim.generateUsiaRekanTim(userAge: age, rand: random);
+          final double sexRoll = random.nextDouble();
+          final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
+          final String pos = subPositions[i % subPositions.length];
+
+          coworkers.add({
+            'name': name,
+            'gender': teamGender,
+            'relationship': (35 + random.nextInt(21)).toString(),
+            'age': ageVal.toString(),
+            'isDeceased': 'false',
+            'sexuality': coworkerSexuality,
+            'intelligence': (35 + random.nextInt(51)).toString(),
+            'teamCategory': '$teamCat (Cadangan)',
+            'role': 'Pemain Cadangan',
+            'position': pos,
+          });
+        }
+        return;
+      }
+
+      final int mainTeamCount = isBasketball ? 4 : 4;
+      final int subTeamCount = isBasketball ? (5 + random.nextInt(4)) : (3 + random.nextInt(3));
 
       // Tim Utama
       for (int i = 0; i < mainTeamCount; i++) {
         final name = getRandomName(teamGender);
-        final ageVal = 18 + random.nextInt(15);
+        final ageVal = LogikaUsiaRekanTim.generateUsiaRekanTim(userAge: age, rand: random);
         final double sexRoll = random.nextDouble();
         final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
 
@@ -1121,7 +1212,7 @@ class Character {
           'isDeceased': 'false',
           'sexuality': coworkerSexuality,
           'intelligence': (40 + random.nextInt(51)).toString(),
-          'teamCategory': 'Tim Utama',
+          'teamCategory': teamCat,
           'role': 'Pemain Utama',
         });
       }
@@ -1129,7 +1220,7 @@ class Character {
       // Tim Cadangan
       for (int i = 0; i < subTeamCount; i++) {
         final name = getRandomName(teamGender);
-        final ageVal = 17 + random.nextInt(12);
+        final ageVal = LogikaUsiaRekanTim.generateUsiaRekanTim(userAge: age, rand: random);
         final double sexRoll = random.nextDouble();
         final String coworkerSexuality = sexRoll < 0.80 ? 'Heteroseksual' : (sexRoll < 0.90 ? 'Homoseksual' : 'Biseksual');
 
@@ -1141,7 +1232,7 @@ class Character {
           'isDeceased': 'false',
           'sexuality': coworkerSexuality,
           'intelligence': (35 + random.nextInt(51)).toString(),
-          'teamCategory': 'Tim Cadangan',
+          'teamCategory': '$teamCat (Cadangan)',
           'role': 'Pemain Cadangan',
         });
       }

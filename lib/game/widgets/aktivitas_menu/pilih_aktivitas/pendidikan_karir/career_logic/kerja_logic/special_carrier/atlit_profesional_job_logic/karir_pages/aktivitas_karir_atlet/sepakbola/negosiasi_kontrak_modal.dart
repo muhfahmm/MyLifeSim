@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'sepakbola_logic/logika_pemain_sepakbola.dart';
 
 class NegosiasiKontrakModal {
   static void show({
@@ -46,7 +47,9 @@ class _NegosiasiDialogWidgetState extends State<_NegosiasiDialogWidget> {
   @override
   void initState() {
     super.initState();
-    _selectedYears = widget.offerData['offeredYears'] as int? ?? 3;
+    final validYears = LogikaPemainSepakbola.getOpsiDurasiKontrak(widget.character.age);
+    final int offered = widget.offerData['offeredYears'] as int? ?? 1;
+    _selectedYears = validYears.contains(offered) ? offered : validYears.first;
     final int baseOffer = widget.offerData['offeredSalary'] as int? ?? 10000;
     _demandedSalary = (baseOffer * 1.15).round(); // Default tuntutan +15% dari penawaran
   }
@@ -227,9 +230,10 @@ class _NegosiasiDialogWidgetState extends State<_NegosiasiDialogWidget> {
               style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
             ),
             const SizedBox(height: 8),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [1, 2, 3, 4, 5].map((years) {
+            Wrap(
+              spacing: 8,
+              runSpacing: 4,
+              children: (LogikaPemainSepakbola.getOpsiDurasiKontrak(widget.character.age).toList()..sort()).map((years) {
                 final bool isSelected = _selectedYears == years;
                 return ChoiceChip(
                   label: Text('$years th'),

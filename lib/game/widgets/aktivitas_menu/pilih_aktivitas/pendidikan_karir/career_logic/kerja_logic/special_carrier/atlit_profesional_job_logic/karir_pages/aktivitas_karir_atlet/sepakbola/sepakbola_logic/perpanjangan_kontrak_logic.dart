@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'gaji_pemain_sepakbola.dart';
+import 'logika_pemain_sepakbola.dart';
 
 class PerpanjanganKontrakLogic {
   /// Memeriksa dan menguji evaluasi perpanjangan kontrak saat durasi kontrak habis.
@@ -36,7 +37,8 @@ class PerpanjanganKontrakLogic {
     final bool getContractExtension = rand.nextInt(100) < extensionChance;
 
     if (getContractExtension) {
-      final int extensionYears = 2 + rand.nextInt(3); // 2 s/d 4 Tahun Kontrak Baru
+      final validYears = LogikaPemainSepakbola.getOpsiDurasiKontrak(character.age);
+      final int extensionYears = validYears[rand.nextInt(validYears.length)];
       final int currentSalary = character.jobSalary ?? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: character.age, rand: rand);
       
       final int offeredSalary = GajiPemainSepakbolaLogic.hitungTawaranGajiBaru(

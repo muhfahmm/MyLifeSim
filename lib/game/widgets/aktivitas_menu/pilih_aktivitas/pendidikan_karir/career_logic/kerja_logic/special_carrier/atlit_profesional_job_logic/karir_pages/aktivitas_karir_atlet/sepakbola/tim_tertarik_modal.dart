@@ -7,6 +7,7 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../../../daftar_tim/database_tim_olahraga.dart';
 import 'sepakbola_logic/gaji_pemain_sepakbola.dart';
+import 'sepakbola_logic/logika_pemain_sepakbola.dart';
 
 class TimTertarikModal {
   /// Menampilkan modal daftar klub-klub lain yang tertarik merekrut pemain
@@ -122,7 +123,8 @@ class _TimTertarikDialogState extends State<_TimTertarikDialog> {
     final selectedTeams = otherTeams.take(targetCount).toList();
 
     _interestedTeams = selectedTeams.map((team) {
-      final int contractYears = 2 + Random().nextInt(4); // 2 - 5 tahun
+      final validYears = LogikaPemainSepakbola.getOpsiDurasiKontrak(widget.character.age);
+      final int contractYears = validYears[Random().nextInt(validYears.length)];
       final int baseSalary = GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(
         usia: widget.character.age,
         rand: Random(team['name'].hashCode + widget.character.age),

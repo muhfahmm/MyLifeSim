@@ -3,6 +3,9 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/database_formasi_pelatih.dart';
+
 class RekanTimPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -27,6 +30,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
             widget.character.assistantCoach == null)) {
       widget.character.generateCoworkersIfEmpty();
     }
+    LogikaUsiaRekanTim.syncTeammateAges(widget.character);
   }
 
   @override
@@ -39,6 +43,8 @@ class _RekanTimPageState extends State<RekanTimPage> {
       widget.character,
       happiness: widget.character.happiness,
     );
+
+    final bool isUserStarter = ((widget.character.discipline + widget.character.health) / 2) >= 65;
 
     return Scaffold(
       appBar: AppBar(
@@ -118,7 +124,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
                         color: isDark ? Colors.green.shade700 : Colors.green.shade300),
                   ),
                   child: Text(
-                    'Dikontrol oleh ${headCoach['name']!.split(" ").first}',
+                    'Dikontrol oleh ${headCoach['name']!.split(" ").first}${headCoach['formation'] != null ? " (${headCoach['formation']})" : ""}',
                     style: TextStyle(
                       fontSize: 10,
                       fontWeight: FontWeight.bold,
@@ -130,57 +136,8 @@ class _RekanTimPageState extends State<RekanTimPage> {
           ),
           const SizedBox(height: 12),
 
-          // User Card (Kamu)
-          Card(
-            elevation: 0,
-            color: isDark ? Colors.grey.shade800 : Colors.green.shade50,
-            margin: const EdgeInsets.only(bottom: 8),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(
-                  color: isDark ? Colors.grey.shade700 : Colors.green.shade200),
-            ),
-            child: ListTile(
-              leading: CircleAvatar(
-                backgroundColor: Colors.transparent,
-                backgroundImage: NetworkImage(userAvatarUrl),
-              ),
-              title: Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      widget.character.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.lightGreenAccent : Colors.green,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: Colors.green.shade700,
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                    child: const Text(
-                      'Kamu',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-              ),
-              subtitle: Text(
-                'Posisi: ${widget.character.jobName} • Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
-                style: TextStyle(
-                  color: isDark ? Colors.white70 : Colors.black54,
-                ),
-              ),
-            ),
-          ),
-
-          if (coworkers.isEmpty)
+          if (coworkers.isEmpty) ...[
+            _buildUserCard(isDark, userAvatarUrl, isUserStarter),
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 32.0),
@@ -192,31 +149,61 @@ class _RekanTimPageState extends State<RekanTimPage> {
                   ),
                 ),
               ),
-            )
-          else ...[
+            ),
+          ] else ...[
             (() {
               final bool hasTeamCategories =
                   coworkers.any((cm) => cm.containsKey('teamCategory'));
 
               if (!hasTeamCategories) {
                 return Column(
-                  children: coworkers
-                      .map((cm) => _buildCoworkerCard(cm, isDark))
-                      .toList(),
+                  children: [
+                    _buildUserCard(isDark, userAvatarUrl, isUserStarter),
+                    ...coworkers.map((cm) => _buildCoworkerCard(cm, isDark)),
+                  ],
                 );
               }
 
               final mainTeam = coworkers
-                  .where((cm) => cm['teamCategory'] == 'Tim Utama')
+                  .where((cm) => cm['role'] == 'Pemain Utama' || (cm.containsKey('teamCategory') && !cm['teamCategory'].toString().contains('Cadangan')))
                   .toList();
               final subTeam = coworkers
-                  .where((cm) => cm['teamCategory'] == 'Tim Cadangan')
+                  .where((cm) => cm['role'] == 'Pemain Cadangan' || (cm.containsKey('teamCategory') && cm['teamCategory'].toString().contains('Cadangan')))
                   .toList();
+
+              final String mainCategoryTitle = mainTeam.isNotEmpty && mainTeam.first.containsKey('teamCategory')
+                  ? mainTeam.first['teamCategory']!
+                  : LogikaUsiaRekanTim.getKategoriTimBerdasarkanUsia(usia: widget.character.age);
+
+              final int mainTeamCount = isUserStarter ? (mainTeam.length + 1) : mainTeam.length;
+              final int subTeamCount = !isUserStarter ? (subTeam.length + 1) : subTeam.length;
+
+              // Susun daftar widget pemain utama berurutan sesuai posisi (Kiper -> Bek -> Gelandang -> Penyerang)
+              final List<Map<String, dynamic>> mainPlayerItems = [];
+              if (isUserStarter) {
+                String uPos = widget.character.jobName ?? 'Atlet';
+                if (uPos.contains(' - ')) uPos = uPos.split(' - ').first.trim();
+                if (uPos.contains('(')) uPos = uPos.split('(').first.trim();
+                mainPlayerItems.add({
+                  'priority': _getPositionPriority(uPos),
+                  'widget': _buildUserCard(isDark, userAvatarUrl, true),
+                });
+              }
+
+              for (var cm in mainTeam) {
+                final pos = cm['position'] ?? 'Pemain';
+                mainPlayerItems.add({
+                  'priority': _getPositionPriority(pos),
+                  'widget': _buildCoworkerCard(cm, isDark),
+                });
+              }
+
+              mainPlayerItems.sort((a, b) => (a['priority'] as int).compareTo(b['priority'] as int));
 
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  if (mainTeam.isNotEmpty) ...[
+                  if (mainTeam.isNotEmpty || isUserStarter) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
                       child: Row(
@@ -224,7 +211,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
                           const Icon(Icons.star, color: Colors.amber, size: 18),
                           const SizedBox(width: 6),
                           Text(
-                            'Tim Utama (${mainTeam.length} Pemain)',
+                            '$mainCategoryTitle ($mainTeamCount Pemain)',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -236,9 +223,9 @@ class _RekanTimPageState extends State<RekanTimPage> {
                         ],
                       ),
                     ),
-                    ...mainTeam.map((cm) => _buildCoworkerCard(cm, isDark)),
+                    ...mainPlayerItems.map((item) => item['widget'] as Widget),
                   ],
-                  if (subTeam.isNotEmpty) ...[
+                  if (subTeam.isNotEmpty || !isUserStarter) ...[
                     const SizedBox(height: 12),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -248,7 +235,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
                               color: Colors.orange, size: 18),
                           const SizedBox(width: 6),
                           Text(
-                            'Tim Cadangan (${subTeam.length} Pemain)',
+                            '$mainCategoryTitle Cadangan ($subTeamCount Pemain)',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
@@ -260,6 +247,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
                         ],
                       ),
                     ),
+                    if (!isUserStarter) _buildUserCard(isDark, userAvatarUrl, false),
                     ...subTeam.map((cm) => _buildCoworkerCard(cm, isDark)),
                   ],
                 ],
@@ -271,6 +259,93 @@ class _RekanTimPageState extends State<RekanTimPage> {
     );
   }
 
+  int _getPositionPriority(String position) {
+    final p = position.toLowerCase();
+    if (p.contains('kiper') || p.contains('goalkeeper')) return 10;
+    if (p.contains('bek kiri') || p.contains('left back')) return 21;
+    if (p.contains('bek tengah') || p.contains('center back')) return 22;
+    if (p.contains('bek kanan') || p.contains('right back')) return 23;
+    if (p.contains('bek') || p.contains('defender')) return 24;
+    if (p.contains('gelandang bertahan') || p.contains('cdm')) return 31;
+    if (p.contains('gelandang tengah') || p.contains('cm') || p.contains('midfielder')) return 32;
+    if (p.contains('sayap kiri') || p.contains('left wing')) return 33;
+    if (p.contains('sayap kanan') || p.contains('right wing')) return 34;
+    if (p.contains('gelandang serang') || p.contains('cam')) return 35;
+    if (p.contains('gelandang')) return 36;
+    if (p.contains('penyerang sayap kiri') || p.contains('lw')) return 41;
+    if (p.contains('striker') || p.contains('penyerang tengah') || p.contains('cf')) return 42;
+    if (p.contains('penyerang sayap kanan') || p.contains('rw')) return 43;
+    if (p.contains('penyerang')) return 44;
+    return 50;
+  }
+
+  Widget _buildUserCard(bool isDark, String userAvatarUrl, bool isStarter) {
+    String userPos = widget.character.jobName ?? 'Atlet';
+    if (userPos.contains(' - ')) {
+      userPos = userPos.split(' - ').first.trim();
+    }
+    if (userPos.contains('(')) {
+      userPos = userPos.split('(').first.trim();
+    }
+    if (userPos == 'Bek Bertahan' || userPos == 'Bek') {
+      userPos = 'Bek Tengah';
+    }
+    userPos = FormasiPelatihDatabase.toPositionCode(userPos);
+    final String userTitleDisplay = '${widget.character.name} - $userPos';
+
+    return Card(
+      elevation: 0,
+      color: isDark ? Colors.grey.shade800 : Colors.green.shade50,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isDark ? Colors.green.shade600 : Colors.green.shade300,
+          width: 1.5,
+        ),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.transparent,
+          backgroundImage: NetworkImage(userAvatarUrl),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                userTitleDisplay,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isDark ? Colors.lightGreenAccent : Colors.green.shade800,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: isStarter ? Colors.green.shade700 : Colors.orange.shade700,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Text(
+                'Kamu',
+                style: TextStyle(
+                  color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+        subtitle: Text(
+          'Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
+          style: TextStyle(
+            color: isDark ? Colors.white70 : Colors.black54,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCoachCard({
     required Map<String, String> coachData,
     required String label,
@@ -278,6 +353,10 @@ class _RekanTimPageState extends State<RekanTimPage> {
   }) {
     final String name = coachData['name']!;
     final String gender = coachData['gender']!;
+    final String? formationStr = coachData['formation'];
+    final String coachNameDisplay = (label == 'Pelatih Utama' && formationStr != null && formationStr.isNotEmpty)
+        ? '$name - $formationStr'
+        : name;
     final int age = int.tryParse(coachData['age'] ?? '40') ?? 40;
     final int rel = int.tryParse(coachData['relationship'] ?? '50') ?? 50;
     final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
@@ -305,7 +384,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
           children: [
             Expanded(
               child: Text(
-                name,
+                coachNameDisplay,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.lightBlueAccent : Colors.blue,
@@ -369,6 +448,24 @@ class _RekanTimPageState extends State<RekanTimPage> {
 
     final String? category = cm['teamCategory'];
 
+    String position = cm['position'] ?? '';
+    if (position.isEmpty) {
+      final String userJob = widget.character.jobName ?? '';
+      if (userJob.contains('Basket') || userJob.contains('Guard') || userJob.contains('Center')) {
+        position = ['Point Guard', 'Shooting Guard', 'Center', 'Power Forward'][name.hashCode.abs() % 4];
+      } else if (userJob.contains('Balap') || userJob.contains('Pebalap')) {
+        position = 'Pebalap';
+      } else if (userJob.contains('Tenis') || userJob.contains('Petenis')) {
+        position = 'Petenis';
+      } else {
+        position = ['ST', 'CM', 'CB', 'GK'][name.hashCode.abs() % 4];
+      }
+    } else {
+      position = FormasiPelatihDatabase.toPositionCode(position);
+    }
+
+    final String titleDisplay = '$name - $position';
+
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
@@ -386,7 +483,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
           children: [
             Expanded(
               child: Text(
-                name,
+                titleDisplay,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : Colors.black87,
@@ -399,9 +496,9 @@ class _RekanTimPageState extends State<RekanTimPage> {
                 margin: const EdgeInsets.only(left: 6),
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: category == 'Tim Utama'
-                      ? Colors.green.shade700
-                      : Colors.orange.shade700,
+                  color: category.contains('Cadangan')
+                      ? Colors.orange.shade700
+                      : Colors.green.shade700,
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
@@ -430,7 +527,7 @@ class _RekanTimPageState extends State<RekanTimPage> {
           ],
         ),
         subtitle: Text(
-          '${cm['role'] ?? 'Pemain'} • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
+          'Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence'] ?? '60'}%',
           style: TextStyle(
             color: isDark ? Colors.white70 : Colors.black54,
           ),

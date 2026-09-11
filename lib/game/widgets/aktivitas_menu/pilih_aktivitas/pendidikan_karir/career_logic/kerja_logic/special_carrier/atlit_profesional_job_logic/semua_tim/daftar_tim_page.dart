@@ -45,7 +45,18 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
 
   int _getPositionBaseSalary(Map<String, dynamic> pos) {
     final String posTitle = pos['title'].toString();
-    final bool isSoccer = posTitle.contains('Striker') ||
+    final String pUpper = posTitle.toUpperCase();
+    final bool isSoccer = pUpper.contains('ST') ||
+        pUpper.contains('LW') ||
+        pUpper.contains('RW') ||
+        pUpper.contains('CAM') ||
+        pUpper.contains('CM') ||
+        pUpper.contains('CDM') ||
+        pUpper.contains('CB') ||
+        pUpper.contains('LB') ||
+        pUpper.contains('RB') ||
+        pUpper.contains('GK') ||
+        posTitle.contains('Striker') ||
         posTitle.contains('Gelandang') ||
         posTitle.contains('Bek') ||
         posTitle.contains('Kiper');
@@ -125,7 +136,18 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     }
 
     final String posTitle = positionItem['title'].toString();
-    final bool isSoccer = posTitle.contains('Striker') ||
+    final String pUpper = posTitle.toUpperCase();
+    final bool isSoccer = pUpper.contains('ST') ||
+        pUpper.contains('LW') ||
+        pUpper.contains('RW') ||
+        pUpper.contains('CAM') ||
+        pUpper.contains('CM') ||
+        pUpper.contains('CDM') ||
+        pUpper.contains('CB') ||
+        pUpper.contains('LB') ||
+        pUpper.contains('RB') ||
+        pUpper.contains('GK') ||
+        posTitle.contains('Striker') ||
         posTitle.contains('Gelandang') ||
         posTitle.contains('Bek') ||
         posTitle.contains('Kiper');
@@ -221,7 +243,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             final int age = widget.character.age;
             final List<int> availableContractOptions = LogikaPemainSepakbola.getOpsiDurasiKontrak(age);
             if (!availableContractOptions.contains(selectedContractYears)) {
-              selectedContractYears = 3;
+              selectedContractYears = availableContractOptions.first;
             }
 
             int getChance(int yrs) {

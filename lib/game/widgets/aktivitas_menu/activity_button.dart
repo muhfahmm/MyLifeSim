@@ -196,7 +196,7 @@ class ActivityButton extends StatelessWidget {
                         : 'Mulai bekerja untuk menghasilkan uang tunai',
                     icon: Icons.work,
                     color: Colors.green,
-                    minAge: (character.gender == 'Perempuan' && age >= 12) ? age : (age >= 13 ? age : 18),
+                    minAge: 6,
                     currentAge: age,
                     onTap: () => _executeAction(context, () {
                       Navigator.push(

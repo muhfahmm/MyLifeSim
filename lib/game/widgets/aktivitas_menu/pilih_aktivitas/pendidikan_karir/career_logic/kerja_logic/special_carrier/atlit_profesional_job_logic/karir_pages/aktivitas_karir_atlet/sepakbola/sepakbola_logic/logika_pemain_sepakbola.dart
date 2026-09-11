@@ -14,12 +14,13 @@ class LogikaPemainSepakbola {
       return 10;
     }
 
-    if (usia >= 13 && usia <= 15) {
-      if (durasiKontrakTahun == 5) return 75;
-      if (durasiKontrakTahun == 4) return 80;
-      if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 95;
+    if (usia <= 10) {
       if (durasiKontrakTahun == 1) return 95;
+      return 80;
+    } else if (usia >= 11 && usia <= 15) {
+      if (durasiKontrakTahun == 2) return 90;
+      if (durasiKontrakTahun == 1) return 95;
+      return 80;
     } else if (usia >= 16 && usia <= 20) {
       if (durasiKontrakTahun == 5) return 85;
       if (durasiKontrakTahun == 4) return 80;
@@ -50,7 +51,15 @@ class LogikaPemainSepakbola {
 
   /// Opsi durasi kontrak yang tersedia berdasarkan usia pemain
   static List<int> getOpsiDurasiKontrak(int usia) {
-    return [5, 4, 3, 2, 1];
+    if (usia <= 10) {
+      return [1];
+    } else if (usia >= 11 && usia <= 15) {
+      return [2, 1];
+    } else if (usia >= 16 && usia <= 19) {
+      return [3, 2, 1];
+    } else {
+      return [5, 4, 3, 2, 1];
+    }
   }
 
   /// Mengecek apakah sisa masa kontrak pemain masih panjang (>= 4 tahun)
@@ -84,8 +93,9 @@ class LogikaPemainSepakbola {
     required int discipline,
     required Random rand,
   }) {
-    final bool isStriker = jobTitle.contains('Striker');
-    final bool isMidfielder = jobTitle.contains('Gelandang');
+    final String jobUpper = jobTitle.toUpperCase();
+    final bool isStriker = jobUpper.contains('ST') || jobUpper.contains('LW') || jobUpper.contains('RW') || jobTitle.contains('Striker') || jobTitle.contains('Penyerang');
+    final bool isMidfielder = jobUpper.contains('CM') || jobUpper.contains('CAM') || jobUpper.contains('CDM') || jobTitle.contains('Gelandang');
 
     // 1. Rasio dasar dari usia (80%, 90%, atau 50%)
     final double baseAgeRatio = getRasioPenampilanBerdasarkanUsia(usia);
@@ -166,7 +176,18 @@ class LogikaPemainSepakbola {
   static void jalankanSimulasiMusim(Character character, List<String> events) {
     if (character.jobName == null) return;
     final String title = character.jobName!;
-    final bool isAthlete = title.contains('Striker') ||
+    final String tUpper = title.toUpperCase();
+    final bool isAthlete = tUpper.contains('ST') ||
+        tUpper.contains('LW') ||
+        tUpper.contains('RW') ||
+        tUpper.contains('CAM') ||
+        tUpper.contains('CM') ||
+        tUpper.contains('CDM') ||
+        tUpper.contains('CB') ||
+        tUpper.contains('LB') ||
+        tUpper.contains('RB') ||
+        tUpper.contains('GK') ||
+        title.contains('Striker') ||
         title.contains('Gelandang') ||
         title.contains('Bek') ||
         title.contains('Kiper') ||
