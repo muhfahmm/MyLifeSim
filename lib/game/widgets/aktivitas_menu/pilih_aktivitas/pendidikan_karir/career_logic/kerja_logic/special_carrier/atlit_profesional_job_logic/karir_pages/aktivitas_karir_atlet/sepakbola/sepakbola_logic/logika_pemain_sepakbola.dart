@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/daftar_tim/database_tim_olahraga.dart';
 import 'perpanjangan_kontrak_logic.dart';
+import 'logika_ekskul_sepakbola.dart';
 
 class LogikaPemainSepakbola {
   /// Peluang diterima kontrak berdasarkan usia pemain dan durasi kontrak
@@ -9,44 +10,84 @@ class LogikaPemainSepakbola {
     required int usia,
     required int durasiKontrakTahun,
     bool isMelamarBaru = false,
+    Character? character,
   }) {
+    int chance = 80;
     if (isMelamarBaru && usia > 25) {
-      return 10;
+      chance = 10;
+    } else if (usia <= 10) {
+      if (durasiKontrakTahun == 1) {
+        chance = 95;
+      } else {
+        chance = 80;
+      }
+    } else if (usia >= 11 && usia <= 15) {
+      if (durasiKontrakTahun == 2) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 1) {
+        chance = 95;
+      } else {
+        chance = 80;
+      }
+    } else if (usia >= 16 && usia <= 20) {
+      if (durasiKontrakTahun == 5) {
+        chance = 85;
+      } else if (durasiKontrakTahun == 4) {
+        chance = 80;
+      } else if (durasiKontrakTahun == 3) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 2) {
+        chance = 95;
+      } else if (durasiKontrakTahun == 1) {
+        chance = 95;
+      }
+    } else if (usia >= 21 && usia <= 25) {
+      if (durasiKontrakTahun == 5) {
+        chance = 70;
+      } else if (durasiKontrakTahun == 4) {
+        chance = 80;
+      } else if (durasiKontrakTahun == 3) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 2) {
+        chance = 95;
+      } else if (durasiKontrakTahun == 1) {
+        chance = 95;
+      }
+    } else if (usia >= 26 && usia <= 30) {
+      if (durasiKontrakTahun == 5) {
+        chance = 55;
+      } else if (durasiKontrakTahun == 4) {
+        chance = 80;
+      } else if (durasiKontrakTahun == 3) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 2) {
+        chance = 95;
+      } else if (durasiKontrakTahun == 1) {
+        chance = 95;
+      }
+    } else if (usia >= 31) {
+      if (durasiKontrakTahun == 5) {
+        chance = 25;
+      } else if (durasiKontrakTahun == 4) {
+        chance = 30;
+      } else if (durasiKontrakTahun == 3) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 2) {
+        chance = 90;
+      } else if (durasiKontrakTahun == 1) {
+        chance = 80;
+      }
     }
 
-    if (usia <= 10) {
-      if (durasiKontrakTahun == 1) return 95;
-      return 80;
-    } else if (usia >= 11 && usia <= 15) {
-      if (durasiKontrakTahun == 2) return 90;
-      if (durasiKontrakTahun == 1) return 95;
-      return 80;
-    } else if (usia >= 16 && usia <= 20) {
-      if (durasiKontrakTahun == 5) return 85;
-      if (durasiKontrakTahun == 4) return 80;
-      if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 95;
-      if (durasiKontrakTahun == 1) return 95;
-    } else if (usia >= 21 && usia <= 25) {
-      if (durasiKontrakTahun == 5) return 70;
-      if (durasiKontrakTahun == 4) return 80;
-      if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 95;
-      if (durasiKontrakTahun == 1) return 95;
-    } else if (usia >= 26 && usia <= 30) {
-      if (durasiKontrakTahun == 5) return 55;
-      if (durasiKontrakTahun == 4) return 80;
-      if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 95;
-      if (durasiKontrakTahun == 1) return 95;
-    } else if (usia >= 31) {
-      if (durasiKontrakTahun == 5) return 25;
-      if (durasiKontrakTahun == 4) return 30;
-      if (durasiKontrakTahun == 3) return 90;
-      if (durasiKontrakTahun == 2) return 90;
-      if (durasiKontrakTahun == 1) return 80;
+    if (character != null) {
+      return LogikaEkskulSepakbola.hitungPeluangDiterima(
+        character: character,
+        baseChance: chance,
+        isSoccer: true,
+      );
     }
-    return 80;
+
+    return chance;
   }
 
   /// Opsi durasi kontrak yang tersedia berdasarkan usia pemain
@@ -187,6 +228,9 @@ class LogikaPemainSepakbola {
         tUpper.contains('LB') ||
         tUpper.contains('RB') ||
         tUpper.contains('GK') ||
+        title.contains('Sepakbola') ||
+        title.contains('Basket') ||
+        title.contains('Pemain') ||
         title.contains('Striker') ||
         title.contains('Gelandang') ||
         title.contains('Bek') ||
@@ -208,7 +252,7 @@ class LogikaPemainSepakbola {
       teamName = title.split(' - ').last.trim();
     }
 
-    final bool isSoccer = title.contains('Striker') || title.contains('Gelandang') || title.contains('Bek') || title.contains('Kiper');
+    final bool isSoccer = title.contains('Sepakbola') || title.contains('Striker') || title.contains('Gelandang') || title.contains('Bek') || title.contains('Kiper');
 
     // Hitung total pertandingan secara dinamis dari jumlah tim yang ada di liga (Total Tim - 1 Tim User)
     final int totalTeamsInLeague = TimOlahragaDatabase.getLeagueTeamCount(teamName);

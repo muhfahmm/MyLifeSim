@@ -238,7 +238,10 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       final String sexuality = widget.classmate['sexuality'] ?? 'Heteroseksual';
                       String typeLabel = 'Teman Sekelas';
                       final bool isAthlete = widget.character.jobName != null &&
-                          (widget.character.jobName!.contains('Striker') ||
+                          (widget.character.jobName!.contains('Sepakbola') ||
+                              widget.character.jobName!.contains('Basket') ||
+                              widget.character.jobName!.contains('Pemain') ||
+                              widget.character.jobName!.contains('Striker') ||
                               widget.character.jobName!.contains('Gelandang') ||
                               widget.character.jobName!.contains('Bek') ||
                               widget.character.jobName!.contains('Kiper') ||
@@ -355,7 +358,10 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     Builder(builder: (context) {
                       String targetRole = 'Teman Sekelas';
                       final bool isAthlete = widget.character.jobName != null &&
-                          (widget.character.jobName!.contains('Striker') ||
+                          (widget.character.jobName!.contains('Sepakbola') ||
+                              widget.character.jobName!.contains('Basket') ||
+                              widget.character.jobName!.contains('Pemain') ||
+                              widget.character.jobName!.contains('Striker') ||
                               widget.character.jobName!.contains('Gelandang') ||
                               widget.character.jobName!.contains('Bek') ||
                               widget.character.jobName!.contains('Kiper') ||

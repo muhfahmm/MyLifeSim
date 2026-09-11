@@ -104,7 +104,10 @@ class LogikaUsiaRekanTim {
   static void syncTeammateAges(Character character) {
     if (character.jobName == null || character.coworkers.isEmpty) return;
     final String job = character.jobName!;
-    final bool isAthlete = job.contains('Striker') ||
+    final bool isAthlete = job.contains('Sepakbola') ||
+        job.contains('Basket') ||
+        job.contains('Pemain') ||
+        job.contains('Striker') ||
         job.contains('Gelandang') ||
         job.contains('Bek') ||
         job.contains('Kiper') ||

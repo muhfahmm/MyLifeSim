@@ -30,7 +30,10 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
   @override
   Widget build(BuildContext context) {
     final String jobNameStr = widget.character.jobName ?? '';
-    final bool isAthlete = jobNameStr.contains('Striker') ||
+    final bool isAthlete = jobNameStr.contains('Sepakbola') ||
+        jobNameStr.contains('Basket') ||
+        jobNameStr.contains('Pemain') ||
+        jobNameStr.contains('Striker') ||
         jobNameStr.contains('Gelandang') ||
         jobNameStr.contains('Bek') ||
         jobNameStr.contains('Kiper') ||

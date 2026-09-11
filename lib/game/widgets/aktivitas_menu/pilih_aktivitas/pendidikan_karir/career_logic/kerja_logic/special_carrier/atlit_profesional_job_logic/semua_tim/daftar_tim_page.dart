@@ -8,6 +8,8 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/im
 import '../daftar_tim/database_tim_olahraga.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
 import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/gaji_pemain_sepakbola.dart';
+import '../karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_ekskul_sepakbola.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/ekstrakurikuler.dart';
 
 class DaftarTimPage extends StatefulWidget {
   final Character character;
@@ -98,18 +100,24 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
       return;
     }
 
-    // Persentase peluang diterima berdasarkan Usia dan Durasi Kontrak
+    // Persentase peluang diterima berdasarkan Usia, Durasi Kontrak, dan Ekstrakurikuler
     final int age = character.age;
     final int successChance = LogikaPemainSepakbola.hitungPeluangDiterimaKontrak(
       usia: age,
       durasiKontrakTahun: contractYears,
       isMelamarBaru: true,
+      character: character,
     );
 
     final int roll = Random().nextInt(100);
     final bool isAccepted = roll < successChance;
 
     if (!isAccepted) {
+      final bool ikutEkskul = LogikaEkskulSepakbola.apakahIkutEkskulSepakbola(character);
+      final String ekskulNote = !ikutEkskul
+          ? '\n\n💡 Petunjuk: Kamu belum/tidak mengikuti Ekstrakurikuler Sepakbola di sekolah, sehingga peluang diterimamu hanya 30%!'
+          : '';
+
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -122,9 +130,31 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             ],
           ),
           content: Text(
-            'Manajemen ${teamItem['name']} menolak pengajuan kontrak selama $contractYears tahun untuk posisimu (Peluang diterima: $successChance%).\n\nCoba ajukan durasi kontrak yang lebih pendek atau coba lagi!',
+            'Manajemen ${teamItem['name']} menolak pengajuan kontrak selama $contractYears tahun untuk posisimu (Peluang diterima: $successChance%).$ekskulNote\n\nCoba ajukan durasi kontrak yang lebih pendek atau coba lagi!',
           ),
           actions: [
+            if (!ikutEkskul)
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.orange.shade700,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.sports_soccer, size: 18),
+                label: const Text('Buka Ekstrakurikuler ⚽'),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (ctx) => ExtracurricularActionPage(
+                        character: character,
+                        onRefresh: widget.onRefresh,
+                      ),
+                    ),
+                  );
+                },
+              ),
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: const Text('Tutup'),
@@ -273,6 +303,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                 usia: age,
                 durasiKontrakTahun: yrs,
                 isMelamarBaru: true,
+                character: widget.character,
               );
             }
 

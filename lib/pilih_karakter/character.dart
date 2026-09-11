@@ -978,7 +978,10 @@ class Character {
   void setJob(String name, int salary) {
     jobName = name;
     jobSalary = salary;
-    final bool isAthleteJob = name.contains('Striker') ||
+    final bool isAthleteJob = name.contains('Sepakbola') ||
+        name.contains('Basket') ||
+        name.contains('Pemain') ||
+        name.contains('Striker') ||
         name.contains('Gelandang') ||
         name.contains('Bek') ||
         name.contains('Kiper') ||
@@ -1042,6 +1045,9 @@ class Character {
         jUpper.contains('LB') ||
         jUpper.contains('RB') ||
         jUpper.contains('GK') ||
+        job.contains('Sepakbola') ||
+        job.contains('Basket') ||
+        job.contains('Pemain') ||
         job.contains('Striker') ||
         job.contains('Gelandang') ||
         job.contains('Bek') ||
@@ -1122,6 +1128,7 @@ class Character {
           jUpper.contains('LB') ||
           jUpper.contains('RB') ||
           jUpper.contains('GK') ||
+          job.contains('Sepakbola') ||
           job.contains('Striker') ||
           job.contains('Gelandang') ||
           job.contains('Bek') ||
@@ -2652,11 +2659,14 @@ class Character {
       if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (!supervisor!.containsKey('job')) {
         final bool isAthlete = jobName != null &&
-            (jobName!.contains('Striker') ||
+            (jobName!.contains('Sepakbola') ||
+                jobName!.contains('Basket') ||
+                jobName!.contains('Striker') ||
                 jobName!.contains('Gelandang') ||
                 jobName!.contains('Bek') ||
                 jobName!.contains('Kiper') ||
                 jobName!.contains('Pemain Olahraga') ||
+                jobName!.contains('Pemain') ||
                 jobName!.contains('Atlet') ||
                 jobName!.contains('Atlit'));
         final String supJob = isAthlete

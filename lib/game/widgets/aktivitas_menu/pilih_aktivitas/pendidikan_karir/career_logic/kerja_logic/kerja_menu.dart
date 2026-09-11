@@ -58,7 +58,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
 
     final String job = character.jobName ?? '';
-    if (job.contains('Pebalap')) {
+    if (job.contains('Sepakbola') || job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper')) {
+      return AtlitActivitiesPage(character: character, onRefresh: refresh);
+    } else if (job.contains('Pebalap')) {
       return AtlitBalapActivitiesPage(character: character, onRefresh: refresh);
     } else if (job.contains('Basket') || job.contains('Point Guard') || job.contains('Shooting Guard') || job.contains('Center')) {
       return AtlitBasketActivitiesPage(character: character, onRefresh: refresh);
@@ -153,7 +155,10 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     final bool isProPlayer = job.startsWith('Pro Player Esport');
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
 
-    final bool isAthlete = job.contains('Striker') ||
+    final bool isAthlete = job.contains('Sepakbola') ||
+        job.contains('Basket') ||
+        job.contains('Pemain') ||
+        job.contains('Striker') ||
         job.contains('Gelandang') ||
         job.contains('Bek') ||
         job.contains('Kiper') ||
@@ -168,7 +173,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     if (isAthlete) {
       // Tentukan jumlah pemain utama & cadangan
-      final bool isSoccer = job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper');
+      final bool isSoccer = job.contains('Sepakbola') || job.contains('Striker') || job.contains('Gelandang') || job.contains('Bek') || job.contains('Kiper');
       final bool isBasketball = job.contains('Guard') || job.contains('Center');
 
       final int mainTeamCount = isSoccer ? 10 : (isBasketball ? 4 : 4);
@@ -346,7 +351,10 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
 
     final String jobTitle = character.jobName ?? '';
-    final bool isAthlete = jobTitle.contains('Striker') ||
+    final bool isAthlete = jobTitle.contains('Sepakbola') ||
+        jobTitle.contains('Basket') ||
+        jobTitle.contains('Pemain') ||
+        jobTitle.contains('Striker') ||
         jobTitle.contains('Gelandang') ||
         jobTitle.contains('Bek') ||
         jobTitle.contains('Kiper') ||
@@ -556,7 +564,10 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         team = jobTitle.substring(jobTitle.indexOf('(') + 1, jobTitle.indexOf(')'));
       }
 
-      final bool isAthlete = jobTitle.contains('Striker') ||
+      final bool isAthlete = jobTitle.contains('Sepakbola') ||
+          jobTitle.contains('Basket') ||
+          jobTitle.contains('Pemain') ||
+          jobTitle.contains('Striker') ||
           jobTitle.contains('Gelandang') ||
           jobTitle.contains('Bek') ||
           jobTitle.contains('Kiper') ||
