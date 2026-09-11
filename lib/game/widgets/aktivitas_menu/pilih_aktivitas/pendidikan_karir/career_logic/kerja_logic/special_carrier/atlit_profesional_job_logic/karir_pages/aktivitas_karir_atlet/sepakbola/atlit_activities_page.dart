@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import 'sepakbola_logic/logika_usia_rekan_tim.dart';
 
 // Import action files per modul/folder
 import 'action_menu/latihan_kondisi_fisik/finishing_drill_action.dart';
@@ -83,6 +84,33 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
     final int fitnessVal = widget.character.health;
     final String statusStarter = ((widget.character.discipline + widget.character.health) / 2) >= 65 ? 'Pemain Utama (Starter) ⭐' : 'Pemain Cadangan 👥';
 
+    // Hitung Kategori Tim Akademi (misal: U-12, U-16, U-20)
+    final String teamCategory = LogikaUsiaRekanTim.getKategoriTimBerdasarkanUsia(usia: widget.character.age);
+    String displayJobName = widget.character.jobName ?? 'Atlet Profesional';
+    if (teamCategory != 'Tim Utama') {
+      final String uTag = teamCategory.replaceAll('Tim ', '');
+      if (!displayJobName.contains(uTag)) {
+        displayJobName = '$displayJobName $uTag';
+      }
+    }
+
+    // Hitung total statistik (Musim lalu + Musim berjalan saat ini)
+    int totalAppearances = 0;
+    int totalGoals = 0;
+    int totalAssists = 0;
+
+    for (var item in widget.character.athleteSeasonStats) {
+      totalAppearances += (item['appearances'] as num?)?.toInt() ?? 0;
+      totalGoals += (item['goals'] as num?)?.toInt() ?? 0;
+      totalAssists += (item['assists'] as num?)?.toInt() ?? 0;
+    }
+    final currentStats = widget.character.currentAthleteStats;
+    if (currentStats != null) {
+      totalAppearances += (currentStats['appearances'] as num?)?.toInt() ?? 0;
+      totalGoals += (currentStats['goals'] as num?)?.toInt() ?? 0;
+      totalAssists += (currentStats['assists'] as num?)?.toInt() ?? 0;
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Menu Karir Atlet ⚽🏆'),
@@ -114,7 +142,7 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              widget.character.jobName ?? 'Atlet Profesional',
+                              displayJobName,
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 16,
@@ -133,6 +161,28 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
                   const SizedBox(height: 14),
                   const Divider(height: 1),
                   const SizedBox(height: 12),
+
+                  // BARIS STATISTIK PERTANDINGAN (Penampilan, Gol, Assist)
+                  Container(
+                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.white.withValues(alpha: 0.8),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.green.shade100),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem('Penampilan', '$totalAppearances Laga', Icons.sports_rounded, Colors.indigo, isDark),
+                        Container(height: 24, width: 1, color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                        _buildStatItem('Gol', '$totalGoals Gol', Icons.sports_score_rounded, Colors.green.shade700, isDark),
+                        Container(height: 24, width: 1, color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                        _buildStatItem('Assist', '$totalAssists Assist', Icons.alt_route_rounded, Colors.orange.shade800, isDark),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -514,4 +564,37 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
       ),
     );
   }
+
+  Widget _buildStatItem(String label, String val, IconData icon, Color color, bool isDark) {
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: color),
+            const SizedBox(width: 4),
+            Text(
+              val,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            color: isDark ? Colors.white54 : Colors.grey.shade600,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+
