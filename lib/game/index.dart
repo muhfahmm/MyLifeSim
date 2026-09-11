@@ -4261,8 +4261,34 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
 
                                 (() {
                                   if (_character.jobName != null) {
+                                    final String rawJob = _character.jobName!;
+                                    String displayJob = rawJob;
+                                    if (rawJob.contains(' - ')) {
+                                      final parts = rawJob.split(' - ');
+                                      final pos = parts[0].trim();
+                                      final team = parts.sublist(1).join(' - ').trim();
+                                      final pUpper = pos.toUpperCase();
+                                      if (pUpper == 'ST' ||
+                                          pUpper == 'LW' ||
+                                          pUpper == 'RW' ||
+                                          pUpper == 'CAM' ||
+                                          pUpper == 'CM' ||
+                                          pUpper == 'CDM' ||
+                                          pUpper == 'CB' ||
+                                          pUpper == 'LB' ||
+                                          pUpper == 'RB' ||
+                                          pUpper == 'GK' ||
+                                          pos.contains('Striker') ||
+                                          pos.contains('Gelandang') ||
+                                          pos.contains('Bek') ||
+                                          pos.contains('Kiper')) {
+                                        displayJob = 'Pemain Sepakbola - $team';
+                                      } else if (pos.contains('Guard') || pos.contains('Basket')) {
+                                        displayJob = 'Pemain Basket - $team';
+                                      }
+                                    }
                                     return Text(
-                                      'Pekerjaan: ${_character.jobName}',
+                                      'Pekerjaan: $displayJob',
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
                                     );
                                   } else if (_character.univMajor != null) {

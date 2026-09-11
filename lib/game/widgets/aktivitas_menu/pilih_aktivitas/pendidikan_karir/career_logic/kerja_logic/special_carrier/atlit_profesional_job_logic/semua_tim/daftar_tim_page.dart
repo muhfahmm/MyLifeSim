@@ -156,7 +156,29 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
         ? GajiPemainSepakbolaLogic.hitungGajiBerdasarkanUsia(usia: character.age)
         : (positionItem['baseSalary'] as int);
     final int finalSalary = (baseSalary * _salaryMultiplier).round();
-    final String fullJobTitle = "${positionItem['title']} - ${teamItem['name']}";
+
+    final String sportNameStr = (widget.sportItem['name'] as String? ?? '').toLowerCase();
+    String jobRoleName = positionItem['title'].toString();
+    if (sportNameStr.contains('sepakbola')) {
+      jobRoleName = 'Pemain Sepakbola';
+    } else if (sportNameStr.contains('basket')) {
+      jobRoleName = 'Pemain Basket';
+    } else if (sportNameStr.contains('balap')) {
+      jobRoleName = 'Pebalap';
+    } else if (sportNameStr.contains('tenis')) {
+      jobRoleName = 'Petenis';
+    } else if (sportNameStr.contains('tinju') || sportNameStr.contains('mma')) {
+      final posLower = positionItem['title'].toString().toLowerCase();
+      if (posLower.contains('tinju') || posLower.contains('boxer')) {
+        jobRoleName = 'Petinju';
+      } else {
+        jobRoleName = 'Petarung MMA';
+      }
+    } else if (sportNameStr.contains('renang')) {
+      jobRoleName = 'Perenang';
+    }
+
+    final String fullJobTitle = "$jobRoleName - ${teamItem['name']}";
 
     setState(() {
       character.setJob(fullJobTitle, finalSalary);

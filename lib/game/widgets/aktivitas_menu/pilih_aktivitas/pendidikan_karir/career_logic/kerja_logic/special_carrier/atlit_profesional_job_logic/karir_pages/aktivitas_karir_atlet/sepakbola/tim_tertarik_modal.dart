@@ -144,7 +144,25 @@ class _TimTertarikDialogState extends State<_TimTertarikDialog> {
   }
 
   void _acceptOffer(Map<String, dynamic> offer) {
-    final String fullJobTitle = "${offer['positionTitle']} - ${offer['teamName']}";
+    String roleName = offer['positionTitle'] as String? ?? 'Pemain Sepakbola';
+    final String rUpper = roleName.toUpperCase();
+    if (rUpper == 'ST' ||
+        rUpper == 'LW' ||
+        rUpper == 'RW' ||
+        rUpper == 'CAM' ||
+        rUpper == 'CM' ||
+        rUpper == 'CDM' ||
+        rUpper == 'CB' ||
+        rUpper == 'LB' ||
+        rUpper == 'RB' ||
+        rUpper == 'GK' ||
+        roleName.contains('Striker') ||
+        roleName.contains('Gelandang') ||
+        roleName.contains('Bek') ||
+        roleName.contains('Kiper')) {
+      roleName = 'Pemain Sepakbola';
+    }
+    final String fullJobTitle = "$roleName - ${offer['teamName']}";
     final int salary = offer['salary'] as int;
     final int years = offer['contractYears'] as int;
 
