@@ -6,6 +6,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/action_menu.dar
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 class RelationshipButton extends StatefulWidget {
   final Character character;
@@ -206,6 +207,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  _buildFamilyWealthCard(context, character),
+
                   // ============================================
                   // 1. BAGIAN ORANGTUA
                   // ============================================
@@ -1468,6 +1471,150 @@ class _RelationshipButtonState extends State<RelationshipButton> {
             ],
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildSalaryChip(String label, int amount, bool isDark) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: isDark ? Colors.black26 : Colors.white.withValues(alpha: 0.7),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
+      ),
+      child: Text(
+        '$label: ${CurrencySettings.format(amount)}',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: isDark ? Colors.white70 : Colors.black87,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFamilyWealthCard(BuildContext context, Character character) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final int userSalary = character.jobSalary ?? 0;
+
+    int fatherSalary = 0;
+    if (character.fatherName != null && !character.isFatherDeceased) {
+      final fJob = character.getNPCJobInfo(character.fatherName!, 'Ayah');
+      fatherSalary = fJob['salary'] as int? ?? 0;
+    }
+
+    int motherSalary = 0;
+    if (character.motherName != null && !character.isMotherDeceased) {
+      final mJob = character.getNPCJobInfo(character.motherName!, 'Ibu');
+      motherSalary = mJob['salary'] as int? ?? 0;
+    }
+
+    int stepFatherSalary = 0;
+    if (character.stepFatherName != null && !character.isStepFatherDeceased) {
+      final sfJob = character.getNPCJobInfo(character.stepFatherName!, 'Ayah Tiri');
+      stepFatherSalary = sfJob['salary'] as int? ?? 0;
+    }
+
+    int stepMotherSalary = 0;
+    if (character.stepMotherName != null && !character.isStepMotherDeceased) {
+      final smJob = character.getNPCJobInfo(character.stepMotherName!, 'Ibu Tiri');
+      stepMotherSalary = smJob['salary'] as int? ?? 0;
+    }
+
+    int siblingsTotalSalary = 0;
+    int livingSiblingsCount = 0;
+    for (var sib in character.siblings) {
+      final bool isDeceased = sib['isDeceased'] == 'true';
+      if (!isDeceased && sib['name'] != null) {
+        final sJob = character.getNPCJobInfo(sib['name']!, sib['relation'] ?? 'Saudara');
+        siblingsTotalSalary += (sJob['salary'] as int? ?? 0);
+        livingSiblingsCount++;
+      }
+    }
+
+    final int totalFamilySalary = userSalary + fatherSalary + motherSalary + stepFatherSalary + stepMotherSalary + siblingsTotalSalary;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: isDark
+              ? [const Color(0xFF0F382C), const Color(0xFF134E4A)]
+              : [const Color(0xFFECFDF5), const Color(0xFFE0F2FE)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? const Color(0xFF059669) : const Color(0xFF6EE7B7),
+          width: 1.2,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: isDark ? const Color(0xFF065F46) : const Color(0xFFA7F3D0),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.account_balance_wallet, color: Color(0xFF059669), size: 22),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      '💰 Total Pendapatan Keluarga',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    Text(
+                      '${CurrencySettings.format(totalFamilySalary)} / bulan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.tealAccent : Colors.green.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Divider(height: 1, thickness: 0.8, color: isDark ? Colors.white24 : Colors.black12),
+          const SizedBox(height: 8),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              _buildSalaryChip('Anda', userSalary, isDark),
+              if (fatherSalary > 0) _buildSalaryChip('Ayah', fatherSalary, isDark),
+              if (motherSalary > 0) _buildSalaryChip('Ibu', motherSalary, isDark),
+              if (stepFatherSalary > 0) _buildSalaryChip('Ayah Tiri', stepFatherSalary, isDark),
+              if (stepMotherSalary > 0) _buildSalaryChip('Ibu Tiri', stepMotherSalary, isDark),
+              if (siblingsTotalSalary > 0) _buildSalaryChip('Saudara ($livingSiblingsCount org)', siblingsTotalSalary, isDark),
+            ],
+          ),
+        ],
       ),
     );
   }

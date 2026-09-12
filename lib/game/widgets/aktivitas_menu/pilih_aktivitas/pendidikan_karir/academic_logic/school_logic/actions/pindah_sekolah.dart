@@ -22,11 +22,12 @@ class PindahSekolahActionPage extends StatelessWidget {
       final success = Random().nextInt(100) < parentRel;
 
       if (success) {
-        character.happiness = (character.happiness + 15).clamp(0, 100);
+        final int happyBoost = 10 + Random().nextInt(11); // 10-20%
+        character.happiness = (character.happiness + happyBoost).clamp(0, 100);
         character.intelligence = (character.intelligence + 10).clamp(0, 100);
         character.classmates.clear(); // Generate new classmates
         onRefresh();
-        _showOutcome(context, 'Permintaan Disetujui!', 'Orang tuamu menyetujui permintaanmu untuk pindah ke Sekolah Swasta Unggulan! Kebahagiaan dan Kecerdasanmu meningkat.');
+        _showOutcome(context, 'Permintaan Disetujui!', 'Orang tuamu menyetujui permintaanmu untuk pindah ke Sekolah Swasta Unggulan! Kebahagiaan (+ $happyBoost%) dan Kecerdasan (+10%) meningkat.');
       } else {
         character.happiness = (character.happiness - 10).clamp(0, 100);
         onRefresh();
@@ -34,10 +35,11 @@ class PindahSekolahActionPage extends StatelessWidget {
       }
     } else {
       // Public school
+      final int happyBoost = 5 + Random().nextInt(6); // 5-10%
       character.classmates.clear(); // Generate new classmates
-      character.happiness = (character.happiness + 5).clamp(0, 100);
+      character.happiness = (character.happiness + happyBoost).clamp(0, 100);
       onRefresh();
-      _showOutcome(context, 'Pindah Sekolah Negeri', 'Kamu berhasil pindah ke Sekolah Negeri baru. Kamu bersiap-siap bertemu dengan teman sekelas baru.');
+      _showOutcome(context, 'Pindah Sekolah Negeri', 'Kamu berhasil pindah ke Sekolah Negeri baru. Kebahagiaanmu meningkat (+$happyBoost%). Kamu bersiap-siap bertemu dengan teman sekelas baru.');
     }
   }
 

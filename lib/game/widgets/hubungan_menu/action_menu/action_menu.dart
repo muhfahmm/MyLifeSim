@@ -3910,13 +3910,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                           final String majorName = sampleMajors[widget.targetName.hashCode.abs() % sampleMajors.length];
                           detailSchool = 'Kuliah ($majorName)';
                         } else {
-                          detailSchool = 'Pengangguran / Lulus';
+                          detailSchool = 'Tamat Pendidikan';
                         }
                       }
 
+                      final int salVal = jobInfo['salary'] as int? ?? 0;
                       final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
                           ? 'Status Pendidikan: $detailSchool'
-                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
+                          : salVal > 0
+                              ? 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(salVal)}/bln)'
+                              : 'Pekerjaan: ${jobInfo['job']}';
 
                       // --- Status Hubungan Anak ---
                       String? childPartnerName;

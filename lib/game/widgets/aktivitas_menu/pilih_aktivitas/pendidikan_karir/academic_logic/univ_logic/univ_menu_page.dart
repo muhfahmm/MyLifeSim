@@ -475,6 +475,8 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
               major: major,
               level: level,
               onPassSuccess: () {
+                final int happyBoost = 5 + Random().nextInt(6); // 5-10%
+                widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
                 widget.character.univName = chosenUniv;
                 widget.character.univMajor = '$major ($level - Negeri)';
                 widget.character.educationHistory[level] = 'Belum Lulus';
@@ -594,6 +596,8 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     final String level = _determineCurrentRegisterLevel();
 
     if (success) {
+      final int happyBoost = 10 + Random().nextInt(11); // 10-20%
+      widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
       widget.character.univName = chosenUniv;
       widget.character.univMajor = '$major ($level - Swasta)';
       widget.character.educationHistory[level] = 'Belum Lulus';
@@ -604,7 +608,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Pendaftaran Disetujui! 💸'),
-          content: Text('Orang tuamu menyetujui membiayai kuliahmu di $chosenUniv untuk jenjang $level jurusan $major dengan biaya \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun.'),
+          content: Text('Orang tuamu menyetujui membiayai kuliahmu di $chosenUniv untuk jenjang $level jurusan $major dengan biaya \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun. Kebahagiaanmu meningkat (+$happyBoost%).'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
         ),
       );
@@ -624,6 +628,8 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     final String level = _determineCurrentRegisterLevel();
     if (widget.character.money >= annualTuition) {
       widget.character.money -= annualTuition;
+      final int happyBoost = 10 + Random().nextInt(11); // 10-20%
+      widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
       widget.character.univName = chosenUniv;
       widget.character.univMajor = '$major ($level - Swasta)';
       widget.character.educationHistory[level] = 'Belum Lulus';
@@ -634,7 +640,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         context: context,
         builder: (c) => AlertDialog(
           title: const Text('Pendaftaran Berhasil! 🎓'),
-          content: Text('Kamu berhasil membayar biaya kuliah tahun pertama secara mandiri di $chosenUniv sebesar \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} untuk jenjang $level jurusan $major.'),
+          content: Text('Kamu berhasil membayar biaya kuliah tahun pertama secara mandiri di $chosenUniv sebesar \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+$happyBoost%).'),
           actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
         ),
       );

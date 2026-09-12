@@ -101,14 +101,15 @@ class BeriTahuOrangTua {
             'text': 'Setuju pergi bersama orang tua',
             'action': () {
               character.health = 100;
-              character.happiness = (character.happiness - 15).clamp(0, 100);
-              _modifyParentRelationships(character, 5);
+              final int happyBoost = 25 + Random().nextInt(11); // 25-35%
+              character.happiness = (character.happiness + happyBoost).clamp(0, 100);
+              _modifyParentRelationships(character, 15);
               _addLongTermDebuff(character, 'Stigma Keluarga');
 
               _showOutcomeDialog(
                 context,
                 'Pergi ke Klinik 🏥',
-                'Orang tuamu membawamu ke dokter dan menanggung seluruh biayanya. Namun, mereka terus menanyai siapa pasanganmu sepanjang perjalanan (Kesehatan Sembuh Total, -15% Kebahagiaan, +5% Hubungan Orang Tua, Status: Stigma Keluarga).',
+                'Orang tuamu membawamu ke dokter dan menanggung seluruh biayanya. Pengobatan berhasil dan perhatian orang tuamu membuatmu merasa tenang (Kesehatan Sembuh Total, +$happyBoost% Kebahagiaan, +15% Hubungan Orang Tua).',
                 onComplete
               );
             }

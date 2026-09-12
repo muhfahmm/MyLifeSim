@@ -99,12 +99,12 @@ class DokterUtils {
 
     final random = Random();
     if (ringanList.any((key) => nameLower.contains(key))) {
-      return 10 + random.nextInt(6); // 10-15
+      return 25 + random.nextInt(11); // 25-35%
     } else if (beratList.any((key) => nameLower.contains(key))) {
-      return 25 + random.nextInt(6); // 25-30
+      return 25 + random.nextInt(11); // 25-35%
     } else {
       // Sedang
-      return 15 + random.nextInt(11); // 15-25
+      return 25 + random.nextInt(11); // 25-35%
     }
   }
 

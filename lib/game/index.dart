@@ -44,6 +44,8 @@ import 'package:mylifesim/game/widgets/character_progression/character_progressi
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_dipecat_modal.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_pensiun_modal.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -596,6 +598,43 @@ class _GameScreenState extends State<GameScreen> {
     }
   }
 
+  void _checkFamilyFiredEvent(VoidCallback onDone) {
+    if (_character.pendingFiredFamilyEvent != null) {
+      final firedData = Map<String, String>.from(_character.pendingFiredFamilyEvent!);
+      _character.pendingFiredFamilyEvent = null;
+
+      KeluargaDipecatModal.show(
+        context: context,
+        character: _character,
+        familyName: firedData['name'] ?? 'Keluarga',
+        familyRelation: firedData['relation'] ?? 'Keluarga',
+        previousJob: firedData['job'] ?? 'Pekerjaan',
+        onComplete: onDone,
+      );
+    } else {
+      onDone();
+    }
+  }
+
+  void _checkFamilyRetireEvent(VoidCallback onDone) {
+    if (_character.pendingRetireFamilyEvent != null) {
+      final retireData = Map<String, dynamic>.from(_character.pendingRetireFamilyEvent!);
+      _character.pendingRetireFamilyEvent = null;
+
+      KeluargaPensiunModal.show(
+        context: context,
+        character: _character,
+        familyName: retireData['name'] ?? 'Keluarga',
+        familyRelation: retireData['relation'] ?? 'Keluarga',
+        previousJob: retireData['job'] ?? 'Pekerjaan',
+        pensionSalary: retireData['pensionSalary'] ?? 0,
+        onComplete: onDone,
+      );
+    } else {
+      onDone();
+    }
+  }
+
   // --- LOGIKA TAMBAH UMUR (DENGAN KELAHIRAN & KEGUGURAN) ---
   void _runAgeUpSequence(List<String> sicknessEvents, VoidCallback onFinish) {
     _handleSicknessSequence(sicknessEvents, () {
@@ -603,11 +642,15 @@ class _GameScreenState extends State<GameScreen> {
         _checkAthleteContractNotice(() {
           _checkParentArgumentEvent(() {
             _checkPendingDivorceFeedback(() {
-              _checkAdikRequestMoney(() {
-                _checkSchoolEnrollmentOptions(() {
-                  _checkChildrenEvents(() {
-                    _checkGraduationOptions(() {
-                      _checkEsportPromotion(onFinish);
+              _checkFamilyFiredEvent(() {
+                _checkFamilyRetireEvent(() {
+                  _checkAdikRequestMoney(() {
+                    _checkSchoolEnrollmentOptions(() {
+                      _checkChildrenEvents(() {
+                        _checkGraduationOptions(() {
+                          _checkEsportPromotion(onFinish);
+                        });
+                      });
                     });
                   });
                 });
@@ -906,23 +949,30 @@ class _GameScreenState extends State<GameScreen> {
     
     if (isCare) {
       _character.health = (_character.health + 30).clamp(0, 100);
+      final int happyBoost = 10 + random.nextInt(6); // 10-15%
+      _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
       if (_character.motherRelationship != null) {
         _character.motherRelationship = (_character.motherRelationship! + 10).clamp(0, 100);
       }
       if (_character.fatherRelationship != null) {
         _character.fatherRelationship = (_character.fatherRelationship! + 10).clamp(0, 100);
       }
+      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+        _character,
+        happiness: _character.happiness,
+      );
       setState(() {});
       
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Respons Orang Tua ❤️'),
-          content: const Text('Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +10% Hubungan Orang Tua).'),
+          content: Text('Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +$happyBoost% Kebahagiaan, +10% Hubungan Orang Tua).'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
+                if (mounted) setState(() {});
                 onDone();
               },
               child: const Text('Mengerti'),
@@ -932,17 +982,24 @@ class _GameScreenState extends State<GameScreen> {
       );
     } else {
       _character.health = (_character.health + 5).clamp(0, 100);
+      final int happyBoost = 10 + random.nextInt(6); // 10-15%
+      _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
+      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+        _character,
+        happiness: _character.happiness,
+      );
       setState(() {});
       
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Respons Orang Tua 🏠'),
-          content: const Text('Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan).'),
+          content: Text('Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan, +$happyBoost% Kebahagiaan).'),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
+                if (mounted) setState(() {});
                 onDone();
               },
               child: const Text('Mengerti'),
@@ -2044,7 +2101,9 @@ class _GameScreenState extends State<GameScreen> {
                     final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
                     _character.educationHistory[levelKey] = 'Belum Lulus';
                     _character.schoolType = 'Negeri';
-                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun.');
+                    final int happyBoost = 5 + Random().nextInt(6); // 5-10%
+                    _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
+                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
                     _character.classmates.clear();
                     _character.sdTeachers.clear();
                     _character.smpTeachers.clear();
@@ -2053,6 +2112,10 @@ class _GameScreenState extends State<GameScreen> {
                     _character.bkTeacher = null;
                     SchoolGenerator.generateClassmatesIfEmpty(_character);
                     SchoolGenerator.generateTeachersIfEmpty(_character);
+                    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                      _character,
+                      happiness: _character.happiness,
+                    );
                     setState(() {});
                     processKidsEnrollment(0, onDone);
                   },
@@ -2071,7 +2134,9 @@ class _GameScreenState extends State<GameScreen> {
                     final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
                     _character.educationHistory[levelKey] = 'Belum Lulus';
                     _character.schoolType = 'Swasta';
-                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun.');
+                    final int happyBoost = 10 + Random().nextInt(11); // 10-20%
+                    _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
+                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
                     _character.classmates.clear();
                     _character.sdTeachers.clear();
                     _character.smpTeachers.clear();
@@ -2080,6 +2145,10 @@ class _GameScreenState extends State<GameScreen> {
                     _character.bkTeacher = null;
                     SchoolGenerator.generateClassmatesIfEmpty(_character);
                     SchoolGenerator.generateTeachersIfEmpty(_character);
+                    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                      _character,
+                      happiness: _character.happiness,
+                    );
                     setState(() {});
                     processKidsEnrollment(0, onDone);
                   },

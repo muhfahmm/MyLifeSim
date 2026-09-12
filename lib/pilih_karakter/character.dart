@@ -13,20 +13,16 @@ import 'package:mylifesim/avatar/skin_color_inheritance.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/idol_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
 // Import Atribut Karakter yang Dipisah
 import 'package:mylifesim/pilih_karakter/atribut_karakter/disiplin.dart';
-import 'package:mylifesim/pilih_karakter/atribut_karakter/kesuburan.dart';
 import 'package:mylifesim/pilih_karakter/atribut_karakter/kebahagiaan.dart';
 import 'package:mylifesim/pilih_karakter/atribut_karakter/kesehatan.dart';
-import 'package:mylifesim/pilih_karakter/atribut_karakter/karma.dart';
-import 'package:mylifesim/pilih_karakter/atribut_karakter/penampilan.dart';
-import 'package:mylifesim/pilih_karakter/atribut_karakter/seksualitas.dart';
 import 'package:mylifesim/pilih_karakter/atribut_karakter/kecerdasan.dart';
-import 'package:mylifesim/pilih_karakter/atribut_karakter/tekad.dart';
 
 // Export agar file lain yang mengimpor character.dart tetap mendapatkan ekstensi atribut
 export 'package:mylifesim/pilih_karakter/atribut_karakter/disiplin.dart';
@@ -132,6 +128,8 @@ class Character {
   String? motherName;        // Nama Ibu Kandung
   String? stepFatherName;    // Nama Ayah Tiri (jika ada)
   String? stepMotherName;    // Nama Ibu Tiri (jika ada)
+  Map<String, String>? pendingFiredFamilyEvent; // Flag event anggota keluarga yang dipecat
+  Map<String, dynamic>? pendingRetireFamilyEvent; // Flag event anggota keluarga yang pensiun
   int birthOrder;            // Urutan kelahiran (1 = anak pertama, 2 = kedua, dst)
   List<Map<String, String>> siblings; // Daftar saudara [{name: '...', gender: 'Laki-laki', relation: '...', relationship: '50', age: '2', isDeceased: 'false'}]
   List<Map<String, String>> extendedFamily = []; // Daftar kakek, nenek, paman, bibi, sepupu [{name: '...', gender: 'Laki-laki', relation: 'Kakek (dari Ayah)', relationship: '50', age: '70', isDeceased: 'false'}]
@@ -280,6 +278,7 @@ class Character {
   Map<String, String>? pendingParentArgumentEvent; // info keributan orang tua {fatherName, motherName, relation}
   int fatherDivorceYearsSince = 0; // berapa tahun sejak ayah cerai (untuk jeda menikah lagi)
   int motherDivorceYearsSince = 0; // berapa tahun sejak ibu cerai (untuk jeda menikah lagi)
+  int parentUnemploymentYears = 0; // berapa tahun ortu menganggur (untuk eskalasi perceraian ortu)
 
   void checkParentArgumentTrigger(Random random, int chancePercentage) {
     // Fitur keributan / dialog orang tua dihapus
@@ -642,6 +641,32 @@ class Character {
     }
   }
 
+  void updateTargetRelationship(String targetName, String targetRole, int delta) {
+    final String nameLower = targetName.toLowerCase();
+    final String roleLower = targetRole.toLowerCase();
+
+    int currentVal = 50;
+    if (fatherName != null && (fatherName!.toLowerCase() == nameLower || roleLower.contains('ayah'))) {
+      currentVal = fatherRelationship ?? 50;
+    } else if (motherName != null && (motherName!.toLowerCase() == nameLower || roleLower.contains('ibu'))) {
+      currentVal = motherRelationship ?? 50;
+    } else if (stepFatherName != null && (stepFatherName!.toLowerCase() == nameLower || roleLower.contains('ayah tiri'))) {
+      currentVal = stepFatherRelationship ?? 50;
+    } else if (stepMotherName != null && (stepMotherName!.toLowerCase() == nameLower || roleLower.contains('ibu tiri'))) {
+      currentVal = stepMotherRelationship ?? 50;
+    } else {
+      for (var sib in siblings) {
+        if (sib['name'] != null && (sib['name']!.toLowerCase() == nameLower || nameLower.contains(sib['name']!.toLowerCase()))) {
+          currentVal = int.tryParse(sib['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
+    }
+
+    int newVal = (currentVal + delta).clamp(0, 100);
+    updateRelationshipValue(targetName, newVal);
+  }
+
   void addPartnerToFreeSlot(Map<String, String> val) {
     final bool isSecret = val['relation'] == 'Pacar (Selingkuhan)' || val['relation'] == 'Pacar (Rahasia)';
     if (isSecret) {
@@ -901,19 +926,17 @@ class Character {
   }
 
   void addCarToGarage(Map<String, dynamic> car, int buyAge) {
-    if (garasiMobil == null) {
-      garasiMobil = {
-        'koleksi': [],
-        'showroom': [],
-        'riwayat': [],
-        'statistik': {
-          'totalMobil': 0,
-          'totalNilai': 0,
-          'pendapatanShowroom': 0,
-          'pengunjung': 0,
-        },
-      };
-    }
+    garasiMobil ??= {
+      'koleksi': [],
+      'showroom': [],
+      'riwayat': [],
+      'statistik': {
+        'totalMobil': 0,
+        'totalNilai': 0,
+        'pendapatanShowroom': 0,
+        'pengunjung': 0,
+      },
+    };
     
     final List koleksi = garasiMobil!['koleksi'] ?? [];
     final List riwayat = garasiMobil!['riwayat'] ?? [];
@@ -941,19 +964,17 @@ class Character {
   }
 
   void addMotorToGarage(Map<String, dynamic> motor, int buyAge) {
-    if (garasiMotor == null) {
-      garasiMotor = {
-        'koleksi': [],
-        'showroom': [],
-        'riwayat': [],
-        'statistik': {
-          'totalMotor': 0,
-          'totalNilai': 0,
-          'pendapatanShowroom': 0,
-          'pengunjung': 0,
-        },
-      };
-    }
+    garasiMotor ??= {
+      'koleksi': [],
+      'showroom': [],
+      'riwayat': [],
+      'statistik': {
+        'totalMotor': 0,
+        'totalNilai': 0,
+        'pendapatanShowroom': 0,
+        'pengunjung': 0,
+      },
+    };
     
     final List koleksi = garasiMotor!['koleksi'] ?? [];
     final List riwayat = garasiMotor!['riwayat'] ?? [];
@@ -1344,7 +1365,7 @@ class Character {
       if (remainingJailYears <= 0) {
         isImprisoned = false;
         remainingJailYears = 0;
-        final releaseMsg = '📢 BEBAS: Kamu telah menyelesaikan masa hukumanmu dan dibebaskan dari penjara!';
+        const releaseMsg = '📢 BEBAS: Kamu telah menyelesaikan masa hukumanmu dan dibebaskan dari penjara!';
         events.add(releaseMsg);
         inbox.add(releaseMsg);
       } else {
@@ -1573,6 +1594,9 @@ class Character {
       LogikaPemainBasket.jalankanSimulasiMusim(this, events);
       LogikaPemainBalap.jalankanSimulasiMusim(this, events);
       LogikaPemainRenang.jalankanSimulasiMusim(this, events);
+      checkFamilyFiredEvent(events);
+      checkFamilyRetireEvent(events);
+      checkParentUnemploymentDivorceEscalation(events);
     }
 
     if (age == 12) {
@@ -1587,7 +1611,7 @@ class Character {
       if (educationHistory['SMA'] == 'Belum Lulus') {
         educationHistory['SMA'] = 'Lulus';
       }
-      final String notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
+      const notice = '🎓 Lulus SMA: Selamat! Kamu telah resmi lulus dari Sekolah Menengah Atas (SMA) 🎉';
       events.add(notice);
       inbox.add(notice);
       classmates.clear();
@@ -1752,13 +1776,13 @@ class Character {
             custodyParent = null;
             fatherDivorceYearsSince = 0;
             motherDivorceYearsSince = 0;
-            final String eventMsg = '💔 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan resmi bercerai!';
+            const eventMsg = '💔 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan resmi bercerai!';
             events.add(eventMsg);
             inbox.add(eventMsg);
           } else {
             parentsReconciled = true;
             parentArgumentCount = 0; // reset counter jika damai kembali
-            final String eventMsg = '💖 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan memutuskan untuk BATAL bercerai!';
+            const eventMsg = '💖 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan memutuskan untuk BATAL bercerai!';
             events.add(eventMsg);
             inbox.add(eventMsg);
           }
@@ -1789,56 +1813,117 @@ class Character {
 
     // Kelahiran dari Ibu Kandung
     if (motherName != null && !isMotherDeceased && motherAge != null && motherAge! >= 18 && motherAge! <= 45) {
-      // Jika orang tua sudah cerai, ibu tidak bisa melahirkan kecuali menikah lagi dengan pria lain (ada ayah tiri)
-      final bool cannotHaveChild = isMotherDivorced && (stepFatherName == null || isStepFatherDeceased);
+      // Ibu HANYA bisa melahirkan jika memiliki suami yang hidup (Ayah Kandung yang belum wafat & belum cerai, ATAU Ayah Tiri yang hidup)
+      final bool hasLivingFather = fatherName != null && !isFatherDeceased && !isFatherDivorced;
+      final bool hasLivingStepFather = stepFatherName != null && !isStepFatherDeceased;
+      final bool cannotHaveChild = !hasLivingFather && !hasLivingStepFather;
       
       final int birthChance = motherWillTryForBaby ? 80 : 6;
       if (!cannotHaveChild && random.nextInt(100) < birthChance) {
         motherWillTryForBaby = false; // reset flag
-        final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
-        final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
-        
-        // Ambil nama belakang dari ayah kandung atau ayah tiri, jika tidak ada pakai nama belakang player/ibu
-        String lastName = '';
-        if (fatherName != null && !isFatherDeceased && !isMotherDivorced) {
-          final parts = fatherName!.split(' ');
-          if (parts.length > 1) lastName = parts.last;
-        } else if (stepFatherName != null && !isStepFatherDeceased) {
-          final parts = stepFatherName!.split(' ');
-          if (parts.length > 1) lastName = parts.last;
-        }
-        
-        if (lastName.isEmpty) {
-          final parts = name.split(' ');
-          if (parts.length > 1) lastName = parts.last;
-        }
-        
-        final String babyName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
-        
-        // Tentukan apakah saudara tiri atau kandung
-        // Jika tidak ada ayah kandung, atau ayah kandung meninggal, atau orang tua sudah cerai tapi ada ayah tiri -> adik tiri
+
         final bool isStepSibling = (fatherName == null || isFatherDeceased || isMotherDivorced);
-        final String relType = isStepSibling
-            ? (gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan')
-            : (gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan');
-            
-        final String notice = '👶 Adik Baru Lahir! Ibumu melahirkan seorang $relType bernama $babyName.';
-        events.add(notice);
-        inbox.add(notice);
-        
-        siblings.add({
-          'name': babyName,
-          'gender': gender,
-          'relation': relType,
-          'relationship': '80',
-          'age': '0',
-          'isDeceased': 'false',
-        });
+        final bool isTwins = random.nextInt(100) < 5; // 5% peluang kelahiran adik kembar
+
+        if (isTwins) {
+          // Kelahiran Adik Kembar (2 bayi sekaligus di tahun yang sama)
+          final String gender1 = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+          final String gender2 = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+
+          final String firstName1 = gender1 == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+          String firstName2 = gender2 == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+          while (firstName2 == firstName1) {
+            firstName2 = gender2 == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+          }
+
+          String lastName = '';
+          if (fatherName != null && !isFatherDeceased && !isMotherDivorced) {
+            final parts = fatherName!.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          } else if (stepFatherName != null && !isStepFatherDeceased) {
+            final parts = stepFatherName!.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          }
+          if (lastName.isEmpty) {
+            final parts = name.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          }
+
+          final String babyName1 = lastName.isNotEmpty ? '$firstName1 $lastName' : firstName1;
+          final String babyName2 = lastName.isNotEmpty ? '$firstName2 $lastName' : firstName2;
+
+          final String relType1 = isStepSibling
+              ? (gender1 == 'Laki-laki' ? 'Adik Tiri Kembar Laki-laki' : 'Adik Tiri Kembar Perempuan')
+              : (gender1 == 'Laki-laki' ? 'Adik Kembar Laki-laki' : 'Adik Kembar Perempuan');
+          final String relType2 = isStepSibling
+              ? (gender2 == 'Laki-laki' ? 'Adik Tiri Kembar Laki-laki' : 'Adik Tiri Kembar Perempuan')
+              : (gender2 == 'Laki-laki' ? 'Adik Kembar Laki-laki' : 'Adik Kembar Perempuan');
+
+          final String notice = '👶👶 Adik Kembar Baru Lahir! Ibumu melahirkan bayi kembar bernama $babyName1 dan $babyName2.';
+          events.add(notice);
+          inbox.add(notice);
+
+          siblings.add({
+            'name': babyName1,
+            'gender': gender1,
+            'relation': relType1,
+            'relationship': '80',
+            'age': '0',
+            'isDeceased': 'false',
+            'isTwin': 'true',
+          });
+          siblings.add({
+            'name': babyName2,
+            'gender': gender2,
+            'relation': relType2,
+            'relationship': '80',
+            'age': '0',
+            'isDeceased': 'false',
+            'isTwin': 'true',
+          });
+        } else {
+          // Kelahiran Tunggal (1 Anak per kelahiran)
+          final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
+          final String firstName = gender == 'Laki-laki' ? sibBoys[random.nextInt(sibBoys.length)] : sibGirls[random.nextInt(sibGirls.length)];
+
+          String lastName = '';
+          if (fatherName != null && !isFatherDeceased && !isMotherDivorced) {
+            final parts = fatherName!.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          } else if (stepFatherName != null && !isStepFatherDeceased) {
+            final parts = stepFatherName!.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          }
+          if (lastName.isEmpty) {
+            final parts = name.split(' ');
+            if (parts.length > 1) lastName = parts.last;
+          }
+
+          final String babyName = lastName.isNotEmpty ? '$firstName $lastName' : firstName;
+
+          final String relType = isStepSibling
+              ? (gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan')
+              : (gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan');
+
+          final String notice = '👶 Adik Baru Lahir! Ibumu melahirkan seorang $relType bernama $babyName.';
+          events.add(notice);
+          inbox.add(notice);
+
+          siblings.add({
+            'name': babyName,
+            'gender': gender,
+            'relation': relType,
+            'relationship': '80',
+            'age': '0',
+            'isDeceased': 'false',
+          });
+        }
       }
     }
 
-    // Kelahiran dari Ibu Tiri
-    if (stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null && stepMotherAge! >= 18 && stepMotherAge! <= 45) {
+    // Kelahiran dari Ibu Tiri (hanya jika Ayah Kandung masih hidup & belum cerai)
+    final bool canStepMotherBirth = stepMotherName != null && !isStepMotherDeceased && stepMotherAge != null && stepMotherAge! >= 18 && stepMotherAge! <= 45 && fatherName != null && !isFatherDeceased && !isFatherDivorced;
+    if (canStepMotherBirth) {
       // Peluang 6% per tahun untuk melahirkan anak baru
       if (random.nextInt(100) < 6) {
         final String gender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
@@ -2209,7 +2294,7 @@ class Character {
         inbox.add('🚨 Kondisi Medis: Kamu saat ini mengidap penyakit $diseases. Segera lakukan pengobatan jika memungkinkan!');
       }
 
-      void _handleSingleBirth(String? partnerName) {
+      void handleSingleBirth(String? partnerName) {
         final String childGender = random.nextBool() ? 'Laki-laki' : 'Perempuan';
         
         final List<String> boys = (maleFirstNames != null && maleFirstNames!.isNotEmpty) ? maleFirstNames! : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi', 'Rehan', 'Fadel', 'Budi', 'Aditya'];
@@ -2289,17 +2374,17 @@ class Character {
       }
 
       if (isPregnant) {
-        _handleSingleBirth(null);
+        handleSingleBirth(null);
       }
 
       if (partnerIsPregnant) {
         if (pregnantByPartnerName != null && pregnantByPartnerName!.isNotEmpty) {
           final List<String> pregnantPartners = pregnantByPartnerName!.split(', ');
           for (var pName in pregnantPartners) {
-            _handleSingleBirth(pName.trim());
+            handleSingleBirth(pName.trim());
           }
         } else {
-          _handleSingleBirth(partner != null ? partner!['name'] : 'Pasangan');
+          handleSingleBirth(partner != null ? partner!['name'] : 'Pasangan');
         }
       }
 
@@ -2322,45 +2407,330 @@ class Character {
     return events;
   }
 
+  void checkFamilyFiredEvent(List<String> events) {
+    pendingFiredFamilyEvent = null;
+    if (age < 6) return;
+
+    final random = Random();
+    if (random.nextInt(100) >= 10) return; // Persentase 10% pemecatan
+
+    List<Map<String, String>> workingMembers = [];
+
+    if (fatherName != null && fatherJob != null && fatherJob != 'Menganggur' && !fatherJob!.startsWith('Pensiunan') && (fatherSalary ?? 0) > 0) {
+      workingMembers.add({
+        'name': fatherName!,
+        'relation': 'Ayah',
+        'job': fatherJob!,
+      });
+    }
+
+    if (motherName != null && motherJob != null && motherJob != 'Tidak Bekerja / Ibu Rumah Tangga' && motherJob != 'Menganggur' && !motherJob!.startsWith('Pensiunan') && (motherSalary ?? 0) > 0) {
+      workingMembers.add({
+        'name': motherName!,
+        'relation': 'Ibu',
+        'job': motherJob!,
+      });
+    }
+
+    if (stepFatherName != null && stepFatherJob != null && stepFatherJob != 'Menganggur' && !stepFatherJob!.startsWith('Pensiunan') && (stepFatherSalary ?? 0) > 0) {
+      workingMembers.add({
+        'name': stepFatherName!,
+        'relation': 'Ayah Tiri',
+        'job': stepFatherJob!,
+      });
+    }
+
+    if (stepMotherName != null && stepMotherJob != null && stepMotherJob != 'Tidak Bekerja / Ibu Rumah Tangga' && stepMotherJob != 'Menganggur' && !stepMotherJob!.startsWith('Pensiunan') && (stepMotherSalary ?? 0) > 0) {
+      workingMembers.add({
+        'name': stepMotherName!,
+        'relation': 'Ibu Tiri',
+        'job': stepMotherJob!,
+      });
+    }
+
+    for (var sib in siblings) {
+      int sAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+      String sJob = sib['job'] ?? '';
+      int sSal = int.tryParse(sib['salary'] ?? '0') ?? 0;
+      if (sAge >= 19 && sJob.isNotEmpty && sJob != 'Menganggur' && !sJob.startsWith('Pensiunan') && sSal > 0) {
+        workingMembers.add({
+          'name': sib['name'] ?? 'Saudara',
+          'relation': sib['relation'] ?? 'Saudara',
+          'job': sJob,
+        });
+      }
+    }
+
+    if (workingMembers.isEmpty) return;
+
+    final chosen = workingMembers[random.nextInt(workingMembers.length)];
+    final String cName = chosen['name']!;
+    final String cRel = chosen['relation']!;
+    final String cJob = chosen['job']!;
+
+    if (cRel == 'Ayah') {
+      fatherJob = 'Menganggur';
+      fatherSalary = 0;
+    } else if (cRel == 'Ibu') {
+      motherJob = 'Tidak Bekerja / Ibu Rumah Tangga';
+      motherSalary = 0;
+    } else if (cRel == 'Ayah Tiri') {
+      stepFatherJob = 'Menganggur';
+      stepFatherSalary = 0;
+    } else if (cRel == 'Ibu Tiri') {
+      stepMotherJob = 'Tidak Bekerja / Ibu Rumah Tangga';
+      stepMotherSalary = 0;
+    } else {
+      for (var sib in siblings) {
+        if (sib['name'] == cName) {
+          sib['job'] = 'Menganggur';
+          sib['salary'] = '0';
+          break;
+        }
+      }
+    }
+
+    pendingFiredFamilyEvent = {
+      'name': cName,
+      'relation': cRel,
+      'job': cJob,
+    };
+
+    final String notice = '⚠️ PHK: $cRel-mu ($cName) baru saja dipecat dari pekerjaannya sebagai $cJob!';
+    events.add(notice);
+    inbox.add(notice);
+  }
+
+  void checkFamilyRetireEvent(List<String> events) {
+    pendingRetireFamilyEvent = null;
+
+    List<Map<String, dynamic>> eligibleRetirees = [];
+
+    int fAge = fatherAge ?? 40;
+    if (fAge >= 60 && fatherName != null && fatherJob != null && fatherJob != 'Menganggur' && !fatherJob!.startsWith('Pensiunan') && (fatherSalary ?? 0) > 0) {
+      eligibleRetirees.add({
+        'name': fatherName!,
+        'relation': 'Ayah',
+        'job': fatherJob!,
+        'salary': fatherSalary!,
+      });
+    }
+
+    int mAge = motherAge ?? 38;
+    if (mAge >= 60 && motherName != null && motherJob != null && motherJob != 'Tidak Bekerja / Ibu Rumah Tangga' && motherJob != 'Menganggur' && !motherJob!.startsWith('Pensiunan') && (motherSalary ?? 0) > 0) {
+      eligibleRetirees.add({
+        'name': motherName!,
+        'relation': 'Ibu',
+        'job': motherJob!,
+        'salary': motherSalary!,
+      });
+    }
+
+    int sfAge = stepFatherAge ?? 40;
+    if (sfAge >= 60 && stepFatherName != null && stepFatherJob != null && stepFatherJob != 'Menganggur' && !stepFatherJob!.startsWith('Pensiunan') && (stepFatherSalary ?? 0) > 0) {
+      eligibleRetirees.add({
+        'name': stepFatherName!,
+        'relation': 'Ayah Tiri',
+        'job': stepFatherJob!,
+        'salary': stepFatherSalary!,
+      });
+    }
+
+    int smAge = stepMotherAge ?? 40;
+    if (smAge >= 60 && stepMotherName != null && stepMotherJob != null && stepMotherJob != 'Tidak Bekerja / Ibu Rumah Tangga' && stepMotherJob != 'Menganggur' && !stepMotherJob!.startsWith('Pensiunan') && (stepMotherSalary ?? 0) > 0) {
+      eligibleRetirees.add({
+        'name': stepMotherName!,
+        'relation': 'Ibu Tiri',
+        'job': stepMotherJob!,
+        'salary': stepMotherSalary!,
+      });
+    }
+
+    for (var sib in siblings) {
+      int sAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+      String sJob = sib['job'] ?? '';
+      int sSal = int.tryParse(sib['salary'] ?? '0') ?? 0;
+      if (sAge >= 60 && sJob.isNotEmpty && sJob != 'Menganggur' && !sJob.startsWith('Pensiunan') && sSal > 0) {
+        eligibleRetirees.add({
+          'name': sib['name'] ?? 'Saudara',
+          'relation': sib['relation'] ?? 'Saudara',
+          'job': sJob,
+          'salary': sSal,
+        });
+      }
+    }
+
+    if (eligibleRetirees.isEmpty) return;
+
+    final chosen = eligibleRetirees[Random().nextInt(eligibleRetirees.length)];
+    final String cName = chosen['name'];
+    final String cRel = chosen['relation'];
+    final String cJob = chosen['job'];
+    final int oldSalary = chosen['salary'];
+    final int pensionSalary = (oldSalary * 0.25).round();
+
+    if (cRel == 'Ayah') {
+      fatherJob = 'Pensiunan ($cJob)';
+      fatherSalary = pensionSalary;
+    } else if (cRel == 'Ibu') {
+      motherJob = 'Pensiunan ($cJob)';
+      motherSalary = pensionSalary;
+    } else if (cRel == 'Ayah Tiri') {
+      stepFatherJob = 'Pensiunan ($cJob)';
+      stepFatherSalary = pensionSalary;
+    } else if (cRel == 'Ibu Tiri') {
+      stepMotherJob = 'Pensiunan ($cJob)';
+      stepMotherSalary = pensionSalary;
+    } else {
+      for (var sib in siblings) {
+        if (sib['name'] == cName) {
+          sib['job'] = 'Pensiunan ($cJob)';
+          sib['salary'] = pensionSalary.toString();
+          break;
+        }
+      }
+    }
+
+    pendingRetireFamilyEvent = {
+      'name': cName,
+      'relation': cRel,
+      'job': cJob,
+      'pensionSalary': pensionSalary,
+    };
+
+    final String notice = '👴 Pensiun: $cRel-mu ($cName) telah resmi pensiun dari pekerjaan $cJob dan sekarang menerima uang pensiun 25% (${CurrencySettings.format(pensionSalary)}/bln).';
+    events.add(notice);
+    inbox.add(notice);
+  }
+
+  void checkParentUnemploymentDivorceEscalation(List<String> events) {
+    if (fatherName == null || motherName == null || isFatherDeceased || isMotherDeceased || isFatherDivorced || isMotherDivorced) {
+      parentUnemploymentYears = 0;
+      return;
+    }
+
+    final bool fUnemployed = fatherJob == 'Menganggur' || (fatherJob == null && (fatherSalary ?? 0) == 0);
+    final bool mUnemployed = motherJob == 'Menganggur';
+
+    if (fUnemployed || mUnemployed) {
+      parentUnemploymentYears++;
+
+      if (parentUnemploymentYears == 1) {
+        final String notice = '⚠️ Ketegangan Ekonomi: Pengangguran di keluarga memicu pertengkaran dan ketegangan keuangan antara $fatherName dan $motherName!';
+        events.add(notice);
+        inbox.add(notice);
+      } else if (parentUnemploymentYears >= 2) {
+        isFatherDivorced = true;
+        isMotherDivorced = true;
+        fatherDivorceYearsSince = 0;
+        motherDivorceYearsSince = 0;
+        parentUnemploymentYears = 0;
+
+        final String notice = '💔 Perceraian Orang Tua: Akibat masalah pengangguran berkepanjangan dan krisis keuangan keluarga, $fatherName dan $motherName akhirnya resmi bercerai!';
+        events.add(notice);
+        inbox.add(notice);
+      }
+    } else {
+      parentUnemploymentYears = 0;
+    }
+  }
+
   // --- LOGIKA WEALTH GETTER & SETTER KELUARGA / NPC ---
+  int calculateRealisticNPCWealth({required String job, required int salary, required int age}) {
+    final random = Random();
+    if (age < 6) return 0;
+    if (age < 12) return random.nextInt(16) + 5;
+    if (age < 15) return random.nextInt(31) + 20;
+    if (age < 19) return random.nextInt(151) + 50;
+
+    if (salary <= 0 || job == 'Menganggur' || job == 'Tidak Bekerja / Ibu Rumah Tangga') {
+      return random.nextInt(701) + 100; // $100 - $800 tabungan darurat
+    }
+
+    // Akumulasi kekayaan/aset realistis berbasis gaji bulanan
+    double monthsMultiplier = 6.0 + (random.nextDouble() * 8.0); // 6x - 14x gaji bulanan
+    if (salary >= 5000) {
+      monthsMultiplier += 6.0 + (random.nextDouble() * 6.0); // Gaji tinggi (12x - 20x gaji bulanan)
+    } else if (salary >= 2500) {
+      monthsMultiplier += 3.0 + (random.nextDouble() * 4.0); // Gaji menengah (9x - 18x gaji bulanan)
+    }
+
+    if (age > 35) {
+      final double ageFactor = ((age - 35) * 0.12).clamp(0.0, 3.0);
+      monthsMultiplier += ageFactor;
+    }
+
+    return (salary * monthsMultiplier).round();
+  }
+
   int getFatherWealth() {
     if (fatherWealth == null) {
-      fatherWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(fatherName ?? 'Ayah', 'Ayah');
+      fatherWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? fatherJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? fatherSalary ?? 0,
+        age: fatherAge ?? 40,
+      );
     }
     return fatherWealth!;
   }
 
   int getMotherWealth() {
     if (motherWealth == null) {
-      motherWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(motherName ?? 'Ibu', 'Ibu');
+      motherWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? motherJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? motherSalary ?? 0,
+        age: motherAge ?? 38,
+      );
     }
     return motherWealth!;
   }
 
   int getStepFatherWealth() {
     if (stepFatherWealth == null) {
-      stepFatherWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(stepFatherName ?? 'Ayah Tiri', 'Ayah Tiri');
+      stepFatherWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? stepFatherJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? stepFatherSalary ?? 0,
+        age: stepFatherAge ?? 40,
+      );
     }
     return stepFatherWealth!;
   }
 
   int getStepMotherWealth() {
     if (stepMotherWealth == null) {
-      stepMotherWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(stepMotherName ?? 'Ibu Tiri', 'Ibu Tiri');
+      stepMotherWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? stepMotherJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? stepMotherSalary ?? 0,
+        age: stepMotherAge ?? 38,
+      );
     }
     return stepMotherWealth!;
   }
 
   int getFatherInLawWealth() {
     if (fatherInLawWealth == null) {
-      fatherInLawWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(fatherInLawName ?? 'Ayah Mertua', 'Mertua');
+      fatherInLawWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? fatherInLawJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? fatherInLawSalary ?? 0,
+        age: fatherInLawAge ?? 50,
+      );
     }
     return fatherInLawWealth!;
   }
 
   int getMotherInLawWealth() {
     if (motherInLawWealth == null) {
-      motherInLawWealth = Random().nextInt(9501) + 500;
+      final j = getNPCJobInfo(motherInLawName ?? 'Ibu Mertua', 'Mertua');
+      motherInLawWealth = calculateRealisticNPCWealth(
+        job: j['job'] as String? ?? motherInLawJob ?? 'Menganggur',
+        salary: j['salary'] as int? ?? motherInLawSalary ?? 0,
+        age: motherInLawAge ?? 48,
+      );
     }
     return motherInLawWealth!;
   }
@@ -2391,22 +2761,17 @@ class Character {
     }
 
     // Helper to get from a list of maps
-    int? getFromList(List<Map<String, String>> list) {
+    int? getFromList(List<Map<String, String>> list, String role) {
       for (var item in list) {
         if (item['name'] == targetName || (item['name'] != null && cleanName.contains(item['name']!.toLowerCase()))) {
           if (!item.containsKey('money')) {
             int targetAge = int.tryParse(item['age'] ?? '0') ?? 0;
-            final random = Random();
-            int initialMoney = 0;
-            if (targetAge >= 6 && targetAge <= 11) {
-              initialMoney = random.nextInt(10) + 1;
-            } else if (targetAge >= 12 && targetAge <= 14) {
-              initialMoney = random.nextInt(31) + 20;
-            } else if (targetAge >= 15 && targetAge <= 18) {
-              initialMoney = random.nextInt(101) + 100;
-            } else if (targetAge >= 19) {
-              initialMoney = random.nextInt(9501) + 500;
-            }
+            final j = getNPCJobInfo(item['name']!, role);
+            int initialMoney = calculateRealisticNPCWealth(
+              job: j['job'] as String? ?? item['job'] ?? 'Menganggur',
+              salary: j['salary'] as int? ?? int.tryParse(item['salary'] ?? '0') ?? 0,
+              age: targetAge,
+            );
             item['money'] = initialMoney.toString();
           }
           return int.tryParse(item['money'] ?? '0') ?? 0;
@@ -2416,25 +2781,30 @@ class Character {
     }
 
     // 2. Check siblings, extendedFamily, classmates, coworkers, exPartners, etc.
-    int? val = getFromList(children);
+    int? val = getFromList(children, 'Anak');
     if (val != null) return val;
-    val = getFromList(siblings);
+    val = getFromList(siblings, 'Saudara');
     if (val != null) return val;
-    val = getFromList(extendedFamily);
+    val = getFromList(extendedFamily, 'Keluarga');
     if (val != null) return val;
-    val = getFromList(classmates);
+    val = getFromList(classmates, 'Teman');
     if (val != null) return val;
-    val = getFromList(univClassmates);
+    val = getFromList(univClassmates, 'Teman Kuliah');
     if (val != null) return val;
-    val = getFromList(coworkers);
+    val = getFromList(coworkers, 'Rekan Kerja');
     if (val != null) return val;
-    val = getFromList(exPartners);
+    val = getFromList(exPartners, 'Mantan');
     if (val != null) return val;
 
     // Check supervisor
     if (supervisor != null && supervisor!['name'] == targetName) {
       if (!supervisor!.containsKey('money')) {
-        int initialMoney = (Random().nextInt(9501) + 500) * 2;
+        final j = getNPCJobInfo(supervisor!['name']!, 'Supervisor');
+        int initialMoney = calculateRealisticNPCWealth(
+          job: j['job'] as String? ?? 'Supervisor',
+          salary: j['salary'] as int? ?? 3500,
+          age: int.tryParse(supervisor!['age'] ?? '40') ?? 40,
+        );
         supervisor!['money'] = initialMoney.toString();
       }
       return int.tryParse(supervisor!['money'] ?? '0') ?? 0;
@@ -2444,7 +2814,12 @@ class Character {
     if (partner != null && partner!['name'] == targetName) {
       if (!partner!.containsKey('money')) {
         int targetAge = int.tryParse(partner!['age'] ?? '18') ?? 18;
-        int initialMoney = targetAge >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
+        final j = getNPCJobInfo(partner!['name']!, 'Partner');
+        int initialMoney = calculateRealisticNPCWealth(
+          job: j['job'] as String? ?? 'Pasangan',
+          salary: j['salary'] as int? ?? 0,
+          age: targetAge,
+        );
         partner!['money'] = initialMoney.toString();
       }
       return int.tryParse(partner!['money'] ?? '0') ?? 0;
@@ -2452,19 +2827,28 @@ class Character {
     if (secondPartner != null && secondPartner!['name'] == targetName) {
       if (!secondPartner!.containsKey('money')) {
         int targetAge = int.tryParse(secondPartner!['age'] ?? '18') ?? 18;
-        int initialMoney = targetAge >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
+        final j = getNPCJobInfo(secondPartner!['name']!, 'Partner');
+        int initialMoney = calculateRealisticNPCWealth(
+          job: j['job'] as String? ?? 'Pasangan',
+          salary: j['salary'] as int? ?? 0,
+          age: targetAge,
+        );
         secondPartner!['money'] = initialMoney.toString();
       }
       return int.tryParse(secondPartner!['money'] ?? '0') ?? 0;
     }
     
     // Fallback if not found anywhere (e.g. teachers)
+    final j = getNPCJobInfo(targetName, targetRole);
     int ageVal = 18;
     if (cleanRole.contains('guru') || cleanRole.contains('dosen') || cleanRole.contains('kepala sekolah')) {
       ageVal = 35;
     }
-    int initialMoney = ageVal >= 19 ? Random().nextInt(9501) + 500 : Random().nextInt(101) + 100;
-    return initialMoney;
+    return calculateRealisticNPCWealth(
+      job: j['job'] as String? ?? 'Pekerja',
+      salary: j['salary'] as int? ?? 0,
+      age: ageVal,
+    );
   }
 
   void setTargetWealth(String targetName, String targetRole, int newWealth) {
@@ -2522,31 +2906,79 @@ class Character {
   }
 
   // --- LOGIKA PEKERJAAN & GAJI NPC ---
-  Map<String, dynamic> generateRandomNPCJobInfo([int? age]) {
+  Map<String, dynamic> generateRandomNPCJobInfo([int? age, bool isParent = false, String gender = 'male']) {
     final random = Random();
-    final int roll = random.nextInt(100);
-    List<String> categories;
-    if (roll < 20) {
-      categories = ['Dasar', 'Layanan'];
-    } else if (roll < 60) {
-      categories = ['Terampil', 'Kreatif'];
-    } else if (roll < 90) {
-      categories = ['Profesional'];
-    } else {
-      categories = ['Prestise'];
+    final String gLower = gender.toLowerCase();
+    final bool isFemale = gLower == 'female' || gLower.contains('perempuan') || gLower.contains('ibu') || gLower.contains('wanita');
+
+    // 1. Jika ini Orang Tua (Ayah / Ibu / Tiri / Mertua):
+    // Ortu user menganggur HANYA berpersentase 10% saja!
+    if (isParent) {
+      if (random.nextInt(100) < 10) {
+        return {
+          'job': isFemale ? 'Tidak Bekerja / Ibu Rumah Tangga' : 'Menganggur',
+          'salary': 0,
+        };
+      }
     }
 
-    final candidateJobs = KerjaMenuScreen.availableJobs.where((j) {
+    // 2. Jika Saudara atau Relatif Dewasa (Bukan Ortu), mereka TIDAK MENGANGGUR (100% Bekerja)
+
+    // Filter daftar pekerjaan dari JobDatabase agar masuk akal dengan umur
+    final int personAge = age ?? 35;
+    List<String> allowedCategories;
+    
+    if (personAge < 25) {
+      // Dewasa Muda (19 - 24): Dasar, Terampil, Layanan, Kreatif
+      allowedCategories = ['Dasar', 'Terampil', 'Layanan', 'Kreatif'];
+    } else if (personAge < 40) {
+      // Dewasa (25 - 39): Terampil, Kreatif, Layanan, Profesional
+      allowedCategories = ['Terampil', 'Kreatif', 'Layanan', 'Profesional'];
+    } else {
+      // Senior (>= 40): Terampil, Profesional, Layanan, Prestise, Dasar
+      allowedCategories = ['Terampil', 'Profesional', 'Layanan', 'Prestise', 'Dasar'];
+    }
+
+    final candidateJobs = JobDatabase.availableJobs.where((j) {
       final String cat = j['category'] as String? ?? '';
-      return categories.contains(cat);
+      return allowedCategories.contains(cat);
     }).toList();
 
-    final jobsList = candidateJobs.isNotEmpty ? candidateJobs : KerjaMenuScreen.availableJobs;
+    // Pekerjaan fisik/kasar berat untuk wanita HANYA berpeluang 10% (90% sisanya non-kasar)
+    const roughFemaleJobs = [
+      'Tukang Las',
+      'Nelayan',
+      'Montir',
+      'Tukang Kayu',
+      'Tukang Listrik',
+      'Supir Ojek Online',
+      'Driver Pribadi',
+      'Civil Engineer',
+      'Mechanical Engineer',
+    ];
+
+    List<Map<String, dynamic>> filteredJobs = candidateJobs;
+    if (isFemale && random.nextInt(100) >= 10) {
+      filteredJobs = candidateJobs.where((j) {
+        final String title = j['title'] as String? ?? '';
+        return !roughFemaleJobs.contains(title);
+      }).toList();
+      if (filteredJobs.isEmpty) filteredJobs = candidateJobs;
+    }
+
+    final jobsList = filteredJobs.isNotEmpty ? filteredJobs : JobDatabase.availableJobs;
     final chosenJob = jobsList[random.nextInt(jobsList.length)];
-    final String jobNameVal = chosenJob['title'] as String? ?? 'Karyawan';
-    final int baseSalary = chosenJob['salary'] as int? ?? 1000;
     
-    // Tambahkan sedikit variasi acak pada gaji awal (+/- 10%)
+    final String jobNameVal = chosenJob['title'] as String? ?? 'Karyawan';
+    int baseSalary = chosenJob['salary'] as int? ?? 1000;
+
+    // Bonus gaji berdasarkan umur (pengalaman kerja)
+    if (personAge > 30) {
+      final int ageBonus = ((personAge - 30) * 0.02 * baseSalary).round();
+      baseSalary += ageBonus;
+    }
+
+    // Variasi acak gaji (+/- 10%)
     final double variation = 0.9 + (random.nextDouble() * 0.2);
     final int salaryVal = (baseSalary * variation).round();
 
@@ -2557,66 +2989,76 @@ class Character {
     final String cleanName = targetName.toLowerCase();
     final String cleanRole = targetRole.toLowerCase();
 
+    String parseStatus(String? jTitle, int sal) {
+      if (jTitle != null && jTitle.startsWith('Pensiunan')) {
+        return 'Pensiun';
+      }
+      if (sal == 0 || jTitle == 'Menganggur') {
+        return 'Menganggur';
+      }
+      return 'Bekerja';
+    }
+
     int ageVal = 0;
     if (fatherName != null && (cleanName == fatherName!.toLowerCase() || cleanName.contains(fatherName!.toLowerCase()))) {
       ageVal = fatherAge ?? 40;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (fatherJob == null) {
-        final j = generateRandomNPCJobInfo();
+        final j = generateRandomNPCJobInfo(ageVal, true, 'male');
         fatherJob = j['job'];
         fatherSalary = j['salary'];
       }
-      return {'status': 'Bekerja', 'job': fatherJob, 'salary': fatherSalary};
+      return {'status': parseStatus(fatherJob, fatherSalary ?? 0), 'job': fatherJob, 'salary': fatherSalary};
     }
     if (motherName != null && (cleanName == motherName!.toLowerCase() || cleanName.contains(motherName!.toLowerCase()))) {
       ageVal = motherAge ?? 38;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (motherJob == null) {
-        final j = generateRandomNPCJobInfo();
+        final j = generateRandomNPCJobInfo(ageVal, true, 'female');
         motherJob = j['job'];
         motherSalary = j['salary'];
       }
-      return {'status': 'Bekerja', 'job': motherJob, 'salary': motherSalary};
+      return {'status': parseStatus(motherJob, motherSalary ?? 0), 'job': motherJob, 'salary': motherSalary};
     }
     if (stepFatherName != null && (cleanName == stepFatherName!.toLowerCase() || cleanName.contains(stepFatherName!.toLowerCase()))) {
       ageVal = stepFatherAge ?? 40;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (stepFatherJob == null) {
-        final j = generateRandomNPCJobInfo();
+        final j = generateRandomNPCJobInfo(ageVal, true, 'male');
         stepFatherJob = j['job'];
         stepFatherSalary = j['salary'];
       }
-      return {'status': 'Bekerja', 'job': stepFatherJob, 'salary': stepFatherSalary};
+      return {'status': parseStatus(stepFatherJob, stepFatherSalary ?? 0), 'job': stepFatherJob, 'salary': stepFatherSalary};
     }
     if (stepMotherName != null && (cleanName == stepMotherName!.toLowerCase() || cleanName.contains(stepMotherName!.toLowerCase()))) {
       ageVal = stepMotherAge ?? 38;
       if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (stepMotherJob == null) {
-        final j = generateRandomNPCJobInfo();
+        final j = generateRandomNPCJobInfo(ageVal, true, 'female');
         stepMotherJob = j['job'];
         stepMotherSalary = j['salary'];
       }
-      return {'status': 'Bekerja', 'job': stepMotherJob, 'salary': stepMotherSalary};
+      return {'status': parseStatus(stepMotherJob, stepMotherSalary ?? 0), 'job': stepMotherJob, 'salary': stepMotherSalary};
     }
     if (cleanRole.contains('mertua')) {
       if (targetName.startsWith('Ayah')) {
         ageVal = fatherInLawAge ?? 50;
         if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
         if (fatherInLawJob == null) {
-          final j = generateRandomNPCJobInfo();
+          final j = generateRandomNPCJobInfo(ageVal, true, 'male');
           fatherInLawJob = j['job'];
           fatherInLawSalary = j['salary'];
         }
-        return {'status': 'Bekerja', 'job': fatherInLawJob, 'salary': fatherInLawSalary};
+        return {'status': parseStatus(fatherInLawJob, fatherInLawSalary ?? 0), 'job': fatherInLawJob, 'salary': fatherInLawSalary};
       } else {
         ageVal = motherInLawAge ?? 48;
         if (ageVal < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
         if (motherInLawJob == null) {
-          final j = generateRandomNPCJobInfo();
+          final j = generateRandomNPCJobInfo(ageVal, true, 'female');
           motherInLawJob = j['job'];
           motherInLawSalary = j['salary'];
         }
-        return {'status': 'Bekerja', 'job': motherInLawJob, 'salary': motherInLawSalary};
+        return {'status': parseStatus(motherInLawJob, motherInLawSalary ?? 0), 'job': motherInLawJob, 'salary': motherInLawSalary};
       }
     }
 
@@ -2632,15 +3074,17 @@ class Character {
               item['job'] = jobName!;
               item['salary'] = (jobSalary ?? 2000).toString();
             } else {
-              final j = generateRandomNPCJobInfo(targetAge);
+              final String itemGender = item['gender'] ?? (item['relation']?.contains('Perempuan') == true ? 'Perempuan' : 'Laki-laki');
+              final j = generateRandomNPCJobInfo(targetAge, false, itemGender);
               item['job'] = j['job'];
               item['salary'] = j['salary'].toString();
             }
           }
+          int sal = int.tryParse(item['salary'] ?? '0') ?? 0;
           return {
-            'status': 'Bekerja',
+            'status': parseStatus(item['job'], sal),
             'job': item['job'],
-            'salary': int.tryParse(item['salary'] ?? '0') ?? 0
+            'salary': sal
           };
         }
       }
@@ -2695,7 +3139,7 @@ class Character {
       int targetAge = int.tryParse(assistantCoach!['age'] ?? '35') ?? 35;
       if (targetAge < 19) return {'status': 'Sekolah/Kuliah', 'job': '', 'salary': 0};
       if (!assistantCoach!.containsKey('job')) {
-        final String asstJob = 'Asisten Pelatih';
+        const String asstJob = 'Asisten Pelatih';
         final int asstSalary = ((jobSalary ?? 2000) * 1.5).round();
         assistantCoach!['job'] = asstJob;
         assistantCoach!['salary'] = asstSalary.toString();

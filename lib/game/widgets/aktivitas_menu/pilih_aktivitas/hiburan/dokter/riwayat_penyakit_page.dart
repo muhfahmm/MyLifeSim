@@ -87,9 +87,11 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           widget.character.hasHPV = false;
         }
 
-        // Tambah kesehatan
+        // Tambah kesehatan dan kebahagiaan
         widget.character.health = (widget.character.health + 25).clamp(0, 100);
-        widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan)');
+        final int happyBoost = 25 + random.nextInt(11); // 25-35%
+        widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
+        widget.character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $diseaseName (-$costPerTreatment uang, +25% Kesehatan, +$happyBoost% Kebahagiaan)');
         widget.onComplete?.call();
       });
 
@@ -333,7 +335,8 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
         } else if (parentRelation == 'Ibu Tiri') {
           widget.character.stepMotherRelationship = ((widget.character.stepMotherRelationship ?? 50) + 10).clamp(0, 100);
         }
-        widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+        final int happyBoost = 25 + random.nextInt(11); // 25-35%
+        widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
       });
 
       // Proses semua pengobatan secara gratis (karena dibayari orang tua)
@@ -407,6 +410,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
               '$parentRelation berbaik hati membayarkan seluruh biaya pengobatan sebesar \$${DokterUtils.fmt(totalCost)} untukmu.\n\n'
               '🎉 Berhasil Sembuh: $curedCount penyakit\n'
               '😔 Gagal Sembuh: $failedCount penyakit\n'
+              '😊 Kebahagiaan: +25-35%\n'
               '(Hubungan dengan $parentRelation meningkat!)',
               style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
             ),
