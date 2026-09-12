@@ -3530,11 +3530,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         _character.motherRelationship = ((_character.motherRelationship ?? 50) - 30).clamp(0, 100);
 
         // 2. Status Ekonomi & Geografis (Waris status kekayaan Ayah)
-        int fatherBonusMoney = ((_character.fatherWealth ?? 50000) ~/ 10).clamp(500, 50000);
-        if (_character.fatherSalary != null && _character.fatherSalary! > 0) {
-          fatherBonusMoney += _character.fatherSalary! ~/ 2;
+        int fatherBonusMoney = 0;
+        if (_character.age >= 18) {
+          fatherBonusMoney = ((_character.fatherWealth ?? 50000) ~/ 10).clamp(500, 50000);
+          if (_character.fatherSalary != null && _character.fatherSalary! > 0) {
+            fatherBonusMoney += _character.fatherSalary! ~/ 2;
+          }
+          _character.money += fatherBonusMoney;
         }
-        _character.money += fatherBonusMoney;
 
         // 3. Dampak Atribut: Disiplin +10, Tekad +5
         _character.discipline = (_character.discipline + 10).clamp(0, 100);
@@ -3547,7 +3550,8 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           _character.traits.add(chosenTrait);
         }
 
-        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh $fatherOrStepFatherLabel. Hubungan dengan $fatherOrStepFatherLabel (+50), Ibu (-30), Disiplin (+10), Tekad (+5), Trait: "$chosenTrait", Keuangan (+\$$fatherBonusMoney).';
+        final String moneyNotice = fatherBonusMoney > 0 ? ', Keuangan (+\$$fatherBonusMoney)' : '';
+        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh $fatherOrStepFatherLabel. Hubungan dengan $fatherOrStepFatherLabel (+50), Ibu (-30), Disiplin (+10), Tekad (+5), Trait: "$chosenTrait"$moneyNotice.';
         _character.inbox.add(msg);
       } else {
         _character.custodyParent = 'Ibu';
@@ -3561,11 +3565,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         }
 
         // 2. Status Ekonomi & Geografis (Waris status kekayaan Ibu)
-        int motherBonusMoney = ((_character.motherWealth ?? 50000) ~/ 10).clamp(500, 50000);
-        if (_character.motherSalary != null && _character.motherSalary! > 0) {
-          motherBonusMoney += _character.motherSalary! ~/ 2;
+        int motherBonusMoney = 0;
+        if (_character.age >= 18) {
+          motherBonusMoney = ((_character.motherWealth ?? 50000) ~/ 10).clamp(500, 50000);
+          if (_character.motherSalary != null && _character.motherSalary! > 0) {
+            motherBonusMoney += _character.motherSalary! ~/ 2;
+          }
+          _character.money += motherBonusMoney;
         }
-        _character.money += motherBonusMoney;
 
         // 3. Dampak Atribut: Kebahagiaan +10, Kesehatan +5
         _character.happiness = (_character.happiness + 10).clamp(0, 100);
@@ -3578,7 +3585,8 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           _character.traits.add(chosenTrait);
         }
 
-        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh Ibumu ($motherLabel). Hubungan dengan Ibu (+50), Ayah (-30), Kebahagiaan (+10), Kesehatan (+5), Trait: "$chosenTrait", Keuangan (+\$$motherBonusMoney).';
+        final String moneyNotice = motherBonusMoney > 0 ? ', Keuangan (+\$$motherBonusMoney)' : '';
+        final String msg = '🏡 Hak Asuh: Kamu diasuh oleh $motherLabel. Hubungan dengan $motherLabel (+50), Ayah (-30), Kebahagiaan (+10), Kesehatan (+5), Trait: "$chosenTrait"$moneyNotice.';
         _character.inbox.add(msg);
       }
     });
@@ -4890,11 +4898,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 
-  // --- WIDGET STAT BAR ---
-  Widget _buildStatRow(String label, int value, Color color, {bool isMoney = false}) {
+  // --- WIDGET STAT BAR MODERN (3D GLOSSY CAPSULE STYLE) ---
+  Widget _buildStatRow(String label, int value, Color baseColor, {bool isMoney = false}) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bool hasGuide = label == 'Kesehatan' || label == 'Kebahagiaan' || label == 'Kecerdasan' || label == 'Disiplin';
-    
+    final double percent = (value.clamp(0, 100)) / 100.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -4906,29 +4915,104 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 if (hasGuide) ...[
                   GestureDetector(
                     onTap: () => _showStatGuide(label),
-                    child: Icon(
-                      Icons.info_outline,
-                      size: 15,
-                      color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isDark ? Colors.white10 : Colors.black12,
+                      ),
+                      child: Icon(
+                        Icons.info_outline,
+                        size: 13,
+                        color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 5),
                 ],
-                Text(label, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12.5,
+                    color: isDark ? Colors.white : Colors.grey.shade900,
+                    letterSpacing: 0.2,
+                  ),
+                ),
               ],
             ),
-            Text(isMoney ? CurrencySettings.format(value) : '$value%', style: const TextStyle(fontSize: 12)),
+            Text(
+              isMoney ? CurrencySettings.format(value) : '$value%',
+              style: TextStyle(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                color: isMoney
+                    ? (isDark ? Colors.amberAccent : Colors.amber.shade900)
+                    : (isDark ? Colors.grey.shade200 : Colors.grey.shade800),
+              ),
+            ),
           ],
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         if (!isMoney)
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: (value.clamp(0, 100)) / 100.0,
-              backgroundColor: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
-              color: color,
-              minHeight: 12,
+          // Capsule Bar Container 3D (Tingkat detail glossy & inset shadow tinggi)
+          Container(
+            height: 16,
+            width: double.infinity,
+            padding: const EdgeInsets.all(2.5),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              color: isDark ? const Color(0xFF121417) : const Color(0xFF23272E),
+              border: Border.all(
+                color: isDark ? Colors.white.withValues(alpha: 0.12) : Colors.black.withValues(alpha: 0.25),
+                width: 1.2,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.5),
+                  blurRadius: 4,
+                  offset: const Offset(0, 2),
+                ),
+                BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  blurRadius: 1,
+                  offset: const Offset(0, -1),
+                ),
+              ],
+            ),
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final double filledWidth = constraints.maxWidth * percent;
+                return Stack(
+                  children: [
+                    // Background track beralur halus
+                    Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(9),
+                        color: isDark ? Colors.black.withValues(alpha: 0.4) : Colors.black.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    // Progress Fill Bar Solid & Clear
+                    if (filledWidth > 0)
+                      AnimatedContainer(
+                        duration: const Duration(milliseconds: 300),
+                        width: filledWidth,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: baseColor,
+                          boxShadow: [
+                            BoxShadow(
+                              color: baseColor.withValues(alpha: 0.4),
+                              blurRadius: 4,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                );
+              },
             ),
           ),
       ],
@@ -5077,3 +5161,5 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     );
   }
 }
+
+

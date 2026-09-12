@@ -154,8 +154,8 @@ class EyeTestLogic {
     final String mainChar = randomTest['main']!;
     final String oddChar = randomTest['odd']!;
 
-    const int rows = 12;
-    const int cols = 16;
+    const int rows = 10;
+    const int cols = 10;
 
     final random = Random();
     final int targetRow = random.nextInt(rows);
@@ -301,19 +301,19 @@ class EyeTestLogic {
                                             );
                                           }
                                         },
-                                  child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 2),
-                                    child: Text(
-                                      char,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black87,
-                                        fontFamily: 'monospace',
-                                      ),
-                                    ),
-                                  ),
+                                   child: Padding(
+                                     padding: const EdgeInsets.symmetric(vertical: 4),
+                                     child: Text(
+                                       char,
+                                       textAlign: TextAlign.center,
+                                       style: const TextStyle(
+                                         fontSize: 22,
+                                         fontWeight: FontWeight.bold,
+                                         color: Colors.black87,
+                                         fontFamily: 'monospace',
+                                       ),
+                                     ),
+                                   ),
                                 ),
                               );
                             }),

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/utils/country_helper.dart';
 
 class LoveMenuHelper {
   static void showLoveMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -375,9 +376,10 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
 
       final String continent = _getContinentForIso(iso);
       final String genderFolder = gender == 'Laki-laki' ? 'male' : 'female';
+      final String countryFolder = CountryHelper.normalizeCountryFolder(countryName);
 
-      final String firstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/$genderFolder/firstname.json');
-      final String lastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/$genderFolder/lastname.json');
+      final String firstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/$genderFolder/firstname.json');
+      final String lastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/$genderFolder/lastname.json');
 
       final List<dynamic> firstList = jsonDecode(firstContent);
       final List<dynamic> lastList = jsonDecode(lastContent);

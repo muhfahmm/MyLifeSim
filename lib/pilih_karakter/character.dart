@@ -13,6 +13,7 @@ import 'package:mylifesim/avatar/skin_color_inheritance.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/idol_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
+import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
@@ -873,10 +874,11 @@ class Character {
       if (saIsos.contains(isoUpper)) continent = 'sa';
       if (oceaniaIsos.contains(isoUpper)) continent = 'oceania';
 
-      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/male/firstname.json');
-      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/female/firstname.json');
-      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/male/lastname.json');
-      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryLower/female/lastname.json');
+      final String countryFolder = CountryHelper.normalizeCountryFolder(countryName);
+      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/male/firstname.json');
+      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/female/firstname.json');
+      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/male/lastname.json');
+      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$continent/$countryFolder/female/lastname.json');
 
       maleFirstNames = List<String>.from(jsonDecode(maleFirstContent));
       femaleFirstNames = List<String>.from(jsonDecode(femaleFirstContent));

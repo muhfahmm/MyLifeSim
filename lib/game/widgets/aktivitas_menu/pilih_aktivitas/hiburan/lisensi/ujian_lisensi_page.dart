@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/menu_dokter/dokter_utils.dart'; // we can use fmt
+import 'database_soal_paspor.dart';
 
 class UjianLisensiPage extends StatefulWidget {
   final Character character;
@@ -73,35 +73,8 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
         }
       ];
     } else if (name.contains('Paspor')) {
-      return [
-        {
-          'q': 'Apa tujuan utama Anda mengajukan Paspor?',
-          'options': [
-            'Untuk keperluan perjalanan internasional dan wisata luar negeri',
-            'Menghindari pemeriksaan identitas dari aparat penegak hukum',
-            'Sebagai pajangan dan koleksi dokumen pribadi di rumah'
-          ],
-          'answer': 'Untuk keperluan perjalanan internasional dan wisata luar negeri',
-        },
-        {
-          'q': 'Dokumen apa saja yang wajib dilampirkan saat pengajuan paspor baru?',
-          'options': [
-            'Cukup melampirkan kartu nama bisnis atau kartu pelajar',
-            'KTP, Kartu Keluarga, dan Akta Kelahiran atau Ijazah asli',
-            'Hanya perlu membawa surat keterangan sehat jasmani'
-          ],
-          'answer': 'KTP, Kartu Keluarga, dan Akta Kelahiran atau Ijazah asli',
-        },
-        {
-          'q': 'Berapa masa berlaku paspor biasa yang berlaku saat ini bagi WNI?',
-          'options': [
-            'Hanya berlaku 1 tahun saja semenjak diterbitkan',
-            '10 tahun (atau 5 tahun bagi anak di bawah umur/khusus)',
-            'Berlaku seumur hidup tanpa perlu perpanjangan lagi'
-          ],
-          'answer': '10 tahun (atau 5 tahun bagi anak di bawah umur/khusus)',
-        }
-      ];
+      final pool = List<Map<String, dynamic>>.from(databaseSoalPaspor)..shuffle();
+      return pool.take(3).toList();
     } else {
       // Pilot License
       return [
@@ -161,7 +134,7 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
   }
 
   void _showResult() {
-    final bool passed = _correctAnswersCount >= (_questions.length * 0.7); // lulus jika >= 70% benar
+    final bool passed = _correctAnswersCount >= (_questions.length * 0.6); // lulus jika >= 60% benar (misal 2 dari 3)
     final int cost = widget.license['cost'] as int;
 
     setState(() {
@@ -227,7 +200,7 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Ujian: ${widget.license['name']}', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: Text('Ujian: ${widget.license['name']}', style: const TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,

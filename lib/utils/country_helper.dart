@@ -39,6 +39,8 @@ class CountryHelper {
     "chad": "TD",
     "chile": "CL",
     "china": "CN",
+    "cina": "CN",
+    "tiongkok": "CN",
     "costa rica": "CR",
     "curacao": "CW",
     "denmark": "DK",
@@ -241,5 +243,16 @@ class CountryHelper {
     int firstChar = iso.toUpperCase().codeUnitAt(0) - 0x41 + 0x1F1E6;
     int secondChar = iso.toUpperCase().codeUnitAt(1) - 0x41 + 0x1F1E6;
     return String.fromCharCode(firstChar) + String.fromCharCode(secondChar);
+  }
+
+  /// Normalisasi nama negara untuk pencocokan nama folder/file aset (misal "Cina" -> "china")
+  static String normalizeCountryFolder(String? countryName) {
+    if (countryName == null || countryName.trim().isEmpty) return '';
+    String cleanName = countryName.trim().toLowerCase();
+    if (cleanName.contains(',')) {
+      cleanName = cleanName.split(',').last.trim();
+    }
+    if (cleanName == 'cina' || cleanName == 'tiongkok') return 'china';
+    return cleanName;
   }
 }

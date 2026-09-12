@@ -5,15 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'package:mylifesim/utils/country_helper.dart';
 
 class PindahNegaraMenuPage extends StatefulWidget {
   final Character character;
   final VoidCallback onComplete;
+  final String? initialSearchQuery;
 
   const PindahNegaraMenuPage({
     super.key,
     required this.character,
     required this.onComplete,
+    this.initialSearchQuery,
   });
 
   @override
@@ -29,6 +32,10 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    if (widget.initialSearchQuery != null && widget.initialSearchQuery!.isNotEmpty) {
+      searchQuery = widget.initialSearchQuery!;
+      _searchController.text = widget.initialSearchQuery!;
+    }
     _tabController.addListener(() {
       setState(() {
         _searchController.clear();
@@ -92,7 +99,8 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
       }
 
       final String continent = _getContinentForIso(iso);
-      final String cityContent = await rootBundle.loadString('json/nama_kota/$continent/$countryLower.json');
+      final String countryFolder = CountryHelper.normalizeCountryFolder(countryName);
+      final String cityContent = await rootBundle.loadString('json/nama_kota/$continent/$countryFolder.json');
       final List<dynamic> jsonList = jsonDecode(cityContent);
       return List<String>.from(jsonList);
     } catch (e) {

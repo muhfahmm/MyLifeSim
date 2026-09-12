@@ -13,6 +13,7 @@ import 'package:mylifesim/pilih_karakter/customization/attributes_customization.
 import 'package:mylifesim/pilih_karakter/customization/special_talent_customization.dart';
 import 'package:mylifesim/pilih_karakter/customization/family_customization.dart';
 import 'package:mylifesim/pilih_karakter/customization/country_picker_dialog.dart';
+import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/pilih_karakter/settings/settings.dart'; // Tambahan Import
 import 'package:mylifesim/main.dart';
 
@@ -128,13 +129,14 @@ class _KarakterScreenState extends State<KarakterScreen> {
     }
 
     final String countryLower = _currentCountry.toLowerCase();
+    final String countryFolder = CountryHelper.normalizeCountryFolder(_currentCountry);
     final String foundContinent = _getContinentForIso(_currentCountryIso);
 
     try {
-      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/firstname.json');
-      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/firstname.json');
-      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/male/lastname.json');
-      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryLower/female/lastname.json');
+      final String maleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryFolder/male/firstname.json');
+      final String femaleFirstContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryFolder/female/firstname.json');
+      final String maleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryFolder/male/lastname.json');
+      final String femaleLastContent = await rootBundle.loadString('json/firstname_lastname/$foundContinent/$countryFolder/female/lastname.json');
 
       final List<String> maleFirst = List<String>.from(jsonDecode(maleFirstContent));
       final List<String> femaleFirst = List<String>.from(jsonDecode(femaleFirstContent));
@@ -143,7 +145,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
       List<String> loadedCities = [];
       try {
-        final String cityContent = await rootBundle.loadString('json/nama_kota/$foundContinent/$countryLower.json');
+        final String cityContent = await rootBundle.loadString('json/nama_kota/$foundContinent/$countryFolder.json');
         loadedCities = List<String>.from(jsonDecode(cityContent));
       } catch (e) {
         debugPrint('Error loading city JSON for $countryLower: $e');
@@ -243,17 +245,17 @@ class _KarakterScreenState extends State<KarakterScreen> {
     final bool isMale = widget.gender == 'male' || widget.gender == 'laki-laki';
     
     // Gunakan fallback jika list null
-    final List<String> firstList = (isMale ? _maleFirstNames : _femaleFirstNames) ?? [];
+    final List<String> firstList = isMale ? _maleFirstNames : _femaleFirstNames;
     List<String> lastList = [];
     if (isMale) {
-      lastList = _maleLastNames ?? [];
+      lastList = _maleLastNames;
     } else {
-      lastList = _femaleLastNames ?? [];
+      lastList = _femaleLastNames;
     }
     
     // Jika kosong, gunakan fallback ke _allLastNames
     if (lastList.isEmpty) {
-      lastList = _allLastNames ?? [];
+      lastList = _allLastNames;
     }
 
     final random = Random();
@@ -540,9 +542,9 @@ class _KarakterScreenState extends State<KarakterScreen> {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   decoration: BoxDecoration(
-                    color: genderColor.withOpacity(0.1),
+                    color: genderColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: genderColor.withOpacity(0.3)),
+                    border: Border.all(color: genderColor.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -1002,68 +1004,6 @@ class _KarakterScreenState extends State<KarakterScreen> {
             ),
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildCustomizerDropdown({
-    required String label,
-    required String value,
-    required Map<String, String> items,
-    required ValueChanged<String?> onChanged,
-    bool isColorDropdown = false,
-  }) {
-    final finalValue = items.values.contains(value) ? value : items.values.first;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
-          const SizedBox(height: 4),
-          DropdownButtonFormField<String>(
-            value: finalValue,
-            decoration: InputDecoration(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            items: items.entries.map((entry) {
-              Widget leading = const SizedBox.shrink();
-              if (isColorDropdown) {
-                Color swatchColor = Colors.transparent;
-                try {
-                  swatchColor = Color(int.parse('FF${entry.value}', radix: 16));
-                } catch (_) {}
-                
-                leading = Container(
-                  width: 14,
-                  height: 14,
-                  margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(
-                    color: swatchColor,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey.shade300, width: 1),
-                  ),
-                );
-              }
-
-              return DropdownMenuItem<String>(
-                value: entry.value,
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    leading,
-                    Text(entry.key),
-                  ],
-                ),
-              );
-            }).toList(),
-            onChanged: onChanged,
-          ),
-        ],
       ),
     );
   }

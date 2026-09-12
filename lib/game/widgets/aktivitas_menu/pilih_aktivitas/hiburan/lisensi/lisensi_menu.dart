@@ -50,7 +50,7 @@ class _LisensiPageState extends State<LisensiPage> {
   final List<Map<String, dynamic>> lisensi = [
     {'name': 'SIM A (Mobil) 🚗', 'cost': 500000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda empat'},
     {'name': 'SIM C (Motor) 🏍️', 'cost': 300000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda dua'},
-    {'name': 'Paspor 🛂', 'cost': 700000, 'minAge': 17, 'desc': 'Dokumen perjalanan internasional'},
+    {'name': 'Paspor 🛂', 'cost': 25000, 'minAge': 17, 'desc': 'Dokumen perjalanan internasional'},
     {'name': 'Lisensi Pilot ✈️', 'cost': 50000000, 'minAge': 21, 'desc': 'Lisensi untuk menerbangkan pesawat'},
   ];
 
@@ -242,10 +242,36 @@ class _LisensiPageState extends State<LisensiPage> {
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               title: Text('Saldo Kurang 💸', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
                               content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                              actionsAlignment: MainAxisAlignment.end,
+                              actionsOverflowDirection: VerticalDirection.down,
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
                                   child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
+                                ),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.person, size: 14),
+                                  label: const Text('Minta Ibu 👩', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.pink.shade400,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    _handleAskParent(context, isMother: true, license: l);
+                                  },
+                                ),
+                                ElevatedButton.icon(
+                                  icon: const Icon(Icons.person, size: 14),
+                                  label: const Text('Minta Ayah 👨', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue.shade600,
+                                    foregroundColor: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(ctx);
+                                    _handleAskParent(context, isMother: false, license: l);
+                                  },
                                 ),
                               ],
                             ),
@@ -269,7 +295,7 @@ class _LisensiPageState extends State<LisensiPage> {
                             ),
                           ),
                         ).then((passed) {
-                          if (passed == true && mounted) {
+                          if (passed == true && mounted && context.mounted) {
                             _checkParentGiftOffer(context, l);
                           }
                         });
@@ -394,5 +420,92 @@ class _LisensiPageState extends State<LisensiPage> {
         ],
       ),
     );
+  }
+
+  void _handleAskParent(BuildContext context, {required bool isMother, required Map<String, dynamic> license}) {
+    final String parentRole = isMother ? 'Ibu' : 'Ayah';
+    final String? parentName = isMother ? widget.character.motherName : widget.character.fatherName;
+    final bool isDeceased = isMother ? widget.character.isMotherDeceased : widget.character.isFatherDeceased;
+    final int cost = license['cost'] as int;
+
+    if (isDeceased || parentName == null) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('$parentRole Tidak Ada 😔', style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Text('${parentName ?? parentRole} sudah tidak ada / meninggal dunia, sehingga tidak dapat membayarkan lisensi.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          ],
+        ),
+      );
+      return;
+    }
+
+    final int parentWealth = isMother ? widget.character.getMotherWealth() : widget.character.getFatherWealth();
+
+    // Jika nilai kekayaan kurang dari biaya lisensi, orang tua otomatis menolak
+    if (parentWealth < cost) {
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Permintaan Ditolak 🚫', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(
+            '$parentName ($parentRole) menolak membayarkan lisensi ${license['name']}.\n\nNilai kekayaan $parentRole (${CurrencySettings.format(parentWealth)}) tidak cukup untuk membayarkan biaya sebesar ${CurrencySettings.format(cost)}.',
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK')),
+          ],
+        ),
+      );
+    } else {
+      // Orang tua menyetujui dan membayarkan
+      if (isMother) {
+        widget.character.motherWealth = parentWealth - cost;
+      } else {
+        widget.character.fatherWealth = parentWealth - cost;
+      }
+      widget.character.money += cost;
+      setState(() {});
+      widget.onComplete();
+
+      showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: Text('Dibiayai $parentRole! 🎉', style: const TextStyle(fontWeight: FontWeight.bold)),
+          content: Text(
+            'Selamat! $parentName ($parentRole) menyetujui untuk membayarkan biaya lisensi ${license['name']} sebesar ${CurrencySettings.format(cost)}!\n\nSaldo kamu bertambah ${CurrencySettings.format(cost)} dan kamu siap mengikuti ujian.',
+          ),
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+              onPressed: () {
+                Navigator.pop(ctx);
+                // Langsung masuk ke Ujian Lisensi
+                Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => UjianLisensiPage(
+                      character: widget.character,
+                      license: license,
+                      onComplete: () {
+                        if (mounted) {
+                          setState(() {});
+                          widget.onComplete();
+                        }
+                      },
+                    ),
+                  ),
+                );
+              },
+              child: const Text('Mulai Ujian 📝'),
+            ),
+          ],
+        ),
+      );
+    }
   }
 }
