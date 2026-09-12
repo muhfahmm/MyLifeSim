@@ -14,10 +14,11 @@ class LogikaEkskulRenang {
 
   static int hitungPeluangDiterima(Character character, int baseChance) {
     final bool ikutEkskul = apakahIkutEkskulRenang(character);
-    if (ikutEkskul) {
+    final int practiceCount = character.extracurricularPracticeCounts['Renang'] ?? 0;
+    if (ikutEkskul && practiceCount >= 3) {
       return 90;
     } else {
-      return 30;
+      return 15;
     }
   }
 }

@@ -69,7 +69,10 @@ class ContractBalapModal {
             Row(
               children: [
                 TextButton(
-                  onPressed: () => Navigator.pop(ctx),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    onDone();
+                  },
                   child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold, fontSize: 13)),
                 ),
                 const SizedBox(width: 4),

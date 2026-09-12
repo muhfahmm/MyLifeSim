@@ -68,4 +68,42 @@ class LogikaPemainRenang {
       'leagueMatches': totalPerlombaan,
     };
   }
+
+  static void jalankanSimulasiMusim(Character character, List<String> events) {
+    if (character.jobName == null) return;
+    final String title = character.jobName!;
+    if (!title.toLowerCase().contains('renang')) return;
+
+    final rand = Random();
+    String teamName = 'Klub Usia Muda';
+    if (title.contains(' - ')) {
+      teamName = title.split(' - ').last.trim();
+    }
+
+    character.currentAthleteStats = simulasiMusim(
+      usia: character.age,
+      teamName: teamName,
+      jobTitle: title,
+      totalPerlombaan: 10,
+      health: character.health,
+      discipline: character.discipline,
+      rand: rand,
+    );
+
+    final int appearances = character.currentAthleteStats!['appearances'] as int;
+    final int goldMedals = character.currentAthleteStats!['goldMedals'] as int;
+    final int totalMedals = character.currentAthleteStats!['totalMedals'] as int;
+    final double avgRating = character.currentAthleteStats!['rating'] as double;
+
+    character.athleteSeasonStats.add(Map<String, dynamic>.from(character.currentAthleteStats!));
+
+    final String notice = '🏊‍♂️ Statistik Musim Usia ${character.age} ($teamName):\n'
+        '• Keikutsertaan: $appearances / 10 Perlombaan\n'
+        '• Medali Emas: $goldMedals 🥇 | Total Medali: $totalMedals 🏅\n'
+        '• Performa Rating: ${avgRating.toStringAsFixed(1)} / 10.0 ⭐';
+    character.pendingAthleteSeasonNotice = notice;
+    character.inbox.add(notice);
+
+    character.athleteContractYears -= 1;
+  }
 }

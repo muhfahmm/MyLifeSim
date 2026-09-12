@@ -16,7 +16,8 @@ class LogikaEkskulSepakbola {
   }
 
   /// Menghitung/menyesuaikan persentase peluang diterima kontrak pemain sepakbola.
-  /// Jika user tidak mengikuti ekstrakurikuler sepakbola, persentase diterimanya hanya 30%.
+  /// Jika user belum ikut ekskul atau belum melakukan setidaknya 3 kali aktivitas/latihan, peluang 15%.
+  /// Jika sudah ikut ekskul DAN sudah melakukan at least 3 kali latihan, peluang 90%.
   static int hitungPeluangDiterima({
     required Character character,
     required int baseChance,
@@ -25,12 +26,12 @@ class LogikaEkskulSepakbola {
     if (!isSoccer) return baseChance;
 
     final bool ikutEkskul = apakahIkutEkskulSepakbola(character);
-    if (ikutEkskul) {
-      // Jika user mengikuti ekstrakurikuler sepakbola, persentase diterimanya menjadi 90%
+    final int practiceCount = character.extracurricularPracticeCounts['Sepakbola'] ?? 0;
+
+    if (ikutEkskul && practiceCount >= 3) {
       return 90;
     } else {
-      // Jika user tidak mengikuti ekstrakurikuler sepakbola, persentase diterimanya hanya 30%
-      return 30;
+      return 15;
     }
   }
 }

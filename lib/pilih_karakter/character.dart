@@ -2,6 +2,9 @@ import 'dart:math';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_pemain_sepakbola.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/basket/basket_logic/logika_pemain_basket.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/balap/balap_logic/logika_pemain_balap.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/renang/renang_logic/logika_pemain_renang.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/database_formasi_pelatih.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
@@ -157,6 +160,7 @@ class Character {
   Map<String, String>? sdHeadmaster; // Kepala Sekolah SD
   Map<String, String>? sdBkTeacher; // Guru BK SD
   List<String> joinedExtracurriculars = []; // Daftar ekstrakurikuler yang diikuti
+  Map<String, int> extracurricularPracticeCounts = {}; // Jumlah sesi latihan per ekstrakurikuler
   Map<String, String>? smpHeadmaster; // Kepala Sekolah SMP
   Map<String, String>? smpBkTeacher; // Guru BK SMP
 
@@ -1562,10 +1566,13 @@ class Character {
       inbox.add(notice);
     }
 
-    // Update karir Idol jika ada
+    // Update karir Idol & Atlet jika ada
     if (!isImprisoned) {
       IdolManager.ageUpIdol(this, events, inbox);
       LogikaPemainSepakbola.jalankanSimulasiMusim(this, events);
+      LogikaPemainBasket.jalankanSimulasiMusim(this, events);
+      LogikaPemainBalap.jalankanSimulasiMusim(this, events);
+      LogikaPemainRenang.jalankanSimulasiMusim(this, events);
     }
 
     if (age == 12) {

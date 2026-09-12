@@ -73,7 +73,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     } else if (job.contains('Petenis')) {
       return AtlitTenisActivitiesPage(character: character, onRefresh: refresh);
     } else if (job.contains('MMA') || job.contains('Petinju')) {
-      return AtlitTinjuMmaActivitiesPage(character: character, onRefresh: refresh);
+      return AtlitTinjuMMAActivitiesPage(character: character, onRefresh: refresh);
     }
     return AtlitActivitiesPage(character: character, onRefresh: refresh);
   }

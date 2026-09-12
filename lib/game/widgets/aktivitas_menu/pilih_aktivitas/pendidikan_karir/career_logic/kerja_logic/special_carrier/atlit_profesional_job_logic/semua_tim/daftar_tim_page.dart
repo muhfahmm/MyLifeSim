@@ -221,8 +221,13 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
       }
 
       // Catatan ekskul hanya ditampilkan jika olahraga ini memang ada di menu ekskul sekolah
-      final String ekskulNote = (adaDiEkskulSekolah && !ikutEkskul)
-          ? '\n\n💡 Petunjuk: Kamu belum/tidak mengikuti Ekstrakurikuler $sportTitle di sekolah, sehingga peluang diterimamu hanya 30%!'
+      final int count = character.extracurricularPracticeCounts[sportTitle] ?? 0;
+      final String ekskulNote = (adaDiEkskulSekolah)
+          ? (!ikutEkskul
+              ? '\n\n💡 Petunjuk: Kamu belum mengikuti Ekstrakurikuler $sportTitle di sekolah, sehingga peluang diterimamu hanya 15%! Lakukan minimal 3 kali kegiatan/latihan di ekskul agar bisa diterima.'
+              : (count < 3
+                  ? '\n\n💡 Petunjuk: Kamu sudah ikutan Ekskul $sportTitle tapi baru melakukan $count kali kegiatan/latihan. Kamu harus melakukan latihan minimal 3 kali agar peluang diterima menjadi tinggi!'
+                  : ''))
           : '';
 
       showDialog(

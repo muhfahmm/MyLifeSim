@@ -13,13 +13,14 @@ class LogikaEkskulBasket {
     );
   }
 
-  /// Peluang diterima tim basket berdasarkan keikutsertaan ekskul bola basket (90% vs 30%)
+  /// Peluang diterima tim basket berdasarkan keikutsertaan ekskul & minimal 3 kali latihan (90% vs 15%)
   static int hitungPeluangDiterimaBasket(Character character, int baseChance) {
     final bool ikutEkskul = apakahIkutEkskulBasket(character);
-    if (ikutEkskul) {
+    final int practiceCount = character.extracurricularPracticeCounts['Basket'] ?? 0;
+    if (ikutEkskul && practiceCount >= 3) {
       return 90;
     } else {
-      return 30;
+      return 15;
     }
   }
 }

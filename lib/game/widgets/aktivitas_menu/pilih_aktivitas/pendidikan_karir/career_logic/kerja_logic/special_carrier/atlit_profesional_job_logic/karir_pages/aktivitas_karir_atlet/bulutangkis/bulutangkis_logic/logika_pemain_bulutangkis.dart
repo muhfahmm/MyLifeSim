@@ -72,4 +72,43 @@ class LogikaPemainBulutangkis {
       'leagueMatches': totalTurnamen,
     };
   }
+
+  static void jalankanSimulasiMusim(Character character, List<String> events) {
+    if (character.jobName == null) return;
+    final String title = character.jobName!;
+    if (!title.toLowerCase().contains('bulutangkis') && !title.toLowerCase().contains('badminton')) return;
+
+    final rand = Random();
+    String teamName = 'Klub Bulutangkis';
+    if (title.contains(' - ')) {
+      teamName = title.split(' - ').last.trim();
+    }
+
+    character.currentAthleteStats = simulasiMusim(
+      usia: character.age,
+      teamName: teamName,
+      jobTitle: title,
+      totalTurnamen: 12,
+      health: character.health,
+      discipline: character.discipline,
+      rand: rand,
+    );
+
+    final int appearances = character.currentAthleteStats!['appearances'] as int;
+    final int titles = character.currentAthleteStats!['titles'] as int;
+    final int runnerUps = character.currentAthleteStats!['runnerUps'] as int;
+    final double avgRating = character.currentAthleteStats!['rating'] as double;
+
+    character.athleteSeasonStats.add(Map<String, dynamic>.from(character.currentAthleteStats!));
+
+    final String notice = '🏸 Statistik Musim Usia ${character.age} ($teamName):\n'
+        '• Turnamen Diikuti: $appearances / 12 Turnamen\n'
+        '• Gelar Juara 1: $titles 🏆 | Runner Up: $runnerUps 🥈\n'
+        '• Performa Rating: ${avgRating.toStringAsFixed(1)} / 10.0 ⭐';
+    character.pendingAthleteSeasonNotice = notice;
+    character.inbox.add(notice);
+
+    character.athleteContractYears -= 1;
+  }
 }
+

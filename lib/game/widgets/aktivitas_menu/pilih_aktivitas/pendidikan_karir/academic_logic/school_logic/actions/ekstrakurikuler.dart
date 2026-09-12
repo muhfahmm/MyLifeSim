@@ -135,6 +135,11 @@ class _ExtracurricularActionPageState extends State<ExtracurricularActionPage> {
 
   void _joinOrPracticeSport(String sportName) {
     bool isAlreadyMember = widget.character.joinedExtracurriculars.contains('Olahraga ($sportName)');
+    
+    // Track practice count for sports
+    final currentCount = widget.character.extracurricularPracticeCounts[sportName] ?? 0;
+    widget.character.extracurricularPracticeCounts[sportName] = currentCount + 1;
+
     if (!isAlreadyMember) {
       widget.character.joinedExtracurriculars.add('Olahraga ($sportName)');
       widget.character.health = (widget.character.health + 5).clamp(0, 100);
