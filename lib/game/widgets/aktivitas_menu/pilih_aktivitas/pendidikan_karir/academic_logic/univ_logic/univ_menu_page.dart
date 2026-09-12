@@ -263,30 +263,35 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
         title: Text(
           'Pendaftaran: $major 🎓',
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontSize: 15,
             color: isDark ? Colors.white : Colors.black87,
           ),
         ),
         content: Text(
           'Pilih jalur pendaftaran universitas yang ingin kamu ambil:',
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+          style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 6.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
                 ),
-                icon: const Icon(Icons.account_balance),
-                label: const Text('Universitas Negeri (Tes Seleksi)', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.account_balance, size: 18),
+                label: const Text('Universitas Negeri (Tes Seleksi)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _tryNegeri(context, major);
@@ -295,17 +300,17 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 6.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.orange,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
                 ),
-                icon: const Icon(Icons.business),
-                label: const Text('Universitas Swasta (Mandiri)', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.business, size: 18),
+                label: const Text('Universitas Swasta (Mandiri)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _trySwasta(context, major);
@@ -314,17 +319,17 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.only(bottom: 8.0),
+            padding: const EdgeInsets.only(bottom: 6.0),
             child: SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.purple,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  padding: const EdgeInsets.symmetric(vertical: 9),
                 ),
-                icon: const Icon(Icons.stars),
-                label: const Text('Beasiswa Berprestasi', style: TextStyle(fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.stars, size: 18),
+                label: const Text('Beasiswa Berprestasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _tryBeasiswa(context, major);
@@ -332,9 +337,12 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
               ),
             ),
           ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey)),
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 12)),
+            ),
           ),
         ],
       ),

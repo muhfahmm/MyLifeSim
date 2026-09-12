@@ -61,47 +61,47 @@ class _BekerjaKerasActionPageState extends State<BekerjaKerasActionPage> {
         foregroundColor: Colors.white,
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         children: [
           Card(
             elevation: 0,
             color: Colors.green.shade50,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(14),
               side: BorderSide(color: Colors.green.shade100),
             ),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 10.0),
               child: Column(
                 children: [
-                  const Icon(Icons.trending_up, size: 48, color: Colors.green),
-                  const SizedBox(height: 12),
+                  const Icon(Icons.trending_up, size: 36, color: Colors.green),
+                  const SizedBox(height: 6),
                   const Text(
                     'Bekerja Lebih Giat',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.green),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.green),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   Text(
                     'Pekerjaan: ${widget.character.jobName ?? "Tidak ada"}',
-                    style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
+                    style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   const Text(
                     'Menunjukkan performa kerja yang luar biasa akan membantu mempercepat promosi jabatan dan meningkatkan bonus gaji tahunan.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                    style: TextStyle(fontSize: 11.5, color: Colors.black54),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 14),
 
           const Text(
             'PILIH METODE KERJA LEBIH GIAT',
-            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
+            style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 0.8),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
 
           _buildMethodCard(
             icon: Icons.timer,
@@ -144,17 +144,18 @@ class _BekerjaKerasActionPageState extends State<BekerjaKerasActionPage> {
   }) {
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: Colors.grey.shade200),
       ),
       child: ListTile(
-        leading: Icon(icon, color: color, size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('$subtitle\n($gain)'),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        leading: Icon(icon, color: color, size: 24),
+        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        subtitle: Text('$subtitle\n($gain)', style: const TextStyle(fontSize: 11)),
         isThreeLine: true,
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 13, color: Colors.grey),
         onTap: onTap,
       ),
     );

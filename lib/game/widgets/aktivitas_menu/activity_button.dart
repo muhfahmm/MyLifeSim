@@ -648,6 +648,7 @@ class ActivityButton extends StatelessWidget {
   }) {
     final bool isUnlocked = currentAge >= minAge;
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     final Color itemColor = isUnlocked ? color : Colors.grey.shade500;
     final Color bgColor = isUnlocked
@@ -680,7 +681,7 @@ class ActivityButton extends StatelessWidget {
                           Expanded(
                             child: Text(
                               customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
-                              style: const TextStyle(fontSize: 14),
+                              style: TextStyle(fontSize: isMobile ? 13 : 14),
                             ),
                           ),
                         ],
@@ -725,8 +726,8 @@ class ActivityButton extends StatelessWidget {
                 );
               },
         child: Container(
-          margin: const EdgeInsets.only(bottom: 8),
-          padding: const EdgeInsets.all(12),
+          margin: const EdgeInsets.only(bottom: 6),
+          padding: EdgeInsets.all(isMobile ? 10 : 12),
           decoration: BoxDecoration(
             color: bgColor,
             borderRadius: BorderRadius.circular(12),
@@ -734,8 +735,8 @@ class ActivityButton extends StatelessWidget {
           ),
           child: Row(
             children: [
-              Icon(icon, color: itemColor, size: 22),
-              const SizedBox(width: 12),
+              Icon(icon, color: itemColor, size: isMobile ? 20 : 22),
+              SizedBox(width: isMobile ? 10 : 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -744,14 +745,14 @@ class ActivityButton extends StatelessWidget {
                       label,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: isMobile ? 13 : 14,
                         color: isUnlocked ? textColor : Colors.grey.shade500,
                       ),
                     ),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isMobile ? 11 : 12,
                         color: isUnlocked ? subtitleColor : Colors.grey.shade400,
                       ),
                     ),
@@ -760,7 +761,7 @@ class ActivityButton extends StatelessWidget {
               ),
               Icon(
                 isUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline,
-                size: isUnlocked ? 14 : 16,
+                size: isUnlocked ? (isMobile ? 12 : 14) : 16,
                 color: isUnlocked ? arrowColor : Colors.grey.shade400,
               ),
             ],

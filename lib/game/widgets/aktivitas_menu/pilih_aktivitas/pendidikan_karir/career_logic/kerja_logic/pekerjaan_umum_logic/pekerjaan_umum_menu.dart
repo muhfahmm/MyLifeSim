@@ -193,76 +193,103 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
                 final job = _jobs[index];
                 final meetsIntel = character.intelligence >= (job['minIntel'] ?? 0);
 
+                final bool isMobile = MediaQuery.of(context).size.width < 600;
+
                 return Card(
                   elevation: 0,
-                  margin: const EdgeInsets.only(bottom: 8),
+                  margin: EdgeInsets.only(bottom: isMobile ? 6 : 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                   ),
                   color: isDark ? Colors.grey.shade800 : null,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: job['color'].withValues(alpha: 0.1),
-                      child: Icon(job['icon'], color: job['color']),
-                    ),
-                    title: Text(
-                      job['title'],
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: EdgeInsets.all(isMobile ? 10 : 12),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Text(
-                          'Gaji: ${CurrencySettings.format((job['salary'] * _salaryMultiplier).round())}/tahun • ${job['category']}',
-                          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
+                        CircleAvatar(
+                          radius: isMobile ? 18 : 20,
+                          backgroundColor: job['color'].withValues(alpha: 0.1),
+                          child: Icon(job['icon'], color: job['color'], size: isMobile ? 20 : 24),
                         ),
-                        Text(
-                          job['desc'],
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark ? Colors.white60 : Colors.grey,
+                        SizedBox(width: isMobile ? 10 : 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                job['title'],
+                                style: TextStyle(
+                                  fontSize: isMobile ? 13 : 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 2),
+                              Text(
+                                'Gaji: ${CurrencySettings.format((job['salary'] * _salaryMultiplier).round())}/tahun • ${job['category']}',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 11 : 12,
+                                  color: isDark ? Colors.white70 : Colors.black54,
+                                ),
+                              ),
+                              Text(
+                                job['desc'],
+                                style: TextStyle(
+                                  fontSize: isMobile ? 10.5 : 11.5,
+                                  color: isDark ? Colors.white60 : Colors.grey,
+                                  height: 1.2,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: meetsIntel ? Colors.green.shade600 : Colors.grey.shade700,
+                            foregroundColor: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isMobile ? 10 : 14,
+                              vertical: isMobile ? 6 : 8,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          onPressed: () {
+                            if (!meetsIntel) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              return;
+                            }
+                            _applyJob(job);
+                          },
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              if (!meetsIntel) ...[
+                                Icon(Icons.lock, size: isMobile ? 12 : 14, color: Colors.white70),
+                                const SizedBox(width: 4),
+                              ],
+                              Text(
+                                meetsIntel ? 'Lamar' : 'Terkunci',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: isMobile ? 11 : 12,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                    trailing: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: meetsIntel ? Colors.green.shade600 : Colors.grey.shade700,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      onPressed: () {
-                        if (!meetsIntel) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'),
-                              backgroundColor: Colors.red,
-                            ),
-                          );
-                          return;
-                        }
-                        _applyJob(job);
-                      },
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          if (!meetsIntel) ...[
-                            const Icon(Icons.lock, size: 14, color: Colors.white70),
-                            const SizedBox(width: 4),
-                          ],
-                          Text(
-                            meetsIntel ? 'Lamar' : 'Terkunci',
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
                 );

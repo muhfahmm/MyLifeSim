@@ -73,7 +73,8 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isDark = MediaQuery.platformBrightnessOf(context) == Brightness.dark;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
     final gigs = FreelanceDatabase.availableGigs;
 
     return Scaffold(
@@ -93,7 +94,7 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(isMobile ? 10 : 16),
           itemCount: gigs.length,
           itemBuilder: (context, index) {
             final gig = gigs[index];
@@ -104,65 +105,93 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
             final bool isEligible = widget.character.intelligence >= minIntel;
 
             return Card(
-              margin: const EdgeInsets.only(bottom: 12),
+              margin: EdgeInsets.only(bottom: isMobile ? 8 : 12),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               color: isDark ? Colors.grey.shade800 : Colors.white,
               elevation: 2,
-              child: ListTile(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, color: color, size: 28),
-                ),
-                title: Text(
-                  gig['title'],
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+              child: Padding(
+                padding: EdgeInsets.all(isMobile ? 10 : 14),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    const SizedBox(height: 4),
-                    Text(
-                      gig['desc'],
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    Container(
+                      padding: EdgeInsets.all(isMobile ? 8 : 10),
+                      decoration: BoxDecoration(
+                        color: color.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Icon(icon, color: color, size: isMobile ? 22 : 28),
+                    ),
+                    SizedBox(width: isMobile ? 10 : 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            gig['title'],
+                            style: TextStyle(
+                              fontSize: isMobile ? 13 : 15,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            gig['desc'],
+                            style: TextStyle(
+                              fontSize: isMobile ? 11 : 12,
+                              color: isDark ? Colors.white70 : Colors.grey.shade600,
+                              height: 1.25,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Wrap(
+                            spacing: 8,
+                            runSpacing: 2,
+                            children: [
+                              Text(
+                                'Bayaran: ${CurrencySettings.format(payout)}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.green,
+                                  fontSize: isMobile ? 11.5 : 13,
+                                ),
+                              ),
+                              Text(
+                                'Kecerdasan: $minIntel%',
+                                style: TextStyle(
+                                  fontSize: isMobile ? 10.5 : 11,
+                                  color: isEligible ? (isDark ? Colors.white54 : Colors.grey.shade600) : Colors.red,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          'Bayaran: ${CurrencySettings.format(payout)}',
-                          style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.green, fontSize: 13),
+                    const SizedBox(width: 8),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: isEligible ? Colors.purple.shade700 : Colors.grey,
+                        foregroundColor: Colors.white,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 10 : 14,
+                          vertical: isMobile ? 6 : 8,
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Kecerdasan: $minIntel%',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isEligible ? (isDark ? Colors.white54 : Colors.grey.shade600) : Colors.red,
-                          ),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      onPressed: () => _takeFreelanceGig(gig),
+                      child: Text(
+                        'Ambil',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: isMobile ? 11.5 : 13,
                         ),
-                      ],
+                      ),
                     ),
                   ],
-                ),
-                trailing: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isEligible ? Colors.purple.shade700 : Colors.grey,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  ),
-                  onPressed: () => _takeFreelanceGig(gig),
-                  child: const Text('Ambil', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
               ),
             );

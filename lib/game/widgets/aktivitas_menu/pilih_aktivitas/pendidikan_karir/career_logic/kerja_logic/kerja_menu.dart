@@ -800,13 +800,14 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     int minAge = 0,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
     final int currentAge = widget.character.age;
     final bool isUnlocked = currentAge >= minAge;
     final Color effectiveColor = isUnlocked ? color : Colors.grey;
 
     return Card(
       elevation: 0,
-      margin: const EdgeInsets.only(bottom: 8),
+      margin: EdgeInsets.only(bottom: isMobile ? 6 : 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
@@ -815,24 +816,29 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           ? (isDark ? Colors.grey.shade800 : null)
           : (isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.grey.shade100),
       child: ListTile(
-        leading: Icon(icon, color: effectiveColor, size: 28),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: isMobile ? 12 : 16,
+          vertical: isMobile ? 4 : 8,
+        ),
+        leading: Icon(icon, color: effectiveColor, size: isMobile ? 24 : 28),
         title: Text(
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontSize: isMobile ? 13 : 15,
             color: isUnlocked ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade600,
           ),
         ),
         subtitle: Text(
           subtitle,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: isMobile ? 11 : 12,
             color: isUnlocked ? (isDark ? Colors.white60 : Colors.grey) : Colors.grey.shade500,
           ),
         ),
         trailing: Icon(
           isUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline,
-          size: isUnlocked ? 14 : 16,
+          size: isUnlocked ? (isMobile ? 12 : 14) : 16,
           color: isUnlocked ? (isDark ? Colors.white54 : Colors.grey) : Colors.grey.shade500,
         ),
         onTap: () {
@@ -851,7 +857,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       Expanded(
                         child: Text(
                           'Kamu harus berusia minimal $minAge tahun untuk membuka lowongan pekerjaan ini.',
-                          style: const TextStyle(fontSize: 14),
+                          style: TextStyle(fontSize: isMobile ? 13 : 14),
                         ),
                       ),
                     ],

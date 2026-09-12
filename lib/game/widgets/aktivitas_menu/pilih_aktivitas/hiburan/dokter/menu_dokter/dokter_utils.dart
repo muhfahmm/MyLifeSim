@@ -139,7 +139,7 @@ class DokterUtils {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Saldo Kurang 💸'),
-          content: Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar \$${fmt(cost)}.\n' +
+          content: Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar ${fmt(cost)}.\n' +
               (hasParents 
                   ? 'Apakah kamu ingin meminta bantuan orang tuamu untuk membiayai pengobatan?' 
                   : 'Kamu tidak memiliki orang tua untuk dimintai bantuan.')),
@@ -186,7 +186,7 @@ class DokterUtils {
             context: context,
             builder: (ctx) => AlertDialog(
               title: const Text('Orang Tua Setuju 🎉'),
-              content: Text('Orang tuamu bersedia membayar pengobatan sebesar \$${fmt(cost)}! Hubunganmu dengan mereka meningkat.'),
+              content: Text('Orang tuamu bersedia membayar pengobatan sebesar ${fmt(cost)}! Hubunganmu dengan mereka meningkat.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(ctx),
@@ -228,7 +228,7 @@ class DokterUtils {
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Penyakit Terdeteksi 🤒'),
-          content: Text('Dokter mendeteksi kamu mengidap $targetDisease.\nApakah kamu ingin sekalian mengobatinya dengan biaya \$${fmt(cost)} melalui $menuType?'),
+          content: Text('Dokter mendeteksi kamu mengidap $targetDisease.\nApakah kamu ingin sekalian mengobatinya dengan biaya ${fmt(cost)} melalui $menuType?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, false),
@@ -263,13 +263,13 @@ class DokterUtils {
       character.health = (character.health + 25).clamp(0, 100);
       final int hapGain = getHappinessGainOnCured(targetDisease);
       character.happiness = (character.happiness + hapGain).clamp(0, 100);
-      character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $targetDisease via $menuType (-\$$cost uang, +25% Kesehatan, +$hapGain% Kebahagiaan)');
+      character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $targetDisease via $menuType (-${fmt(cost)} uang, +25% Kesehatan, +$hapGain% Kebahagiaan)');
 
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Pengobatan Berhasil 🎉'),
-          content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% dan Kebahagiaanmu meningkat +$hapGain% (\$${fmt(cost)} uang berkurang).'),
+          content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% dan Kebahagiaanmu meningkat +$hapGain% (${fmt(cost)} uang berkurang).'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -290,13 +290,13 @@ class DokterUtils {
         failMsg = 'Dokter telah berusaha semaksimal mungkin, namun penyakitmu belum berhasil disembuhkan sepenuhnya.';
       }
       
-      character.inbox.add('🏥 Pengobatan Gagal: Upaya mengobati $targetDisease via $menuType belum berhasil (-\$$cost uang, +$partialHeal% Kesehatan)');
+      character.inbox.add('🏥 Pengobatan Gagal: Upaya mengobati $targetDisease via $menuType belum berhasil (-${fmt(cost)} uang, +$partialHeal% Kesehatan)');
 
       await showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Pengobatan Belum Berhasil 😔'),
-          content: Text('$failMsg\nPenyakit tetap ada di tubuhmu, tetapi kesehatanmu membaik sedikit +$partialHeal% karena terapi medis.\nBiaya sebesar \$${fmt(cost)} tetap ditagihkan.'),
+          content: Text('$failMsg\nPenyakit tetap ada di tubuhmu, tetapi kesehatanmu membaik sedikit +$partialHeal% karena terapi medis.\nBiaya sebesar ${fmt(cost)} tetap ditagihkan.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),

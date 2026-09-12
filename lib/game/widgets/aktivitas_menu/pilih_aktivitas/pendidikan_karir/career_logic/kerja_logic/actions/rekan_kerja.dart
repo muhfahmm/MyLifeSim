@@ -292,78 +292,81 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                     side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                   ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: NetworkImage(avatarUrl),
-                    ),
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        if (category != null)
-                          Container(
-                            margin: const EdgeInsets.only(left: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: category == 'Tim Utama' ? Colors.green.shade700 : Colors.orange.shade700,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              category,
-                              style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                        (() {
-                          final String? relStr = widget.character.getPartnerRelation(name);
-                          if (relStr == null) return const SizedBox.shrink();
-                          return Container(
-                            margin: const EdgeInsets.only(left: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.pink,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              relStr,
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                          );
-                        }()),
-                      ],
-                    ),
-                    subtitle: Text(
-                      '${cm['subject'] != null ? 'Guru ${cm['subject']} 📚 • ' : ''}${cm['role'] ?? 'Rekan Kerja'} • Umur: $age tahun • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
-                      style: TextStyle(
-                        color: isDark ? Colors.white70 : Colors.black54,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+                      leading: CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        backgroundImage: NetworkImage(avatarUrl),
                       ),
-                    ),
-                    trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.black87),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ClassmateInteractionPage(
-                            classmate: cm,
-                            character: widget.character,
-                            onRefresh: () {
-                              setState(() {});
-                              widget.onRefresh();
-                            },
+                      title: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: isDark ? Colors.white : Colors.black87,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
+                          if (category != null)
+                            Container(
+                              margin: const EdgeInsets.only(left: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: category == 'Tim Utama' ? Colors.green.shade700 : Colors.orange.shade700,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                category,
+                                style: const TextStyle(color: Colors.white, fontSize: 8.5, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                          (() {
+                            final String? relStr = widget.character.getPartnerRelation(name);
+                            if (relStr == null) return const SizedBox.shrink();
+                            return Container(
+                              margin: const EdgeInsets.only(left: 4),
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.pink,
+                                borderRadius: BorderRadius.circular(6),
+                              ),
+                              child: Text(
+                                relStr,
+                                style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                              ),
+                            );
+                          }()),
+                        ],
+                      ),
+                      subtitle: Text(
+                        '${cm['subject'] != null ? 'Guru ${cm['subject']} 📚 • ' : ''}${cm['role'] ?? 'Rekan Kerja'} • Umur: $age thn • Hubungan: $rel% • Kecerdasan: ${cm['intelligence']}%',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? Colors.white70 : Colors.black54,
                         ),
-                      );
-                    },
-                  ),
-                );
-              }
+                      ),
+                      trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.black87),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ClassmateInteractionPage(
+                              classmate: cm,
+                              character: widget.character,
+                              onRefresh: () {
+                                setState(() {});
+                                widget.onRefresh();
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  );
+                }
 
               if (!hasTeamCategories) {
                 return Column(

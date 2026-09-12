@@ -196,12 +196,15 @@ class _GameScreenState extends State<GameScreen> {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 14),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: const Row(
             children: [
-              Icon(Icons.family_restroom, color: Colors.blue, size: 28),
-              SizedBox(width: 10),
-              Text('Silsilah Keluarga 👪', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Icon(Icons.family_restroom, color: Colors.blue, size: 22),
+              SizedBox(width: 8),
+              Text('Silsilah Keluarga 👪', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             ],
           ),
           content: SingleChildScrollView(
@@ -210,22 +213,22 @@ class _GameScreenState extends State<GameScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                   child: Text(
                     familyStatusText,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 11.5,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : Colors.blue.shade900,
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                const Text('📊 Data Anggota Keluarga:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                const SizedBox(height: 12),
+                const Text('📊 Data Anggota Keluarga:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 const SizedBox(height: 8),
 
                 // Data Ayah
@@ -518,18 +521,21 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.blueAccent, size: 28),
+              Icon(Icons.info_outline, color: Colors.blueAccent, size: 22),
               SizedBox(width: 8),
-              Text('Kejadian Hari Ini', style: TextStyle(fontWeight: FontWeight.bold)),
+              Text('Kejadian Hari Ini', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             ],
           ),
-          content: Text(eventText),
+          content: Text(eventText, style: const TextStyle(fontSize: 12)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
+              child: const Text('OK', style: TextStyle(fontSize: 12)),
             ),
           ],
         ),
@@ -772,11 +778,14 @@ class _GameScreenState extends State<GameScreen> {
             return PopScope(
               canPop: false,
               child: AlertDialog(
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 title: const Row(
                   children: [
-                    Icon(Icons.notifications_active, color: Colors.orange, size: 28),
+                    Icon(Icons.notifications_active, color: Colors.orange, size: 22),
                     SizedBox(width: 8),
-                    Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   ],
                 ),
                 content: SingleChildScrollView(
@@ -798,8 +807,8 @@ class _GameScreenState extends State<GameScreen> {
                         }
                       }
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(displayText, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w500)),
+                        padding: const EdgeInsets.only(bottom: 6.0),
+                        child: Text(displayText, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                       );
                     }).toList(),
                   ),
@@ -810,7 +819,7 @@ class _GameScreenState extends State<GameScreen> {
                       Navigator.pop(context);
                       _runAgeUpSequence(sicknessEvents, _finishAgeUp);
                     },
-                    child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
                 ],
               ),
@@ -1063,16 +1072,25 @@ class _GameScreenState extends State<GameScreen> {
         barrierDismissible: false,
         builder: (dialogContext) {
           return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
             title: Row(
               children: [
-                const Icon(Icons.monetization_on, color: Colors.amber, size: 28),
+                const Icon(Icons.monetization_on, color: Colors.amber, size: 22),
                 const SizedBox(width: 8),
-                Text('$name Minta Uang', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                Expanded(
+                  child: Text(
+                    '$name Minta Uang',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             content: Text(
               '$relLabel, $name (Umur: $sibAge tahun) meminta uang saku sebesar \$$requestedAmount untuk kebutuhan sekolahnya.',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12, height: 1.35),
             ),
             actions: [
               TextButton(
@@ -1086,21 +1104,22 @@ class _GameScreenState extends State<GameScreen> {
                   showDialog(
                     context: context,
                     builder: (resContext) => AlertDialog(
-                      title: const Text('Menolak Permintaan'),
-                      content: Text('Kamu menolak memberikan uang kepada $name. Hubungan kalian sedikit merenggang.'),
+                      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      title: const Text('Menolak Permintaan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      content: Text('Kamu menolak memberikan uang kepada $name. Hubungan kalian sedikit merenggang.', style: const TextStyle(fontSize: 12)),
                       actions: [
                         TextButton(
                           onPressed: () {
                             Navigator.pop(resContext);
                             onDone();
                           },
-                          child: const Text('OK'),
+                          child: const Text('OK', style: TextStyle(fontSize: 12)),
                         )
                       ],
                     ),
                   );
                 },
-                child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
               ),
               TextButton(
                 onPressed: () {
@@ -1109,15 +1128,16 @@ class _GameScreenState extends State<GameScreen> {
                     showDialog(
                       context: context,
                       builder: (failContext) => AlertDialog(
-                        title: const Text('Uang Tidak Cukup'),
-                        content: const Text('Uangmu tidak mencukupi untuk memenuhi permintaannya.'),
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        title: const Text('Uang Tidak Cukup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        content: const Text('Uangmu tidak mencukupi untuk memenuhi permintaannya.', style: TextStyle(fontSize: 12)),
                         actions: [
                           TextButton(
                             onPressed: () {
                               Navigator.pop(failContext);
                               onDone();
                             },
-                            child: const Text('OK'),
+                            child: const Text('OK', style: TextStyle(fontSize: 12)),
                           )
                         ],
                       ),
@@ -1134,8 +1154,9 @@ class _GameScreenState extends State<GameScreen> {
                     showDialog(
                       context: context,
                       builder: (succContext) => AlertDialog(
-                        title: const Text('Permintaan Dipenuhi'),
-                        content: Text('Kamu memberikan \$$requestedAmount kepada $name. Dia sangat berterima kasih!'),
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        title: const Text('Permintaan Dipenuhi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                        content: Text('Kamu memberikan \$$requestedAmount kepada $name. Dia sangat berterima kasih!', style: const TextStyle(fontSize: 12)),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -1962,109 +1983,121 @@ class _GameScreenState extends State<GameScreen> {
         builder: (context) => PopScope(
           canPop: false,
           child: AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.school, color: Colors.blue.shade700),
-              const SizedBox(width: 8),
-              Text('Sekolahkan Anak: $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ],
-          ),
-          content: Text(
-            'Anakmu, $kidName, telah memasuki usia $childAge tahun dan siap untuk masuk ke Sekolah $schoolLevel. Pilih jenis sekolah yang ingin kamu daftarkan:',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            title: Row(
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Icon(Icons.school, color: Colors.blue.shade700, size: 22),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Sekolahkan Anak: $schoolLevel',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Negeri';
-                    _character.inbox.add('🏫 Sekolah Anak: $kidName resmi masuk Sekolah Negeri ($schoolLevel) secara gratis.');
-                    setState(() {});
-                    showDialog(
-                      context: this.context,
-                      builder: (resContext) => AlertDialog(
-                        title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-                        content: Text('Kamu berhasil menyekolahkan $kidName ke Sekolah Negeri ($schoolLevel) secara gratis. Anakmu senang sekali!'),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(resContext);
-                              processKidsEnrollment(index + 1, next);
-                            },
-                            child: const Text('Lanjutkan'),
-                          )
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    if (_character.money < 1500) {
-                      showDialog(
-                        context: this.context,
-                        builder: (resContext) => AlertDialog(
-                          title: const Text('Uang Tidak Cukup 💸', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: const Text('Kamu tidak memiliki cukup uang untuk menyekolahkan anakmu ke Sekolah Swasta (\$1,500).'),
-                          actions: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pop(resContext);
-                                processKidsEnrollment(index + 1, next);
-                              },
-                              child: const Text('Lanjutkan'),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      _character.money -= 1500;
-                      _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Swasta';
-                      _character.inbox.add('🏫 Sekolah Anak: Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta ($schoolLevel).');
+              ],
+            ),
+            content: Text(
+              'Anakmu, $kidName, telah memasuki usia $childAge tahun dan siap untuk masuk ke Sekolah $schoolLevel. Pilih jenis sekolah yang ingin kamu daftarkan:',
+              style: const TextStyle(fontSize: 12, height: 1.35),
+            ),
+            actions: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Negeri';
+                      _character.inbox.add('🏫 Sekolah Anak: $kidName resmi masuk Sekolah Negeri ($schoolLevel) secara gratis.');
                       setState(() {});
                       showDialog(
                         context: this.context,
                         builder: (resContext) => AlertDialog(
-                          title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: Text('Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta Unggulan ($schoolLevel). Kecerdasan anakmu bertambah!'),
+                          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          content: Text('Kamu berhasil menyekolahkan $kidName ke Sekolah Negeri ($schoolLevel) secara gratis. Anakmu senang sekali!', style: const TextStyle(fontSize: 12)),
                           actions: [
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(resContext);
                                 processKidsEnrollment(index + 1, next);
                               },
-                              child: const Text('Lanjutkan'),
+                              child: const Text('Lanjutkan', style: TextStyle(fontSize: 12)),
                             )
                           ],
                         ),
                       );
-                    }
-                  },
-                  child: const Text('Sekolah Swasta (Berbayar/Premium)', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            )
-          ],
+                    },
+                    child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                  const SizedBox(height: 6),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      if (_character.money < 1500) {
+                        showDialog(
+                          context: this.context,
+                          builder: (resContext) => AlertDialog(
+                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            title: const Text('Uang Tidak Cukup 💸', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            content: const Text('Kamu tidak memiliki cukup uang untuk menyekolahkan anakmu ke Sekolah Swasta (\$1,500).', style: TextStyle(fontSize: 12)),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(resContext);
+                                  processKidsEnrollment(index + 1, next);
+                                },
+                                child: const Text('Lanjutkan', style: TextStyle(fontSize: 12)),
+                              )
+                            ],
+                          ),
+                        );
+                      } else {
+                        _character.money -= 1500;
+                        _character.children[childIndex]['school$schoolLevel'] = 'Sekolah Swasta';
+                        _character.inbox.add('🏫 Sekolah Anak: Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta ($schoolLevel).');
+                        setState(() {});
+                        showDialog(
+                          context: this.context,
+                          builder: (resContext) => AlertDialog(
+                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            title: const Text('Pendaftaran Sukses 🎓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            content: Text('Kamu membayar \$1,500 untuk menyekolahkan $kidName ke Sekolah Swasta Unggulan ($schoolLevel). Kecerdasan anakmu bertambah!', style: const TextStyle(fontSize: 12)),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(resContext);
+                                  processKidsEnrollment(index + 1, next);
+                                },
+                                child: const Text('Lanjutkan', style: TextStyle(fontSize: 12)),
+                              )
+                            ],
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text('Sekolah Swasta (Berbayar/Premium)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
-      ),
       );
     }
 
@@ -2082,79 +2115,86 @@ class _GameScreenState extends State<GameScreen> {
         builder: (context) => PopScope(
           canPop: false,
           child: AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.school, color: Colors.blue.shade700),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text('Pendaftaran $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ],
-          ),
-          content: Text(
-            'Kamu telah memasuki usia $age tahun dan siap untuk masuk ke $schoolLevel. '
-            'Pilih jenis sekolah yang ingin kamu daftarkan:',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            title: Row(
               children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                Icon(Icons.school, color: Colors.blue.shade700, size: 22),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Pendaftaran $schoolLevel',
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
-                    _character.educationHistory[levelKey] = 'Belum Lulus';
-                    _character.schoolType = 'Negeri';
-                    final int happyBoost = 5 + Random().nextInt(6); // 5-10%
-                    _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
-                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
-                    _character.classmates.clear();
-                    _character.sdTeachers.clear();
-                    _character.smpTeachers.clear();
-                    _character.smaTeachers.clear();
-                    _character.headmaster = null;
-                    _character.bkTeacher = null;
-                    SchoolGenerator.generateClassmatesIfEmpty(_character);
-                    SchoolGenerator.generateTeachersIfEmpty(_character);
-                    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                      _character,
-                      happiness: _character.happiness,
-                    );
-                    setState(() {});
-                    processKidsEnrollment(0, onDone);
-                  },
-                  child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ],
+            ),
+            content: Text(
+              'Kamu telah memasuki usia $age tahun dan siap untuk masuk ke $schoolLevel. '
+              'Pilih jenis sekolah yang ingin kamu daftarkan:',
+              style: const TextStyle(fontSize: 12, height: 1.35),
+            ),
+            actions: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
+                      _character.educationHistory[levelKey] = 'Belum Lulus';
+                      _character.schoolType = 'Negeri';
+                      final int happyBoost = 5 + Random().nextInt(6); // 5-10%
+                      _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
+                      _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Negeri) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
+                      _character.classmates.clear();
+                      _character.sdTeachers.clear();
+                      _character.smpTeachers.clear();
+                      _character.smaTeachers.clear();
+                      _character.headmaster = null;
+                      _character.bkTeacher = null;
+                      SchoolGenerator.generateClassmatesIfEmpty(_character);
+                      SchoolGenerator.generateTeachersIfEmpty(_character);
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                      setState(() {});
+                      processKidsEnrollment(0, onDone);
+                    },
+                    child: const Text('Sekolah Negeri (Gratis)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
-                    _character.educationHistory[levelKey] = 'Belum Lulus';
-                    _character.schoolType = 'Swasta';
-                    final int happyBoost = 10 + Random().nextInt(11); // 10-20%
-                    _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
-                    _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
-                    _character.classmates.clear();
-                    _character.sdTeachers.clear();
-                    _character.smpTeachers.clear();
-                    _character.smaTeachers.clear();
-                    _character.headmaster = null;
-                    _character.bkTeacher = null;
-                    SchoolGenerator.generateClassmatesIfEmpty(_character);
+                  const SizedBox(height: 6),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 9),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      final String levelKey = age == 6 ? 'SD' : (age == 12 ? 'SMP' : 'SMA');
+                      _character.educationHistory[levelKey] = 'Belum Lulus';
+                      _character.schoolType = 'Swasta';
+                      final int happyBoost = 10 + Random().nextInt(11); // 10-20%
+                      _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
+                      _character.inbox.add('🏫 Sekolah: Kamu resmi masuk $schoolLevel (Swasta) pada usia $age tahun. Kebahagiaan (+ $happyBoost%).');
+                      _character.classmates.clear();
+                      _character.sdTeachers.clear();
+                      _character.smpTeachers.clear();
+                      _character.smaTeachers.clear();
+                      _character.headmaster = null;
+                      _character.bkTeacher = null;
+                      SchoolGenerator.generateClassmatesIfEmpty(_character);
                     SchoolGenerator.generateTeachersIfEmpty(_character);
                     _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
                       _character,
@@ -2781,21 +2821,21 @@ class _GameScreenState extends State<GameScreen> {
     // --- WIDGET BADGE UNTUK LOKASI & WAKTU INTIM (MENGIKUTI STYLE MASTURBASI) ---
 Widget _buildIntimBadge(IconData icon, String label, Color color) {
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
     decoration: BoxDecoration(
-      color: color.withOpacity(0.10),
-      borderRadius: BorderRadius.circular(20),
-      border: Border.all(color: color.withOpacity(0.35)),
+      color: color.withValues(alpha: 0.10),
+      borderRadius: BorderRadius.circular(16),
+      border: Border.all(color: color.withValues(alpha: 0.35)),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(icon, size: 14, color: color),
+        Icon(icon, size: 12, color: color),
         const SizedBox(width: 4),
         Text(
           label,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: 10.5,
             fontWeight: FontWeight.w600,
             color: color,
           ),
@@ -2999,13 +3039,19 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         return PopScope(
           canPop: false,
           child: AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           title: Row(
             children: [
               isGayOrLesbian
-                  ? const Text('🏳️‍🌈', style: TextStyle(fontSize: 28))
-                  : Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 28),
+                  ? const Text('🏳️‍🌈', style: TextStyle(fontSize: 24))
+                  : Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 24),
               const SizedBox(width: 8),
-              Text(dialogTitle, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+              Expanded(
+                child: Text(
+                  dialogTitle,
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                ),
+              ),
             ],
           ),
           content: (type == 'Bercinta' || type == 'Bersetubuh') && preGeneratedLokasiIntim.isNotEmpty
@@ -3013,8 +3059,8 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(dialogBody, style: const TextStyle(fontSize: 14)),
-                    const SizedBox(height: 12),
+                    Text(dialogBody, style: const TextStyle(fontSize: 12, height: 1.35)),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         _buildIntimBadge(
@@ -3022,7 +3068,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                           preGeneratedLokasiIntim,
                           Colors.deepPurple,
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 6),
                         _buildIntimBadge(
                           _waktuIkonMap[preGeneratedWaktuIntim] ?? Icons.access_time,
                           preGeneratedWaktuIntim,
@@ -3032,7 +3078,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     ),
                   ],
                 )
-              : Text(dialogBody, style: const TextStyle(fontSize: 14)),
+              : Text(dialogBody, style: const TextStyle(fontSize: 12, height: 1.35)),
           actions: [
             if (showReportToMother)
               TextButton(

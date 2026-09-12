@@ -210,7 +210,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Text('Saldo Kurang 💸', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-            content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: \$${DokterUtils.fmt(totalCost)}\nSaldo Kamu: \$${DokterUtils.fmt(widget.character.money)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            content: Text('Kamu tidak memiliki cukup uang untuk mengobati semua penyakit sekaligus.\nTotal Biaya: ${DokterUtils.fmt(totalCost)}\nSaldo Kamu: ${DokterUtils.fmt(widget.character.money)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
             actions: [
               if (hasParent)
                 TextButton(
@@ -302,7 +302,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Text('Hasil Pengobatan Massal 🏥', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-          content: Text('Pengobatan selesai!\n\n🎉 Berhasil Sembuh: $curedCount penyakit\n😔 Gagal Sembuh: $failedCount penyakit\n💸 Total Biaya: \$${DokterUtils.fmt(totalCost)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+          content: Text('Pengobatan selesai!\n\n🎉 Berhasil Sembuh: $curedCount penyakit\n😔 Gagal Sembuh: $failedCount penyakit\n💸 Total Biaya: ${DokterUtils.fmt(totalCost)}', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
@@ -388,7 +388,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
       // Tambah kesehatan
       if (curedCount > 0) {
         widget.character.health = (widget.character.health + (25 * curedCount)).clamp(0, 100);
-        final successMsg = '🏥 Minta Pengobatan: $parentRelation membayar \$${DokterUtils.fmt(totalCost)} untuk mengobati penyakitmu. Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (kesehatan & kebahagiaan meningkat!)';
+        final successMsg = '🏥 Minta Pengobatan: $parentRelation membayar ${DokterUtils.fmt(totalCost)} untuk mengobati penyakitmu. Berhasil menyembuhkan $curedCount penyakit: ${curedDiseases.join(", ")} (kesehatan & kebahagiaan meningkat!)';
         widget.character.inbox.add(successMsg);
       }
       if (failedCount > 0) {
@@ -407,7 +407,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
             backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Text('Minta Pengobatan Sukses! 🏥', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
             content: Text(
-              '$parentRelation berbaik hati membayarkan seluruh biaya pengobatan sebesar \$${DokterUtils.fmt(totalCost)} untukmu.\n\n'
+              '$parentRelation berbaik hati membayarkan seluruh biaya pengobatan sebesar ${DokterUtils.fmt(totalCost)} untukmu.\n\n'
               '🎉 Berhasil Sembuh: $curedCount penyakit\n'
               '😔 Gagal Sembuh: $failedCount penyakit\n'
               '😊 Kebahagiaan: +25-35%\n'
@@ -449,7 +449,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
             backgroundColor: isDark ? Colors.grey.shade900 : null,
             title: Text('Minta Pengobatan Ditolak ❌', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
             content: Text(
-              '$parentRelation menolak membayarkan biaya pengobatan sebesar \$${DokterUtils.fmt(totalCost)} karena hubungan kalian yang kurang dekat atau keterbatasan dana.',
+              '$parentRelation menolak membayarkan biaya pengobatan sebesar ${DokterUtils.fmt(totalCost)} karena hubungan kalian yang kurang dekat atau keterbatasan dana.',
               style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
             ),
             actions: [
@@ -576,7 +576,7 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
                                 setState(() {});
                                 widget.onComplete?.call();
                               },
-                              child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
+                              child: Text('Obati (${DokterUtils.fmt(cost)})'),
                             ),
                           ),
                         );

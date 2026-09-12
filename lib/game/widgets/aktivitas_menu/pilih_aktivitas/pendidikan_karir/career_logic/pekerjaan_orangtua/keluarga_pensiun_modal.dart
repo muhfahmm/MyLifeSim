@@ -67,30 +67,33 @@ class KeluargaPensiunModal {
         return StatefulBuilder(
           builder: (context, setStateModal) {
             return AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
               backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(6),
                     decoration: BoxDecoration(
                       color: Colors.amber.shade100,
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.card_membership, color: Colors.amber, size: 28),
+                    child: const Icon(Icons.card_membership, color: Colors.amber, size: 22),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text(
                           'Pensiun! Masa Purna Tugas',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                         ),
                         Text(
                           '$familyRelation Memasuki Masa Pensiun 👴👵',
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style: const TextStyle(fontSize: 10, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -104,28 +107,28 @@ class KeluargaPensiunModal {
                   children: [
                     // Card Info Anggota Keluarga & Uang Pensiun 25%
                     Container(
-                      padding: const EdgeInsets.all(12),
+                      padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: isDark ? Colors.grey.shade800 : Colors.amber.shade50,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(12),
                         border: Border.all(color: Colors.amber.shade300),
                       ),
                       child: Row(
                         children: [
                           CircleAvatar(
-                            radius: 26,
+                            radius: 20,
                             backgroundColor: isFemale ? Colors.pink.shade100 : Colors.blue.shade100,
                             child: ClipOval(
                               child: Image(
                                 image: AvatarImageCache.getImageProvider(avatarUrl),
-                                width: 52,
-                                height: 52,
+                                width: 40,
+                                height: 40,
                                 fit: BoxFit.cover,
-                                errorBuilder: (c, e, s) => Text(isFemale ? '👵' : '👴', style: const TextStyle(fontSize: 24)),
+                                errorBuilder: (c, e, s) => Text(isFemale ? '👵' : '👴', style: const TextStyle(fontSize: 20)),
                               ),
                             ),
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -134,19 +137,18 @@ class KeluargaPensiunModal {
                                   '$familyName ($familyRelation)',
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 15,
+                                    fontSize: 13,
                                     color: isDark ? Colors.white : Colors.black87,
                                   ),
                                 ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  'Pekerjaan Lama: $previousJob',
-                                  style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54),
-                                ),
                                 const SizedBox(height: 2),
                                 Text(
+                                  'Pekerjaan Lama: $previousJob',
+                                  style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.black54),
+                                ),
+                                Text(
                                   'Uang Pensiun: ${CurrencySettings.format(pensionSalary)}/bln (25%)',
-                                  style: const TextStyle(fontSize: 12, color: Colors.green, fontWeight: FontWeight.bold),
+                                  style: const TextStyle(fontSize: 11, color: Colors.green, fontWeight: FontWeight.bold),
                                 ),
                               ],
                             ),
@@ -154,24 +156,24 @@ class KeluargaPensiunModal {
                         ],
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 8),
 
                     // Narasi Pensiun
                     Text(
                       storyText,
                       style: TextStyle(
-                        fontSize: 13,
-                        height: 1.4,
+                        fontSize: 11.5,
+                        height: 1.3,
                         color: isDark ? Colors.white70 : Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 10),
 
                     const Text(
                       'Bagaimana tanggapanmu atas masa pensiun ini?',
-                      style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold),
+                      style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
                     // Action 1: Selamat & Rayakan
                     _buildActionButton(
@@ -187,7 +189,7 @@ class KeluargaPensiunModal {
                         if (onComplete != null) onComplete();
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
                     // Action 2: Beri Hadiah Pensiun ($300)
                     _buildActionButton(
@@ -208,7 +210,7 @@ class KeluargaPensiunModal {
                             }
                           : null,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 6),
 
                     // Action 3: Biarkan Saja
                     _buildActionButton(
@@ -245,18 +247,18 @@ class KeluargaPensiunModal {
       color: Colors.transparent,
       child: InkWell(
         onTap: onPressed,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(10),
             border: Border.all(color: isDisabled ? Colors.grey.shade400 : color.withValues(alpha: 0.5)),
             color: isDisabled ? Colors.grey.shade200.withValues(alpha: 0.3) : color.withValues(alpha: 0.08),
           ),
           child: Row(
             children: [
-              Icon(icon, color: isDisabled ? Colors.grey : color, size: 22),
-              const SizedBox(width: 10),
+              Icon(icon, color: isDisabled ? Colors.grey : color, size: 18),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -265,14 +267,14 @@ class KeluargaPensiunModal {
                       title,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 13,
+                        fontSize: 11.5,
                         color: isDisabled ? Colors.grey : color,
                       ),
                     ),
                     Text(
                       subtitle,
                       style: TextStyle(
-                        fontSize: 11,
+                        fontSize: 9.5,
                         color: isDisabled ? Colors.grey : Colors.grey.shade700,
                       ),
                     ),

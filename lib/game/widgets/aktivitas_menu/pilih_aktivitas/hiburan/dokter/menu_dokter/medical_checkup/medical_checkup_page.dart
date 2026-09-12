@@ -108,7 +108,7 @@ class _MedicalCheckupPageState extends State<MedicalCheckupPage> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                               ),
                               onPressed: () => _treat(disease),
-                              child: Text('Obati (\$${DokterUtils.fmt(cost)})'),
+                              child: Text('Obati (${DokterUtils.fmt(cost)})'),
                             ),
                           ),
                         );
