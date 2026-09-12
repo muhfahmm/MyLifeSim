@@ -965,6 +965,143 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       ],
                     );
                   })(),
+
+                  // ============================================
+                  // 7. BAGIAN HEWAN PELIHARAAN
+                  // ============================================
+                  if (character.pets.isNotEmpty) ...[
+                    const Divider(height: 32),
+                    Row(
+                      children: [
+                        const Text('🐾 Hewan Peliharaan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.shade700,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            '${character.pets.length} Ekor',
+                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    ...character.pets.map((pet) {
+                      final String petName = pet['name'] ?? 'Peliharaan';
+                      final String breed = pet['breed'] ?? '';
+                      final String petType = pet['type'] ?? 'Peliharaan';
+                      final String emoji = pet['emoji'] ?? '🐾';
+                      final int relVal = pet['relationship'] as int? ?? 80;
+
+                      return InkWell(
+                        onTap: () {
+                          _showPetInteractionModal(context, pet, character);
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          margin: const EdgeInsets.only(bottom: 6),
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.orange.withValues(alpha: 0.05),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 16,
+                                    backgroundColor: Colors.orange.withValues(alpha: 0.15),
+                                    child: Text(emoji, style: const TextStyle(fontSize: 18)),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '$petName ($breed)',
+                                          style: const TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Tipe: $petType',
+                                          style: TextStyle(
+                                            fontSize: 11,
+                                            color: Theme.of(context).brightness == Brightness.dark
+                                                ? Colors.white54
+                                                : Colors.black54,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: Colors.orange.withValues(alpha: 0.12),
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Text(
+                                      petType,
+                                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                                ],
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  Expanded(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(4),
+                                      child: LinearProgressIndicator(
+                                        value: relVal / 100,
+                                        backgroundColor: Colors.grey.shade200,
+                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                          relVal > 65
+                                              ? Colors.green
+                                              : relVal > 35
+                                                  ? Colors.amber
+                                                  : Colors.red,
+                                        ),
+                                        minHeight: 6,
+                                      ),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    '$relVal%',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: relVal > 65
+                                          ? Colors.green
+                                          : relVal > 35
+                                              ? Colors.amber
+                                              : Colors.red,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ],
                   const Divider(height: 32),
                 ],
               );
@@ -992,6 +1129,110 @@ class _RelationshipButtonState extends State<RelationshipButton> {
           ],
         ),
       ),
+    );
+  }
+
+  void _showPetInteractionModal(BuildContext context, Map<String, dynamic> pet, Character character) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        final String name = pet['name'] ?? 'Peliharaan';
+        final String emoji = pet['emoji'] ?? '🐾';
+        final String breed = pet['breed'] ?? '';
+        final String type = pet['type'] ?? 'Peliharaan';
+        int rel = pet['relationship'] as int? ?? 80;
+
+        return StatefulBuilder(
+          builder: (ctx2, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Text(emoji, style: const TextStyle(fontSize: 36)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('$name ($breed)', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text('Hewan Peliharaan • $type', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Text('Tingkat Hubungan: ', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('$rel%', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Text('Interaksi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  const SizedBox(height: 10),
+                  ListTile(
+                    leading: const Text('🧶', style: TextStyle(fontSize: 22)),
+                    title: const Text('Bermain Bersama'),
+                    subtitle: const Text('+5% Hubungan, +5 Kebahagiaan'),
+                    onTap: () {
+                      Navigator.pop(ctx2);
+                      rel = (rel + 5).clamp(0, 100);
+                      pet['relationship'] = rel;
+                      character.happiness = (character.happiness + 5).clamp(0, 100);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Kamu bermain dengan $name! $emoji')),
+                      );
+                      widget.onRefresh();
+                      if (_dialogSetState != null) _dialogSetState!(() {});
+                    },
+                  ),
+                  ListTile(
+                    leading: const Text('🍖', style: TextStyle(fontSize: 22)),
+                    title: const Text('Beri Makanan Favorit'),
+                    subtitle: const Text('+8% Hubungan, +3 Kebahagiaan'),
+                    onTap: () {
+                      Navigator.pop(ctx2);
+                      rel = (rel + 8).clamp(0, 100);
+                      pet['relationship'] = rel;
+                      character.happiness = (character.happiness + 3).clamp(0, 100);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Kamu memberi makan $name! $emoji')),
+                      );
+                      widget.onRefresh();
+                      if (_dialogSetState != null) _dialogSetState!(() {});
+                    },
+                  ),
+                  ListTile(
+                    leading: const Text('🚪', style: TextStyle(fontSize: 22)),
+                    title: const Text('Lepaskan / Jual Peliharaan', style: TextStyle(color: Colors.red)),
+                    subtitle: const Text('Menghapus peliharaan dari daftar'),
+                    onTap: () {
+                      Navigator.pop(ctx2);
+                      character.pets.remove(pet);
+                      character.happiness = (character.happiness - 10).clamp(0, 100);
+                      character.inbox.add('$emoji Kamu melepaskan $name.');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('$name telah dilepaskan/dijual. (-10% Kebahagiaan)')),
+                      );
+                      widget.onRefresh();
+                      if (_dialogSetState != null) _dialogSetState!(() {});
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 

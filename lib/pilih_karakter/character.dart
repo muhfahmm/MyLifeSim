@@ -257,6 +257,7 @@ class Character {
   Map<String, dynamic>? garasiMobil;
   Map<String, dynamic>? garasiMotor;
   List<Map<String, dynamic>> ownedAccessories = [];
+  List<Map<String, dynamic>> pets = []; // Daftar hewan peliharaan [{name, breed, type, emoji, happiness, relationship, cost}]
 
   // --- INVESTASI PERSISTEN ---
   Map<String, int> saham = {};

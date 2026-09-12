@@ -1,8 +1,13 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/peliharaan_menu.dart
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'kucing/kucing_page.dart';
+import 'anjing/anjing_page.dart';
+import 'burung/burung_page.dart';
+import 'ikan/ikan_page.dart';
+import 'kelinci/kelinci_page.dart';
+import 'reptil/reptil_page.dart';
 
 class PeliharaanMenuHelper {
   static void showPeliharaanMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -46,66 +51,75 @@ class PeliharaanPage extends StatefulWidget {
 
 class _PeliharaanPageState extends State<PeliharaanPage> {
   final List<Map<String, dynamic>> hewan = [
-    {'name': 'Kucing 🐱', 'cost': 1500000, 'happiness': 15, 'desc': 'Teman berbulu yang menggemaskan'},
-    {'name': 'Anjing 🐶', 'cost': 2500000, 'happiness': 20, 'desc': 'Teman setia yang aktif'},
-    {'name': 'Burung 🦜', 'cost': 500000, 'happiness': 10, 'desc': 'Hewan cantik yang bisa bernyanyi'},
-    {'name': 'Ikan 🐠', 'cost': 200000, 'happiness': 8, 'desc': 'Hewan tenang dan menenangkan'},
-    {'name': 'Kelinci 🐇', 'cost': 800000, 'happiness': 12, 'desc': 'Hewan lucu dan jinak'},
-    {'name': 'Reptil 🦎', 'cost': 3000000, 'happiness': 10, 'desc': 'Hewan unik untuk kolektor'},
+    {'id': 'kucing', 'name': 'Kucing 🐱', 'desc': 'Teman berbulu yang menggemaskan'},
+    {'id': 'anjing', 'name': 'Anjing 🐶', 'desc': 'Teman setia yang aktif'},
+    {'id': 'burung', 'name': 'Burung 🦜', 'desc': 'Hewan cantik yang bisa bernyanyi'},
+    {'id': 'ikan', 'name': 'Ikan 🐠', 'desc': 'Hewan tenang dan menenangkan'},
+    {'id': 'kelinci', 'name': 'Kelinci 🐇', 'desc': 'Hewan lucu dan jinak'},
+    {'id': 'reptil', 'name': 'Reptil 🦎', 'desc': 'Hewan unik untuk kolektor'},
   ];
 
   static String _fmt(int amount) {
     return CurrencySettings.format(amount);
   }
 
-  void _executeAdopsi(BuildContext context, Map<String, dynamic> h) {
-    setState(() {
-      widget.character.money -= (h['cost'] as int);
-      widget.character.happiness = (widget.character.happiness + (h['happiness'] as int)).clamp(0, 100);
+  void _openCategoryPage(BuildContext context, String categoryId) {
+    Widget targetPage;
+    switch (categoryId) {
+      case 'kucing':
+        targetPage = KucingPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      case 'anjing':
+        targetPage = AnjingPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      case 'burung':
+        targetPage = BurungPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      case 'ikan':
+        targetPage = IkanPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      case 'kelinci':
+        targetPage = KelinciPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      case 'reptil':
+        targetPage = ReptilPage(character: widget.character, onComplete: widget.onComplete);
+        break;
+      default:
+        return;
+    }
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => targetPage),
+    ).then((_) {
+      setState(() {});
     });
-    final names = ['Buddy', 'Luna', 'Max', 'Bella', 'Charlie', 'Mochi'];
-    final petName = names[Random().nextInt(names.length)];
-    final msg = '🐾 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(h['cost'] as int)})';
-    widget.character.inbox.add(msg);
-    showDialog(
-      context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Selamat Datang!', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
+    final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Adopsi Peliharaan 🐾', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
+        backgroundColor: containerBg,
+        foregroundColor: textColor,
         elevation: 0.5,
       ),
       body: Container(
-        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+        color: bgColor,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: isDark ? Colors.grey.shade800 : Colors.white,
+              color: containerBg,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
@@ -128,14 +142,13 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                 itemCount: hewan.length,
                 itemBuilder: (_, i) {
                   final h = hewan[i];
-                  final bool canAfford = widget.character.money >= (h['cost'] as int);
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? (isDark ? Colors.grey.shade800 : Colors.white) : (isDark ? Colors.grey.shade700 : Colors.grey.shade50),
+                    color: cardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                      side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -144,24 +157,24 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: canAfford ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.grey),
+                          color: textColor,
                         ),
                       ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${h['desc']}\nHarga: ${_fmt(h['cost'] as int)}',
+                          h['desc'],
                           style: TextStyle(
-                            color: canAfford ? (isDark ? Colors.white70 : Colors.black54) : (isDark ? Colors.white38 : Colors.grey),
+                            color: subtextColor,
                           ),
                         ),
                       ),
-                      isThreeLine: true,
                       trailing: Icon(
-                        canAfford ? Icons.favorite : Icons.lock_outline,
-                        color: canAfford ? (isDark ? Colors.greenAccent : Colors.green) : (isDark ? Colors.white54 : Colors.grey),
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
                       ),
-                      onTap: canAfford ? () => _executeAdopsi(context, h) : null,
+                      onTap: () => _openCategoryPage(context, h['id'] as String),
                     ),
                   );
                 },
@@ -173,3 +186,4 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
     );
   }
 }
+
