@@ -2308,8 +2308,11 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         widget.character.isFatherDivorced = true;
                       }
 
+                      final int happyLoss = 10 + Random().nextInt(11);
+                      widget.character.happiness = (widget.character.happiness - happyLoss).clamp(0, 100);
+
                       final String msg =
-                          '💔 ${askerTitle} memutuskan untuk menceraikan $spouseName atas permintaanmu!';
+                          '💔 ${askerTitle} memutuskan untuk menceraikan $spouseName atas permintaanmu! (-$happyLoss% Kebahagiaan)';
                       widget.character.inbox.add(msg);
                       _updateRelationship(15);
                       _updateState();
@@ -2698,16 +2701,26 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             }
 
             // 2. Divorce / break spouse connection
+            bool parentDivorceOccurred = false;
             if (widget.character.fatherName != null && widget.character.fatherName!.toLowerCase() == lowerCheater) {
               widget.character.isFatherDivorced = true;
               widget.character.stepMotherName = null;
+              parentDivorceOccurred = true;
             } else if (widget.character.motherName != null && widget.character.motherName!.toLowerCase() == lowerCheater) {
               widget.character.isMotherDivorced = true;
               widget.character.stepFatherName = null;
+              parentDivorceOccurred = true;
             } else if (widget.character.stepFatherName != null && widget.character.stepFatherName!.toLowerCase() == lowerCheater) {
               widget.character.stepFatherName = null;
+              parentDivorceOccurred = true;
             } else if (widget.character.stepMotherName != null && widget.character.stepMotherName!.toLowerCase() == lowerCheater) {
               widget.character.stepMotherName = null;
+              parentDivorceOccurred = true;
+            }
+
+            if (parentDivorceOccurred) {
+              final int happyLoss = 10 + Random().nextInt(11);
+              widget.character.happiness = (widget.character.happiness - happyLoss).clamp(0, 100);
             }
 
             // If it's extendedFamily:

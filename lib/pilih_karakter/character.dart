@@ -1686,7 +1686,9 @@ class Character {
           isFatherDeceased = true;
           fatherRelationship = 0;
           isFatherImprisoned = false;
-          events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun.');
+          final int happyLoss = 20 + random.nextInt(11); // 20-30%
+          happiness = (happiness - happyLoss).clamp(0, 100);
+          events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun (-$happyLoss% Kebahagiaan).');
         }
       }
     }
@@ -1706,7 +1708,9 @@ class Character {
           isMotherDeceased = true;
           motherRelationship = 0;
           isMotherImprisoned = false;
-          events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun.');
+          final int happyLoss = 20 + random.nextInt(11); // 20-30%
+          happiness = (happiness - happyLoss).clamp(0, 100);
+          events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun (-$happyLoss% Kebahagiaan).');
         }
       }
     }
@@ -1718,7 +1722,9 @@ class Character {
         if (random.nextInt(100) < deathChance) {
           isStepFatherDeceased = true;
           stepFatherRelationship = 0;
-          events.add('👨 Kabar Duka: Ayah tirimu, $stepFatherName, meninggal dunia pada usia $stepFatherAge tahun.');
+          final int happyLoss = 20 + random.nextInt(11); // 20-30%
+          happiness = (happiness - happyLoss).clamp(0, 100);
+          events.add('👨 Kabar Duka: Ayah tirimu, $stepFatherName, meninggal dunia pada usia $stepFatherAge tahun (-$happyLoss% Kebahagiaan).');
         }
       }
     }
@@ -1730,7 +1736,9 @@ class Character {
         if (random.nextInt(100) < deathChance) {
           isStepMotherDeceased = true;
           stepMotherRelationship = 0;
-          events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun.');
+          final int happyLoss = 20 + random.nextInt(11); // 20-30%
+          happiness = (happiness - happyLoss).clamp(0, 100);
+          events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun (-$happyLoss% Kebahagiaan).');
         }
       }
     }
@@ -1776,7 +1784,9 @@ class Character {
             custodyParent = null;
             fatherDivorceYearsSince = 0;
             motherDivorceYearsSince = 0;
-            const eventMsg = '💔 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan resmi bercerai!';
+            final int happyLoss = 10 + random.nextInt(11); // 10-20%
+            happiness = (happiness - happyLoss).clamp(0, 100);
+            final String eventMsg = '💔 Keputusan Perceraian: Orang tuamu telah selesai mempertimbangkannya dan resmi bercerai! (-$happyLoss% Kebahagiaan)';
             events.add(eventMsg);
             inbox.add(eventMsg);
           } else {
@@ -1859,7 +1869,9 @@ class Character {
               ? (gender2 == 'Laki-laki' ? 'Adik Tiri Kembar Laki-laki' : 'Adik Tiri Kembar Perempuan')
               : (gender2 == 'Laki-laki' ? 'Adik Kembar Laki-laki' : 'Adik Kembar Perempuan');
 
-          final String notice = '👶👶 Adik Kembar Baru Lahir! Ibumu melahirkan bayi kembar bernama $babyName1 dan $babyName2.';
+          final int happyBoost = 10 + random.nextInt(11); // 10-20%
+          happiness = (happiness + happyBoost).clamp(0, 100);
+          final String notice = '👶👶 Adik Kembar Baru Lahir! Ibumu melahirkan bayi kembar bernama $babyName1 dan $babyName2 (+ $happyBoost% Kebahagiaan).';
           events.add(notice);
           inbox.add(notice);
 
@@ -1905,7 +1917,9 @@ class Character {
               ? (gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan')
               : (gender == 'Laki-laki' ? 'Adik Laki-laki' : 'Adik Perempuan');
 
-          final String notice = '👶 Adik Baru Lahir! Ibumu melahirkan seorang $relType bernama $babyName.';
+          final int happyBoost = 10 + random.nextInt(11); // 10-20%
+          happiness = (happiness + happyBoost).clamp(0, 100);
+          final String notice = '👶 Adik Baru Lahir! Ibumu melahirkan seorang $relType bernama $babyName (+ $happyBoost% Kebahagiaan).';
           events.add(notice);
           inbox.add(notice);
 
@@ -1945,7 +1959,9 @@ class Character {
         // Anak dari Ibu Tiri selalu Adik Tiri bagi player
         final String relType = gender == 'Laki-laki' ? 'Adik Tiri Laki-laki' : 'Adik Tiri Perempuan';
         
-        final String notice = '👶 Adik Baru Lahir! Ibu Tirimu ($stepMotherName) melahirkan seorang $relType bernama $babyName.';
+        final int happyBoost = 10 + random.nextInt(11); // 10-20%
+        happiness = (happiness + happyBoost).clamp(0, 100);
+        final String notice = '👶 Adik Baru Lahir! Ibu Tirimu ($stepMotherName) melahirkan seorang $relType bernama $babyName (+ $happyBoost% Kebahagiaan).';
         events.add(notice);
         inbox.add(notice);
         
@@ -1970,7 +1986,9 @@ class Character {
 
         if (sibAge < 0 && nextAge == 0) {
           // Adik baru saja lahir
-          events.add('👶 Adik Baru Lahir! Ibumu melahirkan seorang ${sib['relation']!.contains('Laki') ? 'Adik Laki-laki' : 'Adik Perempuan'} bernama ${sib['name']}.');
+          final int happyBoost = 10 + random.nextInt(11); // 10-20%
+          happiness = (happiness + happyBoost).clamp(0, 100);
+          events.add('👶 Adik Baru Lahir! Ibumu melahirkan seorang ${sib['relation']!.contains('Laki') ? 'Adik Laki-laki' : 'Adik Perempuan'} bernama ${sib['name']} (+ $happyBoost% Kebahagiaan).');
         } else {
           // Increment dating or engagement years if partner exists
           if (sib['spouseName'] != null) {
@@ -2146,7 +2164,9 @@ class Character {
             if (random.nextInt(100) < deathChance) {
               sib['isDeceased'] = 'true';
               sib['relationship'] = '0';
-              events.add('💀 Kabar Duka: Saudaramu, ${sib['name']} (${sib['relation']}), meninggal dunia pada usia $nextAge tahun.');
+              final int happyLoss = 20 + random.nextInt(11); // 20-30%
+              happiness = (happiness - happyLoss).clamp(0, 100);
+              events.add('💀 Kabar Duka: Saudaramu, ${sib['name']} (${sib['relation']}), meninggal dunia pada usia $nextAge tahun (-$happyLoss% Kebahagiaan).');
             }
           }
         }
@@ -2170,7 +2190,9 @@ class Character {
           if (random.nextInt(100) < deathChance) {
             ext['isDeceased'] = 'true';
             ext['relationship'] = '0';
-            events.add('💀 Kabar Duka: Keluargamu, ${ext['name']} (${ext['relation']}), meninggal dunia pada usia $nextAge tahun.');
+            final int happyLoss = 20 + random.nextInt(11); // 20-30%
+            happiness = (happiness - happyLoss).clamp(0, 100);
+            events.add('💀 Kabar Duka: Keluargamu, ${ext['name']} (${ext['relation']}), meninggal dunia pada usia $nextAge tahun (-$happyLoss% Kebahagiaan).');
           }
         }
       }
@@ -2626,7 +2648,9 @@ class Character {
         motherDivorceYearsSince = 0;
         parentUnemploymentYears = 0;
 
-        final String notice = '💔 Perceraian Orang Tua: Akibat masalah pengangguran berkepanjangan dan krisis keuangan keluarga, $fatherName dan $motherName akhirnya resmi bercerai!';
+        final int happyLoss = 10 + Random().nextInt(11); // 10-20%
+        happiness = (happiness - happyLoss).clamp(0, 100).toInt();
+        final String notice = '💔 Perceraian Orang Tua: Akibat masalah pengangguran berkepanjangan dan krisis keuangan keluarga, $fatherName dan $motherName akhirnya resmi bercerai! (-$happyLoss% Kebahagiaan)';
         events.add(notice);
         inbox.add(notice);
       }

@@ -864,20 +864,25 @@ class _GameScreenState extends State<GameScreen> {
                 style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey),
               ),
               const SizedBox(height: 16),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange.shade400,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              if ((!_character.isMotherDeceased && _character.motherName != null) ||
+                  (!_character.isFatherDeceased && _character.fatherName != null) ||
+                  (!_character.isStepMotherDeceased && _character.stepMotherName != null) ||
+                  (!_character.isStepFatherDeceased && _character.stepFatherName != null)) ...[
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.orange.shade400,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(ctx);
+                    _handleTellParents(sicknessEvent, onDone);
+                  },
+                  child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                 ),
-                onPressed: () {
-                  Navigator.pop(ctx);
-                  _handleTellParents(sicknessEvent, onDone);
-                },
-                child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-              ),
-              const SizedBox(height: 8),
+                const SizedBox(height: 8),
+              ],
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade600,
@@ -3424,10 +3429,13 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           _character.isFatherDivorced = true;
           _character.fatherRelationship = 0;
 
+          final int happyLoss = 10 + rand.nextInt(11); // 10-20%
+          _character.happiness = (_character.happiness - happyLoss).clamp(0, 100).toInt();
+
           if (isJailed) {
-            _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah, menceraikannya, dan melaporkannya ke polisi. Ayahmu kini dipenjara!');
+            _character.inbox.add('🚨 Laporan Polisi: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah, menceraikannya, dan melaporkannya ke polisi. Ayahmu kini dipenjara! (-$happyLoss% Kebahagiaan)');
           } else {
-            _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya.');
+            _character.inbox.add('💔 Perceraian: Kamu melaporkan Ayahmu, $partnerName, ke Ibumu. Ibumu sangat marah dan memutuskan untuk menceraikannya. (-$happyLoss% Kebahagiaan)');
           }
 
           // Karena Ayah diceraikan, Ibu kandung kini menjadi janda.
