@@ -1,0 +1,15 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Run Flutter Web (Port 3100 & Default Browser)",
+      "type": "shell",
+      "command": "powershell -ExecutionPolicy Bypass -File ./dev.ps1",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}

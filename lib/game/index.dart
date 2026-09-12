@@ -4141,20 +4141,51 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   icon: const Icon(Icons.menu),
                   onPressed: () => Scaffold.of(context).openDrawer(),
                 ),
-                Text(
-                  formattedDate,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
+                Flexible(
+                  child: Text(
+                    formattedDate,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
+                    ),
                   ),
                 ),
               ],
             );
           },
         ),
-        leadingWidth: 170, // Beri space yang cukup untuk hamburger + tanggal
+        leadingWidth: 200, // Beri space yang cukup untuk hamburger + tanggal
         actions: [
+          IconButton(
+            icon: Badge(
+              isLabelVisible: _character.inbox.isNotEmpty,
+              label: Text(
+                '${_character.inbox.length}',
+                style: const TextStyle(fontSize: 10, color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              child: const Icon(Icons.mail_outline),
+            ),
+            tooltip: 'Kotak Masuk (Inbox)',
+            onPressed: () {
+              InboxButton.openInboxDialog(
+                context,
+                _character,
+                () {
+                  if (mounted) {
+                    setState(() {
+                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                        _character,
+                        happiness: _character.happiness,
+                      );
+                    });
+                  }
+                },
+              );
+            },
+          ),
           Padding(
             padding: const EdgeInsets.only(right: 12.0),
             child: Center(
@@ -4183,7 +4214,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   // Character Card Info
-                  // Character Card Info
                   Card(
                     elevation: 3,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -4192,22 +4222,53 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          // Left: Avatar Icon
-                          CircleAvatar(
-                            radius: 34,
-                            backgroundColor: Colors.blue.shade50,
-                            child: Image(
-                              image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
-                              loadingBuilder: (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return const SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                          // Left: Avatar Icon (Klik untuk Detail & Perkembangan Karakter)
+                          Tooltip(
+                            message: 'Klik Avatar untuk melihat Detail & Perkembangan Karakter',
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => CharacterProgressionPage(character: _character),
+                                  ),
                                 );
                               },
-                              width: 68,
-                              height: 68,
+                              borderRadius: BorderRadius.circular(34),
+                              child: Stack(
+                                children: [
+                                  CircleAvatar(
+                                    radius: 34,
+                                    backgroundColor: Colors.blue.shade50,
+                                    child: Image(
+                                      image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
+                                      loadingBuilder: (context, child, loadingProgress) {
+                                        if (loadingProgress == null) return child;
+                                        return const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                        );
+                                      },
+                                      width: 68,
+                                      height: 68,
+                                    ),
+                                  ),
+                                  Positioned(
+                                    right: 0,
+                                    bottom: 0,
+                                    child: Container(
+                                      padding: const EdgeInsets.all(3),
+                                      decoration: BoxDecoration(
+                                        color: Colors.indigo.shade900,
+                                        shape: BoxShape.circle,
+                                        border: Border.all(color: Colors.white, width: 1.5),
+                                      ),
+                                      child: const Icon(Icons.star, color: Colors.amber, size: 11),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -4446,42 +4507,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     const SizedBox(height: 10),
                     _buildProposalStatsCard(),
                   ],
-                  const SizedBox(height: 10),
-                  InboxButton(
-                    character: _character,
-                    onRefresh: () {
-                      setState(() {
-                        _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                          _character,
-                          happiness: _character.happiness,
-                        );
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton.icon(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => CharacterProgressionPage(character: _character),
-                        ),
-                      );
-                    },
-                    icon: const Icon(Icons.person_pin, color: Colors.amber),
-                    label: const Text(
-                      'Detail & Perkembangan Karakter 👤✨',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo.shade900,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
+
 
                   // --- STATUS KEHAMILAN (PERBAIKAN) ---
                   if (_character.isPregnant || _character.partnerIsPregnant) ...[
