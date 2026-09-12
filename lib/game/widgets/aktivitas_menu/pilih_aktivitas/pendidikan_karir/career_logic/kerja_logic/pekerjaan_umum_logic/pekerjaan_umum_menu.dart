@@ -7,11 +7,6 @@ import '../database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../special_carrier/idol_logic/idol_manager.dart';
 import '../special_carrier/idol_logic/syarat_ketentuan_idol_modal.dart';
-import '../special_carrier/esport_logic/tim_esport.dart';
-import '../special_carrier/esport_logic/BA/ba_esport_percentage.dart';
-import '../special_carrier/esport_logic/proplayer/pro_player_percentage.dart';
-import '../special_carrier/esport_logic/talent/talent_esport_percentage.dart';
-import '../special_carrier/esport_logic/syarat_ketentuan_esport_modal.dart';
 
 class PekerjaanUmumMenuScreen extends StatefulWidget {
   final Character character;
@@ -42,39 +37,23 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
   void _updateJobList() {
     final age = widget.character.age;
     final gender = widget.character.gender;
-    List<Map<String, dynamic>> allJobs = [];
+    List<Map<String, dynamic>> allJobs = JobDatabase.availableJobs
+        .where((j) => j['category'] != 'Profesional' && j['category'] != 'Prestise')
+        .toList();
 
-    if (age < 18) {
-      if (gender == 'Perempuan' && age >= 12) {
-        allJobs.add({
-          'title': 'Idol (Trainee)',
-          'salary': 667 + Random().nextInt(667),
-          'minIntel': 0,
-          'category': 'Khusus',
-          'desc': 'Bergabunglah dengan grup trainee Idol baru',
-          'icon': Icons.music_note,
-          'color': Colors.pink,
-        });
-      }
+    if (gender == 'Perempuan' && age >= 12 && age < 18) {
+      allJobs.add({
+        'title': 'Idol (Trainee)',
+        'salary': 667 + Random().nextInt(667),
+        'minIntel': 0,
+        'category': 'Khusus',
+        'desc': 'Bergabunglah dengan grup trainee Idol baru',
+        'icon': Icons.music_note,
+        'color': Colors.pink,
+      });
+    }
 
-      for (final job in JobDatabase.availableJobs) {
-        if (job['category'] == 'Profesional' || job['category'] == 'Prestise') continue;
-
-        if (job['title'] == 'Pro Player Esport' && age >= 13) {
-          allJobs.add(job);
-        }
-        if (job['title'] == 'Brand Ambassador Esport' && age >= 15) {
-          allJobs.add(job);
-        }
-        if (job['title'] == 'Talent Esports' && age >= 13) {
-          allJobs.add(job);
-        }
-      }
-    } else {
-      allJobs = JobDatabase.availableJobs
-          .where((j) => j['category'] != 'Profesional' && j['category'] != 'Prestise')
-          .toList();
-
+    if (age >= 18) {
       allJobs.add({
         'title': 'Staf Operasional Idol',
         'salary': 500,
@@ -112,14 +91,6 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
       return;
     }
 
-    if (job['title'] == 'Brand Ambassador Esport' || job['title'] == 'Pro Player Esport' || job['title'] == 'Talent Esports') {
-      SyaratKetentuanEsportModal.show(
-        context: context,
-        character: character,
-        onRefresh: widget.onRefresh,
-      );
-      return;
-    }
     if (character.intelligence < (job['minIntel'] ?? 0)) {
       showDialog(
         context: context,
@@ -139,75 +110,9 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
       return;
     }
 
-    if (job['title'] == 'Brand Ambassador Esport') {
-      final double chance = BaEsportPercentage.getApplyChance(character.gender, hasIdolHistory: character.hasIdolHistory);
-      if (Random().nextDouble() > chance) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Lamaran Ditolak 🚫'),
-            content: const Text('Tim E-Sport merasa profilmu kurang cocok untuk menjadi Brand Ambassador mereka saat ini.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-    }
-
-    if (job['title'] == 'Pro Player Esport') {
-      final double chance = ProPlayerPercentage.getApplyChance(character.gender, character.specialTalent);
-      if (Random().nextDouble() > chance) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Lamaran Ditolak 🚫'),
-            content: const Text('Tim E-Sport merasa kemampuan gaming kamu belum memenuhi standar untuk masuk ke roster utama.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-    }
-
-    if (job['title'] == 'Talent Esports') {
-      final double chance = TalentEsportPercentage.getApplyChance(character.gender, hasIdolHistory: character.hasIdolHistory);
-      if (Random().nextDouble() > chance) {
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('Lamaran Ditolak 🚫'),
-            content: const Text('Tim E-Sport merasa profilmu kurang cocok untuk menjadi Talent konten mereka saat ini.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text('OK'),
-              ),
-            ],
-          ),
-        );
-        return;
-      }
-    }
-
     final isGraduatedRedirect = (job['title'] == 'Idol (Trainee)' && character.hasGraduatedIdol);
     String finalTitle = isGraduatedRedirect ? 'Staf Operasional Idol' : job['title'];
-
     String teamText = '';
-    if (job['title'] == 'Brand Ambassador Esport' || job['title'] == 'Pro Player Esport' || job['title'] == 'Talent Esports') {
-      final String randomTeam = EsportsTeams.list[Random().nextInt(EsportsTeams.list.length)];
-      finalTitle = '${job['title']} ($randomTeam)';
-      teamText = ' untuk tim $randomTeam';
-    }
 
     final int baseSalary = isGraduatedRedirect ? 500 : job['salary'];
     final double salaryMult = getCountrySalaryMultiplier(character.location);

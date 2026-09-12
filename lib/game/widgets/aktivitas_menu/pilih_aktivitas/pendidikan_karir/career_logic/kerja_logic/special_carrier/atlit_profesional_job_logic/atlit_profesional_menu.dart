@@ -312,12 +312,26 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
                                     ],
                                   ),
                                 )
-                              : Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: Icon(
-                                    Icons.lock_outline,
-                                    size: 20,
-                                    color: isDark ? Colors.white54 : Colors.grey.shade500,
+                              : Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                  decoration: BoxDecoration(
+                                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.lock, size: 14, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        'Terkunci (Min $minAge thn)',
+                                        style: TextStyle(
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                           onTap: handleTap,

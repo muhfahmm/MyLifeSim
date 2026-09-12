@@ -323,7 +323,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.purple.shade600,
               title: 'Premium Akses Penuh (18+)',
               description: 'Membuka semua fitur 18+, inses, masturbasi, dan hubungan guru-murid.',
-              price: 'Rp 49.000',
+              price: 'Rp 199.000',
               isUnlocked: _premiumUnlocked,
               onTap: () {
                 _simulatePurchase('Premium Akses Penuh (18+)', () {
@@ -344,7 +344,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.amber.shade700,
               title: 'God Mode',
               description: 'Kustomisasi penuh atribut karakter kapan saja!',
-              price: 'Rp 79.000',
+              price: 'Rp 249.000',
               isUnlocked: _godModeUnlocked,
               onTap: () {
                 _simulatePurchase('God Mode', () {
@@ -375,7 +375,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.red.shade600,
               title: 'Bebas Iklan',
               description: 'Bermain nyaman tanpa gangguan iklan pop-up.',
-              price: 'Rp 19.000',
+              price: 'Rp 49.000',
               isUnlocked: _removeAdsUnlocked,
               onTap: () {
                 _simulatePurchase('Bebas Iklan', () {
@@ -388,7 +388,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.teal.shade600,
               title: 'Kekebalan Abadi (Bebas Penyakit)',
               description: 'Karakter dan seluruh anggota keluarga menjadi kebal 100% dari segala penyakit selamanya.',
-              price: 'Rp 29.000',
+              price: 'Rp 129.000',
               isUnlocked: _immunityUnlocked,
               onTap: () {
                 _simulatePurchase('Kekebalan Abadi (Bebas Penyakit)', () {
@@ -404,7 +404,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.red.shade400,
               title: 'Serum Kesehatan Super',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Memulihkan kesehatan karakter menjadi 100% secara instan.',
-              price: 'Rp 15.000',
+              price: 'Rp 25.000',
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kesehatan Super', () {
@@ -417,7 +417,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.green.shade500,
               title: 'Pil Kebahagiaan Abadi',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Memaksimalkan level kebahagiaan karakter Anda menjadi 100%.',
-              price: 'Rp 15.000',
+              price: 'Rp 35.000',
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Pil Kebahagiaan Abadi', () {
@@ -430,7 +430,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.blue.shade500,
               title: 'Serum Kecerdasan Instan',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan kecerdasan karakter Anda menjadi 100%.',
-              price: 'Rp 15.000',
+              price: 'Rp 45.000',
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kecerdasan Instan', () {
@@ -446,7 +446,7 @@ class _StorePageState extends State<StorePage> {
               iconBgColor: Colors.amber.shade800,
               title: 'Karir Spesial',
               description: 'Membuka jalur karir spesial: Militer, Politik, Pembisnis, Atlit, Aktor, Astronot, Model, Idol, E-Sports.',
-              price: 'Rp 39.000',
+              price: 'Mulai Rp 99.000',
               buttonLabel: 'Lihat Fitur',
               isUnlocked: _specialCareerUnlocked,
               onTap: () {

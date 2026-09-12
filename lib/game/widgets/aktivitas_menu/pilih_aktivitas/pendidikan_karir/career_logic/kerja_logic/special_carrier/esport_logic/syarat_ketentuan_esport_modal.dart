@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'tim_esport.dart';
 import 'BA/ba_esport_percentage.dart';
@@ -185,25 +187,88 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
                   children: _roles.map((r) {
                     final bool isSelected = r['title'] == _selectedRole;
                     final Color rColor = r['color'] as Color;
+
+                    // Periksa status unlock per peran E-Sports
+                    bool isRoleUnlocked = false;
+                    if (r['title'] == 'Pro Player Esport') {
+                      isRoleUnlocked = GlobalSettings.isEsportsProPlayerUnlocked.value;
+                    } else if (r['title'] == 'Talent Esports') {
+                      isRoleUnlocked = GlobalSettings.isEsportsTalentUnlocked.value;
+                    } else if (r['title'] == 'Brand Ambassador Esport') {
+                      isRoleUnlocked = GlobalSettings.isEsportsBAUnlocked.value;
+                    }
+
                     return InkWell(
-                      onTap: () => setState(() => _selectedRole = r['title'] as String),
+                      onTap: () {
+                        if (!isRoleUnlocked) {
+                          DialogHelper.show(
+                            context: context,
+                            title: 'Fitur Terkunci 🔒',
+                            content: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Peran ${r['title']} ini memerlukan akses fitur Karir Spesial. Silakan beli terlebih dahulu di Toko MyLifeSim.',
+                                  style: const TextStyle(fontSize: 14),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton.icon(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFF8A5A32),
+                                    foregroundColor: Colors.white,
+                                    minimumSize: const Size(double.infinity, 44),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                  ),
+                                  onPressed: () {
+                                    Navigator.pop(context);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => StorePage(
+                                          character: widget.character,
+                                          onPurchaseCompleted: () {
+                                            if (mounted) setState(() {});
+                                          },
+                                        ),
+                                      ),
+                                    ).then((_) {
+                                      if (mounted) setState(() {});
+                                    });
+                                  },
+                                  icon: const Icon(Icons.shopping_bag_rounded, size: 18),
+                                  label: const Text('Buka di Toko MyLifeSim', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context),
+                                child: const Text('Batal'),
+                              ),
+                            ],
+                          );
+                          return;
+                        }
+                        setState(() => _selectedRole = r['title'] as String);
+                      },
                       borderRadius: BorderRadius.circular(14),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: 8),
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: isSelected
+                          color: (isRoleUnlocked && isSelected)
                               ? rColor.withValues(alpha: 0.15)
                               : (isDark ? Colors.grey.shade800.withValues(alpha: 0.4) : Colors.grey.shade100),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSelected ? rColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                            width: isSelected ? 2 : 1,
+                            color: (isRoleUnlocked && isSelected) ? rColor : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                            width: (isRoleUnlocked && isSelected) ? 2 : 1,
                           ),
                         ),
                         child: Row(
                           children: [
-                            Icon(r['icon'] as IconData, color: isSelected ? rColor : Colors.grey, size: 22),
+                            Icon(r['icon'] as IconData, color: isRoleUnlocked ? (isSelected ? rColor : Colors.grey) : Colors.grey.shade400, size: 22),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Column(
@@ -214,20 +279,43 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 13,
-                                      color: isDark ? Colors.white : Colors.black87,
+                                      color: isRoleUnlocked ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade600,
                                     ),
                                   ),
                                   Text(
                                     r['desc'] as String,
                                     style: TextStyle(
                                       fontSize: 11,
-                                      color: isDark ? Colors.white60 : Colors.grey.shade600,
+                                      color: isRoleUnlocked ? (isDark ? Colors.white60 : Colors.grey.shade600) : Colors.grey.shade500,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            if (isSelected)
+                            if (!isRoleUnlocked)
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.lock, size: 12, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Terkunci',
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              )
+                            else if (isSelected)
                               Icon(Icons.check_circle, color: rColor, size: 20),
                           ],
                         ),

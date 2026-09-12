@@ -142,35 +142,6 @@ class JobDatabase {
       'color': Colors.pink,
     },
 
-    // ---- KREATIF & ESPORTS ----
-    {
-      'title': 'Brand Ambassador Esport',
-      'salary': 2000,
-      'minIntel': 40,
-      'category': 'Kreatif',
-      'desc': 'Menjadi ikon promosi dan perwakilan tim E-Sport ternama',
-      'icon': Icons.sports_esports,
-      'color': Colors.blueAccent,
-    },
-    {
-      'title': 'Pro Player Esport',
-      'salary': 2500,
-      'minIntel': 30,
-      'category': 'Kreatif',
-      'desc': 'Bermain game kompetitif secara profesional di tim E-Sport ternama',
-      'icon': Icons.gamepad,
-      'color': Colors.deepOrangeAccent,
-    },
-    {
-      'title': 'Talent Esports',
-      'salary': 1500,
-      'minIntel': 30,
-      'category': 'Kreatif',
-      'desc': 'Menjadi talent pengisi konten dan wajah publik dari tim E-Sport',
-      'icon': Icons.star_border,
-      'color': Colors.amberAccent,
-    },
-
     // ---- LAYANAN & SOSIAL ----
     {
       'title': 'Driver Pribadi',

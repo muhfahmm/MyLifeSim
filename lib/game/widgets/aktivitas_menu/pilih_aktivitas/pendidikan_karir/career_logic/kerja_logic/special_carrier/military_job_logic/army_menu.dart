@@ -3,6 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class ArmyMenuPage extends StatefulWidget {
   final Character character;
@@ -273,16 +276,86 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
             const SizedBox(height: 12),
 
             ..._branches.map((b) {
+              final String branchName = b['branch'] as String;
               final IconData icon = b['icon'] as IconData;
               final Color color = b['color'] as Color;
 
+              // Periksa status unlock per cabang militer
+              bool isBranchUnlocked = false;
+              if (branchName == 'Angkatan Darat') {
+                isBranchUnlocked = GlobalSettings.isMiliterADUnlocked.value;
+              } else if (branchName == 'Angkatan Laut') {
+                isBranchUnlocked = GlobalSettings.isMiliterALUnlocked.value;
+              } else if (branchName == 'Angkatan Udara') {
+                isBranchUnlocked = GlobalSettings.isMiliterAUUnlocked.value;
+              }
+
+              final Color effectiveColor = isBranchUnlocked ? color : Colors.grey;
+
               return Card(
                 margin: const EdgeInsets.only(bottom: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                color: isDark ? Colors.grey.shade800 : Colors.white,
-                elevation: 3,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                ),
+                color: isBranchUnlocked
+                    ? (isDark ? Colors.grey.shade800 : Colors.white)
+                    : (isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.grey.shade100),
+                elevation: isBranchUnlocked ? 3 : 0,
                 child: InkWell(
-                  onTap: () => _showBranchDetail(b),
+                  onTap: () {
+                    if (!isBranchUnlocked) {
+                      DialogHelper.show(
+                        context: context,
+                        title: 'Fitur Terkunci 🔒',
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Jalur karir ${b['title']} ini memerlukan akses fitur Karir Spesial. Silakan beli terlebih dahulu di Toko MyLifeSim.',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton.icon(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: const Color(0xFF8A5A32),
+                                foregroundColor: Colors.white,
+                                minimumSize: const Size(double.infinity, 44),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                              ),
+                              onPressed: () {
+                                Navigator.pop(context);
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => StorePage(
+                                      character: widget.character,
+                                      onPurchaseCompleted: () {
+                                        if (mounted) setState(() {});
+                                      },
+                                    ),
+                                  ),
+                                ).then((_) {
+                                  if (mounted) setState(() {});
+                                });
+                              },
+                              icon: const Icon(Icons.shopping_bag_rounded, size: 18),
+                              label: const Text('Buka di Toko MyLifeSim', style: TextStyle(fontWeight: FontWeight.bold)),
+                            ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(context),
+                            child: const Text('Batal'),
+                          ),
+                        ],
+                      );
+                      return;
+                    }
+                    _showBranchDetail(b);
+                  },
                   borderRadius: BorderRadius.circular(16),
                   child: Padding(
                     padding: const EdgeInsets.all(16),
@@ -291,10 +364,10 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
-                            color: color.withValues(alpha: 0.15),
+                            color: effectiveColor.withValues(alpha: 0.15),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(icon, color: color, size: 32),
+                          child: Icon(icon, color: effectiveColor, size: 32),
                         ),
                         const SizedBox(width: 16),
                         Expanded(
@@ -306,7 +379,9 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
+                                  color: isBranchUnlocked
+                                      ? (isDark ? Colors.white : Colors.black87)
+                                      : Colors.grey.shade600,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -314,13 +389,38 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                                 b['desc'],
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: isDark ? Colors.white70 : Colors.grey.shade600,
+                                  color: isBranchUnlocked
+                                      ? (isDark ? Colors.white70 : Colors.grey.shade600)
+                                      : Colors.grey.shade500,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(Icons.chevron_right, color: isDark ? Colors.white54 : Colors.grey),
+                        isBranchUnlocked
+                            ? Icon(Icons.chevron_right, color: isDark ? Colors.white54 : Colors.grey)
+                            : Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.lock, size: 14, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Terkunci',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
                       ],
                     ),
                   ),

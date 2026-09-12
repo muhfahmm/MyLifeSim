@@ -2,6 +2,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'military_job_logic/army_menu.dart';
 import 'politikus_job_logic/politik_menu.dart';
@@ -78,131 +80,173 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
                 },
               ),
             ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.account_balance,
-              color: Colors.amber.shade800,
-              title: 'Karier Politik 🏛️',
-              subtitle: 'Jalur kekuasaan: Dewan, Walikota, Gubernur hingga Presiden',
-              minAge: 18,
-              onTap: () {
-                PolitikMenuHelper.showPolitikMenu(
-                  context,
-                  character,
-                  () {
-                    if (mounted) setState(() {});
-                    widget.onRefresh();
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isPolitikusUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.account_balance,
+                  color: Colors.amber.shade800,
+                  title: 'Karier Politik 🏛️',
+                  subtitle: 'Jalur kekuasaan: Dewan, Walikota, Gubernur hingga Presiden',
+                  minAge: 18,
+                  isPurchased: isUnlocked,
+                  onTap: () {
+                    PolitikMenuHelper.showPolitikMenu(
+                      context,
+                      character,
+                      () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    );
                   },
                 );
               },
             ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.business_center,
-              color: Colors.blue.shade800,
-              title: 'Pembisnis 💼',
-              subtitle: 'Mulai startup, kelola bisnis, dan bangun kekayaan impian',
-              minAge: 18,
-              page: PembisnisMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.sports_soccer,
-              color: Colors.deepOrange.shade800,
-              title: 'Atlit Profesional ⚽',
-              subtitle: 'Karir olahraga profesional & ikuti turnamen kelas dunia',
-              minAge: 6,
-              page: AtlitProfesionalMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.movie_creation,
-              color: Colors.purple.shade800,
-              title: 'Aktor Film 🎬',
-              subtitle: 'Bintang layar lebar, audisi perfilman, dan selebriti Hollywood',
-              minAge: 18,
-              page: AktorFilmMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.rocket_launch,
-              color: Colors.indigo.shade800,
-              title: 'Astronot 🚀',
-              subtitle: 'Misi antariksa, latihan kosmonot, dan penjelajahan tata surya',
-              minAge: 18,
-              page: AstronotMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.style,
-              color: Colors.pink.shade800,
-              title: 'Model 💃',
-              subtitle: 'Catwalk fashion show, majalah ternama, dan brand ambassador',
-              minAge: 18,
-              page: ModelsMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
-            ),
-            _buildMenuTile(
-              context: context,
-              icon: Icons.mic,
-              color: Colors.pinkAccent.shade400,
-              title: 'Idol 🎤',
-              subtitle: 'Latihan vokal & dance, konser panggung, dan agensi entertainment',
-              minAge: 10,
-              onTap: () async {
-                if (character.isIdol || character.isIdolStaff) {
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => IdolMenuScreen(
-                        character: character,
-                        onRefresh: () {
-                          if (mounted) setState(() {});
-                          widget.onRefresh();
-                        },
-                      ),
-                    ),
-                  );
-                  if (mounted) setState(() {});
-                } else {
-                  SyaratKetentuanIdolModal.show(
-                    context: context,
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isPebisnisUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.business_center,
+                  color: Colors.blue.shade800,
+                  title: 'Pembisnis 💼',
+                  subtitle: 'Mulai startup, kelola bisnis, dan bangun kekayaan impian',
+                  minAge: 18,
+                  isPurchased: isUnlocked,
+                  page: PembisnisMenuPage(
                     character: character,
                     onRefresh: () {
                       if (mounted) setState(() {});
                       widget.onRefresh();
                     },
-                  );
-                }
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isAtlitUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.sports_soccer,
+                  color: Colors.deepOrange.shade800,
+                  title: 'Atlit Profesional ⚽',
+                  subtitle: 'Karir olahraga profesional & ikuti turnamen kelas dunia',
+                  minAge: 6,
+                  isPurchased: isUnlocked,
+                  page: AtlitProfesionalMenuPage(
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isAktorFilmUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.movie_creation,
+                  color: Colors.purple.shade800,
+                  title: 'Aktor Film 🎬',
+                  subtitle: 'Bintang layar lebar, audisi perfilman, dan selebriti Hollywood',
+                  minAge: 18,
+                  isPurchased: isUnlocked,
+                  page: AktorFilmMenuPage(
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isAstronotUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.rocket_launch,
+                  color: Colors.indigo.shade800,
+                  title: 'Astronot 🚀',
+                  subtitle: 'Misi antariksa, latihan kosmonot, dan penjelajahan tata surya',
+                  minAge: 18,
+                  isPurchased: isUnlocked,
+                  page: AstronotMenuPage(
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isModelUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.style,
+                  color: Colors.pink.shade800,
+                  title: 'Model 💃',
+                  subtitle: 'Catwalk fashion show, majalah ternama, dan brand ambassador',
+                  minAge: 18,
+                  isPurchased: isUnlocked,
+                  page: ModelsMenuPage(
+                    character: character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                );
+              },
+            ),
+            ValueListenableBuilder<bool>(
+              valueListenable: GlobalSettings.isIdolUnlocked,
+              builder: (context, isUnlocked, _) {
+                return _buildMenuTile(
+                  context: context,
+                  icon: Icons.mic,
+                  color: Colors.pinkAccent.shade400,
+                  title: 'Idol 🎤',
+                  subtitle: 'Latihan vokal & dance, konser panggung, dan agensi entertainment',
+                  minAge: 10,
+                  isPurchased: isUnlocked,
+                  onTap: () async {
+                    if (character.isIdol || character.isIdolStaff) {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => IdolMenuScreen(
+                            character: character,
+                            onRefresh: () {
+                              if (mounted) setState(() {});
+                              widget.onRefresh();
+                            },
+                          ),
+                        ),
+                      );
+                      if (mounted) setState(() {});
+                    } else {
+                      SyaratKetentuanIdolModal.show(
+                        context: context,
+                        character: character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
+                      );
+                    }
+                  },
+                );
               },
             ),
             _buildMenuTile(
@@ -255,10 +299,12 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
     Widget? page,
     VoidCallback? onTap,
     int minAge = 18,
+    bool isPurchased = true,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final int currentAge = widget.character.age;
-    final bool isUnlocked = currentAge >= minAge;
+    final bool isAgeUnlocked = currentAge >= minAge;
+    final bool isUnlocked = isAgeUnlocked && isPurchased;
     final Color effectiveColor = isUnlocked ? color : Colors.grey;
 
     return Card(
@@ -298,13 +344,36 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
             ),
           ),
         ),
-        trailing: Icon(
-          isUnlocked ? Icons.arrow_forward_ios : Icons.lock_outline,
-          size: isUnlocked ? 14 : 18,
-          color: isUnlocked ? (isDark ? Colors.white54 : Colors.grey) : Colors.grey.shade500,
-        ),
+        trailing: isUnlocked
+            ? Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: isDark ? Colors.white54 : Colors.grey,
+              )
+            : Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.lock, size: 14, color: isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Terkunci',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
         onTap: () {
-          if (!isUnlocked) {
+          if (!isAgeUnlocked) {
             DialogHelper.show(
               context: context,
               title: 'Akses Dibatasi',
@@ -354,6 +423,58 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
             );
             return;
           }
+
+          if (!isPurchased) {
+            DialogHelper.show(
+              context: context,
+              title: 'Fitur Terkunci 🔒',
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Jalur $title ini memerlukan akses fitur Karir Spesial. Silakan beli terlebih dahulu di Toko MyLifeSim.',
+                    style: const TextStyle(fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF8A5A32),
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 44),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StorePage(
+                            character: widget.character,
+                            onPurchaseCompleted: () {
+                              if (mounted) setState(() {});
+                            },
+                          ),
+                        ),
+                      ).then((_) {
+                        if (mounted) setState(() {});
+                      });
+                    },
+                    icon: const Icon(Icons.shopping_bag_rounded, size: 18),
+                    label: const Text('Buka di Toko MyLifeSim', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Batal'),
+                ),
+              ],
+            );
+            return;
+          }
+
           if (page != null) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => page));
           } else if (onTap != null) {

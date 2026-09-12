@@ -8,6 +8,25 @@ class GlobalSettings {
   static final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isSpecialCareerUnlocked = ValueNotifier<bool>(false);
 
+  // Status Pembelian Karir Militer per Cabang
+  static final ValueNotifier<bool> isMiliterADUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isMiliterALUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isMiliterAUUnlocked = ValueNotifier<bool>(false);
+
+  // Status Pembelian Karir E-Sports per Kategori
+  static final ValueNotifier<bool> isEsportsProPlayerUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isEsportsTalentUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isEsportsBAUnlocked = ValueNotifier<bool>(false);
+
+  // Status Pembelian Karir Spesial Lainnya
+  static final ValueNotifier<bool> isPolitikusUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isPebisnisUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isAtlitUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isAktorFilmUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isAstronotUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isModelUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isIdolUnlocked = ValueNotifier<bool>(false);
+
   static final ValueNotifier<bool> musicEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> soundEffectsEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> animationsEnabled = ValueNotifier<bool>(true);

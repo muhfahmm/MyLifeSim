@@ -741,7 +741,11 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
             color: Colors.green,
             title: 'Pekerjaan Umum (Tidak Butuh Gelar)',
             subtitle: 'Lowongan kerja dasar tanpa syarat lulusan universitas',
-            minAge: 18,
+            minAge: (character.gender.trim().toLowerCase().startsWith('laki') ||
+                    character.gender.trim().toLowerCase().startsWith('pria') ||
+                    character.gender.trim().toLowerCase().startsWith('male'))
+                ? 15
+                : 18,
             page: PekerjaanUmumMenuScreen(
               character: character,
               onRefresh: () {
