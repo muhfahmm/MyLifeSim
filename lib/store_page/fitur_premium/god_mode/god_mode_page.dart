@@ -19,25 +19,18 @@ class GodModePage extends StatefulWidget {
 
 class _GodModePageState extends State<GodModePage> {
   late double _discipline;
-  late double _fertility;
   late double _happiness;
   late double _health;
-  late double _karma;
-  late double _looks;
   late double _sexualityVal; // 0 = Heteroseksual, 1 = Biseksual, 2 = Homoseksual
   late double _smarts;
-  late double _willpower;
 
   @override
   void initState() {
     super.initState();
     final c = widget.character;
     _discipline = c.discipline.toDouble();
-    _fertility = c.fertility.toDouble();
     _happiness = c.happiness.toDouble();
     _health = c.health.toDouble();
-    _karma = c.karma.toDouble();
-    _looks = c.appearance.toDouble();
 
     if (c.sexuality == 'Biseksual') {
       _sexualityVal = 1;
@@ -48,7 +41,6 @@ class _GodModePageState extends State<GodModePage> {
     }
 
     _smarts = c.intelligence.toDouble();
-    _willpower = c.willpower.toDouble();
   }
 
   String _getSexualityLabel(double val) {
@@ -73,14 +65,10 @@ class _GodModePageState extends State<GodModePage> {
   void _saveChanges() {
     final c = widget.character;
     c.discipline = _discipline.toInt();
-    c.fertility = _fertility.toInt();
     c.happiness = _happiness.toInt();
     c.health = _health.toInt();
-    c.karma = _karma.toInt();
-    c.appearance = _looks.toInt();
     c.sexuality = _getSexualityLabel(_sexualityVal);
     c.intelligence = _smarts.toInt();
-    c.willpower = _willpower.toInt();
 
     _showToast('Atribut berhasil diperbarui!');
     Navigator.pop(context);
@@ -151,38 +139,10 @@ class _GodModePageState extends State<GodModePage> {
                     ),
                     _buildAttributeSlider(
                       context: context,
-                      label: 'Penampilan',
-                      value: _looks,
-                      emoji: '✨',
-                      onChanged: (val) => setState(() => _looks = val),
-                    ),
-                    _buildAttributeSlider(
-                      context: context,
                       label: 'Disiplin',
                       value: _discipline,
                       emoji: '🥋',
                       onChanged: (val) => setState(() => _discipline = val),
-                    ),
-                    _buildAttributeSlider(
-                      context: context,
-                      label: 'Kesuburan',
-                      value: _fertility,
-                      emoji: '🌱',
-                      onChanged: (val) => setState(() => _fertility = val),
-                    ),
-                    _buildAttributeSlider(
-                      context: context,
-                      label: 'Karma',
-                      value: _karma,
-                      emoji: '☯️',
-                      onChanged: (val) => setState(() => _karma = val),
-                    ),
-                    _buildAttributeSlider(
-                      context: context,
-                      label: 'Kemauan',
-                      value: _willpower,
-                      emoji: '💪',
-                      onChanged: (val) => setState(() => _willpower = val),
                     ),
                     _buildSexualitySlider(context),
 
