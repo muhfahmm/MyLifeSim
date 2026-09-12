@@ -14,15 +14,15 @@ import 'special_carrier/esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
 import 'special_carrier/pekerjaan_spesial_menu.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/balap/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/basket/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/bulutangkis/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/catur/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/renang/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/tenis/atlit_activities_page.dart';
-import 'special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/tinju_mma/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/balap/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/basket/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/bulutangkis/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/catur/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/renang/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tenis/atlit_activities_page.dart';
+import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tinju_mma/atlit_activities_page.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;

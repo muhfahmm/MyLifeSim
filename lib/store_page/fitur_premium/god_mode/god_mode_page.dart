@@ -1,11 +1,9 @@
 // lib/store_page/fitur_premium/god_mode/god_mode_page.dart
 
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/univ_logic/univ_menu_page.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/database_nama_pekerjaan.dart';
 
 class GodModePage extends StatefulWidget {
   final Character character;
@@ -61,7 +59,7 @@ class _GodModePageState extends State<GodModePage> {
     return isFemale ? 'Lesbian' : 'Gay';
   }
 
-  void _showToast(String message, {bool isSuccess = true}) {
+  void _showToast(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(message),
@@ -533,27 +531,6 @@ class _GodModePageState extends State<GodModePage> {
     );
   }
 
-  Widget _buildAgeChip(int age, Character character) {
-    final bool isSelected = character.age == age;
-    return ChoiceChip(
-      label: Text('$age Thn', style: TextStyle(fontWeight: FontWeight.bold, color: isSelected ? Colors.white : Colors.black87)),
-      selected: isSelected,
-      selectedColor: Colors.blue,
-      backgroundColor: Colors.grey.shade200,
-      onSelected: (bool selected) {
-        if (selected) {
-          setState(() {
-            character.age = age;
-            if (character.currentDate != null && character.birthDate != null) {
-              character.currentDate = DateTime(character.birthDate!.year + age, character.birthDate!.month, character.birthDate!.day);
-            }
-          });
-          _showToast('Umur di-set menjadi $age tahun');
-        }
-      },
-    );
-  }
-
   void _showUnivGraduationDialog(bool isDark) {
     if (widget.character.age < 18) {
       _showToast('⚠️ Karakter belum memenuhi syarat / belum lulus sekolah (minimal usia 18 tahun)!');
@@ -574,7 +551,7 @@ class _GodModePageState extends State<GodModePage> {
           title: const Text('Pilih Jurusan Kuliah (Database)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           content: SingleChildScrollView(
             child: DropdownButtonFormField<String>(
-              value: selectedMajor,
+              initialValue: selectedMajor,
               isExpanded: true,
               dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
               decoration: const InputDecoration(border: OutlineInputBorder()),
@@ -612,60 +589,7 @@ class _GodModePageState extends State<GodModePage> {
     );
   }
 
-  void _showJobSelectionDialog(bool isDark) {
-    if (widget.character.age < 18) {
-      _showToast('⚠️ Karakter belum berusia 18 tahun (belum memenuhi syarat bekerja)!');
-      return;
-    }
-    // Mengambil seluruh data pekerjaan dari database JobDatabase.availableJobs
-    final List<Map<String, dynamic>> jobs = JobDatabase.availableJobs;
-    Map<String, dynamic> selectedJob = jobs.first;
 
-    showDialog(
-      context: context,
-      builder: (ctx) => StatefulBuilder(
-        builder: (context, setDialogState) => AlertDialog(
-          backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-          title: const Text('Pilih Pekerjaan (Database)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          content: SingleChildScrollView(
-            child: DropdownButtonFormField<Map<String, dynamic>>(
-              value: selectedJob,
-              isExpanded: true,
-              dropdownColor: isDark ? Colors.grey.shade800 : Colors.white,
-              decoration: const InputDecoration(border: OutlineInputBorder()),
-              items: jobs.map((j) {
-                return DropdownMenuItem<Map<String, dynamic>>(
-                  value: j,
-                  child: Text('${j['title']} (Rp ${j['salary']}/thn)', overflow: TextOverflow.ellipsis),
-                );
-              }).toList(),
-              onChanged: (val) {
-                if (val != null) setDialogState(() => selectedJob = val);
-              },
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
-              onPressed: () {
-                Navigator.pop(ctx);
-                setState(() {
-                  widget.character.jobName = selectedJob['title'];
-                  widget.character.jobSalary = (selectedJob['salary'] as num).toInt();
-                });
-                _showToast('Dapat pekerjaan baru: ${selectedJob['title']}!');
-              },
-              child: const Text('Terapkan', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 
   void _showAddPartnerDialog(bool isDark) {
     final TextEditingController nameCtrl = TextEditingController();

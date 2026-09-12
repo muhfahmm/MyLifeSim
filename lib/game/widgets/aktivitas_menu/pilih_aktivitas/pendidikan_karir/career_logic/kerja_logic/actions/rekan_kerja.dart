@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
-import '../special_carrier/atlit_profesional_job_logic/karir_pages/aktivitas_karir_atlet/sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import '../special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
 
 class RekanKerjaPage extends StatefulWidget {
   final Character character;
