@@ -36,9 +36,13 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final bool isUnlocked = BundleAllCareersLogic.isAllCareersUnlocked;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 20),
+      margin: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10 : 16,
+        vertical: isMobile ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -61,15 +65,20 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(isMobile ? 10 : 16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 8 : 10,
+                    vertical: isMobile ? 3 : 4,
+                  ),
                   decoration: BoxDecoration(
                     color: isUnlocked ? Colors.green.shade700 : const Color(0xFFD97706),
                     borderRadius: BorderRadius.circular(20),
@@ -80,14 +89,14 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                       Icon(
                         isUnlocked ? Icons.check_circle : Icons.local_fire_department,
                         color: Colors.white,
-                        size: 14,
+                        size: isMobile ? 12 : 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         isUnlocked ? 'SUDAH AKTIF' : 'BUNDLE HEMAT 25%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: isMobile ? 10 : 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
                         ),
@@ -97,7 +106,10 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                 ),
                 if (!isUnlocked)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 6 : 8,
+                      vertical: isMobile ? 2 : 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade100,
                       borderRadius: BorderRadius.circular(8),
@@ -107,25 +119,25 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                       BundleAllCareersLogic.savingsStr,
                       style: TextStyle(
                         color: Colors.red.shade800,
-                        fontSize: 11,
+                        fontSize: isMobile ? 10 : 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isMobile ? 8 : 12),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.amber.shade900.withValues(alpha: 0.4) : Colors.amber.shade100,
                     shape: BoxShape.circle,
                   ),
-                  child: const Text('👑', style: TextStyle(fontSize: 24)),
+                  child: Text('👑', style: TextStyle(fontSize: isMobile ? 20 : 24)),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: isMobile ? 10 : 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -133,7 +145,7 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                       Text(
                         'Buka Semua Karir Spesial',
                         style: TextStyle(
-                          fontSize: 17,
+                          fontSize: isMobile ? 14 : 17,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.amber.shade200 : const Color(0xFF78350F),
                         ),
@@ -142,8 +154,9 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                       Text(
                         'Akses instan 13 cabang karir: Militer (AD, AL, AU), Politik, Pembisnis, Atlit, Aktor, Astronot, Model, Idol, & E-Sports!',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.brown.shade700,
+                          height: 1.25,
                         ),
                       ),
                     ],
@@ -151,9 +164,9 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: isMobile ? 8 : 14),
             const Divider(height: 1),
-            const SizedBox(height: 12),
+            SizedBox(height: isMobile ? 8 : 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -163,8 +176,8 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                     if (!isUnlocked)
                       Text(
                         BundleAllCareersLogic.originalPriceStr,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: isMobile ? 11 : 12,
                           color: Colors.grey,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -172,7 +185,7 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                     Text(
                       isUnlocked ? 'Semua Karir Terbuka' : BundleAllCareersLogic.bundlePriceStr,
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: isMobile ? 15 : 18,
                         fontWeight: FontWeight.bold,
                         color: isUnlocked ? Colors.green : (isDark ? Colors.amber.shade300 : const Color(0xFFB45309)),
                       ),
@@ -183,7 +196,10 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isUnlocked ? Colors.green.shade600 : const Color(0xFF8A5A32),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 10 : 16,
+                      vertical: isMobile ? 6 : 10,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -192,12 +208,12 @@ class _BundleAllCareersCardState extends State<BundleAllCareersCard> {
                   onPressed: isUnlocked ? null : () => _simulatePurchase(context),
                   icon: Icon(
                     isUnlocked ? Icons.check_rounded : Icons.shopping_bag_rounded,
-                    size: 16,
+                    size: isMobile ? 14 : 16,
                   ),
                   label: Text(
                     isUnlocked ? 'Aktif' : 'Beli Paket Bundle',
-                    style: const TextStyle(
-                      fontSize: 13,
+                    style: TextStyle(
+                      fontSize: isMobile ? 11 : 13,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

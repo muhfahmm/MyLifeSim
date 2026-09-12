@@ -2189,13 +2189,15 @@ class _GameScreenState extends State<GameScreen> {
       backgroundColor: isDark ? Colors.grey.shade900 : null,
       title: Row(
         children: [
-          Icon(Icons.school, color: Colors.indigo),
+          const Icon(Icons.school, color: Colors.indigo),
           const SizedBox(width: 8),
-          Text(
-            'Pilihan Masa Depan 🎓',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
+          Expanded(
+            child: Text(
+              'Pilihan Masa Depan 🎓',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: isDark ? Colors.white : Colors.black87,
+              ),
             ),
           ),
         ],

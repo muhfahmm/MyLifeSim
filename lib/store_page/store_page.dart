@@ -109,12 +109,17 @@ class _StorePageState extends State<StorePage> {
     required String price,
     required VoidCallback onTap,
     bool isUnlocked = false,
-    VoidCallback? onActiveTap, // PARAMETER BARU
-    String? buttonLabel, // PARAMETER OPSIONAL UNTUK LABEL TOMBOL
+    VoidCallback? onActiveTap,
+    String? buttonLabel,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
+
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+      margin: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10 : 16,
+        vertical: isMobile ? 4 : 6,
+      ),
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       color: isDark ? Colors.grey.shade800 : Colors.white,
@@ -130,18 +135,18 @@ class _StorePageState extends State<StorePage> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(isMobile ? 10.0 : 16.0),
           child: Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(isMobile ? 8 : 12),
                 decoration: BoxDecoration(
                   color: iconBgColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, color: iconBgColor, size: 28),
+                child: Icon(icon, color: iconBgColor, size: isMobile ? 22 : 28),
               ),
-              const SizedBox(width: 16),
+              SizedBox(width: isMobile ? 10 : 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -149,30 +154,33 @@ class _StorePageState extends State<StorePage> {
                     Text(
                       title,
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: isMobile ? 14 : 16,
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       description,
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: isMobile ? 11 : 12,
                         color: isDark ? Colors.white70 : Colors.grey.shade600,
-                        height: 1.3,
+                        height: 1.25,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: isMobile ? 8 : 12),
               isUnlocked
                   ? InkWell(
-                      onTap: onActiveTap, // JIKA DIKLIK, BUKA HALAMAN
+                      onTap: onActiveTap,
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 10 : 12,
+                          vertical: isMobile ? 6 : 8,
+                        ),
                         decoration: BoxDecoration(
                           color: isDark ? Colors.green.shade900.withValues(alpha: 0.5) : Colors.green.shade50,
                           borderRadius: BorderRadius.circular(20),
@@ -186,11 +194,11 @@ class _StorePageState extends State<StorePage> {
                               style: TextStyle(
                                 color: isDark ? Colors.greenAccent : Colors.green.shade700,
                                 fontWeight: FontWeight.bold,
-                                fontSize: 13,
+                                fontSize: isMobile ? 11 : 13,
                               ),
                             ),
-                            const SizedBox(width: 4),
-                            Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.greenAccent : Colors.green.shade700),
+                            const SizedBox(width: 2),
+                            Icon(Icons.chevron_right, size: isMobile ? 14 : 16, color: isDark ? Colors.greenAccent : Colors.green.shade700),
                           ],
                         ),
                       ),
@@ -199,9 +207,9 @@ class _StorePageState extends State<StorePage> {
                       onTap: onTap,
                       borderRadius: BorderRadius.circular(20),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: isMobile ? 10 : 16,
+                          vertical: isMobile ? 6 : 8,
                         ),
                         decoration: BoxDecoration(
                           gradient: const LinearGradient(
@@ -220,10 +228,10 @@ class _StorePageState extends State<StorePage> {
                         ),
                         child: Text(
                           buttonLabel ?? price,
-                          style: const TextStyle(
+                          style: TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontSize: isMobile ? 11.5 : 13,
                           ),
                         ),
                       ),

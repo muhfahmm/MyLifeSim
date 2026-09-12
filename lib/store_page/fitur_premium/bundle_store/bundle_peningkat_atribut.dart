@@ -86,9 +86,13 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10 : 16,
+        vertical: isMobile ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -111,15 +115,20 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(isMobile ? 10 : 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 8 : 10,
+                    vertical: isMobile ? 3 : 4,
+                  ),
                   decoration: BoxDecoration(
                     color: widget.isUnlocked ? Colors.green.shade700 : Colors.teal.shade700,
                     borderRadius: BorderRadius.circular(20),
@@ -130,14 +139,14 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       Icon(
                         widget.isUnlocked ? Icons.check_circle : Icons.bolt_rounded,
                         color: Colors.white,
-                        size: 14,
+                        size: isMobile ? 12 : 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         widget.isUnlocked ? 'SUDAH MAX (100%)' : 'PAKET COMBO ATRIBUT 100%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: isMobile ? 10 : 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
                         ),
@@ -147,7 +156,10 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                 ),
                 if (!widget.isUnlocked)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 6 : 8,
+                      vertical: isMobile ? 2 : 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade100,
                       borderRadius: BorderRadius.circular(8),
@@ -157,25 +169,25 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       BundlePeningkatAtributLogic.savingsStr,
                       style: TextStyle(
                         color: Colors.red.shade800,
-                        fontSize: 11,
+                        fontSize: isMobile ? 10 : 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: isMobile ? 8 : 10),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.teal.shade900.withValues(alpha: 0.4) : Colors.teal.shade100,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.auto_awesome, color: Colors.tealAccent, size: 24),
+                  child: Icon(Icons.auto_awesome, color: Colors.tealAccent, size: isMobile ? 20 : 24),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: isMobile ? 10 : 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,7 +195,7 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       Text(
                         'Paket Atribut Max Instan',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: isMobile ? 14 : 16,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.teal.shade200 : Colors.teal.shade900,
                         ),
@@ -192,8 +204,9 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       Text(
                         'Memulihkan Kesehatan (100%), Kebahagiaan (100%), & Kecerdasan (100%) sekaligus!',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,
+                          height: 1.25,
                         ),
                       ),
                     ],
@@ -201,9 +214,9 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isMobile ? 8 : 12),
             const Divider(height: 1),
-            const SizedBox(height: 10),
+            SizedBox(height: isMobile ? 8 : 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -213,8 +226,8 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                     if (!widget.isUnlocked)
                       Text(
                         BundlePeningkatAtributLogic.originalPriceStr,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: isMobile ? 11 : 12,
                           color: Colors.grey,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -222,7 +235,7 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                     Text(
                       widget.isUnlocked ? 'Semua Atribut Max (100%)' : BundlePeningkatAtributLogic.bundlePriceStr,
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: isMobile ? 14 : 17,
                         fontWeight: FontWeight.bold,
                         color: widget.isUnlocked ? Colors.green : (isDark ? Colors.teal.shade300 : Colors.teal.shade800),
                       ),
@@ -233,18 +246,21 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                   style: ElevatedButton.styleFrom(
                     backgroundColor: widget.isUnlocked ? Colors.green.shade600 : const Color(0xFF8A5A32),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 10 : 14,
+                      vertical: isMobile ? 6 : 9,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: widget.isUnlocked ? 0 : 3,
                   ),
                   onPressed: widget.isUnlocked ? null : () => _simulatePurchase(context),
-                  icon: Icon(widget.isUnlocked ? Icons.check_rounded : Icons.shopping_bag_rounded, size: 16),
+                  icon: Icon(widget.isUnlocked ? Icons.check_rounded : Icons.shopping_bag_rounded, size: isMobile ? 14 : 16),
                   label: Text(
                     widget.isUnlocked ? 'Aktif' : 'Beli Combo Atribut',
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: isMobile ? 11 : 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

@@ -1059,19 +1059,19 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                           _getIconForMajor(major),
                           color: badgeLabel != null ? Colors.amber.shade700 : Colors.indigo,
                         ),
-                        title: Row(
+                        title: Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 4,
                           children: [
-                            Flexible(
-                              child: Text(
-                                major,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
-                                ),
+                            Text(
+                              major,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
-                            if (badgeLabel != null) ...[
-                              const SizedBox(width: 8),
+                            if (badgeLabel != null)
                               Container(
                                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                 decoration: BoxDecoration(
@@ -1085,13 +1085,12 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                                 child: Text(
                                   badgeLabel,
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10,
                                     fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.amber.shade200 : Colors.amber.shade900,
                                   ),
                                 ),
                               ),
-                            ],
                           ],
                         ),
                         trailing: Icon(

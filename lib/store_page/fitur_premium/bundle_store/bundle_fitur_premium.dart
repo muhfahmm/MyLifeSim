@@ -77,9 +77,13 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.symmetric(
+        horizontal: isMobile ? 10 : 16,
+        vertical: isMobile ? 4 : 6,
+      ),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
@@ -102,15 +106,20 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
         ],
       ),
       child: Padding(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(isMobile ? 10 : 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            Wrap(
+              spacing: 6,
+              runSpacing: 4,
+              crossAxisAlignment: WrapCrossAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 8 : 10,
+                    vertical: isMobile ? 3 : 4,
+                  ),
                   decoration: BoxDecoration(
                     color: widget.isUnlocked ? Colors.green.shade700 : Colors.purple.shade700,
                     borderRadius: BorderRadius.circular(20),
@@ -121,14 +130,14 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       Icon(
                         widget.isUnlocked ? Icons.check_circle : Icons.workspace_premium_rounded,
                         color: Colors.white,
-                        size: 14,
+                        size: isMobile ? 12 : 14,
                       ),
                       const SizedBox(width: 4),
                       Text(
                         widget.isUnlocked ? 'SEMUA TERBUKA' : 'BUNDLE ULTIMATE (HEMAT 15%)',
-                        style: const TextStyle(
+                        style: TextStyle(
                           color: Colors.white,
-                          fontSize: 11,
+                          fontSize: isMobile ? 10 : 11,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
                         ),
@@ -138,7 +147,10 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                 ),
                 if (!widget.isUnlocked)
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 6 : 8,
+                      vertical: isMobile ? 2 : 3,
+                    ),
                     decoration: BoxDecoration(
                       color: Colors.red.shade100,
                       borderRadius: BorderRadius.circular(8),
@@ -148,25 +160,25 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       BundleFiturPremiumLogic.savingsStr,
                       style: TextStyle(
                         color: Colors.red.shade800,
-                        fontSize: 11,
+                        fontSize: isMobile ? 10 : 11,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ),
               ],
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: isMobile ? 8 : 10),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(isMobile ? 8 : 10),
                   decoration: BoxDecoration(
                     color: isDark ? Colors.purple.shade900.withValues(alpha: 0.4) : Colors.purple.shade100,
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.stars_rounded, color: Colors.purpleAccent, size: 24),
+                  child: Icon(Icons.stars_rounded, color: Colors.purpleAccent, size: isMobile ? 20 : 24),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: isMobile ? 10 : 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -174,7 +186,7 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       Text(
                         'Buka Semua Fitur Premium',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: isMobile ? 14 : 16,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
                         ),
@@ -183,8 +195,9 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       Text(
                         'Akses 4 Fitur Sekaligus: Akses 18+, God Mode, Bebas Iklan, & Kekebalan Abadi!',
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,
+                          height: 1.25,
                         ),
                       ),
                     ],
@@ -192,9 +205,9 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: isMobile ? 8 : 12),
             const Divider(height: 1),
-            const SizedBox(height: 10),
+            SizedBox(height: isMobile ? 8 : 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -204,8 +217,8 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                     if (!widget.isUnlocked)
                       Text(
                         BundleFiturPremiumLogic.originalPriceStr,
-                        style: const TextStyle(
-                          fontSize: 12,
+                        style: TextStyle(
+                          fontSize: isMobile ? 11 : 12,
                           color: Colors.grey,
                           decoration: TextDecoration.lineThrough,
                         ),
@@ -213,7 +226,7 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                     Text(
                       widget.isUnlocked ? 'Semua Fitur Premium Aktif' : BundleFiturPremiumLogic.bundlePriceStr,
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: isMobile ? 14 : 17,
                         fontWeight: FontWeight.bold,
                         color: widget.isUnlocked ? Colors.green : (isDark ? Colors.purple.shade300 : Colors.purple.shade800),
                       ),
@@ -224,7 +237,10 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: widget.isUnlocked ? Colors.green.shade600 : const Color(0xFF8A5A32),
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isMobile ? 10 : 14,
+                      vertical: isMobile ? 6 : 9,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
@@ -233,12 +249,12 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                   onPressed: widget.isUnlocked ? null : () => _simulatePurchase(context),
                   icon: Icon(
                     widget.isUnlocked ? Icons.check_rounded : Icons.shopping_bag_rounded,
-                    size: 16,
+                    size: isMobile ? 14 : 16,
                   ),
                   label: Text(
                     widget.isUnlocked ? 'Aktif' : 'Beli Paket Bundle',
-                    style: const TextStyle(
-                      fontSize: 12,
+                    style: TextStyle(
+                      fontSize: isMobile ? 11 : 12,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
