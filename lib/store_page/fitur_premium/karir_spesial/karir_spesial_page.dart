@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'militer/militer_store.dart';
 import 'esports/esports_store.dart';
+import 'bundle_all_careers/bundle_all_careers_card.dart';
 
 class KarirSpesialPage extends StatelessWidget {
   const KarirSpesialPage({super.key});
@@ -87,6 +88,7 @@ class KarirSpesialPage extends StatelessWidget {
                                     return ListView(
                                       padding: const EdgeInsets.all(16),
                                       children: [
+                                        const BundleAllCareersCard(),
                                         Text(
                                           'Pilih Kategori Karir Spesial:',
                                           style: TextStyle(

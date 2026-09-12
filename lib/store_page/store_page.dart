@@ -9,6 +9,9 @@ import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_p
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
+import 'fitur_premium/bundle_store/bundle_fitur_premium.dart';
+import 'fitur_premium/bundle_store/bundle_peningkat_atribut.dart';
+import 'fitur_premium/bundle_store/promo_twin_date_logic.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -316,8 +319,69 @@ class _StorePageState extends State<StorePage> {
                 ),
               ),
 
+            if (PromoTwinDateLogic.isTwinDate())
+              Container(
+                margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFFE53935), Color(0xFFFF6F00)],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.deepOrange.withValues(alpha: 0.3),
+                      blurRadius: 6,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.local_fire_department, color: Colors.white, size: 22),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        PromoTwinDateLogic.getPromoBannerText(),
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
             // --- SEKSI FITUR PREMIUM ---
             _buildSectionHeader('Fitur Premium', isDark),
+            BundleFiturPremiumCard(
+              isUnlocked: BundleFiturPremiumLogic.isAllUnlocked(
+                premiumUnlocked: _premiumUnlocked,
+                godModeUnlocked: _godModeUnlocked,
+                removeAdsUnlocked: _removeAdsUnlocked,
+                immunityUnlocked: _immunityUnlocked,
+              ),
+              onPurchaseSuccess: () {
+                setState(() {
+                  _premiumUnlocked = true;
+                  _godModeUnlocked = true;
+                  _removeAdsUnlocked = true;
+                  _immunityUnlocked = true;
+                  GlobalSettings.isPremium.value = true;
+                  if (character != null) {
+                    character.health = 100;
+                    character.happiness = 100;
+                    character.intelligence = 100;
+                    character.discipline = 100;
+                  }
+                });
+                if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
+              },
+            ),
             _buildStoreItem(
               icon: Icons.verified_user,
               iconBgColor: Colors.purple.shade600,
@@ -399,12 +463,24 @@ class _StorePageState extends State<StorePage> {
 
             // --- SEKSI PENINGKAT ATRIBUT ---
             _buildSectionHeader('Peningkat Atribut Instan', isDark),
+            BundlePeningkatAtributCard(
+              character: character,
+              isUnlocked: character != null &&
+                  character.health >= 100 &&
+                  character.happiness >= 100 &&
+                  character.intelligence >= 100,
+              onPurchaseSuccess: () {
+                setState(() {});
+                if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
+              },
+            ),
             _buildStoreItem(
               icon: Icons.favorite_rounded,
               iconBgColor: Colors.red.shade400,
               title: 'Serum Kesehatan Super',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Memulihkan kesehatan karakter menjadi 100% secara instan.',
               price: 'Rp 25.000',
+              isUnlocked: character != null && character.health >= 100,
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kesehatan Super', () {
@@ -418,6 +494,7 @@ class _StorePageState extends State<StorePage> {
               title: 'Pil Kebahagiaan Abadi',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Memaksimalkan level kebahagiaan karakter Anda menjadi 100%.',
               price: 'Rp 35.000',
+              isUnlocked: character != null && character.happiness >= 100,
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Pil Kebahagiaan Abadi', () {
@@ -431,6 +508,7 @@ class _StorePageState extends State<StorePage> {
               title: 'Serum Kecerdasan Instan',
               description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan kecerdasan karakter Anda menjadi 100%.',
               price: 'Rp 45.000',
+              isUnlocked: character != null && character.intelligence >= 100,
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kecerdasan Instan', () {
