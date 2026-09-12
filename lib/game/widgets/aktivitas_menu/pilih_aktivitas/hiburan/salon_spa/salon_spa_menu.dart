@@ -94,27 +94,42 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
+    final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
+    final Color disabledCardBg = isDark ? Colors.grey.shade700 : Colors.grey.shade50;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color disabledTextColor = isDark ? Colors.white54 : Colors.grey;
+    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
+    final Color disabledSubtextColor = isDark ? Colors.white38 : Colors.grey;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Salon & Spa 💅', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: containerBg,
+        foregroundColor: textColor,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: bgColor,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: containerBg,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
                     'Saldo Anda: ${_fmt(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.greenAccent : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -130,25 +145,36 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: canAfford ? Colors.white : Colors.grey.shade50,
+                    color: canAfford ? cardBg : disabledCardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      title: Text(l['name'], style: TextStyle(
-                        fontWeight: FontWeight.bold, fontSize: 14,
-                        color: canAfford ? Colors.black87 : Colors.grey,
-                      )),
+                      title: Text(
+                        l['name'],
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: canAfford ? textColor : disabledTextColor,
+                        ),
+                      ),
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
-                        child: Text('${l['desc']}\nHarga: ${_fmt(l['cost'] as int)}',
-                          style: TextStyle(color: canAfford ? Colors.black54 : Colors.grey)),
+                        child: Text(
+                          '${l['desc']}\nHarga: ${_fmt(l['cost'] as int)}',
+                          style: TextStyle(
+                            color: canAfford ? subtextColor : disabledSubtextColor,
+                          ),
+                        ),
                       ),
                       isThreeLine: true,
-                      trailing: Icon(canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                          size: 14, color: canAfford ? Colors.pink : Colors.grey),
+                      trailing: Icon(
+                        canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
+                        size: canAfford ? 14 : 16,
+                        color: canAfford ? Colors.pinkAccent : (isDark ? Colors.white54 : Colors.grey),
+                      ),
                       onTap: canAfford ? () => _executeLayanan(context, l) : null,
                     ),
                   );

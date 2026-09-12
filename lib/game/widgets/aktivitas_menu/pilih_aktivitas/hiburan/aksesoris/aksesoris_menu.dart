@@ -70,16 +70,12 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
     },
   ];
 
-  static String _formatMoney(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
-  }
-
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,

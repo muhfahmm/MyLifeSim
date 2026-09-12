@@ -25,6 +25,14 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
+    final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
+
     final List<String> brands = ['Louis Vuitton 👑', 'Chanel 🇫🇷', 'Prada 🇮🇹'];
     final owned = widget.character.ownedAccessories.where((e) => e['type'] == 'tas_branded').toList();
 
@@ -33,21 +41,21 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Toko Tas Branded', style: TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: Colors.white,
-          foregroundColor: Colors.black87,
+          backgroundColor: containerBg,
+          foregroundColor: textColor,
           elevation: 0.5,
-          bottom: const TabBar(
-            labelColor: Colors.pink,
-            unselectedLabelColor: Colors.black54,
-            indicatorColor: Colors.pink,
-            tabs: [
+          bottom: TabBar(
+            labelColor: isDark ? Colors.pinkAccent : Colors.pink,
+            unselectedLabelColor: isDark ? Colors.white70 : Colors.black54,
+            indicatorColor: isDark ? Colors.pinkAccent : Colors.pink,
+            tabs: const [
               Tab(text: 'Brand'),
               Tab(text: 'Koleksi'),
             ],
           ),
         ),
         body: Container(
-          color: Colors.grey.shade100,
+          color: bgColor,
           child: TabBarView(
             children: [
               // Tab Brand
@@ -59,14 +67,25 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.white,
+                    color: cardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
-                      title: Text(brand, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      title: Text(
+                        brand,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: textColor,
+                        ),
+                      ),
+                      trailing: Icon(
+                        Icons.arrow_forward_ios,
+                        size: 16,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
+                      ),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -87,13 +106,20 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
               ),
               // Tab Koleksi
               owned.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.inventory_2_outlined, size: 64, color: Colors.grey),
-                          SizedBox(height: 12),
-                          Text('Belum ada koleksi tas branded.', style: TextStyle(color: Colors.grey)),
+                          Icon(
+                            Icons.inventory_2_outlined,
+                            size: 64,
+                            color: isDark ? Colors.white54 : Colors.grey,
+                          ),
+                          const SizedBox(height: 12),
+                          Text(
+                            'Belum ada koleksi tas branded.',
+                            style: TextStyle(color: isDark ? Colors.white54 : Colors.grey),
+                          ),
                         ],
                       ),
                     )
@@ -106,17 +132,27 @@ class _TasBrandedBrandPageState extends State<TasBrandedBrandPage> {
                         return Card(
                           elevation: 0,
                           margin: const EdgeInsets.only(bottom: 8),
-                          color: Colors.white,
+                          color: cardBg,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: Colors.grey.shade200),
+                            side: BorderSide(color: borderColor),
                           ),
                           child: ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            title: Text(item['name'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                            title: Text(
+                              item['name'],
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                                color: textColor,
+                              ),
+                            ),
                             subtitle: Padding(
                               padding: const EdgeInsets.only(top: 4),
-                              child: Text('Merek: ${item['brand']}\nHarga: ${_fmt(price)}', style: const TextStyle(color: Colors.black54)),
+                              child: Text(
+                                'Merek: ${item['brand']}\nHarga: ${_fmt(price)}',
+                                style: TextStyle(color: subtextColor),
+                              ),
                             ),
                             trailing: const Icon(Icons.check_circle, color: Colors.green),
                           ),

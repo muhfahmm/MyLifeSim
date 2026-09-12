@@ -4377,15 +4377,22 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.green),
                                     );
                                   } else if (_character.univMajor != null) {
-                                    final String? typeStr = _character.schoolType;
-                                    if (typeStr == null || typeStr.isEmpty) {
-                                      return const Text(
-                                        'Pendidikan:',
-                                        style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
-                                      );
+                                    String typeStr = _character.schoolType ?? '';
+                                    if (typeStr.isEmpty) {
+                                      if (_character.univMajor!.contains('Negeri')) {
+                                        typeStr = 'Negeri';
+                                      } else if (_character.univMajor!.contains('Swasta')) {
+                                        typeStr = 'Swasta';
+                                      } else {
+                                        typeStr = 'Kuliah';
+                                      }
                                     }
+                                    final String majorName = _character.univMajor!.split(" (").first;
+                                    final String univNameStr = (_character.univName != null && _character.univName!.isNotEmpty)
+                                        ? '${_character.univName} - '
+                                        : '';
                                     return Text(
-                                      'Pendidikan: ${_character.univMajor!.split(" (").first} - ($typeStr)',
+                                      'Pendidikan: $univNameStr$majorName - ($typeStr)',
                                       style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue),
                                     );
                                   } else if (_character.age >= 6 && _character.age < 18) {

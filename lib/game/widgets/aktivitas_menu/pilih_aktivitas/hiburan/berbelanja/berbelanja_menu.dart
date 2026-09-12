@@ -79,27 +79,38 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color containerBg = isDark ? const Color(0xFF1E1E1E) : Colors.white;
+    final Color cardBg = isDark ? const Color(0xFF242424) : Colors.white;
+    final Color textColor = isDark ? Colors.white : Colors.black87;
+    final Color borderColor = isDark ? Colors.grey.shade800 : Colors.grey.shade200;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Berbelanja 🛒', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: containerBg,
+        foregroundColor: textColor,
         elevation: 0.5,
       ),
       body: Container(
-        color: Colors.grey.shade100,
+        color: bgColor,
         child: Column(
           children: [
             Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.white,
+              color: containerBg,
               child: Row(
                 children: [
                   const Text('💰', style: TextStyle(fontSize: 18)),
                   const SizedBox(width: 8),
                   Text(
                     'Saldo Anda: ${_fmt(widget.character.money)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.green),
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: isDark ? Colors.greenAccent : Colors.green,
+                    ),
                   ),
                 ],
               ),
@@ -114,60 +125,99 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
                   return Card(
                     elevation: 0,
                     margin: const EdgeInsets.only(bottom: 8),
-                    color: Colors.white,
+                    color: cardBg,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
+                      side: BorderSide(color: borderColor),
                     ),
-                    child: ExpansionTile(
-                      leading: const Icon(Icons.store, color: Colors.orangeAccent),
-                      title: Text(t['name'] as String, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      children: (t['items'] as List<Map<String, dynamic>>).map((item) {
-                        final bool canAfford = widget.character.money >= (item['cost'] as int);
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
-                          title: Text(item['name'] as String, style: TextStyle(
-                              fontSize: 13, color: canAfford ? Colors.black87 : Colors.grey)),
-                          subtitle: Text(CurrencySettings.format(item['cost'] as int),
-                              style: TextStyle(fontSize: 12, color: canAfford ? Colors.green : Colors.grey)),
-                          trailing: Icon(canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
-                              size: 18, color: canAfford ? Colors.orangeAccent : Colors.grey),
-                          onTap: canAfford ? () {
-                            setState(() {
-                              widget.character.money -= (item['cost'] as int);
-                              widget.character.happiness = (widget.character.happiness + (item['happiness'] as int)).clamp(0, 100);
-                              if (item.containsKey('intelligence')) {
-                                widget.character.intelligence = (widget.character.intelligence + (item['intelligence'] as int)).clamp(0, 100);
-                              }
-                              if (item.containsKey('health')) {
-                                widget.character.health = (widget.character.health + (item['health'] as int)).clamp(0, 100);
-                              }
-                            });
-                            final msg = '🛍️ Kamu membeli ${item['name']} seharga ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
-                            widget.character.inbox.add(msg);
-                            showDialog(
-                              context: context,
-                              builder: (ctx2) => AlertDialog(
-                                title: const Row(children: [
-                                  Icon(Icons.check_circle, color: Colors.green),
-                                  SizedBox(width: 8),
-                                  Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
-                                ]),
-                                content: Text(msg),
-                                actions: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(ctx2);
-                                      widget.onComplete();
-                                    },
-                                    child: const Text('OK'),
-                                  )
-                                ],
+                    child: Theme(
+                      data: Theme.of(context).copyWith(
+                        dividerColor: Colors.transparent,
+                        unselectedWidgetColor: isDark ? Colors.white70 : Colors.black54,
+                        colorScheme: Theme.of(context).colorScheme.copyWith(
+                          primary: isDark ? Colors.orangeAccent : Colors.orange,
+                        ),
+                      ),
+                      child: ExpansionTile(
+                        iconColor: isDark ? Colors.orangeAccent : Colors.orange,
+                        collapsedIconColor: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                        leading: const Icon(Icons.store, color: Colors.orangeAccent),
+                        title: Text(
+                          t['name'] as String,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: textColor,
+                          ),
+                        ),
+                        children: (t['items'] as List<Map<String, dynamic>>).map((item) {
+                          final bool canAfford = widget.character.money >= (item['cost'] as int);
+                          return ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
+                            title: Text(
+                              item['name'] as String,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: canAfford ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.grey),
                               ),
-                            );
-                          } : null,
-                        );
-                      }).toList(),
+                            ),
+                            subtitle: Text(
+                              CurrencySettings.format(item['cost'] as int),
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: canAfford
+                                    ? (isDark ? Colors.greenAccent : Colors.green)
+                                    : (isDark ? Colors.white38 : Colors.grey),
+                              ),
+                            ),
+                            trailing: Icon(
+                              canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
+                              size: 18,
+                              color: canAfford ? Colors.orangeAccent : (isDark ? Colors.white54 : Colors.grey),
+                            ),
+                            onTap: canAfford
+                                ? () {
+                                    setState(() {
+                                      widget.character.money -= (item['cost'] as int);
+                                      widget.character.happiness =
+                                          (widget.character.happiness + (item['happiness'] as int)).clamp(0, 100);
+                                      if (item.containsKey('intelligence')) {
+                                        widget.character.intelligence =
+                                            (widget.character.intelligence + (item['intelligence'] as int)).clamp(0, 100);
+                                      }
+                                      if (item.containsKey('health')) {
+                                        widget.character.health =
+                                            (widget.character.health + (item['health'] as int)).clamp(0, 100);
+                                      }
+                                    });
+                                    final msg =
+                                        '🛍️ Kamu membeli ${item['name']} seharga ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
+                                    widget.character.inbox.add(msg);
+                                    showDialog(
+                                      context: context,
+                                      builder: (ctx2) => AlertDialog(
+                                        title: const Row(children: [
+                                          Icon(Icons.check_circle, color: Colors.green),
+                                          SizedBox(width: 8),
+                                          Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
+                                        ]),
+                                        content: Text(msg),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(ctx2);
+                                              widget.onComplete();
+                                            },
+                                            child: const Text('OK'),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                : null,
+                          );
+                        }).toList(),
+                      ),
                     ),
                   );
                 },
