@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/pet_lifespan_logic.dart';
 import 'database_reptil.dart';
 
 class ReptilPage extends StatefulWidget {
@@ -50,6 +51,9 @@ class _ReptilPageState extends State<ReptilPage> {
         'breed': h['name'] as String,
         'type': 'Reptil',
         'emoji': '🦎',
+        'gender': Random().nextBool() ? 'Jantan' : 'Betina',
+        'age': PetLifespanLogic.generateInitialAge(),
+        'maxAge': PetLifespanLogic.generateMaxAge('Reptil'),
         'happiness': happinessBoost,
         'relationship': 80,
         'cost': cost,
@@ -97,6 +101,9 @@ class _ReptilPageState extends State<ReptilPage> {
           'breed': itemName,
           'type': 'Reptil',
           'emoji': '🦎',
+          'gender': Random().nextBool() ? 'Jantan' : 'Betina',
+          'age': PetLifespanLogic.generateInitialAge(),
+          'maxAge': PetLifespanLogic.generateMaxAge('Reptil'),
           'happiness': happinessBoost,
           'relationship': 80,
           'cost': cost,

@@ -7,6 +7,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/pet_action_menu/pet_action_menu.dart';
 
 class RelationshipButton extends StatefulWidget {
   final Character character;
@@ -998,7 +999,19 @@ class _RelationshipButtonState extends State<RelationshipButton> {
 
                       return InkWell(
                         onTap: () {
-                          _showPetInteractionModal(context, pet, character);
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => PetActionMenuScreen(
+                                character: character,
+                                pet: pet,
+                                onRefresh: () {
+                                  widget.onRefresh();
+                                  if (_dialogSetState != null) _dialogSetState!(() {});
+                                },
+                              ),
+                            ),
+                          );
                         },
                         borderRadius: BorderRadius.circular(12),
                         child: Container(
@@ -1033,7 +1046,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                         ),
                                         const SizedBox(height: 2),
                                         Text(
-                                          'Tipe: $petType',
+                                          'Umur: ${pet['age'] ?? 1} tahun (${pet['gender'] ?? 'Jantan'})',
                                           style: TextStyle(
                                             fontSize: 11,
                                             color: Theme.of(context).brightness == Brightness.dark
@@ -1052,7 +1065,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                       border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
                                     ),
                                     child: Text(
-                                      petType,
+                                      '${pet['age'] ?? 1} Tahun',
                                       style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange),
                                     ),
                                   ),

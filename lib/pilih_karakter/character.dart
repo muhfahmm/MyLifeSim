@@ -18,6 +18,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/dokter/penyakit_logic/penyakit_manager.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/pet_lifespan_logic.dart';
 
 // Import Atribut Karakter yang Dipisah
 import 'package:mylifesim/pilih_karakter/atribut_karakter/disiplin.dart';
@@ -2304,6 +2305,15 @@ class Character {
     for (var recipient in donorRecipients) {
       int rAge = int.tryParse(recipient['age'] ?? '25') ?? 25;
       recipient['age'] = (rAge + 1).toString();
+    }
+
+    // 4.c. Pets Aging & Natural Death Logic
+    if (pets.isNotEmpty) {
+      final petNotices = PetLifespanLogic.processPetAging(pets);
+      for (var notice in petNotices) {
+        events.add(notice);
+        inbox.add(notice);
+      }
     }
 
     // --- LOGIKA MELAHIRKAN ---
