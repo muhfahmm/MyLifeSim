@@ -8,6 +8,7 @@ import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
 
 class StorePage extends StatefulWidget {
   final Character? character;
@@ -25,6 +26,9 @@ class StorePage extends StatefulWidget {
   static bool get isImmunityUnlocked => _StorePageState._immunityUnlocked;
   static set isImmunityUnlocked(bool value) => _StorePageState._immunityUnlocked = value;
 
+  static bool get isSpecialCareerUnlocked => _StorePageState._specialCareerUnlocked;
+  static set isSpecialCareerUnlocked(bool value) => _StorePageState._specialCareerUnlocked = value;
+
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -34,6 +38,7 @@ class _StorePageState extends State<StorePage> {
   static bool _removeAdsUnlocked = false;
   static bool _premiumUnlocked = false;
   static bool _immunityUnlocked = false;
+  static bool _specialCareerUnlocked = false;
 
   void _showNoCharacterMessage() {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -102,6 +107,7 @@ class _StorePageState extends State<StorePage> {
     required VoidCallback onTap,
     bool isUnlocked = false,
     VoidCallback? onActiveTap, // PARAMETER BARU
+    String? buttonLabel, // PARAMETER OPSIONAL UNTUK LABEL TOMBOL
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
@@ -210,7 +216,7 @@ class _StorePageState extends State<StorePage> {
                           ],
                         ),
                         child: Text(
-                          price,
+                          buttonLabel ?? price,
                           style: const TextStyle(
                             color: Colors.white,
                             fontWeight: FontWeight.bold,
@@ -430,6 +436,30 @@ class _StorePageState extends State<StorePage> {
                 _simulatePurchase('Serum Kecerdasan Instan', () {
                   character.intelligence = 100;
                 });
+              },
+            ),
+
+            // --- SEKSI PEKERJAAN ---
+            _buildSectionHeader('Pekerjaan', isDark),
+            _buildStoreItem(
+              icon: Icons.star_rounded,
+              iconBgColor: Colors.amber.shade800,
+              title: 'Karir Spesial',
+              description: 'Membuka jalur karir spesial: Militer, Politik, Pembisnis, Atlit, Aktor, Astronot, Model, Idol, E-Sports.',
+              price: 'Rp 39.000',
+              buttonLabel: 'Lihat Fitur',
+              isUnlocked: _specialCareerUnlocked,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const KarirSpesialPage()),
+                );
+              },
+              onActiveTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const KarirSpesialPage()),
+                );
               },
             ),
           ],

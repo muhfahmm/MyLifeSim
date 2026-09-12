@@ -6,6 +6,7 @@ class GlobalSettings {
   // --- TAMBAHAN BARU: STATUS PREMIUM ---
   // (Ini yang dipanggil oleh store_page.dart untuk membuka fitur 18+)
   static final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isSpecialCareerUnlocked = ValueNotifier<bool>(false);
 
   static final ValueNotifier<bool> musicEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> soundEffectsEnabled = ValueNotifier<bool>(true);
