@@ -418,7 +418,9 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   Icon(Icons.family_restroom, color: Colors.blue),
                   SizedBox(width: 8),
-                  Text('Pertemuan Kembali 👪', style: TextStyle(fontWeight: FontWeight.bold)),
+                  Expanded(
+                    child: Text('Pertemuan Kembali 👪', style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
                 ],
               ),
               content: Text(
@@ -847,7 +849,9 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Icon(Icons.healing, color: Colors.red, size: 28),
               SizedBox(width: 10),
-              Text('Terkena Penyakit 🤒', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text('Terkena Penyakit 🤒', style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
             ],
           ),
           content: Column(
@@ -2082,7 +2086,9 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Icon(Icons.school, color: Colors.blue.shade700),
               const SizedBox(width: 8),
-              Text('Pendaftaran $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              Expanded(
+                child: Text('Pendaftaran $schoolLevel', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+              ),
             ],
           ),
           content: Text(

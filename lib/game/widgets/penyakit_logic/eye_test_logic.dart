@@ -218,119 +218,123 @@ class EyeTestLogic {
                   children: [
                     Icon(Icons.remove_red_eye, color: Colors.blueAccent),
                     SizedBox(width: 8),
-                    Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    Expanded(
+                      child: Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                    ),
                   ],
                 ),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      reasonText,
-                      style: const TextStyle(fontSize: 14),
-                    ),
-                    const SizedBox(height: 16),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.blueAccent, width: 2),
+                content: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        reasonText,
+                        style: const TextStyle(fontSize: 14),
                       ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: List.generate(rows, (r) {
-                          return Row(
-                            children: List.generate(cols, (c) {
-                              final bool isTarget = (r == targetRow && c == targetCol);
-                              final String char = isTarget ? oddChar : mainChar;
-                              return Expanded(
-                                child: GestureDetector(
-                                  behavior: HitTestBehavior.opaque,
-                                  onTap: answered
-                                      ? null
-                                      : () {
-                                          answered = true;
-                                          countdownTimer?.cancel();
-                                          if (isTarget) {
-                                            showDialog(
-                                              context: dialogContext,
-                                              barrierDismissible: false,
-                                              builder: (successContext) => PopScope(
-                                                canPop: false,
-                                                child: AlertDialog(
-                                                  title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                  content: Text('Kamu berhasil menemukan dan menekan huruf "$oddChar"! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(successContext);
-                                                        Navigator.pop(dialogContext);
-                                                        onFinish.call();
-                                                      },
-                                                      child: const Text('Lanjutkan'),
-                                                    ),
-                                                  ],
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.grey[200],
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(color: Colors.blueAccent, width: 2),
+                        ),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: List.generate(rows, (r) {
+                            return Row(
+                              children: List.generate(cols, (c) {
+                                final bool isTarget = (r == targetRow && c == targetCol);
+                                final String char = isTarget ? oddChar : mainChar;
+                                return Expanded(
+                                  child: GestureDetector(
+                                    behavior: HitTestBehavior.opaque,
+                                    onTap: answered
+                                        ? null
+                                        : () {
+                                            answered = true;
+                                            countdownTimer?.cancel();
+                                            if (isTarget) {
+                                              showDialog(
+                                                context: dialogContext,
+                                                barrierDismissible: false,
+                                                builder: (successContext) => PopScope(
+                                                  canPop: false,
+                                                  child: AlertDialog(
+                                                    title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                    content: Text('Kamu berhasil menemukan dan menekan huruf "$oddChar"! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(successContext);
+                                                          Navigator.pop(dialogContext);
+                                                          onFinish.call();
+                                                        },
+                                                        child: const Text('Lanjutkan'),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          } else {
-                                            character.avatarAccessoriesType = 'prescription01';
-                                            onUpdateAvatar();
+                                              );
+                                            } else {
+                                              character.avatarAccessoriesType = 'prescription01';
+                                              onUpdateAvatar();
 
-                                            showDialog(
-                                              context: dialogContext,
-                                              barrierDismissible: false,
-                                              builder: (failContext) => PopScope(
-                                                canPop: false,
-                                                child: AlertDialog(
-                                                  title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                  content: Text('Jawabanmu salah. Kamu menekan huruf "$mainChar". Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
-                                                  actions: [
-                                                    TextButton(
-                                                      onPressed: () {
-                                                        Navigator.pop(failContext);
-                                                        Navigator.pop(dialogContext);
-                                                        onFinish.call();
-                                                      },
-                                                      child: const Text('OK'),
-                                                    ),
-                                                  ],
+                                              showDialog(
+                                                context: dialogContext,
+                                                barrierDismissible: false,
+                                                builder: (failContext) => PopScope(
+                                                  canPop: false,
+                                                  child: AlertDialog(
+                                                    title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
+                                                    content: Text('Jawabanmu salah. Kamu menekan huruf "$mainChar". Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(failContext);
+                                                          Navigator.pop(dialogContext);
+                                                          onFinish.call();
+                                                        },
+                                                        child: const Text('OK'),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
-                                              ),
-                                            );
-                                          }
-                                        },
-                                   child: Padding(
-                                     padding: const EdgeInsets.symmetric(vertical: 4),
-                                     child: Text(
-                                       char,
-                                       textAlign: TextAlign.center,
-                                       style: const TextStyle(
-                                         fontSize: 22,
-                                         fontWeight: FontWeight.bold,
-                                         color: Colors.black87,
-                                         fontFamily: 'monospace',
+                                              );
+                                            }
+                                          },
+                                     child: Padding(
+                                       padding: const EdgeInsets.symmetric(vertical: 2),
+                                       child: Text(
+                                         char,
+                                         textAlign: TextAlign.center,
+                                         style: const TextStyle(
+                                           fontSize: 18,
+                                           fontWeight: FontWeight.bold,
+                                           color: Colors.black87,
+                                           fontFamily: 'monospace',
+                                         ),
                                        ),
                                      ),
-                                   ),
-                                ),
-                              );
-                            }),
-                          );
-                        }),
+                                  ),
+                                );
+                              }),
+                            );
+                          }),
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 15),
-                    Text(
-                      'Sisa waktu: $timeLeft detik',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: timeLeft <= 2 ? Colors.red : Colors.orange,
+                      const SizedBox(height: 12),
+                      Text(
+                        'Sisa waktu: $timeLeft detik',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: timeLeft <= 2 ? Colors.red : Colors.orange,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               );
             },
