@@ -231,10 +231,18 @@ class _AnjingPageState extends State<AnjingPage> {
                   if (canAfford) {
                     _executeAdopsi(context, h);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                    showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Text('Uang Tidak Cukup'),
                         content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
-                        backgroundColor: Colors.red,
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(c),
+                            child: const Text('OK'),
+                          ),
+                        ],
                       ),
                     );
                   }

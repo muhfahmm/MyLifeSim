@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 // ============================================================
 // PART FILES
@@ -189,15 +190,16 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
         });
         character.happiness = (character.happiness + 10).clamp(0, 100);
         _updateStatistik();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Berhasil membeli ${mobil['nama']}! +10 Happiness'),
-            backgroundColor: Colors.green,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Pembelian Berhasil',
+          content: Text('Berhasil membeli ${mobil['nama']}! +10 Happiness'),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Uang tidak cukup!'), backgroundColor: Colors.red),
+        DialogHelper.show(
+          context: context,
+          title: 'Transaksi Gagal',
+          content: const Text('Uang tidak cukup!'),
         );
       }
     });
@@ -221,11 +223,10 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
       });
       character.happiness = (character.happiness + 5).clamp(0, 100);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Berhasil menjual ${mobil['nama']} seharga USD ${formatRupiah(hargaJual)}! +5 Happiness'),
-          backgroundColor: Colors.orange,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Penjualan Berhasil',
+        content: Text('Berhasil menjual ${mobil['nama']} seharga USD ${formatRupiah(hargaJual)}! +5 Happiness'),
       );
     });
   }
@@ -234,8 +235,10 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
     setState(() {
       int index = koleksiMobil.indexWhere((m) => m['id'] == mobilId);
       if (index == -1) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Mobil tidak ditemukan!'), backgroundColor: Colors.red),
+        DialogHelper.show(
+          context: context,
+          title: 'Error',
+          content: const Text('Mobil tidak ditemukan!'),
         );
         return;
       }
@@ -244,11 +247,10 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
       showroom.add(mobil);
       character.happiness = (character.happiness + 15).clamp(0, 100);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${mobil['nama']} dipamerkan di showroom! +15 Happiness'),
-          backgroundColor: Colors.blue,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Showroom',
+        content: Text('${mobil['nama']} dipamerkan di showroom! +15 Happiness'),
       );
     });
   }
@@ -259,11 +261,10 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
       var mobil = showroom.removeAt(index);
       koleksiMobil.add(mobil);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${mobil['nama']} dikembalikan ke garasi.'),
-          backgroundColor: Colors.grey,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Garasi',
+        content: Text('${mobil['nama']} dikembalikan ke garasi.'),
       );
     });
   }
@@ -284,11 +285,10 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
           'harga': pendapatan,
           'tahun': character.age,
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Showroom menghasilkan USD ${formatRupiah(pendapatan)}! +5 Happiness'),
-            backgroundColor: Colors.teal,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Pendapatan Showroom',
+          content: Text('Showroom menghasilkan USD ${formatRupiah(pendapatan)}! +5 Happiness'),
         );
       }
       // Depresiasi mobil (jika tidak dirawat)

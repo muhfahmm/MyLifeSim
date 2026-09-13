@@ -42,9 +42,10 @@ class MasturbateEnjoymentModal {
       builder: (dialogCtx) {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: Row(
             children: [
@@ -55,7 +56,7 @@ class MasturbateEnjoymentModal {
                   isMutual ? 'Hasil Masturbasi Bersama 💦' : 'Hasil Masturbasi 💦',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 15.5,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),

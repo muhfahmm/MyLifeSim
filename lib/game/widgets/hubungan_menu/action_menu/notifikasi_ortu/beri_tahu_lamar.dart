@@ -18,11 +18,21 @@ class BeritahuLamaranHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: const Row(
           children: [
-            Icon(Icons.diamond, color: Colors.blueAccent),
+            Icon(Icons.diamond, color: Colors.blueAccent, size: 20),
             SizedBox(width: 8),
-            Text('Kabar Lamaran!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Expanded(
+              child: Text(
+                'Kabar Lamaran!',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -31,7 +41,7 @@ class BeritahuLamaranHelper {
           children: [
             const Text(
               'Selamat! Lamaranmu telah diterima. Apakah kamu ingin memberi tahu orang tuamu tentang pertunangan baru ini?',
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(fontSize: 12),
             ),
             if (!hasLivingParents) ...[
               const SizedBox(height: 12),
@@ -49,7 +59,7 @@ class BeritahuLamaranHelper {
                 Navigator.pop(context);
                 _executeTellParents(context, character, partnerName, partnerRole, onComplete);
               },
-              child: const Text('Ya, Beritahu Ortu', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
+              child: const Text('Ya, Beritahu Ortu', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.green)),
             ),
           TextButton(
             onPressed: () {
@@ -57,7 +67,7 @@ class BeritahuLamaranHelper {
               character.inbox.add('🤫 Rahasia: Kamu memilih untuk tidak membagikan berita pertunanganmu dengan orang tuamu.');
               onComplete();
             },
-            child: const Text('Tidak, Rahasiakan saja', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            child: const Text('Tidak, Rahasiakan saja', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
         ],
       ),
@@ -102,21 +112,31 @@ class BeritahuLamaranHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(Icons.info_outline, color: themeColor),
+            Icon(Icons.info_outline, color: themeColor, size: 20),
             const SizedBox(width: 8),
-            Text(reactionTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                reactionTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
-        content: Text(reactionText),
+        content: Text(reactionText, style: const TextStyle(fontSize: 12)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onComplete();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           )
         ],
       ),

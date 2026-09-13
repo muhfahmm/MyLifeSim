@@ -18,11 +18,21 @@ class BeritahuPacarHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: const Row(
           children: [
-            Icon(Icons.favorite, color: Colors.redAccent),
+            Icon(Icons.favorite, color: Colors.redAccent, size: 20),
             SizedBox(width: 8),
-            Text('Pacar Baru!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Expanded(
+              child: Text(
+                'Pacar Baru!',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -31,13 +41,13 @@ class BeritahuPacarHelper {
           children: [
             Text(
               'Kamu berhasil menjalin hubungan dengan $secondPartnerName. Kamu sudah memiliki pacar ($firstPartnerName). Apakah kamu ingin memberitahu pacarmu tentang hubungan baru ini?',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-            color: Colors.orange.withValues(alpha: 0.1),
+                color: Colors.orange.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
               ),
@@ -60,7 +70,7 @@ class BeritahuPacarHelper {
                 onComplete: onComplete,
               );
             },
-            child: const Text('Ya, Beritahu Pacar', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+            child: const Text('Ya, Beritahu Pacar', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.orange)),
           ),
           TextButton(
             onPressed: () {
@@ -70,7 +80,7 @@ class BeritahuPacarHelper {
               character.inbox.add('🤫 Rahasia: Kamu diam-diam menjalin hubungan dengan $secondPartnerName tanpa sepengetahuan $firstPartnerName!');
               onComplete();
             },
-            child: const Text('Tidak, Rahasiakan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.grey)),
+            child: const Text('Tidak, Rahasiakan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey)),
           ),
         ],
       ),
@@ -233,22 +243,24 @@ class BeritahuPacarHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
             Expanded(
               child: Text(
                 reactionTitle,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
         content: Text(
           reactionText,
-          style: const TextStyle(fontSize: 12.5, height: 1.35),
+          style: const TextStyle(fontSize: 12, height: 1.35),
         ),
         actions: [
           TextButton(
@@ -256,7 +268,7 @@ class BeritahuPacarHelper {
               Navigator.pop(context);
               onComplete();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),

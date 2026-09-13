@@ -13,8 +13,10 @@ class _LoterePageState extends State<LoterePage> {
 
   void buyTicket() {
     if (widget.state.character.money < bet) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Uang tidak cukup!')),
+      DialogHelper.show(
+        context: context,
+        title: 'Lotere',
+        content: const Text('Uang tidak cukup!'),
       );
       return;
     }
@@ -27,21 +29,19 @@ class _LoterePageState extends State<LoterePage> {
         widget.state.character.money += winAmount;
         widget.state._applyGamblingEffect(true, bet, happinessBonus: 25);
         widget.state._recordResult('Lotere', winAmount, true);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('JACKPOT LOTERE! Menang USD ${formatRupiah(winAmount)}!'),
-            backgroundColor: Colors.green,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Lotere',
+          content: Text('JACKPOT LOTERE! Menang USD ${formatRupiah(winAmount)}!'),
         );
       } else {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 3);
         widget.state._recordResult('Lotere', bet, false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Tiket tidak beruntung. Kehilangan USD ${formatRupiah(bet)}'),
-            backgroundColor: Colors.red,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Lotere',
+          content: Text('Tiket tidak beruntung. Kehilangan USD ${formatRupiah(bet)}'),
         );
       }
     });

@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_motor/database_motor.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 part 'menu_garasi_motor/koleksi_motor.dart';
 part 'menu_garasi_motor/jual_beli_motor.dart';
@@ -173,15 +174,16 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
         });
         character.happiness = (character.happiness + 10).clamp(0, 100);
         _updateStatistik();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Berhasil membeli ${motor['nama']}! +10 Happiness'),
-            backgroundColor: Colors.green,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Pembelian Berhasil',
+          content: Text('Berhasil membeli ${motor['nama']}! +10 Happiness'),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Uang tidak cukup!'), backgroundColor: Colors.red),
+        DialogHelper.show(
+          context: context,
+          title: 'Transaksi Gagal',
+          content: const Text('Uang tidak cukup!'),
         );
       }
     });
@@ -205,11 +207,10 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
       });
       character.happiness = (character.happiness + 5).clamp(0, 100);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Berhasil menjual ${motor['nama']} seharga USD ${formatRupiah(hargaJual)}! +5 Happiness'),
-          backgroundColor: Colors.orange,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Penjualan Berhasil',
+        content: Text('Berhasil menjual ${motor['nama']} seharga USD ${formatRupiah(hargaJual)}! +5 Happiness'),
       );
     });
   }
@@ -218,8 +219,10 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
     setState(() {
       int index = koleksiMotor.indexWhere((m) => m['id'] == motorId);
       if (index == -1) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Motor tidak ditemukan!'), backgroundColor: Colors.red),
+        DialogHelper.show(
+          context: context,
+          title: 'Error',
+          content: const Text('Motor tidak ditemukan!'),
         );
         return;
       }
@@ -228,11 +231,10 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
       showroomMotor.add(motor);
       character.happiness = (character.happiness + 15).clamp(0, 100);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${motor['nama']} dipamerkan di showroom! +15 Happiness'),
-          backgroundColor: Colors.blue,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Showroom',
+        content: Text('${motor['nama']} dipamerkan di showroom! +15 Happiness'),
       );
     });
   }
@@ -243,11 +245,10 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
       var motor = showroomMotor.removeAt(index);
       koleksiMotor.add(motor);
       _updateStatistik();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${motor['nama']} dikembalikan ke garasi.'),
-          backgroundColor: Colors.grey,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Garasi',
+        content: Text('${motor['nama']} dikembalikan ke garasi.'),
       );
     });
   }
@@ -267,11 +268,10 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
           'harga': pendapatan,
           'tahun': character.age,
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Showroom menghasilkan USD ${formatRupiah(pendapatan)}! +5 Happiness'),
-            backgroundColor: Colors.teal,
-          ),
+        DialogHelper.show(
+          context: context,
+          title: 'Pendapatan Showroom',
+          content: Text('Showroom menghasilkan USD ${formatRupiah(pendapatan)}! +5 Happiness'),
         );
       }
       for (var m in koleksiMotor) {

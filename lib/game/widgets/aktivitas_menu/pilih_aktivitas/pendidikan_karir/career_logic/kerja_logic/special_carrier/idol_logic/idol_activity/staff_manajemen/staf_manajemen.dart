@@ -162,8 +162,19 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         trailing: const Icon(Icons.star, color: Colors.orangeAccent),
         onTap: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Ini adalah dirimu! Kelola grup dengan bijaksana!')),
+          showDialog(
+            context: context,
+            builder: (c) => AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Profil Diri'),
+              content: const Text('Ini adalah dirimu! Kelola grup dengan bijaksana!'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(c),
+                  child: const Text('OK'),
+                ),
+              ],
+            ),
           );
         },
       ),

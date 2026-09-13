@@ -78,14 +78,18 @@ class ActivityButton extends StatelessWidget {
             ),
       onPressed: () {
         if (isImprisoned) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Akses ditolak! Kamu sedang berada di dalam penjara.')),
+          DialogHelper.show(
+            context: context,
+            title: 'Akses Ditolak',
+            content: const Text('Kamu sedang berada di dalam penjara.'),
           );
           return;
         }
         if (!isAlive) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Karakter sudah meninggal!')),
+          DialogHelper.show(
+            context: context,
+            title: 'Karakter Meninggal',
+            content: const Text('Karakter sudah meninggal!'),
           );
           return;
         }

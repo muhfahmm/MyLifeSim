@@ -263,8 +263,9 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
     final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       backgroundColor: backgroundColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
       content: Column(
         mainAxisSize: MainAxisSize.min,

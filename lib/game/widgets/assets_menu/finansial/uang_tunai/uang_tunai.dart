@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:flutter/services.dart';
 
 // ============================================================

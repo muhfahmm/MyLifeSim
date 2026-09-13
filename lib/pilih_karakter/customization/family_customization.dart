@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 // Import database pekerjaan agar daftar orang tua dinamis mengikuti daftar pekerjaan game
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/database_nama_pekerjaan.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class FamilyCustomizationScreen extends StatefulWidget {
   final List<String> maleFirstNames;
@@ -136,8 +137,10 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
 
   void _submit() {
     if (_motherAgeRange.start < 15) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Usia Ibu minimal adalah 15 tahun.')),
+      DialogHelper.show(
+        context: context,
+        title: 'Peringatan',
+        content: const Text('Usia Ibu minimal adalah 15 tahun.'),
       );
       return;
     }

@@ -76,14 +76,6 @@ class TemanKerjaSettingsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     onTap: () {
                       ProposalPercentageSettings.enableAllRelations();
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Semua teman kerja berhasil DIAKTIFKAN'),
-                          duration: Duration(milliseconds: 900),
-                          backgroundColor: Colors.green,
-                        ),
-                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
@@ -112,14 +104,6 @@ class TemanKerjaSettingsPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                     onTap: () {
                       ProposalPercentageSettings.disableAllRelations();
-                      ScaffoldMessenger.of(context).clearSnackBars();
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Semua teman kerja berhasil DIMATIKAN'),
-                          duration: Duration(milliseconds: 900),
-                          backgroundColor: Colors.redAccent,
-                        ),
-                      );
                     },
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),

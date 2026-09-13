@@ -18,7 +18,7 @@ class DialogHelper {
 
     if (isNotification) {
       // Centered scale-animated modal card popup
-      final double dialogWidth = (screenWidth * 0.88).clamp(280, 480);
+      final double dialogWidth = isMobile ? (screenWidth - 32) : (screenWidth * 0.88).clamp(280.0, 480.0);
       return showGeneralDialog(
         context: context,
         barrierDismissible: true,
@@ -39,10 +39,10 @@ class DialogHelper {
             color: Colors.transparent,
             child: Container(
               width: dialogWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey.shade900 : Colors.white,
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(16),
                 boxShadow: [
                   BoxShadow(
                     color: isDark ? Colors.black54 : Colors.black.withAlpha(38),
@@ -62,7 +62,7 @@ class DialogHelper {
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontSize: 17, 
+                            fontSize: 14, 
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Colors.black87,
                             height: 1.2,
@@ -88,15 +88,15 @@ class DialogHelper {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   Flexible(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: DefaultTextStyle(
                         style: TextStyle(
-                          fontSize: 13.5,
+                          fontSize: 12,
                           color: isDark ? Colors.white70 : Colors.black87,
-                          height: 1.45,
+                          height: 1.35,
                         ),
                         child: content,
                       ),

@@ -35,26 +35,30 @@ class _PetActionMenuScreenState extends State<PetActionMenuScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(icon, color: color, size: 20),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],
         ),
-        content: Text(message, style: const TextStyle(fontSize: 14)),
+        content: Text(message, style: const TextStyle(fontSize: 12)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               if (onConfirm != null) onConfirm();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -117,21 +121,31 @@ class _PetActionMenuScreenState extends State<PetActionMenuScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: const Row(
           children: [
-            Icon(Icons.sell, color: Colors.redAccent, size: 28),
+            Icon(Icons.sell, color: Colors.redAccent, size: 20),
             SizedBox(width: 8),
-            Text('Jual Peliharaan', style: TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                'Jual Peliharaan',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Text(
           'Apakah kamu yakin ingin menjual/melepaskan $petName ($breed)?\n\n'
           'Kamu akan menerima ${_fmt(resaleValue)} (60% dari harga asli) dan kebahagiaanmu berkurang -10.',
+          style: const TextStyle(fontSize: 12),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -161,7 +175,7 @@ class _PetActionMenuScreenState extends State<PetActionMenuScreen> {
                 },
               );
             },
-            child: const Text('Jual'),
+            child: const Text('Jual', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

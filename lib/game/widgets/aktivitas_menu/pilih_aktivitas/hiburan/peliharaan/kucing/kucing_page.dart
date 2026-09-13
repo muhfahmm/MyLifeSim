@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/pet_lifespan_logic.dart';
 import 'database_kucing.dart';
 
@@ -231,11 +232,10 @@ class _KucingPageState extends State<KucingPage> {
                   if (canAfford) {
                     _executeAdopsi(context, h);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
-                        backgroundColor: Colors.red,
-                      ),
+                    DialogHelper.show(
+                      context: context,
+                      title: 'Uang Tidak Cukup',
+                      content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
                     );
                   }
                 },

@@ -81,14 +81,6 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     if (_dialogSetState != null) {
       _dialogSetState!(() {});
     }
-
-    // Tampilkan Feedback
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Aksi "$action" berhasil dilakukan pada $childName!'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
   }
 
   @override
@@ -125,14 +117,18 @@ class _RelationshipButtonState extends State<RelationshipButton> {
             ),
       onPressed: () {
         if (isImprisoned) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Akses ditolak! Kamu sedang berada di dalam penjara.')),
+          DialogHelper.show(
+            context: context,
+            title: 'Akses Ditolak',
+            content: const Text('Kamu sedang berada di dalam penjara.'),
           );
           return;
         }
         if (!isAlive) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Karakter sudah meninggal!')),
+          DialogHelper.show(
+            context: context,
+            title: 'Karakter Meninggal',
+            content: const Text('Karakter sudah meninggal!'),
           );
           return;
         }
@@ -1201,8 +1197,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       rel = (rel + 5).clamp(0, 100);
                       pet['relationship'] = rel;
                       character.happiness = (character.happiness + 5).clamp(0, 100);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Kamu bermain dengan $name! $emoji')),
+                      DialogHelper.show(
+                        context: context,
+                        title: 'Interaksi Peliharaan',
+                        content: Text('Kamu bermain dengan $name! $emoji'),
                       );
                       widget.onRefresh();
                       if (_dialogSetState != null) _dialogSetState!(() {});
@@ -1217,8 +1215,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       rel = (rel + 8).clamp(0, 100);
                       pet['relationship'] = rel;
                       character.happiness = (character.happiness + 3).clamp(0, 100);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Kamu memberi makan $name! $emoji')),
+                      DialogHelper.show(
+                        context: context,
+                        title: 'Interaksi Peliharaan',
+                        content: Text('Kamu memberi makan $name! $emoji'),
                       );
                       widget.onRefresh();
                       if (_dialogSetState != null) _dialogSetState!(() {});
@@ -1233,8 +1233,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       character.pets.remove(pet);
                       character.happiness = (character.happiness - 10).clamp(0, 100);
                       character.inbox.add('$emoji Kamu melepaskan $name.');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('$name telah dilepaskan/dijual. (-10% Kebahagiaan)')),
+                      DialogHelper.show(
+                        context: context,
+                        title: 'Interaksi Peliharaan',
+                        content: Text('$name telah dilepaskan/dijual. (-10% Kebahagiaan)'),
                       );
                       widget.onRefresh();
                       if (_dialogSetState != null) _dialogSetState!(() {});

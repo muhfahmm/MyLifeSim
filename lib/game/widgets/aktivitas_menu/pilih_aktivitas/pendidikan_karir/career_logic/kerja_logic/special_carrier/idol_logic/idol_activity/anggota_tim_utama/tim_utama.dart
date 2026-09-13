@@ -116,8 +116,19 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                       subtitle: Text('Anggota Utama • Umur: ${widget.character.age} tahun • Disiplin: ${widget.character.discipline}%'),
                       trailing: const Icon(Icons.star, color: Colors.pinkAccent),
                       onTap: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Ini adalah dirimu! Teruslah berlatih keras!')),
+                        showDialog(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: const Text('Profil Diri'),
+                            content: const Text('Ini adalah dirimu! Teruslah berlatih keras!'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(c),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
                         );
                       },
                     ),

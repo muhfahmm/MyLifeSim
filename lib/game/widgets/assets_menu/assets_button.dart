@@ -5,6 +5,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
+import 'package:mylifesim/game/widgets/assets_menu/koleksi_aset/koleksi_aset_item.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/kasino/kasino.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/garasi_mobil.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_motor/garasi_motor.dart';
@@ -50,8 +51,10 @@ class AssetsButton extends StatelessWidget {
             ),
       onPressed: () {
         if (isImprisoned) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Akses ditolak! Kamu sedang berada di dalam penjara.')),
+          DialogHelper.show(
+            context: context,
+            title: 'Akses Ditolak',
+            content: const Text('Kamu sedang berada di dalam penjara.'),
           );
           return;
         }
@@ -79,6 +82,11 @@ class AssetsButton extends StatelessWidget {
                     character: character,
                     onPop: () => setStateDialog(() {}),
                   ),
+                  const Divider(height: 32),
+                  const Text('Koleksi Aset & Belanja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const SizedBox(height: 8),
+                  KoleksiAksorisItem(character: character, onPop: () => setStateDialog(() {})),
+                  KoleksiPerbelanjaanItem(character: character, onPop: () => setStateDialog(() {})),
                   const Divider(height: 32),
                   const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'dart:async';
 import 'promo_twin_date_logic.dart';
 
@@ -63,8 +64,10 @@ class BundlePeningkatAtributCard extends StatefulWidget {
 class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard> {
   void _simulatePurchase(BuildContext context) {
     if (widget.character == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Membutuhkan karakter aktif untuk menggunakan item ini!')),
+      DialogHelper.show(
+        context: context,
+        title: 'Perhatian',
+        content: const Text('Membutuhkan karakter aktif untuk menggunakan item ini!'),
       );
       return;
     }
@@ -310,8 +313,9 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
     final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       backgroundColor: backgroundColor,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
       content: Column(
         mainAxisSize: MainAxisSize.min,

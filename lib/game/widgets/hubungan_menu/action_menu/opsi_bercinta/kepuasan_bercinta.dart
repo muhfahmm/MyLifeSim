@@ -32,16 +32,26 @@ class KepuasanBercintaHelper {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
-              Icon(Icons.heart_broken, color: Colors.red),
+              Icon(Icons.heart_broken, color: Colors.red, size: 20),
               SizedBox(width: 8),
-              Text('Ajakan Ditolak 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  'Ajakan Ditolak 💔',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           content: Text(
             '$targetName $rejectReason Rawatlah hubunganmu terlebih dahulu!',
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 12),
           ),
           actions: [
             TextButton(
@@ -49,7 +59,7 @@ class KepuasanBercintaHelper {
                 Navigator.pop(context);
                 onRejected();
               },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -100,10 +110,10 @@ class MLEnjoymentModal {
       builder: (dialogCtx) {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: Row(
             children: [
               const Icon(Icons.favorite, color: Colors.pink, size: 20),
@@ -113,9 +123,10 @@ class MLEnjoymentModal {
                   'Hasil Hubungan Intim 💒',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -127,7 +138,7 @@ class MLEnjoymentModal {
               Text(
                 'Kalian baru saja menyelesaikan hubungan intim secara intim.',
                 style: TextStyle(
-                  fontSize: 13,
+                  fontSize: 12,
                   color: isDark ? Colors.white70 : Colors.black54,
                 ),
               ),
@@ -138,7 +149,7 @@ class MLEnjoymentModal {
                 'Kenikmatan Kamu:',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
@@ -178,7 +189,7 @@ class MLEnjoymentModal {
                 'Kenikmatan $partnerRelation ($partnerName):',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
@@ -244,7 +255,7 @@ class MLEnjoymentModal {
                 'Lanjutkan',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 12,
                   color: isDark ? Colors.blueAccent : Colors.blue,
                 ),
               ),

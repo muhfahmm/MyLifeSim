@@ -314,11 +314,21 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
           context: context,
           barrierDismissible: false,
           builder: (dialogCtx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: const Row(
               children: [
-                Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
                 SizedBox(width: 8),
-                Text('Ketahuan Basah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    'Ketahuan Basah! 😡',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             content: Text(
@@ -326,7 +336,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
                   ? 'Gawat! Saat hendak melakukan masturbasi bersama $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc!'
                   : 'Gawat! Saat hendak melakukan masturbasi bersama $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc! '
                     'Kabar buruk ini menyebar cepat dan pacar utamamu ($firstPartnerName) mengetahuinya!',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             actions: [
               TextButton(
@@ -335,7 +345,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
                   Navigator.pop(context); // Tutup MasturbateScreen
                   widget.onActionComplete.call();
                 },
-                child: const Text('Lanjutkan', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('Lanjutkan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

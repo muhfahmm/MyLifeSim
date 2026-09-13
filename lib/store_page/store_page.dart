@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 // IMPOR FILE BARU
 import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
@@ -44,11 +45,10 @@ class _StorePageState extends State<StorePage> {
   static bool _specialCareerUnlocked = false;
 
   void _showNoCharacterMessage() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Anda belum memiliki karakter. Buat karakter terlebih dahulu!'),
-        backgroundColor: Colors.orange,
-      ),
+    DialogHelper.show(
+      context: context,
+      title: 'Perhatian',
+      content: const Text('Anda belum memiliki karakter. Buat karakter terlebih dahulu!'),
     );
   }
 
@@ -65,22 +65,6 @@ class _StorePageState extends State<StorePage> {
         action();
         widget.onPurchaseCompleted?.call();
         setState(() {});
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.check_circle, color: Colors.white),
-                const SizedBox(width: 8),
-                Text('Berhasil membeli: $itemName!'),
-              ],
-            ),
-            backgroundColor: Colors.green.shade700,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(10),
-            ),
-          ),
-        );
       }
     });
   }
@@ -582,8 +566,9 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
       backgroundColor: isDark ? Colors.grey.shade900 : null,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
         child: Column(

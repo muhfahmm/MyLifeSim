@@ -37,11 +37,18 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
 
   void _submitExam() {
     if (_userAnswers.length < _questions.length) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-              'Harap jawab semua ${_questions.length} soal sebelum mengumpulkan tes!'),
-          backgroundColor: Colors.orangeAccent,
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Perhatian'),
+          content: Text('Harap jawab semua ${_questions.length} soal sebelum mengumpulkan tes!'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: const Text('OK'),
+            ),
+          ],
         ),
       );
       return;
@@ -64,16 +71,24 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
       context: context,
       barrierDismissible: false,
       builder: (c) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
             Icon(
               passed ? Icons.check_circle : Icons.cancel,
               color: passed ? Colors.green : Colors.red,
-              size: 28,
+              size: 20,
             ),
             const SizedBox(width: 8),
-            Text(passed ? 'Lolos Seleksi PTN! 🎉' : 'Gagal Seleksi PTN 🚫'),
+            Expanded(
+              child: Text(
+                passed ? 'Lolos Seleksi PTN! 🎉' : 'Gagal Seleksi PTN 🚫',
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -82,14 +97,14 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
           children: [
             Text(
               'Skor Akhir Kamu: $score / ${_questions.length}',
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
               passed
                   ? 'Selamat! Kamu berhasil menjawab minimal 8 soal dengan benar dan diterima di ${widget.chosenUniv} (${widget.major}).'
                   : 'Maaf, syarat kelulusan tes seleksi minimal 8 dari 10 soal benar. Coba lagi di kesempatan berikutnya.',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
           ],
         ),
@@ -106,7 +121,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                 widget.onPassSuccess();
               }
             },
-            child: const Text('Selesai'),
+            child: const Text('Selesai', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -118,14 +133,19 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
     final bool? shouldExit = await showDialog<bool>(
       context: context,
       builder: (c) => AlertDialog(
-        title: const Text('Keluar Ujian Seleksi? ⚠️'),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Keluar Ujian Seleksi? ⚠️', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         content: const Text(
           'Apakah kamu yakin ingin keluar dari tes seleksi? Seluruh kemajuan jawaban tes kamu akan hilang!',
+          style: TextStyle(fontSize: 12),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(c, false),
-            child: const Text('Batal'),
+            child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(

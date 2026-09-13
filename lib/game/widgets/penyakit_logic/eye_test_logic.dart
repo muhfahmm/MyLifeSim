@@ -194,8 +194,15 @@ class EyeTestLogic {
                       builder: (timeoutContext) => PopScope(
                         canPop: false,
                         child: AlertDialog(
-                          title: const Text('Waktu Habis! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: Text('Kamu tidak sempat menekan huruf tersebut. Huruf yang berbeda adalah: "$oddChar". Dokter mendiagnosis mata silinder/minus, sehingga kamu harus memakai kacamata.'),
+                          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: const Text('Waktu Habis! 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                          content: Text(
+                            'Kamu tidak sempat menekan huruf tersebut. Huruf yang berbeda adalah: "$oddChar". Dokter mendiagnosis mata silinder/minus, sehingga kamu harus memakai kacamata.',
+                            style: const TextStyle(fontSize: 12),
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () {
@@ -203,7 +210,7 @@ class EyeTestLogic {
                                 Navigator.pop(dialogContext);
                                 onFinish.call();
                               },
-                              child: const Text('OK'),
+                              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -214,12 +221,16 @@ class EyeTestLogic {
               });
 
               return AlertDialog(
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 title: const Row(
                   children: [
-                    Icon(Icons.remove_red_eye, color: Colors.blueAccent),
+                    Icon(Icons.remove_red_eye, color: Colors.blueAccent, size: 20),
                     SizedBox(width: 8),
                     Expanded(
-                      child: Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+                      child: Text('Tes Kesehatan Mata 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                     ),
                   ],
                 ),
@@ -229,7 +240,7 @@ class EyeTestLogic {
                     children: [
                       Text(
                         reasonText,
-                        style: const TextStyle(fontSize: 14),
+                        style: const TextStyle(fontSize: 12),
                       ),
                       const SizedBox(height: 12),
                       Container(
@@ -262,8 +273,15 @@ class EyeTestLogic {
                                                 builder: (successContext) => PopScope(
                                                   canPop: false,
                                                   child: AlertDialog(
-                                                    title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                    content: Text('Kamu berhasil menemukan dan menekan huruf "$oddChar"! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.'),
+                                                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                                                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                    title: const Text('Fokus Bagus! 🎉', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                                    content: Text(
+                                                      'Kamu berhasil menemukan dan menekan huruf "$oddChar"! Penglihatanmu masih sangat baik, kamu tidak memerlukan kacamata.',
+                                                      style: const TextStyle(fontSize: 12),
+                                                    ),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {
@@ -271,7 +289,7 @@ class EyeTestLogic {
                                                           Navigator.pop(dialogContext);
                                                           onFinish.call();
                                                         },
-                                                        child: const Text('Lanjutkan'),
+                                                        child: const Text('Lanjutkan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                                       ),
                                                     ],
                                                   ),
@@ -287,8 +305,15 @@ class EyeTestLogic {
                                                 builder: (failContext) => PopScope(
                                                   canPop: false,
                                                   child: AlertDialog(
-                                                    title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold)),
-                                                    content: Text('Jawabanmu salah. Kamu menekan huruf "$mainChar". Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.'),
+                                                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                                                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                                                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                                    title: const Text('Salah Tebak! 👓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                                    content: Text(
+                                                      'Jawabanmu salah. Kamu menekan huruf "$mainChar". Huruf yang benar adalah "$oddChar". Penglihatanmu buruk dan sekarang kamu harus memakai kacamata.',
+                                                      style: const TextStyle(fontSize: 12),
+                                                    ),
                                                     actions: [
                                                       TextButton(
                                                         onPressed: () {
@@ -296,7 +321,7 @@ class EyeTestLogic {
                                                           Navigator.pop(dialogContext);
                                                           onFinish.call();
                                                         },
-                                                        child: const Text('OK'),
+                                                        child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                                       ),
                                                     ],
                                                   ),

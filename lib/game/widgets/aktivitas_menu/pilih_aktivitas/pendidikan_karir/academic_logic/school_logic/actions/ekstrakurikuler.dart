@@ -93,14 +93,17 @@ class _ExtracurricularActionPageState extends State<ExtracurricularActionPage> {
       builder: (ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
-              Icon(Icons.sports_soccer, color: Colors.orange),
+              Icon(Icons.sports_soccer, color: Colors.orange, size: 20),
               SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Pilih Cabang Olahraga',
-                  style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

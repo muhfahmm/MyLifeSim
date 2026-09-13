@@ -54,7 +54,7 @@ void _showPickerBottomSheet({
                   ),
                 ],
         ),
-        padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -1095,14 +1095,33 @@ List<ActionItem> getAge12PlusActions(
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Aksi Diblokir 🚫'),
-              content: Text(isGay 
-                ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
-                : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.'),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              title: const Row(
+                children: [
+                  Icon(Icons.block, color: Colors.red, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Aksi Diblokir 🚫',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                isGay 
+                  ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
+                  : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.',
+                style: const TextStyle(fontSize: 12),
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
+                  child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -1166,15 +1185,34 @@ List<ActionItem> getAge12PlusActions(
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
-                content: Text('$targetRole marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Rayuan Ditolak (Tragedi) 🚨',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  '$targetRole marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                       updateState();
                     },
-                    child: const Text('OK'),
+                    child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -1187,15 +1225,34 @@ List<ActionItem> getAge12PlusActions(
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Ajakan Ditolak ❌'),
-                content: Text('$targetName menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.heart_broken, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Ajakan Ditolak ❌',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  '$targetName menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                       updateState();
                     },
-                    child: const Text('OK'),
+                    child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

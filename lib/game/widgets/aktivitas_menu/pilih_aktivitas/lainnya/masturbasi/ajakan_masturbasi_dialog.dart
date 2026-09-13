@@ -128,21 +128,24 @@ class AjakanMasturbasiDialog {
       builder: (dialogContext) {
         final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFEEF2F5),
           title: Row(
             children: [
               if (isGay || isLesbian)
-                const Text('🏳️‍🌈', style: TextStyle(fontSize: 22))
+                const Text('🏳️‍🌈', style: TextStyle(fontSize: 20))
               else
-                const Icon(Icons.favorite, color: Colors.pink, size: 24),
+                const Icon(Icons.favorite, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   dialogTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -156,7 +159,7 @@ class AjakanMasturbasiDialog {
               Text(
                 dialogBody,
                 style: TextStyle(
-                  fontSize: 12.5,
+                  fontSize: 12,
                   height: 1.35,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
@@ -294,18 +297,21 @@ class AjakanMasturbasiDialog {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Row(
             children: [
-              Icon(Icons.location_on, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
+              Icon(Icons.location_on, color: isDark ? Colors.purpleAccent : Colors.deepPurple, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Pilih Tempat Bersama $viewerName',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -389,18 +395,21 @@ class AjakanMasturbasiDialog {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Row(
             children: [
-              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigo),
+              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigo, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Pilih Waktu',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -589,13 +598,17 @@ class AjakanMasturbasiDialog {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: Text(
             'Ajakan Ditolak 💔',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
           ),
           content: Text(
             'Kamu dengan tegas menolak ajakan dari $partnerDesc. Hubungan kalian menjadi agak renggang (-$relPenalty% Hubungan).',
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
           ),
           actions: [
             TextButton(
@@ -605,7 +618,7 @@ class AjakanMasturbasiDialog {
               },
               child: Text(
                 'OK',
-                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
               ),
             )
           ],
@@ -639,13 +652,17 @@ class AjakanMasturbasiDialog {
         builder: (context) {
           final bool isDark = Theme.of(context).brightness == Brightness.dark;
           return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: Text(
               'Orang Tua Bercerai! 🚨',
-              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
             ),
             content: Text(
               'Laporanmu memicu pertengkaran hebat dan keributan dahsyat di rumah. $reportTarget tidak tahan dan memutuskan untuk bercerai! (-100% Hubungan dengan pelaku, Orang tuamu sekarang BERCERAI).',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
             ),
             actions: [
               TextButton(
@@ -653,7 +670,7 @@ class AjakanMasturbasiDialog {
                   Navigator.pop(context);
                   onComplete?.call();
                 },
-                child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                child: Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               )
             ],
           );
@@ -668,13 +685,17 @@ class AjakanMasturbasiDialog {
         builder: (context) {
           final bool isDark = Theme.of(context).brightness == Brightness.dark;
           return AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: Text(
               'Pertengkaran Hebat! 🚨',
-              style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
             ),
             content: Text(
               'Laporanmu memicu keributan besar di antara orang tuamu. Mereka berteriak sepanjang malam tetapi akhirnya tidak bercerai (-30% Hubungan orang tua).',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
             ),
             actions: [
               TextButton(
@@ -682,7 +703,7 @@ class AjakanMasturbasiDialog {
                   Navigator.pop(context);
                   onComplete?.call();
                 },
-                child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                child: Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               )
             ],
           );
@@ -714,13 +735,17 @@ class AjakanMasturbasiDialog {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: Text(
             'Dilaporkan ke Orang Tua! 📢',
-            style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
           ),
           content: Text(
             'Kamu memutuskan untuk melaporkan ajakan cabul $partnerDesc ke orang tuamu. Orang tuamu sangat marah kepada $viewerName dan langsung menghukumnya dengan sangat berat! (-100% Hubungan dengan saudara, +15% Karma karena jujur).',
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+            style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
           ),
           actions: [
             TextButton(
@@ -728,7 +753,7 @@ class AjakanMasturbasiDialog {
                 Navigator.pop(ctx);
                 onComplete?.call();
               },
-              child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+              child: Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
             )
           ],
         );

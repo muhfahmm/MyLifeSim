@@ -731,24 +731,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(icon, color: color, size: 28),
+            Icon(icon, color: color, size: 20),
             const SizedBox(width: 8),
-            Text(title,
-                style:
-                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Expanded(
+              child: Text(
+                title,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
-        content: Text(message, style: const TextStyle(fontSize: 14)),
+        content: Text(message, style: const TextStyle(fontSize: 12)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onConfirm();
             },
-            child:
-                const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -1482,14 +1489,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 showDialog(
                   context: screenCtx,
                   builder: (confirmCtx) => AlertDialog(
-                    title: const Text('Minta Cerai 💔',
-                        style: TextStyle(fontWeight: FontWeight.bold)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.heart_broken, color: Colors.redAccent, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Minta Cerai 💔',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
                     content: Text(
-                        'Apakah kamu yakin ingin meminta ${widget.targetName} untuk memutuskan hubungannya dengan $childCurrentPartner?'),
+                        'Apakah kamu yakin ingin meminta ${widget.targetName} untuk memutuskan hubungannya dengan $childCurrentPartner?', style: const TextStyle(fontSize: 12)),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(confirmCtx),
-                        child: const Text('Batal'),
+                        child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                       TextButton(
                         onPressed: () {
@@ -1617,12 +1639,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   showDialog(
                     context: screenContext,
                     builder: (confirmContext) => AlertDialog(
-                      title: const Text('Minta Tidak Menikah Lagi 💍', style: TextStyle(fontWeight: FontWeight.bold)),
-                      content: const Text('Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      title: const Row(
+                        children: [
+                          Icon(Icons.block, color: Colors.orange, size: 20),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              'Minta Tidak Menikah Lagi 💍',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      content: const Text('Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?', style: TextStyle(fontSize: 12)),
                       actions: [
                         TextButton(
                           onPressed: () => Navigator.pop(confirmContext),
-                          child: const Text('Batal'),
+                          child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                         ),
                         TextButton(
                           onPressed: () {
@@ -1651,7 +1689,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                               );
                             }
                           },
-                          child: const Text('Bujuk Ayah', style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold)),
+                          child: const Text('Bujuk Ayah', style: TextStyle(fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold)),
                         ),
                       ],
                     ),
@@ -1693,12 +1731,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 showDialog(
                   context: context,
                   builder: (confirmCtx) => AlertDialog(
-                    title: const Text('Pindah Tinggal Bersama Ayah 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ayahmu (${widget.character.fatherName})?'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.home_work, color: Colors.blueAccent, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Pindah Tinggal Bersama Ayah 🏡',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ayahmu (${widget.character.fatherName})?', style: const TextStyle(fontSize: 12)),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(confirmCtx),
-                        child: const Text('Batal'),
+                        child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                       TextButton(
                         onPressed: () {
@@ -1715,7 +1769,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             () {},
                           );
                         },
-                        child: const Text('Pindah', style: TextStyle(color: Colors.blueAccent, fontWeight: FontWeight.bold)),
+                        child: const Text('Pindah', style: TextStyle(fontSize: 12, color: Colors.blueAccent, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -1750,12 +1804,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 showDialog(
                   context: context,
                   builder: (confirmCtx) => AlertDialog(
-                    title: const Text('Pindah Tinggal Bersama Ibu 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
-                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ibumu (${widget.character.motherName})?'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                    title: const Row(
+                      children: [
+                        Icon(Icons.home_work, color: Colors.pinkAccent, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Pindah Tinggal Bersama Ibu 🏡',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text('Apakah kamu yakin ingin berpindah tempat tinggal dan hidup bersama Ibumu (${widget.character.motherName})?', style: const TextStyle(fontSize: 12)),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(confirmCtx),
-                        child: const Text('Batal'),
+                        child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                       ),
                       TextButton(
                         onPressed: () {
@@ -1772,7 +1842,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                             () {},
                           );
                         },
-                        child: const Text('Pindah', style: TextStyle(color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
+                        child: const Text('Pindah', style: TextStyle(fontSize: 12, color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -2059,13 +2129,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         showDialog(
           context: screenContext,
           builder: (confirmDialogContext) => AlertDialog(
-            title: Text(breakTitle,
-                style: const TextStyle(fontWeight: FontWeight.bold)),
-            content: Text(breakBody),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            title: Row(
+              children: [
+                const Icon(Icons.heart_broken, color: Colors.red, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    breakTitle,
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            content: Text(breakBody, style: const TextStyle(fontSize: 12)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(confirmDialogContext),
-                child: const Text('Batal'),
+                child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
               TextButton(
                 onPressed: () {
@@ -2200,14 +2285,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             showDialog(
               context: screenContext,
               builder: (confirmContext) => AlertDialog(
-                title: const Text('Minta Tidak Menikah Lagi 💍',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.block, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Minta Tidak Menikah Lagi 💍',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
                 content: const Text(
-                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?', style: TextStyle(fontSize: 12)),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(confirmContext),
-                    child: const Text('Batal'),
+                    child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                   TextButton(
                     onPressed: () {
@@ -2236,7 +2336,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     },
                     child: const Text('Bujuk Ayah',
                         style: TextStyle(
-                            color: Colors.orange, fontWeight: FontWeight.bold)),
+                            fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -2275,14 +2375,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           showDialog(
             context: screenContext,
             builder: (confirmContext) => AlertDialog(
-              title: const Text('Minta Cerai 💔',
-                  style: TextStyle(fontWeight: FontWeight.bold)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              title: const Row(
+                children: [
+                  Icon(Icons.heart_broken, color: Colors.redAccent, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Minta Cerai 💔',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
               content: Text(
-                  'Apakah kamu yakin ingin meminta ${askerTitle} untuk menceraikan $spouseName?'),
+                  'Apakah kamu yakin ingin meminta ${askerTitle} untuk menceraikan $spouseName?', style: const TextStyle(fontSize: 12)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(confirmContext),
-                  child: const Text('Batal'),
+                  child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
                 TextButton(
                   onPressed: () {
@@ -2391,14 +2506,29 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             showDialog(
               context: screenContext,
               builder: (confirmContext) => AlertDialog(
-                title: const Text('Minta Tidak Menikah Lagi 💍',
-                    style: TextStyle(fontWeight: FontWeight.bold)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.block, color: Colors.orange, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Minta Tidak Menikah Lagi 💍',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
                 content: const Text(
-                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?'),
+                    'Apakah kamu yakin ingin membujuk ayahmu untuk tidak menikah lagi dengan orang lain?', style: TextStyle(fontSize: 12)),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(confirmContext),
-                    child: const Text('Batal'),
+                    child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                   TextButton(
                     onPressed: () {
@@ -2427,7 +2557,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     },
                     child: const Text('Bujuk Ayah',
                         style: TextStyle(
-                            color: Colors.orange, fontWeight: FontWeight.bold)),
+                            fontSize: 12, color: Colors.orange, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -2516,12 +2646,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             showDialog(
               context: screenContext,
               builder: (confirmContext) => AlertDialog(
-                title: const Text('Minta Cerai 💔', style: TextStyle(fontWeight: FontWeight.bold)),
-                content: Text('Apakah kamu yakin ingin meminta ${targetParentLabel}mu untuk menceraikan $spouseName?'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.heart_broken, color: Colors.redAccent, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Minta Cerai 💔',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text('Apakah kamu yakin ingin meminta ${targetParentLabel}mu untuk menceraikan $spouseName?', style: const TextStyle(fontSize: 12)),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(confirmContext),
-                    child: const Text('Batal'),
+                    child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                   TextButton(
                     onPressed: () {
@@ -2834,18 +2980,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   canPop: false,
                   child: AlertDialog(
                   backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   title: Row(
                     children: [
-                      Icon(Icons.school, color: Colors.blue.shade700),
+                      Icon(Icons.school, color: Colors.blue.shade700, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           'Pendaftaran Sekolah $schoolLevel',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 16,
+                            fontSize: 14,
                             color: isDark ? Colors.white : Colors.black87,
                           ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],
@@ -2853,7 +3004,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   content: Text(
                     'Anakmu, ${widget.targetName}, telah memasuki usia $childAge tahun dan siap untuk masuk ke Sekolah $schoolLevel. Pilih jenis sekolah:',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: isDark ? Colors.white70 : Colors.black87,
                     ),
                   ),
@@ -2967,13 +3118,18 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 return StatefulBuilder(
                   builder: (ctx, setModalState) => AlertDialog(
                     backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     title: Row(
                       children: [
-                        const Icon(Icons.family_restroom, color: Colors.teal),
+                        const Icon(Icons.family_restroom, color: Colors.teal, size: 20),
                         const SizedBox(width: 8),
                         const Expanded(
                           child: Text('Terapkan Gaya Pengasuhan',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                              overflow: TextOverflow.ellipsis),
                         ),
                         // X BUTTON
                         IconButton(
@@ -3495,18 +3651,28 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   title: const Row(
                     children: [
-                      Icon(Icons.block, color: Colors.orange),
+                      Icon(Icons.block, color: Colors.orange, size: 20),
                       SizedBox(width: 8),
-                      Text('Belum Cukup Umur 👶', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Expanded(
+                        child: Text(
+                          'Belum Cukup Umur 👶',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
-                  content: Text('Adikmu (${widget.targetName}) masih berusia $targetAge tahun. Adik harus berusia minimal 12 tahun untuk bisa diajak pindah ke luar negeri secara mandiri.'),
+                  content: Text('Adikmu (${widget.targetName}) masih berusia $targetAge tahun. Adik harus berusia minimal 12 tahun untuk bisa diajak pindah ke luar negeri secara mandiri.', style: const TextStyle(fontSize: 12)),
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text('OK'),
+                      child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -3567,21 +3733,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   title: const Row(
                     children: [
-                      Icon(Icons.flight_land, color: Colors.green),
+                      Icon(Icons.flight_land, color: Colors.green, size: 20),
                       SizedBox(width: 8),
-                      Text('Ajakan Diterima! ✈️', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Expanded(
+                        child: Text(
+                          'Ajakan Diterima! ✈️',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
-                  content: Text('${widget.targetName} setuju dan memutuskan untuk pindah tinggal bersamamu di $userCityStr${widget.character.location}! (+15% Hubungan)'),
+                  content: Text('${widget.targetName} setuju dan memutuskan untuk pindah tinggal bersamamu di $userCityStr${widget.character.location}! (+15% Hubungan)', style: const TextStyle(fontSize: 12)),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.pop(ctx);
                         _updateState();
                       },
-                      child: const Text('OK'),
+                      child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),
@@ -3591,21 +3767,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               showDialog(
                 context: context,
                 builder: (ctx) => AlertDialog(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                  contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                   title: const Row(
                     children: [
-                      Icon(Icons.block, color: Colors.red),
+                      Icon(Icons.block, color: Colors.red, size: 20),
                       SizedBox(width: 8),
-                      Text('Ajakan Ditolak ❌', style: TextStyle(fontWeight: FontWeight.bold)),
+                      Expanded(
+                        child: Text(
+                          'Ajakan Ditolak ❌',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
-                  content: Text('${widget.targetName} menolak ajakanmu untuk pindah ke ${widget.character.location}. ${widget.targetName} memilih untuk tetap tinggal di tempat asalnya saat ini.'),
+                  content: Text('${widget.targetName} menolak ajakanmu untuk pindah ke ${widget.character.location}. ${widget.targetName} memilih untuk tetap tinggal di tempat asalnya saat ini.', style: const TextStyle(fontSize: 12)),
                   actions: [
                     TextButton(
                       onPressed: () {
                         Navigator.pop(ctx);
                         _updateState();
                       },
-                      child: const Text('OK'),
+                      child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     )
                   ],
                 ),
@@ -4243,14 +4429,33 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: const Text('Aksi Diblokir 🚫'),
-              content: Text(isGay 
-                ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
-                : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.'),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              title: const Row(
+                children: [
+                  Icon(Icons.block, color: Colors.red, size: 20),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Aksi Diblokir 🚫',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+              content: Text(
+                isGay 
+                  ? 'Kamu telah menonaktifkan ajakan gay di pengaturan karakter.' 
+                  : 'Kamu telah menonaktifkan ajakan lesbian di pengaturan karakter.',
+                style: const TextStyle(fontSize: 12),
+              ),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
+                  child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
               ],
             ),
@@ -4309,15 +4514,34 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
-                content: Text('${widget.targetRole} marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Rayuan Ditolak (Tragedi) 🚨',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  '${widget.targetRole} marah besar dan merasa sangat jijik! Kamu langsung diusir dari rumah, dan polisi dipanggil untuk menangkapmu. Kamu dipenjara selama 3 tahun (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                       _updateState();
                     },
-                    child: const Text('OK'),
+                    child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -4330,15 +4554,34 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('Ajakan Ditolak ❌'),
-                content: Text('${widget.targetName} menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).'),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                title: const Row(
+                  children: [
+                    Icon(Icons.heart_broken, color: Colors.red, size: 20),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Ajakan Ditolak ❌',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ),
+                content: Text(
+                  '${widget.targetName} menolak ajakanmu secara mentah-mentah karena merasa aneh dan canggung! (-$relDrop% Hubungan, -$hapDrop% Kebahagiaan).',
+                  style: const TextStyle(fontSize: 12),
+                ),
                 actions: [
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
                       _updateState();
                     },
-                    child: const Text('OK'),
+                    child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),

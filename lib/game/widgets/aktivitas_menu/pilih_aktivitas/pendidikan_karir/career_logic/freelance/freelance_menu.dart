@@ -51,8 +51,9 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -62,14 +63,14 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
             const Expanded(
               child: Text(
                 'Proyek Selesai! 🎉',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
           ],
         ),
         content: Text(
           'Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar ${CurrencySettings.format(payout)}.',
-          style: const TextStyle(fontSize: 12.5, height: 1.35),
+          style: const TextStyle(fontSize: 12, height: 1.35),
         ),
         actions: [
           ElevatedButton(

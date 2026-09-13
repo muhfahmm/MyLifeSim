@@ -20,7 +20,7 @@ class _RoulettePageState extends State<RoulettePage> {
   void spin() {
     if (isSpinning || widget.state.character.money < bet) {
       if (widget.state.character.money < bet) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Roulette', content: const Text('Uang tidak cukup!'));
       }
       return;
     }

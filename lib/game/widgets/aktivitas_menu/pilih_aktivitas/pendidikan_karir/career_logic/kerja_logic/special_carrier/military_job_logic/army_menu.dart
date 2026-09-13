@@ -127,18 +127,37 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                               widget.character.jobName!.contains('Angkatan Udara'));
 
                       if (hasMilitaryJob) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
+                        showDialog(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: const Text('Perhatian'),
                             content: Text('⚠️ Kamu saat ini sedang aktif bertugas sebagai ${widget.character.jobName}. Mundur terlebih dahulu jika ingin mendaftar ke cabang militer lain.'),
-                            backgroundColor: Colors.orange.shade800,
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(c),
+                                child: const Text('OK'),
+                              ),
+                            ],
                           ),
                         );
                         return;
                       }
 
                       if (!isEligible) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Kecerdasanmu (${widget.character.intelligence}%) belum memenuhi syarat minimal $minIntel%!')),
+                        showDialog(
+                          context: context,
+                          builder: (c) => AlertDialog(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            title: const Text('Persyaratan Belum Terpenuhi'),
+                            content: Text('Kecerdasanmu (${widget.character.intelligence}%) belum memenuhi syarat minimal $minIntel%!'),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(c),
+                                child: const Text('OK'),
+                              ),
+                            ],
+                          ),
                         );
                         return;
                       }
@@ -151,10 +170,18 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
                       });
                       widget.onRefresh();
 
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                      showDialog(
+                        context: context,
+                        builder: (c) => AlertDialog(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                          title: const Text('Pendaftaran Berhasil'),
                           content: Text('🎖️ Selamat! Kamu kini bergabung dengan $rankTitle!'),
-                          backgroundColor: Colors.green.shade700,
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(c),
+                              child: const Text('OK'),
+                            ),
+                          ],
                         ),
                       );
 

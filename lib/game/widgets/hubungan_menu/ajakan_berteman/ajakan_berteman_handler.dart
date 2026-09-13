@@ -143,18 +143,22 @@ class AjakanBertemanHandler {
         );
 
         return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           title: Row(
             children: [
-              const Icon(Icons.people_alt_rounded, color: Colors.blueAccent, size: 24),
+              const Icon(Icons.people_alt_rounded, color: Colors.blueAccent, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Ajakan Berteman! 🤝',
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -168,11 +172,12 @@ class AjakanBertemanHandler {
               Text(
                 '$relationLabel-mu, $friendName, menyapamu di lorong dan mengajakmu untuk berteman lebih dekat!',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
                 decoration: BoxDecoration(
@@ -182,12 +187,12 @@ class AjakanBertemanHandler {
                 child: Row(
                   children: [
                     CircleAvatar(
-                      radius: 18,
+                      radius: 16,
                       backgroundColor: isFemale ? Colors.pink.shade50 : Colors.blue.shade50,
                       child: Image(
                         image: AvatarImageCache.getImageProvider(avatarUrl),
-                        width: 36,
-                        height: 36,
+                        width: 32,
+                        height: 32,
                       ),
                     ),
                     const SizedBox(width: 10),
@@ -201,7 +206,7 @@ class AjakanBertemanHandler {
                       child: Text(
                         '$friendName ($friendGender)',
                         style: TextStyle(
-                          fontSize: 13,
+                          fontSize: 12,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
@@ -222,16 +227,9 @@ class AjakanBertemanHandler {
                 int rel = int.tryParse(targetData['relationship'] ?? '50') ?? 50;
                 targetData['relationship'] = (rel - relPenalty).clamp(0, 100).toString();
                 character.inbox.add('💔 Tolak Pertemanan: Kamu menolak ajakan berteman dari $friendName (-$relPenalty% hubungan).');
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('💔 Kamu menolak ajakan berteman dari $friendName.'),
-                    backgroundColor: Colors.redAccent,
-                  ),
-                );
                 onComplete?.call();
               },
-              child: const Text('Tolak', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              child: const Text('Tolak', style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 12)),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
@@ -254,16 +252,9 @@ class AjakanBertemanHandler {
 
                 character.happiness = (character.happiness + 10).clamp(0, 100);
                 character.inbox.add('🤝 Pertemanan Baru: Kamu dan $friendName sekarang menjadi teman dekat!');
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('🤝 Selamat! Kamu kini berteman dekat dengan $friendName!'),
-                    backgroundColor: Colors.green,
-                  ),
-                );
                 onComplete?.call();
               },
-              child: const Text('Terima Ajakan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: const Text('Terima Ajakan', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
             ),
           ],
         );

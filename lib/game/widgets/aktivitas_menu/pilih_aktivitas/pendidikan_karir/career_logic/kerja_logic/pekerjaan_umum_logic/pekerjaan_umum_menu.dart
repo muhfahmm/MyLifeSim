@@ -262,10 +262,18 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
                           ),
                           onPressed: () {
                             if (!meetsIntel) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
+                              showDialog(
+                                context: context,
+                                builder: (c) => AlertDialog(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  title: const Text('Persyaratan Belum Terpenuhi'),
                                   content: Text('Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'),
-                                  backgroundColor: Colors.red,
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(c),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
                                 ),
                               );
                               return;

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 // ============================================================
 // PART FILES
@@ -259,7 +260,7 @@ class _KemewahanPageState extends State<KemewahanPage> {
         character.happiness = (character.happiness + 5 * newAchievements.length).clamp(0, 100);
       });
       String msg = '🏆 Penghargaan baru: ${newAchievements.join(', ')}!';
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+      DialogHelper.show(context: context, title: 'Prestasi', content: Text(msg));
     }
   }
 
@@ -289,9 +290,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
         int h = item['happiness'] ?? 8;
         character.happiness = (character.happiness + h).clamp(0, 100);
         _checkAchievements();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bergabung dengan ${item['nama']}! +$h Happiness')));
+        DialogHelper.show(context: context, title: 'Keanggotaan', content: Text('Bergabung dengan ${item['nama']}! +$h Happiness'));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Transaksi Gagal', content: const Text('Uang tidak cukup!'));
       }
     });
   }
@@ -309,9 +310,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
         int h = item['happiness'] ?? 10;
         character.happiness = (character.happiness + h).clamp(0, 100);
         _checkAchievements();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Menyewa ${item['nama']}! +$h Happiness')));
+        DialogHelper.show(context: context, title: 'Layanan', content: Text('Menyewa ${item['nama']}! +$h Happiness'));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Transaksi Gagal', content: const Text('Uang tidak cukup!'));
       }
     });
   }
@@ -324,9 +325,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
         int bonus = 10 + (nominal ~/ 1000000) * 2;
         character.happiness = (character.happiness + bonus).clamp(0, 100);
         _checkAchievements();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Donasi \$${formatRupiah(nominal)} berhasil! +$bonus Happiness')));
+        DialogHelper.show(context: context, title: 'Donasi Berhasil', content: Text('Donasi \$${formatRupiah(nominal)} berhasil! +$bonus Happiness'));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Donasi Gagal', content: const Text('Uang tidak cukup!'));
       }
     });
   }
@@ -346,9 +347,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
         int bonus = item['happiness'] ?? 10;
         character.happiness = (character.happiness + bonus).clamp(0, 100);
         _checkAchievements();
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Berhasil membeli ${item['nama']}! +$bonus Happiness')));
+        DialogHelper.show(context: context, title: 'Pembelian Berhasil', content: Text('Berhasil membeli ${item['nama']}! +$bonus Happiness'));
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Transaksi Gagal', content: const Text('Uang tidak cukup!'));
       }
     });
   }

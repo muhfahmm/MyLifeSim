@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/univ_logic/univ_menu_page.dart';
 
 class GodModePage extends StatefulWidget {
@@ -52,13 +53,10 @@ class _GodModePageState extends State<GodModePage> {
   }
 
   void _showToast(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: Colors.blue.shade700,
-        duration: const Duration(seconds: 2),
-        behavior: SnackBarBehavior.floating,
-      ),
+    DialogHelper.show(
+      context: context,
+      title: 'Informasi',
+      content: Text(message),
     );
   }
 

@@ -169,19 +169,25 @@ class _KacamataSunglassesProductsPageState extends State<KacamataSunglassesProdu
                         showDialog(
                           context: context,
                           builder: (ctx2) => AlertDialog(
+                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                             title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green),
+                              Icon(Icons.check_circle, color: Colors.green, size: 20),
                               SizedBox(width: 8),
-                              Text('Pembelian Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
+                              Expanded(
+                                child: Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                              ),
                             ]),
-                            content: Text(msg),
+                            content: Text(msg, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
                             actions: [
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(ctx2);
                                   widget.onComplete();
                                 },
-                                child: const Text('OK'),
+                                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                               )
                             ],
                           ),

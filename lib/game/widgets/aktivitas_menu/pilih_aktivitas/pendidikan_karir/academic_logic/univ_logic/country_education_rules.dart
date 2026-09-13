@@ -107,17 +107,20 @@ class CountryEducationRules {
       context: context,
       barrierDismissible: false,
       builder: (dialogCtx) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 28),
-            const SizedBox(width: 10),
+            const Icon(Icons.warning_amber_rounded, color: Colors.amber, size: 20),
+            const SizedBox(width: 8),
             Expanded(
               child: Text(
                 'Pembatasan Negara ⚠️',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 18,
+                  fontSize: 14,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
@@ -131,13 +134,13 @@ class CountryEducationRules {
             Text(
               'Pemerintah $country menerapkan regulasi ketat terhadap pendidikan agama bebas di perguruan tinggi negeri.',
               style: TextStyle(
-                fontSize: 14,
+                fontSize: 12,
                 color: isDark ? Colors.white70 : Colors.black87,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 10),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.red.shade50,
                 borderRadius: BorderRadius.circular(10),
@@ -145,13 +148,13 @@ class CountryEducationRules {
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.gavel, color: Colors.red, size: 22),
-                  const SizedBox(width: 10),
+                  const Icon(Icons.gavel, color: Colors.red, size: 18),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Pemberitahuan Risiko:\nBelajar agama secara diam-diam / mendaftar lembaga tak terdaftar berisiko sanksi hukum, penalti karma, penurunan kebahagiaan, atau tindakan aparat.',
                       style: TextStyle(
-                        fontSize: 12,
+                        fontSize: 11,
                         fontWeight: FontWeight.w600,
                         color: Colors.red.shade900,
                       ),
@@ -168,7 +171,7 @@ class CountryEducationRules {
               Navigator.pop(dialogCtx);
               onResult(false);
             },
-            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey)),
+            child: Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.grey)),
           ),
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
@@ -176,8 +179,8 @@ class CountryEducationRules {
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
             ),
-            icon: const Icon(Icons.lock_clock),
-            label: const Text('Lanjut Diam-diam (Risiko)', style: TextStyle(fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.lock_clock, size: 16),
+            label: const Text('Lanjut Diam-diam (Risiko)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             onPressed: () {
               Navigator.pop(dialogCtx);
               _processConsequences(context, character, country, onResult);
@@ -208,9 +211,14 @@ class CountryEducationRules {
         showDialog(
           context: context,
           builder: (c) => AlertDialog(
-            title: const Text('Ditangkap Aparat Keamanan! 🚔'),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Ditangkap Aparat Keamanan! 🚔', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             content: Text(
               'Aparat intelijen $country mendeteksi aktivitas pendidikan agama tak terizin yang kamu ikuti.\n\nKamu dijatuhi hukuman penjara selama ${character.remainingJailYears} tahun!\n\n• Karma: -30\n• Kebahagiaan: -35',
+              style: const TextStyle(fontSize: 12),
             ),
             actions: [
               TextButton(
@@ -218,7 +226,7 @@ class CountryEducationRules {
                   Navigator.pop(c);
                   onResult(false);
                 },
-                child: const Text('Terima Nasib'),
+                child: const Text('Terima Nasib', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -227,9 +235,14 @@ class CountryEducationRules {
         showDialog(
           context: context,
           builder: (c) => AlertDialog(
-            title: const Text('Peringatan & Pengawasan Ketat 🛑'),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text('Peringatan & Pengawasan Ketat 🛑', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
             content: Text(
               'Kamu diinterogasi oleh otoritas $country dan diberikan peringatan keras atas kegiatan akademik غير terdaftar.\n\n• Karma: -30\n• Kebahagiaan: -35',
+              style: const TextStyle(fontSize: 12),
             ),
             actions: [
               TextButton(
@@ -237,7 +250,7 @@ class CountryEducationRules {
                   Navigator.pop(c);
                   onResult(false);
                 },
-                child: const Text('Kembali'),
+                child: const Text('Kembali', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
@@ -249,9 +262,14 @@ class CountryEducationRules {
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Belajar Diam-diam 🤫'),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Belajar Diam-diam 🤫', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           content: Text(
             'Kamu berhasil mengikuti pembelajaran keagamaan secara rahasia di $country tanpa terdeteksi aparat. Namun, tekanan psikologis membuatmu cemas.\n\n• Kebahagiaan: -15',
+            style: const TextStyle(fontSize: 12),
           ),
           actions: [
             TextButton(

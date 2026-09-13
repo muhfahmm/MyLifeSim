@@ -169,8 +169,9 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                               actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               title: Row(
@@ -180,12 +181,12 @@ class _LisensiPageState extends State<LisensiPage> {
                                   Expanded(
                                     child: Text(
                                       'Lisensi Dimiliki ✅',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                                     ),
                                   ),
                                 ],
                               ),
-                              content: Text('Kamu sudah memiliki lisensi $name.', style: TextStyle(fontSize: 12.5, color: isDark ? Colors.white70 : Colors.black54)),
+                              content: Text('Kamu sudah memiliki lisensi $name.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
@@ -215,8 +216,9 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                               actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               title: Row(
@@ -226,12 +228,12 @@ class _LisensiPageState extends State<LisensiPage> {
                                   Expanded(
                                     child: Text(
                                       'Lisensi Terkunci 🔒',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                                     ),
                                   ),
                                 ],
                               ),
-                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(fontSize: 12.5, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
+                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(fontSize: 12, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
@@ -248,8 +250,9 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                               actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               title: Row(
@@ -259,12 +262,12 @@ class _LisensiPageState extends State<LisensiPage> {
                                   Expanded(
                                     child: Text(
                                       'Belum Cukup Umur 🔞',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                                     ),
                                   ),
                                 ],
                               ),
-                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.', style: TextStyle(fontSize: 12.5, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
+                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.', style: TextStyle(fontSize: 12, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
@@ -281,8 +284,9 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
-                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                               actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               title: Row(
@@ -292,7 +296,7 @@ class _LisensiPageState extends State<LisensiPage> {
                                   Expanded(
                                     child: Text(
                                       'Saldo Kurang',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                                     ),
                                   ),
                                 ],

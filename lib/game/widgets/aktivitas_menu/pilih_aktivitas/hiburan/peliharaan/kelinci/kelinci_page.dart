@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/pet_lifespan_logic.dart';
 import 'database_kelinci.dart';
 
@@ -231,10 +232,18 @@ class _KelinciPageState extends State<KelinciPage> {
                   if (canAfford) {
                     _executeAdopsi(context, h);
                   } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
+                    showDialog(
+                      context: context,
+                      builder: (c) => AlertDialog(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Text('Uang Tidak Cukup'),
                         content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
-                        backgroundColor: Colors.red,
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.pop(c),
+                            child: const Text('OK'),
+                          ),
+                        ],
                       ),
                     );
                   }

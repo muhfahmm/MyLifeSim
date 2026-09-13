@@ -26,14 +26,19 @@ class InterograsiPacarHelper {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               title: Row(
                 children: [
-                  const Icon(Icons.gavel, color: Colors.redAccent, size: 28),
+                  const Icon(Icons.gavel, color: Colors.redAccent, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Konfrontasi: $partnerName 😡',
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -46,7 +51,7 @@ class InterograsiPacarHelper {
                     '$partnerName menatapmu dengan mata berkaca-kaca penuh amarah. Dia berkata:\n\n'
                     '"Aku baru saja diberitahu oleh $informantName kalau kamu mencoba merayunya untuk pacaran! '
                     'Jelaskan padaku, kenapa kamu tega melakukan ini di belakangku?!"',
-                    style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic),
+                    style: const TextStyle(fontSize: 12, fontStyle: FontStyle.italic),
                   ),
                   const SizedBox(height: 16),
                   const Text(
@@ -63,7 +68,7 @@ class InterograsiPacarHelper {
                     items: reasons.map((String reason) {
                       return DropdownMenuItem<String>(
                         value: reason,
-                        child: Text(reason, style: const TextStyle(fontSize: 13)),
+                        child: Text(reason, style: const TextStyle(fontSize: 12)),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -82,7 +87,7 @@ class InterograsiPacarHelper {
                     Navigator.pop(context);
                     _processResponse(context, character, partnerName, selectedReason, onComplete);
                   },
-                  child: const Text('Kirim Penjelasan', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
+                  child: const Text('Kirim Penjelasan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.redAccent)),
                 ),
               ],
             );
@@ -169,21 +174,31 @@ class InterograsiPacarHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(didBreakUp ? Icons.heart_broken : Icons.info_outline, color: didBreakUp ? Colors.red : Colors.orange),
+            Icon(didBreakUp ? Icons.heart_broken : Icons.info_outline, color: didBreakUp ? Colors.red : Colors.orange, size: 20),
             const SizedBox(width: 8),
-            Text(didBreakUp ? 'Putus Hubungan' : 'Hasil Interograsi', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                didBreakUp ? 'Putus Hubungan' : 'Hasil Interograsi',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
-        content: Text(reactionText),
+        content: Text(reactionText, style: const TextStyle(fontSize: 12)),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onComplete();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

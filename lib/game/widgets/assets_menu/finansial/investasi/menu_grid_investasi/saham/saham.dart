@@ -158,9 +158,7 @@ class _SahamPageState extends State<SahamPage> {
                   onPressed: () {
                     final jumlah = int.tryParse(controller.text.replaceAll(',', '')) ?? 0;
                     if (jumlah > maxJual) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Jumlah lembar melebihi kepemilikan!')),
-                      );
+                      DialogHelper.show(context: context, title: 'Investasi Saham', content: const Text('Jumlah lembar melebihi kepemilikan!'));
                       return;
                     }
                     if (jumlah > 0) {

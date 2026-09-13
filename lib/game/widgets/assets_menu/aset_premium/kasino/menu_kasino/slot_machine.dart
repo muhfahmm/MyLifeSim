@@ -24,7 +24,7 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
   void spin() {
     if (isSpinning || widget.state.character.money < bet) {
       if (widget.state.character.money < bet) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Uang tidak cukup!')));
+        DialogHelper.show(context: context, title: 'Kasino', content: const Text('Uang tidak cukup!'));
       }
       return;
     }
@@ -76,12 +76,12 @@ class _SlotMachinePageState extends State<SlotMachinePage> {
         widget.state.character.money += winAmount;
         widget.state._applyGamblingEffect(true, bet, happinessBonus: 15);
         widget.state._recordResult('Slot Machine', winAmount, true);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg), backgroundColor: Colors.green));
+        DialogHelper.show(context: context, title: 'Slot Machine', content: Text(msg));
       } else {
         widget.state.character.money -= bet;
         widget.state._applyGamblingEffect(false, bet, happinessPenalty: 5, healthPenalty: 3);
         widget.state._recordResult('Slot Machine', bet, false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Kalah, - \$${formatRupiah(bet)}'), backgroundColor: Colors.red));
+        DialogHelper.show(context: context, title: 'Slot Machine', content: Text('Kalah, - \$${formatRupiah(bet)}'));
       }
     });
   }

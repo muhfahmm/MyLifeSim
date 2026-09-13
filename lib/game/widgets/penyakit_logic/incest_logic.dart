@@ -80,19 +80,21 @@ Future<void> showIncestPsychologicalModal(
   if (!context.mounted) return;
   await showDialog(
     context: context,
-    barrierDismissible: false,
-    builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      builder: (ctx) => AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Row(children: [
-        Icon(Icons.psychology, color: Colors.deepPurple, size: 28),
-        SizedBox(width: 10),
+        Icon(Icons.psychology, color: Colors.deepPurple, size: 20),
+        SizedBox(width: 8),
         Expanded(child: Text('⚠️ Guncangan Psikologis',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepPurple))),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.deepPurple))),
       ]),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Kamu baru saja berhubungan intim dengan $relationLabel, $partnerName.',
-            style: const TextStyle(fontSize: 14)),
-        const SizedBox(height: 12),
+            style: const TextStyle(fontSize: 12)),
+        const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -105,7 +107,7 @@ Future<void> showIncestPsychologicalModal(
               const Icon(Icons.sentiment_very_dissatisfied, color: Colors.red, size: 18),
               const SizedBox(width: 6),
               Text('Kebahagiaan: -$happinessPenalty%',
-                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 12)),
             ]),
             const SizedBox(height: 4),
             const Row(children: [
@@ -124,7 +126,7 @@ Future<void> showIncestPsychologicalModal(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.deepPurple)),
+          child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.deepPurple)),
         ),
       ],
     ),
@@ -138,17 +140,20 @@ Future<void> showIncestGeneticModal(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: const Row(children: [
-        Icon(Icons.biotech, color: Colors.red, size: 28),
-        SizedBox(width: 10),
+        Icon(Icons.biotech, color: Colors.red, size: 20),
+        SizedBox(width: 8),
         Expanded(child: Text('🧬 Peringatan Risiko Genetik',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.red))),
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.red))),
       ]),
       content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text('Hubungan sedarah dengan $relationLabel ($partnerName) membawa risiko genetik serius pada kehamilan.',
-            style: const TextStyle(fontSize: 14)),
-        const SizedBox(height: 12),
+            style: const TextStyle(fontSize: 12)),
+        const SizedBox(height: 10),
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
@@ -158,7 +163,7 @@ Future<void> showIncestGeneticModal(
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('⚠️ Peluang cacat bawaan: $geneticRisk%',
-                style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.orange)),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.orange)),
             const SizedBox(height: 4),
             const Text('Risiko: Down syndrome, cacat fisik/mental, keguguran, atau bayi lahir mati.',
                 style: TextStyle(fontSize: 12, color: Colors.black54)),
@@ -168,7 +173,7 @@ Future<void> showIncestGeneticModal(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+          child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: Colors.red)),
         ),
       ],
     ),

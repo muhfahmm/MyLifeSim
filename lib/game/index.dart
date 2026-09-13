@@ -4,6 +4,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/paused_menu/pausedMenu.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'dart:math';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
@@ -364,8 +365,10 @@ class _GameScreenState extends State<GameScreen> {
         happiness: _character.happiness,
       );
     });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('🔄 Semua status berhasil direset!'), backgroundColor: Colors.green),
+    DialogHelper.show(
+      context: context,
+      title: 'Reset Status',
+      content: const Text('🔄 Semua status berhasil direset!'),
     );
   }
 
@@ -412,27 +415,30 @@ class _GameScreenState extends State<GameScreen> {
             barrierDismissible: false,
             builder: (ctx) => AlertDialog(
               backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               title: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
                       color: Colors.blue.withValues(alpha: 0.12),
                       shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.family_restroom_rounded, color: Colors.blue, size: 22),
+                    child: const Icon(Icons.family_restroom_rounded, color: Colors.blue, size: 20),
                   ),
-                  const SizedBox(width: 12),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Pertemuan Kembali',
                       style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
                         color: isDark ? Colors.white : const Color(0xFF0F172A),
                       ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                   ),
                 ],
@@ -444,16 +450,16 @@ class _GameScreenState extends State<GameScreen> {
                   Text(
                     '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       height: 1.4,
                       color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 10),
                   Text(
                     'Apakah kamu ingin menemuinya?',
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.bold,
                       color: isDark ? Colors.white : const Color(0xFF0F172A),
                     ),
@@ -725,17 +731,18 @@ class _GameScreenState extends State<GameScreen> {
 
   void _ageDown() {
     if (!_character.isAlive) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Karakter sudah meninggal!')),
+      DialogHelper.show(
+        context: context,
+        title: 'Perhatian',
+        content: const Text('Karakter sudah meninggal!'),
       );
       return;
     }
     if (_character.age <= 0) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('⚠️ Usia karakter sudah 0 tahun (tidak bisa dikurangi lagi).'),
-          backgroundColor: Colors.orange,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Perhatian',
+        content: const Text('⚠️ Usia karakter sudah 0 tahun (tidak bisa dikurangi lagi).'),
       );
       return;
     }
@@ -755,12 +762,10 @@ class _GameScreenState extends State<GameScreen> {
       );
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('⏪ GodMode: Umur berhasil dikurangi 1 tahun! (Sekarang usia ${_character.age} tahun)'),
-        backgroundColor: Colors.purple.shade700,
-        duration: const Duration(seconds: 2),
-      ),
+    DialogHelper.show(
+      context: context,
+      title: 'GodMode',
+      content: Text('⏪ GodMode: Umur berhasil dikurangi 1 tahun! (Sekarang usia ${_character.age} tahun)'),
     );
   }
 
@@ -834,11 +839,18 @@ class _GameScreenState extends State<GameScreen> {
                 insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                 titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
                 contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 title: const Row(
                   children: [
-                    Icon(Icons.notifications_active, color: Colors.orange, size: 22),
+                    Icon(Icons.notifications_active, color: Colors.orange, size: 20),
                     SizedBox(width: 8),
-                    Text('Kejadian Penting', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    Expanded(
+                      child: Text(
+                        'Kejadian Penting',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
                   ],
                 ),
                 content: SingleChildScrollView(
@@ -907,14 +919,14 @@ class _GameScreenState extends State<GameScreen> {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-          contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
-              const Icon(Icons.healing, color: Colors.red, size: 18),
+              const Icon(Icons.healing, color: Colors.red, size: 20),
               const SizedBox(width: 6),
               Expanded(
                 child: Text(
@@ -922,7 +934,7 @@ class _GameScreenState extends State<GameScreen> {
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 13.5,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -936,7 +948,7 @@ class _GameScreenState extends State<GameScreen> {
               Text(
                 sicknessEvent.contains(': ') ? sicknessEvent.substring(sicknessEvent.indexOf(': ') + 2) : sicknessEvent,
                 style: TextStyle(
-                  fontSize: 11.5,
+                  fontSize: 12,
                   fontWeight: FontWeight.w500,
                   height: 1.3,
                   color: isDark ? Colors.white70 : Colors.black87,
@@ -963,7 +975,7 @@ class _GameScreenState extends State<GameScreen> {
                     Navigator.pop(ctx);
                     _handleTellParents(sicknessEvent, onDone);
                   },
-                  child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
+                  child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 ),
                 const SizedBox(height: 5),
               ],
@@ -983,7 +995,7 @@ class _GameScreenState extends State<GameScreen> {
                     onDone();
                   });
                 },
-                child: const Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
+                child: const Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ),
               const SizedBox(height: 5),
               ElevatedButton(
@@ -997,7 +1009,7 @@ class _GameScreenState extends State<GameScreen> {
                   Navigator.pop(ctx);
                   onDone();
                 },
-                child: const Text('Biarkan saja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
+                child: const Text('Biarkan saja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
               ),
             ],
           ),
@@ -1016,11 +1028,11 @@ class _GameScreenState extends State<GameScreen> {
         builder: (ctx) {
           final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
           return AlertDialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-            contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             backgroundColor: isDark ? Colors.grey.shade900 : null,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
                 Expanded(
@@ -1029,7 +1041,7 @@ class _GameScreenState extends State<GameScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 13.5,
+                      fontSize: 14,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
@@ -1038,7 +1050,7 @@ class _GameScreenState extends State<GameScreen> {
             ),
             content: Text(
               'Kamu tidak memiliki orang tua yang bisa dihubungi saat ini.',
-              style: TextStyle(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isDark ? Colors.white70 : Colors.black87),
             ),
             actions: [
               TextButton(
@@ -1046,7 +1058,7 @@ class _GameScreenState extends State<GameScreen> {
                   Navigator.pop(ctx);
                   _showSicknessModal(sicknessEvent, onDone);
                 },
-                child: const Text('Kembali', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                child: const Text('Kembali', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               )
             ],
           );
@@ -1079,14 +1091,14 @@ class _GameScreenState extends State<GameScreen> {
         builder: (ctx) {
           final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
           return AlertDialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
             backgroundColor: isDark ? Colors.grey.shade900 : null,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
-                const Icon(Icons.favorite, color: Colors.red, size: 18),
+                const Icon(Icons.favorite, color: Colors.red, size: 20),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -1094,7 +1106,7 @@ class _GameScreenState extends State<GameScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 13.5,
+                      fontSize: 14,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
@@ -1104,7 +1116,7 @@ class _GameScreenState extends State<GameScreen> {
             content: Text(
               'Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +$happyBoost% Kebahagiaan, +10% Hubungan Orang Tua).',
               style: TextStyle(
-                fontSize: 11.5,
+                fontSize: 12,
                 height: 1.3,
                 color: isDark ? Colors.white70 : Colors.black87,
               ),
@@ -1116,7 +1128,7 @@ class _GameScreenState extends State<GameScreen> {
                   if (mounted) setState(() {});
                   onDone();
                 },
-                child: const Text('Mengerti', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                child: const Text('Mengerti', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               )
             ],
           );
@@ -1137,14 +1149,14 @@ class _GameScreenState extends State<GameScreen> {
         builder: (ctx) {
           final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
           return AlertDialog(
-            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
             contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
             backgroundColor: isDark ? Colors.grey.shade900 : null,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
-                const Icon(Icons.home, color: Colors.blue, size: 18),
+                const Icon(Icons.home, color: Colors.blue, size: 20),
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
@@ -1152,7 +1164,7 @@ class _GameScreenState extends State<GameScreen> {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 13.5,
+                      fontSize: 14,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
@@ -1162,7 +1174,7 @@ class _GameScreenState extends State<GameScreen> {
             content: Text(
               'Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan, +$happyBoost% Kebahagiaan).',
               style: TextStyle(
-                fontSize: 11.5,
+                fontSize: 12,
                 height: 1.3,
                 color: isDark ? Colors.white70 : Colors.black87,
               ),
@@ -1174,7 +1186,7 @@ class _GameScreenState extends State<GameScreen> {
                   if (mounted) setState(() {});
                   onDone();
                 },
-                child: const Text('Mengerti', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+                child: const Text('Mengerti', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               )
             ],
           );
@@ -2273,6 +2285,7 @@ class _GameScreenState extends State<GameScreen> {
             insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
             contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
                 Icon(Icons.school, color: Colors.blue.shade700, size: 22),
@@ -2468,9 +2481,6 @@ class _GameScreenState extends State<GameScreen> {
                     ),
                     onPressed: () {
                       Navigator.pop(dialogContext);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
-                      );
                       _checkUniversityGraduationOptions(onDone);
                     },
                     child: Text(
@@ -3219,9 +3229,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         return PopScope(
           canPop: false,
           child: AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: Row(
             children: [
@@ -3232,7 +3243,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               Expanded(
                 child: Text(
                   dialogTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                 ),
               ),
             ],
@@ -3242,7 +3253,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(dialogBody, style: const TextStyle(fontSize: 12.5, height: 1.35)),
+                    Text(dialogBody, style: const TextStyle(fontSize: 12, height: 1.35)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -3374,8 +3385,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
-                      titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-                      contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                       title: const Row(
                         children: [
@@ -3384,7 +3397,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                           Expanded(
                             child: Text(
                               'Sukses Fantastis! 🔥',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                             ),
                           ),
                         ],
@@ -3429,12 +3442,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     _character.happiness = (_character.happiness + 25).clamp(0, 100);
                     _character.activeProposal = null;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('💍 Selamat! Kamu kini bertunangan dengan $partnerName!'),
-                      backgroundColor: Colors.pinkAccent,
-                    ),
-                  );
                   _checkGlassesNeed(onDone);
                 } else if (type == 'Rencanakan Nikah') {
                   setState(() {
@@ -3462,12 +3469,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     _character.happiness = (_character.happiness + 40).clamp(0, 100);
                     _character.activeProposal = null;
                   });
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('💒 Selamat! Kamu kini resmi menikah dengan $partnerName!'),
-                      backgroundColor: Colors.pink,
-                    ),
-                  );
                   _checkGlassesNeed(onDone);
                 } else if (type == 'Ajak Pacaran') {
                   setState(() {
@@ -3541,16 +3542,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     );
                     _character.activeProposal = null;
                   });
-
-                  
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text((_character.partner != null && !_character.isAnyPartnerNameMatching(partnerName))
-                          ? '🤫 Hubungan Rahasia dimulai dengan $partnerName!'
-                          : '💖 Kamu menerima ajakan dari $partnerName!'),
-                      backgroundColor: Colors.pink,
-                    ),
-                  );
                   _checkGlassesNeed(onDone);
                 } else {
                   _showIncomingCondomDialog(proposal, onDone);
@@ -3628,15 +3619,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   
                   _character.activeProposal = null;
                 });
-                
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(type == 'Ajak 3some'
-                        ? '💔 Kamu menolak ajakan 3some dari $partnerName.'
-                        : '💔 Kamu menolak ajakan dari $partnerName.'),
-                    backgroundColor: Colors.red,
-                  ),
-                );
                 _checkGlassesNeed(onDone);
               },
               child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
@@ -4416,21 +4398,20 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
 
   // --- FUNGSI SIMPAN PROGRESS ---
   void _saveProgress() {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('💾 Fitur Simpan Progress belum diimplementasikan!'),
-        backgroundColor: Colors.green,
-      ),
+    DialogHelper.show(
+      context: context,
+      title: 'Simpan Progress',
+      content: const Text('💾 Fitur Simpan Progress belum diimplementasikan!'),
     );
   }
 
   // --- FUNGSI MULAI GAME BARU ---
   void _startNewGame() {
     _resetGame();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('🔄 Game Baru dimulai! Buat karakter baru lagi.'),
-      ),
+    DialogHelper.show(
+      context: context,
+      title: 'Game Baru',
+      content: const Text('🔄 Game Baru dimulai! Buat karakter baru lagi.'),
     );
   }
 
@@ -5096,8 +5077,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                         happiness: _character.happiness,
                                       );
                                     });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Mendapatkan uang 100!')),
+                                    DialogHelper.show(
+                                      context: context,
+                                      title: 'Bekerja',
+                                      content: const Text('Mendapatkan uang 100!'),
                                     );
                                   },
                                   onExercise: () {
@@ -5108,8 +5091,10 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                         happiness: _character.happiness,
                                       );
                                     });
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Kesehatan +10!')),
+                                    DialogHelper.show(
+                                      context: context,
+                                      title: 'Olahraga',
+                                      content: const Text('Kesehatan +10!'),
                                     );
                                   },
                                 ),
@@ -5185,16 +5170,20 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           title: Row(
             children: [
-              Icon(icon, color: iconColor, size: 24),
+              Icon(icon, color: iconColor, size: 20),
               const SizedBox(width: 8),
               Text(
                 title, 
                 style: TextStyle(
                   fontWeight: FontWeight.bold, 
-                  fontSize: 16,
+                  fontSize: 14,
                   color: isDark ? Colors.white : Colors.black87
                 )
               ),

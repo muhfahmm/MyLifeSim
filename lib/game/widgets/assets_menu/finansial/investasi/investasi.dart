@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 // ============================================================
 // PART FILES (setiap menu akan menjadi part)
@@ -468,7 +469,7 @@ class _InvestasiPageState extends State<InvestasiPage> {
   }
 
   void _showSnackbar(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(msg)));
+    DialogHelper.show(context: context, title: 'Investasi', content: Text(msg));
   }
 
   // ---- UI ROOT (Tampilan daftar / Column) ----

@@ -137,8 +137,19 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                                 subtitle: Text('Anggota Trainee • Umur: ${widget.character.age} tahun • Disiplin: ${widget.character.discipline}%'),
                                 trailing: const Icon(Icons.star, color: Colors.orangeAccent),
                                 onTap: () {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Ini adalah dirimu! Teruslah berlatih keras!')),
+                                  showDialog(
+                                    context: context,
+                                    builder: (c) => AlertDialog(
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                      title: const Text('Profil Diri'),
+                                      content: const Text('Ini adalah dirimu! Teruslah berlatih keras!'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(c),
+                                          child: const Text('OK'),
+                                        ),
+                                      ],
+                                    ),
                                   );
                                 },
                               ),

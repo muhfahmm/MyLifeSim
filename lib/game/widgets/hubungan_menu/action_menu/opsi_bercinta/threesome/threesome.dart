@@ -17,21 +17,31 @@ class ThreesomeHelper {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.blue),
+              Icon(Icons.info_outline, color: Colors.blue, size: 20),
               SizedBox(width: 8),
-              Text('Syarat Kurang', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  'Syarat Kurang',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           content: const Text(
             'Untuk mengajak hubungan ini, kamu harus memiliki minimal 2 pacar aktif!',
-            style: TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 12),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -52,11 +62,21 @@ class ThreesomeHelper {
     showDialog(
       context: context,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            const Icon(Icons.people, color: Colors.purple, size: 28),
+            const Icon(Icons.people, color: Colors.purple, size: 20),
             const SizedBox(width: 8),
-            Text('Ajak $someName? 🔥', style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                'Ajak $someName? 🔥',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -65,7 +85,7 @@ class ThreesomeHelper {
           children: [
             Text(
               'Apakah kamu yakin ingin mengajak $partnerNamesText untuk melakukan $someName bersama-sama?',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
             Container(
@@ -124,26 +144,35 @@ class ThreesomeHelper {
                   context: context,
                   barrierDismissible: false,
                   builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     title: const Row(
                       children: [
-                        Icon(Icons.security, color: Colors.blue),
-                        SizedBox(width: 10),
-                        Text('Gunakan Pengaman?', style: TextStyle(fontWeight: FontWeight.bold)),
+                        Icon(Icons.security, color: Colors.blue, size: 20),
+                        SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Gunakan Pengaman?',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                       ],
                     ),
                     content: const Text(
                       'Apakah kamu ingin menggunakan pengaman (kondom) saat melakukan threesome untuk mencegah kehamilan?',
-                      style: TextStyle(fontSize: 14),
+                      style: TextStyle(fontSize: 12),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Ya, pakai', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                        child: const Text('Ya, pakai', style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                        child: const Text('Tidak', style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),
@@ -155,11 +184,11 @@ class ThreesomeHelper {
               if (!context.mounted) return;
               _executeThreesome(context, character, partnerNamesText, someName, loc, time, useCondom, femalePartners, updateState);
             },
-            child: const Text('Ya, Lakukan!', style: TextStyle(color: Colors.purple, fontWeight: FontWeight.bold)),
+            child: const Text('Ya, Lakukan!', style: TextStyle(fontSize: 12, color: Colors.purple, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+            child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -186,16 +215,26 @@ class ThreesomeHelper {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
-              Icon(Icons.info_outline, color: Colors.blueGrey),
+              Icon(Icons.info_outline, color: Colors.blueGrey, size: 20),
               SizedBox(width: 8),
-              Text('Ajakan Ditolak', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  'Ajakan Ditolak',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           content: Text(
             'Ajakan $someName ditolak. $partnerNamesText menolak ajakan $someName karena merasa belum siap. Hubungan kalian tetap berjalan baik.',
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 12),
           ),
           actions: [
             TextButton(
@@ -203,7 +242,7 @@ class ThreesomeHelper {
                 Navigator.pop(context);
                 updateState();
               },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -260,9 +299,10 @@ class ThreesomeHelper {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
-          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: const Row(
             children: [
               Icon(Icons.bolt, color: Colors.purple, size: 20),
@@ -270,14 +310,15 @@ class ThreesomeHelper {
               Expanded(
                 child: Text(
                   'Sukses Fantastis! 🔥',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
           ),
           content: Text(
             'Luar biasa! $partnerNamesText menerima ajakanmu dengan gairah yang membara. Pengalaman $someName kalian $loc pada waktu $time berjalan sangat memuaskan!$detailsText',
-            style: const TextStyle(fontSize: 12.5, height: 1.35),
+            style: const TextStyle(fontSize: 12, height: 1.35),
           ),
           actions: [
             TextButton(
@@ -285,7 +326,7 @@ class ThreesomeHelper {
                 Navigator.pop(context);
                 updateState();
               },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

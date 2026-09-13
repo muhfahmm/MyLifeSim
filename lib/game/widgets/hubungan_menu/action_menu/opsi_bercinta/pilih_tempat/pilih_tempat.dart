@@ -87,18 +87,23 @@ class TempatBercintaHelper {
         final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : null,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: Row(
             children: [
-              const Icon(Icons.location_on, color: Colors.redAccent),
+              const Icon(Icons.location_on, color: Colors.redAccent, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Pilih Tempat Bercinta dengan $partnerName',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -119,7 +124,7 @@ class TempatBercintaHelper {
                   child: ListTile(
                     leading: CircleAvatar(
                       backgroundColor: isDark ? Colors.red.shade900 : Colors.red.shade50,
-                      child: Icon(loc.icon, color: Colors.redAccent),
+                      child: Icon(loc.icon, color: Colors.redAccent, size: 20),
                     ),
                     title: Text(
                       loc.name,
@@ -148,6 +153,7 @@ class TempatBercintaHelper {
               child: Text(
                 'Batal',
                 style: TextStyle(
+                  fontSize: 12,
                   color: isDark ? Colors.white70 : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),
@@ -301,16 +307,23 @@ class TempatBercintaHelper {
 
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: Row(
               children: [
-                const Icon(Icons.home, color: Colors.redAccent),
+                const Icon(Icons.home, color: Colors.redAccent, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  'Pilih Rumah Siapa?',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isDark ? Colors.white : Colors.black87,
+                Expanded(
+                  child: Text(
+                    'Pilih Rumah Siapa?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -329,9 +342,9 @@ class TempatBercintaHelper {
                         side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.people, color: Colors.blue),
-                        title: Text('Rumah $parentName', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                        subtitle: const Text('Rumah orang tuamu sendiri.'),
+                        leading: const Icon(Icons.people, color: Colors.blue, size: 20),
+                        title: Text('Rumah $parentName', style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
+                        subtitle: const Text('Rumah orang tuamu sendiri.', style: TextStyle(fontSize: 12)),
                         onTap: () => Navigator.pop(dialogContext, 'Orang Tua'),
                       ),
                     ),
@@ -345,6 +358,7 @@ class TempatBercintaHelper {
                 child: Text(
                   'Kembali',
                   style: TextStyle(
+                    fontSize: 12,
                     color: isDark ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),
@@ -372,16 +386,23 @@ class TempatBercintaHelper {
           final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
           return AlertDialog(
             backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: Row(
               children: [
-                Icon(Icons.meeting_room, color: Colors.redAccent),
+                const Icon(Icons.meeting_room, color: Colors.redAccent, size: 20),
                 const SizedBox(width: 8),
-                Text(
-                  'Pilih Ruangan di Rumah',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                    color: isDark ? Colors.white : Colors.black87,
+                Expanded(
+                  child: Text(
+                    'Pilih Ruangan di Rumah',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -402,7 +423,7 @@ class TempatBercintaHelper {
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: isDark ? Colors.red.shade900 : Colors.red.shade50,
-                        child: Icon(room.icon, color: Colors.redAccent),
+                        child: Icon(room.icon, color: Colors.redAccent, size: 20),
                       ),
                       title: Text(
                         room.name,
@@ -431,6 +452,7 @@ class TempatBercintaHelper {
                 child: Text(
                   'Kembali',
                   style: TextStyle(
+                    fontSize: 12,
                     color: isDark ? Colors.white : Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),

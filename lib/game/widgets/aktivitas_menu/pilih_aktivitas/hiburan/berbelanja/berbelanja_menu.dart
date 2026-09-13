@@ -3,6 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
+import 'mall/pakaian_kasual/pakaian_kasual_page.dart';
+import 'mall/sepatu_sneakers/sepatu_sneakers_page.dart';
+import 'mall/tas_punggung/tas_punggung_page.dart';
+import 'mall/gadget_elektronik/gadget_elektronik_page.dart';
+
+import 'toko_online/buku_pengetahuan/buku_pengetahuan_page.dart';
+import 'toko_online/alat_olahraga/alat_olahraga_page.dart';
+import 'toko_online/dekorasi_rumah/dekorasi_rumah_page.dart';
+
 class BerbelanjaMenuHelper {
   static void showBerbelanjaMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 12) {
@@ -48,27 +57,53 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
     {
       'name': 'Mall / Pusat Perbelanjaan 🏬',
       'items': [
-        {'name': 'Pakaian Kasual 👕', 'cost': 300000, 'happiness': 8},
-        {'name': 'Sepatu Sneakers 👟', 'cost': 600000, 'happiness': 10},
-        {'name': 'Tas Punggung 🎒', 'cost': 400000, 'happiness': 7},
-        {'name': 'Gadget / Elektronik 📱', 'cost': 3000000, 'happiness': 20},
+        {
+          'id': 'pakaian_kasual',
+          'name': 'Pakaian Kasual 👕',
+          'cost': 300000,
+          'page': (context, character, onComplete) => PakaianKasualPage(character: character, onComplete: onComplete),
+        },
+        {
+          'id': 'sepatu_sneakers',
+          'name': 'Sepatu Sneakers 👟',
+          'cost': 600000,
+          'page': (context, character, onComplete) => SepatuSneakersPage(character: character, onComplete: onComplete),
+        },
+        {
+          'id': 'tas_punggung',
+          'name': 'Tas Punggung 🎒',
+          'cost': 400000,
+          'page': (context, character, onComplete) => TasPunggungPage(character: character, onComplete: onComplete),
+        },
+        {
+          'id': 'gadget_elektronik',
+          'name': 'Gadget / Elektronik 📱',
+          'cost': 3000000,
+          'page': (context, character, onComplete) => GadgetElektronikPage(character: character, onComplete: onComplete),
+        },
       ],
     },
     {
       'name': 'Toko Online 🛒',
       'items': [
-        {'name': 'Buku Pengetahuan 📚', 'cost': 100000, 'happiness': 5, 'intelligence': 5},
-        {'name': 'Alat Olahraga 🏋️', 'cost': 500000, 'happiness': 8, 'health': 5},
-        {'name': 'Dekorasi Rumah 🏠', 'cost': 400000, 'happiness': 10},
-        {'name': 'Makanan & Minuman Fancy 🍣', 'cost': 200000, 'happiness': 12},
-      ],
-    },
-    {
-      'name': 'Pasar Tradisional 🏪',
-      'items': [
-        {'name': 'Kebutuhan Sehari-hari 🛍️', 'cost': 50000, 'happiness': 3, 'health': 2},
-        {'name': 'Sayur & Buah Segar 🥦', 'cost': 30000, 'happiness': 2, 'health': 5},
-        {'name': 'Makanan Jajanan 🍜', 'cost': 15000, 'happiness': 8},
+        {
+          'id': 'buku_pengetahuan',
+          'name': 'Buku Pengetahuan 📚',
+          'cost': 100000,
+          'page': (context, character, onComplete) => BukuPengetahuanPage(character: character, onComplete: onComplete),
+        },
+        {
+          'id': 'alat_olahraga',
+          'name': 'Alat Olahraga 🏋️',
+          'cost': 500000,
+          'page': (context, character, onComplete) => AlatOlahragaPage(character: character, onComplete: onComplete),
+        },
+        {
+          'id': 'dekorasi_rumah',
+          'name': 'Dekorasi Rumah 🏠',
+          'cost': 400000,
+          'page': (context, character, onComplete) => DekorasiRumahPage(character: character, onComplete: onComplete),
+        },
       ],
     },
   ];
@@ -151,70 +186,36 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
                           ),
                         ),
                         children: (t['items'] as List<Map<String, dynamic>>).map((item) {
-                          final bool canAfford = widget.character.money >= (item['cost'] as int);
                           return ListTile(
                             contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 4),
                             title: Text(
                               item['name'] as String,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: canAfford ? (isDark ? Colors.white : Colors.black87) : (isDark ? Colors.white54 : Colors.grey),
+                                color: isDark ? Colors.white : Colors.black87,
                               ),
                             ),
                             subtitle: Text(
-                              CurrencySettings.format(item['cost'] as int),
+                              'Mulai dari ${_fmt(item['cost'] as int)}',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: canAfford
-                                    ? (isDark ? Colors.greenAccent : Colors.green)
-                                    : (isDark ? Colors.white38 : Colors.grey),
+                                color: isDark ? Colors.white70 : Colors.grey.shade600,
                               ),
                             ),
-                            trailing: Icon(
-                              canAfford ? Icons.add_shopping_cart : Icons.lock_outline,
-                              size: 18,
-                              color: canAfford ? Colors.orangeAccent : (isDark ? Colors.white54 : Colors.grey),
+                            trailing: const Icon(
+                              Icons.chevron_right,
+                              size: 20,
+                              color: Colors.grey,
                             ),
-                            onTap: canAfford
-                                ? () {
-                                    setState(() {
-                                      widget.character.money -= (item['cost'] as int);
-                                      widget.character.happiness =
-                                          (widget.character.happiness + (item['happiness'] as int)).clamp(0, 100);
-                                      if (item.containsKey('intelligence')) {
-                                        widget.character.intelligence =
-                                            (widget.character.intelligence + (item['intelligence'] as int)).clamp(0, 100);
-                                      }
-                                      if (item.containsKey('health')) {
-                                        widget.character.health =
-                                            (widget.character.health + (item['health'] as int)).clamp(0, 100);
-                                      }
-                                    });
-                                    final msg =
-                                        '🛍️ Kamu membeli ${item['name']} seharga ${_fmt(item['cost'] as int)}! (+${item['happiness']}% Kebahagiaan)';
-                                    widget.character.inbox.add(msg);
-                                    showDialog(
-                                      context: context,
-                                      builder: (ctx2) => AlertDialog(
-                                        title: const Row(children: [
-                                          Icon(Icons.check_circle, color: Colors.green),
-                                          SizedBox(width: 8),
-                                          Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold)),
-                                        ]),
-                                        content: Text(msg),
-                                        actions: [
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(ctx2);
-                                              widget.onComplete();
-                                            },
-                                            child: const Text('OK'),
-                                          )
-                                        ],
-                                      ),
-                                    );
-                                  }
-                                : null,
+                            onTap: () {
+                              final builder = item['page'] as Widget Function(BuildContext, Character, VoidCallback);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => builder(context, widget.character, widget.onComplete),
+                                ),
+                              ).then((_) => setState(() {}));
+                            },
                           );
                         }).toList(),
                       ),

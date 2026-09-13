@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/main.dart'; // Untuk mengakses themeNotifier
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
@@ -58,8 +59,10 @@ class _SettingsPageState extends State<SettingsPage> {
               Navigator.pop(ctx);
               GlobalSettings.resetAll();
               themeNotifier.value = ThemeMode.light;
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Semua data dan pengaturan berhasil direset!'), backgroundColor: Colors.redAccent),
+              DialogHelper.show(
+                context: context,
+                title: 'Informasi',
+                content: const Text('Semua data dan pengaturan berhasil direset!'),
               );
             },
             child: const Text('Reset Permanen', style: TextStyle(fontWeight: FontWeight.bold)),

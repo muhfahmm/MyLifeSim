@@ -57,15 +57,11 @@ void showTransferDialogInternal(BuildContext context, _UangTunaiPageState state)
             if (formKey.currentState!.validate()) {
               formKey.currentState!.save();
               if (nominal! <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Nominal harus lebih dari 0')),
-                );
+                DialogHelper.show(context: context, title: 'Transfer Gagal', content: const Text('Nominal harus lebih dari 0'));
                 return;
               }
               if (state.widget.character.money < nominal!) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Saldo tidak cukup!')),
-                );
+                DialogHelper.show(context: context, title: 'Transfer Gagal', content: const Text('Saldo tidak cukup!'));
                 return;
               }
               // Proses transfer
@@ -74,9 +70,7 @@ void showTransferDialogInternal(BuildContext context, _UangTunaiPageState state)
                 state._addTransaction(-nominal!, 'Transfer: $tujuan');
               });
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Berhasil transfer \$${formatRupiah(nominal!)} untuk $tujuan')),
-              );
+              DialogHelper.show(context: context, title: 'Transfer Berhasil', content: Text('Berhasil transfer \$${formatRupiah(nominal!)} untuk $tujuan'));
             }
           },
           child: const Text('Kirim'),

@@ -137,11 +137,21 @@ class _BercintaScreenState extends State<BercintaScreen> {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(Icons.health_and_safety, color: isGay ? Colors.redAccent : Colors.blue, size: 28),
+            Icon(Icons.health_and_safety, color: isGay ? Colors.redAccent : Colors.blue, size: 20),
             const SizedBox(width: 8),
-            Text(isGay ? 'Gunakan Pengaman (IMS)?' : 'Gunakan Pengaman?', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Expanded(
+              child: Text(
+                isGay ? 'Gunakan Pengaman (IMS)?' : 'Gunakan Pengaman?',
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -152,12 +162,12 @@ class _BercintaScreenState extends State<BercintaScreen> {
               isGay
                   ? 'Apakah kamu ingin menggunakan pengaman (kondom) untuk melindungi diri dari Infeksi Menular Seksual (IMS)?'
                   : 'Apa kamu ingin menggunakan kondom untuk mencegah kehamilan?',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             const SizedBox(height: 12),
             Text(
               'Gender: Kamu (${widget.character.gender}) & ${_getTargetRoleLabel()} (${_getPartnerGender()})',
-              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
             ),
             const SizedBox(height: 8),
             Container(
@@ -169,7 +179,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               ),
               child: Text(
                 riskInfo,
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isGay ? Colors.red.shade900 : Colors.blue),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isGay ? Colors.red.shade900 : Colors.blue),
               ),
             ),
           ],
@@ -181,7 +191,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               _useCondom = true;
               _executeMakeLove();
             },
-            child: const Text('Ya, pakai', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Ya, pakai', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
@@ -189,7 +199,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               _useCondom = false;
               _executeMakeLove();
             },
-            child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text('Tidak', style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -217,16 +227,26 @@ class _BercintaScreenState extends State<BercintaScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: const Row(
           children: [
-            Icon(Icons.heart_broken, color: Colors.red),
+            Icon(Icons.heart_broken, color: Colors.red, size: 20),
             SizedBox(width: 8),
-            Text('Ajakan Ditolak 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                'Ajakan Ditolak 💔',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Text(
           '${widget.targetName} sedang tidak dalam mood yang baik meskipun hubungan kalian cukup dekat ($satisfaction%). Rawatlah hubunganmu terlebih dahulu!',
-          style: const TextStyle(fontSize: 14),
+          style: const TextStyle(fontSize: 12),
         ),
         actions: [
           TextButton(
@@ -234,7 +254,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -254,16 +274,26 @@ class _BercintaScreenState extends State<BercintaScreen> {
       context: context,
       barrierDismissible: false,
       builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: const Row(
           children: [
-            Icon(Icons.heart_broken, color: Colors.red),
+            Icon(Icons.heart_broken, color: Colors.red, size: 20),
             SizedBox(width: 8),
-            Text('Ajakan Ditolak 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(
+                'Ajakan Ditolak 💔',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Text(
           '${widget.targetName} $chosenExcuse',
-          style: const TextStyle(fontSize: 14),
+          style: const TextStyle(fontSize: 12),
         ),
         actions: [
           TextButton(
@@ -271,7 +301,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -409,11 +439,21 @@ class _BercintaScreenState extends State<BercintaScreen> {
           context: context,
           barrierDismissible: false,
           builder: (context) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: const Row(
               children: [
-                Icon(Icons.warning_amber_rounded, color: Colors.red, size: 28),
+                Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
                 SizedBox(width: 8),
-                Text('Ketahuan Basah! 😡', style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    'Ketahuan Basah! 😡',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             content: Text(
@@ -421,7 +461,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
                   ? 'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc!'
                   : 'Gawat! Saat hendak berhubungan intim $_chosenLocation pada waktu $_chosenTime, aksi kalian dipergoki oleh $informantDesc! '
                     'Kabar buruk ini menyebar cepat dan pacar utamamu ($firstPartnerName) mengetahuinya!',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             actions: [
               TextButton(
@@ -430,7 +470,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
                   Navigator.pop(context); // Tutup layar bercinta
                   widget.onActionComplete.call();
                 },
-                child: const Text('Lanjutkan', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('Lanjutkan', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

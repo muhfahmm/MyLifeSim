@@ -408,8 +408,12 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                         showDialog(
                           context: context,
                           builder: (ctx) => AlertDialog(
-                            title: const Text('Rayuan Ditolak (Tragedi) 🚨'),
-                            content: Text('$name marah besar dan merasa sangat terganggu! Kamu langsung dilaporkan ke pihak sekolah dan dikeluarkan secara tidak terhormat! (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).'),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                            title: const Text('Rayuan Ditolak (Tragedi) 🚨', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+                            content: Text('$name marah besar dan merasa sangat terganggu! Kamu langsung dilaporkan ke pihak sekolah dan dikeluarkan secara tidak terhormat! (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).', style: const TextStyle(fontSize: 12)),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -417,7 +421,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                                   Navigator.pop(context);
                                   widget.onRefresh();
                                 },
-                                child: const Text('OK'),
+                                child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                               )
                             ],
                           ),

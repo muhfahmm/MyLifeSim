@@ -72,14 +72,17 @@ Future<void> _showSTDModal(
     context: context,
     barrierDismissible: false,
     builder: (ctx) => AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       title: Row(
         children: [
-          Icon(Icons.coronavirus, color: color, size: 28),
-          const SizedBox(width: 10),
+          Icon(Icons.coronavirus, color: color, size: 20),
+          const SizedBox(width: 8),
           Expanded(
             child: Text('$emoji Terdiagnosis $disease',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: color)),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: color)),
           ),
         ],
       ),
@@ -88,11 +91,11 @@ Future<void> _showSTDModal(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Setelah berhubungan intim $sexType dengan $partnerName tanpa pengaman,',
-              style: const TextStyle(fontSize: 14)),
+              style: const TextStyle(fontSize: 12)),
           const SizedBox(height: 4),
           Text('kamu terdiagnosis mengidap $disease.',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: color)),
-          const SizedBox(height: 12),
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
+          const SizedBox(height: 10),
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
@@ -100,9 +103,9 @@ Future<void> _showSTDModal(
               borderRadius: BorderRadius.circular(10),
               border: Border.all(color: color.withAlpha(80)),
             ),
-            child: Text(description, style: const TextStyle(fontSize: 13, color: Colors.black87)),
+            child: Text(description, style: const TextStyle(fontSize: 12, color: Colors.black87)),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
           const Text('Selalu gunakan pengaman untuk mengurangi risiko penularan penyakit.',
               style: TextStyle(fontSize: 11, color: Colors.black45)),
         ],
@@ -110,7 +113,7 @@ Future<void> _showSTDModal(
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(ctx),
-          child: Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
+          child: Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
         ),
       ],
     ),

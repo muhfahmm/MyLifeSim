@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mylifesim/pilih_karakter/character.dart'; // Model utama
 import '../game/index.dart'; // Halaman game
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/logic/family_generator.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/pilih_karakter/customization/appearance_customization.dart';
@@ -288,7 +289,11 @@ class _KarakterScreenState extends State<KarakterScreen> {
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     if (firstName.isEmpty || lastName.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Nama depan dan belakang tidak boleh kosong!')));
+      DialogHelper.show(
+        context: context,
+        title: 'Peringatan',
+        content: const Text('Nama depan dan belakang tidak boleh kosong!'),
+      );
       return;
     }
 
@@ -362,8 +367,10 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
   void _showCountryPicker() {
     if (_countriesList.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Daftar negara belum selesai dimuat. Silakan tunggu.')),
+      DialogHelper.show(
+        context: context,
+        title: 'Informasi',
+        content: const Text('Daftar negara belum selesai dimuat. Silakan tunggu.'),
       );
       return;
     }

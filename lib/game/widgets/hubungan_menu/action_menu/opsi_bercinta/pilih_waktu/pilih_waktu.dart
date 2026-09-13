@@ -45,18 +45,23 @@ class PilihWaktuHelper {
         final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : null,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           title: Row(
             children: [
-              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigoAccent),
+              Icon(Icons.access_time, color: isDark ? Colors.indigoAccent : Colors.indigoAccent, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   'Pilih Waktu Bercinta',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -70,11 +75,12 @@ class PilihWaktuHelper {
                 Text(
                   'Lokasi terpilih: $locationText',
                   style: TextStyle(
-                    fontSize: 13,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: isDark ? Colors.white70 : Colors.black54,
                   ),
                 ),
+                const SizedBox(height: 8),
                 ...timeOptions.map((time) {
                   return Card(
                     elevation: 0,
@@ -87,7 +93,7 @@ class PilihWaktuHelper {
                     child: ListTile(
                       leading: CircleAvatar(
                         backgroundColor: isDark ? Colors.indigo.shade900 : Colors.indigo.shade50,
-                        child: Icon(time.icon, color: isDark ? Colors.indigoAccent : Colors.indigoAccent),
+                        child: Icon(time.icon, color: isDark ? Colors.indigoAccent : Colors.indigoAccent, size: 20),
                       ),
                       title: Text(
                         time.name,
@@ -117,6 +123,7 @@ class PilihWaktuHelper {
               child: Text(
                 'Batal',
                 style: TextStyle(
+                  fontSize: 12,
                   color: isDark ? Colors.white70 : Colors.grey,
                   fontWeight: FontWeight.bold,
                 ),

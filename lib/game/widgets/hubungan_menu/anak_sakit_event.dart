@@ -120,20 +120,24 @@ class AnakSakitEvent {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : const Color(0xFFFFF3F3),
           title: Row(
             children: [
-              Text(emoji, style: const TextStyle(fontSize: 26)),
-              const SizedBox(width: 10),
+              Text(emoji, style: const TextStyle(fontSize: 20)),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   '$namaAnak Sakit!',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 17,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -146,7 +150,7 @@ class AnakSakitEvent {
                 '$namaAnak ($usia tahun) tiba-tiba menderita $namaPenyakit. '
                 'Sebagai orang tua, kamu harus memutuskan apa yang akan dilakukan.',
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
@@ -183,6 +187,7 @@ class AnakSakitEvent {
               child: Text(
                 'Biarkan',
                 style: TextStyle(
+                  fontSize: 12,
                   color: isDark ? Colors.grey : Colors.grey.shade600,
                   fontWeight: FontWeight.bold,
                 ),
@@ -197,6 +202,7 @@ class AnakSakitEvent {
               child: Text(
                 'Berobat Sendiri',
                 style: TextStyle(
+                  fontSize: 12,
                   color: isDark ? Colors.orangeAccent : Colors.orange,
                   fontWeight: FontWeight.bold,
                 ),
@@ -217,6 +223,7 @@ class AnakSakitEvent {
                 child: Text(
                   'Bawa ke Dokter 🏥',
                   style: TextStyle(
+                    fontSize: 12,
                     color: isDark ? Colors.lightBlueAccent : Colors.blue.shade800,
                     fontWeight: FontWeight.bold,
                   ),
@@ -379,20 +386,24 @@ class AnakSakitEvent {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Row(
             children: [
-              Text(icon, style: const TextStyle(fontSize: 24)),
+              Text(icon, style: const TextStyle(fontSize: 20)),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   judul,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ],
@@ -400,7 +411,7 @@ class AnakSakitEvent {
           content: Text(
             pesan,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               color: isDark ? Colors.white70 : Colors.black87,
             ),
           ),
@@ -413,6 +424,7 @@ class AnakSakitEvent {
               child: Text(
                 'OK',
                 style: TextStyle(
+                  fontSize: 12,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white70 : warna,
                 ),

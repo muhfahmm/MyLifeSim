@@ -59,9 +59,7 @@ void showAjukanPinjamanDialogInternal(BuildContext context, _UangTunaiPageState 
             if (formKey.currentState!.validate()) {
               formKey.currentState!.save();
               if (jumlah! <= 0 || tenor! <= 0) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Jumlah dan tenor harus lebih dari 0')),
-                );
+                DialogHelper.show(context: context, title: 'Pinjaman Gagal', content: const Text('Jumlah dan tenor harus lebih dari 0'));
                 return;
               }
               // Simulasi persetujuan
@@ -82,9 +80,7 @@ void showAjukanPinjamanDialogInternal(BuildContext context, _UangTunaiPageState 
                 state._addTransaction(jumlah!, 'Pinjaman diterima');
               });
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Pinjaman \$${formatRupiah(jumlah!)} disetujui!')),
-              );
+              DialogHelper.show(context: context, title: 'Pinjaman Disetujui', content: Text('Pinjaman \$${formatRupiah(jumlah!)} disetujui!'));
             }
           },
           child: const Text('Ajukan'),
@@ -97,16 +93,12 @@ void showAjukanPinjamanDialogInternal(BuildContext context, _UangTunaiPageState 
 void bayarCicilanInternal(BuildContext context, _UangTunaiPageState state, int index) {
   final loan = state.loans[index];
   if (loan['sisaCicilan'] <= 0) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Pinjaman sudah lunas')),
-    );
+    DialogHelper.show(context: context, title: 'Informasi', content: const Text('Pinjaman sudah lunas'));
     return;
   }
   int cicilan = loan['cicilanPerBulan'] as int;
   if (state.widget.character.money < cicilan) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Saldo tidak cukup untuk membayar cicilan!')),
-    );
+    DialogHelper.show(context: context, title: 'Pembayaran Gagal', content: const Text('Saldo tidak cukup untuk membayar cicilan!'));
     return;
   }
   state.setState(() {
@@ -114,9 +106,7 @@ void bayarCicilanInternal(BuildContext context, _UangTunaiPageState state, int i
     loan['sisaCicilan'] = loan['sisaCicilan'] - 1;
     state._addTransaction(-cicilan, 'Bayar cicilan pinjaman');
   });
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('Cicilan \$${formatRupiah(cicilan)} dibayar. Sisa ${loan['sisaCicilan']} kali lagi.')),
-  );
+  DialogHelper.show(context: context, title: 'Cicilan Dibayar', content: Text('Cicilan \$${formatRupiah(cicilan)} dibayar. Sisa ${loan['sisaCicilan']} kali lagi.'));
 }
 
 void showLoanManagementDialogInternal(BuildContext context, _UangTunaiPageState state) {

@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class TopUpPage extends StatefulWidget {
   final Character? character;
@@ -18,11 +19,10 @@ class TopUpPage extends StatefulWidget {
 class _TopUpPageState extends State<TopUpPage> {
   void _simulatePurchase(String itemName, int amount) {
     if (widget.character == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Anda belum memiliki karakter aktif!'),
-          backgroundColor: Colors.orange,
-        ),
+      DialogHelper.show(
+        context: context,
+        title: 'Perhatian',
+        content: const Text('Anda belum memiliki karakter aktif!'),
       );
       return;
     }
@@ -56,12 +56,10 @@ class _TopUpPageState extends State<TopUpPage> {
                 widget.character!.money += amount;
               });
 
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('🎉 Berhasil Top Up $itemName! +\$${_fmt(amount)} telah ditambahkan ke dompet.'),
-                  backgroundColor: Colors.green.shade700,
-                  duration: const Duration(seconds: 3),
-                ),
+              DialogHelper.show(
+                context: context,
+                title: 'Top Up Berhasil',
+                content: Text('🎉 Berhasil Top Up $itemName!\n+\$${_fmt(amount)} telah ditambahkan ke dompet.'),
               );
             },
             child: const Text('Bayar Sekarang', style: TextStyle(fontWeight: FontWeight.bold)),

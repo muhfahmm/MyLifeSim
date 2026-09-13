@@ -90,7 +90,7 @@ class CiumanHelper {
             color: Color(0xFF1E1E2E),
             borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
           ),
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 24),
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -508,18 +508,28 @@ class CiumanHelper {
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             title: const Row(
               children: [
-                Icon(Icons.favorite, color: Color(0xFFE91E63)),
+                Icon(Icons.favorite, color: Color(0xFFE91E63), size: 20),
                 SizedBox(width: 8),
-                Text('Momen Romantis 💋', style: TextStyle(fontWeight: FontWeight.bold)),
+                Expanded(
+                  child: Text(
+                    'Momen Romantis 💋',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
               ],
             ),
             content: Text(
               'Ciuman di bagian $partLabel berjalan sangat romantis!\n\n'
               '• Hubungan dengan $targetName +$relBonus%\n'
               '• Kebahagiaan +$happyBonus%',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 12),
             ),
             actions: [
               TextButton(
@@ -527,7 +537,7 @@ class CiumanHelper {
                   Navigator.pop(ctx);
                   onActionComplete();
                 },
-                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
               ),
             ],
           ),

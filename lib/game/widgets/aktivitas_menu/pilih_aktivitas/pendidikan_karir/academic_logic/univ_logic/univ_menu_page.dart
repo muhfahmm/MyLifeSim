@@ -267,11 +267,12 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           'Pendaftaran: $major 🎓',
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 15,
+            fontSize: 14,
             color: isDark ? Colors.white : Colors.black87,
           ),
         ),
@@ -409,12 +410,16 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     showDialog(
       context: context,
       builder: (dialogCtx) => AlertDialog(
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : Colors.black87,
-            fontSize: 18,
+            fontSize: 14,
           ),
         ),
         content: SizedBox(
@@ -559,17 +564,20 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           context: context,
           barrierDismissible: false,
           builder: (payCtx) => AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             title: Row(
               children: [
-                const Icon(Icons.payments, color: Colors.amber, size: 28),
+                const Icon(Icons.payments, color: Colors.amber, size: 20),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                     'Metode Pembayaran Kuliah',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 18,
+                      fontSize: 14,
                       color: isDark ? Colors.white : Colors.black87,
                     ),
                   ),
@@ -658,18 +666,26 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Pendaftaran Disetujui! 💸'),
-          content: Text('Orang tuamu menyetujui membiayai kuliahmu di $chosenUniv untuk jenjang $level jurusan $major dengan biaya \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun. Kebahagiaanmu meningkat (+$happyBoost%).'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Pendaftaran Disetujui! 💸', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Orang tuamu menyetujui membiayai kuliahmu di $chosenUniv untuk jenjang $level jurusan $major dengan biaya \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} / tahun. Kebahagiaanmu meningkat (+$happyBoost%).', style: const TextStyle(fontSize: 12)),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
         ),
       );
     } else {
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Permintaan Ditolak 🚫'),
-          content: Text('Orang tuamu menolak membiayaimu masuk $chosenUniv karena keterbatasan finansial.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Permintaan Ditolak 🚫', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Orang tuamu menolak membiayaimu masuk $chosenUniv karena keterbatasan finansial.', style: const TextStyle(fontSize: 12)),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
         ),
       );
     }
@@ -690,18 +706,26 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Pendaftaran Berhasil! 🎓'),
-          content: Text('Kamu berhasil membayar biaya kuliah tahun pertama secara mandiri di $chosenUniv sebesar \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+$happyBoost%).'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Pendaftaran Berhasil! 🎓', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Kamu berhasil membayar biaya kuliah tahun pertama secara mandiri di $chosenUniv sebesar \$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")} untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+$happyBoost%).', style: const TextStyle(fontSize: 12)),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
         ),
       );
     } else {
       showDialog(
         context: context,
         builder: (c) => AlertDialog(
-          title: const Text('Saldo Tidak Cukup 🚫'),
-          content: Text('Uangmu tidak mencukupi untuk membayar biaya kuliah tahun pertama di $chosenUniv (\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}). Saldomu saat ini: \$${widget.character.money.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Saldo Tidak Cukup 🚫', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Uangmu tidak mencukupi untuk membayar biaya kuliah tahun pertama di $chosenUniv (\$${annualTuition.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}). Saldomu saat ini: \$${widget.character.money.toString().replaceAllMapped(RegExp(r"(\d{1,3})(?=(\d{3})+(?!\d))"), (m) => "${m[1]}.")}.', style: const TextStyle(fontSize: 12)),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
         ),
       );
     }
@@ -789,9 +813,13 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           showDialog(
             context: context,
             builder: (c) => AlertDialog(
-              title: const Text('Beasiswa Ditolak 🚫'),
-              content: Text('Lamaran beasiswa di $chosenUniv ditolak karena kecerdasanmu berada di bawah 90%.'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Beasiswa Ditolak 🚫', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              content: Text('Lamaran beasiswa di $chosenUniv ditolak karena kecerdasanmu berada di bawah 90%.', style: const TextStyle(fontSize: 12)),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
             ),
           );
           return;
@@ -804,25 +832,29 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
             showDialog(
               context: context,
               builder: (c) => AlertDialog(
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 title: const Row(
                   children: [
-                    Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                    Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
                     SizedBox(width: 8),
-                    Text('Paspor Diperlukan! 🛂', style: TextStyle(fontWeight: FontWeight.bold)),
+                    Text('Paspor Diperlukan! 🛂', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
                   ],
                 ),
                 content: Text(
                   'Selamat! Lamaran beasiswamu di $chosenUniv ($targetCountry) diterima! 🌟\n\nNamun, karena universitas ini berada di luar negeri, kamu memerlukan Paspor terlebih dahulu sebelum bisa berkuliah di sana.\n\nSilakan urus lisensi paspor terlebih dahulu.',
+                  style: const TextStyle(fontSize: 12),
                 ),
                 actions: [
                   TextButton(
                     onPressed: () => Navigator.pop(c),
-                    child: const Text('Batal'),
+                    child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                   ),
                   ElevatedButton.icon(
-                    icon: const Icon(Icons.assignment_ind),
-                    label: const Text('Urus Lisensi 📋'),
+                    icon: const Icon(Icons.assignment_ind, size: 18),
+                    label: const Text('Urus Lisensi 📋', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.blue,
                       foregroundColor: Colors.white,
@@ -853,17 +885,20 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           showDialog(
             context: context,
             builder: (c) => AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Beasiswa Diterima! 🌟'),
-              content: Text('Selamat! Lamaran beasiswamu disetujui untuk berkuliah di $chosenUniv (Luar Negeri ($targetCountry)) secara gratis untuk jenjang $level jurusan $major.\n\nKarena universitas ini berada di luar negeri ($targetCountry), kamu perlu memilih kota tempat tinggal dan berimigrasi terlebih dahulu sebelum resmi berkuliah.'),
+              title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              content: Text('Selamat! Lamaran beasiswamu disetujui untuk berkuliah di $chosenUniv (Luar Negeri ($targetCountry)) secara gratis untuk jenjang $level jurusan $major.\n\nKarena universitas ini berada di luar negeri ($targetCountry), kamu perlu memilih kota tempat tinggal dan berimigrasi terlebih dahulu sebelum resmi berkuliah.', style: const TextStyle(fontSize: 12)),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(c),
-                  child: const Text('Batal'),
+                  child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                 ),
                 ElevatedButton.icon(
-                  icon: const Icon(Icons.flight_takeoff),
-                  label: Text('Imigrasi ke $targetCountry ✈️', style: const TextStyle(fontWeight: FontWeight.bold)),
+                  icon: const Icon(Icons.flight_takeoff, size: 18),
+                  label: Text('Imigrasi ke $targetCountry ✈️', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
@@ -906,9 +941,13 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           showDialog(
             context: context,
             builder: (c) => AlertDialog(
-              title: const Text('Beasiswa Diterima! 🌟'),
-              content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $chosenUniv (Dalam Negeri ($currentCountry)) secara gratis untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+30%).'),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK'))],
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+              content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $chosenUniv (Dalam Negeri ($currentCountry)) secara gratis untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+30%).', style: const TextStyle(fontSize: 12)),
+              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
             ),
           );
         }

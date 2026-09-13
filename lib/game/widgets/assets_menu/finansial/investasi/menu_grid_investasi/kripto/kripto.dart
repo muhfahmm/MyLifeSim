@@ -157,9 +157,7 @@ class _KriptoPageState extends State<KriptoPage> {
                   onPressed: () {
                     final jumlah = double.tryParse(controller.text) ?? 0.0;
                     if (jumlah > maxJual) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Jumlah kripto melebihi kepemilikan!')),
-                      );
+                      DialogHelper.show(context: context, title: 'Investasi Kripto', content: const Text('Jumlah kripto melebihi kepemilikan!'));
                       return;
                     }
                     if (jumlah > 0) {

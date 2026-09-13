@@ -403,8 +403,11 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                                     ),
                                     onPressed: () {
                                       if (!canApply) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(
+                                        showDialog(
+                                          context: context,
+                                          builder: (c) => AlertDialog(
+                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                            title: const Text('Persyaratan Belum Terpenuhi'),
                                             content: Text(
                                               !meetsIntel
                                                   ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
@@ -412,6 +415,12 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                                                       ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
                                                       : 'Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}'),
                                             ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(c),
+                                                child: const Text('OK'),
+                                              ),
+                                            ],
                                           ),
                                         );
                                         return;

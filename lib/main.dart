@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_gender/gender.dart';
 import 'package:mylifesim/intro_animation.dart';
 import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 // Global theme mode notifier
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -126,8 +127,10 @@ class HomePage extends StatelessWidget {
                 MouseRegion(
                   cursor: SystemMouseCursors.click,
                   child: OutlinedButton(
-                    onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Fitur Load Game belum dibuat!')),
+                    onPressed: () => DialogHelper.show(
+                      context: context,
+                      title: 'Informasi',
+                      content: const Text('Fitur Load Game belum dibuat!'),
                     ),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: Colors.blue,

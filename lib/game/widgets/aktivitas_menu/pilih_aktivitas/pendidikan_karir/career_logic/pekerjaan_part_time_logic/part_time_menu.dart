@@ -26,12 +26,16 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Persyaratan Tidak Cukup'),
-          content: Text('Pekerjaan "${job['title']}" membutuhkan kecerdasan minimal $minIntel%. Kecerdasanmu saat ini: ${widget.character.intelligence}%.'),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Persyaratan Tidak Cukup', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Pekerjaan "${job['title']}" membutuhkan kecerdasan minimal $minIntel%. Kecerdasanmu saat ini: ${widget.character.intelligence}%.', style: const TextStyle(fontSize: 12)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Tutup'),
+              child: const Text('Tutup', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -51,8 +55,9 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
-        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -62,20 +67,20 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
             const Expanded(
               child: Text(
                 'Diterima Bekerja! 🎉',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
               ),
             ),
           ],
         ),
         content: Text(
           'Selamat! Kamu resmi diterima sebagai "${job['title']}" secara Part-Time dengan tambahan penghasilan ${CurrencySettings.format(salary)}/tahun.',
-          style: const TextStyle(fontSize: 12.5, height: 1.35),
+          style: const TextStyle(fontSize: 12, height: 1.35),
         ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Mulai Bekerja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            child: const Text('Mulai Bekerja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
           ),
         ],
       ),
@@ -86,12 +91,16 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Berhenti Kerja Part-Time'),
-        content: Text('Apakah kamu yakin ingin berhenti dari pekerjaan part-time "${widget.character.partTimeJobName}"?'),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Berhenti Kerja Part-Time', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+        content: Text('Apakah kamu yakin ingin berhenti dari pekerjaan part-time "${widget.character.partTimeJobName}"?', style: const TextStyle(fontSize: 12)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
+            child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white),
