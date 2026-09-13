@@ -6,17 +6,15 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class LoveMenuHelper {
   static void showLoveMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 16) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 16 tahun untuk memulai hubungan percintaan.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 16 tahun untuk memulai hubungan percintaan.'),
       );
       return;
     }
@@ -105,7 +103,7 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
                   ),
                 ),
                 subtitle: Text(
-                  'Cari pasangan ideal berdasarkan kriteria umur (Biaya: ${CurrencySettings.format(50000)})',
+                  'Cari pasangan ideal berdasarkan kriteria umur (Biaya: ${CurrencySettings.format(5)})',
                   style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
                 ),
                 trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
@@ -152,7 +150,7 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
                   final age = (character.age - 2) + r.nextInt(5);
                   final looks = 30 + r.nextInt(70);
                   final smart = 30 + r.nextInt(70);
-                  final moneyValue = 100000 + r.nextInt(5000000);
+                  final moneyValue = 10 + r.nextInt(500);
 
                   _showCandidateDialog(
                     context,
@@ -318,7 +316,6 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
                   } else if (val == 'Heteroseksual') {
                     selectedGender = userGen == 'laki-laki' ? 'Perempuan' : 'Laki-laki';
                   }
-                  // Jika Biseksual, target gender tetap sesuai pilihan Radio/sebelumnya
                 });
               },
             ),
@@ -330,7 +327,7 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
                 padding: const EdgeInsets.symmetric(vertical: 16),
               ),
               onPressed: _searchCandidate,
-              child: Text('Cari Pasangan (${CurrencySettings.format(50000)})', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              child: Text('Cari Pasangan (${CurrencySettings.format(5)})', style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -400,18 +397,15 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
   }
 
   void _searchCandidate() async {
-    if (widget.character.money < 50000) {
-      showDialog(
+    if (widget.character.money < 5) {
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Uang Tidak Cukup'),
-          content: Text('Kamu butuh minimal ${CurrencySettings.format(50000)} untuk menggunakan aplikasi kencan.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Uang Tidak Cukup',
+        content: Text('Kamu butuh minimal ${CurrencySettings.format(5)} untuk menggunakan aplikasi kencan.'),
       );
       return;
     }
-    widget.character.money -= 50000;
+    widget.character.money -= 5;
 
     final r = Random();
     final String userCountry = widget.character.location.isNotEmpty ? widget.character.location : (widget.character.birthCountry ?? 'Indonesia');

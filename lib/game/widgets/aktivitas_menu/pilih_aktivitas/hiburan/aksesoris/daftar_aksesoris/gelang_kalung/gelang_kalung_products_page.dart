@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class GelangKalungProductsPage extends StatefulWidget {
   final Character character;
@@ -31,18 +32,18 @@ class _GelangKalungProductsPageState extends State<GelangKalungProductsPage> {
     super.initState();
     if (widget.brand.contains('Tiffany & Co.')) {
       products = [
-        {'name': 'Tiffany T Bracelet 💫', 'price': 15000000, 'happiness': 15, 'desc': 'Desain gelang minimalis dengan inisial T'},
-        {'name': 'Tiffany Lock Pendant 📿', 'price': 18000000, 'happiness': 18, 'desc': 'Kalung gembok dengan nilai keindahan tinggi'},
+        {'name': 'Tiffany T Bracelet 💫', 'price': 1000, 'happiness': 15, 'desc': 'Desain gelang minimalis dengan inisial T'},
+        {'name': 'Tiffany Lock Pendant 📿', 'price': 1200, 'happiness': 18, 'desc': 'Kalung gembok dengan nilai keindahan tinggi'},
       ];
     } else if (widget.brand.contains('Cartier')) {
       products = [
-        {'name': 'Cartier Love Bracelet 💍', 'price': 45000000, 'happiness': 25, 'desc': 'Gelang legendaris lambang komitmen abadi'},
-        {'name': 'Cartier Juste un Clou 📿', 'price': 38000000, 'happiness': 24, 'desc': 'Desain kalung/gelang berbentuk paku mewah'},
+        {'name': 'Cartier Love Bracelet 💍', 'price': 3000, 'happiness': 25, 'desc': 'Gelang legendaris lambang komitmen abadi'},
+        {'name': 'Cartier Juste un Clou 📿', 'price': 2500, 'happiness': 24, 'desc': 'Desain kalung/gelang berbentuk paku mewah'},
       ];
     } else {
       products = [
-        {'name': 'Pandora Moments Bracelet ✨', 'price': 3500000, 'happiness': 10, 'desc': 'Gelang charm yang dapat dipersonalisasi'},
-        {'name': 'Pandora Signature Pendant 📿', 'price': 2800000, 'happiness': 12, 'desc': 'Kalung perak dengan logo khas pandora'},
+        {'name': 'Pandora Moments Bracelet ✨', 'price': 200, 'happiness': 10, 'desc': 'Gelang charm yang dapat dipersonalisasi'},
+        {'name': 'Pandora Signature Pendant 📿', 'price': 180, 'happiness': 12, 'desc': 'Kalung perak dengan logo khas pandora'},
       ];
     }
   }
@@ -164,31 +165,19 @@ class _GelangKalungProductsPageState extends State<GelangKalungProductsPage> {
                         });
                         final msg = '🛍️ Kamu membeli ${p['name']}! (-${_fmt(price)}, +${p['happiness']}% Kebahagiaan)';
                         widget.character.inbox.add(msg);
-                        showDialog(
+                        DialogHelper.show(
                           context: context,
-                          builder: (ctx2) => AlertDialog(
-                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green, size: 20),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              ),
-                            ]),
-                            content: Text(msg, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx2);
-                                  widget.onComplete();
-                                },
-                                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                              )
-                            ],
-                          ),
+                          title: 'Pembelian Berhasil',
+                          content: Text(msg),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                widget.onComplete();
+                              },
+                              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            )
+                          ],
                         );
                       } : null),
                     ),

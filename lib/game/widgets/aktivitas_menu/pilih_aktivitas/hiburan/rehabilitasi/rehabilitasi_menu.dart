@@ -2,17 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class RehabilitasiMenuHelper {
   static void showRehabilitasiMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 18) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 18 tahun untuk program rehabilitasi.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 18 tahun untuk program rehabilitasi.'),
       );
       return;
     }
@@ -45,10 +43,10 @@ class RehabilitasiPage extends StatefulWidget {
 
 class _RehabilitasiPageState extends State<RehabilitasiPage> {
   final List<Map<String, dynamic>> program = [
-    {'name': 'Rehabilitasi Alkohol 🍺', 'cost': 10000000, 'duration': 30, 'happiness': 20, 'health': 25, 'desc': 'Program detoks dari ketergantungan alkohol'},
-    {'name': 'Rehabilitasi Narkoba 💊', 'cost': 25000000, 'duration': 90, 'happiness': 25, 'health': 30, 'desc': 'Program pemulihan dari ketergantungan narkoba'},
-    {'name': 'Rehabilitasi Judi 🎲', 'cost': 5000000, 'duration': 14, 'happiness': 15, 'health': 10, 'desc': 'Terapi mengatasi kecanduan berjudi'},
-    {'name': 'Terapi Perilaku 🧠', 'cost': 3000000, 'duration': 7, 'happiness': 18, 'health': 5, 'desc': 'Terapi kognitif untuk mengubah pola pikir negatif'},
+    {'name': 'Terapi Perilaku 🧠', 'cost': 250, 'duration': 7, 'happiness': 18, 'health': 5, 'desc': 'Terapi kognitif untuk mengubah pola pikir negatif'},
+    {'name': 'Rehabilitasi Judi 🎲', 'cost': 500, 'duration': 14, 'happiness': 15, 'health': 10, 'desc': 'Terapi mengatasi kecanduan berjudi'},
+    {'name': 'Rehabilitasi Alkohol 🍺', 'cost': 1200, 'duration': 30, 'happiness': 20, 'health': 25, 'desc': 'Program detoks dari ketergantungan alkohol'},
+    {'name': 'Rehabilitasi Narkoba 💊', 'cost': 2500, 'duration': 90, 'happiness': 25, 'health': 30, 'desc': 'Program pemulihan dari ketergantungan narkoba'},
   ];
 
   static String _fmt(int amount) {
@@ -64,25 +62,19 @@ class _RehabilitasiPageState extends State<RehabilitasiPage> {
 
     final msg = '💚 Program ${p['name']} selesai! Kamu pulih dan siap menjalani hidup lebih baik. (+${p['happiness']}% Kebahagiaan, +${p['health']}% Kesehatan)';
     widget.character.inbox.add(msg);
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Program Selesai!', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: 'Program Selesai!',
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+          },
+          child: const Text('OK'),
+        )
+      ],
     );
   }
 

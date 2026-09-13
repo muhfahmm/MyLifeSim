@@ -3,18 +3,16 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'page_donor_sperma.dart';
 
 class KesuburanMenuHelper {
   static void showKesuburanMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 18) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 18 tahun untuk mengakses layanan kesuburan.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 18 tahun untuk mengakses layanan kesuburan.'),
       );
       return;
     }
@@ -57,9 +55,9 @@ class _KesuburanPageState extends State<KesuburanPage> {
 
   void _updateLayananList() {
     layanan = [
-      {'name': 'Cek Kesuburan 🔬', 'cost': 15000, 'desc': 'Periksa tingkat kesuburan saat ini'},
-      {'name': 'Terapi Hormon 💊', 'cost': 35000, 'desc': 'Meningkatkan kesuburan dengan terapi hormon'},
-      {'name': 'Bayi Tabung (IVF) 🧪', 'cost': 30000, 'desc': 'Program bayi tabung untuk kehamilan'},
+      {'name': 'Cek Kesuburan 🔬', 'cost': 50, 'desc': 'Periksa tingkat kesuburan saat ini'},
+      {'name': 'Terapi Hormon 💊', 'cost': 250, 'desc': 'Meningkatkan kesuburan dengan terapi hormon'},
+      {'name': 'Bayi Tabung (IVF) 🧪', 'cost': 2500, 'desc': 'Program bayi tabung untuk kehamilan'},
     ];
 
     final String genderClean = widget.character.gender.trim().toLowerCase();
@@ -68,12 +66,12 @@ class _KesuburanPageState extends State<KesuburanPage> {
       layanan.add({
         'name': 'Donor Sperma 🧬',
         'cost': 0,
-        'desc': 'Donorkan sperma Anda ke bank sperma untuk membantu orang lain (Dapat uang ${CurrencySettings.format(5000)})',
+        'desc': 'Donorkan sperma Anda ke bank sperma untuk membantu orang lain (Dapat uang ${CurrencySettings.format(150)})',
       });
     } else {
       layanan.add({
         'name': widget.character.birthControlActive ? 'Matikan Kontrol Kehamilan (KB) ❌' : 'Aktifkan Kontrol Kehamilan (KB) 🛡️',
-        'cost': 1000,
+        'cost': 20,
         'desc': widget.character.birthControlActive 
             ? 'Nonaktifkan perlindungan KB' 
             : 'Aktifkan perlindungan KB untuk mengurangi risiko hamil menjadi 5%',
@@ -98,9 +96,8 @@ class _KesuburanPageState extends State<KesuburanPage> {
       widget.character.health = (widget.character.health + 5).clamp(0, 100);
       msg = '💊 Terapi hormon berhasil! Kesuburanmu meningkat (+5% Kesehatan).';
     } else if (l['name'].toString().contains('Donor')) {
-      // Dapatkan uang $5.000
       setState(() {
-        widget.character.money += 5000;
+        widget.character.money += 150;
       });
       final bool berhasil = r.nextInt(100) < (kesuburan + 20).clamp(0, 100);
       if (berhasil) {
@@ -123,9 +120,9 @@ class _KesuburanPageState extends State<KesuburanPage> {
           'isDeceased': 'false',
         });
 
-        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan ${CurrencySettings.format(5000)} untuk kontribusi ini!';
+        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan ${CurrencySettings.format(150)} untuk kontribusi ini!';
       } else {
-        msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan ${CurrencySettings.format(5000)} untuk donor ini!';
+        msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan ${CurrencySettings.format(150)} untuk donor ini!';
       }
     } else if (l['name'].toString().contains('Kontrol Kehamilan') || l['name'].toString().contains('KB')) {
       setState(() {
@@ -143,25 +140,19 @@ class _KesuburanPageState extends State<KesuburanPage> {
     }
 
     widget.character.inbox.add(msg);
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.info, color: Colors.purple),
-          SizedBox(width: 8),
-          Text('Hasil Layanan', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: 'Hasil Layanan',
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+          },
+          child: const Text('OK'),
+        )
+      ],
     );
   }
 

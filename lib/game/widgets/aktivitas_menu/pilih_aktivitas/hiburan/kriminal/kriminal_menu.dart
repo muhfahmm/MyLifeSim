@@ -3,17 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class KriminalMenuHelper {
   static void showKriminalMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 18) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 18 tahun untuk melakukan tindakan kriminal.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 18 tahun untuk melakukan tindakan kriminal.'),
       );
       return;
     }
@@ -46,10 +44,10 @@ class KriminalPage extends StatefulWidget {
 
 class _KriminalPageState extends State<KriminalPage> {
   final List<Map<String, dynamic>> crimes = [
-    {'name': 'Copet Dompet 👜', 'risk': 30, 'gain': 200000, 'jail': 1, 'desc': 'Mencuri dompet orang di keramaian'},
-    {'name': 'Penipuan Online 💻', 'risk': 25, 'gain': 1000000, 'jail': 2, 'desc': 'Menipu orang melalui internet'},
-    {'name': 'Perampokan Toko 🏪', 'risk': 60, 'gain': 5000000, 'jail': 5, 'desc': 'Merampok toko kecil'},
-    {'name': 'Perjudian Ilegal 🎲', 'risk': 20, 'gain': 500000, 'jail': 1, 'desc': 'Berjudi di tempat terlarang'},
+    {'name': 'Copet Dompet 👜', 'risk': 30, 'gain': 10000, 'jail': 1, 'desc': 'Mencuri dompet orang di keramaian'},
+    {'name': 'Perjudian Ilegal 🎲', 'risk': 20, 'gain': 25000, 'jail': 1, 'desc': 'Berjudi di tempat terlarang'},
+    {'name': 'Penipuan Online 💻', 'risk': 25, 'gain': 50000, 'jail': 2, 'desc': 'Menipu orang melalui internet'},
+    {'name': 'Perampokan Toko 🏪', 'risk': 60, 'gain': 100000, 'jail': 5, 'desc': 'Merampok toko kecil'},
   ];
 
   static String _fmt(int amount) {
@@ -94,33 +92,25 @@ class _KriminalPageState extends State<KriminalPage> {
     }
 
     widget.character.inbox.add(msg);
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(children: [
-          Icon(tertangkap ? Icons.local_police : Icons.check_circle,
-              color: tertangkap ? Colors.red : Colors.green),
-          const SizedBox(width: 8),
-          Text(tertangkap ? 'Tertangkap!' : 'Berhasil!', style: const TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx); // Close Tertangkap dialog
-              widget.onComplete();
-              if (tertangkap) {
-                // Pop KriminalPage and also pop the Pilih Aktivitas modal sheet to return to the character profile screen
+      title: tertangkap ? 'Tertangkap!' : 'Berhasil!',
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+            if (tertangkap) {
+              Navigator.of(context).pop();
+              if (Navigator.canPop(context)) {
                 Navigator.of(context).pop();
-                if (Navigator.canPop(context)) {
-                  Navigator.of(context).pop();
-                }
               }
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+            }
+          },
+          child: const Text('OK'),
+        )
+      ],
     );
   }
 

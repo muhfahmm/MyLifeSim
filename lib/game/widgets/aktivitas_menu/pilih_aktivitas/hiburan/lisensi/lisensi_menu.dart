@@ -48,14 +48,14 @@ class LisensiPage extends StatefulWidget {
 
 class _LisensiPageState extends State<LisensiPage> {
   final List<Map<String, dynamic>> lisensi = [
-    {'name': 'SIM A (Mobil) 🚗', 'cost': 500000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda empat'},
-    {'name': 'SIM C (Motor) 🏍️', 'cost': 300000, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda dua'},
-    {'name': 'Paspor 🛂', 'cost': 25000, 'minAge': 17, 'desc': 'Dokumen perjalanan internasional'},
-    {'name': 'Lisensi Pilot ✈️', 'cost': 50000000, 'minAge': 21, 'desc': 'Lisensi untuk menerbangkan pesawat'},
+    {'name': 'SIM C (Motor) 🏍️', 'cost': 20, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda dua'},
+    {'name': 'SIM A (Mobil) 🚗', 'cost': 35, 'minAge': 17, 'desc': 'Surat Izin Mengemudi kendaraan roda empat'},
+    {'name': 'Paspor 🛂', 'cost': 25, 'minAge': 17, 'desc': 'Dokumen perjalanan internasional'},
+    {'name': 'Lisensi Pilot ✈️', 'cost': 10000, 'minAge': 21, 'desc': 'Lisensi untuk menerbangkan pesawat'},
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   @override

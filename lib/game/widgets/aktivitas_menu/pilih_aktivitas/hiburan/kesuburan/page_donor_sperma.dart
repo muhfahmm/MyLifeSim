@@ -38,7 +38,7 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
     kesuburan = kesuburan.clamp(0, 100);
 
     setState(() {
-      widget.character.money += 5000;
+      widget.character.money += 150;
     });
 
     final bool berhasil = r.nextInt(100) < (kesuburan + 20).clamp(0, 100);
@@ -73,11 +73,11 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
       });
 
       title = 'Donor Sperma Berhasil! 🧬';
-      content = 'Penerima: Ibu $ibuNama\nBayi lahir: $anakGender bernama $anakNama.\n\nAnda mendapatkan ${CurrencySettings.format(5000)} atas kontribusi ini!';
+      content = 'Penerima: Ibu $ibuNama\nBayi lahir: $anakGender bernama $anakNama.\n\nAnda mendapatkan ${CurrencySettings.format(150)} atas kontribusi ini!';
       widget.character.inbox.add('🧬 Donor Sperma Berhasil! Ibu $ibuNama melahirkan bayi $anakGender bernama $anakNama dari sperma Anda.');
     } else {
       title = 'Donor Sperma Tersimpan 🧪';
-      content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(5000)}!';
+      content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(150)}!';
       widget.character.inbox.add('🧬 Donor Sperma: Sperma Anda berhasil disimpan di bank sperma.');
     }
 
@@ -137,7 +137,7 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Setiap kali mendonorkan sperma yang layak, Anda akan menerima imbalan ${CurrencySettings.format(5000)}.',
+                  'Setiap kali mendonorkan sperma yang layak, Anda akan menerima imbalan ${CurrencySettings.format(150)}.',
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,

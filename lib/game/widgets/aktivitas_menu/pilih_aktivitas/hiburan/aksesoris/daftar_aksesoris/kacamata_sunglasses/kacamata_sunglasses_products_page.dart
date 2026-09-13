@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class KacamataSunglassesProductsPage extends StatefulWidget {
   final Character character;
@@ -31,18 +32,18 @@ class _KacamataSunglassesProductsPageState extends State<KacamataSunglassesProdu
     super.initState();
     if (widget.brand.contains('Ray-Ban')) {
       products = [
-        {'name': 'Ray-Ban Aviator 🕶️', 'price': 2500000, 'happiness': 10, 'desc': 'Kacamata ikonik pilot klasik', 'type': 'sunglasses'},
-        {'name': 'Ray-Ban Wayfarer 🕶️', 'price': 2200000, 'happiness': 12, 'desc': 'Gaya kasual sepanjang masa', 'type': 'wayfarers'},
+        {'name': 'Ray-Ban Aviator 🕶️', 'price': 160, 'happiness': 10, 'desc': 'Kacamata ikonik pilot klasik', 'type': 'sunglasses'},
+        {'name': 'Ray-Ban Wayfarer 🕶️', 'price': 150, 'happiness': 12, 'desc': 'Gaya kasual sepanjang masa', 'type': 'wayfarers'},
       ];
     } else if (widget.brand.contains('Oakley')) {
       products = [
-        {'name': 'Oakley Radar EV 🚴', 'price': 3500000, 'happiness': 15, 'desc': 'Kacamata olahraga spesifikasi atlet', 'type': 'sunglasses'},
-        {'name': 'Oakley Holbrook 🕶️', 'price': 2800000, 'happiness': 12, 'desc': 'Gaya hidup klasik penuh petualangan', 'type': 'wayfarers'},
+        {'name': 'Oakley Radar EV 🚴', 'price': 220, 'happiness': 15, 'desc': 'Kacamata olahraga spesifikasi atlet', 'type': 'sunglasses'},
+        {'name': 'Oakley Holbrook 🕶️', 'price': 180, 'happiness': 12, 'desc': 'Gaya hidup klasik penuh petualangan', 'type': 'wayfarers'},
       ];
     } else {
       products = [
-        {'name': 'Gucci GG Aviator 👑', 'price': 6500000, 'happiness': 20, 'desc': 'Gaya mewah khas rumah mode florensia', 'type': 'sunglasses'},
-        {'name': 'Gucci Square Acetate 💅', 'price': 5800000, 'happiness': 22, 'desc': 'Kacamata modis dan elegan', 'type': 'prescription02'},
+        {'name': 'Gucci GG Aviator 👑', 'price': 450, 'happiness': 20, 'desc': 'Gaya mewah khas rumah mode florensia', 'type': 'sunglasses'},
+        {'name': 'Gucci Square Acetate 💅', 'price': 380, 'happiness': 22, 'desc': 'Kacamata modis dan elegan', 'type': 'prescription02'},
       ];
     }
   }
@@ -166,31 +167,19 @@ class _KacamataSunglassesProductsPageState extends State<KacamataSunglassesProdu
                         });
                         final msg = '🛍️ Kamu membeli ${p['name']}! (-${_fmt(price)}, +${p['happiness']}% Kebahagiaan)';
                         widget.character.inbox.add(msg);
-                        showDialog(
+                        DialogHelper.show(
                           context: context,
-                          builder: (ctx2) => AlertDialog(
-                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green, size: 20),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              ),
-                            ]),
-                            content: Text(msg, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx2);
-                                  widget.onComplete();
-                                },
-                                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                              )
-                            ],
-                          ),
+                          title: 'Pembelian Berhasil',
+                          content: Text(msg),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                widget.onComplete();
+                              },
+                              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            )
+                          ],
                         );
                       } : null),
                     ),

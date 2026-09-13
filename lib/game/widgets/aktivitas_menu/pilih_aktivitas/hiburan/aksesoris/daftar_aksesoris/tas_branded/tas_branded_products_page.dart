@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class TasBrandedProductsPage extends StatefulWidget {
   final Character character;
@@ -31,18 +32,18 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
     super.initState();
     if (widget.brand.contains('Louis Vuitton')) {
       products = [
-        {'name': 'LV Speedy 👜', 'price': 25000000, 'happiness': 20, 'desc': 'Tas kasual dengan pola monogram klasik'},
-        {'name': 'LV Neverfull 👜', 'price': 28000000, 'happiness': 22, 'desc': 'Tas jinjing berukuran luas dan fungsional'},
+        {'name': 'LV Speedy 👜', 'price': 1600, 'happiness': 20, 'desc': 'Tas kasual dengan pola monogram klasik'},
+        {'name': 'LV Neverfull 👜', 'price': 1800, 'happiness': 22, 'desc': 'Tas jinjing berukuran luas dan fungsional'},
       ];
     } else if (widget.brand.contains('Chanel')) {
       products = [
-        {'name': 'Chanel Classic Flap 👜', 'price': 120000000, 'happiness': 30, 'desc': 'Tas klasik legendaris berbahan kulit berkualitas'},
-        {'name': 'Chanel Boy Bag 👜', 'price': 95000000, 'happiness': 28, 'desc': 'Desain modern dengan sentuhan maskulin'},
+        {'name': 'Chanel Classic Flap 👜', 'price': 8000, 'happiness': 30, 'desc': 'Tas klasik legendaris berbahan kulit berkualitas'},
+        {'name': 'Chanel Boy Bag 👜', 'price': 6000, 'happiness': 28, 'desc': 'Desain modern dengan sentuhan maskulin'},
       ];
     } else {
       products = [
-        {'name': 'Prada Galleria 👜', 'price': 45000000, 'happiness': 22, 'desc': 'Tas formal yang minimalis dan terstruktur'},
-        {'name': 'Prada Re-Edition 👜', 'price': 30000000, 'happiness': 20, 'desc': 'Tas nilon ikonik khas prada'},
+        {'name': 'Prada Galleria 👜', 'price': 3000, 'happiness': 22, 'desc': 'Tas formal yang minimalis dan terstruktur'},
+        {'name': 'Prada Re-Edition 👜', 'price': 2000, 'happiness': 20, 'desc': 'Tas nilon ikonik khas prada'},
       ];
     }
   }
@@ -164,31 +165,19 @@ class _TasBrandedProductsPageState extends State<TasBrandedProductsPage> {
                         });
                         final msg = '🛍️ Kamu membeli ${p['name']}! (-${_fmt(price)}, +${p['happiness']}% Kebahagiaan)';
                         widget.character.inbox.add(msg);
-                        showDialog(
+                        DialogHelper.show(
                           context: context,
-                          builder: (ctx2) => AlertDialog(
-                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            title: const Row(children: [
-                              Icon(Icons.check_circle, color: Colors.green, size: 20),
-                              SizedBox(width: 8),
-                              Expanded(
-                                child: Text('Pembelian Berhasil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                              ),
-                            ]),
-                            content: Text(msg, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx2);
-                                  widget.onComplete();
-                                },
-                                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                              )
-                            ],
-                          ),
+                          title: 'Pembelian Berhasil',
+                          content: Text(msg),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                widget.onComplete();
+                              },
+                              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                            )
+                          ],
                         );
                       } : null),
                     ),

@@ -3,17 +3,15 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class OperasiPlastikMenuHelper {
   static void showOperasiPlastikMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 18) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 18 tahun untuk operasi plastik.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 18 tahun untuk operasi plastik.'),
       );
       return;
     }
@@ -46,15 +44,15 @@ class OperasiPlastikPage extends StatefulWidget {
 
 class _OperasiPlastikPageState extends State<OperasiPlastikPage> {
   final List<Map<String, dynamic>> operasi = [
-    {'name': 'Rhinoplasty (Hidung) 👃', 'cost': 15000000, 'happiness': 15, 'risk': 10, 'desc': 'Operasi bentuk hidung agar lebih proporsional'},
-    {'name': 'Blepharoplasty (Mata) 👁️', 'cost': 10000000, 'happiness': 12, 'risk': 8, 'desc': 'Operasi kelopak mata untuk tampak lebih segar'},
-    {'name': 'Lip Filler (Bibir) 💋', 'cost': 5000000, 'happiness': 10, 'risk': 5, 'desc': 'Filler untuk bibir lebih penuh dan seksi'},
-    {'name': 'Liposuction (Tubuh) 🏃', 'cost': 25000000, 'happiness': 20, 'risk': 20, 'desc': 'Sedot lemak untuk tubuh lebih ideal'},
-    {'name': 'Facelift (Wajah) ✨', 'cost': 40000000, 'happiness': 25, 'risk': 15, 'desc': 'Operasi menyeluruh untuk tampak lebih muda'},
+    {'name': 'Lip Filler (Bibir) 💋', 'cost': 500, 'happiness': 10, 'risk': 5, 'desc': 'Filler untuk bibir lebih penuh dan seksi'},
+    {'name': 'Blepharoplasty (Mata) 👁️', 'cost': 1500, 'happiness': 12, 'risk': 8, 'desc': 'Operasi kelopak mata untuk tampak lebih segar'},
+    {'name': 'Rhinoplasty (Hidung) 👃', 'cost': 3000, 'happiness': 15, 'risk': 10, 'desc': 'Operasi bentuk hidung agar lebih proporsional'},
+    {'name': 'Liposuction (Tubuh) 🏃', 'cost': 4000, 'happiness': 20, 'risk': 20, 'desc': 'Sedot lemak untuk tubuh lebih ideal'},
+    {'name': 'Facelift (Wajah) ✨', 'cost': 6000, 'happiness': 25, 'risk': 15, 'desc': 'Operasi menyeluruh untuk tampak lebih muda'},
   ];
 
   static String _fmt(int amount) {
-    return amount.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]}.');
+    return CurrencySettings.format(amount);
   }
 
   void _executeOperasi(BuildContext context, Map<String, dynamic> o) {
@@ -79,26 +77,19 @@ class _OperasiPlastikPageState extends State<OperasiPlastikPage> {
     }
 
     widget.character.inbox.add(msg);
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(children: [
-          Icon(komplikasi ? Icons.warning : Icons.check_circle,
-              color: komplikasi ? Colors.red : Colors.green),
-          const SizedBox(width: 8),
-          Text(komplikasi ? 'Komplikasi!' : 'Operasi Berhasil', style: const TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: komplikasi ? 'Komplikasi!' : 'Operasi Berhasil',
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+          },
+          child: const Text('OK'),
+        )
+      ],
     );
   }
 

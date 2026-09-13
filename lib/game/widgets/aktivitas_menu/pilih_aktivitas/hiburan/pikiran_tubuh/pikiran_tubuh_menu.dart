@@ -2,17 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class PikiranTubuhMenuHelper {
   static void showPikiranTubuhMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 12) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 12 tahun untuk melakukan latihan pikiran dan tubuh.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 12 tahun untuk melakukan latihan pikiran dan tubuh.'),
       );
       return;
     }
@@ -46,9 +44,9 @@ class PikiranTubuhPage extends StatefulWidget {
 class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
   final List<Map<String, dynamic>> aktivitas = [
     {'name': 'Meditasi 🧘', 'cost': 0, 'happiness': 15, 'intelligence': 5, 'health': 5, 'desc': 'Latihan pernapasan dan ketenangan batin'},
-    {'name': 'Yoga 🌿', 'cost': 100000, 'happiness': 12, 'intelligence': 3, 'health': 8, 'desc': 'Gerakan tubuh untuk fleksibilitas dan ketenangan'},
-    {'name': 'Terapi Pikiran 🧠', 'cost': 800000, 'happiness': 20, 'intelligence': 8, 'health': 5, 'desc': 'Sesi terapi kognitif dengan psikolog'},
-    {'name': 'Tai Chi ☯️', 'cost': 150000, 'happiness': 10, 'intelligence': 4, 'health': 6, 'desc': 'Seni bela diri lembut untuk keseimbangan'},
+    {'name': 'Yoga 🌿', 'cost': 15, 'happiness': 12, 'intelligence': 3, 'health': 8, 'desc': 'Gerakan tubuh untuk fleksibilitas dan ketenangan'},
+    {'name': 'Tai Chi ☯️', 'cost': 12, 'happiness': 10, 'intelligence': 4, 'health': 6, 'desc': 'Seni bela diri lembut untuk keseimbangan'},
+    {'name': 'Terapi Pikiran 🧠', 'cost': 60, 'happiness': 20, 'intelligence': 8, 'health': 5, 'desc': 'Sesi terapi kognitif dengan psikolog'},
     {'name': 'Journaling ✍️', 'cost': 0, 'happiness': 8, 'intelligence': 7, 'health': 2, 'desc': 'Menulis jurnal untuk ekspresi diri'},
   ];
 
@@ -67,22 +65,17 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
     widget.character.inbox.add('🧘 Pikiran & Tubuh: Kamu melakukan ${a['name']} (+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan)');
     widget.onComplete();
 
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? Colors.grey.shade900 : null,
-        title: Text('${a['name']} Selesai 🎉', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-        content: Text('Kamu merasa lebih tenang dan sehat setelah melakukan ${a['name']}.\n'
-            '(+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)',
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text('OK', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-          ),
-        ],
-      ),
+      title: '${a['name']} Selesai 🎉',
+      content: Text('Kamu merasa lebih tenang dan sehat setelah melakukan ${a['name']}.\n'
+          '(+${a['happiness']}% Kebahagiaan, +${a['intelligence']}% Kecerdasan, +${a['health']}% Kesehatan)'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
+        ),
+      ],
     );
   }
 

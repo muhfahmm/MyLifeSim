@@ -6,6 +6,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import 'package:mylifesim/utils/country_helper.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class PindahNegaraMenuPage extends StatefulWidget {
   final Character character;
@@ -525,7 +526,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
         final bool isAlreadyCitizen = birthCountry.toLowerCase() == capitalizedName.toLowerCase();
         
         final bool livesHere = widget.character.location.toLowerCase() == capitalizedName.toLowerCase();
-        const int processingFee = 100000;
+        const int processingFee = 10000;
         final bool canAfford = widget.character.money >= processingFee;
         final bool hasIntelligence = widget.character.intelligence >= 70;
         final bool hasKarma = widget.character.karma >= 50;
@@ -621,24 +622,16 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                         });
                         widget.onComplete();
 
-                        showDialog(
+                        DialogHelper.show(
                           context: context,
-                          builder: (ctx) => AlertDialog(
-                            title: const Row(
-                              children: [
-                                Icon(Icons.verified, color: Colors.blue),
-                                SizedBox(width: 8),
-                                Text('Naturalisasi Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
-                              ],
-                            ),
-                            content: Text('🎉 Selamat! Permohonan kewarganegaraan barumu di $capitalizedName telah disetujui. Kamu sekarang memegang paspor resmi negara tersebut!'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(ctx),
-                                child: const Text('OK'),
-                              )
-                            ],
-                          ),
+                          title: 'Naturalisasi Berhasil!',
+                          content: Text('🎉 Selamat! Permohonan kewarganegaraan barumu di $capitalizedName telah disetujui. Kamu sekarang memegang paspor resmi negara tersebut!'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: const Text('OK'),
+                            )
+                          ],
                         );
                       } : null,
                       child: const Text('Ajukan Kewarganegaraan', style: TextStyle(fontWeight: FontWeight.bold)),

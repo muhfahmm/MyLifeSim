@@ -2,17 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class SalonSpaMenuHelper {
   static void showSalonSpaMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 15) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 15 tahun untuk pergi to salon & spa.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        content: const Text('Kamu harus berusia minimal 15 tahun untuk pergi ke salon & spa.'),
       );
       return;
     }
@@ -45,13 +43,13 @@ class SalonSpaPage extends StatefulWidget {
 
 class _SalonSpaPageState extends State<SalonSpaPage> {
   final List<Map<String, dynamic>> layanan = [
-    {'name': 'Potong Rambut ✂️', 'cost': 100000, 'happiness': 8, 'desc': 'Tampilan baru yang segar dan stylish'},
-    {'name': 'Creambath & Masker 🧖', 'cost': 200000, 'happiness': 10, 'health': 5, 'desc': 'Perawatan rambut intensif'},
-    {'name': 'Full Body Massage 💆', 'cost': 500000, 'happiness': 20, 'health': 10, 'desc': 'Pijat seluruh tubuh untuk relaksasi'},
-    {'name': 'Facial & Peeling 🌸', 'cost': 300000, 'happiness': 15, 'desc': 'Perawatan kulit wajah intensif'},
-    {'name': 'Mewarnai Rambut 🎨', 'cost': 400000, 'happiness': 12, 'desc': 'Warna rambut baru sesuai selera'},
-    {'name': 'Nail Art 💅', 'cost': 150000, 'happiness': 8, 'desc': 'Hiasan kuku yang cantik dan kreatif'},
-    {'name': 'Spa Package Lengkap 🌺', 'cost': 1500000, 'happiness': 35, 'health': 15, 'desc': 'Paket spa menyeluruh premium'},
+    {'name': 'Potong Rambut ✂️', 'cost': 15, 'happiness': 8, 'desc': 'Tampilan baru yang segar dan stylish'},
+    {'name': 'Creambath & Masker 🧖', 'cost': 25, 'happiness': 10, 'health': 5, 'desc': 'Perawatan rambut intensif'},
+    {'name': 'Nail Art 💅', 'cost': 20, 'happiness': 8, 'desc': 'Hiasan kuku yang cantik dan kreatif'},
+    {'name': 'Facial & Peeling 🌸', 'cost': 40, 'happiness': 15, 'desc': 'Perawatan kulit wajah intensif'},
+    {'name': 'Mewarnai Rambut 🎨', 'cost': 50, 'happiness': 12, 'desc': 'Warna rambut baru sesuai selera'},
+    {'name': 'Full Body Massage 💆', 'cost': 60, 'happiness': 20, 'health': 10, 'desc': 'Pijat seluruh tubuh untuk relaksasi'},
+    {'name': 'Spa Package Lengkap 🌺', 'cost': 150, 'happiness': 35, 'health': 15, 'desc': 'Paket spa menyeluruh premium'},
   ];
 
   static String _fmt(int amount) {
@@ -70,25 +68,19 @@ class _SalonSpaPageState extends State<SalonSpaPage> {
     final extraHealth = l.containsKey('health') ? ', +${l['health']}% Kesehatan' : '';
     final msg = '💅 ${l['name']} selesai! Kamu tampak lebih segar dan cantik/ganteng. (+${l['happiness']}% Kebahagiaan$extraHealth)';
     widget.character.inbox.add(msg);
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(children: [
-          Icon(Icons.check_circle, color: Colors.green),
-          SizedBox(width: 8),
-          Text('Perawatan Selesai', style: TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: 'Perawatan Selesai',
+      content: Text(msg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+          },
+          child: const Text('OK'),
+        )
+      ],
     );
   }
 
