@@ -1061,8 +1061,6 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
               children: widget.character.acceptedScholarships.map((sch) {
                 final country = sch['countryName'] ?? currentCountry;
                 final flag = CountryHelper.getFlagEmoji(country);
-                final iso = CountryHelper.getIsoCode(country);
-                final String displayIso = iso.isNotEmpty ? iso : country.toUpperCase();
                 final String univName = sch['univName'] ?? 'Universitas';
                 final String schMajor = sch['major'] ?? '';
 
@@ -1097,22 +1095,6 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                             Text(
                               flag.isNotEmpty ? flag : '🎓',
                               style: const TextStyle(fontSize: 14),
-                            ),
-                            const SizedBox(width: 6),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                              decoration: BoxDecoration(
-                                color: Colors.amber.shade700,
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                displayIso,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 10,
-                                ),
-                              ),
                             ),
                             const SizedBox(width: 6),
                             Text(
