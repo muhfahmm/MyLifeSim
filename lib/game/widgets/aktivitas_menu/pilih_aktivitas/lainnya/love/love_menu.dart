@@ -49,10 +49,10 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
     
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Love & Asmara 💕'),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Love & Asmara 💕', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.pink.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -628,21 +628,39 @@ void _showCandidateDialog(
           ),
         ],
       ),
+      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       actions: [
-        TextButton(
-          onPressed: () {
-            Navigator.pop(ctx); // Tutup dialog kandidat
-            onComplete();
-            Navigator.pop(context); // Pop halaman config
-          },
-          child: Text('Abaikan', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-          onPressed: () {
-            Navigator.pop(ctx); // Tutup dialog kandidat
-            final chance = (smart + happiness + 20) ~/ 3;
-            final success = r.nextInt(100) < chance;
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  side: BorderSide(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx); // Tutup dialog kandidat
+                  onComplete();
+                  Navigator.pop(context); // Pop halaman config
+                },
+                child: Text('Abaikan', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.bold)),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pinkAccent.shade400,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  Navigator.pop(ctx); // Tutup dialog kandidat
+                  final chance = (smart + happiness + 20) ~/ 3;
+                  final success = r.nextInt(100) < chance;
 
             String msg;
             if (success) {
@@ -696,7 +714,10 @@ void _showCandidateDialog(
               ),
             );
           },
-          child: const Text('Ajak Pacaran 💖', style: TextStyle(color: Colors.white)),
+                child: const Text('Ajak Pacaran 💖', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              ),
+            ),
+          ],
         ),
       ],
     ),

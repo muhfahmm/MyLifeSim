@@ -218,31 +218,7 @@ class LogikaPemainSepakbola {
     if (character.jobName == null) return;
     final String title = character.jobName!;
     final String tUpper = title.toUpperCase();
-    final bool isAthlete = tUpper.contains('ST') ||
-        tUpper.contains('LW') ||
-        tUpper.contains('RW') ||
-        tUpper.contains('CAM') ||
-        tUpper.contains('CM') ||
-        tUpper.contains('CDM') ||
-        tUpper.contains('CB') ||
-        tUpper.contains('LB') ||
-        tUpper.contains('RB') ||
-        tUpper.contains('GK') ||
-        title.contains('Sepakbola') ||
-        title.contains('Basket') ||
-        title.contains('Pemain') ||
-        title.contains('Striker') ||
-        title.contains('Gelandang') ||
-        title.contains('Bek') ||
-        title.contains('Kiper') ||
-        title.contains('Point Guard') ||
-        title.contains('Shooting Guard') ||
-        title.contains('Center') ||
-        title.contains('Pebalap') ||
-        title.contains('Petenis') ||
-        title.contains('MMA') ||
-        title.contains('Petinju') ||
-        title.contains('Renang');
+    final bool isAthlete = Character.isAthleteJob(title);
 
     if (!isAthlete) return;
 

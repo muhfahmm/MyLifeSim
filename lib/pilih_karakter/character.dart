@@ -1005,12 +1005,15 @@ class Character {
     garasiMotor!['statistik']['totalNilai'] = totalNilai;
   }
 
-  void setJob(String name, int salary) {
-    jobName = name;
-    jobSalary = salary;
-    final bool isAthleteJob = name.contains('Sepakbola') ||
+  static bool isAthleteJob(String name) {
+    final String nUpper = name.toUpperCase();
+    final bool hasSoccerAcronym = RegExp(r'\b(ST|LW|RW|CAM|CM|CDM|CB|LB|RB|GK)\b').hasMatch(nUpper);
+    return hasSoccerAcronym ||
+        name.contains('Sepakbola') ||
         name.contains('Basket') ||
-        name.contains('Pemain') ||
+        name.contains('Pemain Sepakbola') ||
+        name.contains('Pemain Basket') ||
+        name.contains('Pemain Olahraga') ||
         name.contains('Striker') ||
         name.contains('Gelandang') ||
         name.contains('Bek') ||
@@ -1022,8 +1025,16 @@ class Character {
         name.contains('Petenis') ||
         name.contains('MMA') ||
         name.contains('Petinju') ||
-        name.contains('Renang');
-    if (isAthleteJob) {
+        name.contains('Renang') ||
+        name.contains('Atlet') ||
+        name.contains('Atlit');
+  }
+
+  void setJob(String name, int salary) {
+    jobName = name;
+    jobSalary = salary;
+    final bool isAthlete = isAthleteJob(name);
+    if (isAthlete) {
       athleteContractYears = 3;
     }
     final bool alreadyInHistory = jobHistory.any((j) => j['title'] == name && j['endAge'] == null);
@@ -1055,41 +1066,28 @@ class Character {
   }
 
   void generateCoworkersIfEmpty() {
-    if (jobName == null || coworkers.isNotEmpty) return;
+    if (jobName == null) return;
+
+    final String job = jobName!;
+    final bool isAthlete = isAthleteJob(job);
+
+    final bool hasInvalidAthleteCoworkers = !isAthlete &&
+        coworkers.any((cm) => cm['role'] == 'Pemain Utama' || cm.containsKey('teamCategory'));
+    if (hasInvalidAthleteCoworkers) {
+      coworkers.clear();
+      supervisor = null;
+      assistantCoach = null;
+    }
+
+    if (coworkers.isNotEmpty) return;
 
     final random = Random();
-    final String job = jobName!;
 
     final bool isProPlayer = job.startsWith('Pro Player Esport');
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
     final bool isEsport = isProPlayer || isBAOrTalent;
 
     final String jUpper = job.toUpperCase();
-    final bool isAthlete = jUpper.contains('ST') ||
-        jUpper.contains('LW') ||
-        jUpper.contains('RW') ||
-        jUpper.contains('CAM') ||
-        jUpper.contains('CM') ||
-        jUpper.contains('CDM') ||
-        jUpper.contains('CB') ||
-        jUpper.contains('LB') ||
-        jUpper.contains('RB') ||
-        jUpper.contains('GK') ||
-        job.contains('Sepakbola') ||
-        job.contains('Basket') ||
-        job.contains('Pemain') ||
-        job.contains('Striker') ||
-        job.contains('Gelandang') ||
-        job.contains('Bek') ||
-        job.contains('Kiper') ||
-        job.contains('Point Guard') ||
-        job.contains('Shooting Guard') ||
-        job.contains('Center') ||
-        job.contains('Pebalap') ||
-        job.contains('Petenis') ||
-        job.contains('MMA') ||
-        job.contains('Petinju') ||
-        job.contains('Renang');
 
     String getRandomName(String gen) {
       final List<String> fList = gen == 'Laki-laki'
@@ -1148,16 +1146,7 @@ class Character {
     }
 
     if (isAthlete) {
-      final bool isSoccer = jUpper.contains('ST') ||
-          jUpper.contains('LW') ||
-          jUpper.contains('RW') ||
-          jUpper.contains('CAM') ||
-          jUpper.contains('CM') ||
-          jUpper.contains('CDM') ||
-          jUpper.contains('CB') ||
-          jUpper.contains('LB') ||
-          jUpper.contains('RB') ||
-          jUpper.contains('GK') ||
+      final bool isSoccer = RegExp(r'\b(ST|LW|RW|CAM|CM|CDM|CB|LB|RB|GK)\b').hasMatch(jUpper) ||
           job.contains('Sepakbola') ||
           job.contains('Striker') ||
           job.contains('Gelandang') ||

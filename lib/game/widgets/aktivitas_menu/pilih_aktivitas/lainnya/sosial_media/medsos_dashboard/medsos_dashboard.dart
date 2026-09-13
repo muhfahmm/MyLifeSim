@@ -160,8 +160,9 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
                     style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               ],
             ),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             content: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 40), // Padding vertikal sangat besar
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -170,13 +171,13 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
                     'Pilih Jenis Konten:',
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 12),
                   DropdownButtonFormField<String>(
                     value: selectedType,
                     isExpanded: true,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
                     items: <String>[
                       'Dance Video / Komedi',
@@ -188,7 +189,7 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
                     }).toList(),
                     onChanged: (val) => setState(() => selectedType = val!),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
                   const Text(
                     'Konten yang bagus akan mendapatkan lebih banyak pengikut!',
                     style: TextStyle(fontSize: 13, color: Colors.grey),
@@ -203,12 +204,15 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
                 child: const Text('Batal'),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(backgroundColor: Colors.blueAccent),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                ),
                 onPressed: () {
                   Navigator.pop(ctx);
                   _executePostContent(selectedType);
                 },
-                child: const Text('Post Sekarang 🚀', style: TextStyle(color: Colors.white)),
+                child: const Text('Post Sekarang 🚀', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
               ),
             ],
           );
@@ -223,9 +227,25 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: const Text('Uang Tidak Cukup'),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.warning_amber_rounded, color: Colors.orangeAccent),
+              SizedBox(width: 8),
+              Text('Uang Tidak Cukup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            ],
+          ),
           content: Text('Kamu butuh minimal ${CurrencySettings.format(1000000)} untuk membeli pengikut bot.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+          actions: [
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              onPressed: () => Navigator.pop(ctx),
+              child: const Text('Tutup', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ],
         ),
       );
       return;
@@ -282,19 +302,15 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final myPosts = character.posts.where((post) => post['platform'] == platformName).toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Icon(_platformIcon, color: _platformColor),
-            const SizedBox(width: 10),
-            Text('$platformName Dashboard'),
-          ],
-        ),
-        backgroundColor: _platformColor,
+        title: Text('$platformName Dashboard', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.red.shade700,
         foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
@@ -303,7 +319,7 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
           children: [
             // Kartu Info Platform
             Card(
-              elevation: 4,
+              elevation: 2,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
@@ -332,7 +348,10 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
               icon: const Icon(Icons.post_add),
               label: const Text('Posting Konten 📝'),
               style: ElevatedButton.styleFrom(
+                backgroundColor: isDark ? Colors.blue.shade800 : Colors.blue.shade600,
+                foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
@@ -342,9 +361,10 @@ class _MedSosDashboardState extends State<MedSosDashboard> {
               icon: const Icon(Icons.android),
               label: const Text('Beli Pengikut Bot 🤖'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.redAccent,
+                backgroundColor: Colors.redAccent.shade700,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 textStyle: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),

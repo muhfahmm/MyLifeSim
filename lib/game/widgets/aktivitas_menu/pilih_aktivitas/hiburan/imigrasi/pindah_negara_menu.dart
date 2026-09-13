@@ -232,11 +232,11 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
       appBar: AppBar(
         title: const Text(
           'Imigrasi & Kebangsaan ✈️🛂',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        backgroundColor: Colors.blueAccent.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
         bottom: TabBar(
           controller: _tabController,
           labelColor: isDark ? Colors.lightBlueAccent : Colors.blue,

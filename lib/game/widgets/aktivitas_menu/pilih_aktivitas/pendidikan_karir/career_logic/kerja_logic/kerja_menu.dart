@@ -155,21 +155,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     final bool isProPlayer = job.startsWith('Pro Player Esport');
     final bool isBAOrTalent = job.startsWith('Brand Ambassador Esport') || job.startsWith('Talent Esports');
 
-    final bool isAthlete = job.contains('Sepakbola') ||
-        job.contains('Basket') ||
-        job.contains('Pemain') ||
-        job.contains('Striker') ||
-        job.contains('Gelandang') ||
-        job.contains('Bek') ||
-        job.contains('Kiper') ||
-        job.contains('Point Guard') ||
-        job.contains('Shooting Guard') ||
-        job.contains('Center') ||
-        job.contains('Pebalap') ||
-        job.contains('Petenis') ||
-        job.contains('MMA') ||
-        job.contains('Petinju') ||
-        job.contains('Renang');
+    final bool isAthlete = Character.isAthleteJob(job);
 
     if (isAthlete) {
       // Tentukan jumlah pemain utama & cadangan
@@ -361,21 +347,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
     }
 
     final String jobTitle = character.jobName ?? '';
-    final bool isAthlete = jobTitle.contains('Sepakbola') ||
-        jobTitle.contains('Basket') ||
-        jobTitle.contains('Pemain') ||
-        jobTitle.contains('Striker') ||
-        jobTitle.contains('Gelandang') ||
-        jobTitle.contains('Bek') ||
-        jobTitle.contains('Kiper') ||
-        jobTitle.contains('Point Guard') ||
-        jobTitle.contains('Shooting Guard') ||
-        jobTitle.contains('Center') ||
-        jobTitle.contains('Pebalap') ||
-        jobTitle.contains('Petenis') ||
-        jobTitle.contains('MMA') ||
-        jobTitle.contains('Petinju') ||
-        jobTitle.contains('Renang');
+    final bool isAthlete = Character.isAthleteJob(jobTitle);
 
     String positionName = jobTitle;
     String teamBaseName = '';
@@ -574,21 +546,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         team = jobTitle.substring(jobTitle.indexOf('(') + 1, jobTitle.indexOf(')'));
       }
 
-      final bool isAthlete = jobTitle.contains('Sepakbola') ||
-          jobTitle.contains('Basket') ||
-          jobTitle.contains('Pemain') ||
-          jobTitle.contains('Striker') ||
-          jobTitle.contains('Gelandang') ||
-          jobTitle.contains('Bek') ||
-          jobTitle.contains('Kiper') ||
-          jobTitle.contains('Point Guard') ||
-          jobTitle.contains('Shooting Guard') ||
-          jobTitle.contains('Center') ||
-          jobTitle.contains('Pebalap') ||
-          jobTitle.contains('Petenis') ||
-          jobTitle.contains('MMA') ||
-          jobTitle.contains('Petinju') ||
-          jobTitle.contains('Renang');
+      final bool isAthlete = Character.isAthleteJob(jobTitle);
 
       return Scaffold(
         appBar: AppBar(

@@ -88,10 +88,10 @@ class _BerbelanjaPageState extends State<BerbelanjaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Berbelanja 🛒', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: containerBg,
-        foregroundColor: textColor,
-        elevation: 0.5,
+        title: const Text('Berbelanja 🛒', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.teal.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: bgColor,

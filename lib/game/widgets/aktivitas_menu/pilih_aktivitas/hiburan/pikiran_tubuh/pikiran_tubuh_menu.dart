@@ -91,7 +91,7 @@ class _PikiranTubuhPageState extends State<PikiranTubuhPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pikiran & Tubuh 🧘', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Pikiran & Tubuh 🧘', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

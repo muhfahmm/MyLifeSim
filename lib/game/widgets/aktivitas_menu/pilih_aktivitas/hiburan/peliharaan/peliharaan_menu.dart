@@ -108,10 +108,10 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adopsi Peliharaan 🐾', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: containerBg,
-        foregroundColor: textColor,
-        elevation: 0.5,
+        title: const Text('Adopsi Peliharaan 🐾', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.brown.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: bgColor,

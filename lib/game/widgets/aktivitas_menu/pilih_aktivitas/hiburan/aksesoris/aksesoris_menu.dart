@@ -75,10 +75,10 @@ class _TokoAksesorisPageState extends State<TokoAksesorisPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Toko Aksesoris 🛍️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.purple.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,

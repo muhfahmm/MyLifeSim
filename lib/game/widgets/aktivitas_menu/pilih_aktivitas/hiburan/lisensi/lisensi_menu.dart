@@ -63,10 +63,10 @@ class _LisensiPageState extends State<LisensiPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Urus Lisensi 📋', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Urus Lisensi 📋', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.indigo.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -169,13 +169,27 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
+                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Text('Lisensi Dimiliki ✅', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                              content: Text('Kamu sudah memiliki lisensi $name.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                              title: Row(
+                                children: [
+                                  const Icon(Icons.check_circle, color: Colors.green, size: 20),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Lisensi Dimiliki ✅',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text('Kamu sudah memiliki lisensi $name.', style: TextStyle(fontSize: 12.5, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                                 if (name.contains('Paspor'))
                                   ElevatedButton(
@@ -188,7 +202,7 @@ class _LisensiPageState extends State<LisensiPage> {
                                       Navigator.pop(context);
                                       ImigrasimMenuHelper.showImigrasimMenu(context, widget.character, widget.onComplete);
                                     },
-                                    child: const Text('Ke Imigrasi ✈️', style: TextStyle(fontWeight: FontWeight.bold)),
+                                    child: const Text('Ke Imigrasi ✈️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                                   ),
                               ],
                             ),
@@ -201,13 +215,27 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
+                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Text('Lisensi Terkunci 🔒', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                              title: Row(
+                                children: [
+                                  const Icon(Icons.lock, color: Colors.amber, size: 20),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Lisensi Terkunci 🔒',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(fontSize: 12.5, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -220,13 +248,27 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
+                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Text('Belum Cukup Umur 🔞', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                              title: Row(
+                                children: [
+                                  const Icon(Icons.block, color: Colors.redAccent, size: 20),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Belum Cukup Umur 🔞',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text('Kamu belum cukup umur. Kamu baru berumur ${widget.character.age} tahun. Minimal $minAge tahun untuk $name.', style: TextStyle(fontSize: 12.5, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
                                 TextButton(
                                   onPressed: () => Navigator.pop(ctx),
-                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
+                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
                                 ),
                               ],
                             ),
@@ -239,39 +281,79 @@ class _LisensiPageState extends State<LisensiPage> {
                           showDialog(
                             context: context,
                             builder: (ctx) => AlertDialog(
+                              titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                              contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Text('Saldo Kurang 💸', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                              content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
-                              actionsAlignment: MainAxisAlignment.end,
-                              actionsOverflowDirection: VerticalDirection.down,
+                              title: Row(
+                                children: [
+                                  const Text('💸', style: TextStyle(fontSize: 20)),
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Saldo Kurang',
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              content: Text('Uang kamu tidak cukup! Harga lisensi \$${_fmt(cost)}, saldo kamu hanya \$${_fmt(widget.character.money)}.', style: TextStyle(fontSize: 12.5, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
                               actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
-                                ),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.person, size: 14),
-                                  label: const Text('Minta Ibu 👩', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.pink.shade400,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    _handleAskParent(context, isMother: true, license: l);
-                                  },
-                                ),
-                                ElevatedButton.icon(
-                                  icon: const Icon(Icons.person, size: 14),
-                                  label: const Text('Minta Ayah 👨', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.blue.shade600,
-                                    foregroundColor: Colors.white,
-                                  ),
-                                  onPressed: () {
-                                    Navigator.pop(ctx);
-                                    _handleAskParent(context, isMother: false, license: l);
-                                  },
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: ElevatedButton.icon(
+                                            icon: const Icon(Icons.person, size: 14),
+                                            label: const Text('Minta Ibu 👩', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.pink.shade400,
+                                              foregroundColor: Colors.white,
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              elevation: 0,
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pop(ctx);
+                                              _handleAskParent(context, isMother: true, license: l);
+                                            },
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: ElevatedButton.icon(
+                                            icon: const Icon(Icons.person, size: 14),
+                                            label: const Text('Minta Ayah 👨', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.blue.shade600,
+                                              foregroundColor: Colors.white,
+                                              padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
+                                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              elevation: 0,
+                                            ),
+                                            onPressed: () {
+                                              Navigator.pop(ctx);
+                                              _handleAskParent(context, isMother: false, license: l);
+                                            },
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 6),
+                                    TextButton(
+                                      style: TextButton.styleFrom(
+                                        padding: const EdgeInsets.symmetric(vertical: 8),
+                                      ),
+                                      onPressed: () => Navigator.pop(ctx),
+                                      child: Text(
+                                        'Tutup',
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),

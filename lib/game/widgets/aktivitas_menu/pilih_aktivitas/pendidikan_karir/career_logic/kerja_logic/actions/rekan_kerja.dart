@@ -30,16 +30,7 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
   @override
   Widget build(BuildContext context) {
     final String jobNameStr = widget.character.jobName ?? '';
-    final bool isAthlete = jobNameStr.contains('Sepakbola') ||
-        jobNameStr.contains('Basket') ||
-        jobNameStr.contains('Pemain') ||
-        jobNameStr.contains('Striker') ||
-        jobNameStr.contains('Gelandang') ||
-        jobNameStr.contains('Bek') ||
-        jobNameStr.contains('Kiper') ||
-        jobNameStr.contains('Pemain Olahraga') ||
-        jobNameStr.contains('Atlet') ||
-        jobNameStr.contains('Atlit');
+    final bool isAthlete = Character.isAthleteJob(jobNameStr);
     if (isAthlete) {
       return RekanTimPage(
         character: widget.character,
