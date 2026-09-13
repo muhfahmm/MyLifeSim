@@ -306,94 +306,78 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
 
-          // 4. Top Control Bar (Location, Pulsing Skip Hint, History Log, Auto, Skip, Close)
+          // 4. Top Control Bar (Location, History Log, Auto, Skip, Close)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.black54,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: Colors.white24),
-                      ),
-                      child: Text(
-                        _getFormattedLocation(currentNode.background),
-                        style: const TextStyle(
-                          color: Colors.white70,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                        decoration: BoxDecoration(
+                          color: Colors.black54,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(color: Colors.white24),
                         ),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    // Tulisan berkedip / berdenyut lambat "Ketuk layar untuk skip percakapan"
-                    Expanded(
-                      child: FadeTransition(
-                        opacity: _pulseAnimation,
                         child: Text(
-                          'Ketuk layar untuk skip percakapan...',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                            color: Colors.amber.shade300,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w600,
-                            fontStyle: FontStyle.italic,
-                            shadows: const [
-                              Shadow(color: Colors.black, blurRadius: 4),
-                            ],
+                          _getFormattedLocation(currentNode.background),
+                          style: const TextStyle(
+                            color: Colors.white70,
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ),
-                    _buildControlButton(
-                      icon: Icons.history,
-                      label: 'Log',
-                      onTap: _showHistorySheet,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildControlButton(
-                      icon: Icons.play_arrow,
-                      label: _isAuto ? 'Auto ON' : 'Auto',
-                      isActive: _isAuto,
-                      onTap: () {
-                        setState(() {
-                          _isAuto = !_isAuto;
-                        });
-                        if (_isAuto && !_isTyping) {
-                          _scheduleAutoNext();
-                        }
-                      },
-                    ),
-                    const SizedBox(width: 8),
-                    _buildControlButton(
-                      icon: Icons.check_circle_outline,
-                      label: 'Selesai',
-                      isActive: true,
-                      onTap: _finishDialogue,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildControlButton(
-                      icon: Icons.fast_forward,
-                      label: 'Skip',
-                      onTap: _finishDialogue,
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70),
-                      onPressed: _finishDialogue,
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black54,
-                        padding: const EdgeInsets.all(8),
+                      const SizedBox(width: 8),
+                      _buildControlButton(
+                        icon: Icons.history,
+                        label: 'Log',
+                        onTap: _showHistorySheet,
                       ),
-                    ),
-                  ],
+                      const SizedBox(width: 6),
+                      _buildControlButton(
+                        icon: Icons.play_arrow,
+                        label: _isAuto ? 'Auto ON' : 'Auto',
+                        isActive: _isAuto,
+                        onTap: () {
+                          setState(() {
+                            _isAuto = !_isAuto;
+                          });
+                          if (_isAuto && !_isTyping) {
+                            _scheduleAutoNext();
+                          }
+                        },
+                      ),
+                      const SizedBox(width: 6),
+                      _buildControlButton(
+                        icon: Icons.check_circle_outline,
+                        label: 'Selesai',
+                        isActive: true,
+                        onTap: _finishDialogue,
+                      ),
+                      const SizedBox(width: 6),
+                      _buildControlButton(
+                        icon: Icons.fast_forward,
+                        label: 'Skip',
+                        onTap: _finishDialogue,
+                      ),
+                      const SizedBox(width: 6),
+                      IconButton(
+                        icon: const Icon(Icons.close, color: Colors.white70, size: 18),
+                        onPressed: _finishDialogue,
+                        style: IconButton.styleFrom(
+                          backgroundColor: Colors.black54,
+                          padding: const EdgeInsets.all(6),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -579,43 +563,50 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  color: style.badgeBgColor,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: style.badgeBorderColor,
-                    width: 1.2,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: style.badgeBorderColor.withValues(alpha: 0.4),
-                      blurRadius: 6,
+              Flexible(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                  decoration: BoxDecoration(
+                    color: style.badgeBgColor,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(
+                      color: style.badgeBorderColor,
+                      width: 1.2,
                     ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      style.icon,
-                      size: 14,
-                      color: style.textColor,
-                    ),
-                    const SizedBox(width: 6),
-                    Text(
-                      node.speakerName,
-                      style: TextStyle(
-                        color: style.textColor,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 13,
-                        letterSpacing: 0.4,
+                    boxShadow: [
+                      BoxShadow(
+                        color: style.badgeBorderColor.withValues(alpha: 0.4),
+                        blurRadius: 6,
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        style.icon,
+                        size: 14,
+                        color: style.textColor,
+                      ),
+                      const SizedBox(width: 6),
+                      Flexible(
+                        child: Text(
+                          node.speakerName,
+                          style: TextStyle(
+                            color: style.textColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13,
+                            letterSpacing: 0.4,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
+              const SizedBox(width: 8),
               // Tombol Selanjutnya di samping Badge Narasi
               InkWell(
                 onTap: _nextDialogue,

@@ -44,6 +44,7 @@ class ActionMenuScreen extends StatefulWidget {
 
 class _ActionMenuScreenState extends State<ActionMenuScreen> {
   final Random _random = Random();
+  bool _isStatsVisible = true;
 
   // Helper untuk mengambil nilai umur target saat ini
   String _getCurrentAgeValue() {
@@ -3662,26 +3663,26 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                 child: Column(
                   children: [
                     Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
                           backgroundColor: Colors.blue.shade100,
-                          radius: 28,
+                          radius: 22,
                           child: Image(
                             image: AvatarImageCache.getImageProvider(_getTargetAvatarUrl()),
                             loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return const SizedBox(
-                                width: 28,
-                                height: 28,
-                                child:
-                                    CircularProgressIndicator(strokeWidth: 2),
+                                width: 22,
+                                height: 22,
+                                child: CircularProgressIndicator(strokeWidth: 2),
                               );
                             },
-                            width: 56,
-                            height: 56,
+                            width: 44,
+                            height: 44,
                           ),
                         ),
-                        const SizedBox(width: 16),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -3690,20 +3691,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                 final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
                                 final birthYear = currentYear - targetAge;
                                 return Text(
-                                  'Tanggal Lahir: 4 September $birthYear',
+                                  'Tanggal Lahir: 4 September $birthYear | ${_getCurrentAgeValue()}',
                                   style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 10.5,
                                     fontWeight: FontWeight.w600,
                                     color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
                                   ),
                                 );
                               }),
-                              const SizedBox(height: 2),
-                              Text(widget.targetName,
-                                  style: TextStyle(
-                                      fontSize: 17,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white : Colors.black87)),
+                              const SizedBox(height: 1),
+                              Text(
+                                widget.targetName,
+                                style: TextStyle(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.black87,
+                                ),
+                              ),
                               const SizedBox(height: 2),
                               Builder(builder: (context) {
                                 String npcLocation = widget.character.birthCountry ?? 'Indonesia';
@@ -3743,25 +3747,84 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                                 return Text(
                                   'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityText$npcLocation$lFlagStr',
                                   style: TextStyle(
-                                    fontSize: 12,
+                                    fontSize: 11.5,
                                     color: isDark ? Colors.white70 : Colors.black54,
                                     fontWeight: FontWeight.w500,
                                   ),
                                 );
                               }),
                               const SizedBox(height: 2),
-                              Text(
-                                'Hubungan: ${_getDetailedRelationLabel()} | Gender: ${_getTargetGender()} | Umur: ${_getCurrentAgeValue()}',
-                                style: TextStyle(
-                                    fontSize: 12,
-                                    color: isDark ? Colors.white60 : Colors.black54),
-                              ),
+                              Builder(builder: (context) {
+                                final String targetGen = _getTargetGender();
+                                final bool isFemale = targetGen.toLowerCase() == 'perempuan';
+                                return Row(
+                                  children: [
+                                    Text(
+                                      'Hubungan: ${_getDetailedRelationLabel()} • ',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: isDark ? Colors.white60 : Colors.black54,
+                                      ),
+                                    ),
+                                    Icon(
+                                      isFemale ? Icons.female : Icons.male,
+                                      size: 16,
+                                      color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
+                                    ),
+                                  ],
+                                );
+                              }),
                             ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _isStatsVisible = !_isStatsVisible;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Detail & Statistik',
+                              style: TextStyle(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white70 : Colors.black87,
+                              ),
+                            ),
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _isStatsVisible ? 'Sembunyikan' : 'Tampilkan',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  _isStatsVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  size: 18,
+                                  color: Colors.blue,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    if (_isStatsVisible) ...[
+                      const SizedBox(height: 10),
                     Row(
                       children: [
                         Text('Tingkat Hubungan: ',
@@ -4097,6 +4160,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         );
                       },
                     ),
+                    ],
                   ],
                 ),
               ),
