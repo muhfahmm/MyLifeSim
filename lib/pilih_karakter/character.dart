@@ -147,6 +147,7 @@ class Character {
   String? univMajor; // Jurusan Universitas (e.g. 'Teknik Informatika', dll), null jika belum kuliah
   String? univName; // Nama Universitas (e.g. 'Universitas Indonesia (UI)')
   List<String> graduatedMajors = [];
+  List<Map<String, String>> acceptedScholarships = []; // Daftar beasiswa yang sudah lolos tes seleksi
   Map<String, String> educationHistory = {};
   int currentUnivStudyYears = 0;
   String? justGraduatedStage; // Menyimpan jenjang pendidikan yang baru saja lulus (misal 'S1')

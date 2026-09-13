@@ -25,15 +25,63 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
     if (widget.character.intelligence < minIntel) {
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Kecerdasan Tidak Mencukupi'),
-          content: Text('Proyek "${gig['title']}" membutuhkan tingkat kecerdasan minimal $minIntel%. Kecerdasanmu saat ini: ${widget.character.intelligence}%.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Tutup'),
+        builder: (ctx) => Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          backgroundColor: const Color(0xFF1E1E2C),
+          child: Padding(
+            padding: const EdgeInsets.all(22),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.amber.withValues(alpha: 0.3), width: 2),
+                  ),
+                  child: const Icon(Icons.psychology_rounded, color: Colors.amber, size: 36),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Kecerdasan Tidak Mencukupi',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
+                ),
+                const SizedBox(height: 10),
+                RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 13, color: Colors.white70, height: 1.4),
+                    children: [
+                      const TextSpan(text: 'Proyek '),
+                      TextSpan(text: '"${gig['title']}"', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                      const TextSpan(text: ' membutuhkan tingkat kecerdasan minimal '),
+                      TextSpan(text: '$minIntel%', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.amberAccent)),
+                      const TextSpan(text: '.\n\nKecerdasanmu saat ini: '),
+                      TextSpan(text: '${widget.character.intelligence}%', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.redAccent)),
+                      const TextSpan(text: '.'),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      elevation: 0,
+                    ),
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       );
       return;
@@ -50,35 +98,61 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
 
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(gig['icon'] as IconData, color: gig['color'] as Color, size: 20),
-            const SizedBox(width: 8),
-            const Expanded(
-              child: Text(
-                'Proyek Selesai! 🎉',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: const Color(0xFF1E1E2C),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: (gig['color'] as Color).withValues(alpha: 0.2),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: (gig['color'] as Color).withValues(alpha: 0.4), width: 2),
+                ),
+                child: Icon(gig['icon'] as IconData, color: gig['color'] as Color, size: 36),
               ),
-            ),
-          ],
-        ),
-        content: Text(
-          'Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar ${CurrencySettings.format(payout)}.',
-          style: const TextStyle(fontSize: 12, height: 1.35),
-        ),
-        actions: [
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Terima Uang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              const SizedBox(height: 16),
+              const Text(
+                'Proyek Selesai! 🎉',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              const SizedBox(height: 10),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: const TextStyle(fontSize: 13, color: Colors.white70, height: 1.4),
+                  children: [
+                    const TextSpan(text: 'Selamat! Kamu telah menyelesaikan proyek '),
+                    TextSpan(text: '"${gig['title']}"', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+                    const TextSpan(text: ' dengan sukses dan mengantongi uang tunai sebesar '),
+                    TextSpan(text: CurrencySettings.format(payout), style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.greenAccent)),
+                    const TextSpan(text: '.'),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade600,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    elevation: 0,
+                  ),
+                  onPressed: () => Navigator.pop(ctx),
+                  child: const Text('Terima Uang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

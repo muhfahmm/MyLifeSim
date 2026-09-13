@@ -330,7 +330,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                   padding: const EdgeInsets.symmetric(vertical: 9),
                 ),
                 icon: const Icon(Icons.stars, size: 18),
-                label: const Text('Beasiswa Berprestasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                label: const Text('Beasiswa Berprestasi (Tes Seleksi)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 onPressed: () {
                   Navigator.pop(dialogContext);
                   _tryBeasiswa(context, major);
@@ -750,12 +750,144 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     return isNegeri ? ['Universitas Negeri $targetCountry'] : ['Universitas Swasta $targetCountry'];
   }
 
+  void _handleScholarshipEnrollment(
+    BuildContext context, {
+    required String chosenUniv,
+    required String major,
+    required String level,
+    required bool isLuar,
+    required String targetCountry,
+    required String currentCountry,
+  }) {
+    if (isLuar) {
+      final bool hasPassport = widget.character.ownedLicenses.any((l) => l.contains('Paspor'));
+      if (!hasPassport) {
+        showDialog(
+          context: context,
+          builder: (c) => AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
+                SizedBox(width: 8),
+                Text('Paspor Diperlukan! 🛂', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              ],
+            ),
+            content: Text(
+              'Selamat! Kamu lolos tes seleksi beasiswa di $chosenUniv ($targetCountry)! 🌟\n\nNamun, karena universitas ini berada di luar negeri, kamu memerlukan Paspor terlebih dahulu sebelum bisa berkuliah di sana.\n\nSilakan urus lisensi paspor terlebih dahulu.',
+              style: const TextStyle(fontSize: 12),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(c),
+                child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+              ),
+              ElevatedButton.icon(
+                icon: const Icon(Icons.assignment_ind, size: 18),
+                label: const Text('Urus Lisensi 📋', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.pop(c);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => LisensiPage(
+                        character: widget.character,
+                        onComplete: widget.onRefresh,
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        );
+        return;
+      }
+
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Selamat! Kamu lolos tes seleksi beasiswa untuk berkuliah di $chosenUniv (Luar Negeri ($targetCountry)) secara gratis untuk jenjang $level jurusan $major.\n\nKarena universitas ini berada di luar negeri ($targetCountry), kamu perlu memilih kota tempat tinggal dan berimigrasi terlebih dahulu sebelum resmi berkuliah.', style: const TextStyle(fontSize: 12)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(c),
+              child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            ),
+            ElevatedButton.icon(
+              icon: const Icon(Icons.flight_takeoff, size: 18),
+              label: Text('Imigrasi ke $targetCountry ✈️', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () async {
+                Navigator.pop(c);
+                await ImigrasimMenuHelper.processImigrasiToCountry(
+                  context,
+                  widget.character,
+                  targetCountry,
+                  widget.onRefresh,
+                  onCitySelected: () {
+                    const int happyBoost = 35;
+                    widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
+                    widget.character.univName = chosenUniv;
+                    widget.character.univMajor = '$major ($level - Beasiswa Luar Negeri ($targetCountry))';
+                    widget.character.educationHistory[level] = 'Belum Lulus';
+                    widget.character.currentUnivStudyYears = 0;
+                    widget.character.inbox.add('🎓 Resmi Kuliah: Selamat! Kamu resmi terdaftar sebagai mahasiswa beasiswa $chosenUniv di $targetCountry jurusan $major.');
+                    widget.character.acceptedScholarships.removeWhere((s) => s['univName'] == chosenUniv);
+                    widget.onRefresh();
+                    if (Navigator.canPop(context)) Navigator.pop(context);
+                  },
+                );
+              },
+            ),
+          ],
+        ),
+      );
+    } else {
+      // Beasiswa Dalam Negeri
+      const int happyBoost = 35;
+      widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
+      widget.character.univName = chosenUniv;
+      widget.character.univMajor = '$major ($level - Beasiswa Dalam Negeri ($currentCountry))';
+      widget.character.educationHistory[level] = 'Belum Lulus';
+      widget.character.currentUnivStudyYears = 0;
+      widget.character.acceptedScholarships.removeWhere((s) => s['univName'] == chosenUniv);
+      widget.onRefresh();
+      if (Navigator.canPop(context)) Navigator.pop(context);
+      showDialog(
+        context: context,
+        builder: (c) => AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+          contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
+          content: Text('Selamat! Kamu lolos tes seleksi beasiswa. Kamu berkuliah di $chosenUniv (Dalam Negeri ($currentCountry)) secara gratis 100% untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+35%).', style: const TextStyle(fontSize: 12)),
+          actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
+        ),
+      );
+    }
+  }
+
   void _tryBeasiswa(BuildContext context, String major) async {
     final String currentCountry = widget.character.location.isNotEmpty
         ? widget.character.location
         : (widget.character.birthCountry ?? 'Indonesia');
 
-    // Seed acak berdasarkan umur dan nama karakter agar opsi negara luar negeri terefresh tiap bertambahnya usia
     final int seed = widget.character.age * 31 + widget.character.name.hashCode;
     final Random yearRandom = Random(seed);
 
@@ -767,12 +899,10 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
 
     foreignPool.shuffle(yearRandom);
 
-    // 1-2 Beasiswa Luar Negeri
-    final int numForeign = 1 + (yearRandom.nextInt(2)); // 1 atau 2
+    final int numForeign = 1 + (yearRandom.nextInt(2));
 
     final List<Map<String, dynamic>> univItems = [];
 
-    // Tambahkan 1-2 Beasiswa Luar Negeri
     for (int i = 0; i < numForeign && i < foreignPool.length; i++) {
       final String targetCountry = foreignPool[i];
       final bool isNegeri = yearRandom.nextBool();
@@ -786,7 +916,6 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
       });
     }
 
-    // Sisanya Beasiswa Dalam Negeri
     final bool isNegeri = Random().nextBool();
     final localUnivs = await _getUnivList(isNegeri);
     for (final univ in localUnivs) {
@@ -808,150 +937,203 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
         final String chosenUniv = chosenItem['name'];
         final bool isLuar = chosenItem['isLuarNegeri'] == true;
         final String targetCountry = chosenItem['countryName'] ?? currentCountry;
+        final String level = _determineCurrentRegisterLevel();
 
-        if (widget.character.intelligence < 90) {
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Beasiswa Ditolak 🚫', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              content: Text('Lamaran beasiswa di $chosenUniv ditolak karena kecerdasanmu berada di bawah 90%.', style: const TextStyle(fontSize: 12)),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
-            ),
+        final bool alreadyPassed = widget.character.acceptedScholarships.any(
+          (s) => s['univName'] == chosenUniv && s['major'] == major,
+        );
+
+        if (alreadyPassed) {
+          _handleScholarshipEnrollment(
+            context,
+            chosenUniv: chosenUniv,
+            major: major,
+            level: level,
+            isLuar: isLuar,
+            targetCountry: targetCountry,
+            currentCountry: currentCountry,
           );
           return;
         }
 
-        // Jika beasiswa luar negeri, cek apakah user sudah memiliki paspor
-        if (isLuar) {
-          final bool hasPassport = widget.character.ownedLicenses.any((l) => l.contains('Paspor'));
-          if (!hasPassport) {
-            showDialog(
-              context: context,
-              builder: (c) => AlertDialog(
-                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                title: const Row(
-                  children: [
-                    Icon(Icons.warning_amber_rounded, color: Colors.orange, size: 20),
-                    SizedBox(width: 8),
-                    Text('Paspor Diperlukan! 🛂', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                  ],
-                ),
-                content: Text(
-                  'Selamat! Lamaran beasiswamu di $chosenUniv ($targetCountry) diterima! 🌟\n\nNamun, karena universitas ini berada di luar negeri, kamu memerlukan Paspor terlebih dahulu sebelum bisa berkuliah di sana.\n\nSilakan urus lisensi paspor terlebih dahulu.',
-                  style: const TextStyle(fontSize: 12),
-                ),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(c),
-                    child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                  ),
-                  ElevatedButton.icon(
-                    icon: const Icon(Icons.assignment_ind, size: 18),
-                    label: const Text('Urus Lisensi 📋', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(c);
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => LisensiPage(
-                            character: widget.character,
-                            onComplete: widget.onRefresh,
-                          ),
-                        ),
-                      );
-                    },
-                  ),
-                ],
-              ),
-            );
-            return;
-          }
-        }
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TesSeleksiRunnerPage(
+              character: widget.character,
+              chosenUniv: chosenUniv,
+              major: major,
+              level: level,
+              onPassSuccess: () {
+                setState(() {
+                  widget.character.acceptedScholarships.add({
+                    'univName': chosenUniv,
+                    'major': major,
+                    'level': level,
+                    'countryName': targetCountry,
+                    'isLuarNegeri': isLuar ? 'true' : 'false',
+                  });
+                });
 
-        final String level = _determineCurrentRegisterLevel();
-
-        if (isLuar) {
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              content: Text('Selamat! Lamaran beasiswamu disetujui untuk berkuliah di $chosenUniv (Luar Negeri ($targetCountry)) secara gratis untuk jenjang $level jurusan $major.\n\nKarena universitas ini berada di luar negeri ($targetCountry), kamu perlu memilih kota tempat tinggal dan berimigrasi terlebih dahulu sebelum resmi berkuliah.', style: const TextStyle(fontSize: 12)),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(c),
-                  child: const Text('Batal', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                ),
-                ElevatedButton.icon(
-                  icon: const Icon(Icons.flight_takeoff, size: 18),
-                  label: Text('Imigrasi ke $targetCountry ✈️', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  onPressed: () async {
-                    Navigator.pop(c);
-                    await ImigrasimMenuHelper.processImigrasiToCountry(
-                      context,
-                      widget.character,
-                      targetCountry,
-                      widget.onRefresh,
-                      onCitySelected: () {
-                        // SETELAH MEMILIH KOTA & IMIGRASI, BARU RESMI MASUK UNIVERSITAS
-                        const int happyBoost = 30; // 30% untuk Beasiswa
-                        widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
-                        widget.character.univName = chosenUniv;
-                        widget.character.univMajor = '$major ($level - Beasiswa Luar Negeri ($targetCountry))';
-                        widget.character.educationHistory[level] = 'Belum Lulus';
-                        widget.character.currentUnivStudyYears = 0;
-                        widget.character.inbox.add('🎓 Resmi Kuliah: Selamat! Kamu resmi terdaftar sebagai mahasiswa $chosenUniv di $targetCountry jurusan $major.');
-                        widget.onRefresh();
-                        if (Navigator.canPop(context)) Navigator.pop(context);
-                      },
-                    );
-                  },
-                ),
-              ],
+                _handleScholarshipEnrollment(
+                  context,
+                  chosenUniv: chosenUniv,
+                  major: major,
+                  level: level,
+                  isLuar: isLuar,
+                  targetCountry: targetCountry,
+                  currentCountry: currentCountry,
+                );
+              },
             ),
-          );
-        } else {
-          // Beasiswa Dalam Negeri
-          const int happyBoost = 30; // 30% untuk Beasiswa
-          widget.character.happiness = (widget.character.happiness + happyBoost).clamp(0, 100);
-          widget.character.univName = chosenUniv;
-          widget.character.univMajor = '$major ($level - Beasiswa Dalam Negeri ($currentCountry))';
-          widget.character.educationHistory[level] = 'Belum Lulus';
-          widget.character.currentUnivStudyYears = 0;
-          widget.onRefresh();
-          if (Navigator.canPop(context)) Navigator.pop(context);
-          showDialog(
-            context: context,
-            builder: (c) => AlertDialog(
-              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: const Text('Beasiswa Diterima! 🌟', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-              content: Text('Selamat! Lamaran beasiswamu disetujui. Kamu kuliah di $chosenUniv (Dalam Negeri ($currentCountry)) secara gratis untuk jenjang $level jurusan $major. Kebahagiaanmu meningkat (+30%).', style: const TextStyle(fontSize: 12)),
-              actions: [TextButton(onPressed: () => Navigator.pop(c), child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)))],
-            ),
-          );
-        }
+          ),
+        );
       },
+    );
+  }
+
+  Widget _buildAcceptedScholarshipsBanner() {
+    if (widget.character.acceptedScholarships.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final currentCountry = widget.character.location.isNotEmpty
+        ? widget.character.location
+        : (widget.character.birthCountry ?? 'Indonesia');
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Colors.purple.shade900.withValues(alpha: 0.9),
+            Colors.indigo.shade900.withValues(alpha: 0.9),
+          ],
+        ),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.amber.shade400, width: 1.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.shade900.withValues(alpha: 0.4),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.stars_rounded, color: Colors.amber, size: 20),
+              const SizedBox(width: 6),
+              const Text(
+                'Lolos Seleksi Beasiswa ✨',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.amber.withValues(alpha: 0.25),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  '${widget.character.acceptedScholarships.length} Diterima',
+                  style: const TextStyle(
+                    color: Colors.amberAccent,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: widget.character.acceptedScholarships.map((sch) {
+                final country = sch['countryName'] ?? currentCountry;
+                final flag = CountryHelper.getFlagEmoji(country);
+                final iso = CountryHelper.getIsoCode(country);
+                final String displayIso = iso.isNotEmpty ? iso : country.toUpperCase();
+                final String univName = sch['univName'] ?? 'Universitas';
+                final String schMajor = sch['major'] ?? '';
+
+                return Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: () {
+                        final bool isLuar = sch['isLuarNegeri'] == 'true';
+                        _handleScholarshipEnrollment(
+                          context,
+                          chosenUniv: univName,
+                          major: schMajor,
+                          level: sch['level'] ?? 'S1',
+                          isLuar: isLuar,
+                          targetCountry: country,
+                          currentCountry: currentCountry,
+                        );
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.white24, width: 1),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              flag.isNotEmpty ? flag : '🎓',
+                              style: const TextStyle(fontSize: 14),
+                            ),
+                            const SizedBox(width: 6),
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                              decoration: BoxDecoration(
+                                color: Colors.amber.shade700,
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                displayIso,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 10,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              '$univName ($schMajor)',
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -1022,6 +1204,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
           children: [
             _buildSearchInput(),
             _buildCategoryFilter(),
+            _buildAcceptedScholarshipsBanner(),
             const SizedBox(height: 12),
             Row(
               children: [

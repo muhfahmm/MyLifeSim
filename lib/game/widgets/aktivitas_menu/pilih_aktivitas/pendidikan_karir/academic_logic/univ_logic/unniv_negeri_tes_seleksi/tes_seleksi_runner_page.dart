@@ -85,7 +85,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                passed ? 'Lolos Seleksi PTN! 🎉' : 'Gagal Seleksi PTN 🚫',
+                passed ? 'Lolos Seleksi Universitas! 🎉' : 'Gagal Seleksi Universitas 🚫',
                 style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
             ),
@@ -170,7 +170,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
 
     return PopScope(
       canPop: _submitted,
-      onPopInvoked: (didPop) async {
+      onPopInvokedWithResult: (didPop, result) async {
         if (didPop) return;
         final navigator = Navigator.of(context);
         final bool shouldExit = await _showExitConfirmationDialog();
@@ -180,7 +180,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: Text('Tes PTN: ${widget.major}'),
+          title: Text('Tes Seleksi: ${widget.major}'),
           centerTitle: true,
           actions: [
             Padding(
@@ -190,7 +190,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.2),
+                    color: Colors.blue.withValues(alpha: 0.2),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -225,7 +225,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Soal #${_currentIndex + 1} dari ${_questions.length}',
+                            'Soal ${_currentIndex + 1} dari ${_questions.length}',
                             style: TextStyle(
                               color: isDark ? Colors.white70 : Colors.black54,
                               fontWeight: FontWeight.bold,
@@ -236,7 +236,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(
-                              color: Colors.orange.withOpacity(0.2),
+                              color: Colors.orange.withValues(alpha: 0.2),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: const Text(
@@ -293,7 +293,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                               decoration: BoxDecoration(
                                 color: isSelected
                                     ? (isDark
-                                        ? Colors.blue.withOpacity(0.3)
+                                        ? Colors.blue.withValues(alpha: 0.3)
                                         : Colors.blue.shade50)
                                     : (isDark
                                         ? Colors.grey[850]
@@ -360,7 +360,7 @@ class _TesSeleksiRunnerPageState extends State<TesSeleksiRunnerPage> {
                   color: isDark ? Colors.grey[900] : Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha: 0.05),
                       blurRadius: 4,
                       offset: const Offset(0, -2),
                     )
