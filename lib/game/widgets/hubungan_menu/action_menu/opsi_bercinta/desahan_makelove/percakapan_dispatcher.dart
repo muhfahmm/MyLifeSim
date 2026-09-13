@@ -26,12 +26,31 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_lo
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_6tahun/minta_adik_baru/minta_adik_baru_dialogue.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
 
-// Import skrip dialog Usia 10 Tahun
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_pacaran/ajak_pacaran_dialogue.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
-
+import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
+
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_pelukan/beri_pelukan_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_pelukan/beri_pelukan_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_uang_jajan/beri_uang_jajan_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_uang_jajan/beri_uang_jajan_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_hadiah_mainan/beri_hadiah_mainan_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_hadiah_mainan/beri_hadiah_mainan_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_bermain_ke_taman/ajak_bermain_ke_taman_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_bermain_ke_taman/ajak_bermain_ke_taman_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/puji_anak/puji_anak_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/puji_anak/puji_anak_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/marahi_anak/marahi_anak_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/marahi_anak/marahi_anak_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_hadiah/beri_hadiah_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/beri_hadiah/beri_hadiah_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_diskusi/ajak_diskusi_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_diskusi/ajak_diskusi_dialog_user.dart';
+
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_makelove/desahan_makelove_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_makelove/desahan_makelove_dialog_user.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_masturbate/desahan_masturbate_dialog_npc.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_masturbate/desahan_masturbate_dialog_user.dart';
 
 class PercakapanDispatcher {
   /// Membuka Layar Percakapan Visual Novel Secara Otomatis Sesuai Aksi Menu Interaksi
@@ -145,9 +164,51 @@ class PercakapanDispatcher {
       displayActionTitle = 'Ajak Pacaran (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = AjakPacaranDialogue.getDialogue(player: character, npc: npcMap, isAccepted: isAccepted);
     } else if (cleanAction.contains('make love') || cleanAction.contains('bercinta') || cleanAction.contains('makelove')) {
-      nodes = AjakMakeLoveDialogue.getDialogue(player: character, npc: npcMap);
+      displayActionTitle = 'Make Love';
+      calculatedDelta = random.nextInt(15) + 5;
+      final npcList = DesahanMakeloveDialogNpc.getNPCDialogues(npcName: targetName, targetGender: npcGender, partnerName: character.name);
+      final userList = DesahanMakeloveDialogUser.getUserDialogues(playerName: character.name, playerGender: character.gender, partnerName: targetName);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.blush,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.blush,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
     } else if (cleanAction.contains('masturbasi') || cleanAction.contains('masturbate')) {
-      nodes = AjakMasturbateDialogue.getDialogue(player: character, npc: npcMap);
+      displayActionTitle = 'Masturbasi Bersama';
+      calculatedDelta = random.nextInt(10) + 3;
+      final npcList = DesahanMasturbateDialogNpc.getNPCDialogues(npcName: targetName, targetGender: npcGender, partnerName: character.name);
+      final userList = DesahanMasturbateDialogUser.getUserDialogues(playerName: character.name, playerGender: character.gender, partnerName: targetName);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.blush,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.blush,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
     } else if (cleanAction.contains('minta uang')) {
       int? amount;
       bool isAccepted = true;
@@ -252,10 +313,190 @@ class PercakapanDispatcher {
       calculatedDelta = isAccepted ? (random.nextInt(10) + 1) : -(random.nextInt(5) + 1);
       displayActionTitle = 'Minta Mainan (${isAccepted ? "Diterima" : "Ditolak"})';
       nodes = MintaMainanDialogue.getDialogue(player: character, npc: npcMap);
-    } else if (cleanAction.contains('minta pelukan') || cleanAction.contains('pelukan')) {
+    } else if (cleanAction.contains('beri pelukan') || cleanAction == 'pelukan') {
       calculatedDelta = random.nextInt(8) + 3;
-      displayActionTitle = 'Pelukan';
-      nodes = MintaPelukanDialogue.getDialogue(player: character, npc: npcMap);
+      displayActionTitle = 'Beri Pelukan';
+      final npcList = BeriPelukanDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = BeriPelukanDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.blush,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('beri uang jajan') || cleanAction.contains('uang jajan')) {
+      calculatedDelta = random.nextInt(10) + 2;
+      displayActionTitle = 'Beri Uang Jajan';
+      final npcList = BeriUangJajanDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name, amountFormatted: 'Rp 50.000');
+      final userList = BeriUangJajanDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name, amountFormatted: 'Rp 50.000');
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('hadiah mainan') || cleanAction.contains('beri mainan')) {
+      calculatedDelta = random.nextInt(12) + 4;
+      displayActionTitle = 'Beri Hadiah Mainan';
+      final npcList = BeriHadiahMainanDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = BeriHadiahMainanDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('bermain ke taman') || cleanAction.contains('ajak ke taman') || cleanAction.contains('taman')) {
+      calculatedDelta = random.nextInt(15) + 5;
+      displayActionTitle = 'Ajak Bermain ke Taman';
+      final npcList = AjakBermainKeTamanDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = AjakBermainKeTamanDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.park,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.park,
+        ),
+      ];
+    } else if (cleanAction.contains('puji anak') || cleanAction == 'puji') {
+      calculatedDelta = random.nextInt(10) + 3;
+      displayActionTitle = 'Puji Anak';
+      final npcList = PujiAnakDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = PujiAnakDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('marahi anak') || cleanAction == 'marahi') {
+      calculatedDelta = -(random.nextInt(10) + 2);
+      displayActionTitle = 'Marahi Anak';
+      final npcList = MarahiAnakDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = MarahiAnakDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.angry,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.sad,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('beri hadiah') || (cleanAction.contains('hadiah') && !cleanAction.contains('mainan'))) {
+      calculatedDelta = random.nextInt(12) + 3;
+      displayActionTitle = 'Beri Hadiah';
+      final npcList = BeriHadiahDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = BeriHadiahDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
+    } else if (cleanAction.contains('ajak diskusi') || cleanAction.contains('diskusi')) {
+      calculatedDelta = random.nextInt(10) + 4;
+      displayActionTitle = 'Ajak Diskusi';
+      final npcList = AjakDiskusiDialogNpc.getNPCDialogues(npcName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final userList = AjakDiskusiDialogUser.getUserDialogues(childName: targetName, childAge: resolvedTargetAge, parentName: character.name);
+      final int idx = random.nextInt(npcList.length);
+      nodes = [
+        VNDialogueNode(
+          speakerName: character.name,
+          dialogueText: userList[idx],
+          emotion: VNEmotionType.happy,
+          isPlayerSpeaking: true,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+        VNDialogueNode(
+          speakerName: targetName,
+          dialogueText: npcList[idx],
+          emotion: VNEmotionType.happy,
+          outfit: VNOutfitType.casual,
+          background: VNBackgroundType.bedroom,
+        ),
+      ];
     } else if (cleanRole.contains('pacar') || cleanRole.contains('pasangan') || cleanRole.contains('suami') || cleanRole.contains('istri')) {
       nodes = VNDialoguePreset.getDatingDialogue(player: character, npc: npcMap);
     } else if (cleanRole.contains('sekolah') || cleanRole.contains('kuliah') || cleanRole.contains('teman')) {

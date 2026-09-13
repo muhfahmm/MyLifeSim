@@ -806,18 +806,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.face,
             color: Colors.pinkAccent,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 10;
-              _showResultDialog(
-                'Pelukan Hangat',
-                'Kamu memeluk erat bayi/balitamu, ${widget.targetName}. Bayimu merasa sangat hangat dan tenang! (+$relBonus% hubungan)',
-                Icons.face,
-                Colors.pinkAccent,
-                () {
-                  widget.character.happiness =
-                      (widget.character.happiness + 5).clamp(0, 100);
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'beri pelukan',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -826,16 +827,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.child_care,
             color: Colors.lightBlue,
             onTap: () {
-              int relBonus = _random.nextInt(5) + 8;
-              _showResultDialog(
-                'Menimang Bayi',
-                'Kamu menimang-nimang ${widget.targetName} hingga dia tersenyum dan tertidur lelap. (+$relBonus% hubungan)',
-                Icons.child_care,
-                Colors.lightBlue,
-                () {
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'beri pelukan',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -853,17 +857,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   () {},
                 );
               } else {
-                int relBonus = _random.nextInt(8) + 12;
-                _showResultDialog(
-                  'Mainan Balita',
-                  'Kamu membelikan mainan bunyi-bunyian baru seharga \$15 untuk ${widget.targetName}. Dia tertawa gembira! (+$relBonus% hubungan)',
-                  Icons.toys,
-                  Colors.orange,
-                  () {
-                    widget.character.money -= 15;
-                    _updateRelationship(relBonus);
-                    _updateState();
-                  },
+                widget.character.money -= 15;
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge tahun',
+                  targetRealAge: targetAge,
+                  targetGender: _getTargetGender(),
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'hadiah mainan',
+                  onActionComplete: _updateState,
                 );
               }
             },
@@ -877,18 +884,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.face,
             color: Colors.pinkAccent,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 10;
-              _showResultDialog(
-                'Pelukan Hangat',
-                'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
-                Icons.face,
-                Colors.pinkAccent,
-                () {
-                  widget.character.happiness =
-                      (widget.character.happiness + 5).clamp(0, 100);
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'beri pelukan',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -897,16 +905,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.menu_book,
             color: Colors.purple,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 10;
-              _showResultDialog(
-                'Bacakan Dongeng',
-                'Kamu membacakan buku dongeng seru sebelum tidur untuk ${widget.targetName}. Anakmu sangat antusias! (+$relBonus% hubungan)',
-                Icons.menu_book,
-                Colors.purple,
-                () {
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'ajak diskusi',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -924,17 +935,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   () {},
                 );
               } else {
-                int relBonus = _random.nextInt(11) + 12;
-                _showResultDialog(
-                  'Hadiah Mainan',
-                  'Kamu membelikan mainan baru seharga \$25 untuk ${widget.targetName}. Anakmu melompat kegirangan! (+$relBonus% hubungan)',
-                  Icons.toys,
-                  Colors.orange,
-                  () {
-                    widget.character.money -= 25;
-                    _updateRelationship(relBonus);
-                    _updateState();
-                  },
+                widget.character.money -= 25;
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge tahun',
+                  targetRealAge: targetAge,
+                  targetGender: _getTargetGender(),
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'hadiah mainan',
+                  onActionComplete: _updateState,
                 );
               }
             },
@@ -944,42 +958,86 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.park,
             color: Colors.deepOrange,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 12;
-              _showResultDialog(
-                'Bermain di Taman',
-                'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
-                Icons.park,
-                Colors.green,
-                () {
-                  widget.character.happiness =
-                      (widget.character.happiness + 10).clamp(0, 100);
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'bermain ke taman',
+                onActionComplete: _updateState,
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Puji Anak',
+            icon: Icons.thumb_up,
+            color: Colors.blue,
+            onTap: () {
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'puji anak',
+                onActionComplete: _updateState,
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Marahi Anak',
+            icon: Icons.warning_amber_rounded,
+            color: Colors.red,
+            onTap: () {
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'marahi anak',
+                onActionComplete: _updateState,
               );
             },
           ),
         ];
       } else {
-        // Umur 6 - 11 tahun (Anak SD): Uang jajan, pujian, mainan, bermain
+        // Umur 6 - 11 tahun (Anak SD): Uang jajan, pujian, mainan, bermain, dll
         actions = [
           ActionItem(
             label: 'Beri Pelukan',
             icon: Icons.face,
             color: Colors.pinkAccent,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 10;
-              _showResultDialog(
-                'Pelukan Hangat',
-                'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
-                Icons.face,
-                Colors.pinkAccent,
-                () {
-                  widget.character.happiness =
-                      (widget.character.happiness + 5).clamp(0, 100);
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'beri pelukan',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -997,17 +1055,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   () {},
                 );
               } else {
-                int relBonus = _random.nextInt(6) + 10;
-                _showResultDialog(
-                  'Beri Uang Jajan',
-                  'Kamu memberikan uang jajan sebesar \$10 kepada ${widget.targetName}. Dia sangat gembira! (+$relBonus% hubungan)',
-                  Icons.monetization_on,
-                  Colors.green,
-                  () {
-                    widget.character.money -= 10;
-                    _updateRelationship(relBonus);
-                    _updateState();
-                  },
+                widget.character.money -= 10;
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge tahun',
+                  targetRealAge: targetAge,
+                  targetGender: _getTargetGender(),
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'beri uang jajan',
+                  onActionComplete: _updateState,
                 );
               }
             },
@@ -1026,17 +1087,20 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   () {},
                 );
               } else {
-                int relBonus = _random.nextInt(11) + 15;
-                _showResultDialog(
-                  'Hadiah Mainan',
-                  'Kamu membelikan mainan baru seharga \$30 untuk ${widget.targetName}. Anakmu langsung melompat kegirangan! (+$relBonus% hubungan)',
-                  Icons.toys,
-                  Colors.orange,
-                  () {
-                    widget.character.money -= 30;
-                    _updateRelationship(relBonus);
-                    _updateState();
-                  },
+                widget.character.money -= 30;
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge tahun',
+                  targetRealAge: targetAge,
+                  targetGender: _getTargetGender(),
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'hadiah mainan',
+                  onActionComplete: _updateState,
                 );
               }
             },
@@ -1046,18 +1110,19 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.park,
             color: Colors.deepOrange,
             onTap: () {
-              int relBonus = _random.nextInt(6) + 12;
-              _showResultDialog(
-                'Bermain di Taman',
-                'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
-                Icons.park,
-                Colors.green,
-                () {
-                  widget.character.happiness =
-                      (widget.character.happiness + 10).clamp(0, 100);
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'bermain ke taman',
+                onActionComplete: _updateState,
               );
             },
           ),
@@ -1066,16 +1131,93 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
             icon: Icons.thumb_up,
             color: Colors.blue,
             onTap: () {
-              int relBonus = _random.nextInt(5) + 8;
-              _showResultDialog(
-                'Pujian Orang Tua',
-                'Kamu memuji kepintaran dan tingkah laku baik ${widget.targetName}. (+$relBonus% hubungan)',
-                Icons.thumb_up,
-                Colors.blue,
-                () {
-                  _updateRelationship(relBonus);
-                  _updateState();
-                },
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'puji anak',
+                onActionComplete: _updateState,
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Marahi Anak',
+            icon: Icons.warning_amber_rounded,
+            color: Colors.red,
+            onTap: () {
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'marahi anak',
+                onActionComplete: _updateState,
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Beri Hadiah',
+            icon: Icons.card_giftcard,
+            color: Colors.purple,
+            onTap: () {
+              if (widget.character.money < 50) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk membelikan hadiah (\$50).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+              } else {
+                widget.character.money -= 50;
+                PercakapanDispatcher.dispatchAction(
+                  context: context,
+                  character: widget.character,
+                  targetName: widget.targetName,
+                  targetRole: widget.targetRole,
+                  targetAge: '$targetAge tahun',
+                  targetRealAge: targetAge,
+                  targetGender: _getTargetGender(),
+                  targetAvatarUrl: _getTargetAvatarUrl(),
+                  playerAvatarUrl: _getPlayerAvatarUrl(),
+                  relationshipValue: _getCurrentRelationshipValue(),
+                  actionType: 'beri hadiah',
+                  onActionComplete: _updateState,
+                );
+              }
+            },
+          ),
+          ActionItem(
+            label: 'Ajak Diskusi',
+            icon: Icons.forum,
+            color: Colors.teal,
+            onTap: () {
+              PercakapanDispatcher.dispatchAction(
+                context: context,
+                character: widget.character,
+                targetName: widget.targetName,
+                targetRole: widget.targetRole,
+                targetAge: '$targetAge tahun',
+                targetRealAge: targetAge,
+                targetGender: _getTargetGender(),
+                targetAvatarUrl: _getTargetAvatarUrl(),
+                playerAvatarUrl: _getPlayerAvatarUrl(),
+                relationshipValue: _getCurrentRelationshipValue(),
+                actionType: 'ajak diskusi',
+                onActionComplete: _updateState,
               );
             },
           ),
