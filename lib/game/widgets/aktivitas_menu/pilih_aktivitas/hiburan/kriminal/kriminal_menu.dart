@@ -107,8 +107,15 @@ class _KriminalPageState extends State<KriminalPage> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(ctx);
+              Navigator.pop(ctx); // Close Tertangkap dialog
               widget.onComplete();
+              if (tertangkap) {
+                // Pop KriminalPage and also pop the Pilih Aktivitas modal sheet to return to the character profile screen
+                Navigator.of(context).pop();
+                if (Navigator.canPop(context)) {
+                  Navigator.of(context).pop();
+                }
+              }
             },
             child: const Text('OK'),
           )
