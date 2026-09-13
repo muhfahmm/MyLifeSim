@@ -260,16 +260,24 @@ class ThreesomeHelper {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
+          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: const Row(
             children: [
-              Icon(Icons.bolt, color: Colors.purple),
+              Icon(Icons.bolt, color: Colors.purple, size: 20),
               SizedBox(width: 8),
-              Text('Sukses Fantastis! 🔥', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  'Sukses Fantastis! 🔥',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
             ],
           ),
           content: Text(
             'Luar biasa! $partnerNamesText menerima ajakanmu dengan gairah yang membara. Pengalaman $someName kalian $loc pada waktu $time berjalan sangat memuaskan!$detailsText',
-            style: const TextStyle(fontSize: 14),
+            style: const TextStyle(fontSize: 12.5, height: 1.35),
           ),
           actions: [
             TextButton(
@@ -277,7 +285,7 @@ class ThreesomeHelper {
                 Navigator.pop(context);
                 updateState();
               },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
             ),
           ],
         ),

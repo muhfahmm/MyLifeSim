@@ -358,7 +358,7 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                   child: Padding(
                     padding: EdgeInsets.all(isMobile ? 10 : 12),
                     child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         CircleAvatar(
                           radius: isMobile ? 18 : 20,
@@ -370,35 +370,92 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                job['title'],
-                                style: TextStyle(
-                                  fontSize: isMobile ? 13 : 15,
-                                  fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
-                                ),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      job['title'],
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 13.5 : 15,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : Colors.black87,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  ElevatedButton.icon(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: canApply ? Colors.green.shade600 : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                                      foregroundColor: canApply ? Colors.white : (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                                      padding: EdgeInsets.symmetric(
+                                        horizontal: isMobile ? 8 : 12,
+                                        vertical: isMobile ? 4 : 6,
+                                      ),
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      minimumSize: Size.zero,
+                                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      elevation: 0,
+                                    ),
+                                    onPressed: () {
+                                      if (!canApply) {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(
+                                            content: Text(
+                                              !meetsIntel
+                                                  ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
+                                                  : (!_isUnivGraduated
+                                                      ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
+                                                      : 'Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}'),
+                                            ),
+                                          ),
+                                        );
+                                        return;
+                                      }
+                                      _applyJob(job);
+                                    },
+                                    icon: Icon(
+                                      canApply ? Icons.check_circle_outline : Icons.lock,
+                                      size: 13,
+                                      color: canApply ? Colors.white : (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+                                    ),
+                                    label: Text(
+                                      canApply ? 'Lamar' : 'Terkunci',
+                                      style: TextStyle(
+                                        fontSize: isMobile ? 11 : 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 'Gaji: ${CurrencySettings.format((job['salary'] * _salaryMultiplier).round())}/tahun • ${job['category']}',
                                 style: TextStyle(
-                                  fontSize: isMobile ? 11 : 12,
+                                  fontSize: isMobile ? 10.5 : 11.5,
                                   color: isDark ? Colors.white70 : Colors.black54,
                                 ),
                               ),
+                              const SizedBox(height: 2),
                               Text(
                                 job['desc'],
                                 style: TextStyle(
-                                  fontSize: isMobile ? 10.5 : 11.5,
-                                  color: isDark ? Colors.white60 : Colors.grey,
-                                  height: 1.2,
+                                  fontSize: isMobile ? 10 : 11,
+                                  color: isDark ? Colors.white60 : Colors.grey.shade600,
+                                  height: 1.25,
                                 ),
                               ),
+                              const SizedBox(height: 3),
                               if (character.bypassDegreeRequirement)
                                 Text(
                                   '🔓 Syarat Gelar Sarjana Dibebaskan (God Mode)',
                                   style: TextStyle(
-                                    fontSize: isMobile ? 10 : 11,
+                                    fontSize: isMobile ? 9.5 : 10.5,
                                     fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.greenAccent : Colors.green.shade700,
                                   ),
@@ -407,70 +464,20 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                                 Text(
                                   '⚠️ Membutuhkan gelar Sarjana (S1) di bidang: ${_formatAllowedMajors(allowed)}',
                                   style: TextStyle(
-                                    fontSize: isMobile ? 10 : 11,
+                                    fontSize: isMobile ? 9.5 : 10.5,
                                     fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                                    color: isDark ? Colors.orangeAccent : Colors.orange.shade800,
                                   ),
                                 )
                               else if (!meetsGelar)
                                 Text(
                                   '⚠️ Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}.\nJurusanmu saat ini: $_currentMajorsStr.',
                                   style: TextStyle(
-                                    fontSize: isMobile ? 10 : 11,
+                                    fontSize: isMobile ? 9.5 : 10.5,
                                     fontWeight: FontWeight.bold,
-                                    color: isDark ? Colors.orangeAccent : Colors.orange,
+                                    color: isDark ? Colors.orangeAccent : Colors.orange.shade800,
                                   ),
                                 ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: canApply ? Colors.green.shade600 : Colors.grey.shade700,
-                            foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(
-                              horizontal: isMobile ? 10 : 14,
-                              vertical: isMobile ? 6 : 8,
-                            ),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            minimumSize: Size.zero,
-                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                          ),
-                          onPressed: () {
-                            if (!canApply) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    !meetsIntel
-                                        ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
-                                        : (!_isUnivGraduated
-                                            ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
-                                            : 'Jurusan Anda tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}. Jurusanmu: $_currentMajorsStr.'),
-                                  ),
-                                  backgroundColor: Colors.red,
-                                ),
-                              );
-                              return;
-                            }
-                            _applyJob(job);
-                          },
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (!canApply) ...[
-                                Icon(Icons.lock, size: isMobile ? 12 : 14, color: Colors.white70),
-                                const SizedBox(width: 4),
-                              ],
-                              Text(
-                                canApply ? 'Lamar' : 'Terkunci',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: isMobile ? 11 : 12,
-                                ),
-                              ),
                             ],
                           ),
                         ),

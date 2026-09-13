@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/school_menu_page.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'dart:math';
 import 'actions/belajar.dart';
 import 'actions/kelas.dart';
@@ -24,29 +25,31 @@ class SchoolMenuPage extends StatefulWidget {
 
 class _SchoolMenuPageState extends State<SchoolMenuPage> {
   void _showBolosDialog(BuildContext context) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Rencana Membolos 🏃‍♂️', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text(
-          'Apakah kamu yakin ingin membolos sekolah hari ini? '
-          'Tindakan ini berisiko ketahuan guru atau orang tuamu.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _executeBolosSekolah(context);
-            },
-            child: const Text('Membolos Sekarang', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+      title: 'Rencana Membolos 🏃‍♂️',
+      content: const Text(
+        'Apakah kamu yakin ingin membolos sekolah hari ini?\n'
+        'Tindakan ini berisiko ketahuan guru atau orang tuamu.',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.redAccent,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            _executeBolosSekolah(context);
+          },
+          child: const Text('Membolos Sekarang', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
@@ -79,29 +82,31 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
   }
 
   void _showKeluarDialog(BuildContext context) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        title: const Text('Keluar / Putus Sekolah 🚪', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text(
-          'Keluar dari sekolah secara sepihak akan membatasi opsi karir berkualitas di masa depan. '
-          'Apakah kamu yakin ingin putus sekolah sekarang?',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.black),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _executeKeluarSekolah(context);
-            },
-            child: const Text('Putus Sekolah', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      title: 'Keluar / Putus Sekolah 🚪',
+      content: const Text(
+        'Keluar dari sekolah secara sepihak akan membatasi opsi karir berkualitas di masa depan.\n'
+        'Apakah kamu yakin ingin putus sekolah sekarang?',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade700,
+            elevation: 0,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            _executeKeluarSekolah(context);
+          },
+          child: const Text('Putus Sekolah', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
@@ -127,18 +132,16 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
   }
 
   void _showOutcomeDialog(BuildContext context, String title, String content) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (c) => AlertDialog(
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      title: title,
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
+        ),
+      ],
     );
   }
 

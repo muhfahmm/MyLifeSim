@@ -101,16 +101,21 @@ class MLEnjoymentModal {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: Row(
             children: [
-              const Icon(Icons.favorite, color: Colors.pink, size: 28),
+              const Icon(Icons.favorite, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
-              Text(
-                'Hasil Hubungan Intim 💒',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: isDark ? Colors.white : Colors.black87,
+              Expanded(
+                child: Text(
+                  'Hasil Hubungan Intim 💒',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ),
             ],
@@ -239,6 +244,7 @@ class MLEnjoymentModal {
                 'Lanjutkan',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 13,
                   color: isDark ? Colors.blueAccent : Colors.blue,
                 ),
               ),

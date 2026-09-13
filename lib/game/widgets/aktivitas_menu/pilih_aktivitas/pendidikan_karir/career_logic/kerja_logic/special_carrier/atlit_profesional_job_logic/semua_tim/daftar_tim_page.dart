@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
 import '../daftar_tim/database_tim_olahraga.dart';
@@ -238,7 +239,13 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
             children: [
               Icon(Icons.cancel, color: Colors.red, size: 28),
               SizedBox(width: 8),
-              Text('Penawaran Ditolak 🚫', style: TextStyle(fontWeight: FontWeight.bold)),
+              Expanded(
+                child: Text(
+                  'Penawaran Ditolak 🚫',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
           ),
           content: Text(
@@ -329,23 +336,26 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
     });
     widget.onRefresh();
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Kontrak Diterima! 🎉🏆'),
-        content: Text(
-          'Selamat! Manajemen ${teamItem['name']} menyetujui pengajuan kontrakmu selama $contractYears Tahun!\n\n'
-          'Kamu resmi bergabung sebagai $fullJobTitle asal ${teamItem['origin']} (${teamItem['league']}) dengan nilai kontrak ${CurrencySettings.format(finalSalary)}/tahun.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
-            },
-            child: const Text('Luar Biasa!'),
-          ),
-        ],
+      title: 'Kontrak Diterima! 🎉🏆',
+      content: Text(
+        'Selamat! Manajemen ${teamItem['name']} menyetujui pengajuan kontrakmu selama $contractYears Tahun!\n\n'
+        'Kamu resmi bergabung sebagai $fullJobTitle asal ${teamItem['origin']} (${teamItem['league']}) dengan nilai kontrak ${CurrencySettings.format(finalSalary)}/tahun.',
       ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green.shade700,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+          },
+          child: const Text('Luar Biasa! 🏆', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
@@ -570,18 +580,19 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                                     'Kontrak $yrs Tahun',
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 13,
+                                      fontSize: 12.5,
                                       color: isDark ? Colors.white : Colors.blue.shade900,
                                     ),
                                   ),
+                                  const SizedBox(width: 4),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
                                       color: ch >= 80 ? Colors.green.withValues(alpha: 0.15) : (ch >= 50 ? Colors.amber.withValues(alpha: 0.15) : Colors.red.withValues(alpha: 0.15)),
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Text(
-                                      'Peluang Diterima: $ch%',
+                                      'Peluang: $ch%',
                                       style: TextStyle(
                                         fontSize: 10,
                                         fontWeight: FontWeight.bold,

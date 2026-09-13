@@ -133,16 +133,16 @@ class AjakanMasturbasiDialog {
           title: Row(
             children: [
               if (isGay || isLesbian)
-                const Text('🏳️‍🌈', style: TextStyle(fontSize: 28))
+                const Text('🏳️‍🌈', style: TextStyle(fontSize: 22))
               else
-                const Icon(Icons.favorite, color: Colors.pink, size: 28),
+                const Icon(Icons.favorite, color: Colors.pink, size: 24),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   dialogTitle,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 18,
+                    fontSize: 16,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
@@ -156,7 +156,8 @@ class AjakanMasturbasiDialog {
               Text(
                 dialogBody,
                 style: TextStyle(
-                  fontSize: 14,
+                  fontSize: 12.5,
+                  height: 1.35,
                   color: isDark ? Colors.white70 : Colors.black87,
                 ),
               ),
@@ -173,90 +174,102 @@ class AjakanMasturbasiDialog {
               ],
             ],
           ),
-          actionsAlignment: MainAxisAlignment.end,
           actions: [
-            if (showReportToMother)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                  _executeReport(context, character, relationType, viewerName, 'Ibu', onComplete);
-                },
-                child: Text(
-                  'Laporkan ke Ibu',
-                  style: TextStyle(
-                    color: isDark ? Colors.orangeAccent : Colors.orange,
-                    fontWeight: FontWeight.bold,
+            Wrap(
+              alignment: WrapAlignment.end,
+              spacing: 6,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                if (showReportToMother)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _executeReport(context, character, relationType, viewerName, 'Ibu', onComplete);
+                    },
+                    child: Text(
+                      'Laporkan ke Ibu',
+                      style: TextStyle(
+                        color: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                if (showReportToFather)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _executeReport(context, character, relationType, viewerName, 'Ayah', onComplete);
+                    },
+                    child: Text(
+                      'Laporkan ke Ayah',
+                      style: TextStyle(
+                        color: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                if (showReportToParents)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _executeReportSibling(context, character, relationType, viewerName, onComplete);
+                    },
+                    child: Text(
+                      'Laporkan ke Orang Tua',
+                      style: TextStyle(
+                        color: isDark ? Colors.orangeAccent : Colors.orange.shade800,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    if (isUserInitiated) {
+                      if (onComplete != null) onComplete();
+                    } else {
+                      _executeReject(context, character, relationType, viewerName, onComplete);
+                    }
+                  },
+                  child: Text(
+                    isUserInitiated ? 'Batal' : 'Tolak',
+                    style: TextStyle(
+                      color: isDark ? Colors.redAccent : Colors.red.shade700,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13,
+                    ),
                   ),
                 ),
-              ),
-            if (showReportToFather)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                  _executeReport(context, character, relationType, viewerName, 'Ayah', onComplete);
-                },
-                child: Text(
-                  'Laporkan ke Ayah',
-                  style: TextStyle(
-                    color: isDark ? Colors.orangeAccent : Colors.orange,
-                    fontWeight: FontWeight.bold,
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isDark ? Colors.green.shade700 : const Color(0xFF28A745),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  ),
+                  onPressed: () {
+                    Navigator.pop(dialogContext);
+                    if (isUserInitiated) {
+                      _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
+                    } else {
+                      _executeAccept(context, character, relationType, viewerName, partnerDesc,
+                          preGeneratedLokasi!, preGeneratedWaktu!, onComplete);
+                    }
+                  },
+                  child: Text(
+                    isUserInitiated ? 'Lanjutkan ➡️' : 'Terima ajakan masturbasi',
+                    style: const TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-            if (showReportToParents)
-              TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                  _executeReportSibling(context, character, relationType, viewerName, onComplete);
-                },
-                child: Text(
-                  'Laporkan ke Orang Tua',
-                  style: TextStyle(
-                    color: isDark ? Colors.orangeAccent : Colors.orange,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            // Konfirmasi → untuk user-initiated lanjut ke picker, untuk incoming langsung ke result
-            Container(
-              decoration: BoxDecoration(
-                color: isDark ? Colors.green.shade900 : const Color(0xFFD4EDDA),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 4),
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pop(dialogContext);
-                  if (isUserInitiated) {
-                    // User mengajak → picker tempat → picker waktu → result
-                    _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
-                  } else {
-                    // Partner mengajak → langsung ke result dengan lokasi & waktu pre-generated
-                    _executeAccept(context, character, relationType, viewerName, partnerDesc,
-                        preGeneratedLokasi!, preGeneratedWaktu!, onComplete);
-                  }
-                },
-                child: Text(
-                  isUserInitiated ? 'Lanjutkan \u27A1' : 'Terima ajakan masturbasi',
-                  style: TextStyle(
-                    color: isDark ? Colors.greenAccent : const Color(0xFF28A745),
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                _executeReject(context, character, relationType, viewerName, onComplete);
-              },
-              child: Text(
-                isUserInitiated ? 'Batal' : 'Tolak',
-                style: TextStyle(
-                  color: isDark ? Colors.redAccent : Colors.red,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              ],
             ),
           ],
         );

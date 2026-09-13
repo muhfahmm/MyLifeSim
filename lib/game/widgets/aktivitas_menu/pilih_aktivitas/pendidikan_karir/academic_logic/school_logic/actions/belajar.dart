@@ -181,32 +181,67 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
       ),
-      color: isDark ? Colors.grey.shade800 : null,
-      child: ListTile(
-        leading: Icon(icon, color: color, size: 28),
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        subtitle: Text(
-          '$subtitle\n($gain)',
-          style: TextStyle(
-            color: isDark ? Colors.white70 : Colors.black54,
-          ),
-        ),
-        isThreeLine: true,
-        trailing: Icon(
-          Icons.arrow_forward_ios,
-          size: 14,
-          color: isDark ? Colors.white54 : Colors.grey,
-        ),
+      color: isDark ? Colors.grey.shade800 : Colors.white,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
         onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(14.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 24),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white70 : Colors.black54,
+                      ),
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      '($gain)',
+                      style: TextStyle(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(
+                Icons.arrow_forward_ios,
+                size: 14,
+                color: isDark ? Colors.white54 : Colors.grey.shade400,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

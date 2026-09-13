@@ -212,67 +212,15 @@ class _KelasActionPageState extends State<KelasActionPage> {
                 );
 
                 return Card(
-                  elevation: 2,
+                  elevation: 1,
                   margin: const EdgeInsets.only(bottom: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  color: isDark ? Colors.grey.shade800 : null,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.transparent,
-                      backgroundImage: NetworkImage(avatarUrl),
-                    ),
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                        (() {
-                          final String? relStr = widget.character.getPartnerRelation(name);
-                          if (relStr == null) return const SizedBox.shrink();
-                          return Container(
-                            margin: const EdgeInsets.only(left: 8),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.pink,
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              relStr,
-                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                            ),
-                          );
-                        }()),
-                      ],
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Teman Sekelas • Umur: $ageVal tahun • Kecerdasan: ${cm['intelligence'] ?? '50'}%',
-                          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          'Hubungan: $rel%',
-                          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                        ),
-                        const SizedBox(height: 4),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: rel / 100.0,
-                            color: rel > 70 ? Colors.green : (rel > 40 ? Colors.orange : Colors.red),
-                            backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                            minHeight: 6,
-                          ),
-                        ),
-                      ],
-                    ),
-                    trailing: const Icon(Icons.chevron_right),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                  ),
+                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(14),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -288,6 +236,93 @@ class _KelasActionPageState extends State<KelasActionPage> {
                         ),
                       );
                     },
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: Colors.transparent,
+                            backgroundImage: NetworkImage(avatarUrl),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: isDark ? Colors.white : Colors.black87,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    (() {
+                                      final String? relStr = widget.character.getPartnerRelation(name);
+                                      if (relStr == null) return const SizedBox.shrink();
+                                      return Container(
+                                        margin: const EdgeInsets.only(left: 6),
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.pink,
+                                          borderRadius: BorderRadius.circular(6),
+                                        ),
+                                        child: Text(
+                                          relStr,
+                                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                                        ),
+                                      );
+                                    }()),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  'Teman Sekelas • Umur: $ageVal tahun • Kecerdasan: ${cm['intelligence'] ?? '50'}%',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white70 : Colors.grey.shade700,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Hubungan: $rel%',
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
+                                        color: isDark ? Colors.white70 : Colors.black87,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(4),
+                                        child: LinearProgressIndicator(
+                                          value: rel / 100.0,
+                                          color: rel > 70 ? Colors.green : (rel > 40 ? Colors.orange : Colors.red),
+                                          backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                          minHeight: 6,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(Icons.chevron_right, color: isDark ? Colors.white54 : Colors.grey.shade400, size: 20),
+                        ],
+                      ),
+                    ),
                   ),
                 );
               },

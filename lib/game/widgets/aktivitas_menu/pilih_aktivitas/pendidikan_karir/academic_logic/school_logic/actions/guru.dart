@@ -139,54 +139,14 @@ class _GuruActionPageState extends State<GuruActionPage> {
     );
 
     return Card(
-      elevation: 2,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 1,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+      ),
       color: isDark ? Colors.grey.shade800 : Colors.white,
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.transparent,
-          backgroundImage: NetworkImage(avatarUrl),
-        ),
-        title: Text(
-          name, 
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '$role • Umur: $age tahun', 
-              style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.grey.shade600, 
-                fontSize: 13,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              'Hubungan: $rel%',
-              style: TextStyle(
-                color: isDark ? Colors.white70 : Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 4),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: LinearProgressIndicator(
-                value: rel / 100.0,
-                color: rel > 70 ? Colors.green : (rel > 40 ? Colors.orange : Colors.red),
-                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                minHeight: 6,
-              ),
-            ),
-          ],
-        ),
-        trailing: Icon(
-          Icons.chevron_right,
-          color: isDark ? Colors.white70 : Colors.grey,
-        ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
         onTap: () {
           Navigator.push(
             context,
@@ -203,6 +163,74 @@ class _GuruActionPageState extends State<GuruActionPage> {
             ),
           );
         },
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.transparent,
+                backgroundImage: NetworkImage(avatarUrl),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '$role • Umur: $age tahun',
+                      style: TextStyle(
+                        color: isDark ? Colors.white70 : Colors.grey.shade700,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          'Hubungan: $rel%',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? Colors.white70 : Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(4),
+                            child: LinearProgressIndicator(
+                              value: rel / 100.0,
+                              color: rel > 70 ? Colors.green : (rel > 40 ? Colors.orange : Colors.red),
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                              minHeight: 6,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              Icon(
+                Icons.chevron_right,
+                color: isDark ? Colors.white54 : Colors.grey.shade400,
+                size: 20,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

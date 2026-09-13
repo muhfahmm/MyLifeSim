@@ -90,46 +90,55 @@ class _ExtracurricularActionPageState extends State<ExtracurricularActionPage> {
     final sports = ['Sepakbola', 'Voli', 'Basket', 'Badminton', 'Renang'];
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.sports_soccer, color: Colors.orange),
-            SizedBox(width: 8),
-            Text('Pilih Cabang Olahraga'),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: sports.map((sport) {
-            IconData sportIcon = Icons.sports;
-            if (sport == 'Sepakbola') sportIcon = Icons.sports_soccer;
-            if (sport == 'Voli') sportIcon = Icons.sports_volleyball;
-            if (sport == 'Basket') sportIcon = Icons.sports_basketball;
-            if (sport == 'Badminton') sportIcon = Icons.sports_tennis;
-            if (sport == 'Renang') sportIcon = Icons.pool;
-
-            bool isSportJoined = widget.character.joinedExtracurriculars.contains('Olahraga ($sport)');
-
-            return ListTile(
-              leading: Icon(sportIcon, color: isSportJoined ? Colors.green : Colors.orange),
-              title: Row(
-                children: [
-                  Text(sport, style: const TextStyle(fontWeight: FontWeight.bold)),
-                  if (isSportJoined) ...[
-                    const SizedBox(width: 8),
-                    const Icon(Icons.check_circle, color: Colors.green, size: 18),
-                  ],
-                ],
+      builder: (ctx) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          title: const Row(
+            children: [
+              Icon(Icons.sports_soccer, color: Colors.orange),
+              SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pilih Cabang Olahraga',
+                  style: TextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-              subtitle: isSportJoined ? const Text('Sudah diikuti (Ketuk untuk latihan)', style: TextStyle(color: Colors.green, fontSize: 12)) : null,
-              onTap: () {
-                Navigator.pop(ctx);
-                _joinOrPracticeSport(sport);
-              },
-            );
-          }).toList(),
-        ),
-      ),
+            ],
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: sports.map((sport) {
+              IconData sportIcon = Icons.sports;
+              if (sport == 'Sepakbola') sportIcon = Icons.sports_soccer;
+              if (sport == 'Voli') sportIcon = Icons.sports_volleyball;
+              if (sport == 'Basket') sportIcon = Icons.sports_basketball;
+              if (sport == 'Badminton') sportIcon = Icons.sports_tennis;
+              if (sport == 'Renang') sportIcon = Icons.pool;
+
+              bool isSportJoined = widget.character.joinedExtracurriculars.contains('Olahraga ($sport)');
+
+              return ListTile(
+                leading: Icon(sportIcon, color: isSportJoined ? Colors.green : Colors.orange),
+                title: Row(
+                  children: [
+                    Text(sport, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    if (isSportJoined) ...[
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check_circle, color: Colors.green, size: 18),
+                    ],
+                  ],
+                ),
+                subtitle: isSportJoined ? const Text('Sudah diikuti (Ketuk untuk latihan)', style: TextStyle(color: Colors.green, fontSize: 12)) : null,
+                onTap: () {
+                  Navigator.pop(ctx);
+                  _joinOrPracticeSport(sport);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
 

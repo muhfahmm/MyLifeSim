@@ -3220,16 +3220,19 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
           canPop: false,
           child: AlertDialog(
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: Row(
             children: [
               isGayOrLesbian
-                  ? const Text('🏳️‍🌈', style: TextStyle(fontSize: 24))
-                  : Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 24),
+                  ? const Text('🏳️‍🌈', style: TextStyle(fontSize: 20))
+                  : Icon(type == 'Ajak Pacaran' ? Icons.favorite : Icons.heart_broken, color: Colors.pink, size: 20),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   dialogTitle,
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),
             ],
@@ -3239,7 +3242,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(dialogBody, style: const TextStyle(fontSize: 12, height: 1.35)),
+                    Text(dialogBody, style: const TextStyle(fontSize: 12.5, height: 1.35)),
                     const SizedBox(height: 10),
                     Row(
                       children: [
@@ -3258,7 +3261,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     ),
                   ],
                 )
-              : Text(dialogBody, style: const TextStyle(fontSize: 12, height: 1.35)),
+              : Text(dialogBody, style: const TextStyle(fontSize: 12.5, height: 1.35)),
           actions: [
             if (showReportToMother)
               TextButton(
@@ -3266,9 +3269,9 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   Navigator.pop(context);
                   _executeReportParent(context, partnerName, relation, 'Ibu');
                 },
-                child: Text(
+                child: const Text(
                   'Laporkan ke Ibu',
-                  style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             if (showReportToFather)
@@ -3282,7 +3285,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned)
                       ? 'Laporkan ke Ayah'
                       : 'Laporkan ke Ayah Tiri',
-                  style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             if (showReportToHeadmaster)
@@ -3293,7 +3296,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 },
                 child: const Text(
                   'Laporkan ke Kepala Sekolah',
-                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             if (showReportToTeacher)
@@ -3304,7 +3307,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 },
                 child: const Text(
                   'Laporkan ke Guru',
-                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             if (_character.partner != null &&
@@ -3334,7 +3337,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 },
                 child: Text(
                   'Beri tahu ${_character.partner!['name']}',
-                  style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                  style: const TextStyle(color: Colors.orange, fontWeight: FontWeight.bold, fontSize: 13),
                 ),
               ),
             TextButton(
@@ -3371,16 +3374,24 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                   showDialog(
                     context: context,
                     builder: (context) => AlertDialog(
+                      titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+                      contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+                      actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
                       title: const Row(
                         children: [
-                          Icon(Icons.bolt, color: Colors.purple),
+                          Icon(Icons.bolt, color: Colors.purple, size: 20),
                           SizedBox(width: 8),
-                          Text('Sukses Fantastis! 🔥', style: TextStyle(fontWeight: FontWeight.bold)),
+                          Expanded(
+                            child: Text(
+                              'Sukses Fantastis! 🔥',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                            ),
+                          ),
                         ],
                       ),
                       content: const Text(
                         'Pengalaman 3some kalian berjalan sangat memuaskan dan menyenangkan!',
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: 12.5, height: 1.35),
                       ),
                       actions: [
                         TextButton(
@@ -3388,7 +3399,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                             Navigator.pop(context);
                             _checkGlassesNeed(onDone);
                           },
-                          child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                          child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                         ),
                       ],
                     ),
@@ -3549,7 +3560,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 (type == 'Bercinta' || type == 'Bersetubuh')
                     ? 'Terima hubungan intim'
                     : ((type == 'Ajak Pacaran' && _character.partner != null && !_character.isAnyPartnerNameMatching(partnerName)) ? 'Terima menjadi selingkuhan' : 'Terima'),
-                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold, fontSize: 13),
               ),
             ),
             TextButton(
@@ -3628,7 +3639,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 );
                 _checkGlassesNeed(onDone);
               },
-              child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold, fontSize: 13)),
             ),
           ],
         ),

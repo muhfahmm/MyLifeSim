@@ -100,13 +100,11 @@ class BeritahuPacarHelper {
 
     String reactionTitle;
     String reactionText;
-    Color themeColor;
 
     if (accepted) {
       if (isBercinta) {
         reactionTitle = '🔥 Sukses 3some!';
         reactionText = '$firstPartnerName menyetujui ajakanmu! Kalian melakukan hubungan intim bersama yang luar biasa memuaskan.';
-        themeColor = Colors.orange;
         
         if (character.partner != null) {
           int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
@@ -133,7 +131,6 @@ class BeritahuPacarHelper {
         final int partnerNumber = currentCount + 1;
         reactionTitle = 'Pacar Menerima! 💔→❤️';
         reactionText = '$firstPartnerName terkejut namun akhirnya menerima hubunganmu dengan $secondPartnerName. Kalian setuju menjalani hubungan terbuka secara resmi! Sekarang kamu memiliki $partnerNumber pacar resmi.';
-        themeColor = Colors.green;
         
         if (character.partner != null) {
           int rel = int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
@@ -205,13 +202,11 @@ class BeritahuPacarHelper {
       
       if (firstPartnerWins) {
         reactionText = '$fighterName marah besar mengetahui hal ini dan berkelahi sengit dengan $secondPartnerName untuk memperebutkan cintamu. \n\n🏆 $fighterName MEMENANGKAN perkelahian! Kamu tetap bersama $fighterName dan hubungan dengan $secondPartnerName dibatalkan.';
-        themeColor = Colors.blue;
         
         character.isHavingAffair = false;
         character.happiness = (character.happiness - 10).clamp(0, 100);
       } else {
         reactionText = '$fighterName marah besar mengetahui hal ini dan berkelahi sengit dengan $secondPartnerName untuk memperebutkan cintamu. \n\n🏆 $secondPartnerName MEMENANGKAN perkelahian! Kamu kini berpacaran resmi dengan $secondPartnerName dan memutuskan hubungan dengan $fighterName.';
-        themeColor = Colors.redAccent;
         
         final Map<String, String> newPartnerData = {
           'name': secondPartnerName,
@@ -238,21 +233,30 @@ class BeritahuPacarHelper {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         title: Row(
           children: [
-            Icon(Icons.info_outline, color: themeColor),
-            const SizedBox(width: 8),
-            Flexible(child: Text(reactionTitle, style: const TextStyle(fontWeight: FontWeight.bold))),
+            Expanded(
+              child: Text(
+                reactionTitle,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
         ),
-        content: Text(reactionText),
+        content: Text(
+          reactionText,
+          style: const TextStyle(fontSize: 12.5, height: 1.35),
+        ),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               onComplete();
             },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           ),
         ],
       ),

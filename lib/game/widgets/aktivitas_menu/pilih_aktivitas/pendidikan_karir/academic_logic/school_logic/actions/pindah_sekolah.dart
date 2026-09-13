@@ -64,21 +64,27 @@ class PindahSekolahActionPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Pindah Sekolah'),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const Card(
-              color: Colors.blueGrey,
-              child: Padding(
-                padding: EdgeInsets.all(16.0),
+            Card(
+              elevation: 0,
+              color: isDark ? Colors.blueGrey.shade900.withValues(alpha: 0.4) : Colors.blueGrey.shade700,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.all(20.0),
                 child: Column(
                   children: [
                     Icon(Icons.swap_horiz, size: 48, color: Colors.white),
@@ -91,7 +97,7 @@ class PindahSekolahActionPage extends StatelessWidget {
                     Text(
                       'Apakah kamu merasa tidak cocok dengan sekolah saat ini? Pilih tipe sekolah baru yang ingin kamu masuki.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(color: Colors.white70, fontSize: 13, height: 1.4),
                     ),
                   ],
                 ),
@@ -100,21 +106,41 @@ class PindahSekolahActionPage extends StatelessWidget {
             const SizedBox(height: 24),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.blue,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                backgroundColor: Colors.blueAccent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 1,
               ),
-              icon: const Icon(Icons.school, color: Colors.white),
-              label: const Text('Pindah ke Sekolah Negeri (Gratis)', style: TextStyle(color: Colors.white, fontSize: 16)),
+              icon: const Icon(Icons.school, color: Colors.white, size: 20),
+              label: const Flexible(
+                child: Text(
+                  'Pindah ke Sekolah Negeri (Gratis)',
+                  style: TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               onPressed: () => _pindahSekolah(context, 'Negeri'),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                backgroundColor: Colors.purple,
+                padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                backgroundColor: Colors.purple.shade600,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                elevation: 1,
               ),
-              icon: const Icon(Icons.star, color: Colors.white),
-              label: const Text('Pindah ke Sekolah Swasta (Minta Orang Tua)', style: TextStyle(color: Colors.white, fontSize: 16)),
+              icon: const Icon(Icons.star, color: Colors.white, size: 20),
+              label: const Flexible(
+                child: Text(
+                  'Pindah ke Sekolah Swasta (Minta Orang Tua)',
+                  style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
               onPressed: () => _pindahSekolah(context, 'Swasta'),
             ),
           ],

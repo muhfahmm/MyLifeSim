@@ -43,16 +43,21 @@ class MasturbateEnjoymentModal {
         return AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+          contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+          actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
           title: Row(
             children: [
-              const Icon(Icons.flash_on, color: Colors.amber, size: 28),
+              const Icon(Icons.flash_on, color: Colors.amber, size: 20),
               const SizedBox(width: 8),
-              Text(
-                isMutual ? 'Hasil Masturbasi Bersama 💦' : 'Hasil Masturbasi 💦',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: isDark ? Colors.white : Colors.black87,
+              Expanded(
+                child: Text(
+                  isMutual ? 'Hasil Masturbasi Bersama 💦' : 'Hasil Masturbasi 💦',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15.5,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
                 ),
               ),
             ],
@@ -159,9 +164,9 @@ class MasturbateEnjoymentModal {
                   width: double.infinity,
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(0.1),
+                    color: Colors.blue.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.withOpacity(0.2)),
+                    border: Border.all(color: Colors.blue.withValues(alpha: 0.2)),
                   ),
                   child: Text(
                     additionalText,
@@ -185,6 +190,7 @@ class MasturbateEnjoymentModal {
                 'Mengerti',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 13,
                   color: isDark ? Colors.blueAccent : Colors.blue,
                 ),
               ),

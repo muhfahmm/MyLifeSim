@@ -56,41 +56,54 @@ class DialogHelper {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontSize: 18, 
+                            fontSize: 17, 
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Colors.black87,
+                            height: 1.2,
                           ),
                         ),
                       ),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.grey),
-                        onPressed: () => Navigator.pop(context),
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => Navigator.pop(context),
+                        borderRadius: BorderRadius.circular(16),
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(
+                            Icons.close,
+                            size: 18,
+                            color: isDark ? Colors.white70 : Colors.grey.shade600,
+                          ),
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   Flexible(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: DefaultTextStyle(
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: 13.5,
                           color: isDark ? Colors.white70 : Colors.black87,
-                          height: 1.4,
+                          height: 1.45,
                         ),
                         child: content,
                       ),
                     ),
                   ),
-                  if (actions != null) ...[
-                    const SizedBox(height: 16),
+                  if (actions != null && actions.isNotEmpty) ...[
+                    const SizedBox(height: 18),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: actions.map((a) {
