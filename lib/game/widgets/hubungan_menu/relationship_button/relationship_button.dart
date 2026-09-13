@@ -1528,7 +1528,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 if (avatarUrl != null)
                   CircleAvatar(
                     radius: 14,
-                    backgroundColor: color.withOpacity(0.15),
+                    backgroundColor: color.withValues(alpha: 0.15),
                     child: Image(
                       image: AvatarImageCache.getImageProvider(avatarUrl),
                       loadingBuilder: (context, child, loadingProgress) {
@@ -1545,7 +1545,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   )
                 else
                   Icon(icon, color: color, size: 28),
-                const SizedBox(width: 16),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -1576,7 +1576,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                 label,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                                  fontWeight: FontWeight.bold,
                                   color: isDeceased
                                       ? Colors.grey.shade600
                                       : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
@@ -1598,94 +1598,101 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               : Colors.black54,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 6,
+                        runSpacing: 4,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: color.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: color.withValues(alpha: 0.2)),
+                            ),
+                            child: Text(
+                              isDeceased ? 'Wafat' : status,
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+                            ),
+                          ),
+                          if (!isDeceased)
+                            PopupMenuButton<String>(
+                              tooltip: 'Interaksi Pengasuhan',
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                              onSelected: (value) => _handleParentingAction(label, value),
+                              itemBuilder: (context) => [
+                                const PopupMenuItem(
+                                  enabled: false,
+                                  child: Text('Gaya Pengasuhan', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Strict',
+                                  child: Row(children: const [Text('🗡️'), SizedBox(width: 8), Text('Strict')]),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Balanced',
+                                  child: Row(children: const [Text('⚖️'), SizedBox(width: 8), Text('Balanced')]),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Loose',
+                                  child: Row(children: const [Text('🕊️'), SizedBox(width: 8), Text('Loose')]),
+                                ),
+                                const PopupMenuDivider(),
+                                const PopupMenuItem(
+                                  enabled: false,
+                                  child: Text('Aksi Cepat', style: TextStyle(fontWeight: FontWeight.bold)),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Marahi Anak',
+                                  child: Row(children: const [Text('📢'), SizedBox(width: 8), Text('Marahi Anak (Strict)')]),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Beri Hadiah',
+                                  child: Row(children: const [Text('🎁'), SizedBox(width: 8), Text('Beri Hadiah (Loose)')]),
+                                ),
+                                PopupMenuItem(
+                                  value: 'Ajak Diskusi',
+                                  child: Row(children: const [Text('💬'), SizedBox(width: 8), Text('Ajak Diskusi (Balanced)')]),
+                                ),
+                              ],
+                              child: Builder(builder: (context) {
+                                final Map<String, dynamic> styleInfo = {
+                                  'Strict':     {'emoji': '🗡️', 'color': Colors.red.shade700},
+                                  'Balanced':   {'emoji': '⚖️', 'color': Colors.blue.shade600},
+                                  'Loose':      {'emoji': '🕊️', 'color': Colors.green.shade600},
+                                  'Neglectful': {'emoji': '👻', 'color': Colors.grey.shade600},
+                                };
+                                final info = styleInfo[parentingStyle] ?? styleInfo['Balanced']!;
+                                final Color badgeColor = info['color'] as Color;
+                                final String emoji = info['emoji'] as String;
+
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: badgeColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text('$emoji $parentingStyle', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor)),
+                                      const SizedBox(width: 2),
+                                      const Icon(Icons.arrow_drop_down, size: 14, color: Colors.grey),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ),
+                        ],
+                      ),
                     ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: color.withOpacity(0.2)),
-                  ),
-                  child: Text(
-                    isDeceased ? 'Wafat' : status,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                   ),
                 ),
                 if (!isDeceased) ...[
-                  const SizedBox(width: 4),
-
-                  // MENU INTERAKSI PENGAHUSAN (POPUP) DI SISI KANAN
-                  PopupMenuButton<String>(
-                    tooltip: 'Interaksi Pengasuhan',
-                    onSelected: (value) => _handleParentingAction(label, value),
-                    itemBuilder: (context) => [
-                      const PopupMenuItem(
-                        enabled: false,
-                        child: Text('Gaya Pengasuhan', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      PopupMenuItem(
-                        value: 'Strict',
-                        child: Row(children: const [Text('🗡️'), SizedBox(width: 8), Text('Strict')]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Balanced',
-                        child: Row(children: const [Text('⚖️'), SizedBox(width: 8), Text('Balanced')]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Loose',
-                        child: Row(children: const [Text('🕊️'), SizedBox(width: 8), Text('Loose')]),
-                      ),
-                      const PopupMenuDivider(),
-                      const PopupMenuItem(
-                        enabled: false,
-                        child: Text('Aksi Cepat', style: TextStyle(fontWeight: FontWeight.bold)),
-                      ),
-                      PopupMenuItem(
-                        value: 'Marahi Anak',
-                        child: Row(children: const [Text('📢'), SizedBox(width: 8), Text('Marahi Anak (Strict)')]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Beri Hadiah',
-                        child: Row(children: const [Text('🎁'), SizedBox(width: 8), Text('Beri Hadiah (Loose)')]),
-                      ),
-                      PopupMenuItem(
-                        value: 'Ajak Diskusi',
-                        child: Row(children: const [Text('💬'), SizedBox(width: 8), Text('Ajak Diskusi (Balanced)')]),
-                      ),
-                    ],
-                    child: Builder(builder: (context) {
-                      // Tampilkan Badge Gaya Asuh saat ini (sebagai tombol)
-                      final Map<String, dynamic> styleInfo = {
-                        'Strict':     {'emoji': '🗡️', 'color': Colors.red.shade700},
-                        'Balanced':   {'emoji': '⚖️', 'color': Colors.blue.shade600},
-                        'Loose':      {'emoji': '🕊️', 'color': Colors.green.shade600},
-                        'Neglectful': {'emoji': '👻', 'color': Colors.grey.shade600},
-                      };
-                      final info = styleInfo[parentingStyle] ?? styleInfo['Balanced']!;
-                      final Color badgeColor = info['color'] as Color;
-                      final String emoji = info['emoji'] as String;
-
-                      return Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: badgeColor.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: badgeColor.withOpacity(0.4)),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text('$emoji $parentingStyle', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor)),
-                            const SizedBox(width: 4),
-                            const Icon(Icons.arrow_drop_down, size: 16, color: Colors.grey),
-                          ],
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 8),
                   const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                 ],
               ],

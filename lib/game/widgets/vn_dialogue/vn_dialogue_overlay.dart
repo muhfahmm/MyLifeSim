@@ -313,10 +313,12 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
+                  physics: const BouncingScrollPhysics(),
                   child: Row(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
@@ -334,7 +336,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: 6),
                       _buildControlButton(
                         icon: Icons.history,
                         label: 'Log',

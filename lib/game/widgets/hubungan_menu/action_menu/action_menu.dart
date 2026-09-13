@@ -25,6 +25,7 @@ import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
 
 class ActionMenuScreen extends StatefulWidget {
   final Character character;
@@ -375,355 +376,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
   // Helper untuk mengambil nilai hubungan target saat ini
   int _getCurrentRelationshipValue() {
-    final String role = widget.targetRole;
-    final String name = widget.targetName;
-
-    if (role == 'Mantan Pacar') {
-      for (var ex in widget.character.exPartners) {
-        if (ex['name'] == name) {
-          return int.tryParse(ex['relationship'] ?? '50') ?? 50;
-        }
-      }
-      return 30;
-    }
-
-    if ((role == 'Pacar' ||
-            role == 'Tunangan' ||
-            role == 'Suami' ||
-            role == 'Istri' ||
-            role.contains('Pacar')) &&
-        role != 'Mantan Pacar') {
-      final String plainName = _getPlainTargetName().toLowerCase();
-      // SUMBER TUNGGAL: Jika pacar adalah Ibu kandung, gunakan motherRelationship
-      if (widget.character.motherName != null &&
-          widget.character.motherName!.toLowerCase() == plainName) {
-        final int val = widget.character.motherRelationship ?? 50;
-        // Sinkronkan partner map agar konsisten
-        if (widget.character.partner != null &&
-            widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-          widget.character.partner!['relationship'] = val.toString();
-        }
-        if (widget.character.secondPartner != null &&
-            widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-          widget.character.secondPartner!['relationship'] = val.toString();
-        }
-        return val;
-      }
-      // SUMBER TUNGGAL: Jika pacar adalah Ayah kandung, gunakan fatherRelationship
-      if (widget.character.fatherName != null &&
-          widget.character.fatherName!.toLowerCase() == plainName) {
-        final int val = widget.character.fatherRelationship ?? 50;
-        if (widget.character.partner != null &&
-            widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-          widget.character.partner!['relationship'] = val.toString();
-        }
-        if (widget.character.secondPartner != null &&
-            widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-          widget.character.secondPartner!['relationship'] = val.toString();
-        }
-        return val;
-      }
-      // 1. Cari di classmates
-      for (var cm in widget.character.classmates) {
-        if (cm['name']!.toLowerCase() == plainName) {
-          final int val = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.partner!['relationship'] = val.toString();
-          }
-          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.secondPartner!['relationship'] = val.toString();
-          }
-          return val;
-        }
-      }
-      // 2. Cari di univClassmates
-      for (var cm in widget.character.univClassmates) {
-        if (cm['name']!.toLowerCase() == plainName) {
-          final int val = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.partner!['relationship'] = val.toString();
-          }
-          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.secondPartner!['relationship'] = val.toString();
-          }
-          return val;
-        }
-      }
-      // 3. Cari di coworkers
-      for (var cw in widget.character.coworkers) {
-        if (cw['name']!.toLowerCase() == plainName) {
-          final int val = int.tryParse(cw['relationship'] ?? '50') ?? 50;
-          if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.partner!['relationship'] = val.toString();
-          }
-          if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-            widget.character.secondPartner!['relationship'] = val.toString();
-          }
-          return val;
-        }
-      }
-
-      if (widget.character.partner != null &&
-          widget.character.partner!['name']!.toLowerCase().contains(plainName)) {
-        return int.tryParse(
-                widget.character.partner!['relationship'] ?? '50') ??
-            50;
-      }
-      if (widget.character.secondPartner != null &&
-          widget.character.secondPartner!['name']!.toLowerCase().contains(plainName)) {
-        return int.tryParse(
-                widget.character.secondPartner!['relationship'] ?? '50') ??
-            50;
-      }
-      // Check exPartners fallback
-      for (var ex in widget.character.exPartners) {
-        if (ex['name'] == name) {
-          return int.tryParse(ex['relationship'] ?? '50') ?? 50;
-        }
-      }
-      // Check classmates fallback
-      for (var cm in widget.character.classmates) {
-        if (cm['name'] == name) {
-          return int.tryParse(cm['relationship'] ?? '50') ?? 50;
-        }
-      }
-      return int.tryParse(widget.character.partner?['relationship'] ?? '50') ??
-          50;
-    }
-
-    if (role == 'Mertua') {
-      if (name.startsWith('Ayah Mertua')) {
-        return widget.character.fatherInLawRelationship ?? 50;
-      } else {
-        return widget.character.motherInLawRelationship ?? 50;
-      }
-    }
-
-    final String nameLower = name.toLowerCase();
-    if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
-      final int val = widget.character.fatherRelationship ?? 50;
-      // Sinkronkan partner map jika Ayah juga pasangan
-      final String cleanF = (widget.character.fatherName ?? '').toLowerCase();
-      if (cleanF.isNotEmpty) {
-        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanF)) {
-          widget.character.partner!['relationship'] = val.toString();
-        }
-        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanF)) {
-          widget.character.secondPartner!['relationship'] = val.toString();
-        }
-      }
-      return val;
-    } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
-      final int val = widget.character.motherRelationship ?? 50;
-      // Sinkronkan partner map jika Ibu juga pasangan
-      final String cleanM = (widget.character.motherName ?? '').toLowerCase();
-      if (cleanM.isNotEmpty) {
-        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanM)) {
-          widget.character.partner!['relationship'] = val.toString();
-        }
-        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanM)) {
-          widget.character.secondPartner!['relationship'] = val.toString();
-        }
-      }
-      return val;
-    } else if (nameLower.contains('ayah tiri')) {
-      return widget.character.stepFatherRelationship ?? 50;
-    } else if (nameLower.contains('ibu tiri')) {
-      return widget.character.stepMotherRelationship ?? 50;
-    } else if (role == 'Laki-laki' || role == 'Perempuan') {
-      // Ini adalah anak
-      for (var child in widget.character.children) {
-        final String childName = child['name'] ?? '';
-        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
-        if (childName == cleanName) {
-          return int.tryParse(child['relationship'] ?? '50') ?? 50;
-        }
-      }
-    } else {
-      // Cek di extended family
-      for (var ext in widget.character.extendedFamily) {
-        if (ext['name'] == name) {
-          return int.tryParse(ext['relationship'] ?? '50') ?? 50;
-        }
-      }
-      for (var sib in widget.character.siblings) {
-        final String expectedLabel = '${sib['name']} (${sib['relation']})';
-        if (expectedLabel == name) {
-          return int.tryParse(sib['relationship'] ?? '50') ?? 50;
-        }
-      }
-      for (var cm in widget.character.classmates) {
-        final String expectedLabel = '${cm['name']} (Teman Sekelas)';
-        if (expectedLabel == name || cm['name'] == name) {
-          return int.tryParse(cm['relationship'] ?? '50') ?? 50;
-        }
-      }
-      for (var cw in widget.character.coworkers) {
-        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
-          return int.tryParse(cw['relationship'] ?? '50') ?? 50;
-        }
-      }
-    }
-    return 50;
+    return NpcRelationshipHelper.getCurrentRelationship(
+      character: widget.character,
+      targetName: widget.targetName,
+      targetRole: widget.targetRole,
+    );
   }
 
   // Helper untuk mengupdate nilai hubungan target saat ini
   void _updateRelationship(int changeAmount) {
-    final String role = widget.targetRole;
-    final String name = widget.targetName;
-
-    if (role == 'Mantan Pacar') {
-      for (var ex in widget.character.exPartners) {
-        if (ex['name'] == name) {
-          int currentRel = int.tryParse(ex['relationship'] ?? '50') ?? 50;
-          ex['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          return;
-        }
-      }
-    }
-
-    if ((role == 'Pacar' ||
-            role == 'Tunangan' ||
-            role == 'Suami' ||
-            role == 'Istri' ||
-            role.contains('Pacar')) &&
-        role != 'Mantan Pacar') {
-      final String plainTargetName = _getPlainTargetName().toLowerCase();
-      // SYNC: Jika pacar yang diupdate adalah Ibu kandung
-      if (widget.character.motherName != null && widget.character.motherName!.toLowerCase() == plainTargetName) {
-        widget.character.motherRelationship =
-            ((widget.character.motherRelationship ?? 50) + changeAmount)
-                .clamp(0, 100);
-      }
-      // SYNC: Jika pacar yang diupdate adalah Ayah kandung
-      if (widget.character.fatherName != null && widget.character.fatherName!.toLowerCase() == plainTargetName) {
-        widget.character.fatherRelationship =
-            ((widget.character.fatherRelationship ?? 50) + changeAmount)
-                .clamp(0, 100);
-      }
-
-      if (widget.character.partner != null &&
-          widget.character.partner!['name']!.toLowerCase().contains(plainTargetName)) {
-        int currentRel =
-            int.tryParse(widget.character.partner!['relationship'] ?? '50') ??
-                50;
-        widget.character.partner!['relationship'] =
-            (currentRel + changeAmount).clamp(0, 100).toString();
-      } else if (widget.character.secondPartner != null &&
-          widget.character.secondPartner!['name']!.toLowerCase().contains(plainTargetName)) {
-        int currentRel = int.tryParse(
-                widget.character.secondPartner!['relationship'] ?? '50') ??
-            50;
-        widget.character.secondPartner!['relationship'] =
-            (currentRel + changeAmount).clamp(0, 100).toString();
-      }
-      return;
-    }
-
-    if (role == 'Mertua') {
-      if (name.startsWith('Ayah Mertua')) {
-        widget.character.fatherInLawRelationship =
-            ((widget.character.fatherInLawRelationship ?? 50) + changeAmount)
-                .clamp(0, 100);
-      } else {
-        widget.character.motherInLawRelationship =
-            ((widget.character.motherInLawRelationship ?? 50) + changeAmount)
-                .clamp(0, 100);
-      }
-      return;
-    }
-
-    final String nameLower = name.toLowerCase();
-    if (nameLower.contains('ayah') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
-      widget.character.fatherRelationship =
-          ((widget.character.fatherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-      // SYNC: Update matching partner map
-      final String cleanF = (widget.character.fatherName ?? '').toLowerCase();
-      if (cleanF.isNotEmpty) {
-        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanF)) {
-          widget.character.partner!['relationship'] = widget.character.fatherRelationship.toString();
-        }
-        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanF)) {
-          widget.character.secondPartner!['relationship'] = widget.character.fatherRelationship.toString();
-        }
-      }
-    } else if (nameLower.contains('ibu') && !nameLower.contains('tiri') && !nameLower.contains('mertua')) {
-      widget.character.motherRelationship =
-          ((widget.character.motherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-      // SYNC: Update matching partner map
-      final String cleanM = (widget.character.motherName ?? '').toLowerCase();
-      if (cleanM.isNotEmpty) {
-        if (widget.character.partner != null && widget.character.partner!['name']!.toLowerCase().contains(cleanM)) {
-          widget.character.partner!['relationship'] = widget.character.motherRelationship.toString();
-        }
-        if (widget.character.secondPartner != null && widget.character.secondPartner!['name']!.toLowerCase().contains(cleanM)) {
-          widget.character.secondPartner!['relationship'] = widget.character.motherRelationship.toString();
-        }
-      }
-    } else if (nameLower.contains('ayah tiri')) {
-      widget.character.stepFatherRelationship =
-          ((widget.character.stepFatherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-    } else if (nameLower.contains('ibu tiri')) {
-      widget.character.stepMotherRelationship =
-          ((widget.character.stepMotherRelationship ?? 50) + changeAmount)
-              .clamp(0, 100);
-    } else if (role == 'Laki-laki' || role == 'Perempuan') {
-      // Ini adalah anak
-      for (var child in widget.character.children) {
-        final String childName = child['name'] ?? '';
-        final String cleanName = name.replaceAll(' (Wafat)', '').trim();
-        if (childName == cleanName) {
-          int currentRel = int.tryParse(child['relationship'] ?? '50') ?? 50;
-          child['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          break;
-        }
-      }
-    } else {
-      // Cek di extended family
-      for (var ext in widget.character.extendedFamily) {
-        if (ext['name'] == name) {
-          int currentRel = int.tryParse(ext['relationship'] ?? '50') ?? 50;
-          ext['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          return;
-        }
-      }
-      for (var sib in widget.character.siblings) {
-        final String expectedLabel = '${sib['name']} (${sib['relation']})';
-        if (expectedLabel == name) {
-          int currentRel = int.tryParse(sib['relationship'] ?? '50') ?? 50;
-          sib['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          break;
-        }
-      }
-      for (var cm in widget.character.classmates) {
-        final String expectedLabel = '${cm['name']} (Teman Sekelas)';
-        if (expectedLabel == name || cm['name'] == name) {
-          int currentRel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-          cm['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          break;
-        }
-      }
-      for (var cw in widget.character.coworkers) {
-        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!.toLowerCase()))) {
-          int currentRel = int.tryParse(cw['relationship'] ?? '50') ?? 50;
-          cw['relationship'] =
-              (currentRel + changeAmount).clamp(0, 100).toString();
-          break;
-        }
-      }
-    }
-    
-    // Sinkronkan nilai hubungan terbaru ke semua list sosial (classmate, partner, dll)
-    final int updatedVal = _getCurrentRelationshipValue();
-    widget.character.updateRelationshipValue(name, updatedVal);
+    NpcRelationshipHelper.applyRelationshipChange(
+      character: widget.character,
+      targetName: widget.targetName,
+      targetRole: widget.targetRole,
+      delta: changeAmount,
+    );
   }
 
   void _showResultDialog(String title, String message, IconData icon,
@@ -1131,149 +798,289 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
     // Logika filter menu pacar dihilangkan agar menu dewasa/normal konsisten dengan getAge12PlusActions / getAge6to11Actions standar.
     if (isChild && targetAge < 12) {
-      // Jika target anak kita di bawah 12 tahun, tampilkan menu khusus orang tua mengasuh anak:
-      // - Beri Uang Jajan (Minta uang dari sisi anak, di sini orang tua yang memberi uang)
-      // - Beri Hadiah
-      // - Ajak Bicara / Mengobrol
-      // - Beri Pelukan
-      // - Ajak Jalan-jalan / Bermain
-      // - Disiplinkan (jika nakal)
-      actions = [
-        ActionItem(
-          label: 'Beri Pelukan',
-          icon: Icons.face,
-          color: Colors.pinkAccent,
-          onTap: () {
-            int relBonus = _random.nextInt(6) + 10;
-            _showResultDialog(
-              'Pelukan Hangat',
-              'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
-              Icons.face,
-              Colors.pinkAccent,
-              () {
-                widget.character.happiness =
-                    (widget.character.happiness + 5).clamp(0, 100);
-                _updateRelationship(relBonus);
-                _updateState();
-              },
-            );
-          },
-        ),
-        ActionItem(
-          label: 'Bercakap-cakap',
-          icon: Icons.chat,
-          color: Colors.teal,
-          onTap: () {
-            int relBonus = _random.nextInt(5) + 5;
-            _showResultDialog(
-              'Mengobrol dengan Anak',
-              'Kamu menghabiskan waktu mengobrol dan mendengarkan cerita ${widget.targetName}. (+$relBonus% hubungan)',
-              Icons.chat,
-              Colors.teal,
-              () {
-                _updateRelationship(relBonus);
-                _updateState();
-              },
-            );
-          },
-        ),
-        ActionItem(
-          label: 'Beri Uang Jajan',
-          icon: Icons.monetization_on,
-          color: Colors.green,
-          onTap: () {
-            if (widget.character.money < 10) {
-              _showResultDialog(
-                'Uang Tidak Cukup',
-                'Kamu tidak memiliki cukup uang untuk memberikan uang jajan (\$10).',
-                Icons.money_off,
-                Colors.red,
-                () {},
-              );
-            } else {
+      if (targetAge < 3) {
+        // Umur 0 - 2 tahun (Bayi / Balita): Interaksi dasar pengasuhan balita
+        actions = [
+          ActionItem(
+            label: 'Beri Pelukan',
+            icon: Icons.face,
+            color: Colors.pinkAccent,
+            onTap: () {
               int relBonus = _random.nextInt(6) + 10;
               _showResultDialog(
-                'Beri Uang Jajan',
-                'Kamu memberikan uang jajan sebesar \$10 kepada ${widget.targetName}. Dia sangat gembira! (+$relBonus% hubungan)',
-                Icons.monetization_on,
+                'Pelukan Hangat',
+                'Kamu memeluk erat bayi/balitamu, ${widget.targetName}. Bayimu merasa sangat hangat dan tenang! (+$relBonus% hubungan)',
+                Icons.face,
+                Colors.pinkAccent,
+                () {
+                  widget.character.happiness =
+                      (widget.character.happiness + 5).clamp(0, 100);
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Timang-timang Bayi',
+            icon: Icons.child_care,
+            color: Colors.lightBlue,
+            onTap: () {
+              int relBonus = _random.nextInt(5) + 8;
+              _showResultDialog(
+                'Menimang Bayi',
+                'Kamu menimang-nimang ${widget.targetName} hingga dia tersenyum dan tertidur lelap. (+$relBonus% hubungan)',
+                Icons.child_care,
+                Colors.lightBlue,
+                () {
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Beri Hadiah Mainan Balita',
+            icon: Icons.toys,
+            color: Colors.orange,
+            onTap: () {
+              if (widget.character.money < 15) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk membelikan mainan balita (\$15).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+              } else {
+                int relBonus = _random.nextInt(8) + 12;
+                _showResultDialog(
+                  'Mainan Balita',
+                  'Kamu membelikan mainan bunyi-bunyian baru seharga \$15 untuk ${widget.targetName}. Dia tertawa gembira! (+$relBonus% hubungan)',
+                  Icons.toys,
+                  Colors.orange,
+                  () {
+                    widget.character.money -= 15;
+                    _updateRelationship(relBonus);
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ),
+        ];
+      } else if (targetAge >= 3 && targetAge < 6) {
+        // Umur 3 - 5 tahun (Balita / PAUD): Bermain, dongeng, pelukan, hadiah mainan
+        actions = [
+          ActionItem(
+            label: 'Beri Pelukan',
+            icon: Icons.face,
+            color: Colors.pinkAccent,
+            onTap: () {
+              int relBonus = _random.nextInt(6) + 10;
+              _showResultDialog(
+                'Pelukan Hangat',
+                'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
+                Icons.face,
+                Colors.pinkAccent,
+                () {
+                  widget.character.happiness =
+                      (widget.character.happiness + 5).clamp(0, 100);
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Bacakan Dongeng',
+            icon: Icons.menu_book,
+            color: Colors.purple,
+            onTap: () {
+              int relBonus = _random.nextInt(6) + 10;
+              _showResultDialog(
+                'Bacakan Dongeng',
+                'Kamu membacakan buku dongeng seru sebelum tidur untuk ${widget.targetName}. Anakmu sangat antusias! (+$relBonus% hubungan)',
+                Icons.menu_book,
+                Colors.purple,
+                () {
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Beri Hadiah Mainan',
+            icon: Icons.toys,
+            color: Colors.orange,
+            onTap: () {
+              if (widget.character.money < 25) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk membelikan mainan (\$25).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+              } else {
+                int relBonus = _random.nextInt(11) + 12;
+                _showResultDialog(
+                  'Hadiah Mainan',
+                  'Kamu membelikan mainan baru seharga \$25 untuk ${widget.targetName}. Anakmu melompat kegirangan! (+$relBonus% hubungan)',
+                  Icons.toys,
+                  Colors.orange,
+                  () {
+                    widget.character.money -= 25;
+                    _updateRelationship(relBonus);
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ),
+          ActionItem(
+            label: 'Ajak Bermain ke Taman',
+            icon: Icons.park,
+            color: Colors.deepOrange,
+            onTap: () {
+              int relBonus = _random.nextInt(6) + 12;
+              _showResultDialog(
+                'Bermain di Taman',
+                'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
+                Icons.park,
                 Colors.green,
                 () {
-                  widget.character.money -= 10;
+                  widget.character.happiness =
+                      (widget.character.happiness + 10).clamp(0, 100);
                   _updateRelationship(relBonus);
                   _updateState();
                 },
               );
-            }
-          },
-        ),
-        ActionItem(
-          label: 'Beri Hadiah Mainan',
-          icon: Icons.toys,
-          color: Colors.orange,
-          onTap: () {
-            if (widget.character.money < 30) {
+            },
+          ),
+        ];
+      } else {
+        // Umur 6 - 11 tahun (Anak SD): Uang jajan, pujian, mainan, bermain
+        actions = [
+          ActionItem(
+            label: 'Beri Pelukan',
+            icon: Icons.face,
+            color: Colors.pinkAccent,
+            onTap: () {
+              int relBonus = _random.nextInt(6) + 10;
               _showResultDialog(
-                'Uang Tidak Cukup',
-                'Kamu tidak memiliki cukup uang untuk membelikan mainan (\$30).',
-                Icons.money_off,
-                Colors.red,
-                () {},
-              );
-            } else {
-              int relBonus = _random.nextInt(11) + 15;
-              _showResultDialog(
-                'Hadiah Mainan',
-                'Kamu membelikan mainan baru seharga \$30 untuk ${widget.targetName}. Anakmu langsung melompat kegirangan! (+$relBonus% hubungan)',
-                Icons.toys,
-                Colors.orange,
+                'Pelukan Hangat',
+                'Kamu memeluk erat ${widget.targetName}. Anakmu merasa sangat disayangi! (+$relBonus% hubungan)',
+                Icons.face,
+                Colors.pinkAccent,
                 () {
-                  widget.character.money -= 30;
+                  widget.character.happiness =
+                      (widget.character.happiness + 5).clamp(0, 100);
                   _updateRelationship(relBonus);
                   _updateState();
                 },
               );
-            }
-          },
-        ),
-        ActionItem(
-          label: 'Ajak Bermain ke Taman',
-          icon: Icons.park,
-          color: Colors.deepOrange,
-          onTap: () {
-            int relBonus = _random.nextInt(6) + 12;
-            _showResultDialog(
-              'Bermain di Taman',
-              'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
-              Icons.park,
-              Colors.green,
-              () {
-                widget.character.happiness =
-                    (widget.character.happiness + 10).clamp(0, 100);
-                _updateRelationship(relBonus);
-                _updateState();
-              },
-            );
-          },
-        ),
-        ActionItem(
-          label: 'Puji Anak',
-          icon: Icons.thumb_up,
-          color: Colors.blue,
-          onTap: () {
-            int relBonus = _random.nextInt(5) + 8;
-            _showResultDialog(
-              'Pujian Orang Tua',
-              'Kamu memuji kepintaran dan tingkah laku baik ${widget.targetName}. (+$relBonus% hubungan)',
-              Icons.thumb_up,
-              Colors.blue,
-              () {
-                _updateRelationship(relBonus);
-                _updateState();
-              },
-            );
-          },
-        ),
-      ];
+            },
+          ),
+          ActionItem(
+            label: 'Beri Uang Jajan',
+            icon: Icons.monetization_on,
+            color: Colors.green,
+            onTap: () {
+              if (widget.character.money < 10) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk memberikan uang jajan (\$10).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+              } else {
+                int relBonus = _random.nextInt(6) + 10;
+                _showResultDialog(
+                  'Beri Uang Jajan',
+                  'Kamu memberikan uang jajan sebesar \$10 kepada ${widget.targetName}. Dia sangat gembira! (+$relBonus% hubungan)',
+                  Icons.monetization_on,
+                  Colors.green,
+                  () {
+                    widget.character.money -= 10;
+                    _updateRelationship(relBonus);
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ),
+          ActionItem(
+            label: 'Beri Hadiah Mainan',
+            icon: Icons.toys,
+            color: Colors.orange,
+            onTap: () {
+              if (widget.character.money < 30) {
+                _showResultDialog(
+                  'Uang Tidak Cukup',
+                  'Kamu tidak memiliki cukup uang untuk membelikan mainan (\$30).',
+                  Icons.money_off,
+                  Colors.red,
+                  () {},
+                );
+              } else {
+                int relBonus = _random.nextInt(11) + 15;
+                _showResultDialog(
+                  'Hadiah Mainan',
+                  'Kamu membelikan mainan baru seharga \$30 untuk ${widget.targetName}. Anakmu langsung melompat kegirangan! (+$relBonus% hubungan)',
+                  Icons.toys,
+                  Colors.orange,
+                  () {
+                    widget.character.money -= 30;
+                    _updateRelationship(relBonus);
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ),
+          ActionItem(
+            label: 'Ajak Bermain ke Taman',
+            icon: Icons.park,
+            color: Colors.deepOrange,
+            onTap: () {
+              int relBonus = _random.nextInt(6) + 12;
+              _showResultDialog(
+                'Bermain di Taman',
+                'Kamu mengajak ${widget.targetName} bermain ayunan dan berlarian di taman. Waktu yang sangat menyenangkan! (+$relBonus% hubungan)',
+                Icons.park,
+                Colors.green,
+                () {
+                  widget.character.happiness =
+                      (widget.character.happiness + 10).clamp(0, 100);
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+          ActionItem(
+            label: 'Puji Anak',
+            icon: Icons.thumb_up,
+            color: Colors.blue,
+            onTap: () {
+              int relBonus = _random.nextInt(5) + 8;
+              _showResultDialog(
+                'Pujian Orang Tua',
+                'Kamu memuji kepintaran dan tingkah laku baik ${widget.targetName}. (+$relBonus% hubungan)',
+                Icons.thumb_up,
+                Colors.blue,
+                () {
+                  _updateRelationship(relBonus);
+                  _updateState();
+                },
+              );
+            },
+          ),
+        ];
+      }
     } else {
       // Gunakan logika standar berdasarkan usia terkecil (minAge)
       if (minAge < 3) {

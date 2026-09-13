@@ -587,63 +587,84 @@ class Character {
   }
 
   void updateRelationshipValue(String targetName, int newValue) {
-    final String nameLower = targetName.toLowerCase();
-    final String valStr = newValue.toString();
+    if (targetName.trim().isEmpty) return;
+    final String nameLower = targetName.toLowerCase().trim();
+    final String valStr = newValue.clamp(0, 100).toString();
 
-    if (partner != null && (partner!['name']!.toLowerCase() == nameLower || partner!['name']!.toLowerCase().contains(nameLower))) {
-      partner!['relationship'] = valStr;
+    bool isMatch(String? nameInChar) {
+      if (nameInChar == null || nameInChar.trim().isEmpty) return false;
+      final String cn = nameInChar.toLowerCase().trim();
+      return nameLower == cn || nameLower.contains(cn) || cn.contains(nameLower);
     }
-    if (secondPartner != null && (secondPartner!['name']!.toLowerCase() == nameLower || secondPartner!['name']!.toLowerCase().contains(nameLower))) {
-      secondPartner!['relationship'] = valStr;
-    }
-    if (thirdPartner != null && (thirdPartner!['name']!.toLowerCase() == nameLower || thirdPartner!['name']!.toLowerCase().contains(nameLower))) {
-      thirdPartner!['relationship'] = valStr;
-    }
-    if (fourthPartner != null && (fourthPartner!['name']!.toLowerCase() == nameLower || fourthPartner!['name']!.toLowerCase().contains(nameLower))) {
-      fourthPartner!['relationship'] = valStr;
-    }
-    if (fifthPartner != null && (fifthPartner!['name']!.toLowerCase() == nameLower || fifthPartner!['name']!.toLowerCase().contains(nameLower))) {
-      fifthPartner!['relationship'] = valStr;
-    }
-    for (var sp in secretPartners) {
-      if (sp['name']!.toLowerCase() == nameLower || sp['name']!.toLowerCase().contains(nameLower)) {
-        sp['relationship'] = valStr;
+
+    void updateMapList(List<Map<String, String>> list) {
+      for (var item in list) {
+        final String n = (item['name'] ?? '').toLowerCase().trim();
+        final String relLabel = '${item['name']} (${item['relation']})'.toLowerCase().trim();
+        if (n.isNotEmpty && (isMatch(n) || relLabel == nameLower || isMatch(relLabel))) {
+          item['relationship'] = valStr;
+        }
       }
     }
 
-    for (var cm in classmates) {
-      if (cm['name']!.toLowerCase() == nameLower || cm['name']!.toLowerCase().contains(nameLower)) {
-        cm['relationship'] = valStr;
+    void updateDynamicList(List<Map<String, dynamic>> list) {
+      for (var item in list) {
+        final String n = (item['name'] ?? '').toString().toLowerCase().trim();
+        if (n.isNotEmpty && isMatch(n)) {
+          item['relationship'] = valStr;
+        }
       }
     }
-    for (var cm in univClassmates) {
-      if (cm['name']!.toLowerCase() == nameLower || cm['name']!.toLowerCase().contains(nameLower)) {
-        cm['relationship'] = valStr;
+
+    // 1. Pasangan Aktif & Selingkuhan
+    for (var p in [partner, secondPartner, thirdPartner, fourthPartner, fifthPartner]) {
+      if (p != null) {
+        final String n = (p['name'] ?? '').toLowerCase().trim();
+        if (n.isNotEmpty && isMatch(n)) {
+          p['relationship'] = valStr;
+        }
       }
     }
-    for (var cw in coworkers) {
-      if (cw['name']!.toLowerCase() == nameLower || cw['name']!.toLowerCase().contains(nameLower)) {
-        cw['relationship'] = valStr;
+    updateMapList(secretPartners);
+    updateMapList(exPartners);
+
+    // 2. Orang Tua Kandung, Tiri, & Mertua
+    if (isMatch(motherName)) motherRelationship = newValue;
+    if (isMatch(fatherName)) fatherRelationship = newValue;
+    if (isMatch(stepMotherName)) stepMotherRelationship = newValue;
+    if (isMatch(stepFatherName)) stepFatherRelationship = newValue;
+    if (isMatch(motherInLawName)) motherInLawRelationship = newValue;
+    if (isMatch(fatherInLawName)) fatherInLawRelationship = newValue;
+
+    // 3. Seluruh List Sosial & Pekerjaan / Pendidikan
+    updateMapList(siblings);
+    updateMapList(extendedFamily);
+    updateMapList(children);
+    updateMapList(friends);
+    updateMapList(classmates);
+    updateMapList(univClassmates);
+    updateMapList(coworkers);
+    updateMapList(sdTeachers);
+    updateMapList(smpTeachers);
+    updateMapList(smaTeachers);
+    updateMapList(univLecturers);
+
+    if (supervisor != null) {
+      final String n = (supervisor!['name'] ?? '').toLowerCase().trim();
+      if (n.isNotEmpty && isMatch(n)) {
+        supervisor!['relationship'] = valStr;
       }
     }
-    
-    if (motherName != null && motherName!.toLowerCase() == nameLower) {
-      motherRelationship = newValue;
-    }
-    if (fatherName != null && fatherName!.toLowerCase() == nameLower) {
-      fatherRelationship = newValue;
-    }
-    if (stepMotherName != null && stepMotherName!.toLowerCase() == nameLower) {
-      stepMotherRelationship = newValue;
-    }
-    if (stepFatherName != null && stepFatherName!.toLowerCase() == nameLower) {
-      stepFatherRelationship = newValue;
-    }
-    for (var sib in siblings) {
-      if (sib['name']!.toLowerCase() == nameLower) {
-        sib['relationship'] = valStr;
+    if (assistantCoach != null) {
+      final String n = (assistantCoach!['name'] ?? '').toLowerCase().trim();
+      if (n.isNotEmpty && isMatch(n)) {
+        assistantCoach!['relationship'] = valStr;
       }
     }
+
+    updateMapList(idolTrainees);
+    updateMapList(idolMainMembers);
+    updateMapList(idolStaff);
   }
 
   void updateTargetRelationship(String targetName, String targetRole, int delta) {
