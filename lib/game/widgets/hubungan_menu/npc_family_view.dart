@@ -159,7 +159,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'section': 'orangtua',
         'name': fatherNameVal,
         'relation': 'Ayah',
-        'relLabel': 'Ayah',
+        'relLabel': 'Ayah Kandung',
         'gender': 'Laki-laki',
         'age': fatherAgeVal,
         'isDeceased': fatherDeceasedVal,
@@ -174,7 +174,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'section': 'orangtua',
         'name': motherNameVal,
         'relation': 'Ibu',
-        'relLabel': 'Ibu',
+        'relLabel': 'Ibu Kandung',
         'gender': 'Perempuan',
         'age': motherAgeVal,
         'isDeceased': motherDeceasedVal,
@@ -704,15 +704,17 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        isDeceased ? '$name (Wafat)' : '$name ($relation)',
+                        isDeceased ? '$name (Wafat)' : name,
                         style: TextStyle(
                           fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                           color: isDeceased
                               ? (isDark ? Colors.white38 : Colors.grey.shade600)
                               : (isDark ? Colors.white : Colors.black87),
                           decoration: isDeceased ? TextDecoration.lineThrough : null,
                         ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 2),
                       Text(

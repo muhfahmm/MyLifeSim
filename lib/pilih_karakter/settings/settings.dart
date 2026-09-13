@@ -3,11 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/main.dart'; // Untuk mengakses themeNotifier
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
-import 'package:mylifesim/store_page/store_page.dart'; // Tambahkan Import ini
+import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
-import 'kategori_persentase/keluarga/keluarga_settings_page.dart';
-import 'kategori_persentase/teman_sekolah/teman_sekolah_settings_page.dart';
-import 'kategori_persentase/teman_kerja/teman_kerja_settings_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -18,28 +15,54 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   void _showResetConfirmation() {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Reset Semua Data?', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: const Text(
-          'Semua progres game, karakter, dan pengaturan akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.'
+        backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.redAccent, size: 24),
+            const SizedBox(width: 8),
+            Text(
+              'Reset Semua Data?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 18,
+                color: isDark ? Colors.white : const Color(0xFF0F172A),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          'Semua progres game, karakter, dan pengaturan akan dihapus permanen. Tindakan ini tidak dapat dibatalkan.',
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white54 : Colors.grey.shade600, fontWeight: FontWeight.bold)),
           ),
-          TextButton(
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              foregroundColor: Colors.white,
+              elevation: 0,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
             onPressed: () {
               Navigator.pop(ctx);
               GlobalSettings.resetAll();
               themeNotifier.value = ThemeMode.light;
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Semua data dan pengaturan berhasil direset!'), backgroundColor: Colors.red),
+                const SnackBar(content: Text('Semua data dan pengaturan berhasil direset!'), backgroundColor: Colors.redAccent),
               );
             },
-            child: const Text('Reset', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text('Reset Permanen', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -49,29 +72,44 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+    final cardBgColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final borderColor = isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.06);
 
     return Scaffold(
-      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
+      backgroundColor: backgroundColor,
       appBar: AppBar(
-        title: const Text('⚙️ Settingan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
+        title: Text(
+          '⚙️ Settingan',
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 18, color: textColor),
+        ),
+        backgroundColor: backgroundColor,
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: isDark ? Colors.white : Colors.black87),
+          icon: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.white.withValues(alpha: 0.08) : Colors.black.withValues(alpha: 0.05),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(Icons.arrow_back, size: 18, color: textColor),
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16.0),
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
         children: [
           // --- SEKSI TAMPILAN ---
-          _buildSectionTitle('Tampilan', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          _buildSectionTitle('Tampilan', subtextColor),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
@@ -80,20 +118,34 @@ class _SettingsPageState extends State<SettingsPage> {
                   builder: (context, mode, _) {
                     final bool isDarkMode = mode == ThemeMode.dark;
                     return SwitchListTile(
-                      secondary: Icon(
-                        isDarkMode ? Icons.dark_mode : Icons.light_mode,
-                        color: isDarkMode ? Colors.yellow.shade700 : Colors.blue,
+                      activeThumbColor: Colors.amber,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      secondary: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: (isDarkMode ? Colors.amber : Colors.blue).withValues(alpha: 0.12),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isDarkMode ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                          color: isDarkMode ? Colors.amber : Colors.blue,
+                          size: 20,
+                        ),
                       ),
                       title: Text(
                         'Mode Gelap (Dark Mode)',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
+                          fontSize: 14.5,
+                          color: textColor,
                         ),
                       ),
                       subtitle: Text(
                         isDarkMode ? 'Mode gelap aktif' : 'Mode terang aktif',
-                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
+                        style: TextStyle(fontSize: 12, color: subtextColor),
                       ),
                       value: isDarkMode,
                       onChanged: (val) {
@@ -102,24 +154,35 @@ class _SettingsPageState extends State<SettingsPage> {
                     );
                   },
                 ),
-                const Divider(height: 1),
+                Divider(height: 1, color: borderColor),
                 ValueListenableBuilder<CurrencyModel>(
                   valueListenable: CurrencySettings.selectedCurrency,
                   builder: (context, curr, _) {
                     return ListTile(
-                      leading: Text(curr.flag, style: const TextStyle(fontSize: 22)),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      leading: Container(
+                        width: 40,
+                        height: 40,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Text(curr.flag, style: const TextStyle(fontSize: 20)),
+                      ),
                       title: Text(
                         'Mata Uang Game',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
+                          fontSize: 14.5,
+                          color: textColor,
                         ),
                       ),
                       subtitle: Text(
                         '${curr.name} (${curr.code} / ${curr.symbol})',
-                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.black54),
+                        style: TextStyle(fontSize: 12, color: subtextColor),
                       ),
-                      trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+                      trailing: Icon(Icons.chevron_right_rounded, size: 18, color: subtextColor),
                       onTap: () {
                         Navigator.push(
                           context,
@@ -132,45 +195,69 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // --- SEKSI AUDIO ---
-          _buildSectionTitle('Audio', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          _buildSectionTitle('Audio', subtextColor),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
             ),
             child: Column(
               children: [
                 ValueListenableBuilder<bool>(
                   valueListenable: GlobalSettings.musicEnabled,
                   builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.music_note, color: Colors.purple),
+                    activeThumbColor: Colors.purpleAccent,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    secondary: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.purple.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.music_note_rounded, color: Colors.purpleAccent, size: 20),
+                    ),
                     title: Text(
                       'Musik Latar',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 14.5,
+                        color: textColor,
                       ),
                     ),
+                    subtitle: Text('Aktifkan musik latar game', style: TextStyle(fontSize: 12, color: subtextColor)),
                     value: val,
                     onChanged: (newVal) => GlobalSettings.musicEnabled.value = newVal,
                   ),
                 ),
-                const Divider(height: 1),
+                Divider(height: 1, color: borderColor),
                 ValueListenableBuilder<bool>(
                   valueListenable: GlobalSettings.soundEffectsEnabled,
                   builder: (context, val, _) => SwitchListTile(
-                    secondary: const Icon(Icons.volume_up, color: Colors.orange),
+                    activeThumbColor: Colors.orangeAccent,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    secondary: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.12),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.volume_up_rounded, color: Colors.orangeAccent, size: 20),
+                    ),
                     title: Text(
                       'Efek Suara',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.white : Colors.black87,
+                        fontSize: 14.5,
+                        color: textColor,
                       ),
                     ),
+                    subtitle: Text('Efek suara tombol & aktivitas', style: TextStyle(fontSize: 12, color: subtextColor)),
                     value: val,
                     onChanged: (newVal) => GlobalSettings.soundEffectsEnabled.value = newVal,
                   ),
@@ -178,468 +265,323 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // --- SEKSI GAMEPLAY ---
-          _buildSectionTitle('Gameplay', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          _buildSectionTitle('Gameplay', subtextColor),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
             ),
             child: ValueListenableBuilder<bool>(
               valueListenable: GlobalSettings.animationsEnabled,
               builder: (context, val, _) => SwitchListTile(
-                secondary: const Icon(Icons.animation, color: Colors.teal),
+                activeThumbColor: Colors.tealAccent,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                secondary: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.teal.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.animation_rounded, color: Colors.teal, size: 20),
+                ),
                 title: Text(
                   'Animasi UI',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white : Colors.black87,
+                    fontSize: 14.5,
+                    color: textColor,
                   ),
                 ),
-                subtitle: const Text(
+                subtitle: Text(
                   'Aktifkan atau nonaktifkan animasi halus',
-                  style: TextStyle(fontSize: 12),
+                  style: TextStyle(fontSize: 12, color: subtextColor),
                 ),
                 value: val,
                 onChanged: (newVal) => GlobalSettings.animationsEnabled.value = newVal,
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // =========================================================
           // --- SEKSI PREFERENSI KONTEN DEWASA (DENGAN PREMIUM GATE) ---
           // =========================================================
-          _buildSectionTitle('Preferensi Konten Dewasa', isDark),
-          
-          // Bungkus seluruh Card dengan ValueListenableBuilder yang mendengarkan status Premium
+          _buildSectionTitle('Preferensi Konten Dewasa', subtextColor),
+
           ValueListenableBuilder<bool>(
             valueListenable: GlobalSettings.isPremium,
             builder: (context, isPremium, _) {
-              
-              // Jika BELUM premium, tampilkan tampilan Terkunci (Lock)
               if (!isPremium) {
-                return Card(
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                return Container(
+                  padding: const EdgeInsets.all(20.0),
+                  decoration: BoxDecoration(
+                    color: cardBgColor,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: borderColor),
                   ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.lock,
-                          size: 48,
-                          color: isDark ? Colors.orange.shade200 : Colors.orange,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          '🔒 Fitur Dewasa Terkunci',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black87,
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 56,
+                        height: 56,
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFF59E0B), Color(0xFFD97706)],
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Fitur ini hanya tersedia untuk pengguna Premium.\nSilakan aktifkan untuk membuka semua pengaturan.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: isDark ? Colors.white70 : Colors.grey.shade600,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton.icon(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF8A5A32),
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFF59E0B).withValues(alpha: 0.3),
+                              blurRadius: 12,
+                              offset: const Offset(0, 4),
                             ),
-                            // MENGUBAH ONPRESSED: Arahkan ke Store Page dulu!
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const StorePage(),
-                                ),
-                              );
-                            },
-                            icon: const Icon(Icons.diamond),
-                            label: const Text(
-                              'Aktifkan Premium Sekarang 💎',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                          ],
+                        ),
+                        child: const Icon(Icons.lock_rounded, size: 26, color: Colors.white),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        '🔒 Fitur Dewasa Terkunci',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w800,
+                          color: textColor,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Fitur ini hanya tersedia untuk pengguna Premium.\nAktifkan untuk membuka semua kontrol preferensi.',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 12.5,
+                          height: 1.4,
+                          color: subtextColor,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD97706),
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
                           ),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const StorePage()),
+                            );
+                          },
+                          icon: const Icon(Icons.diamond_rounded, size: 18),
+                          label: const Text(
+                            'Aktifkan Premium Sekarang 💎',
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                          ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 );
               }
 
-              // Jika SUDAH premium, tampilkan Toggle seperti biasa
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                    ),
-                    child: Column(
-                      children: [
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disableMasturbationFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.block, color: Colors.redAccent),
-                            title: Text(
-                              'Nonaktifkan Ajakan Masturbasi (Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan dari ayah, ibu, kakak, adik, paman, bibi, dll.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disableMasturbationFamily.value = newVal,
-                          ),
+              // Jika SUDAH premium
+              return Container(
+                decoration: BoxDecoration(
+                  color: cardBgColor,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: borderColor),
+                ),
+                child: Column(
+                  children: [
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMasturbationFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.redAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.block, color: Colors.redAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Masturbasi (Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
                         ),
-                        const Divider(height: 1),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disableMasturbationNonFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.group, color: Colors.orange),
-                            title: Text(
-                              'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan dari teman, guru, rekan kerja, atau orang lain.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disableMasturbationNonFamily.value = newVal,
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disableMakeLoveFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.favorite, color: Colors.pinkAccent),
-                            title: Text(
-                              'Nonaktifkan Ajakan Make Love (Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan hubungan intim dari anggota keluarga.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disableMakeLoveFamily.value = newVal,
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disableMakeLoveNonFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.people, color: Colors.blueAccent),
-                            title: Text(
-                              'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan hubungan intim dari teman, guru, rekan kerja, atau orang lain.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disableMakeLoveNonFamily.value = newVal,
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disablePacaranFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.heart_broken, color: Colors.red),
-                            title: Text(
-                              'Nonaktifkan Ajakan Pacaran (Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan pacaran dari anggota keluarga.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disablePacaranFamily.value = newVal,
-                          ),
-                        ),
-                        const Divider(height: 1),
-                        ValueListenableBuilder<bool>(
-                          valueListenable: GlobalSettings.disablePacaranNonFamily,
-                          builder: (context, val, _) => SwitchListTile(
-                            secondary: const Icon(Icons.person_add_disabled, color: Colors.deepOrange),
-                            title: Text(
-                              'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: const Text(
-                              'Mencegah ajakan pacaran dari teman, guru, rekan kerja, atau orang lain.',
-                              style: TextStyle(fontSize: 12),
-                            ),
-                            value: val,
-                            onChanged: (newVal) => GlobalSettings.disablePacaranNonFamily.value = newVal,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      _buildSectionTitle('Pengaturan Persentase Ajakan Pacaran, Make Love & Mastrubasi Per-Anggota', isDark),
-                      ValueListenableBuilder<String>(
-                        valueListenable: GlobalSettings.userGender,
-                        builder: (context, genderVal, _) {
-                          final bool isFemale = genderVal.trim().toLowerCase() == 'perempuan' || genderVal.trim().toLowerCase() == 'female';
-                          return Container(
-                              margin: const EdgeInsets.only(right: 12, top: 12),
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                              decoration: BoxDecoration(
-                                color: isFemale ? Colors.pink.withValues(alpha: 0.15) : Colors.blue.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(20),
-                                border: Border.all(
-                                  color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                                  width: 1.2,
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(
-                                    isFemale ? Icons.female : Icons.male,
-                                    color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                                    size: 14,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    isFemale ? 'Perempuan' : 'Laki-laki',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                        },
+                        subtitle: Text('Mencegah ajakan dari anggota keluarga.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMasturbationFamily.value = newVal,
                       ),
-                    ],
-                  ),
-                  const SizedBox(height: 6),
-                  Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 12),
-                    padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 10),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.blue.shade300.withValues(alpha: 0.4), width: 1),
                     ),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(Icons.info_outline, color: Colors.blueAccent, size: 16),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            'Catatan: Persentase pada slider di bawah mengatur peluang inisiatif ajakan DARI NPC KE KARAKTER USER (Bukan peluang ajakan user yang diterima oleh NPC).',
-                            style: TextStyle(
-                              fontSize: 11.5,
-                              color: isDark ? Colors.blue.shade100 : Colors.blue.shade900,
-                              height: 1.3,
-                            ),
-                          ),
+                    Divider(height: 1, color: borderColor),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMasturbationNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.orangeAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.group, color: Colors.orange),
+                        title: Text(
+                          'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
                         ),
-                      ],
+                        subtitle: Text('Mencegah ajakan dari teman, guru, atau rekan kerja.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMasturbationNonFamily.value = newVal,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  // CARD NAVIGATION BUTTONS UNTUK 3 KATEGORI PERSENTASE
-                  Card(
-                    elevation: 1,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    color: isDark ? Colors.grey.shade900 : Colors.white,
-                    child: Column(
-                      children: [
-                        ListTile(
-                          leading: const Icon(Icons.family_restroom, color: Colors.blueAccent),
-                          title: Text(
-                            'Keluarga',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          subtitle: const Text(
-                            'Atur persentase ajakan untuk Ayah, Ibu, Kakak, Adik, Paman, Sepupu, dll.',
-                            style: TextStyle(fontSize: 11),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const KeluargaSettingsPage()),
-                            );
-                          },
+                    Divider(height: 1, color: borderColor),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMakeLoveFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.pinkAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.favorite, color: Colors.pinkAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Make Love (Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
                         ),
-                        const Divider(height: 1),
-                        ListTile(
-                          leading: const Icon(Icons.school, color: Colors.amber),
-                          title: Text(
-                            'Teman Sekolah',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          subtitle: const Text(
-                            'Atur persentase ajakan untuk Guru, Dosen, dan Teman Sekelas/Sekolah.',
-                            style: TextStyle(fontSize: 11),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const TemanSekolahSettingsPage()),
-                            );
-                          },
-                        ),
-                        const Divider(height: 1),
-                        ListTile(
-                          leading: const Icon(Icons.work, color: Colors.deepPurpleAccent),
-                          title: Text(
-                            'Teman Kerja',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                              color: isDark ? Colors.white : Colors.black87,
-                            ),
-                          ),
-                          subtitle: const Text(
-                            'Atur persentase ajakan untuk Bos, Atasan, Supervisor, dan Rekan Kerja.',
-                            style: TextStyle(fontSize: 11),
-                          ),
-                          trailing: const Icon(Icons.arrow_forward_ios, size: 14),
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (_) => const TemanKerjaSettingsPage()),
-                            );
-                          },
-                        ),
-                      ],
+                        subtitle: Text('Mencegah ajakan hubungan intim dari keluarga.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMakeLoveFamily.value = newVal,
+                      ),
                     ),
-                  ),
-                ],
+                    Divider(height: 1, color: borderColor),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disableMakeLoveNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.blueAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.people, color: Colors.blueAccent),
+                        title: Text(
+                          'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
+                        ),
+                        subtitle: Text('Mencegah ajakan hubungan intim dari non-keluarga.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disableMakeLoveNonFamily.value = newVal,
+                      ),
+                    ),
+                    Divider(height: 1, color: borderColor),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disablePacaranFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.redAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.heart_broken, color: Colors.red),
+                        title: Text(
+                          'Nonaktifkan Ajakan Pacaran (Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
+                        ),
+                        subtitle: Text('Mencegah ajakan pacaran dari anggota keluarga.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disablePacaranFamily.value = newVal,
+                      ),
+                    ),
+                    Divider(height: 1, color: borderColor),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.disablePacaranNonFamily,
+                      builder: (context, val, _) => SwitchListTile(
+                        activeThumbColor: Colors.deepOrangeAccent,
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                        secondary: const Icon(Icons.person_add_disabled, color: Colors.deepOrange),
+                        title: Text(
+                          'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
+                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: textColor),
+                        ),
+                        subtitle: Text('Mencegah ajakan pacaran dari non-keluarga.', style: TextStyle(fontSize: 11.5, color: subtextColor)),
+                        value: val,
+                        onChanged: (newVal) => GlobalSettings.disablePacaranNonFamily.value = newVal,
+                      ),
+                    ),
+                  ],
+                ),
               );
             },
           ),
-          // =========================================================
-          // --- AKHIR SEKSI PREMIUM GATE ---
-          // =========================================================
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // --- SEKSI DATA & PRIVASI ---
-          _buildSectionTitle('Data & Privasi', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          _buildSectionTitle('Data & Privasi', subtextColor),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
             ),
             child: ListTile(
-              leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: Text(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.red.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.delete_forever_rounded, color: Colors.redAccent, size: 20),
+              ),
+              title: const Text(
                 'Reset Semua Data',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
+                  fontSize: 14.5,
+                  color: Colors.redAccent,
                 ),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Hapus semua progres dan mulai dari awal',
-                style: TextStyle(fontSize: 12, color: Colors.grey),
+                style: TextStyle(fontSize: 12, color: subtextColor),
               ),
-              trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+              trailing: Icon(Icons.chevron_right_rounded, size: 18, color: subtextColor),
               onTap: _showResetConfirmation,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 12),
 
           // --- SEKSI TENTANG ---
-          _buildSectionTitle('Tentang', isDark),
-          Card(
-            elevation: 0,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-              side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+          _buildSectionTitle('Tentang', subtextColor),
+          Container(
+            decoration: BoxDecoration(
+              color: cardBgColor,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: borderColor),
             ),
-            child: const ListTile(
-              leading: Icon(Icons.info_outline, color: Colors.blue),
-              title: Text('Versi Aplikasi', style: TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text('v1.0.0 (Latest)', style: TextStyle(fontSize: 12)),
-              trailing: Text('Game Simulasi Kehidupan', style: TextStyle(fontSize: 10, color: Colors.grey)),
+            child: ListTile(
+              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              leading: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withValues(alpha: 0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(Icons.info_outline_rounded, color: Colors.blue, size: 20),
+              ),
+              title: Text('Versi Aplikasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14.5, color: textColor)),
+              subtitle: Text('v1.0.0 (Latest)', style: TextStyle(fontSize: 12, color: subtextColor)),
+              trailing: Text('MyLifeSim', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: subtextColor)),
             ),
           ),
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildSectionTitle(String title, bool isDark) {
+  Widget _buildSectionTitle(String title, Color subtextColor) {
     return Padding(
-      padding: const EdgeInsets.only(left: 4, top: 20, bottom: 8),
+      padding: const EdgeInsets.only(left: 4, top: 16, bottom: 8),
       child: Text(
         title.toUpperCase(),
         style: TextStyle(
-          fontSize: 13,
-          fontWeight: FontWeight.bold,
-          color: isDark ? Colors.blueGrey.shade200 : Colors.blueGrey,
+          fontSize: 11.5,
+          fontWeight: FontWeight.w800,
+          color: subtextColor,
           letterSpacing: 1.2,
         ),
       ),

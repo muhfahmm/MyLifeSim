@@ -5,9 +5,7 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/paused_menu/pausedMenu.dart';
 import 'dart:math';
-import 'dart:async';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
@@ -25,7 +23,6 @@ import 'package:mylifesim/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/std_logic.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/eye_test_logic.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/univ_logic/univ_menu_page.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/contract_modals.dart';
@@ -41,9 +38,6 @@ import 'package:mylifesim/game/widgets/statistik_ajakan/statistik_ajakan_masturb
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_berteman/ajakan_berteman_handler.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/character_progression/character_progression_page.dart';
-import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_6tahun/minta_cerai/minta_cerai_dialogue.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_dipecat_modal.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_pensiun_modal.dart';
 
@@ -412,56 +406,115 @@ class _GameScreenState extends State<GameScreen> {
       if (nonChosenName != null && !isDeceased && !isImprisoned) {
         final bool shouldTrigger = _character.age == 15 || Random().nextInt(100) < 20;
         if (shouldTrigger) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
           showDialog(
             context: context,
             barrierDismissible: false,
             builder: (ctx) => AlertDialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-              title: const Row(
+              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+              contentPadding: const EdgeInsets.fromLTRB(24, 20, 24, 16),
+              title: Row(
                 children: [
-                  Icon(Icons.family_restroom, color: Colors.blue),
-                  SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.family_restroom_rounded, color: Colors.blue, size: 22),
+                  ),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text('Pertemuan Kembali 👪', style: TextStyle(fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Pertemuan Kembali',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 18,
+                        color: isDark ? Colors.white : const Color(0xFF0F172A),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              content: Text(
-                '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.\n\nApakah kamu ingin menemuinya?',
-                style: const TextStyle(fontSize: 14),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.',
+                    style: TextStyle(
+                      fontSize: 14,
+                      height: 1.4,
+                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  Text(
+                    'Apakah kamu ingin menemuinya?',
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.white : const Color(0xFF0F172A),
+                    ),
+                  ),
+                ],
               ),
+              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    setState(() {
-                      _character.hasEstrangedReunionTriggered = true;
-                      if (nonChosenIsFather) {
-                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) + 40).clamp(0, 100);
-                      } else {
-                        _character.motherRelationship = ((_character.motherRelationship ?? 20) + 40).clamp(0, 100);
-                      }
-                      _character.inbox.add('❤️ Pertemuan Kembali: Kamu bertemu dengan $nonChosenName. Hubungan kalian membaik secara signifikan (+40).');
-                    });
-                    done();
-                  },
-                  child: const Text('Temui', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green)),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    setState(() {
-                      _character.hasEstrangedReunionTriggered = true;
-                      if (nonChosenIsFather) {
-                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) - 20).clamp(0, 100);
-                      } else {
-                        _character.motherRelationship = ((_character.motherRelationship ?? 20) - 20).clamp(0, 100);
-                      }
-                      _character.inbox.add('💔 Menolak Bertemu: Kamu memilih untuk tidak menemui $nonChosenName (-20 Hubungan).');
-                    });
-                    done();
-                  },
-                  child: const Text('Tolak', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.redAccent,
+                          side: const BorderSide(color: Colors.redAccent, width: 1.2),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            _character.hasEstrangedReunionTriggered = true;
+                            if (nonChosenIsFather) {
+                              _character.fatherRelationship = ((_character.fatherRelationship ?? 20) - 20).clamp(0, 100);
+                            } else {
+                              _character.motherRelationship = ((_character.motherRelationship ?? 20) - 20).clamp(0, 100);
+                            }
+                            _character.inbox.add('💔 Menolak Bertemu: Kamu memilih untuk tidak menemui $nonChosenName (-20 Hubungan).');
+                          });
+                          done();
+                        },
+                        child: const Text('Tolak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF10B981),
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          setState(() {
+                            _character.hasEstrangedReunionTriggered = true;
+                            if (nonChosenIsFather) {
+                              _character.fatherRelationship = ((_character.fatherRelationship ?? 20) + 40).clamp(0, 100);
+                            } else {
+                              _character.motherRelationship = ((_character.motherRelationship ?? 20) + 40).clamp(0, 100);
+                            }
+                            _character.inbox.add('❤️ Pertemuan Kembali: Kamu bertemu dengan $nonChosenName. Hubungan kalian membaik secara signifikan (+40).');
+                          });
+                          done();
+                        },
+                        child: const Text('Temui', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -852,31 +905,49 @@ class _GameScreenState extends State<GameScreen> {
       context: context,
       barrierDismissible: false,
       builder: (ctx) {
+        final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          title: const Row(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+          contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+          title: Row(
             children: [
-              Icon(Icons.healing, color: Colors.red, size: 28),
-              SizedBox(width: 10),
+              const Icon(Icons.healing, color: Colors.red, size: 18),
+              const SizedBox(width: 6),
               Expanded(
-                child: Text('Terkena Penyakit 🤒', style: TextStyle(fontWeight: FontWeight.bold)),
+                child: Text(
+                  'Terkena Penyakit 🤒',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13.5,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
               ),
             ],
           ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch, // Membuat semua button lebar seragam
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
                 sicknessEvent.contains(': ') ? sicknessEvent.substring(sicknessEvent.indexOf(': ') + 2) : sicknessEvent,
-                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                style: TextStyle(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w500,
+                  height: 1.3,
+                  color: isDark ? Colors.white70 : Colors.black87,
+                ),
               ),
-              const SizedBox(height: 20),
-              const Text(
+              const SizedBox(height: 8),
+              Text(
                 'Apa yang ingin kamu lakukan?',
-                style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey),
+                style: TextStyle(fontSize: 10.5, fontStyle: FontStyle.italic, color: isDark ? Colors.grey.shade400 : Colors.grey.shade600),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
               if ((!_character.isMotherDeceased && _character.motherName != null) ||
                   (!_character.isFatherDeceased && _character.fatherName != null) ||
                   (!_character.isStepMotherDeceased && _character.stepMotherName != null) ||
@@ -885,27 +956,26 @@ class _GameScreenState extends State<GameScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.orange.shade400,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(vertical: 7),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                   ),
                   onPressed: () {
                     Navigator.pop(ctx);
                     _handleTellParents(sicknessEvent, onDone);
                   },
-                  child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                  child: const Text('Beritahu Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: 5),
               ],
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade600,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 7),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: () {
                   Navigator.pop(ctx);
-                  // Buka DokterPage dan pastikan callback onDone dipanggil ketika menutup/kembali dari DokterPage
                   DokterMenuHelper.showDokterMenu(context, _character, () {
                     if (mounted) setState(() {});
                   }).then((_) {
@@ -913,21 +983,21 @@ class _GameScreenState extends State<GameScreen> {
                     onDone();
                   });
                 },
-                child: const Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                child: const Text('Pergi ke Dokter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 5),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey.shade500,
                   foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 7),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                 ),
                 onPressed: () {
                   Navigator.pop(ctx);
                   onDone();
                 },
-                child: const Text('Biarkan saja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                child: const Text('Biarkan saja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 11.5)),
               ),
             ],
           ),
@@ -943,31 +1013,54 @@ class _GameScreenState extends State<GameScreen> {
     if (!hasParents) {
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Tidak Ada Orang Tua 😔'),
-          content: const Text('Kamu tidak memiliki orang tua yang bisa dihubungi saat ini.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                // Karena gagal beritahu ortu, tanya lagi apakah mau ke dokter
-                _showSicknessModal(sicknessEvent, onDone);
-              },
-              child: const Text('Kembali'),
-            )
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    'Tidak Ada Orang Tua 😔',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.5,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Kamu tidak memiliki orang tua yang bisa dihubungi saat ini.',
+              style: TextStyle(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  _showSicknessModal(sicknessEvent, onDone);
+                },
+                child: const Text('Kembali', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+              )
+            ],
+          );
+        },
       );
       return;
     }
     
-    // Logika respon orang tua
     final random = Random();
-    final bool isCare = random.nextDouble() < 0.7; // 70% dirawat/dibawa ke dokter
+    final bool isCare = random.nextDouble() < 0.7;
     
     if (isCare) {
       _character.health = (_character.health + 30).clamp(0, 100);
-      final int happyBoost = 10 + random.nextInt(6); // 10-15%
+      final int happyBoost = 10 + random.nextInt(6);
       _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
       if (_character.motherRelationship != null) {
         _character.motherRelationship = (_character.motherRelationship! + 10).clamp(0, 100);
@@ -983,24 +1076,55 @@ class _GameScreenState extends State<GameScreen> {
       
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Respons Orang Tua ❤️'),
-          content: Text('Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +$happyBoost% Kebahagiaan, +10% Hubungan Orang Tua).'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                if (mounted) setState(() {});
-                onDone();
-              },
-              child: const Text('Mengerti'),
-            )
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            title: Row(
+              children: [
+                const Icon(Icons.favorite, color: Colors.red, size: 18),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Respons Orang Tua ❤️',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.5,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Orang tuamu sangat khawatir. Mereka membawamu ke klinik dan merawatmu sampai kondisi kesehatanmu membaik (+30% Kesehatan, +$happyBoost% Kebahagiaan, +10% Hubungan Orang Tua).',
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.3,
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  if (mounted) setState(() {});
+                  onDone();
+                },
+                child: const Text('Mengerti', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+              )
+            ],
+          );
+        },
       );
     } else {
       _character.health = (_character.health + 5).clamp(0, 100);
-      final int happyBoost = 10 + random.nextInt(6); // 10-15%
+      final int happyBoost = 10 + random.nextInt(6);
       _character.happiness = (_character.happiness + happyBoost).clamp(0, 100);
       _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
         _character,
@@ -1010,20 +1134,51 @@ class _GameScreenState extends State<GameScreen> {
       
       showDialog(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Respons Orang Tua 🏠'),
-          content: Text('Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan, +$happyBoost% Kebahagiaan).'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                if (mounted) setState(() {});
-                onDone();
-              },
-              child: const Text('Mengerti'),
-            )
-          ],
-        ),
+        builder: (ctx) {
+          final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+            contentPadding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+            title: Row(
+              children: [
+                const Icon(Icons.home, color: Colors.blue, size: 18),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    'Respons Orang Tua 🏠',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 13.5,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Text(
+              'Orang tuamu menyuruhmu beristirahat di kamar dan membelikanmu obat warung biasa (+5% Kesehatan, +$happyBoost% Kebahagiaan).',
+              style: TextStyle(
+                fontSize: 11.5,
+                height: 1.3,
+                color: isDark ? Colors.white70 : Colors.black87,
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                  if (mounted) setState(() {});
+                  onDone();
+                },
+                child: const Text('Mengerti', style: TextStyle(fontSize: 11.5, fontWeight: FontWeight.bold)),
+              )
+            ],
+          );
+        },
       );
     }
   }
@@ -2219,114 +2374,120 @@ class _GameScreenState extends State<GameScreen> {
   void _checkGraduationOptions([VoidCallback? onDone]) {
     if (_character.age == 18 && _character.univMajor == null && _character.jobName == null) {
       showDialog(
-  context: context,
-  barrierDismissible: false,
-  builder: (dialogContext) {
-    final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
-    return PopScope(
-      canPop: false,
-      child: AlertDialog(
-      backgroundColor: isDark ? Colors.grey.shade900 : null,
-      title: Row(
-        children: [
-          const Icon(Icons.school, color: Colors.indigo),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              'Pilihan Masa Depan 🎓',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white : Colors.black87,
-              ),
-            ),
-          ),
-        ],
-      ),
-      content: Text(
-        'Selamat! Kamu telah resmi lulus dari SMA pada usia 18 tahun. Apa rencana hidupmu selanjutnya?',
-        style: TextStyle(
-          fontSize: 14,
-          color: isDark ? Colors.white70 : Colors.black87,
-        ),
-      ),
-      actions: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.indigo,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                _checkUniversityGraduationOptions(onDone);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => UnivMenuPage(
-                      character: _character,
-                      onRefresh: () => setState(() {}),
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+          return PopScope(
+            canPop: false,
+            child: AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              backgroundColor: isDark ? Colors.grey.shade900 : null,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Row(
+                children: [
+                  const Icon(Icons.school, color: Colors.indigo, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Pilihan Masa Depan 🎓',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
                     ),
                   ),
-                );
-              },
-              child: const Text('Mendaftar Universitas 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 8),
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ],
               ),
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                _checkUniversityGraduationOptions(onDone);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    settings: const RouteSettings(name: 'KerjaMenuScreen'),
-                    builder: (context) => KerjaMenuScreen(
-                      character: _character,
-                      onRefresh: () => setState(() {}),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Selamat! Kamu telah resmi lulus dari SMA pada usia 18 tahun. Apa rencana hidupmu selanjutnya?',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white70 : Colors.black87,
                     ),
                   ),
-                );
-              },
-              child: const Text('Mencari Pekerjaan 💼', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-            const SizedBox(height: 8),
-            TextButton(
-              style: TextButton.styleFrom(
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                foregroundColor: isDark ? Colors.white70 : Colors.grey.shade700,
+                  const SizedBox(height: 14),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.indigo,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _checkUniversityGraduationOptions(onDone);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UnivMenuPage(
+                            character: _character,
+                            onRefresh: () => setState(() {}),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Mendaftar Universitas 🎓', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 6),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      _checkUniversityGraduationOptions(onDone);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          settings: const RouteSettings(name: 'KerjaMenuScreen'),
+                          builder: (context) => KerjaMenuScreen(
+                            character: _character,
+                            onRefresh: () => setState(() {}),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Mencari Pekerjaan 💼', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 6),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      foregroundColor: isDark ? Colors.white70 : Colors.grey.shade700,
+                    ),
+                    onPressed: () {
+                      Navigator.pop(dialogContext);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
+                      );
+                      _checkUniversityGraduationOptions(onDone);
+                    },
+                    child: Text(
+                      'Tidak Memilih Apapun (Menganggur)',
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.bold,
+                        color: isDark ? Colors.white70 : Colors.grey.shade700,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Kamu memilih untuk tidak kuliah maupun bekerja saat ini.')),
-                );
-                _checkUniversityGraduationOptions(onDone);
-              },
-              child: Text(
-                'Tidak Memilih Apapun (Menganggur)',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white70 : Colors.grey.shade700,
-                ),
-              ),
             ),
-          ],
-        ),
-      ],
-    ),
-    );
-  },
-);
+          );
+        },
+      );
     } else {
       _checkUniversityGraduationOptions(onDone);
     }
@@ -2338,78 +2499,97 @@ class _GameScreenState extends State<GameScreen> {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => PopScope(
-          canPop: false,
-          child: AlertDialog(
-          title: Row(
-            children: [
-              Icon(Icons.school, color: Colors.blue.shade700),
-              const SizedBox(width: 8),
-              const Text('Kelulusan Kuliah 🎓', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ],
-          ),
-          content: Text(
-            '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang S1 dengan jurusan $major! 🎉\n\n'
-            'Pilih langkah selanjutnya untuk masa depanmu:',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.purple.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _character.justGraduatedStage = null;
-                    _checkEsportPromotion(onDone);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => UnivMenuPage(
-                          character: _character,
-                          onRefresh: () => setState(() {}),
-                        ),
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return PopScope(
+            canPop: false,
+            child: AlertDialog(
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              backgroundColor: isDark ? Colors.grey.shade900 : null,
+              title: Row(
+                children: [
+                  Icon(Icons.school, color: Colors.blue.shade700, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Kelulusan Kuliah 🎓',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
-                    );
-                  },
-                  child: const Text('Lanjut S2 🎓', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    ),
                   ),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    _character.justGraduatedStage = null;
-                    _checkEsportPromotion(onDone);
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        settings: const RouteSettings(name: 'KerjaMenuScreen'),
-                        builder: (context) => KerjaMenuScreen(
-                          character: _character,
-                          onRefresh: () => setState(() {}),
+                ],
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang S1 dengan jurusan $major! 🎉\n\nPilih langkah selanjutnya untuk masa depanmu:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple.shade600,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.justGraduatedStage = null;
+                      _checkEsportPromotion(onDone);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => UnivMenuPage(
+                            character: _character,
+                            onRefresh: () => setState(() {}),
+                          ),
                         ),
-                      ),
-                    );
-                  },
-                  child: const Text('Pilih Bekerja 💼', style: TextStyle(fontWeight: FontWeight.bold)),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
+                      );
+                    },
+                    child: const Text('Lanjut S2 🎓', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                  const SizedBox(height: 6),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue.shade700,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      _character.justGraduatedStage = null;
+                      _checkEsportPromotion(onDone);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          settings: const RouteSettings(name: 'KerjaMenuScreen'),
+                          builder: (context) => KerjaMenuScreen(
+                            character: _character,
+                            onRefresh: () => setState(() {}),
+                          ),
+                        ),
+                      );
+                    },
+                    child: const Text('Pilih Bekerja 💼', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       );
     } else {
       _checkEsportPromotion(onDone);
@@ -3715,28 +3895,45 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.home, color: Colors.blue),
-              SizedBox(width: 8),
-              Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: Text(
-            'Karena ibumu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada $fatherOrStepFatherLabel.',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _applyCustodyChoice('Ayah', onDone);
-              },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Row(
+              children: [
+                const Icon(Icons.home, color: Colors.blue, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Pilih Hak Asuh 🏡',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+            content: Text(
+              'Karena ibumu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada $fatherOrStepFatherLabel.',
+              style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _applyCustodyChoice('Ayah', onDone);
+                },
+                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
@@ -3745,28 +3942,45 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       showDialog(
         context: context,
         barrierDismissible: false,
-        builder: (context) => AlertDialog(
-          title: const Row(
-            children: [
-              Icon(Icons.home, color: Colors.pink),
-              SizedBox(width: 8),
-              Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
-          ),
-          content: Text(
-            'Karena ayahmu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada Ibumu ($motherName).',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _applyCustodyChoice('Ibu', onDone);
-              },
-              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+        builder: (context) {
+          final bool isDark = Theme.of(context).brightness == Brightness.dark;
+          return AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+            contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            title: Row(
+              children: [
+                const Icon(Icons.home, color: Colors.pink, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Pilih Hak Asuh 🏡',
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+            content: Text(
+              'Karena ayahmu dipenjara/wafat, hak asuh kamu otomatis jatuh kepada Ibumu ($motherName).',
+              style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _applyCustodyChoice('Ibu', onDone);
+                },
+                child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              ),
+            ],
+          );
+        },
       );
       return;
     }
@@ -3775,35 +3989,78 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.home, color: Colors.blue),
-            SizedBox(width: 8),
-            Text('Pilih Hak Asuh 🏡', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
-        ),
-        content: const Text(
-          'Karena orang tuamu bercerai, kamu harus memilih untuk tinggal bersama siapa.',
-          style: TextStyle(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _applyCustodyChoice('Ayah', onDone);
-            },
-            child: Text('Ikut Ayah ($fatherOrStepFatherLabel)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+      builder: (context) {
+        final bool isDark = Theme.of(context).brightness == Brightness.dark;
+        return AlertDialog(
+          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          contentPadding: const EdgeInsets.fromLTRB(16, 12, 16, 16),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: isDark ? Colors.grey.shade900 : null,
+          title: Row(
+            children: [
+              const Icon(Icons.home, color: Colors.blue, size: 20),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Pilih Hak Asuh 🏡',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
+            ],
           ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _applyCustodyChoice('Ibu', onDone);
-            },
-            child: Text('Ikut Ibu ($motherName)', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.pink)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                'Karena orang tuamu bercerai, kamu harus memilih untuk tinggal bersama siapa.',
+                style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black87),
+              ),
+              const SizedBox(height: 14),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _applyCustodyChoice('Ayah', onDone);
+                },
+                child: Text(
+                  'Ikut Ayah ($fatherOrStepFatherLabel)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(height: 6),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.pink.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  _applyCustodyChoice('Ibu', onDone);
+                },
+                child: Text(
+                  'Ikut Ibu ($motherName)',
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12.5),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -4670,16 +4927,95 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 SafeArea(
                   top: false,
                   child: SizedBox(
-                    height: 115,
+                    height: 125,
                     child: Stack(
-                      alignment: Alignment.bottomCenter,
                       clipBehavior: Clip.none,
                       children: [
-                        // Row 4 tombol utama di bawah
+                        // Row Top Bar Controls: Kurangi Umur (Kiri), Tambah Umur (Tengah), Toko (Kanan) - Bebas Tabrakan!
+                        Positioned(
+                          top: 4,
+                          left: 12,
+                          right: 12,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              // Kiri: Kurangi Umur jika GodMode, jika tidak beri spacer agar Tambah Umur tetap di tengah
+                              if (StorePage.isGodModeUnlocked)
+                                KurangiUmurButton(
+                                  onPressed: _ageDown,
+                                )
+                              else
+                                const SizedBox(width: 75),
+
+                              // Tengah: Tambah Umur
+                              AgeUpButton(
+                                onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
+                              ),
+
+                              // Kanan: Tombol Toko
+                              Material(
+                                color: Colors.transparent,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => StorePage(
+                                          character: _character,
+                                          onPurchaseCompleted: () {
+                                            setState(() {});
+                                          },
+                                        ),
+                                      ),
+                                    ).then((_) => setState(() {}));
+                                  },
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      border: Border.all(color: Colors.amberAccent, width: 1.5),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.amber.withValues(alpha: 0.4),
+                                          blurRadius: 6,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: const [
+                                        Icon(Icons.shopping_bag, color: Colors.black87, size: 16),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          'Toko',
+                                          style: TextStyle(
+                                            color: Colors.black87,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        // Row 4 tombol utama di bawah (Bayi, Assets, Hubungan, Aktivitas)
                         Positioned(
                           left: 4,
                           right: 4,
-                          bottom: 10,
+                          bottom: 6,
                           height: 52,
                           child: Row(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -4768,84 +5104,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                 ),
                               )),
                             ],
-                          ),
-                        ),
-                        // Tombol Tambah Umur & Kurangi Umur (Besar & Menonjol Tinggi di Atas Garis + Hover 100% Aktif!)
-                        Positioned(
-                          top: 2,
-                          child: StorePage.isGodModeUnlocked
-                              ? Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    KurangiUmurButton(
-                                      onPressed: _ageDown,
-                                    ),
-                                    const SizedBox(width: 8),
-                                    AgeUpButton(
-                                      onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
-                                    ),
-                                  ],
-                                )
-                              : AgeUpButton(
-                                  onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
-                                ),
-                        ),
-                        // Tombol Toko (Di Samping Kanan Di Atas Garis)
-                        Positioned(
-                          right: 16,
-                          top: 4,
-                          child: Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => StorePage(
-                                      character: _character,
-                                      onPurchaseCompleted: () {
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ),
-                                ).then((_) => setState(() {}));
-                              },
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                decoration: BoxDecoration(
-                                  gradient: const LinearGradient(
-                                    colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: Colors.amberAccent, width: 1.5),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.amber.withOpacity(0.4),
-                                      blurRadius: 6,
-                                      offset: const Offset(0, 3),
-                                    ),
-                                  ],
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: const [
-                                    Icon(Icons.shopping_bag, color: Colors.black87, size: 16),
-                                    SizedBox(width: 4),
-                                    Text(
-                                      'Toko',
-                                      style: TextStyle(
-                                        color: Colors.black87,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 13,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
                           ),
                         ),
                       ],

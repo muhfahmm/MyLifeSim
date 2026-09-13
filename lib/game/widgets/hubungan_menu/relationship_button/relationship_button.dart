@@ -221,11 +221,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         context,
                         icon: Icons.person,
                         label: character.isFatherDeceased
-                            ? 'Ayah (${character.fatherName}) (Wafat)'
+                            ? '${character.fatherName} (Wafat)'
                             : character.isFatherImprisoned
-                                ? 'Ayah (${character.fatherName}) (Dipenjara)'
-                                : 'Ayah (${character.fatherName})',
-                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Cerai',
+                                ? '${character.fatherName} (Dipenjara)'
+                                : character.fatherName!,
+                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Ayah Kandung',
                         color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                         relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                         ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
@@ -243,8 +243,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         _buildFamilyItem(
                           context,
                           icon: Icons.person_add,
-                          label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
-                          status: 'Tiri',
+                          label: character.isStepMotherDeceased ? '${character.stepMotherName} (Wafat)' : character.stepMotherName!,
+                          status: 'Ibu Tiri',
                           color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
                           relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                           ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
@@ -267,11 +267,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         context,
                         icon: Icons.person_outline,
                         label: character.isMotherDeceased
-                            ? 'Ibu (${character.motherName}) (Wafat)'
+                            ? '${character.motherName} (Wafat)'
                             : character.isMotherImprisoned
-                                ? 'Ibu (${character.motherName}) (Dipenjara)'
-                                : 'Ibu (${character.motherName})',
-                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Cerai',
+                                ? '${character.motherName} (Dipenjara)'
+                                : character.motherName!,
+                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Ibu Kandung',
                         color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                         relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                         ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
@@ -289,8 +289,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         _buildFamilyItem(
                           context,
                           icon: Icons.person_add,
-                          label: character.isStepFatherDeceased ? 'Ayah Tiri (${character.stepFatherName}) (Wafat)' : 'Ayah Tiri (${character.stepFatherName})',
-                          status: 'Tiri',
+                          label: character.isStepFatherDeceased ? '${character.stepFatherName} (Wafat)' : character.stepFatherName!,
+                          status: 'Ayah Tiri',
                           color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
                           relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                           ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
@@ -314,11 +314,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         context,
                         icon: Icons.person,
                         label: character.isFatherDeceased
-                            ? 'Ayah (${character.fatherName}) (Wafat)'
+                            ? '${character.fatherName} (Wafat)'
                             : character.isFatherImprisoned
-                                ? 'Ayah (${character.fatherName}) (Dipenjara)'
-                                : 'Ayah (${character.fatherName})',
-                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Kandung',
+                                ? '${character.fatherName} (Dipenjara)'
+                                : character.fatherName!,
+                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Ayah Kandung',
                         color: character.isFatherDeceased ? Colors.grey : Colors.blue,
                         relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                         ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
@@ -336,8 +336,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_add,
-                        label: character.isStepMotherDeceased ? 'Ibu Tiri (${character.stepMotherName}) (Wafat)' : 'Ibu Tiri (${character.stepMotherName})',
-                        status: 'Tiri',
+                        label: character.isStepMotherDeceased ? '${character.stepMotherName} (Wafat)' : character.stepMotherName!,
+                        status: 'Ibu Tiri',
                         color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
                         relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                         ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
@@ -356,11 +356,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         context,
                         icon: Icons.person_outline,
                         label: character.isMotherDeceased
-                            ? 'Ibu (${character.motherName}) (Wafat)'
+                            ? '${character.motherName} (Wafat)'
                             : character.isMotherImprisoned
-                                ? 'Ibu (${character.motherName}) (Dipenjara)'
-                                : 'Ibu (${character.motherName})',
-                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Kandung',
+                                ? '${character.motherName} (Dipenjara)'
+                                : character.motherName!,
+                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Ibu Kandung',
                         color: character.isMotherDeceased ? Colors.grey : Colors.pink,
                         relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                         ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
@@ -378,8 +378,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_add,
-                        label: character.isStepFatherDeceased ? 'Ayah Tiri (${character.stepFatherName}) (Wafat)' : 'Ayah Tiri (${character.stepFatherName})',
-                        status: 'Tiri',
+                        label: character.isStepFatherDeceased ? '${character.stepFatherName} (Wafat)' : character.stepFatherName!,
+                        status: 'Ayah Tiri',
                         color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
                         relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                         ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
@@ -613,8 +613,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       _buildFamilyItem(
                         context,
                         icon: Icons.person,
-                        label: character.isFatherInLawDeceased ? 'Ayah Mertua (${character.fatherInLawName}) (Wafat)' : 'Ayah Mertua (${character.fatherInLawName})',
-                        status: 'Mertua',
+                        label: character.isFatherInLawDeceased ? '${character.fatherInLawName} (Wafat)' : character.fatherInLawName!,
+                        status: 'Ayah Mertua',
                         color: character.isFatherInLawDeceased ? Colors.grey : Colors.blueGrey,
                         relationshipValue: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
                         ageText: character.fatherInLawAge != null ? '${character.fatherInLawAge} tahun' : 'Tidak diketahui',
@@ -629,8 +629,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_outline,
-                        label: character.isMotherInLawDeceased ? 'Ibu Mertua (${character.motherInLawName}) (Wafat)' : 'Ibu Mertua (${character.motherInLawName})',
-                        status: 'Mertua',
+                        label: character.isMotherInLawDeceased ? '${character.motherInLawName} (Wafat)' : character.motherInLawName!,
+                        status: 'Ibu Mertua',
                         color: character.isMotherInLawDeceased ? Colors.grey : Colors.brown,
                         relationshipValue: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
                         ageText: character.motherInLawAge != null ? '${character.motherInLawAge} tahun' : 'Tidak diketahui',
@@ -763,7 +763,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       return _buildFamilyItem(
                         context,
                         icon: isMale ? Icons.male : Icons.female,
-                        label: isDeceased ? '$name ($relation) (Wafat)' : '$name ($relation)',
+                        label: isDeceased ? '$name (Wafat)' : name,
                         status: relation,
                         color: isDeceased ? Colors.grey : (isMale ? Colors.indigo : Colors.purple),
                         relationshipValue: child['relationship'] as int,
@@ -1380,51 +1380,54 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               : Colors.black54,
                         ),
                       ),
+                      const SizedBox(height: 4),
+                      Wrap(
+                        spacing: 4,
+                        runSpacing: 4,
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: color.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(6),
+                              border: Border.all(color: color.withOpacity(0.2)),
+                            ),
+                            child: Text(
+                              isDeceased ? 'Wafat' : status,
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+                            ),
+                          ),
+                          if (extraBadgeText != null && !isDeceased)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: (extraBadgeColor ?? Colors.green).withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: (extraBadgeColor ?? Colors.green).withOpacity(0.2)),
+                              ),
+                              child: Text(
+                                extraBadgeText,
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: extraBadgeColor ?? Colors.green),
+                              ),
+                            ),
+                          if (isLivingTogether && !isDeceased)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(6),
+                                border: Border.all(color: Colors.green.withOpacity(0.2)),
+                              ),
+                              child: const Text(
+                                'Tinggal Bersama 🏡',
+                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green),
+                              ),
+                            ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: color.withOpacity(0.2)),
-                  ),
-                  child: Text(
-                    isDeceased ? 'Wafat' : status,
-                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
-                  ),
-                ),
-                if (extraBadgeText != null && !isDeceased) ...[
-                  const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: (extraBadgeColor ?? Colors.green).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: (extraBadgeColor ?? Colors.green).withOpacity(0.2)),
-                    ),
-                    child: Text(
-                      extraBadgeText,
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: extraBadgeColor ?? Colors.green),
-                    ),
-                  ),
-                ],
-                if (isLivingTogether && !isDeceased) ...[
-                  const SizedBox(width: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.green.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.green.withOpacity(0.2)),
-                    ),
-                    child: const Text(
-                      'Tinggal Bersama 🏡',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green),
-                    ),
-                  ),
-                ],
                 if (!isDeceased) ...[
                   const SizedBox(width: 8),
                   const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),

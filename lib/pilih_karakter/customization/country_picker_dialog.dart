@@ -19,6 +19,14 @@ class CountryPickerDialog extends StatefulWidget {
     return String.fromCharCode(firstChar) + String.fromCharCode(secondChar);
   }
 
+  static String capitalizeTitle(String text) {
+    if (text.isEmpty) return '';
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return '';
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
+  }
+
   @override
   State<CountryPickerDialog> createState() => _CountryPickerDialogState();
 }
@@ -38,6 +46,9 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
 
     final Map<String, List<Map<String, dynamic>>> groupedCountries = {
       'Asia': [], 'Afrika': [], 'Eropa': [], 'Amerika Utara': [], 'Amerika Selatan': [], 'Oseania': []
@@ -60,46 +71,72 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
     final List<String> tabLabels = ['Asia', 'Afrika', 'Eropa', 'Amerika Utara', 'Amerika Selatan', 'Oseania'];
 
     return Dialog(
-      backgroundColor: isDark ? Colors.grey.shade900 : null,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      backgroundColor: backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: Container(
         constraints: BoxConstraints(
           maxHeight: MediaQuery.of(context).size.height * 0.8,
-          maxWidth: 600,
+          maxWidth: 500,
         ),
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: DefaultTabController(
           length: tabLabels.length,
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(
-                'Pilih Negara Asal',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
+              // Header title and Close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.public_rounded, size: 20, color: Colors.blue),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        'Pilih Negara Asal',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w800,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.close_rounded, size: 20, color: subtextColor),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
+
+              // Search Field
               TextField(
-                style: TextStyle(color: isDark ? Colors.white : Colors.black87),
-                cursorColor: isDark ? Colors.lightBlueAccent : Colors.blue,
+                style: TextStyle(color: textColor, fontSize: 14, fontWeight: FontWeight.w500),
+                cursorColor: Colors.blue,
                 decoration: InputDecoration(
-                  hintText: 'Cari negara...',
-                  hintStyle: TextStyle(color: isDark ? Colors.white54 : Colors.grey),
-                  prefixIcon: Icon(Icons.search, color: isDark ? Colors.white70 : Colors.grey),
+                  hintText: 'Cari nama negara...',
+                  hintStyle: TextStyle(color: subtextColor, fontSize: 13),
+                  prefixIcon: Icon(Icons.search_rounded, color: subtextColor, size: 20),
                   filled: true,
-                  fillColor: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                  fillColor: isDark ? const Color(0xFF0F172A) : const Color(0xFFF1F5F9),
                   enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: isDark ? Colors.white10 : Colors.black.withValues(alpha: 0.05)),
                   ),
                   focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide(color: isDark ? Colors.lightBlueAccent : Colors.blue),
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(color: Colors.blue, width: 1.5),
                   ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 ),
                 onChanged: (value) {
                   setState(() {
@@ -107,20 +144,26 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
                   });
                 },
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
+
+              // TabBar with scrollable tabs & proper padding
               TabBar(
                 isScrollable: true,
-                tabAlignment: TabAlignment.center,
-                labelColor: isDark ? Colors.lightBlueAccent : Colors.blue,
-                unselectedLabelColor: isDark ? Colors.white54 : Colors.black54,
-                indicatorColor: isDark ? Colors.lightBlueAccent : Colors.blue,
+                tabAlignment: TabAlignment.start,
+                labelColor: Colors.blue,
+                unselectedLabelColor: subtextColor,
+                indicatorColor: Colors.blue,
+                indicatorWeight: 2.5,
                 indicatorSize: TabBarIndicatorSize.label,
-                labelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14),
+                labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 padding: EdgeInsets.zero,
-                labelPadding: const EdgeInsets.symmetric(horizontal: 16.0),
+                labelPadding: const EdgeInsets.symmetric(horizontal: 12.0),
                 tabs: tabLabels.map((label) => Tab(text: label)).toList(),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
+
+              // TabBarView Content
               Expanded(
                 child: TabBarView(
                   children: tabLabels.map((continent) {
@@ -132,23 +175,55 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
                       }).toList();
                     }
                     return countriesInContinent.isEmpty
-                        ? Center(child: Text('Tidak ada negara ditemukan', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey)))
-                        : ListView.builder(
+                        ? Center(
+                            child: Text(
+                              'Tidak ada negara ditemukan',
+                              style: TextStyle(color: subtextColor, fontSize: 13),
+                            ),
+                          )
+                        : ListView.separated(
+                            physics: const BouncingScrollPhysics(),
                             itemCount: countriesInContinent.length,
+                            separatorBuilder: (_, __) => Divider(
+                              height: 1,
+                              color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.04),
+                            ),
                             itemBuilder: (context, index) {
                               final country = countriesInContinent[index];
+                              final formattedName = CountryPickerDialog.capitalizeTitle(country['name'].toString());
+
                               return ListTile(
-                                leading: Text(
-                                  CountryPickerDialog.countryCodeToEmoji(country['iso']),
-                                  style: const TextStyle(fontSize: 24),
+                                dense: true,
+                                contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                leading: Container(
+                                  width: 36,
+                                  height: 36,
+                                  alignment: Alignment.center,
+                                  decoration: BoxDecoration(
+                                    color: isDark ? Colors.white.withValues(alpha: 0.05) : Colors.black.withValues(alpha: 0.03),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Text(
+                                    CountryPickerDialog.countryCodeToEmoji(country['iso']),
+                                    style: const TextStyle(fontSize: 20),
+                                  ),
                                 ),
                                 title: Text(
-                                  country['name'],
-                                  style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                                  formattedName,
+                                  style: TextStyle(
+                                    color: textColor,
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w600,
+                                  ),
                                 ),
+                                trailing: Icon(Icons.arrow_forward_ios_rounded, size: 14, color: subtextColor.withValues(alpha: 0.6)),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  widget.onCountrySelected(country);
+                                  // Update country map with capitalized name
+                                  final selectedMap = Map<String, dynamic>.from(country);
+                                  selectedMap['name'] = formattedName;
+                                  widget.onCountrySelected(selectedMap);
                                 },
                               );
                             },
@@ -163,3 +238,4 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
     );
   }
 }
+

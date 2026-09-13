@@ -304,42 +304,117 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final backgroundColor = isDark ? const Color(0xFF1E293B) : Colors.white;
+    final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
+    final subtextColor = isDark ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
     return AlertDialog(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Text(_step == 0 ? 'Memproses Pembelian...' : 'Pembelian Berhasil! 🎉'),
+      backgroundColor: backgroundColor,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+      contentPadding: const EdgeInsets.fromLTRB(24, 24, 24, 20),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           if (_step == 0) ...[
-            const CircularProgressIndicator(color: Color(0xFF8A5A32)),
-            const SizedBox(height: 16),
-            Text('Menghubungkan ke Store untuk ${widget.itemName}...'),
+            Container(
+              width: 56,
+              height: 56,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.teal.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: const CircularProgressIndicator(
+                strokeWidth: 3,
+                color: Colors.teal,
+              ),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Memproses Pembelian...',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w800,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Menghubungkan ke Store untuk ${widget.itemName}...',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13.5,
+                height: 1.4,
+                color: subtextColor,
+              ),
+            ),
           ] else ...[
-            const Icon(Icons.favorite, color: Colors.redAccent, size: 50),
-            const SizedBox(height: 12),
-            const Text(
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [Color(0xFF0D9488), Color(0xFF0F766E)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.teal.withValues(alpha: 0.35),
+                    blurRadius: 16,
+                    offset: const Offset(0, 6),
+                  ),
+                ],
+              ),
+              child: const Icon(Icons.bolt_rounded, color: Colors.white, size: 36),
+            ),
+            const SizedBox(height: 18),
+            Text(
+              'Pembelian Berhasil! 🎉',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w800,
+                color: textColor,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
               'Selamat! Kesehatan, Kebahagiaan, dan Kecerdasan karaktermu kini 100% penuh!',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
+              style: TextStyle(
+                fontSize: 13.5,
+                height: 1.4,
+                color: subtextColor,
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF0D9488),
+                  foregroundColor: Colors.white,
+                  elevation: 0,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+                onPressed: () {
+                  widget.onSuccess();
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  'Luar Biasa!',
+                  style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15, letterSpacing: 0.5),
+                ),
+              ),
             ),
           ],
         ],
       ),
-      actions: [
-        if (_step == 1)
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF8A5A32),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-            ),
-            onPressed: () {
-              widget.onSuccess();
-              Navigator.pop(context);
-            },
-            child: const Text('Luar Biasa!'),
-          ),
-      ],
     );
   }
 }
