@@ -50,9 +50,12 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
     switch (jobTitle) {
       // STEM & TEKNIK
       case 'Junior Software Engineer':
+      case 'Senior Software Engineer':
       case 'Network Engineer':
+      case 'Cybersecurity Specialist':
         return ['Teknik Informatika', 'Sistem Informasi', 'Teknik Elektro'];
       case 'Data Analyst':
+      case 'Data Scientist':
         return ['Teknik Informatika', 'Sistem Informasi', 'Akuntansi', 'Ekonomi Pembangunan', 'Manajemen'];
       case 'Civil Engineer':
         return ['Teknik Sipil'];
@@ -69,6 +72,7 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
       // KESEHATAN
       case 'Dokter Umum':
       case 'Dokter Spesialis':
+      case 'Epidemiolog':
         return ['Kedokteran'];
       case 'Bidan':
         return ['Kebidanan', 'Keperawatan', 'Kedokteran'];
@@ -83,15 +87,17 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
 
       // BISNIS & EKONOMI
       case 'Manajer Keuangan':
+      case 'Auditor Keuangan':
+      case 'Bankir Investment':
         return ['Manajemen', 'Akuntansi', 'Perbankan & Keuangan'];
       case 'Akuntan':
         return ['Akuntansi'];
       case 'Analis Ekonomi':
         return ['Ekonomi Pembangunan', 'Akuntansi', 'Perbankan & Keuangan'];
-      case 'Bankir':
-        return ['Perbankan & Keuangan', 'Akuntansi', 'Manajemen'];
       case 'Marketing Specialist':
         return ['Pemasaran Digital', 'Manajemen', 'Ilmu Komunikasi'];
+      case 'Manajer Sumber Daya Manusia (HRD)':
+        return ['Manajemen', 'Psikologi', 'Administrasi Publik'];
       case 'CEO Startup':
         return ['Manajemen', 'Akuntansi', 'Teknik Informatika', 'Sistem Informasi', 'Ekonomi Pembangunan'];
       case 'Konsultan Manajemen':
@@ -101,13 +107,17 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
       case 'Pengacara':
       case 'Pengacara Senior':
       case 'Jaksa':
+      case 'Notaris':
+      case 'Hakim':
         return ['Hukum'];
       case 'Diplomat':
         return ['Hubungan Internasional', 'Hukum'];
-      case 'Jurnalis':
+      case 'Jurnalis Investigasi':
         return ['Ilmu Komunikasi', 'Sastra & Bahasa'];
       case 'Psikolog':
         return ['Psikologi'];
+      case 'Kriminolog':
+        return ['Kriminologi', 'Hukum', 'Psikologi'];
       case 'Pegawai Negeri Sipil (PNS)':
         return ['Administrasi Publik', 'Hukum', 'Hubungan Internasional', 'Ekonomi Pembangunan'];
 
@@ -118,30 +128,38 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
       case 'Guru SMA':
       case 'Dosen':
         return ['Pendidikan / PGSD', 'Pendidikan Agama', 'Sastra & Bahasa', 'Hukum', 'Kedokteran', 'Teknik Informatika'];
-      case 'Penerjemah':
+      case 'Penerjemah Bahasa':
         return ['Sastra & Bahasa', 'Hubungan Internasional'];
-      case 'Penulis':
+      case 'Penulis & Editor Buku':
         return ['Sastra & Bahasa', 'Ilmu Komunikasi', 'Pendidikan / PGSD'];
 
       // KREATIF & SENI
       case 'Desainer Grafis':
-        return ['Desain Komunikasi Visual (DKV)'];
-      case 'Desainer Mode':
-        return ['Desain Mode'];
+      case 'UI/UX Designer':
+        return ['Desain Komunikasi Visual (DKV)', 'Teknik Informatika', 'Sistem Informasi'];
+      case 'Desainer Mode (Fashion Designer)':
+        return ['Desain Mode', 'Seni Rupa & Desain'];
       case 'Sutradara Film':
-        return ['Film & Televisi'];
+        return ['Film & Televisi', 'Desain Komunikasi Visual (DKV)'];
       case 'Produser Musik':
         return ['Seni Musik'];
       case 'Seniman':
-        return ['Desain Komunikasi Visual (DKV)', 'Desain Mode', 'Film & Televisi', 'Seni Musik'];
+        return ['Desain Komunikasi Visual (DKV)', 'Desain Mode', 'Film & Televisi', 'Seni Musik', 'Seni Rupa & Desain'];
 
-      // PERTANIAN & LAINNYA
+      // PERTANIAN, KELAUTAN & LINGKUNGAN
       case 'Agronom':
         return ['Agroteknologi'];
+      case 'Oseanograf & Biolog Laut':
+        return ['Ilmu Kelautan'];
+      case 'Konservasionis Hutan':
+        return ['Kehutanan'];
+      case 'Food Technologist':
+        return ['Teknologi Pangan', 'Gizi & Ilmu Pangan'];
       case 'Manajer Hotel':
         return ['Manajemen Perhotelan', 'Manajemen'];
 
-      // LAINNYA
+      // LAINNYA & PRESTISE
+      case 'Pilot Maskapai':
       case 'Pilot':
         return ['Teknik Elektro', 'Teknik Mesin', 'Teknik Sipil', 'Teknik Kimia', 'Teknik Informatika', 'Sistem Informasi', 'Arsitektur', 'Kedokteran'];
 
