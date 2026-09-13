@@ -51,20 +51,31 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(job['icon'] as IconData, color: job['color'] as Color),
+            Icon(job['icon'] as IconData, color: job['color'] as Color, size: 20),
             const SizedBox(width: 8),
-            const Text('Diterima Bekerja! 🎉'),
+            const Expanded(
+              child: Text(
+                'Diterima Bekerja! 🎉',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
         ),
-        content: Text('Selamat! Kamu resmi diterima sebagai "${job['title']}" secara Part-Time dengan tambahan penghasilan ${CurrencySettings.format(salary)}/tahun.'),
+        content: Text(
+          'Selamat! Kamu resmi diterima sebagai "${job['title']}" secara Part-Time dengan tambahan penghasilan ${CurrencySettings.format(salary)}/tahun.',
+          style: const TextStyle(fontSize: 12.5, height: 1.35),
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.teal, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Mulai Bekerja'),
+            child: const Text('Mulai Bekerja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           ),
         ],
       ),

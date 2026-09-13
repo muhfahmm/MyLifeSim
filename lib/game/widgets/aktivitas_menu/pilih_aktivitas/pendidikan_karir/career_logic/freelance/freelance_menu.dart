@@ -51,20 +51,31 @@ class _FreelanceMenuPageState extends State<FreelanceMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 8),
+        contentPadding: const EdgeInsets.fromLTRB(20, 0, 20, 12),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
           children: [
-            Icon(gig['icon'] as IconData, color: gig['color'] as Color),
+            Icon(gig['icon'] as IconData, color: gig['color'] as Color, size: 20),
             const SizedBox(width: 8),
-            const Text('Proyek Selesai! 🎉'),
+            const Expanded(
+              child: Text(
+                'Proyek Selesai! 🎉',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
         ),
-        content: Text('Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar ${CurrencySettings.format(payout)}.'),
+        content: Text(
+          'Selamat! Kamu telah menyelesaikan proyek "${gig['title']}" dengan sukses dan mengantongi uang tunai sebesar ${CurrencySettings.format(payout)}.',
+          style: const TextStyle(fontSize: 12.5, height: 1.35),
+        ),
         actions: [
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('Terima Uang'),
+            child: const Text('Terima Uang', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
           ),
         ],
       ),
