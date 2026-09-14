@@ -17,6 +17,14 @@ class PanggilanPacar {
     String? userGender,
     bool includeName = true,
   }) {
+    final bool isUserMale = (userGender ?? '').toLowerCase().contains('laki') || (userGender ?? '').toLowerCase().contains('male');
+    final bool isTargetFemale = (targetGender == null || targetGender.isEmpty || targetGender.toLowerCase().contains('perempuan') || targetGender.toLowerCase().contains('female') || targetGender.toLowerCase().contains('cewek'));
+
+    // Jika NPC (perempuan) memanggil User (laki-laki) yang merupakan pacar
+    if (!isSpeakerPlayer && isUserMale && isTargetFemale) {
+      return 'Sayang';
+    }
+
     final String g = isSpeakerPlayer
         ? (targetGender ?? '').toLowerCase()
         : (userGender ?? '').toLowerCase();

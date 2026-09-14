@@ -11,17 +11,24 @@ class PanggilanPacar {
     String? userName,
     String? userGender,
   }) {
+    final bool isUserMale = (userGender ?? '').toLowerCase().contains('laki') || (userGender ?? '').toLowerCase().contains('male');
+    final bool isTargetFemale = (targetGender == null || targetGender.isEmpty || targetGender.toLowerCase().contains('perempuan') || targetGender.toLowerCase().contains('female') || targetGender.toLowerCase().contains('cewek'));
+
+    if (!isSpeakerPlayer && isUserMale && isTargetFemale) {
+      return 'Sayang';
+    }
+
     final String cleanTargetName = AvatarAgeRules.getCleanNPCName(targetName);
     final String roleLower = targetRole.toLowerCase();
 
     if (roleLower.contains('suami')) {
-      return isSpeakerPlayer ? 'Suamiku ($cleanTargetName)' : 'Istriku';
+      return isSpeakerPlayer ? 'Suamiku ($cleanTargetName)' : 'Sayang';
     }
     if (roleLower.contains('istri')) {
-      return isSpeakerPlayer ? 'Istriku ($cleanTargetName)' : 'Suamiku';
+      return isSpeakerPlayer ? 'Istriku ($cleanTargetName)' : 'Sayang';
     }
     if (roleLower.contains('tunangan')) {
-      return isSpeakerPlayer ? 'Tunanganku ($cleanTargetName)' : 'Tunanganku';
+      return isSpeakerPlayer ? 'Tunanganku ($cleanTargetName)' : 'Sayang';
     }
     return isSpeakerPlayer ? 'Sayang ($cleanTargetName)' : 'Sayang';
   }
