@@ -226,7 +226,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                         ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isFatherDeceased,
-                        isLivingTogether: character.custodyParent == 'Ayah' && !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents && character.custodyParent == 'Ayah' && !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fatherName!,
                           gender: 'Laki-laki',
@@ -245,7 +245,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                           ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
                           isDeceased: character.isStepMotherDeceased,
-                          isLivingTogether: character.custodyParent == 'Ayah',
+                          isLivingTogether: character.livesWithParents && character.custodyParent == 'Ayah',
                           avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                             name: character.stepMotherName!,
                             gender: 'Perempuan',
@@ -272,7 +272,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                         ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isMotherDeceased,
-                        isLivingTogether: character.custodyParent == 'Ibu' && !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents && character.custodyParent == 'Ibu' && !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.motherName!,
                           gender: 'Perempuan',
@@ -291,7 +291,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                           ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
                           isDeceased: character.isStepFatherDeceased,
-                          isLivingTogether: character.custodyParent == 'Ibu',
+                          isLivingTogether: character.livesWithParents && character.custodyParent == 'Ibu',
                           avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                             name: character.stepFatherName!,
                             gender: 'Laki-laki',
@@ -319,7 +319,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
                         ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isFatherDeceased,
-                        isLivingTogether: !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents && !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fatherName!,
                           gender: 'Laki-laki',
@@ -338,7 +338,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
                         ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isStepMotherDeceased,
-                        isLivingTogether: !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents && !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.stepMotherName!,
                           gender: 'Perempuan',
@@ -361,7 +361,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
                         ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isMotherDeceased,
-                        isLivingTogether: !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents && !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.motherName!,
                           gender: 'Perempuan',
@@ -380,7 +380,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
                         ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
                         isDeceased: character.isStepFatherDeceased,
-                        isLivingTogether: !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents && !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.stepFatherName!,
                           gender: 'Laki-laki',
@@ -866,16 +866,20 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
                           final bool isDeceased = child['isDeceased'] == 'true';
                           final bool isMale = gender == 'Laki-laki';
+                          final bool livesWithUser = child['livesWithUser'] == 'true';
+                          final String parentingStyle = character.parentingStyles[name] ?? 'Balanced';
 
                           return _buildChildItem(
                             context,
                             icon: isMale ? Icons.boy : Icons.girl,
                             label: isDeceased ? '$name (Wafat)' : name,
-                            status: '$gender (Donor)',
+                            status: livesWithUser ? gender : '$gender (Donor)',
                             color: isDeceased ? Colors.grey : Colors.teal,
                             relationshipValue: relVal,
                             ageText: '$childAge tahun',
                             isDeceased: isDeceased,
+                            parentingStyle: parentingStyle,
+                            showParentingStyle: livesWithUser,
                             avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                               name: name,
                               gender: gender,
@@ -1492,6 +1496,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     bool isDeceased = false,
     String? avatarUrl,
     String parentingStyle = 'Balanced',
+    bool showParentingStyle = true,
   }) {
     return InkWell(
       onTap: isDeceased ? null : () {
@@ -1616,7 +1621,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                             ),
                           ),
-                          if (!isDeceased)
+                          if (!isDeceased && showParentingStyle)
                             PopupMenuButton<String>(
                               tooltip: 'Interaksi Pengasuhan',
                               padding: EdgeInsets.zero,

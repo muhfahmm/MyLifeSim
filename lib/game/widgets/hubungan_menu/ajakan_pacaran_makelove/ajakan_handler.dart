@@ -703,18 +703,30 @@ class AjakanHandler {
         if (roll < 70) {
           if (oppositeSexCandidates.isNotEmpty) {
             candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          } else if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
           }
         } else if (roll < 85) {
           if (sameSexCandidates.isNotEmpty) {
             candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          } else if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
           }
         }
         // remaining 15% (roll >= 85) results in no proposal (candidate remains null)
       } else if (mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') {
-        if (sameSexCandidates.isNotEmpty) {
-          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
-        } else if (oppositeSexCandidates.isNotEmpty && roll < 20) {
-          candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+        if (roll < 70) {
+          if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          } else if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          }
+        } else if (roll < 90) {
+          if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          } else if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          }
         }
       } else {
         // Biseksual: 50% sesama gender, 50% lawan jenis
@@ -734,8 +746,16 @@ class AjakanHandler {
       }
 
       if (candidate == null && selectedPool.isNotEmpty) {
-        if ((mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') && sameSexCandidates.isNotEmpty) {
-          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+        if ((mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian')) {
+          if (sameSexCandidates.isNotEmpty && random.nextInt(100) < 70) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          } else if (oppositeSexCandidates.isNotEmpty) {
+            candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
+          } else if (sameSexCandidates.isNotEmpty) {
+            candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+          } else {
+            candidate = selectedPool[random.nextInt(selectedPool.length)];
+          }
         } else if (oppositeSexCandidates.isNotEmpty) {
           candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
         } else {
@@ -756,7 +776,9 @@ class AjakanHandler {
             oppositeSexCandidates.add(c);
           }
         }
-        if (oppositeSexCandidates.isNotEmpty) {
+        if ((mySexuality == 'homoseksual' || mySexuality == 'gay' || mySexuality == 'lesbian') && sameSexCandidates.isNotEmpty && random.nextInt(100) < 70) {
+          candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];
+        } else if (oppositeSexCandidates.isNotEmpty) {
           candidate = oppositeSexCandidates[random.nextInt(oppositeSexCandidates.length)];
         } else if (sameSexCandidates.isNotEmpty) {
           candidate = sameSexCandidates[random.nextInt(sameSexCandidates.length)];

@@ -64,6 +64,7 @@ class VNDialogueOverlay extends StatefulWidget {
 class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   bool _isAuto = false;
+  bool _showActionMenu = false;
   Timer? _autoTimer;
   final List<VNLogItem> _historyLog = [];
 
@@ -274,7 +275,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           // 5. Panel Dropdown Aksi Persisten (Ciuman & Penetrasi) - TIDAK memblokir Selanjutnya
           if (hasPersistentActions)
             Positioned(
-              top: 100,
+              top: _showActionMenu ? 160 : 70,
               left: 20,
               right: 20,
               child: _buildPersistentActionPanel(currentNode),
@@ -283,7 +284,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           // 5b. Choice Decision Card biasa (jika ada choices yang memblokir)
           if (hasChoices)
             Positioned(
-              top: 100,
+              top: _showActionMenu ? 160 : 70,
               left: 20,
               right: 20,
               child: _buildChoiceCard(currentNode),
@@ -306,78 +307,148 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
 
-          // 4. Top Control Bar (Location, History Log, Auto, Skip, Close)
+          // 4. Top Control Bar (Location & Close X on Top Row, Toggleable Action Buttons Below)
           Positioned(
             top: 0,
             left: 0,
             right: 0,
             child: SafeArea(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-                child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  physics: const BouncingScrollPhysics(),
-                  child: Row(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                child: Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white24, width: 1),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black87,
+                        blurRadius: 10,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
                     mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                        decoration: BoxDecoration(
-                          color: Colors.black54,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.white24),
-                        ),
-                        child: Text(
-                          _getFormattedLocation(currentNode.background),
-                          style: const TextStyle(
-                            color: Colors.white70,
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.bold,
+                      // Baris Atas: Badge Lokasi (Kiri), Toggle Show/Hide (Tengah), & Tombol X (Kanan) Sejajar
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Flexible(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: Colors.white10,
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(color: Colors.white24),
+                              ),
+                              child: Text(
+                                _getFormattedLocation(currentNode.background),
+                                style: const TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 11.5,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              ),
+                            ),
                           ),
+                          const SizedBox(width: 6),
+                          Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              // Tombol Toggle Show / Hide Menu
+                              InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    _showActionMenu = !_showActionMenu;
+                                  });
+                                },
+                                borderRadius: BorderRadius.circular(16),
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black54,
+                                    borderRadius: BorderRadius.circular(16),
+                                    border: Border.all(color: Colors.amber.withValues(alpha: 0.6)),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        _showActionMenu ? Icons.keyboard_arrow_up : Icons.menu,
+                                        color: Colors.amber,
+                                        size: 14,
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _showActionMenu ? 'Sembunyikan' : 'Menu',
+                                        style: const TextStyle(
+                                          color: Colors.amber,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 6),
+                              IconButton(
+                                icon: const Icon(Icons.close, color: Colors.white70, size: 18),
+                                onPressed: _finishDialogue,
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.white10,
+                                  padding: const EdgeInsets.all(6),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      if (_showActionMenu) ...[
+                        const SizedBox(height: 8),
+                        // Baris Bawah: Tombol Aksi (Log, Auto, Selesai, Skip) (Grid/Wrap)
+                        Wrap(
+                          spacing: 6,
+                          runSpacing: 6,
+                          children: [
+                            _buildControlButton(
+                              icon: Icons.history,
+                              label: 'Log',
+                              onTap: _showHistorySheet,
+                            ),
+                            _buildControlButton(
+                              icon: Icons.play_arrow,
+                              label: _isAuto ? 'Auto ON' : 'Auto',
+                              isActive: _isAuto,
+                              onTap: () {
+                                setState(() {
+                                  _isAuto = !_isAuto;
+                                });
+                                if (_isAuto && !_isTyping) {
+                                  _scheduleAutoNext();
+                                }
+                              },
+                            ),
+                            _buildControlButton(
+                              icon: Icons.check_circle_outline,
+                              label: 'Selesai',
+                              isActive: true,
+                              onTap: _finishDialogue,
+                            ),
+                            _buildControlButton(
+                              icon: Icons.fast_forward,
+                              label: 'Skip',
+                              onTap: _finishDialogue,
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 6),
-                      _buildControlButton(
-                        icon: Icons.history,
-                        label: 'Log',
-                        onTap: _showHistorySheet,
-                      ),
-                      const SizedBox(width: 6),
-                      _buildControlButton(
-                        icon: Icons.play_arrow,
-                        label: _isAuto ? 'Auto ON' : 'Auto',
-                        isActive: _isAuto,
-                        onTap: () {
-                          setState(() {
-                            _isAuto = !_isAuto;
-                          });
-                          if (_isAuto && !_isTyping) {
-                            _scheduleAutoNext();
-                          }
-                        },
-                      ),
-                      const SizedBox(width: 6),
-                      _buildControlButton(
-                        icon: Icons.check_circle_outline,
-                        label: 'Selesai',
-                        isActive: true,
-                        onTap: _finishDialogue,
-                      ),
-                      const SizedBox(width: 6),
-                      _buildControlButton(
-                        icon: Icons.fast_forward,
-                        label: 'Skip',
-                        onTap: _finishDialogue,
-                      ),
-                      const SizedBox(width: 6),
-                      IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white70, size: 18),
-                        onPressed: _finishDialogue,
-                        style: IconButton.styleFrom(
-                          backgroundColor: Colors.black54,
-                          padding: const EdgeInsets.all(6),
-                        ),
-                      ),
+                      ],
                     ],
                   ),
                 ),
@@ -467,14 +538,23 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       if (loc.startsWith('📍')) {
         return loc;
       }
+      
+      // Bersihkan format "Rumah (Pemilik: Rumah Minimalis Tipe 36 | Ruangan: Kamar Tidur)"
       if (loc.contains('Ruangan:')) {
         final roomPart = loc.split('Ruangan:').last.replaceAll(')', '').trim();
+        String ownerPart = '';
         if (loc.contains('Pemilik:')) {
-          final ownerPart = loc.split('Pemilik:').last.split('|').first.trim();
-          return '📍 $roomPart (Rumah $ownerPart)';
+          ownerPart = loc.split('Pemilik:').last.split('|').first.trim();
+          if (ownerPart.toLowerCase().contains('rumah') || ownerPart.toLowerCase().contains('sendiri')) {
+            ownerPart = 'Rumah Sendiri';
+          }
+          return '📍 $roomPart ($ownerPart)';
         }
         return '📍 $roomPart';
       }
+
+      // Bersihkan kemunculan "Rumah Rumah ..." ganda
+      loc = loc.replaceAll('Rumah Rumah', 'Rumah');
       return '📍 $loc';
     }
     return _getBackgroundTitle(background);
@@ -657,15 +737,22 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
           const SizedBox(height: 8),
-          // Tap hint icon on dialogue box
+          // Tap hint icon on dialogue box (Menutup dialog jika ditekan)
           Align(
             alignment: Alignment.bottomRight,
-            child: Icon(
-              (_currentIndex >= widget.nodes.length - 1)
-                  ? Icons.check_circle
-                  : Icons.arrow_drop_down_circle,
-              color: style.badgeBorderColor,
-              size: 20,
+            child: InkWell(
+              onTap: _finishDialogue,
+              borderRadius: BorderRadius.circular(12),
+              child: Padding(
+                padding: const EdgeInsets.all(2.0),
+                child: Icon(
+                  (_currentIndex >= widget.nodes.length - 1)
+                      ? Icons.check_circle
+                      : Icons.arrow_drop_down_circle,
+                  color: style.badgeBorderColor,
+                  size: 22,
+                ),
+              ),
             ),
           ),
         ],
@@ -995,6 +1082,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         : 'Pilih Tanggapan / Keputusan:';
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.55,
+      ),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E2E).withValues(alpha: 0.96),
@@ -1030,7 +1120,13 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ],
           ),
           const SizedBox(height: 14),
-          ...choices.map((c) {
+          Flexible(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: choices.map((c) {
             String displayText = c.text;
             if (displayText.contains('4. Posisi Seks') || displayText.contains('4. Pilih Posisi Seks')) {
               final activePos = widget.player.currentPosisiSeks;
@@ -1234,7 +1330,10 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                 ),
               ),
             );
-          }),
+          }).toList(),
+              ),
+            ),
+          ),
         ],
       ),
     );

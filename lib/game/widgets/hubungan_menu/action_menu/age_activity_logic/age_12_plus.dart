@@ -669,7 +669,7 @@ List<ActionItem> getAge12PlusActions(
       color: Colors.amber,
       onTap: () {
         int currentRel = _getCurrentRelationshipValue();
-        bool accepted = currentRel >= 60 ? (random.nextInt(100) < 80) : (random.nextInt(100) < 30);
+        bool accepted = currentRel >= 50 ? (random.nextInt(100) < 80) : (random.nextInt(100) < 30);
 
         if (accepted) {
           showDialogCallback(
@@ -1141,8 +1141,8 @@ List<ActionItem> getAge12PlusActions(
           viewerName: targetName,
         );
 
-        // Jika tingkat hubungan 60% atau lebih, NPC otomatis menyetujui (100% mau)
-        if (currentRel >= 60) {
+        // Jika tingkat hubungan 50% atau lebih, NPC otomatis menyetujui (100% mau)
+        if (currentRel >= 50) {
           successChance = 100;
         }
 

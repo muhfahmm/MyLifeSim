@@ -1312,6 +1312,64 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
+    // --- FITUR DONOR: Ajak Tinggal Bersama (jika anak donor berusia >= 12 dan belum tinggal bersama) ---
+    if (isChild && targetAge >= 12) {
+      final String cleanTargetName = widget.targetName.replaceAll(' (Wafat)', '').trim();
+      final bool isDonorChild = widget.character.donorRecipients.any((r) => r['childName'] == cleanTargetName);
+      Map<String, String>? donorChildMap;
+      for (var c in widget.character.children) {
+        if (c['name'] == cleanTargetName) {
+          donorChildMap = c;
+          break;
+        }
+      }
+      final bool livesWithUser = donorChildMap?['livesWithUser'] == 'true';
+      if (isDonorChild && !livesWithUser) {
+        final bool hasAjakTinggal = actions.any((a) => a.label == 'Ajak Tinggal Bersama');
+        if (!hasAjakTinggal) {
+          actions.add(ActionItem(
+            label: 'Ajak Tinggal Bersama',
+            icon: Icons.home,
+            color: Colors.teal,
+            onTap: () {
+              final String gender = _getTargetGender();
+              final bool isMale = gender == 'Laki-laki';
+              final int chance = isMale ? 30 : 50;
+              final bool accepted = _random.nextInt(100) < chance;
+
+              if (accepted) {
+                if (donorChildMap != null) {
+                  donorChildMap['livesWithUser'] = 'true';
+                }
+                _updateRelationship(25);
+                widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+                _showResultDialog(
+                  'Ajak Tinggal Bersama 🏠',
+                  '${widget.targetName} sangat senang dan menyetujui untuk tinggal bersamamu! Kini ia telah resmi menjadi bagian dari rumahmu.',
+                  Icons.home_work,
+                  Colors.green,
+                  () {
+                    _updateState();
+                  },
+                );
+              } else {
+                _updateRelationship(-5);
+                _showResultDialog(
+                  'Ajakan Ditolak 🏠',
+                  '${widget.targetName} merasa lebih nyaman tinggal bersama ibunya saat ini dan menolak halus ajakanmu.',
+                  Icons.home_outlined,
+                  Colors.orange,
+                  () {
+                    _updateState();
+                  },
+                );
+              }
+            },
+          ));
+        }
+      }
+    }
+
     // --- PREMIUM: Tombol dewasa untuk ANAK / SAUDARA (Hanya jika Player berusia >= 12 tahun) ---
     if (age >= 12 && AdultFeatures.isPremiumUnlocked) {
       if (isChild && targetAge >= 10) {
@@ -4419,8 +4477,8 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           viewerName: widget.targetName,
         );
 
-        // Jika tingkat hubungan 60% atau lebih, NPC otomatis menyetujui (100% mau)
-        if (currentRel >= 60) {
+        // Jika tingkat hubungan 50% atau lebih, NPC otomatis menyetujui (100% mau)
+        if (currentRel >= 50) {
           successChance = 100;
         }
 

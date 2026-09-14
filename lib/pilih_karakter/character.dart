@@ -300,6 +300,7 @@ class Character {
   // --- FLAG EJAKULASI DALAM VAGINA (reset setelah sesi bercinta selesai) ---
   // Hanya true jika user memilih ejakulasi 'vagina_dalam' tanpa kondom.
   bool didCreampieThisSession = false;
+  bool didEjakulasiThisSession = false;
 
   // --- POSISI SEKS AKTIF (Sesi Bercinta) ---
   String? currentPosisiSeks;
@@ -318,6 +319,11 @@ class Character {
   Map<String, dynamic>? activeProposal; // {'name': '...', 'relation': '...', 'type': 'Pacaran' / 'Bercinta', 'gender': '...', 'age': '...'}
   List<Map<String, dynamic>> activeTabooSecrets = [];
   List<String> ownedLicenses = [];
+
+  // --- DATA PROPERTI & TEMPAT TINGGAL ---
+  List<Map<String, String>> ownedHouses = []; // [{id: '...', name: '...', price: '...', yearlyMaintenance: '...'}]
+  String? activeHouseName; // Nama rumah yang sedang ditinggali (jika null & livesWithParents=true, maka tinggal dengan ortu)
+  bool livesWithParents = true; // Status tinggal bersama orang tua
 
   // --- DATA PACAR / PASANGAN ---
   Map<String, String>? _partner;

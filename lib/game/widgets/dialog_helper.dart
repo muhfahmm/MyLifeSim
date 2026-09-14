@@ -10,6 +10,7 @@ class DialogHelper {
     bool isNotification = true, // Defaults to true so all activity results become modals
     bool showCloseButton = true, // Set to false when user must choose an action
     bool barrierDismissible = true,
+    VoidCallback? onClose,
   }) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -36,7 +37,13 @@ class DialogHelper {
             child: FadeTransition(opacity: anim1, child: child),
           );
         },
-        pageBuilder: (dialogContext, anim1, anim2) => Center(
+        pageBuilder: (dialogContext, anim1, anim2) => PopScope(
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) {
+              onClose?.call();
+            }
+          },
+          child: Center(
           child: Material(
             color: Colors.transparent,
             child: Container(
@@ -74,7 +81,10 @@ class DialogHelper {
                       if (showCloseButton) ...[
                         const SizedBox(width: 8),
                         InkWell(
-                          onTap: () => Navigator.of(dialogContext).pop(),
+                          onTap: () {
+                            Navigator.of(dialogContext).pop();
+                            onClose?.call();
+                          },
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
                             padding: const EdgeInsets.all(4),
@@ -108,14 +118,12 @@ class DialogHelper {
                   ),
                   if (actions != null && actions.isNotEmpty) ...[
                     const SizedBox(height: 18),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: actions.map((a) {
-                        return Padding(
-                          padding: const EdgeInsets.only(left: 8.0),
-                          child: a,
-                        );
-                      }).toList(),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 8.0,
+                      runSpacing: 8.0,
+                      children: actions,
                     ),
                   ],
                 ],
@@ -123,6 +131,7 @@ class DialogHelper {
             ),
           ),
         ),
+      ),
       );
     } else {
       // Fullscreen/Stretching card style for main dashboard pages (Anak-anak, Hubungan, Assets, dll.)

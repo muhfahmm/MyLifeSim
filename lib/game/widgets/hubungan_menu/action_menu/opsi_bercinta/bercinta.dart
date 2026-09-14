@@ -335,8 +335,16 @@ class _BercintaScreenState extends State<BercintaScreen> {
       if (!isSpouse) {
         final String locLower = _chosenLocation.toLowerCase();
         final String tLower = _chosenTime.toLowerCase();
+        final bool isOwnHouse = locLower.contains('rumah sendiri') ||
+            ((!widget.character.livesWithParents || widget.character.ownedHouses.isNotEmpty || widget.character.activeHouseName != null) &&
+                locLower.contains('rumah') &&
+                !locLower.contains('ibu') &&
+                !locLower.contains('orang tua'));
 
-        if (locLower.contains('kamar tidur')) {
+        if (isOwnHouse) {
+          // Di rumah sendiri: Persentase ketahuan adalah 0!
+          caughtChance = 0;
+        } else if (locLower.contains('kamar tidur')) {
           if (tLower.contains('pagi')) {
             caughtChance = 60;
           } else if (tLower.contains('siang')) {
@@ -659,6 +667,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
       'skinColor': skinColor,
     };
 
+    widget.character.didEjakulasiThisSession = false;
     final vnNodes = AjakMakeLoveDialogue.getDialogue(
       player: widget.character,
       npc: npcMap,
@@ -838,6 +847,13 @@ class _BercintaScreenState extends State<BercintaScreen> {
     } else if (widget.character.fifthPartner != null && widget.character.fifthPartner!['name'] == cleanTargetName) {
       currentSatisfaction = int.tryParse(widget.character.fifthPartner!['relationship'] ?? '50') ?? 50;
     } else {
+      // Cari di children
+      for (var child in widget.character.children) {
+        if (child['name'] == cleanTargetName) {
+          currentSatisfaction = int.tryParse(child['relationship'] ?? '50') ?? 50;
+          break;
+        }
+      }
       // Cari di siblings
       for (var sib in widget.character.siblings) {
         final String expectedLabel = '${sib['name']} (${sib['relation']})';

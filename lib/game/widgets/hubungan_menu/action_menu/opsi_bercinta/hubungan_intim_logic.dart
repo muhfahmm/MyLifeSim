@@ -6,31 +6,106 @@ import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/aja
 class HubunganIntimLogic {
   /// Mengambil tingkat kepuasan / hubungan saat ini dengan target
   static int getRelationshipValue(Character character, String targetName) {
-    if (character.partner != null && character.partner!['name'] == targetName) {
-      return int.tryParse(character.partner!['relationship'] ?? '50') ?? 50;
+    if (targetName.trim().isEmpty) return 50;
+
+    // Bersihkan targetName dari format "Nama (Relasi)"
+    String rawName = targetName;
+    final int parenIdx = targetName.indexOf('(');
+    if (parenIdx != -1) {
+      rawName = targetName.substring(0, parenIdx).trim();
     }
-    if (character.secondPartner != null && character.secondPartner!['name'] == targetName) {
-      return int.tryParse(character.secondPartner!['relationship'] ?? '50') ?? 50;
+    rawName = rawName.trim();
+    final String lowerRaw = rawName.toLowerCase();
+    final String lowerFull = targetName.trim().toLowerCase();
+
+    bool isMatch(String? nameInChar) {
+      if (nameInChar == null || nameInChar.trim().isEmpty) return false;
+      final String cn = nameInChar.trim().toLowerCase();
+      return lowerRaw == cn || lowerFull == cn || lowerRaw.contains(cn) || cn.contains(lowerRaw);
     }
-    if (character.thirdPartner != null && character.thirdPartner!['name'] == targetName) {
-      return int.tryParse(character.thirdPartner!['relationship'] ?? '50') ?? 50;
+
+    int parseRel(dynamic val) {
+      if (val == null) return 50;
+      return int.tryParse(val.toString()) ?? 50;
     }
-    if (character.fourthPartner != null && character.fourthPartner!['name'] == targetName) {
-      return int.tryParse(character.fourthPartner!['relationship'] ?? '50') ?? 50;
-    }
-    if (character.fifthPartner != null && character.fifthPartner!['name'] == targetName) {
-      return int.tryParse(character.fifthPartner!['relationship'] ?? '50') ?? 50;
-    }
-    for (var sib in character.siblings) {
-      if (sib['name'] == targetName || '${sib['name']} (${sib['relation']})' == targetName) {
-        return int.tryParse(sib['relationship'] ?? '50') ?? 50;
+
+    // 1. Orang Tua Kandung & Tiri & Mertua
+    if (isMatch(character.fatherName)) return character.fatherRelationship ?? 50;
+    if (isMatch(character.motherName)) return character.motherRelationship ?? 50;
+    if (isMatch(character.stepFatherName)) return character.stepFatherRelationship ?? 50;
+    if (isMatch(character.stepMotherName)) return character.stepMotherRelationship ?? 50;
+    if (isMatch(character.fatherInLawName)) return character.fatherInLawRelationship ?? 50;
+    if (isMatch(character.motherInLawName)) return character.motherInLawRelationship ?? 50;
+
+    // 2. Pasangan & Selingkuhan
+    for (var p in [
+      character.partner,
+      character.secondPartner,
+      character.thirdPartner,
+      character.fourthPartner,
+      character.fifthPartner,
+    ]) {
+      if (p != null && (isMatch(p['name']) || (p['name'] ?? '').toLowerCase() == lowerFull)) {
+        return parseRel(p['relationship']);
       }
     }
-    for (var ext in character.extendedFamily) {
-      if (ext['name'] == targetName) {
-        return int.tryParse(ext['relationship'] ?? '50') ?? 50;
+
+    // Helper untuk list of map
+    int? checkList(List<Map<String, String>> list) {
+      for (var item in list) {
+        final String itemName = (item['name'] ?? '').trim();
+        final String itemRelLabel = '$itemName (${item['relation']})'.trim();
+        if (isMatch(itemName) || isMatch(itemRelLabel) || itemName.toLowerCase() == lowerFull || itemRelLabel.toLowerCase() == lowerFull) {
+          return parseRel(item['relationship']);
+        }
       }
+      return null;
     }
+
+    // 3. Children, Siblings, Extended Family, Friends, Classmates, Coworkers, etc.
+    final int? childRel = checkList(character.children);
+    if (childRel != null) return childRel;
+
+    final int? sibRel = checkList(character.siblings);
+    if (sibRel != null) return sibRel;
+
+    final int? extRel = checkList(character.extendedFamily);
+    if (extRel != null) return extRel;
+
+    final int? friendRel = checkList(character.friends);
+    if (friendRel != null) return friendRel;
+
+    final int? cmRel = checkList(character.classmates);
+    if (cmRel != null) return cmRel;
+
+    final int? ucmRel = checkList(character.univClassmates);
+    if (ucmRel != null) return ucmRel;
+
+    final int? cwRel = checkList(character.coworkers);
+    if (cwRel != null) return cwRel;
+
+    final int? secRel = checkList(character.secretPartners);
+    if (secRel != null) return secRel;
+
+    final int? donRel = checkList(character.donorRecipients);
+    if (donRel != null) return donRel;
+
+    final int? sdtRel = checkList(character.sdTeachers);
+    if (sdtRel != null) return sdtRel;
+
+    final int? smptRel = checkList(character.smpTeachers);
+    if (smptRel != null) return smptRel;
+
+    final int? smatRel = checkList(character.smaTeachers);
+    if (smatRel != null) return smatRel;
+
+    final int? lectRel = checkList(character.univLecturers);
+    if (lectRel != null) return lectRel;
+
+    if (character.supervisor != null && isMatch(character.supervisor!['name'])) {
+      return parseRel(character.supervisor!['relationship']);
+    }
+
     return 50;
   }
 
@@ -79,8 +154,8 @@ class HubunganIntimLogic {
     required int satisfaction,
     required Random random,
   }) {
-    // Jika tingkat hubungan 60% ke atas, otomatis mau! (Sama seperti bercinta/makelove)
-    if (satisfaction >= 60) {
+    // Jika tingkat hubungan 50% ke atas, otomatis mau! (Sama seperti bercinta/makelove)
+    if (satisfaction >= 50) {
       return {
         'isWilling': true,
         'rejectReason': '',
@@ -140,8 +215,8 @@ class HubunganIntimLogic {
   }) {
     final int satisfaction = getRelationshipValue(character, targetName);
     
-    // Jika tingkat hubungan > 60%, otomatis mau (100% penerimaan)!
-    if (satisfaction > 60 || (satisfaction >= 60)) {
+    // Jika tingkat hubungan >= 50%, otomatis mau (100% penerimaan)!
+    if (satisfaction >= 50) {
       return true;
     }
 

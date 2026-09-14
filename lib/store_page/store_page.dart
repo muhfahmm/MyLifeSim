@@ -10,6 +10,7 @@ import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_p
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/skip_usia/skip_usia_page.dart';
 import 'fitur_premium/bundle_store/bundle_fitur_premium.dart';
 import 'fitur_premium/bundle_store/bundle_peningkat_atribut.dart';
 import 'fitur_premium/bundle_store/promo_twin_date_logic.dart';
@@ -33,6 +34,12 @@ class StorePage extends StatefulWidget {
   static bool get isSpecialCareerUnlocked => _StorePageState._specialCareerUnlocked;
   static set isSpecialCareerUnlocked(bool value) => _StorePageState._specialCareerUnlocked = value;
 
+  static bool get isSkipUsiaUnlocked => _StorePageState._skipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value;
+  static set isSkipUsiaUnlocked(bool value) {
+    _StorePageState._skipUsiaUnlocked = value;
+    GlobalSettings.isSkipUsiaUnlocked.value = value;
+  }
+
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -43,6 +50,7 @@ class _StorePageState extends State<StorePage> {
   static bool _premiumUnlocked = false;
   static bool _immunityUnlocked = false;
   static bool _specialCareerUnlocked = false;
+  static bool _skipUsiaUnlocked = false;
 
   void _showNoCharacterMessage() {
     DialogHelper.show(
@@ -450,6 +458,35 @@ class _StorePageState extends State<StorePage> {
                 _simulatePurchase('Kekebalan Abadi (Bebas Penyakit)', () {
                   _immunityUnlocked = true;
                 });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.fast_forward_rounded,
+              iconBgColor: Colors.purple.shade600,
+              title: 'Fast Forward Usia (Lompat Usia Instan)',
+              description: 'Lompat langsung ke usia berapa pun yang kamu inginkan secara instan tanpa menunggu!',
+              price: 'Rp 149.000',
+              isUnlocked: _skipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value,
+              onTap: () {
+                _simulatePurchase('Fast Forward Usia (Lompat Usia Instan)', () {
+                  _skipUsiaUnlocked = true;
+                  GlobalSettings.isSkipUsiaUnlocked.value = true;
+                });
+              },
+              onActiveTap: () {
+                if (character != null) {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SkipUsiaPage(
+                        character: character,
+                        onAgeChanged: () => setState(() {}),
+                      ),
+                    ),
+                  );
+                } else {
+                  _showNoCharacterMessage();
+                }
               },
             ),
 

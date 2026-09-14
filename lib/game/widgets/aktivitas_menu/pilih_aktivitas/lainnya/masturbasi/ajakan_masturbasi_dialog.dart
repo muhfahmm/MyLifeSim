@@ -528,38 +528,46 @@ class AjakanMasturbasiDialog {
     final String parsedRel = _parseRelation(relationType)['main']!;
     final String partnerRelation = _getRelationWithMu(parsedRel);
 
-    MasturbateEnjoymentModal.show(
+    String partnerGender = 'Perempuan';
+    final String vLower = viewerName.toLowerCase();
+    final String rLower = relationType.toLowerCase();
+    if (vLower.startsWith('ayah') || vLower.startsWith('paman') || vLower.startsWith('kakek') || vLower.startsWith('kakak laki') || vLower.startsWith('adik laki') ||
+        rLower.contains('ayah') || rLower.contains('paman') || rLower.contains('kakek') || rLower.contains('suami') || (rLower.contains('saudara') && rLower.contains('laki')) || (rLower.contains('adik') && rLower.contains('laki')) || (rLower.contains('kakak') && rLower.contains('laki'))) {
+      partnerGender = 'Laki-laki';
+    }
+
+    final Map<String, dynamic> npcMap = {
+      'name': viewerName,
+      'role': relationType,
+      'gender': partnerGender,
+      'age': '10Tahun',
+      'relationship': '50',
+    };
+
+    final vnNodes = AjakMasturbateDialogue.getDialogue(
+      player: character,
+      npc: npcMap,
+      chosenLocation: lokasi,
+      chosenTime: waktu,
+    );
+
+    // Tampilkan Visual Novel Dialogue terlebih dahulu
+    VNDialogueOverlay.show(
       context: context,
-      character: character,
-      fantasyPartner: viewerName,
-      isMutual: true,
-      partnerName: viewerName,
-      partnerRelation: partnerRelation,
-      additionalText: resultMsg + '\n\n📈 Efek: +15% Kebahagiaan, -$healthLoss% Kesehatan, +20% Hubungan',
-      onComplete: () {
-        final Map<String, dynamic> npcMap = {
-          'name': viewerName,
-          'role': relationType,
-          'gender': 'Perempuan',
-          'age': '10Tahun',
-          'relationship': '50',
-        };
-
-
-
-        final vnNodes = AjakMasturbateDialogue.getDialogue(
-          player: character,
-          npc: npcMap,
-          chosenLocation: lokasi,
-          chosenTime: waktu,
-        );
-
-        VNDialogueOverlay.show(
+      player: character,
+      npc: npcMap,
+      nodes: vnNodes,
+      onFinished: () {
+        // Tampilkan Hasil Masturbasi SETELAH user menekan Selesai
+        MasturbateEnjoymentModal.show(
           context: context,
-          player: character,
-          npc: npcMap,
-          nodes: vnNodes,
-          onFinished: () {
+          character: character,
+          fantasyPartner: viewerName,
+          isMutual: true,
+          partnerName: viewerName,
+          partnerRelation: partnerRelation,
+          additionalText: resultMsg + '\n\n📈 Efek: +15% Kebahagiaan, -$healthLoss% Kesehatan, +20% Hubungan',
+          onComplete: () {
             EfekSampingMasturbasi.checkPartnerEffect(
               context, character, relationType, viewerName, onComplete,
               acceptanceHealthLoss: healthLoss,

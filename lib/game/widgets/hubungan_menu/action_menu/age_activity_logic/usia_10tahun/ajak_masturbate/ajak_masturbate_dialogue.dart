@@ -100,7 +100,17 @@ class AjakMasturbateDialogue {
       VNChoiceOption(text: '🖐️ 3. Minta $partnerName lakukan stimulasi manual', nextNodeIndex: 31),
       VNChoiceOption(text: '👆 4. Lakukan fingering ke $partnerName', nextNodeIndex: 35),
       VNChoiceOption(text: '🍑 5. Stimulasi Payudara', nextNodeIndex: 52),
-      VNChoiceOption(text: '💦 6. Mencapai Puncak / Klimaks Bersama', nextNodeIndex: 69),
+      VNChoiceOption(
+        text: '💦 6. Mencapai Puncak / Klimaks Bersama',
+        nextNodeIndex: 69,
+        onSelect: (p, n) {
+          p.didEjakulasiThisSession = true;
+        },
+      ),
+      VNChoiceOption(
+        text: '🏁 Selesai Masturbasi',
+        nextNodeIndex: null, // Terminal choice → selesai dialog
+      ),
     ];
 
     final List<VNChoiceOption> subCiumChoices = CiumanMasturbateHelper.ciumOptions.map((opt) {

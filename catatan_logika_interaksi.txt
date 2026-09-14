@@ -1,0 +1,35 @@
+================================================================================
+DOKUMENTASI LOGIKA INTERAKSI & HUBUNGAN (>= 60%) - MYLIFESIM
+================================================================================
+
+1. BERCINTA / MAKE LOVE
+--------------------------------------------------------------------------------
+• Tahap 1 (Kesediaan Awal / Initial Willingness):
+  - Jika Tingkat Hubungan < 60%: NPC dapat menolak dengan alasan "hubungan kurang hangat (X%)".
+  - Jika Tingkat Hubungan >= 60%: NPC PASTI LOLOS dari penolakan kasar/kurang hangat.
+
+• Tahap 2 (Kalkulasi Keberhasilan & Alasan Halus):
+  - Meskipun hubungan >= 60%, masih ada kalkulasi peluang keberhasilan berdasarkan faktor usia, gender, dan bonus hubungan.
+  - Jika tidak lolos pada tahap ini tetapi hubungan >= 60%, NPC akan menolak secara halus dengan alasan acak (misal: "sedang lelah", "sedang kurang sehat", "sedang tidak mood").
+
+
+2. AJAK MASTURBASI BERSAMA
+--------------------------------------------------------------------------------
+• Menggunakan logika kesediaan awal (checkInitialWillingness) yang sama dengan Bercinta.
+• Jika Tingkat Hubungan >= 60%, NPC menganggap hubungan sudah cukup dekat sehingga tidak menolak karena alasan kehangatan hubungan.
+
+
+3. AJAK PACARAN
+--------------------------------------------------------------------------------
+• Tidak menggunakan batasan mutlak 60% seperti Bercinta/Masturbasi.
+• Menggunakan sistem peluang roll berbasis kondisi:
+  - Ajakan Pacaran standar (Anak/Npc umum): Peluang keberhasilan dasar 50%.
+  - Ajakan Tinggal Bersama Anak Donor (Usia >= 12 thn):
+    * Laki-laki: 30% peluang diterima.
+    * Perempuan: 50% peluang diterima.
+
+================================================================================
+Catatan Tambahan:
+Pencarian tingkat hubungan anak (children) kini sudah terhubung secara dinamis pada
+BercintaScreen sehingga nilai persen hubungan anak di halaman profil dibaca secara tepat.
+================================================================================

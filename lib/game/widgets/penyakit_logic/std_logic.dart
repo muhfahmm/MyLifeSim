@@ -71,52 +71,67 @@ Future<void> _showSTDModal(
   await showDialog(
     context: context,
     barrierDismissible: false,
-    builder: (ctx) => AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-      contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Row(
-        children: [
-          Icon(Icons.coronavirus, color: color, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text('$emoji Terdiagnosis $disease',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: color)),
-          ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Setelah berhubungan intim $sexType dengan $partnerName tanpa pengaman,',
-              style: const TextStyle(fontSize: 12)),
-          const SizedBox(height: 4),
-          Text('kamu terdiagnosis mengidap $disease.',
-              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color)),
-          const SizedBox(height: 10),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: color.withAlpha(20),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: color.withAlpha(80)),
+    builder: (ctx) {
+      final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
+      return AlertDialog(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            Icon(Icons.coronavirus, color: color, size: 20),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$emoji Terdiagnosis $disease',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: color),
+              ),
             ),
-            child: Text(description, style: const TextStyle(fontSize: 12, color: Colors.black87)),
-          ),
-          const SizedBox(height: 8),
-          const Text('Selalu gunakan pengaman untuk mengurangi risiko penularan penyakit.',
-              style: TextStyle(fontSize: 11, color: Colors.black45)),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(ctx),
-          child: Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
+          ],
         ),
-      ],
-    ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Setelah berhubungan intim $sexType dengan $partnerName tanpa pengaman,',
+              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              'kamu terdiagnosis mengidap $disease.',
+              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: color),
+            ),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: isDark ? color.withAlpha(40) : color.withAlpha(20),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: color.withAlpha(100)),
+              ),
+              child: Text(
+                description,
+                style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Selalu gunakan pengaman untuk mengurangi risiko penularan penyakit.',
+              style: TextStyle(fontSize: 11, color: isDark ? Colors.white38 : Colors.black45),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: color)),
+          ),
+        ],
+      );
+    },
   );
 }
 

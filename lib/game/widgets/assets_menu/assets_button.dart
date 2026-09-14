@@ -9,6 +9,7 @@ import 'package:mylifesim/game/widgets/assets_menu/koleksi_aset/koleksi_aset_ite
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/kasino/kasino.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/garasi_mobil.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_motor/garasi_motor.dart';
+import 'package:mylifesim/game/widgets/assets_menu/properti/properti_menu.dart';
 
 class AssetsButton extends StatelessWidget {
   final Character character;
@@ -87,6 +88,7 @@ class AssetsButton extends StatelessWidget {
                   const SizedBox(height: 8),
                   KoleksiAksorisItem(character: character, onPop: () => setStateDialog(() {})),
                   KoleksiPerbelanjaanItem(character: character, onPop: () => setStateDialog(() {})),
+                  PropertiItem(character: character, onPop: () => setStateDialog(() {})),
                   const Divider(height: 32),
                   const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
                   const SizedBox(height: 8),

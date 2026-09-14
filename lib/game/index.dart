@@ -19,6 +19,8 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:mylifesim/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:mylifesim/game/widgets/kategori_usia/kurangi_umur_button.dart';
 import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/fitur_premium/skip_usia/skip_usia_page.dart';
 import 'package:mylifesim/game/widgets/kategori_usia/next_day_button.dart';
 import 'package:mylifesim/game/widgets/inbox_menu/inbox_button.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/std_logic.dart';
@@ -41,6 +43,8 @@ import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features
 import 'package:mylifesim/game/widgets/character_progression/character_progression_page.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_dipecat_modal.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_orangtua/keluarga_pensiun_modal.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_makelove/ajak_makelove_dialogue.dart';
+import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 
 class GameScreen extends StatefulWidget {
   final Character character;
@@ -1328,6 +1332,7 @@ class _GameScreenState extends State<GameScreen> {
       DialogHelper.show(
         context: context,
         title: 'Anak Sakit: $kidName 🤒',
+        onClose: onDone,
         content: Text(
           'Anakmu, $kidName (Umur: $childAge tahun), didiagnosis menderita penyakit $sickness.\n\n'
           'Biaya perawatan medis yang dibutuhkan adalah sebesar \$$cost.',
@@ -3128,6 +3133,8 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
     final String preGeneratedWaktuIntim = type == 'Bercinta'
         ? (_waktuListIntim[_randIntim.nextInt(_waktuListIntim.length)]['name'] as String)
         : '';
+    proposal['chosenLocation'] = preGeneratedLokasiIntim;
+    proposal['chosenTime'] = preGeneratedWaktuIntim;
     final Map<String, IconData> _lokasiIkonMap = {
       'Di Kamar Tidur': Icons.bed,
       'Di Kamar Mandi': Icons.bathtub,
@@ -4234,15 +4241,50 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       }
     }
 
-    MLEnjoymentModal.show(
+    final String chosenLocation = (proposal['chosenLocation'] as String?)?.isNotEmpty == true
+        ? proposal['chosenLocation'] as String
+        : 'Di Kamar Tidur';
+    final String chosenTime = (proposal['chosenTime'] as String?)?.isNotEmpty == true
+        ? proposal['chosenTime'] as String
+        : 'Malam';
+
+    final Map<String, dynamic> npcMap = {
+      'name': partnerName,
+      'role': relation,
+      'gender': partnerGender,
+      'age': '${_character.age} tahun',
+      'relationship': relValue.toString(),
+    };
+
+    final vnNodes = AjakMakeLoveDialogue.getDialogue(
+      player: _character,
+      npc: npcMap,
+      chosenLocation: chosenLocation,
+      chosenTime: chosenTime,
+      useCondom: useCondom,
+      isAccepted: true,
+    );
+
+    // Tampilkan Visual Novel Dialogue terlebih dahulu
+    VNDialogueOverlay.show(
       context: context,
-      character: _character,
-      partnerName: partnerName,
-      partnerRelation: relation,
-      relationshipValue: relValue,
-      additionalText: addText.isNotEmpty ? addText : null,
-      onComplete: () {
-        _checkGlassesNeed(onDone);
+      player: _character,
+      npc: npcMap,
+      nodes: vnNodes,
+      customLocation: chosenLocation,
+      onFinished: () {
+        // Tampilkan Hasil Hubungan Intim SETELAH user menekan Selesai
+        MLEnjoymentModal.show(
+          context: context,
+          character: _character,
+          partnerName: partnerName,
+          partnerRelation: relation,
+          relationshipValue: relValue,
+          additionalText: addText.isNotEmpty ? addText : null,
+          onComplete: () {
+            _checkGlassesNeed(onDone);
+          },
+        );
       },
     );
   }
@@ -4786,7 +4828,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                     // Sticky Bottom Actions Outer Wrapper (Protruding FAB Style + 100% Hit-Test)
           SizedBox(
             width: double.infinity,
-            height: 115,
+            height: 130,
             child: Stack(
               alignment: Alignment.bottomCenter,
               clipBehavior: Clip.none,
@@ -4816,19 +4858,21 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 SafeArea(
                   top: false,
                   child: SizedBox(
-                    height: 125,
+                    height: 130,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
-                        // Row Top Bar Controls: Kurangi Umur (Kiri), Tambah Umur (Tengah), Toko (Kanan) - Bebas Tabrakan!
+                        // Row Top Bar Controls: Kurangi Umur (Kiri), Tambah Umur & Skip Usia (Tengah), Toko (Kanan) - Scaled with FittedBox
                         Positioned(
-                          top: 4,
-                          left: 12,
-                          right: 12,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
+                          top: 2,
+                          left: 8,
+                          right: 8,
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
                               // Kiri: Kurangi Umur jika GodMode, jika tidak beri spacer agar Tambah Umur tetap di tengah
                               if (StorePage.isGodModeUnlocked)
                                 KurangiUmurButton(
@@ -4837,9 +4881,122 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                               else
                                 const SizedBox(width: 75),
 
-                              // Tengah: Tambah Umur
-                              AgeUpButton(
-                                onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
+                              // Tengah: Tambah Umur & Skip Usia
+                              Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  AgeUpButton(
+                                    onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        final bool isUnlocked = StorePage.isSkipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value;
+                                        if (isUnlocked) {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => SkipUsiaPage(
+                                                character: _character,
+                                                onAgeChanged: () {
+                                                  if (mounted) {
+                                                    setState(() {
+                                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                                        _character,
+                                                        happiness: _character.happiness,
+                                                      );
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ).then((_) {
+                                            if (mounted) {
+                                              setState(() {
+                                                _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                                  _character,
+                                                  happiness: _character.happiness,
+                                                );
+                                              });
+                                            }
+                                          });
+                                        } else {
+                                          DialogHelper.show(
+                                            context: context,
+                                            title: 'Fitur Premium ⏩',
+                                            content: const Text(
+                                              'Fitur Fast Forward Usia (Lompat Usia Instan) adalah Fitur Premium.\n\nIngin membelinya di Toko?',
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                onPressed: () => Navigator.pop(context),
+                                                child: const Text('Batal'),
+                                              ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: Colors.amber,
+                                                  foregroundColor: Colors.black,
+                                                ),
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => StorePage(
+                                                        character: _character,
+                                                        onPurchaseCompleted: () => setState(() {}),
+                                                      ),
+                                                    ),
+                                                  ).then((_) => setState(() {}));
+                                                },
+                                                child: const Text('Buka Toko'),
+                                              ),
+                                            ],
+                                          );
+                                        }
+                                      },
+                                      borderRadius: BorderRadius.circular(14),
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                        height: 54,
+                                        decoration: BoxDecoration(
+                                          gradient: const LinearGradient(
+                                            colors: [Color(0xFF8E24AA), Color(0xFF4A148C)],
+                                            begin: Alignment.topLeft,
+                                            end: Alignment.bottomRight,
+                                          ),
+                                          borderRadius: BorderRadius.circular(14),
+                                          border: Border.all(color: Colors.purpleAccent, width: 1.5),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.purple.withValues(alpha: 0.4),
+                                              blurRadius: 6,
+                                              offset: const Offset(0, 3),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: const [
+                                            Icon(Icons.fast_forward_rounded, color: Colors.white, size: 20),
+                                            SizedBox(height: 2),
+                                            Text(
+                                              'Skip Usia',
+                                              style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
 
                               // Kanan: Tombol Toko
@@ -4899,6 +5056,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                             ],
                           ),
                         ),
+                      ),
 
                         // Row 4 tombol utama di bawah (Bayi, Assets, Hubungan, Aktivitas)
                         Positioned(
@@ -4915,13 +5073,13 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                   character: _character,
                                   ageData: ageData,
                                   age: _character.age,
-                                  gender: _character.gender ?? 'Laki-laki',
-                                  location: _character.location ?? 'Indonesia',
+                                  gender: _character.gender,
+                                  location: _character.location,
                                   health: _character.health,
                                   happiness: _character.happiness,
                                   intelligence: _character.intelligence,
                                   money: _character.money,
-                                  appearance: _character.appearance ?? 50,
+                                  appearance: _character.appearance,
                                 ),
                               )),
                               Expanded(child: Padding(

@@ -47,11 +47,6 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_di
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_diskusi/ajak_diskusi_dialog_npc.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/ajak_diskusi/ajak_diskusi_dialog_user.dart';
 
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_makelove/desahan_makelove_dialog_npc.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_makelove/desahan_makelove_dialog_user.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_masturbate/desahan_masturbate_dialog_npc.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/child_action_dialogue/adult_action_dialogue/desahan_masturbate/desahan_masturbate_dialog_user.dart';
-
 class PercakapanDispatcher {
   /// Membuka Layar Percakapan Visual Novel Secara Otomatis Sesuai Aksi Menu Interaksi
   static void dispatchAction({
@@ -166,13 +161,10 @@ class PercakapanDispatcher {
     } else if (cleanAction.contains('make love') || cleanAction.contains('bercinta') || cleanAction.contains('makelove')) {
       displayActionTitle = 'Make Love';
       calculatedDelta = random.nextInt(15) + 5;
-      final npcList = DesahanMakeloveDialogNpc.getNPCDialogues(npcName: targetName, targetGender: npcGender, partnerName: character.name);
-      final userList = DesahanMakeloveDialogUser.getUserDialogues(playerName: character.name, playerGender: character.gender, partnerName: targetName);
-      final int idx = random.nextInt(npcList.length);
       nodes = [
         VNDialogueNode(
           speakerName: character.name,
-          dialogueText: userList[idx],
+          dialogueText: 'Ayo kita nikmati momen berdua ini...',
           emotion: VNEmotionType.blush,
           isPlayerSpeaking: true,
           outfit: VNOutfitType.casual,
@@ -180,7 +172,7 @@ class PercakapanDispatcher {
         ),
         VNDialogueNode(
           speakerName: targetName,
-          dialogueText: npcList[idx],
+          dialogueText: 'Tentu saja... bersamamu terasa begitu nikmat dan indah. 💕',
           emotion: VNEmotionType.blush,
           outfit: VNOutfitType.casual,
           background: VNBackgroundType.bedroom,
@@ -189,13 +181,10 @@ class PercakapanDispatcher {
     } else if (cleanAction.contains('masturbasi') || cleanAction.contains('masturbate')) {
       displayActionTitle = 'Masturbasi Bersama';
       calculatedDelta = random.nextInt(10) + 3;
-      final npcList = DesahanMasturbateDialogNpc.getNPCDialogues(npcName: targetName, targetGender: npcGender, partnerName: character.name);
-      final userList = DesahanMasturbateDialogUser.getUserDialogues(playerName: character.name, playerGender: character.gender, partnerName: targetName);
-      final int idx = random.nextInt(npcList.length);
       nodes = [
         VNDialogueNode(
           speakerName: character.name,
-          dialogueText: userList[idx],
+          dialogueText: 'Mari kita saling memberi kepuasan malam ini...',
           emotion: VNEmotionType.blush,
           isPlayerSpeaking: true,
           outfit: VNOutfitType.casual,
@@ -203,7 +192,7 @@ class PercakapanDispatcher {
         ),
         VNDialogueNode(
           speakerName: targetName,
-          dialogueText: npcList[idx],
+          dialogueText: 'Sentuhanmu sungguh membuatku terbuai oleh sensasi ini... ✨',
           emotion: VNEmotionType.blush,
           outfit: VNOutfitType.casual,
           background: VNBackgroundType.bedroom,

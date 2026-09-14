@@ -21,6 +21,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/op
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/rehabilitasi/rehabilitasi_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/salon_spa/salon_spa_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/tempat_tinggal/tempat_tinggal_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/school_menu_page.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/univ_logic/univ_menu_page.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart';
@@ -315,6 +316,22 @@ class ActivityButton extends StatelessWidget {
                     );
                   }),
                   const SizedBox(height: 8),
+
+                  // Tempat Tinggal
+                  _buildActivityTile(
+                    context: context,
+                    label: 'Tempat Tinggal',
+                    subtitle: character.livesWithParents
+                        ? 'Tinggal bersama orang tua'
+                        : 'Tinggal di ${character.activeHouseName ?? 'Rumah Sendiri'}',
+                    icon: Icons.home,
+                    color: Colors.indigo,
+                    minAge: 18,
+                    currentAge: age,
+                    onTap: () => _executeAction(context, () {
+                      TempatTinggalMenuHelper.showTempatTinggalMenu(context, character, localRefresh);
+                    }),
+                  ),
 
                   // Aksesoris
                   _buildActivityTile(

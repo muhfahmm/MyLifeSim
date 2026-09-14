@@ -52,10 +52,13 @@ class AnakSakitEvent {
 
     final Random rng = Random();
 
-    // Cari anak yang belum sakit dan masih hidup
-    final List<Map<String, String>> anakHidup = character.children
-        .where((c) => c['isDeceased'] != 'true' && c['isSick'] != 'true')
-        .toList();
+    // Cari anak yang belum sakit, masih hidup, dan tinggal bersama user (jika anak donor)
+    final List<Map<String, String>> anakHidup = character.children.where((c) {
+      if (c['isDeceased'] == 'true' || c['isSick'] == 'true') return false;
+      final bool isDonorChild = character.donorRecipients.any((r) => r['childName'] == c['name']);
+      if (isDonorChild && c['livesWithUser'] != 'true') return false;
+      return true;
+    }).toList();
 
     if (anakHidup.isEmpty) return;
 
@@ -119,7 +122,13 @@ class AnakSakitEvent {
       barrierDismissible: false,
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
-        return AlertDialog(
+        return PopScope(
+          onPopInvokedWithResult: (didPop, result) {
+            if (didPop) {
+              onComplete();
+            }
+          },
+          child: AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
@@ -231,9 +240,10 @@ class AnakSakitEvent {
               ),
             ),
           ],
-        );
-      },
-    );
+        ),
+      );
+    },
+  );
   }
 
   // ================================================================

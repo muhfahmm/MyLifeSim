@@ -247,8 +247,16 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
       if (!isSpouse) {
         final String locLower = _chosenLocation.toLowerCase();
         final String tLower = _chosenTime.toLowerCase();
+        final bool isOwnHouse = locLower.contains('rumah sendiri') ||
+            ((!widget.character.livesWithParents || widget.character.ownedHouses.isNotEmpty || widget.character.activeHouseName != null) &&
+                locLower.contains('rumah') &&
+                !locLower.contains('ibu') &&
+                !locLower.contains('orang tua'));
 
-        if (locLower.contains('kamar tidur')) {
+        if (isOwnHouse) {
+          // Di rumah sendiri: Persentase ketahuan adalah 0!
+          caughtChance = 0;
+        } else if (locLower.contains('kamar tidur')) {
           if (tLower.contains('pagi')) {
             caughtChance = 50; // (60 - 10)
           } else if (tLower.contains('siang')) {
@@ -437,6 +445,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
       'skinColor': skinColor,
     };
 
+    widget.character.didEjakulasiThisSession = false;
     final vnNodes = AjakMasturbateDialogue.getDialogue(
       player: widget.character,
       npc: npcMap,

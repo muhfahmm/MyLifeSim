@@ -166,209 +166,216 @@ class TempatBercintaHelper {
 
     if (selectedMain == null) return null;
 
-    // Langkah 2: Jika memilih "Di Rumah", tawarkan pilihan rumah siapa (Rumah Orang Tua, Rumah Pacar Utama, Rumah Pacar Rahasia)
+    // Langkah 2: Jika memilih "Di Rumah", tawarkan pilihan rumah siapa jika user belum/masih tinggal dengan orang tua.
+    // Jika user sudah memiliki rumah sendiri (atau tidak tinggal dengan ortu), gunakan rumah sendiri tanpa menampilkan modal tambahan "Pilih Rumah Siapa?".
     if (selectedMain.name == 'Di Rumah') {
-      final String? selectedHouseOwner = await showDialog<String>(
-        context: context,
-        barrierDismissible: false,
-        builder: (dialogContext) {
-          final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
-          final String parentName = character.motherName != null ? 'Ibu (${character.motherName})' : 'Orang Tua';
+      final bool hasOwnHouse = !character.livesWithParents || character.ownedHouses.isNotEmpty || character.activeHouseName != null;
+      String? selectedHouseOwner;
 
-          final List<Widget> partnerHouseCards = [];
+      if (hasOwnHouse) {
+        selectedHouseOwner = character.activeHouseName ?? 'Rumah Sendiri';
+      } else {
+        selectedHouseOwner = await showDialog<String>(
+          context: context,
+          barrierDismissible: false,
+          builder: (dialogContext) {
+            final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+            final String parentName = character.motherName != null ? 'Ibu (${character.motherName})' : 'Orang Tua';
 
-          bool isSiblingLivingWithParents(String partnerName) {
-            final String cleanPName = partnerName.toLowerCase();
-            for (var sib in character.siblings) {
-              final String sibName = (sib['name'] ?? '').toLowerCase();
-              if (sibName.isNotEmpty && (cleanPName.contains(sibName) || sibName.contains(cleanPName))) {
-                final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
-                return sibAge < 18;
+            final List<Widget> partnerHouseCards = [];
+
+            bool isSiblingLivingWithParents(String partnerName) {
+              final String cleanPName = partnerName.toLowerCase();
+              for (var sib in character.siblings) {
+                final String sibName = (sib['name'] ?? '').toLowerCase();
+                if (sibName.isNotEmpty && (cleanPName.contains(sibName) || sibName.contains(cleanPName))) {
+                  final int sibAge = int.tryParse(sib['age'] ?? '0') ?? 0;
+                  return sibAge < 18;
+                }
+              }
+              return false;
+            }
+
+            if (character.partner != null) {
+              final String name = character.partner!['name']!;
+              if (!isSiblingLivingWithParents(name)) {
+                partnerHouseCards.add(
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite, color: Colors.pink),
+                      title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                      subtitle: const Text('Rumah pacar utamamu.'),
+                      onTap: () => Navigator.pop(dialogContext, 'Pacar Pertama'),
+                    ),
+                  ),
+                );
               }
             }
-            return false;
-          }
 
-          if (character.partner != null) {
-            final String name = character.partner!['name']!;
-            if (!isSiblingLivingWithParents(name)) {
-              partnerHouseCards.add(
-                Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.favorite, color: Colors.pink),
-                    title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                    subtitle: const Text('Rumah pacar utamamu.'),
-                    onTap: () => Navigator.pop(dialogContext, 'Pacar Pertama'),
-                  ),
-                ),
-              );
-            }
-          }
-
-          if (character.secondPartner != null) {
-            final String name = character.secondPartner!['name']!;
-            if (!isSiblingLivingWithParents(name)) {
-              final String subtitle = character.isHavingAffair ? 'Rumah pacar rahasiamu (selingkuhan).' : 'Rumah pacar keduamu.';
-              partnerHouseCards.add(
-                Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: Icon(character.isHavingAffair ? Icons.heart_broken : Icons.favorite, color: character.isHavingAffair ? Colors.deepOrange : Colors.pink),
-                    title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                    subtitle: Text(subtitle, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
-                    onTap: () => Navigator.pop(dialogContext, 'Pacar Kedua'),
-                  ),
-                ),
-              );
-            }
-          }
-
-          if (character.thirdPartner != null) {
-            final String name = character.thirdPartner!['name']!;
-            if (!isSiblingLivingWithParents(name)) {
-              partnerHouseCards.add(
-                Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.favorite, color: Colors.pink),
-                    title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                    subtitle: const Text('Rumah pacar ketigamu.'),
-                    onTap: () => Navigator.pop(dialogContext, 'Pacar Ketiga'),
-                  ),
-                ),
-              );
-            }
-          }
-
-          if (character.fourthPartner != null) {
-            final String name = character.fourthPartner!['name']!;
-            if (!isSiblingLivingWithParents(name)) {
-              partnerHouseCards.add(
-                Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.favorite, color: Colors.pink),
-                    title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                    subtitle: const Text('Rumah pacar keempatmu.'),
-                    onTap: () => Navigator.pop(dialogContext, 'Pacar Keempat'),
-                  ),
-                ),
-              );
-            }
-          }
-
-          if (character.fifthPartner != null) {
-            final String name = character.fifthPartner!['name']!;
-            if (!isSiblingLivingWithParents(name)) {
-              partnerHouseCards.add(
-                Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: const Icon(Icons.favorite, color: Colors.pink),
-                    title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-                    subtitle: const Text('Rumah pacar kelimamu.'),
-                    onTap: () => Navigator.pop(dialogContext, 'Pacar Kelima'),
-                  ),
-                ),
-              );
-            }
-          }
-
-          return AlertDialog(
-            backgroundColor: isDark ? Colors.grey.shade900 : null,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            title: Row(
-              children: [
-                const Icon(Icons.home, color: Colors.redAccent, size: 20),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Pilih Rumah Siapa?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: isDark ? Colors.white : Colors.black87,
+            if (character.secondPartner != null) {
+              final String name = character.secondPartner!['name']!;
+              if (!isSiblingLivingWithParents(name)) {
+                final String subtitle = character.isHavingAffair ? 'Rumah pacar rahasiamu (selingkuhan).' : 'Rumah pacar keduamu.';
+                partnerHouseCards.add(
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
-                    overflow: TextOverflow.ellipsis,
+                    child: ListTile(
+                      leading: Icon(character.isHavingAffair ? Icons.heart_broken : Icons.favorite, color: character.isHavingAffair ? Colors.deepOrange : Colors.pink),
+                      title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                      subtitle: Text(subtitle, style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                      onTap: () => Navigator.pop(dialogContext, 'Pacar Kedua'),
+                    ),
                   ),
-                ),
-              ],
-            ),
-            content: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
+                );
+              }
+            }
+
+            if (character.thirdPartner != null) {
+              final String name = character.thirdPartner!['name']!;
+              if (!isSiblingLivingWithParents(name)) {
+                partnerHouseCards.add(
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite, color: Colors.pink),
+                      title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                      subtitle: const Text('Rumah pacar ketigamu.'),
+                      onTap: () => Navigator.pop(dialogContext, 'Pacar Ketiga'),
+                    ),
+                  ),
+                );
+              }
+            }
+
+            if (character.fourthPartner != null) {
+              final String name = character.fourthPartner!['name']!;
+              if (!isSiblingLivingWithParents(name)) {
+                partnerHouseCards.add(
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite, color: Colors.pink),
+                      title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                      subtitle: const Text('Rumah pacar keempatmu.'),
+                      onTap: () => Navigator.pop(dialogContext, 'Pacar Keempat'),
+                    ),
+                  ),
+                );
+              }
+            }
+
+            if (character.fifthPartner != null) {
+              final String name = character.fifthPartner!['name']!;
+              if (!isSiblingLivingWithParents(name)) {
+                partnerHouseCards.add(
+                  Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      leading: const Icon(Icons.favorite, color: Colors.pink),
+                      title: Text('Rumah $name', style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
+                      subtitle: const Text('Rumah pacar kelimamu.'),
+                      onTap: () => Navigator.pop(dialogContext, 'Pacar Kelima'),
+                    ),
+                  ),
+                );
+              }
+            }
+
+            return AlertDialog(
+              backgroundColor: isDark ? Colors.grey.shade900 : null,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+              title: Row(
                 children: [
-                  if (character.motherName != null || character.fatherName != null)
-                    Card(
-                      elevation: 0,
-                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                  const Icon(Icons.home, color: Colors.redAccent, size: 20),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Pilih Rumah Siapa?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
-                      child: ListTile(
-                        leading: const Icon(Icons.people, color: Colors.blue, size: 20),
-                        title: Text('Rumah $parentName', style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
-                        subtitle: const Text('Rumah orang tuamu sendiri.', style: TextStyle(fontSize: 12)),
-                        onTap: () => Navigator.pop(dialogContext, 'Orang Tua'),
-                      ),
+                      overflow: TextOverflow.ellipsis,
                     ),
-                  ...partnerHouseCards,
+                  ),
                 ],
               ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(dialogContext, null),
-                child: Text(
-                  'Kembali',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isDark ? Colors.white : Colors.black87,
-                    fontWeight: FontWeight.bold,
-                  ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    if (character.motherName != null || character.fatherName != null)
+                      Card(
+                        elevation: 0,
+                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        ),
+                        child: ListTile(
+                          leading: const Icon(Icons.people, color: Colors.blue, size: 20),
+                          title: Text('Rumah $parentName', style: TextStyle(color: isDark ? Colors.white : Colors.black87, fontSize: 14, fontWeight: FontWeight.bold)),
+                          subtitle: const Text('Rumah orang tuamu sendiri.', style: TextStyle(fontSize: 12)),
+                          onTap: () => Navigator.pop(dialogContext, 'Orang Tua'),
+                        ),
+                      ),
+                    ...partnerHouseCards,
+                  ],
                 ),
-              )
-            ],
-          );
-        },
-      );
-
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(dialogContext, null),
+                  child: Text(
+                    'Kembali',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                )
+              ],
+            );
+          },
+        );
+      }
       if (selectedHouseOwner == null) {
         return showLocationChooser(
           context: context,

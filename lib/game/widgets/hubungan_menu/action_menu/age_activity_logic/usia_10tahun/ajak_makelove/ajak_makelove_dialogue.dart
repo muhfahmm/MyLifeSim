@@ -196,27 +196,46 @@ class AjakMakeLoveDialogue {
       VNChoiceOption(
         text: isGay ? '💦 Keluar di Dalam Anus' : '💦 Keluar di Dalam Vagina',
         nextNodeIndex: startEjakulasiIndex,
-        onSelect: (p, n) { p.didCreampieThisSession = true; },
+        onSelect: (p, n) { 
+          p.didCreampieThisSession = true;
+          p.didEjakulasiThisSession = true;
+        },
       ),
       VNChoiceOption(
         text: '🧴 Keluar di Perut / Luar',
         nextNodeIndex: startEjakulasiIndex + 4,
-        onSelect: (p, n) { p.didCreampieThisSession = false; },
+        onSelect: (p, n) { 
+          p.didCreampieThisSession = false;
+          p.didEjakulasiThisSession = true;
+        },
       ),
       VNChoiceOption(
         text: '👑 Keluar di Wajah',
         nextNodeIndex: startEjakulasiIndex + 8,
-        onSelect: (p, n) { p.didCreampieThisSession = false; },
+        onSelect: (p, n) { 
+          p.didCreampieThisSession = false;
+          p.didEjakulasiThisSession = true;
+        },
       ),
       VNChoiceOption(
         text: '👄 Keluar di Mulut',
         nextNodeIndex: startEjakulasiIndex + 12,
-        onSelect: (p, n) { p.didCreampieThisSession = false; },
+        onSelect: (p, n) { 
+          p.didCreampieThisSession = false;
+          p.didEjakulasiThisSession = true;
+        },
       ),
       VNChoiceOption(
         text: '🔥 Keluar di Dalam Anus',
         nextNodeIndex: startEjakulasiIndex + 16,
-        onSelect: (p, n) { p.didCreampieThisSession = false; },
+        onSelect: (p, n) { 
+          p.didCreampieThisSession = false;
+          p.didEjakulasiThisSession = true;
+        },
+      ),
+      VNChoiceOption(
+        text: '🏁 Selesai Bercinta',
+        nextNodeIndex: null, // Terminal choice → selesai dialog
       ),
     ];
 
@@ -232,13 +251,19 @@ class AjakMakeLoveDialogue {
         ? '🌸 3. Minta $partnerName melakukan penetrasi'
         : '🌸 3. Lakukan Penetrasi';
 
-    final String askFingeringLabel = isMalePlayer
-        ? '🖐️ 5. Minta $partnerName melakukan stimulasi penis/anal'
-        : '🖐️ 5. Minta $partnerName melakukan stimulasi vagina/anal';
+    final bool isMalePlayerWithFemaleNPC = isMalePlayer && !isMaleNPC;
+
+    final String askFingeringLabel = isMalePlayerWithFemaleNPC
+        ? '🖐️ 5. Minta $partnerName melakukan onani'
+        : (isMalePlayer
+            ? '🖐️ 5. Minta $partnerName melakukan stimulasi penis/anal'
+            : '🖐️ 5. Minta $partnerName melakukan stimulasi vagina/anal');
 
     final String doFingeringLabel = isBothFemale 
         ? '👆 6. Lakukan fingering kepada $partnerName'
         : '👆 6. Lakukan onani kepada $partnerName';
+
+    final bool showPayudaraOption = !isMalePlayer && !isGay;
 
     // Button Utama awal
     final List<VNChoiceOption> initialMainActionButtons = [
@@ -248,12 +273,12 @@ class AjakMakeLoveDialogue {
       VNChoiceOption(text: posisiBtnText, nextNodeIndex: 4),
       VNChoiceOption(text: askFingeringLabel, nextNodeIndex: startManualIndex),
       VNChoiceOption(text: doFingeringLabel, nextNodeIndex: fingeringSubMenuIndex),
-      if (!isGay) VNChoiceOption(text: '🍑 7. Minta $partnerName melakukan stimulasi payudara', nextNodeIndex: payudaraSubMenuIndex),
+      if (showPayudaraOption) VNChoiceOption(text: '🍑 7. Minta $partnerName melakukan stimulasi payudara', nextNodeIndex: payudaraSubMenuIndex),
     ];
 
     final String ejakulasiBtnLabel = isFemaleWithMale
         ? '💦 8. Suruh $partnerName segera ejakulasi'
-        : (isGay ? '💦 7. Ejakulasi / Klimaks' : '💦 8. Ejakulasi / Klimaks');
+        : (!showPayudaraOption ? '💦 7. Ejakulasi / Klimaks' : '💦 8. Ejakulasi / Klimaks');
 
     // Button Utama unlocked (Sembunyikan tombol ejakulasi jika Lesbian)
     final List<VNChoiceOption> unlockedMainActionButtons = [
@@ -263,24 +288,29 @@ class AjakMakeLoveDialogue {
       VNChoiceOption(text: posisiBtnText, nextNodeIndex: 4),
       VNChoiceOption(text: askFingeringLabel, nextNodeIndex: startManualIndex),
       VNChoiceOption(text: doFingeringLabel, nextNodeIndex: fingeringSubMenuIndex),
-      if (!isGay) VNChoiceOption(text: '🍑 7. Minta $partnerName melakukan stimulasi payudara', nextNodeIndex: payudaraSubMenuIndex),
+      if (showPayudaraOption) VNChoiceOption(text: '🍑 7. Minta $partnerName melakukan stimulasi payudara', nextNodeIndex: payudaraSubMenuIndex),
       if (!isBothFemale)
         VNChoiceOption(
           text: ejakulasiBtnLabel,
           nextNodeIndex: isFemaleWithMale
               ? (startEjakulasiIndex + ((DateTime.now().millisecondsSinceEpoch % 5) * 4))
               : 5,
-          onSelect: isFemaleWithMale
-              ? (p, n) {
-                  // NPC Pria memilih tempat ejakulasi secara acak (Random)
-                  final random = DateTime.now().millisecondsSinceEpoch % 5;
-                  if (random == 0) {
-                    p.didCreampieThisSession = true;
-                  } else {
-                    p.didCreampieThisSession = false;
-                  }
-                }
-              : null,
+          onSelect: (p, n) {
+            p.didEjakulasiThisSession = true;
+            if (isFemaleWithMale) {
+              final random = DateTime.now().millisecondsSinceEpoch % 5;
+              if (random == 0) {
+                p.didCreampieThisSession = true;
+              } else {
+                p.didCreampieThisSession = false;
+              }
+            }
+          },
+        ),
+      if (player.didEjakulasiThisSession)
+        VNChoiceOption(
+          text: '🏁 Selesai Bercinta',
+          nextNodeIndex: null, // Terminal choice → selesai dialog
         ),
     ];
 
@@ -897,24 +927,41 @@ class AjakMakeLoveDialogue {
       }
     }
 
-    // Sub-Menu Stimulasi Vagina/Anal Pasangan (Node = startManualIndex)
+    // Sub-Menu Stimulasi Vagina/Anal/Penis Pasangan (Node = startManualIndex)
+    final String manualSubTitle = isMalePlayerWithFemaleNPC
+        ? '(Pilih jenis teknik kocok penis (handjob) yang kamu minta dari $partnerName...) 🖐️'
+        : '(Pilih jenis stimulasi intim yang ingin kamu minta dari $partnerName...) 🖐️';
+
+    final List<VNChoiceOption> manualSubChoices = isMalePlayerWithFemaleNPC
+        ? [
+            VNChoiceOption(
+              text: '🍆 Kocok Penis (Handjob)',
+              nextNodeIndex: startManualIndex + 6, // Langsung ke node Jari/Handjob Vagina/Penis
+            ),
+            VNChoiceOption(
+              text: '🧴 Kocok Penis dengan Pelumas',
+              nextNodeIndex: startManualIndex + 2, // Ke node Lube Handjob
+            ),
+          ]
+        : [
+            VNChoiceOption(
+              text: '🌸 Stimulasi Vagina',
+              nextNodeIndex: startManualIndex + 1,
+            ),
+            VNChoiceOption(
+              text: '🔥 Stimulasi Anal',
+              nextNodeIndex: startManualIndex + 10,
+            ),
+          ];
+
     allNodes.add(VNDialogueNode(
       speakerName: 'Narasi',
-      dialogueText: '(Pilih jenis stimulasi intim yang ingin kamu minta dari $partnerName...) 🖐️',
+      dialogueText: manualSubTitle,
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
       background: VNBackgroundType.bedroom,
-      choices: [
-        VNChoiceOption(
-          text: '🌸 Stimulasi Vagina',
-          nextNodeIndex: startManualIndex + 1,
-        ),
-        VNChoiceOption(
-          text: '🔥 Stimulasi Anal',
-          nextNodeIndex: startManualIndex + 10,
-        ),
-      ],
+      choices: manualSubChoices,
     ));
 
     // Sub-Menu Alat Vagina (Node = startManualIndex + 1)
@@ -937,10 +984,23 @@ class AjakMakeLoveDialogue {
       ],
     ));
 
-    // Nodes Vibrator Vagina (startManualIndex + 2 .. + 5)
+    // Nodes Vibrator Vagina / Kocok Penis Pelumas (startManualIndex + 2 .. + 5)
+    final String lubeNarasi1 = isMalePlayerWithFemaleNPC
+        ? '($partnerName membalurkan pelumas hangat ke tangannya, lalu perlahan memegang dan mengocok penis ${player.name} dengan gerakan lembut dan ritmis...) 🧴🍆'
+        : '($partnerName mengambil vibrator, menyalakannya pada getaran hangat, lalu perlahan menempelkannya ke area vagina sensitif ${player.name}...) ⚡';
+    final String lubeNpcText = isMalePlayerWithFemaleNPC
+        ? 'Rasakan usapan hangat pelumas ini $callNpcToPlayer... Aku akan mengocoknya perlahan sampai kamu merasa sangat nikmat... 💗'
+        : 'Rasakan getaran nikmat mainan ini $callNpcToPlayer... Aku meyakinkanmu akan mengaturnya sampai kamu terpesona... ⚡';
+    final String lubePlayerText = isMalePlayerWithFemaleNPC
+        ? 'Aaahhh...! Sentuhan pelumasmu licin dan nikmat sekali $partnerName...! Sensasinya sungguh meledak... 💜'
+        : 'Aaahhh...! Getarannya kuat sekali $partnerName...! Tubuhku rasanya ingin melayang ke udara... 💜';
+    final String lubeNarasi4 = isMalePlayerWithFemaleNPC
+        ? '(Sentuhan kocokan tangan berpelumas dari $partnerName memberikan kenikmatan luar biasa pada penis!) ✨'
+        : '(Getaran intens vibrator dari $partnerName membawa sensasi kenikmatan luar biasa pada area vagina!) ✨';
+
     allNodes.add(VNDialogueNode(
       speakerName: 'Narasi',
-      dialogueText: '($partnerName mengambil vibrator, menyalakannya pada getaran hangat, lalu perlahan menempelkannya ke area vagina sensitif ${player.name}...) ⚡',
+      dialogueText: lubeNarasi1,
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
@@ -948,7 +1008,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: partnerName,
-      dialogueText: 'Rasakan getaran nikmat mainan ini $callNpcToPlayer... Aku akan mengaturnya sampai kamu terpesona... ⚡',
+      dialogueText: lubeNpcText,
       emotion: VNEmotionType.happy,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
@@ -956,7 +1016,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: player.name,
-      dialogueText: 'Aaahhh...! Getarannya kuat sekali $partnerName...! Tubuhku rasanya ingin melayang ke udara... 💜',
+      dialogueText: lubePlayerText,
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: true,
       outfit: VNOutfitType.casual,
@@ -964,7 +1024,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: 'Narasi',
-      dialogueText: '(Getaran intens vibrator dari $partnerName membawa sensasi kenikmatan luar biasa pada area vagina!) ✨',
+      dialogueText: lubeNarasi4,
       emotion: VNEmotionType.happy,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
@@ -972,10 +1032,23 @@ class AjakMakeLoveDialogue {
       nextIndex: lockedCardIndex,
     ));
 
-    // Nodes Jari Vagina (startManualIndex + 6 .. + 9)
+    // Nodes Jari Vagina / Kocok Penis (startManualIndex + 6 .. + 9)
+    final String handjobNarasi1 = isMalePlayerWithFemaleNPC
+        ? '($partnerName mendekat dengan mesra, mengusap dan mengocok penis ${player.name} menggunakan kehangatan tangannya yang lembut...) 🖐️'
+        : '($partnerName mendekat dengan mesra, mengusap dan membelai area vagina ${player.name} menggunakan kehangatan jari-jarinya yang lembut...) 🖐️';
+    final String handjobNpcText = isMalePlayerWithFemaleNPC
+        ? 'Genggaman tanganku khusus untuk memanjakan penismu hari ini $callNpcToPlayer... Rasakan setiap gerakan hangatnya... 💗'
+        : 'Sentuhan jariku khusus untuk memanjakanmu hari ini $callNpcToPlayer... Rasakan setiap usapan hangatnya... 💗';
+    final String handjobPlayerText = isMalePlayerWithFemaleNPC
+        ? 'Ahh... nnnggh... genggaman tanganmu terasa begitu hangat dan lihai $partnerName! Aku sangat menyukainya... 🔥'
+        : 'Ahh... nnnggh... jari-jarimu terasa begitu hangat dan lihai $partnerName! Aku sangat menyukainya... 🔥';
+    final String handjobNarasi4 = isMalePlayerWithFemaleNPC
+        ? '(Kocokan tangan hangat dari $partnerName membakar gairah hingga semakin memuncak!) ✨'
+        : '(Stimulasi jari manual pada vagina dari $partnerName membakar gairah hingga semakin memuncak!) ✨';
+
     allNodes.add(VNDialogueNode(
       speakerName: 'Narasi',
-      dialogueText: '($partnerName mendekat dengan mesra, mengusap dan membelai area vagina ${player.name} menggunakan kehangatan jari-jarinya yang lembut...) 🖐️',
+      dialogueText: handjobNarasi1,
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
@@ -983,7 +1056,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: partnerName,
-      dialogueText: 'Sentuhan jariku khusus untuk memanjakanmu hari ini $callNpcToPlayer... Rasakan setiap usapan hangatnya... 💗',
+      dialogueText: handjobNpcText,
       emotion: VNEmotionType.happy,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
@@ -991,7 +1064,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: player.name,
-      dialogueText: 'Ahh... nnnggh... jari-jarimu terasa begitu hangat dan lihai $partnerName! Aku sangat menyukainya... 🔥',
+      dialogueText: handjobPlayerText,
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: true,
       outfit: VNOutfitType.casual,
@@ -999,7 +1072,7 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: 'Narasi',
-      dialogueText: '(Stimulasi jari manual pada vagina dari $partnerName membakar gairah hingga semakin memuncak!) ✨',
+      dialogueText: handjobNarasi4,
       emotion: VNEmotionType.happy,
       isPlayerSpeaking: false,
       outfit: VNOutfitType.casual,
