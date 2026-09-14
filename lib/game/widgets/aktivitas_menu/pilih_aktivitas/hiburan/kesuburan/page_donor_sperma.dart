@@ -81,28 +81,11 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
       widget.character.inbox.add('🧬 Donor Sperma: Sperma Anda berhasil disimpan di bank sperma.');
     }
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            const Icon(Icons.check_circle, color: Colors.green),
-            const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ],
-        ),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: title,
+      content: Text(content),
+      onClose: widget.onComplete,
     );
   }
 

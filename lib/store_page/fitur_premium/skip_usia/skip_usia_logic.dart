@@ -159,6 +159,23 @@ class SkipUsiaLogic {
     updateNpcList(character.siblings);
     updateNpcList(character.children);
 
+    // Sync status sekolah seluruh anak sesuai umur terbaru saat Skip Usia
+    for (var child in character.children) {
+      final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+      if (childAge >= 6 && (child['schoolSD'] == null || child['schoolSD'] == 'Belum Sekolah')) {
+        child['schoolSD'] = 'Sekolah Negeri';
+      }
+      if (childAge >= 12 && (child['schoolSMP'] == null || child['schoolSMP'] == 'Belum Sekolah')) {
+        child['schoolSMP'] = 'Sekolah Negeri';
+      }
+      if (childAge >= 15 && (child['schoolSMA'] == null || child['schoolSMA'] == 'Belum Sekolah')) {
+        child['schoolSMA'] = 'Sekolah Negeri';
+      }
+      if (childAge >= 18 && (child['choice18'] == null || child['choice18'] == 'Belum')) {
+        child['choice18'] = 'Biarkan';
+      }
+    }
+
     // E. Kerabat & Teman & Lainnya
     updateNpcList(character.extendedFamily);
     updateNpcList(character.classmates);

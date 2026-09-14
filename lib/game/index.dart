@@ -1310,7 +1310,12 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     final rand = Random();
-    final List<Map<String, String>> aliveKids = _character.children.where((c) => c['isDeceased'] != 'true').toList();
+    final List<Map<String, String>> aliveKids = _character.children.where((c) {
+      if (c['isDeceased'] == 'true') return false;
+      final bool isDonorChild = _character.donorRecipients.any((r) => r['childName'] == c['name']);
+      if (isDonorChild && c['livesWithUser'] != 'true') return false;
+      return true;
+    }).toList();
 
     if (aliveKids.isEmpty) {
       onDone();
@@ -1869,7 +1874,27 @@ class _GameScreenState extends State<GameScreen> {
     final List<Map<String, String>> kidsGraduated18 = [];
 
     for (var child in _character.children) {
+      final bool isDonorChild = _character.donorRecipients.any((r) => r['childName'] == child['name']);
+      final bool livesWithUser = child['livesWithUser'] == 'true';
       final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+
+      if (isDonorChild && !livesWithUser) {
+        // Otomatis update status sekolah anak donor tanpa meminta modal dari user (6th=SD, 12th=SMP, 15th=SMA, 18th=Bebaskan)
+        if (childAge >= 6 && (child['schoolSD'] == null || child['schoolSD'] == 'Belum Sekolah')) {
+          child['schoolSD'] = 'Sekolah Negeri';
+        }
+        if (childAge >= 12 && (child['schoolSMP'] == null || child['schoolSMP'] == 'Belum Sekolah')) {
+          child['schoolSMP'] = 'Sekolah Negeri';
+        }
+        if (childAge >= 15 && (child['schoolSMA'] == null || child['schoolSMA'] == 'Belum Sekolah')) {
+          child['schoolSMA'] = 'Sekolah Negeri';
+        }
+        if (childAge >= 18 && (child['choice18'] == null || child['choice18'] == 'Belum')) {
+          child['choice18'] = 'Biarkan';
+        }
+        continue;
+      }
+
       final String schoolStatusSD = child['schoolSD'] ?? 'Belum Sekolah';
       final String schoolStatusSMP = child['schoolSMP'] ?? 'Belum Sekolah';
       final String schoolStatusSMA = child['schoolSMA'] ?? 'Belum Sekolah';
