@@ -307,11 +307,10 @@ class AjakMakeLoveDialogue {
             }
           },
         ),
-      if (player.didEjakulasiThisSession)
-        VNChoiceOption(
-          text: '🏁 Selesai Bercinta',
-          nextNodeIndex: null, // Terminal choice → selesai dialog
-        ),
+      VNChoiceOption(
+        text: '🏁 Selesai Bercinta',
+        nextNodeIndex: null, // Terminal choice → selesai dialog
+      ),
     ];
 
     // NODE 0: Narasi Pertama (Menampilkan 5 Button Utama awal dengan Stimulasi Manual menggantikan Ejakulasi)

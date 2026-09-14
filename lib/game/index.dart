@@ -10,6 +10,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/anak_sakit_event.dart';
 
 // Import widget-widget UI
 import 'package:mylifesim/game/widgets/kategori_usia/age_category_button.dart';
@@ -661,9 +662,15 @@ class _GameScreenState extends State<GameScreen> {
                   _checkAdikRequestMoney(() {
                     _checkSchoolEnrollmentOptions(() {
                       _checkChildrenEvents(() {
-                        _checkGraduationOptions(() {
-                          _checkEsportPromotion(onFinish);
-                        });
+                        AnakSakitEvent.cekDanTampilkan(
+                          context: context,
+                          character: _character,
+                          onComplete: () {
+                            _checkGraduationOptions(() {
+                              _checkEsportPromotion(onFinish);
+                            });
+                          },
+                        );
                       });
                     });
                   });
@@ -1349,6 +1356,7 @@ class _GameScreenState extends State<GameScreen> {
               Navigator.pop(context);
               if (_character.money < cost) {
                 _character.updateRelationshipValue(kidName, -15);
+                setState(() {});
                 DialogHelper.show(
                   context: this.context,
                   title: 'Uang Tidak Cukup 💸',
