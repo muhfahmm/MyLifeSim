@@ -19,6 +19,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/relatio
 import 'package:mylifesim/game/widgets/aktivitas_menu/activity_button.dart';
 import 'package:mylifesim/game/widgets/kategori_usia/age_up_button.dart';
 import 'package:mylifesim/game/widgets/kategori_usia/kurangi_umur_button.dart';
+import 'package:mylifesim/game/widgets/kategori_usia/skip_usia_button.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/store_page/fitur_premium/skip_usia/skip_usia_page.dart';
@@ -4866,7 +4867,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 SafeArea(
                   top: false,
                   child: SizedBox(
-                    height: 130,
+                    height: 140,
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -4887,7 +4888,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                   onPressed: _ageDown,
                                 )
                               else
-                                const SizedBox(width: 75),
+                                const SizedBox(width: 50),
 
                               // Tengah: Tambah Umur & Skip Usia
                               Row(
@@ -4897,170 +4898,81 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                     onPressed: (_character.isAlive && !_isAgingUp) ? _ageUp : null,
                                   ),
                                   const SizedBox(width: 6),
-                                  Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        final bool isUnlocked = StorePage.isSkipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value;
-                                        if (isUnlocked) {
-                                          Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => SkipUsiaPage(
-                                                character: _character,
-                                                onAgeChanged: () {
-                                                  if (mounted) {
-                                                    setState(() {
-                                                      _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                                                        _character,
-                                                        happiness: _character.happiness,
-                                                      );
-                                                    });
-                                                  }
-                                                },
-                                              ),
+                                  SkipUsiaButton(
+                                    onTap: () {
+                                      final bool isUnlocked = StorePage.isSkipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value;
+                                      if (isUnlocked) {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => SkipUsiaPage(
+                                              character: _character,
+                                              onAgeChanged: () {
+                                                if (mounted) {
+                                                  setState(() {
+                                                    _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                                      _character,
+                                                      happiness: _character.happiness,
+                                                    );
+                                                  });
+                                                }
+                                              },
                                             ),
-                                          ).then((_) {
-                                            if (mounted) {
-                                              setState(() {
-                                                _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
-                                                  _character,
-                                                  happiness: _character.happiness,
-                                                );
-                                              });
-                                            }
-                                          });
-                                        } else {
-                                          DialogHelper.show(
-                                            context: context,
-                                            title: 'Fitur Premium ⏩',
-                                            content: const Text(
-                                              'Fitur Fast Forward Usia (Lompat Usia Instan) adalah Fitur Premium.\n\nIngin membelinya di Toko?',
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(context),
-                                                child: const Text('Batal'),
-                                              ),
-                                              ElevatedButton(
-                                                style: ElevatedButton.styleFrom(
-                                                  backgroundColor: Colors.amber,
-                                                  foregroundColor: Colors.black,
-                                                ),
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) => StorePage(
-                                                        character: _character,
-                                                        onPurchaseCompleted: () => setState(() {}),
-                                                      ),
-                                                    ),
-                                                  ).then((_) => setState(() {}));
-                                                },
-                                                child: const Text('Buka Toko'),
-                                              ),
-                                            ],
-                                          );
-                                        }
-                                      },
-                                      borderRadius: BorderRadius.circular(14),
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                                        height: 54,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [Color(0xFF8E24AA), Color(0xFF4A148C)],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
                                           ),
-                                          borderRadius: BorderRadius.circular(14),
-                                          border: Border.all(color: Colors.purpleAccent, width: 1.5),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: Colors.purple.withValues(alpha: 0.4),
-                                              blurRadius: 6,
-                                              offset: const Offset(0, 3),
+                                        ).then((_) {
+                                          if (mounted) {
+                                            setState(() {
+                                              _avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(
+                                                _character,
+                                                happiness: _character.happiness,
+                                              );
+                                            });
+                                          }
+                                        });
+                                      } else {
+                                        DialogHelper.show(
+                                          context: context,
+                                          title: 'Fitur Premium ⏩',
+                                          content: const Text(
+                                            'Fitur Fast Forward Usia (Lompat Usia Instan) adalah Fitur Premium.\n\nIngin membelinya di Toko?',
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: const Text('Batal'),
                                             ),
-                                          ],
-                                        ),
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: const [
-                                            Icon(Icons.fast_forward_rounded, color: Colors.white, size: 20),
-                                            SizedBox(height: 2),
-                                            Text(
-                                              'Skip Usia',
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 10,
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.amber,
+                                                foregroundColor: Colors.black,
                                               ),
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => StorePage(
+                                                      character: _character,
+                                                      onPurchaseCompleted: () => setState(() {}),
+                                                    ),
+                                                  ),
+                                                ).then((_) => setState(() {}));
+                                              },
+                                              child: const Text('Buka Toko'),
                                             ),
                                           ],
-                                        ),
-                                      ),
-                                    ),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ],
                               ),
 
-                              // Kanan: Tombol Toko
-                              Material(
-                                color: Colors.transparent,
-                                child: InkWell(
-                                  onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => StorePage(
-                                          character: _character,
-                                          onPurchaseCompleted: () {
-                                            setState(() {});
-                                          },
-                                        ),
-                                      ),
-                                    ).then((_) => setState(() {}));
-                                  },
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                                    decoration: BoxDecoration(
-                                      gradient: const LinearGradient(
-                                        colors: [Color(0xFFFFD700), Color(0xFFFFA500)],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(20),
-                                      border: Border.all(color: Colors.amberAccent, width: 1.5),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.amber.withValues(alpha: 0.4),
-                                          blurRadius: 6,
-                                          offset: const Offset(0, 3),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: const [
-                                        Icon(Icons.shopping_bag, color: Colors.black87, size: 16),
-                                        SizedBox(width: 4),
-                                        Text(
-                                          'Toko',
-                                          style: TextStyle(
-                                            color: Colors.black87,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 13,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
+                              // Spacer kanan agar tombol tengah tetap teratur
+                              if (StorePage.isGodModeUnlocked)
+                                const SizedBox(width: 50)
+                              else
+                                const SizedBox(width: 50),
                             ],
                           ),
                         ),

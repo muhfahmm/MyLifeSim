@@ -40,9 +40,15 @@ class TawaranIdolEvent {
     required Character character,
     required VoidCallback onComplete,
   }) {
-    if (!PersentaseTawaranIdol.memenuhiSyarat(character)) return;
+    if (!PersentaseTawaranIdol.memenuhiSyarat(character)) {
+      onComplete();
+      return;
+    }
     final int roll = Random().nextInt(100);
-    if (!PersentaseTawaranIdol.apakahEventMuncul(character, roll)) return;
+    if (!PersentaseTawaranIdol.apakahEventMuncul(character, roll)) {
+      onComplete();
+      return;
+    }
 
     final String namaGM = _namaGM[Random().nextInt(_namaGM.length)];
     final Map<String, String> agensi = _agensi[Random().nextInt(_agensi.length)];

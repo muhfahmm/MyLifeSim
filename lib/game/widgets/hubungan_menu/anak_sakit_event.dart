@@ -48,7 +48,10 @@ class AnakSakitEvent {
     required Character character,
     required VoidCallback onComplete,
   }) {
-    if (StorePage.isImmunityUnlocked || character.children.isEmpty) return;
+    if (StorePage.isImmunityUnlocked || character.children.isEmpty) {
+      onComplete();
+      return;
+    }
 
     final Random rng = Random();
 
@@ -60,7 +63,10 @@ class AnakSakitEvent {
       return true;
     }).toList();
 
-    if (anakHidup.isEmpty) return;
+    if (anakHidup.isEmpty) {
+      onComplete();
+      return;
+    }
 
     // Roll per anak
     Map<String, String>? anakSakit;
@@ -71,7 +77,10 @@ class AnakSakitEvent {
       }
     }
 
-    if (anakSakit == null) return;
+    if (anakSakit == null) {
+      onComplete();
+      return;
+    }
 
     // Pilih penyakit acak
     final Map<String, String> penyakit =

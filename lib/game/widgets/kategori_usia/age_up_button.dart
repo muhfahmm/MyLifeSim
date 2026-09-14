@@ -14,25 +14,26 @@ class AgeUpButton extends StatelessWidget {
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
         elevation: 6,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        minimumSize: const Size(0, 54),
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+        minimumSize: const Size(0, 48),
+        fixedSize: const Size.fromHeight(48),
         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
           side: const BorderSide(color: Colors.orangeAccent, width: 1.5),
         ),
       ),
-      child: const FittedBox(
-        fit: BoxFit.scaleDown,
+      child: const SizedBox(
+        height: 44,
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.add_circle_outline, size: 24, color: Colors.white),
-            SizedBox(height: 2),
+            Icon(Icons.add_circle_outline, size: 18, color: Colors.white),
+            SizedBox(height: 1),
             Text(
               'Tambah Umur',
-              style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.white),
+              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
             ),
           ],
         ),

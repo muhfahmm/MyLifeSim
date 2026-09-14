@@ -701,7 +701,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
 
             if (isPregnant || isPartnerPregnant) {
               if (!context.mounted) return;
-              BeritahuKehamilanHelper.showTellOrNotDialog(
+              await BeritahuKehamilanHelper.showTellOrNotDialog(
                 context: context,
                 character: widget.character,
                 partnerName: widget.targetName,

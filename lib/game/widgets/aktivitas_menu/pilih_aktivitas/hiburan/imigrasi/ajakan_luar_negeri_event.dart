@@ -17,10 +17,16 @@ class AjakanLuarNegeriEvent {
   }) {
     // Gunakan logika persentase dari file yang sudah Anda buat
     final int roll = Random().nextInt(100);
-    if (!PersentaseAjakanLuarNegeri.apakahEventMuncul(character, roll)) return;
+    if (!PersentaseAjakanLuarNegeri.apakahEventMuncul(character, roll)) {
+      onComplete();
+      return;
+    }
 
     final List<Map<String, dynamic>> semuaNegara = negaraList;
-    if (semuaNegara.isEmpty) return;
+    if (semuaNegara.isEmpty) {
+      onComplete();
+      return;
+    }
 
     final Map<String, dynamic> negaraTujuan =
         semuaNegara[Random().nextInt(semuaNegara.length)];
