@@ -1704,7 +1704,16 @@ class Character {
           isFatherImprisoned = false;
           final int happyLoss = 20 + random.nextInt(11); // 20-30%
           happiness = (happiness - happyLoss).clamp(0, 100);
-          events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun (-$happyLoss% Kebahagiaan).');
+
+          final bool isDivorced = isFatherDivorced || isMotherDivorced;
+          if (isDivorced && custodyParent == 'Ayah') {
+            final int inheritance = getFatherWealth();
+            money += inheritance;
+            fatherWealth = 0;
+            events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun (-$happyLoss% Kebahagiaan).\n💰 Warisan: Kamu mewarisi seluruh kekayaan Ayah sebesar \$$inheritance!');
+          } else {
+            events.add('👴 Kabar Duka: Ayahmu, $fatherName, meninggal dunia pada usia $fatherAge tahun (-$happyLoss% Kebahagiaan).');
+          }
         }
       }
     }
@@ -1726,7 +1735,16 @@ class Character {
           isMotherImprisoned = false;
           final int happyLoss = 20 + random.nextInt(11); // 20-30%
           happiness = (happiness - happyLoss).clamp(0, 100);
-          events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun (-$happyLoss% Kebahagiaan).');
+
+          final bool isDivorced = isFatherDivorced || isMotherDivorced;
+          if (isDivorced && custodyParent == 'Ibu') {
+            final int inheritance = getMotherWealth();
+            money += inheritance;
+            motherWealth = 0;
+            events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun (-$happyLoss% Kebahagiaan).\n💰 Warisan: Kamu mewarisi seluruh kekayaan Ibu sebesar \$$inheritance!');
+          } else {
+            events.add('👵 Kabar Duka: Ibumu, $motherName, meninggal dunia pada usia $motherAge tahun (-$happyLoss% Kebahagiaan).');
+          }
         }
       }
     }
@@ -1740,7 +1758,16 @@ class Character {
           stepFatherRelationship = 0;
           final int happyLoss = 20 + random.nextInt(11); // 20-30%
           happiness = (happiness - happyLoss).clamp(0, 100);
-          events.add('👨 Kabar Duka: Ayah tirimu, $stepFatherName, meninggal dunia pada usia $stepFatherAge tahun (-$happyLoss% Kebahagiaan).');
+
+          final bool isDivorced = isFatherDivorced || isMotherDivorced;
+          if (isDivorced && custodyParent == 'Ayah') {
+            final int inheritance = getStepFatherWealth();
+            money += inheritance;
+            stepFatherWealth = 0;
+            events.add('👨 Kabar Duka: Ayah tirimu, $stepFatherName, meninggal dunia pada usia $stepFatherAge tahun (-$happyLoss% Kebahagiaan).\n💰 Warisan: Kamu mewarisi seluruh kekayaan Ayah Tiri sebesar \$$inheritance!');
+          } else {
+            events.add('👨 Kabar Duka: Ayah tirimu, $stepFatherName, meninggal dunia pada usia $stepFatherAge tahun (-$happyLoss% Kebahagiaan).');
+          }
         }
       }
     }
@@ -1754,7 +1781,16 @@ class Character {
           stepMotherRelationship = 0;
           final int happyLoss = 20 + random.nextInt(11); // 20-30%
           happiness = (happiness - happyLoss).clamp(0, 100);
-          events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun (-$happyLoss% Kebahagiaan).');
+
+          final bool isDivorced = isFatherDivorced || isMotherDivorced;
+          if (isDivorced && custodyParent == 'Ibu') {
+            final int inheritance = getStepMotherWealth();
+            money += inheritance;
+            stepMotherWealth = 0;
+            events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun (-$happyLoss% Kebahagiaan).\n💰 Warisan: Kamu mewarisi seluruh kekayaan Ibu Tiri sebesar \$$inheritance!');
+          } else {
+            events.add('👩 Kabar Duka: Ibu tirimu, $stepMotherName, meninggal dunia pada usia $stepMotherAge tahun (-$happyLoss% Kebahagiaan).');
+          }
         }
       }
     }
