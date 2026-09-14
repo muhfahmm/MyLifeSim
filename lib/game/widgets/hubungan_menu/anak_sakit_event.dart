@@ -120,7 +120,7 @@ class AnakSakitEvent {
       builder: (ctx) {
         final bool isDark = Theme.of(ctx).brightness == Brightness.dark;
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
           contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),

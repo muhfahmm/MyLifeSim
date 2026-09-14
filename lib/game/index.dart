@@ -1382,90 +1382,68 @@ class _GameScreenState extends State<GameScreen> {
       final String sickness = sicknessTypes[rand.nextInt(sicknessTypes.length)];
       final int cost = 200 + rand.nextInt(300);
 
-      showDialog(
+      DialogHelper.show(
         context: context,
-        barrierDismissible: false,
-        builder: (ctx) => AlertDialog(
-          title: Row(
-            children: [
-              const Icon(Icons.healing, color: Colors.red),
-              const SizedBox(width: 8),
-              Text('Anak Sakit: $kidName 🤒', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ],
-          ),
-          content: Text(
-            'Anakmu, $kidName (Umur: $childAge tahun), didiagnosis menderita penyakit $sickness.\n\n'
-            'Biaya perawatan medis yang dibutuhkan adalah sebesar \$$cost.',
-            style: const TextStyle(fontSize: 14),
-          ),
-          actions: [
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue.shade700,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    if (_character.money < cost) {
-                      _character.updateRelationshipValue(kidName, -15);
-                      showDialog(
-                        context: this.context,
-                        builder: (resCtx) => AlertDialog(
-                          title: const Text('Uang Tidak Cukup 💸', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: const Text('Uangmu tidak mencukupi untuk membiayai pengobatan anakmu. Kondisinya semakin memburuk dan ia merasa kecewa.'),
-                          actions: [
-                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
-                          ],
-                        ),
-                      );
-                    } else {
-                      _character.money -= cost;
-                      _character.updateRelationshipValue(kidName, 20);
-                      _character.inbox.add('🏥 Medis Anak: Kamu membayar \$$cost untuk mengobati penyakit $sickness dari $kidName.');
-                      setState(() {});
-                      showDialog(
-                        context: this.context,
-                        builder: (resCtx) => AlertDialog(
-                          title: const Text('Pengobatan Sukses 🩺', style: TextStyle(fontWeight: FontWeight.bold)),
-                          content: Text('Kamu membiayai pengobatan $kidName. Kesehatannya berangsur pulih dan hubungannya denganmu membaik! (+20% hubungan)'),
-                          actions: [
-                            TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
-                          ],
-                        ),
-                      );
-                    }
-                  },
-                  child: Text('Biayai Pengobatan (\$$cost)', style: const TextStyle(fontWeight: FontWeight.bold)),
-                ),
-                const SizedBox(height: 8),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(ctx);
-                    _character.updateRelationshipValue(kidName, -25);
-                    _character.inbox.add('💔 Medis Anak: Kamu mengabaikan penyakit $sickness dari $kidName.');
-                    setState(() {});
-                    showDialog(
-                      context: this.context,
-                      builder: (resCtx) => AlertDialog(
-                        title: const Text('Abaikan Sakit 😔', style: TextStyle(fontWeight: FontWeight.bold)),
-                        content: Text('Kamu mengabaikan rasa sakit $kidName. Hubungan kalian memburuk drastis (-25% hubungan).'),
-                        actions: [
-                          TextButton(onPressed: () { Navigator.pop(resCtx); onDone(); }, child: const Text('Lanjutkan'))
-                        ],
-                      ),
-                    );
-                  },
-                  child: const Text('Biarkan Saja (Abaikan)', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
-                ),
-              ],
-            )
-          ],
+        title: 'Anak Sakit: $kidName 🤒',
+        content: Text(
+          'Anakmu, $kidName (Umur: $childAge tahun), didiagnosis menderita penyakit $sickness.\n\n'
+          'Biaya perawatan medis yang dibutuhkan adalah sebesar \$$cost.',
         ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue.shade700,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            ),
+            onPressed: () {
+              Navigator.pop(context);
+              if (_character.money < cost) {
+                _character.updateRelationshipValue(kidName, -15);
+                DialogHelper.show(
+                  context: this.context,
+                  title: 'Uang Tidak Cukup 💸',
+                  content: const Text('Uangmu tidak mencukupi untuk membiayai pengobatan anakmu. Kondisinya semakin memburuk dan ia merasa kecewa.'),
+                  actions: [
+                    TextButton(onPressed: () { Navigator.pop(this.context); onDone(); }, child: const Text('Lanjutkan'))
+                  ],
+                );
+              } else {
+                _character.money -= cost;
+                _character.updateRelationshipValue(kidName, 20);
+                _character.inbox.add('🏥 Medis Anak: Kamu membayar \$$cost untuk mengobati penyakit $sickness dari $kidName.');
+                setState(() {});
+                DialogHelper.show(
+                  context: this.context,
+                  title: 'Pengobatan Sukses 🩺',
+                  content: Text('Kamu membiayai pengobatan $kidName. Kesehatannya berangsur pulih dan hubungannya denganmu membaik! (+20% hubungan)'),
+                  actions: [
+                    TextButton(onPressed: () { Navigator.pop(this.context); onDone(); }, child: const Text('Lanjutkan'))
+                  ],
+                );
+              }
+            },
+            child: Text('Biayai Pengobatan (\$$cost)', style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _character.updateRelationshipValue(kidName, -25);
+              _character.inbox.add('💔 Medis Anak: Kamu mengabaikan penyakit $sickness dari $kidName.');
+              setState(() {});
+              DialogHelper.show(
+                context: this.context,
+                title: 'Abaikan Sakit 😔',
+                content: Text('Kamu mengabaikan rasa sakit $kidName. Hubungan kalian memburuk drastis (-25% hubungan).'),
+                actions: [
+                  TextButton(onPressed: () { Navigator.pop(this.context); onDone(); }, child: const Text('Lanjutkan'))
+                ],
+              );
+            },
+            child: const Text('Biarkan Saja (Abaikan)', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+          ),
+        ],
       );
     }
     // 2. Logika Minta Uang / Minta Gadget / HP (Usia 6-12 dan Remaja)
@@ -3278,7 +3256,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _executeReportParent(context, partnerName, relation, 'Ibu');
+                  _executeReportParent(context, partnerName, relation, 'Ibu', onDone);
                 },
                 child: const Text(
                   'Laporkan ke Ibu',
@@ -3290,7 +3268,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                 onPressed: () {
                   Navigator.pop(context);
                   final String reportTarget = (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned) ? 'Ayah' : 'Ayah Tiri';
-                  _executeReportParent(context, partnerName, relation, reportTarget);
+                  _executeReportParent(context, partnerName, relation, reportTarget, onDone);
                 },
                 child: Text(
                   (_character.fatherName != null && !_character.isFatherDeceased && !_character.isFatherImprisoned)
@@ -3303,7 +3281,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               TextButton(
                 onPressed: () {
                   Navigator.pop(context);
-                  _executeReportStaff(context, cleanName, role);
+                  _executeReportStaff(context, cleanName, role, onDone);
                 },
                 child: const Text(
                   'Laporkan ke Kepala Sekolah',
@@ -3632,7 +3610,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
 
   // --- RESTORED CLASS METHOD CLOSURE ---
 
-  void _executeReportParent(BuildContext context, String partnerName, String relation, String reportTarget) {
+  void _executeReportParent(BuildContext context, String partnerName, String relation, String reportTarget, [VoidCallback? onDone]) {
     final rand = Random();
     final int roll = rand.nextInt(100);
     final bool isJailed = roll < 40; // 40% chance of prison + divorce
@@ -3708,34 +3686,21 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
         ? 'Laporanmu berhasil! $partnerName telah dilaporkan ke polisi oleh $reportTarget, diceraikan, dan kini mendekam di penjara selama ${_character.motherPrisonYears} tahun.'
         : '$reportTarget sangat terkejut mendengarnya dan memutuskan untuk menceraikan $partnerName secara langsung!';
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(isJailed ? Icons.gavel : Icons.heart_broken, color: isJailed ? Colors.red : Colors.orange, size: 28),
-            const SizedBox(width: 8),
-            Text(
-              isJailed ? 'Laporan Polisi Sukses! 🚨' : 'Orang Tua Bercerai! 💔',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
-        ),
-        content: Text(
-          customContent,
-          style: const TextStyle(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
+      title: isJailed ? 'Laporan Polisi Sukses! 🚨' : 'Orang Tua Bercerai! 💔',
+      content: Text(customContent),
+      actions: [
+        Builder(
+          builder: (dialogCtx) => TextButton(
             onPressed: () {
-              Navigator.pop(context);
-              _showCustodySelectionDialog(context, _character.fatherName ?? 'Ayah', _character.motherName ?? 'Ibu');
+              Navigator.of(dialogCtx).pop();
+              _showCustodySelectionDialog(context, _character.fatherName ?? 'Ayah', _character.motherName ?? 'Ibu', onDone);
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 
@@ -4096,36 +4061,25 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       _character.activeProposal = null;
     });
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(isFired ? Icons.check_circle : Icons.error, color: isFired ? Colors.green : Colors.red, size: 28),
-            const SizedBox(width: 8),
-            Text(
-              isFired ? 'Laporan Diterima! 🚨' : 'Laporan Ditolak! 📢',
-              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-            ),
-          ],
-        ),
-        content: Text(
-          isFired
-              ? 'Laporanmu diproses. Pihak sekolah memutuskan untuk memecat $partnerName secara tidak hormat!'
-              : 'Pihak sekolah mengabaikan laporanmu karena dianggap tidak memiliki bukti yang cukup. $partnerName tetap bertugas.',
-          style: const TextStyle(fontSize: 14),
-        ),
-        actions: [
-          TextButton(
+      title: isFired ? 'Laporan Diterima! 🚨' : 'Laporan Ditolak! 📢',
+      content: Text(
+        isFired
+            ? 'Laporanmu diproses. Pihak sekolah memutuskan untuk memecat $partnerName secara tidak hormat!'
+            : 'Pihak sekolah mengabaikan laporanmu karena dianggap tidak memiliki bukti yang cukup. $partnerName tetap bertugas.',
+      ),
+      actions: [
+        Builder(
+          builder: (dialogCtx) => TextButton(
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.of(dialogCtx).pop();
               _checkGlassesNeed(onDone);
             },
             child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 

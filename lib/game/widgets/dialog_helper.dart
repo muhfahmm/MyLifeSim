@@ -18,7 +18,7 @@ class DialogHelper {
 
     if (isNotification) {
       // Centered scale-animated modal card popup
-      final double dialogWidth = isMobile ? (screenWidth - 32) : (screenWidth * 0.88).clamp(280.0, 480.0);
+      final double dialogWidth = isMobile ? (screenWidth - 24) : (screenWidth * 0.90).clamp(320.0, 500.0);
       return showGeneralDialog(
         context: context,
         barrierDismissible: true,
@@ -34,15 +34,15 @@ class DialogHelper {
             child: FadeTransition(opacity: anim1, child: child),
           );
         },
-        pageBuilder: (context, anim1, anim2) => Center(
+        pageBuilder: (dialogContext, anim1, anim2) => Center(
           child: Material(
             color: Colors.transparent,
             child: Container(
               width: dialogWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey.shade900 : Colors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
                     color: isDark ? Colors.black54 : Colors.black.withAlpha(38),
@@ -71,7 +71,7 @@ class DialogHelper {
                       ),
                       const SizedBox(width: 8),
                       InkWell(
-                        onTap: () => Navigator.pop(context),
+                        onTap: () => Navigator.of(dialogContext).pop(),
                         borderRadius: BorderRadius.circular(16),
                         child: Container(
                           padding: const EdgeInsets.all(4),
