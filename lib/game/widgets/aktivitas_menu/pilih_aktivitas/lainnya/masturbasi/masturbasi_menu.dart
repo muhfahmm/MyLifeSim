@@ -6,6 +6,9 @@ import 'risiko_masturbasi.dart'; // Import file risiko
 import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
 import 'efek_samping.dart'; // Import efek samping masturbasi
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'masturbate_enjoyment.dart';
 
 class MasturbasiHelper {
@@ -48,6 +51,33 @@ class MasturbasiHelper {
   // FUNGSI PUBLIK: BUKA MENU MASTURBASI (HALAMAN)
   // ============================================================
   static void showMasturbationMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    if (!GlobalSettings.isPremium.value) {
+      DialogHelper.show(
+        context: context,
+        title: 'Fitur Premium 18+',
+        content: const Text('Fitur Masturbasi ini merupakan bagian dari Premium Akses Penuh (18+). Silakan beli akses premium di Toko untuk membuka fitur ini.'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => StorePage(character: character),
+                ),
+              );
+            },
+            child: const Text('Buka Toko 🛒', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Tutup'),
+          ),
+        ],
+      );
+      return;
+    }
+
     if (character.age < 9) {
       showDialog(
         context: context,

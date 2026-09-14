@@ -26,6 +26,8 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/kerja_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/freelance/freelance_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/pekerjaan_part_time_logic/part_time_menu.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/store_page.dart';
 
 class ActivityButton extends StatelessWidget {
   final Character character;
@@ -538,59 +540,33 @@ class ActivityButton extends StatelessWidget {
                     }),
                   ),
 
-                  // Masturbasi (hanya jika usia >= 9)
+                  // Masturbasi (hanya jika usia >= 9 & Premium Akses Penuh 18+)
                   if (age >= 9)
                     Builder(builder: (ctx) {
-                      final inheritedColor = DefaultTextStyle.of(ctx).style.color;
-                      return MouseRegion(
-                        cursor: SystemMouseCursors.click,
-                        child: GestureDetector(
-                          onTap: () => _executeAction(context, () {
-                            MasturbasiHelper.showMasturbationMenu(context, character, localRefresh);
-                          }),
-                          child: Container(
-                            margin: const EdgeInsets.only(bottom: 8),
-                            padding: const EdgeInsets.all(12),
-                            decoration: BoxDecoration(
-                              color: Colors.pinkAccent.withValues(alpha: 0.05),
-                              borderRadius: BorderRadius.circular(12),
-                              border: Border.all(color: Colors.pinkAccent.withValues(alpha: 0.3)),
-                            ),
-                            child: Row(
-                              children: [
-                                const Icon(Icons.favorite_border, color: Colors.pinkAccent, size: 22),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Masturbasi (Fantasi)',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 14,
-                                          color: inheritedColor,
-                                        ),
-                                      ),
-                                      Text(
-                                        'Mengeksplorasi fantasi pribadimu',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          color: inheritedColor?.withValues(alpha: 0.6),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Icon(
-                                  Icons.arrow_forward_ios,
-                                  size: 14,
-                                  color: inheritedColor?.withValues(alpha: 0.4),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
+                      final bool isPremium = GlobalSettings.isPremium.value;
+                      return _buildActivityTile(
+                        context: context,
+                        label: 'Masturbasi (Fantasi)',
+                        subtitle: 'Mengeksplorasi fantasi pribadimu',
+                        icon: Icons.favorite_border,
+                        color: Colors.pinkAccent,
+                        minAge: 9,
+                        currentAge: isPremium ? age : 0,
+                        customLockMessage: isPremium
+                            ? null
+                            : 'Fitur Masturbasi ini merupakan bagian dari Premium Akses Penuh (18+). Beli akses premium 18+ di Toko untuk membuka fitur ini.',
+                        lockActionLabel: isPremium ? null : 'Buka Toko 🛒',
+                        onLockAction: isPremium
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => StorePage(character: character)),
+                                );
+                              },
+                        onTap: () => _executeAction(context, () {
+                          MasturbasiHelper.showMasturbationMenu(context, character, localRefresh);
+                        }),
                       );
                     }),
 
