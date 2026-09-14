@@ -8,6 +8,8 @@ class DialogHelper {
     required Widget content,
     List<Widget>? actions,
     bool isNotification = true, // Defaults to true so all activity results become modals
+    bool showCloseButton = true, // Set to false when user must choose an action
+    bool barrierDismissible = true,
   }) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -21,7 +23,7 @@ class DialogHelper {
       final double dialogWidth = isMobile ? (screenWidth - 24) : (screenWidth * 0.90).clamp(320.0, 500.0);
       return showGeneralDialog(
         context: context,
-        barrierDismissible: true,
+        barrierDismissible: barrierDismissible,
         barrierColor: Colors.black54,
         barrierLabel: MaterialLocalizations.of(context).modalBarrierDismissLabel,
         transitionDuration: const Duration(milliseconds: 200),
@@ -69,23 +71,25 @@ class DialogHelper {
                           ),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      InkWell(
-                        onTap: () => Navigator.of(dialogContext).pop(),
-                        borderRadius: BorderRadius.circular(16),
-                        child: Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            Icons.close,
-                            size: 18,
-                            color: isDark ? Colors.white70 : Colors.grey.shade600,
+                      if (showCloseButton) ...[
+                        const SizedBox(width: 8),
+                        InkWell(
+                          onTap: () => Navigator.of(dialogContext).pop(),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              size: 18,
+                              color: isDark ? Colors.white70 : Colors.grey.shade600,
+                            ),
                           ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 10),

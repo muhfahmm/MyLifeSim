@@ -409,121 +409,64 @@ class _GameScreenState extends State<GameScreen> {
       if (nonChosenName != null && !isDeceased && !isImprisoned) {
         final bool shouldTrigger = _character.age == 15 || Random().nextInt(100) < 20;
         if (shouldTrigger) {
-          final bool isDark = Theme.of(context).brightness == Brightness.dark;
-          showDialog(
+          DialogHelper.show(
             context: context,
+            title: 'Pertemuan Kembali ❤️',
+            showCloseButton: false,
             barrierDismissible: false,
-            builder: (ctx) => AlertDialog(
-              backgroundColor: isDark ? const Color(0xFF1E293B) : Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-              title: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withValues(alpha: 0.12),
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Icons.family_restroom_rounded, color: Colors.blue, size: 20),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      'Pertemuan Kembali',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: isDark ? Colors.white : const Color(0xFF0F172A),
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.',
-                    style: TextStyle(
-                      fontSize: 12,
-                      height: 1.4,
-                      color: isDark ? const Color(0xFFCBD5E1) : const Color(0xFF334155),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Apakah kamu ingin menemuinya?',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : const Color(0xFF0F172A),
-                    ),
-                  ),
-                ],
-              ),
-              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              actions: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.redAccent,
-                          side: const BorderSide(color: Colors.redAccent, width: 1.2),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          setState(() {
-                            _character.hasEstrangedReunionTriggered = true;
-                            if (nonChosenIsFather) {
-                              _character.fatherRelationship = ((_character.fatherRelationship ?? 20) - 20).clamp(0, 100);
-                            } else {
-                              _character.motherRelationship = ((_character.motherRelationship ?? 20) - 20).clamp(0, 100);
-                            }
-                            _character.inbox.add('💔 Menolak Bertemu: Kamu memilih untuk tidak menemui $nonChosenName (-20 Hubungan).');
-                          });
-                          done();
-                        },
-                        child: const Text('Tolak', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF10B981),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        ),
-                        onPressed: () {
-                          Navigator.pop(ctx);
-                          setState(() {
-                            _character.hasEstrangedReunionTriggered = true;
-                            if (nonChosenIsFather) {
-                              _character.fatherRelationship = ((_character.fatherRelationship ?? 20) + 40).clamp(0, 100);
-                            } else {
-                              _character.motherRelationship = ((_character.motherRelationship ?? 20) + 40).clamp(0, 100);
-                            }
-                            _character.inbox.add('❤️ Pertemuan Kembali: Kamu bertemu dengan $nonChosenName. Hubungan kalian membaik secara signifikan (+40).');
-                          });
-                          done();
-                        },
-                        child: const Text('Temui', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                      ),
-                    ),
-                  ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '$label ($nonChosenName), orang tuamu yang tidak tinggal bersamamu sejak perceraian, menghubungi dan ingin menemuimu.',
+                  style: const TextStyle(fontSize: 12.5, height: 1.35),
+                ),
+                const SizedBox(height: 10),
+                const Text(
+                  'Apakah kamu ingin menemuinya?',
+                  style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold),
                 ),
               ],
             ),
+            actions: [
+              Builder(
+                builder: (dialogCtx) => TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogCtx).pop();
+                    setState(() {
+                      _character.hasEstrangedReunionTriggered = true;
+                      if (nonChosenIsFather) {
+                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) - 20).clamp(0, 100);
+                      } else {
+                        _character.motherRelationship = ((_character.motherRelationship ?? 20) - 20).clamp(0, 100);
+                      }
+                      _character.inbox.add('💔 Menolak Bertemu: Kamu memilih untuk tidak menemui $nonChosenName (-20 Hubungan).');
+                    });
+                    done();
+                  },
+                  child: const Text('Tolak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                ),
+              ),
+              Builder(
+                builder: (dialogCtx) => TextButton(
+                  onPressed: () {
+                    Navigator.of(dialogCtx).pop();
+                    setState(() {
+                      _character.hasEstrangedReunionTriggered = true;
+                      if (nonChosenIsFather) {
+                        _character.fatherRelationship = ((_character.fatherRelationship ?? 20) + 40).clamp(0, 100);
+                      } else {
+                        _character.motherRelationship = ((_character.motherRelationship ?? 20) + 40).clamp(0, 100);
+                      }
+                      _character.inbox.add('❤️ Pertemuan Kembali: Kamu bertemu dengan $nonChosenName. Hubungan kalian membaik secara signifikan (+40).');
+                    });
+                    done();
+                  },
+                  child: const Text('Temui', style: TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
           );
           return;
         }
