@@ -4,9 +4,43 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'politik_career.dart';
+import 'aktivitas_peran/dprd_page.dart';
+import 'aktivitas_peran/walikota_page.dart';
+import 'aktivitas_peran/gubernur_page.dart';
+import 'aktivitas_peran/presiden_page.dart';
 
 class PolitikMenuHelper {
+  static Widget buildRolePage(Character character, VoidCallback onRefresh) {
+    final String job = character.jobName ?? '';
+    if (job == 'Walikota / Bupati') {
+      return WalikotaPage(character: character, onRefresh: onRefresh);
+    } else if (job == 'Gubernur / Senator') {
+      return GubernurPage(character: character, onRefresh: onRefresh);
+    } else if (job == 'Presiden / Perdana Menteri') {
+      return PresidenPage(character: character, onRefresh: onRefresh);
+    }
+    return DprdPage(character: character, onRefresh: onRefresh);
+  }
+
   static void showPolitikMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    if (PoliticalCareerData.isPoliticianJob(character.jobName)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => buildRolePage(character, onComplete),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PolitikMenuPage(character: character, onComplete: onComplete),
+        ),
+      );
+    }
+  }
+
+  static void showElectionMenu(BuildContext context, Character character, VoidCallback onComplete) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -41,7 +75,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
       _showAlert('Syarat Usia Belum Cukup 🔞', 'Kamu belum cukup umur untuk posisi ${level.title}. Minimal berusia ${level.minAge} tahun.');
       return;
     }
-    if (level.requireDegree && !character.isUnivGraduated) {
+    if (level.requireDegree && !character.isUnivGraduated && !character.bypassDegreeRequirement) {
       _showAlert('Syarat Gelar Pendidikan 🎓', 'Posisi ${level.title} membutuhkan gelar Sarjana/Universitas.');
       return;
     }
@@ -57,6 +91,8 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: isDark ? Colors.grey.shade900 : null,
         title: Row(
           children: [
@@ -67,24 +103,27 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                 'Mulai Kampanye 🏛️',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
+                  fontSize: 18,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
             ),
           ],
         ),
-        content: Text(
-          'Apakah kamu siap mencalonkan diri sebagai ${level.title}?\n\n'
-          '• Biaya Kampanye: \$${_fmt(level.campaignCost)}\n'
-          '• Estimasi Gaji: \$${_fmt(level.baseSalary)}/tahun\n\n'
-          'Peluang kemenangan ditentukan oleh Kecerdasan, Karma, dan Kebahagiaanmu.',
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+        content: SizedBox(
+          width: double.infinity,
+          child: Text(
+            'Apakah kamu siap mencalonkan diri sebagai ${level.title}?\n\n'
+            '• Biaya Kampanye: \$${_fmt(level.campaignCost)}\n'
+            '• Estimasi Gaji: \$${_fmt(level.baseSalary)}/tahun\n\n'
+            'Peluang kemenangan ditentukan oleh Kecerdasan, Karma, dan Kebahagiaanmu.',
+            style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14),
+          ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+            child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.amber.shade700, foregroundColor: Colors.black),
@@ -92,7 +131,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
               Navigator.pop(ctx);
               _processElection(level);
             },
-            child: const Text('Mulai Pemilu 🗳️', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Mulai Pemilu 🗳️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
           ),
         ],
       ),
@@ -121,6 +160,8 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Row(
             children: [
@@ -131,14 +172,17 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                   'Kemenangan Pemilu! 🏆',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
               ),
             ],
           ),
-          content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+          content: SizedBox(
+            width: double.infinity,
+            child: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14)),
+          ),
           actions: [
             ElevatedButton(
               onPressed: () {
@@ -146,7 +190,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                 setState(() {});
                 Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
               },
-              child: const Text('OK'),
+              child: const Text('OK', style: TextStyle(fontSize: 14)),
             ),
           ],
         ),
@@ -160,6 +204,8 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
           backgroundColor: isDark ? Colors.grey.shade900 : null,
           title: Row(
             children: [
@@ -170,21 +216,24 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                   'Kalah Pemilu 💔',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 18,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                 ),
               ),
             ],
           ),
-          content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+          content: SizedBox(
+            width: double.infinity,
+            child: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14)),
+          ),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(ctx);
                 setState(() {});
               },
-              child: const Text('OK'),
+              child: const Text('OK', style: TextStyle(fontSize: 14)),
             ),
           ],
         ),
@@ -197,20 +246,37 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: isDark ? Colors.grey.shade900 : null,
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-            color: isDark ? Colors.white : Colors.black87,
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
+          ],
+        ),
+        content: SizedBox(
+          width: double.infinity,
+          child: Text(
+            msg,
+            style: TextStyle(
+              color: isDark ? Colors.white70 : Colors.black87,
+              fontSize: 14,
+            ),
           ),
         ),
-        content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
+            child: const Text('OK', style: TextStyle(fontSize: 14)),
           ),
         ],
       ),
@@ -262,7 +328,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          character.jobName != null && character.jobName!.contains(RegExp(r'Dewan|Walikota|Gubernur|Presiden|Staf'))
+                          character.jobName != null && character.jobName!.contains(RegExp(r'Dewan|Walikota|Gubernur|Presiden'))
                               ? 'Jabatan Sekarang: ${character.jobName}'
                               : 'Status: Belum Menjabat di Politik',
                           style: TextStyle(
@@ -290,7 +356,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                   final level = PoliticalCareerData.levels[idx];
                   final bool isCurrentJob = character.jobName == level.title;
                   final bool canAge = character.age >= level.minAge;
-                  final bool canDegree = !level.requireDegree || character.isUnivGraduated;
+                  final bool canDegree = !level.requireDegree || character.isUnivGraduated || character.bypassDegreeRequirement;
                   final bool canAfford = character.money >= level.campaignCost;
 
                   return Card(
@@ -362,14 +428,24 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
                           ),
                           if (level.requireDegree) ...[
                             const SizedBox(height: 4),
-                            Text(
-                              '🎓 Syarat Gelar: ${level.requiredDegreeName}',
-                              style: TextStyle(
-                                fontSize: 11,
-                                fontWeight: FontWeight.bold,
-                                color: canDegree ? (isDark ? Colors.lightBlueAccent : Colors.blue.shade800) : Colors.red,
+                            if (character.bypassDegreeRequirement)
+                              Text(
+                                '🔓 Syarat Gelar Sarjana Dibebaskan (God Mode)',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.greenAccent : Colors.green.shade700,
+                                ),
+                              )
+                            else
+                              Text(
+                                '🎓 Syarat Gelar: ${level.requiredDegreeName}',
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.bold,
+                                  color: canDegree ? (isDark ? Colors.lightBlueAccent : Colors.blue.shade800) : Colors.red,
+                                ),
                               ),
-                            ),
                           ],
                         ],
                       ),

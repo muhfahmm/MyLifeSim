@@ -23,6 +23,8 @@ import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/catur/
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/renang/atlit_activities_page.dart';
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tenis/atlit_activities_page.dart';
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tinju_mma/atlit_activities_page.dart';
+import 'special_carrier/politikus_job_logic/politik_career.dart';
+import 'special_carrier/politikus_job_logic/politik_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -246,9 +248,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       } else if (job.startsWith('Pro Player Esport')) {
         ageVal = 13 + random.nextInt(13);
       }
-      String coworkerRole = isProPlayer 
-          ? 'Pro Player' 
-          : (job.startsWith('Brand Ambassador Esport') ? 'Brand Ambassador' : 'Talent Esports');
+      String coworkerRole = 'Rekan Kerja';
+      if (isProPlayer) {
+        coworkerRole = 'Pro Player';
+      } else if (job.startsWith('Brand Ambassador Esport')) {
+        coworkerRole = 'Brand Ambassador';
+      } else if (job.startsWith('Talent Esports')) {
+        coworkerRole = 'Talent Esports';
+      } else if (PoliticalCareerData.isPoliticianJob(job)) {
+        coworkerRole = 'Staf / Kolega Politik';
+      }
       String? subject;
       if (job.startsWith('Guru SD')) {
         coworkerRole = 'Guru';
@@ -547,6 +556,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       }
 
       final bool isAthlete = Character.isAthleteJob(jobTitle);
+
+      if (PoliticalCareerData.isPoliticianJob(jobTitle)) {
+        return PolitikMenuHelper.buildRolePage(
+          character,
+          () {
+            if (mounted) setState(() {});
+            widget.onRefresh();
+          },
+        );
+      }
 
       return Scaffold(
         appBar: AppBar(

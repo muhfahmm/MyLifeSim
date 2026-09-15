@@ -24,15 +24,6 @@ class PoliticalLevel {
 class PoliticalCareerData {
   static const List<PoliticalLevel> levels = [
     PoliticalLevel(
-      title: 'Staf / Relawan Kampanye',
-      minAge: 21,
-      requireDegree: false,
-      campaignCost: 50000,
-      baseSalary: 35000,
-      description: 'Mulai dari bawah, membangun jaringan politik dan kepercayaan partai.',
-      minKarma: 30,
-    ),
-    PoliticalLevel(
       title: 'Anggota Dewan Kota / DPRD',
       minAge: 25,
       requireDegree: true,
@@ -73,4 +64,9 @@ class PoliticalCareerData {
       minKarma: 50,
     ),
   ];
+
+  static bool isPoliticianJob(String? jobName) {
+    if (jobName == null) return false;
+    return levels.any((level) => level.title == jobName);
+  }
 }
