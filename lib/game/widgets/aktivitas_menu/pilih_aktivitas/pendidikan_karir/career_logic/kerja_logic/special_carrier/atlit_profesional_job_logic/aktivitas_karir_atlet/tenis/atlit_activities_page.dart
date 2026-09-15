@@ -15,7 +15,8 @@ import 'action_menu/sosial_media_fans/press_conference_tenis_action.dart';
 import 'action_menu/sosial_media_fans/post_social_media_tenis_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
-import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/grand_slam/grand_slam_tenis_page.dart';
 
 class AtlitTenisActivitiesPage extends StatefulWidget {
   final Character character;
@@ -246,6 +247,21 @@ class _AtlitTenisActivitiesPageState extends State<AtlitTenisActivitiesPage> {
 
           // 3. KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.lightGreen),
+          _buildActionCard(
+            title: 'Turnamen Grand Slam Tenis 🎾',
+            subtitle: 'Ikuti Wimbledon, Roland Garros, US Open, dan Australian Open',
+            icon: Icons.emoji_events_rounded,
+            color: Colors.green.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => GrandSlamTenisPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak 📝',
             subtitle: 'Minta negosiasi gaji dan nilai kontrak baru kepada klub',

@@ -20,6 +20,7 @@ import 'action_menu/sosial_media_fans/post_social_media_basket_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_basket_action.dart';
 import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/playbook_taktik/taktik_basket_page.dart';
 
 class AtlitBasketActivitiesPage extends StatefulWidget {
   final Character character;
@@ -370,6 +371,21 @@ class _AtlitBasketActivitiesPageState extends State<AtlitBasketActivitiesPage> {
 
           // KATEGORI 3: KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.purple),
+          _buildActionCard(
+            title: 'Playbook & Taktik Basket 🏀',
+            subtitle: 'Atur skema Pick & Roll, Pace & Space, dan strategi pertahanan',
+            icon: Icons.analytics_rounded,
+            color: Colors.orange.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TaktikBasketPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak Basket 📝',
             subtitle: 'Minta perbaikan nilai gaji tahunan kepada manajemen klub basket',

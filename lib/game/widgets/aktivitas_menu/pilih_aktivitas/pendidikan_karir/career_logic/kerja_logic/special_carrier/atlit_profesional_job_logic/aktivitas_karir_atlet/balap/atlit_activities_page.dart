@@ -19,6 +19,7 @@ import 'action_menu/sosial_media_fans/post_social_media_balap_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_balap_action.dart';
 import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/pit_strategy/balap_strategy_page.dart';
 
 class AtlitBalapActivitiesPage extends StatefulWidget {
   final Character character;
@@ -340,8 +341,23 @@ class _AtlitBalapActivitiesPageState extends State<AtlitBalapActivitiesPage> {
           ),
           const SizedBox(height: 20),
 
-          // KATEGORI 3: KONTRAK & MANAJEMEN
-          _buildCategoryHeader('KONTRAK & TIM PADDOCK', Icons.business_center, Colors.purple),
+          // KATEGORI 3: KONTRAK & MANAJEMEN TIM
+          _buildCategoryHeader('KONTRAK & MANAJEMEN TIM', Icons.business_center, Colors.purple),
+          _buildActionCard(
+            title: 'Pit Strategy & Aerodinamis 🏎️',
+            subtitle: 'Atur senyawa ban soft/medium/hard & jalani sesi kualifikasi',
+            icon: Icons.speed_rounded,
+            color: Colors.red.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BalapStrategyPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak Tim Balap 📝',
             subtitle: 'Minta perbaikan nilai kontrak kepada manajemen pabrikan tim',

@@ -15,7 +15,8 @@ import 'action_menu/sosial_media_fans/press_conference_tinju_mma_action.dart';
 import 'action_menu/sosial_media_fans/post_social_media_tinju_mma_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
-import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/pay_per_view/fight_promotions_page.dart';
 
 class AtlitTinjuMMAActivitiesPage extends StatefulWidget {
   final Character character;
@@ -246,6 +247,21 @@ class _AtlitTinjuMMAActivitiesPageState extends State<AtlitTinjuMMAActivitiesPag
 
           // 3. KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.redAccent),
+          _buildActionCard(
+            title: 'PPV Fight Night & Sabuk Juara 🥊',
+            subtitle: 'Ikuti laga utama UFC, WBC Heavyweight, dan ONE Championship',
+            icon: Icons.local_fire_department_rounded,
+            color: Colors.red.shade900,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => FightPromotionsPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak 📝',
             subtitle: 'Minta negosiasi gaji dan nilai kontrak baru kepada klub',

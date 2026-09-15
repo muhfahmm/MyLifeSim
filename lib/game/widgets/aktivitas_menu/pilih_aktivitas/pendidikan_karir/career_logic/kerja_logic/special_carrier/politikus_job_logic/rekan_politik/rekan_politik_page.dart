@@ -259,8 +259,8 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                           radius: 26,
                           backgroundImage: NetworkImage(
                             AvatarAgeRules.getSchoolAvatarUrl(
-                              name: supervisor['name']!,
-                              gender: supervisor['gender']!,
+                              name: supervisor['name'] ?? 'Senior Politik',
+                              gender: supervisor['gender'] ?? 'Laki-laki',
                               age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
                               schoolLevel: 'SMA',
                               happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
@@ -273,7 +273,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                supervisor['name']!,
+                                supervisor['name'] ?? 'Senior Politik',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

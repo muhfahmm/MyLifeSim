@@ -7,6 +7,34 @@ import 'menu_pembisnis/buat_usaha_menu.dart';
 import 'menu_pembisnis/manajemen_operasional_menu.dart';
 import 'menu_pembisnis/manajemen_keuangan_menu.dart';
 import 'menu_pembisnis/ekspansi_strategi_menu.dart';
+import 'aktivitas_peran/umkm_page.dart';
+import 'aktivitas_peran/franchise_page.dart';
+import 'aktivitas_peran/korporasi_page.dart';
+import 'pilih_perusahaan/pilih_perusahaan_page.dart';
+
+class PembisnisMenuHelper {
+  static Widget getSpecificRolePage(Character character, VoidCallback onRefresh) {
+    final int modal = character.businessModal;
+    if (modal >= 70000) {
+      return KorporasiPage(character: character, onRefresh: onRefresh);
+    } else if (modal >= 4000) {
+      return FranchisePage(character: character, onRefresh: onRefresh);
+    }
+    return UmkmPage(character: character, onRefresh: onRefresh);
+  }
+
+  static Widget buildRolePage(Character character, VoidCallback onRefresh) {
+    character.syncBusinessData();
+    if (character.ownedBusinesses.length > 1) {
+      return PilihPerusahaanPage(character: character, onRefresh: onRefresh);
+    }
+
+    if (!character.hasBusiness && character.ownedBusinesses.isEmpty) {
+      return PembisnisMenuPage(character: character, onRefresh: onRefresh);
+    }
+    return getSpecificRolePage(character, onRefresh);
+  }
+}
 
 class PembisnisMenuPage extends StatelessWidget {
   final Character character;

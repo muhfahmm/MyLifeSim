@@ -195,12 +195,22 @@ class ActivityButton extends StatelessWidget {
                   // Item Bekerja (Pekerjaan Tetap)
                   _buildActivityTile(
                     context: context,
-                    label: character.jobName != null
-                        ? 'Bekerja (${character.jobName})'
-                        : 'Bekerja',
-                    subtitle: (character.jobName != null && character.jobSalary != null)
-                        ? '${character.jobName} - Gaji: ${CurrencySettings.format(character.jobSalary!)}/tahun'
-                        : 'Mulai bekerja untuk menghasilkan uang tunai',
+                    label: () {
+                      character.syncBusinessData();
+                      if (character.ownedBusinesses.length > 1) {
+                        return 'Bekerja (${character.ownedBusinesses.length} Perusahaan)';
+                      }
+                      return character.jobName != null ? 'Bekerja (${character.jobName})' : 'Bekerja';
+                    }(),
+                    subtitle: () {
+                      character.syncBusinessData();
+                      if (character.ownedBusinesses.length > 1) {
+                        return 'Kelola ${character.ownedBusinesses.length} perusahaan & agensi usaha milikmu';
+                      }
+                      return character.jobName != null
+                          ? '${character.jobName} - Gaji: ${CurrencySettings.format(character.jobSalary ?? character.businessAnnualProfit)}/tahun'
+                          : 'Mulai bekerja untuk menghasilkan uang tunai';
+                    }(),
                     icon: Icons.work,
                     color: Colors.green,
                     minAge: 6,

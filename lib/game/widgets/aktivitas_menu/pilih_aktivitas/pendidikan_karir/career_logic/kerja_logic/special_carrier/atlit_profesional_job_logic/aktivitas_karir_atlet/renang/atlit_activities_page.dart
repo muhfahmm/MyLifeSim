@@ -18,7 +18,8 @@ import 'action_menu/sosial_media_fans/press_conference_renang_action.dart';
 import 'action_menu/sosial_media_fans/post_social_media_renang_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
-import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/olimpiade/olimpiade_renang_page.dart';
 
 class AtlitRenangActivitiesPage extends StatefulWidget {
   final Character character;
@@ -215,6 +216,21 @@ class _AtlitRenangActivitiesPageState extends State<AtlitRenangActivitiesPage> {
           const SizedBox(height: 16),
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.assignment, Colors.indigo),
           _buildActionCard(
+            title: 'Kualifikasi Olimpiade & Rekor Renang 🏊‍♂️',
+            subtitle: 'Ikuti nomor 100m Freestyle, 200m Butterfly, & 100m Backstroke',
+            icon: Icons.waves_rounded,
+            color: Colors.blue.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => OlimpiadeRenangPage(character: widget.character, onRefresh: widget.onRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
+          _buildActionCard(
             title: 'Diskusi Kontrak Klub 📝',
             subtitle: 'Bahas nilai gaji dan kesepakatan bonus medali',
             icon: Icons.edit_note,
@@ -247,7 +263,7 @@ class _AtlitRenangActivitiesPageState extends State<AtlitRenangActivitiesPage> {
             color: Colors.deepOrange,
             onTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => RekanTimRenangPage(character: widget.character)),
+              MaterialPageRoute(builder: (_) => RekanTimPage(character: widget.character, onRefresh: widget.onRefresh)),
             ),
             isDark: isDark,
           ),

@@ -15,7 +15,8 @@ import 'action_menu/sosial_media_fans/press_conference_catur_action.dart';
 import 'action_menu/sosial_media_fans/post_social_media_catur_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
-import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import '../sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/analisis_engine/catur_engine_page.dart';
 
 class AtlitCaturActivitiesPage extends StatefulWidget {
   final Character character;
@@ -246,6 +247,21 @@ class _AtlitCaturActivitiesPageState extends State<AtlitCaturActivitiesPage> {
 
           // 3. KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.deepPurple),
+          _buildActionCard(
+            title: 'Analisis Stockfish & Pembukaan Catur ♟️',
+            subtitle: 'Studi repertoar Ruy Lopez, Sicilian Defense, & taktik engine',
+            icon: Icons.computer_rounded,
+            color: Colors.brown.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CaturEnginePage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak 📝',
             subtitle: 'Minta negosiasi gaji dan nilai kontrak baru kepada klub',

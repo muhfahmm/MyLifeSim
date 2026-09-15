@@ -190,88 +190,118 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              title: Text('Mulai $businessType 💼'),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(10),
-                      decoration: BoxDecoration(
-                        color: Colors.blue.shade50,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text('Modal: ${_formatCurrency(modal)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: riskColor.withValues(alpha: 0.15),
-                                  borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: riskColor),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text('Mulai $businessType 💼', style: const TextStyle(fontWeight: FontWeight.bold)),
+              content: SizedBox(
+                width: double.infinity,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade50,
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(color: Colors.blue.shade200),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text('Modal: ${_formatCurrency(modal)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue, fontSize: 13)),
+                                Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: riskColor.withValues(alpha: 0.15),
+                                    borderRadius: BorderRadius.circular(8),
+                                    border: Border.all(color: riskColor),
+                                  ),
+                                  child: Text(
+                                    'Risiko $risk',
+                                    style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: riskColor),
+                                  ),
                                 ),
-                                child: Text(
-                                  'Risiko $risk',
-                                  style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: riskColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text('Estimasi Keuntungan: $profitFormattedStr / thn', style: const TextStyle(color: Colors.grey, fontSize: 11)),
-                          const SizedBox(height: 4),
-                          Text('Syarat: Intel > $minIntel, Health > $minHealth', style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                        ],
+                              ],
+                            ),
+                            const SizedBox(height: 6),
+                            Text('Estimasi Keuntungan: $profitFormattedStr / thn', style: const TextStyle(color: Colors.black87, fontSize: 12, fontWeight: FontWeight.w500)),
+                            const SizedBox(height: 4),
+                            Text('Syarat: Intel > $minIntel%, Health > $minHealth%', style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                          ],
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(labelText: 'Nama Usaha', border: OutlineInputBorder()),
-                    ),
-                    const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedLocation,
-                      decoration: const InputDecoration(labelText: 'Lokasi Usaha', border: OutlineInputBorder()),
-                      items: [selectedLocation, 'Jakarta', 'New York', 'Tokyo', 'Seoul', 'London']
-                          .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                          .toList(),
-                      onChanged: (val) {
-                        if (val != null) setState(() => selectedLocation = val);
-                      },
-                    ),
-                  ],
+                      const SizedBox(height: 14),
+                      TextField(
+                        controller: nameController,
+                        decoration: InputDecoration(
+                          labelText: 'Nama Usaha',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedLocation,
+                        decoration: InputDecoration(
+                          labelText: 'Lokasi Usaha',
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+                        ),
+                        items: [selectedLocation, 'Jakarta', 'New York', 'Tokyo', 'Seoul', 'London']
+                            .map((e) => DropdownMenuItem(value: e, child: Text(e)))
+                            .toList(),
+                        onChanged: (val) {
+                          if (val != null) setState(() => selectedLocation = val);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
                 TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
                 ElevatedButton(
-                  style: ElevatedButton.styleFrom(backgroundColor: Colors.green, foregroundColor: Colors.white),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green.shade700,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                   onPressed: () {
-                    // Proses Pembelian & Pendaftaran Keuntungan Tahunan
                     widget.character.money -= modal;
-                    widget.character.businessName = nameController.text;
-                    widget.character.businessLocation = selectedLocation;
-                    widget.character.hasBusiness = true;
-                    widget.character.businessModal = modal;
-                    widget.character.businessAnnualProfit = annualProfitVal;
-                    widget.character.jobName = 'Pemilik Usaha ($businessType)';
+                    widget.character.syncBusinessData();
+
+                    final newBusiness = {
+                      'id': 'bus_${DateTime.now().millisecondsSinceEpoch}',
+                      'name': nameController.text,
+                      'type': businessType,
+                      'location': selectedLocation,
+                      'modal': modal,
+                      'annualProfit': annualProfitVal,
+                      'employees': 5,
+                      'marketingLevel': 0,
+                      'qualityLevel': 1,
+                      'bankLoan': 0,
+                      'branchCount': 1,
+                      'researchLevel': 0,
+                      'hasInsurance': false,
+                    };
+
+                    widget.character.ownedBusinesses.add(newBusiness);
+                    widget.character.setActiveBusiness(newBusiness);
 
                     if (mounted) setState(() {});
-                    Navigator.pop(ctx); // Close dialog
+                    Navigator.pop(ctx);
                     widget.onRefresh();
 
-                    // Dialog Sukses
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('Usaha Berhasil Didirikan! 🎉'),
+                        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        title: const Text('Usaha Berhasil Didirikan! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
                         content: Text(
                           'Selamat! $businessType ("${nameController.text}") di $selectedLocation telah resmi menjadi bisnismu.\n\nKeuntungan sekitar ${_formatCurrency(annualProfitVal)}/tahun akan masuk ke saldo keuangannmu setiap bertambah usia!',
                         ),
@@ -279,7 +309,7 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                       ),
                     );
                   },
-                  child: const Text('Bayar & Mulai'),
+                  child: const Text('Bayar & Mulai Usaha'),
                 ),
               ],
             );
@@ -510,7 +540,10 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                                 'Modal: ${_formatCurrency(modal)} • Profit: $profitFormattedStr / thn',
                                 style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
                               ),
-                              Row(
+                              Wrap(
+                                crossAxisAlignment: WrapCrossAlignment.center,
+                                spacing: 6,
+                                runSpacing: 2,
                                 children: [
                                   Container(
                                     margin: const EdgeInsets.only(top: 2),
@@ -525,12 +558,11 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                                       style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: riskColor),
                                     ),
                                   ),
-                                  const SizedBox(width: 8),
                                   Text(
                                     'Min Intel: $minIntel% • Health: $minHealth%',
                                     style: TextStyle(
-                                      fontSize: 12,
-                                      color: isDark ? Colors.white60 : Colors.grey,
+                                      fontSize: 11,
+                                      color: isDark ? Colors.white60 : Colors.grey.shade600,
                                     ),
                                   ),
                                 ],

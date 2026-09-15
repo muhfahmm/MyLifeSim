@@ -16,6 +16,7 @@ import 'action_menu/sosial_media_fans/post_social_media_bulutangkis_action.dart'
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
 import 'action_menu/rekan_tim/rekan_tim_page.dart';
+import 'action_menu/pelatnas_turnamen/pelatnas_bulutangkis_page.dart';
 
 class AtlitBulutangkisActivitiesPage extends StatefulWidget {
   final Character character;
@@ -246,6 +247,21 @@ class _AtlitBulutangkisActivitiesPageState extends State<AtlitBulutangkisActivit
 
           // 3. KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.teal),
+          _buildActionCard(
+            title: 'Pelatnas & Turnamen BWF 🏸',
+            subtitle: 'Ikuti All England, Indonesia Open, dan Kejuaraan Dunia',
+            icon: Icons.emoji_events_rounded,
+            color: Colors.teal.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PelatnasBulutangkisPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kontrak 📝',
             subtitle: 'Minta negosiasi gaji dan nilai kontrak baru kepada klub',

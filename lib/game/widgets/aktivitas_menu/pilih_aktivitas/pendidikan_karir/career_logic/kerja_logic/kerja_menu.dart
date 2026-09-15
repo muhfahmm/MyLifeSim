@@ -26,6 +26,8 @@ import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tinju_
 import 'special_carrier/politikus_job_logic/politik_career.dart';
 import 'special_carrier/politikus_job_logic/politik_menu.dart';
 import 'special_carrier/military_job_logic/army_menu.dart';
+import 'special_carrier/aktor_film_job_logic/aktor_film_menu.dart';
+import 'special_carrier/pembisnis_job_logic/pembisnis_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -347,6 +349,26 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         },
       );
     }
+
+    if (character.hasBusiness || (character.jobName != null && character.jobName!.contains('Pemilik Usaha'))) {
+      return PembisnisMenuHelper.buildRolePage(
+        character,
+        () {
+          if (mounted) setState(() {});
+          widget.onRefresh();
+        },
+      );
+    }
+
+    if (character.jobName != null && character.jobName!.contains('Aktor Film')) {
+      return AktorFilmMenuPage(
+        character: character,
+        onRefresh: () {
+          if (mounted) setState(() {});
+          widget.onRefresh();
+        },
+      );
+    }
     final hasJob = character.jobName != null;
 
     String currentCategory = '';
@@ -445,7 +467,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Gaji: ${CurrencySettings.format(character.jobSalary!)}/tahun',
+                        'Gaji: ${CurrencySettings.format(character.jobSalary ?? character.businessAnnualProfit)}/tahun',
                         style: TextStyle(
                           fontSize: 13,
                           fontWeight: FontWeight.bold,
@@ -467,7 +489,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Gaji: ${CurrencySettings.format(character.jobSalary!)}/tahun',
+                  'Gaji: ${CurrencySettings.format(character.jobSalary ?? character.businessAnnualProfit)}/tahun',
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.bold,

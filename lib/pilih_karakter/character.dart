@@ -104,6 +104,82 @@ class Character {
   String? businessLocation;
   int businessModal = 0;
   int businessAnnualProfit = 0;
+  int businessEmployees = 0;
+  int businessMarketingLevel = 0;
+  int businessQualityLevel = 1;
+  int businessBankLoan = 0;
+  int businessBranchCount = 1;
+  int businessResearchLevel = 0;
+  bool businessHasInsurance = false;
+  List<Map<String, dynamic>> ownedBusinesses = [];
+
+  void syncBusinessData() {
+    if (ownedBusinesses.isEmpty && hasBusiness && businessName != null) {
+      ownedBusinesses.add({
+        'id': 'bus_1',
+        'name': businessName,
+        'type': businessName,
+        'location': businessLocation ?? 'Indonesia',
+        'modal': businessModal,
+        'annualProfit': businessAnnualProfit,
+        'employees': businessEmployees,
+        'marketingLevel': businessMarketingLevel,
+        'qualityLevel': businessQualityLevel,
+        'bankLoan': businessBankLoan,
+        'branchCount': businessBranchCount,
+        'researchLevel': businessResearchLevel,
+        'hasInsurance': businessHasInsurance,
+      });
+    }
+  }
+
+  void setActiveBusiness(Map<String, dynamic> busData) {
+    hasBusiness = true;
+    businessName = busData['name'] as String?;
+    businessLocation = busData['location'] as String?;
+    businessModal = (busData['modal'] as num?)?.toInt() ?? 0;
+    businessAnnualProfit = (busData['annualProfit'] as num?)?.toInt() ?? 0;
+    businessEmployees = (busData['employees'] as num?)?.toInt() ?? 0;
+    businessMarketingLevel = (busData['marketingLevel'] as num?)?.toInt() ?? 0;
+    businessQualityLevel = (busData['qualityLevel'] as num?)?.toInt() ?? 1;
+    businessBankLoan = (busData['bankLoan'] as num?)?.toInt() ?? 0;
+    businessBranchCount = (busData['branchCount'] as num?)?.toInt() ?? 1;
+    businessResearchLevel = (busData['researchLevel'] as num?)?.toInt() ?? 0;
+    businessHasInsurance = (busData['hasInsurance'] as bool?) ?? false;
+    jobName = 'Pemilik Usaha (${busData['name']})';
+    jobSalary = businessAnnualProfit;
+  }
+
+  void dissolveCurrentBusiness() {
+    if (businessName != null) {
+      final String targetName = businessName!;
+      final int returnCash = (businessModal * 0.7).round();
+      money += returnCash;
+
+      ownedBusinesses.removeWhere((b) => b['name'] == targetName || b['id'] == targetName);
+
+      if (ownedBusinesses.isNotEmpty) {
+        setActiveBusiness(ownedBusinesses.first);
+      } else {
+        hasBusiness = false;
+        businessName = null;
+        businessLocation = null;
+        businessModal = 0;
+        businessAnnualProfit = 0;
+        businessEmployees = 0;
+        businessMarketingLevel = 0;
+        businessQualityLevel = 1;
+        businessBankLoan = 0;
+        businessBranchCount = 1;
+        businessResearchLevel = 0;
+        businessHasInsurance = false;
+        if (jobName != null && jobName!.contains('Pemilik Usaha')) {
+          jobName = null;
+          jobSalary = null;
+        }
+      }
+    }
+  }
 
   void addProposalHistory({
     required String name,
@@ -205,6 +281,7 @@ class Character {
   // --- FIELD PEKERJAAN ---
   String? jobName;
   int? jobSalary;
+  int? contractYears;
   int athleteContractYears = 3; // Kontrak atlet default 3 tahun
   int? lastContractSignedAge; // Usia saat terakhir kali meneken/memperbarui kontrak atlet
   bool athleteIsInjured = false; // Status cedera atlet

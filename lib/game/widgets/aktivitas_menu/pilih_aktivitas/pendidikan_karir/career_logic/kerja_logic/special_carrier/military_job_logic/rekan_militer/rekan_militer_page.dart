@@ -247,8 +247,8 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                           radius: 26,
                           backgroundImage: NetworkImage(
                             AvatarAgeRules.getSchoolAvatarUrl(
-                              name: supervisor['name']!,
-                              gender: supervisor['gender']!,
+                              name: supervisor['name'] ?? 'Komandan Atasan',
+                              gender: supervisor['gender'] ?? 'Laki-laki',
                               age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
                               schoolLevel: 'SMA',
                               happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
@@ -261,7 +261,7 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                supervisor['name']!,
+                                supervisor['name'] ?? 'Komandan Atasan',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,

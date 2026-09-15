@@ -21,6 +21,11 @@ import 'action_menu/sosial_media_fans/post_social_media_action.dart';
 
 import 'action_menu/rekan_tim/team_dinner_action.dart';
 
+import 'action_menu/taktik_strategi/pusat_taktik_page.dart';
+import 'action_menu/sponsor_endorsement/sponsor_endorse_page.dart';
+import 'action_menu/bursa_transfer/bursa_transfer_page.dart';
+import 'action_menu/trophy_room/trophy_room_page.dart';
+
 class AtlitActivitiesPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -405,6 +410,66 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
 
           // KATEGORI 3: KONTRAK & MANAJEMEN
           _buildCategoryHeader('KONTRAK & MANAJEMEN', Icons.business_center, Colors.purple),
+          _buildActionCard(
+            title: 'Pusat Taktik & Strategi Tim 📋',
+            subtitle: 'Atur gaya bermain tiki-taka, gegenpress, dan peran eksekutor',
+            icon: Icons.analytics_rounded,
+            color: Colors.green.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => PusatTaktikPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
+          _buildActionCard(
+            title: 'Bursa Transfer & Agen Pemain ✈️',
+            subtitle: 'Ajukan transfer request dan negosiasi klub top Eropa',
+            icon: Icons.swap_horiz_rounded,
+            color: Colors.blue.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => BursaTransferPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
+          _buildActionCard(
+            title: 'Sponsor & Commercial Deals 👟',
+            subtitle: 'Kontrak sepatu apparel (Nike, Adidas) & iklan komersial',
+            icon: Icons.monetization_on_rounded,
+            color: Colors.amber.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => SponsorEndorsePage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
+          _buildActionCard(
+            title: 'Lemari Trofi & Penghargaan 🏆',
+            subtitle: 'Koleksi trofi Ballon d\'Or, Sepatu Emas, & Juara Liga',
+            icon: Icons.workspace_premium_rounded,
+            color: Colors.purple.shade800,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => TrophyRoomPage(character: widget.character, onRefresh: _triggerRefresh),
+                ),
+              );
+            },
+            isDark: isDark,
+          ),
           _buildActionCard(
             title: 'Negosiasi Kenaikan Kontrak 📝',
             subtitle: 'Minta kenaikan nilai gaji tahunan kepada manajemen klub',
