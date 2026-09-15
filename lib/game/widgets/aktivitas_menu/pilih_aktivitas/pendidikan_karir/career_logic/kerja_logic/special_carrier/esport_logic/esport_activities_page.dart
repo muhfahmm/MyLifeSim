@@ -36,7 +36,9 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
           children: [
             Icon(icon, color: color, size: 28),
             const SizedBox(width: 8),
-            Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+            Expanded(
+              child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            ),
           ],
         ),
         content: Text(content, style: const TextStyle(fontSize: 14)),

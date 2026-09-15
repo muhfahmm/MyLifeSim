@@ -1421,7 +1421,9 @@ class _GameScreenState extends State<GameScreen> {
               children: [
                 const Icon(Icons.monetization_on, color: Colors.amber),
                 const SizedBox(width: 8),
-                Text('Minta Uang Jajan: $kidName 💵', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Expanded(
+                  child: Text('Minta Uang Jajan: $kidName 💵', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
               ],
             ),
             content: Text(
@@ -1496,7 +1498,9 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   const Icon(Icons.phone_android, color: Colors.purple),
                   const SizedBox(width: 8),
-                  Text('Minta Gadget: $kidName 📱', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Expanded(
+                    child: Text('Minta Gadget: $kidName 📱', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
                 ],
               ),
               content: Text(
@@ -1569,7 +1573,9 @@ class _GameScreenState extends State<GameScreen> {
                 children: [
                   const Icon(Icons.people, color: Colors.blue),
                   const SizedBox(width: 8),
-                  Text('Minta Uang Nongkrong ☕', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  Expanded(
+                    child: Text('Minta Uang Nongkrong ☕', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  ),
                 ],
               ),
               content: Text(
@@ -4109,11 +4115,19 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         title: const Row(
           children: [
-            Icon(Icons.health_and_safety, color: Colors.blue, size: 28),
+            Icon(Icons.health_and_safety, color: Colors.blue, size: 24),
             SizedBox(width: 8),
-            Text('Gunakan Pengaman?', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Expanded(
+              child: Text(
+                'Gunakan Pengaman?',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ],
         ),
         content: Column(
@@ -4150,14 +4164,14 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
               Navigator.pop(context);
               _executeIncomingBercinta(proposal, true, onDone);
             },
-            child: const Text('Ya, pakai', style: TextStyle(fontWeight: FontWeight.bold)),
+            child: const Text('Ya, pakai', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               _executeIncomingBercinta(proposal, false, onDone);
             },
-            child: const Text('Tidak', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text('Tidak', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),

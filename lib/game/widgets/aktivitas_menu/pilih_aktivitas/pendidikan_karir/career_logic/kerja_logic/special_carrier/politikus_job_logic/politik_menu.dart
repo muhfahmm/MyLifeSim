@@ -62,7 +62,16 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
           children: [
             const Icon(Icons.how_to_vote, color: Colors.amber),
             const SizedBox(width: 8),
-            Text('Mulai Kampanye 🏛️', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+            Expanded(
+              child: Text(
+                'Mulai Kampanye 🏛️',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+              ),
+            ),
           ],
         ),
         content: Text(
@@ -113,11 +122,20 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : null,
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.emoji_events, color: Colors.amber),
-              SizedBox(width: 8),
-              Text('Kemenangan Pemilu! 🏆', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Icon(Icons.emoji_events, color: Colors.amber),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Kemenangan Pemilu! 🏆',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
             ],
           ),
           content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
@@ -143,11 +161,20 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
         context: context,
         builder: (ctx) => AlertDialog(
           backgroundColor: isDark ? Colors.grey.shade900 : null,
-          title: const Row(
+          title: Row(
             children: [
-              Icon(Icons.cancel, color: Colors.red),
-              SizedBox(width: 8),
-              Text('Kalah Pemilu 💔', style: TextStyle(fontWeight: FontWeight.bold)),
+              const Icon(Icons.cancel, color: Colors.red),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  'Kalah Pemilu 💔',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                    color: isDark ? Colors.white : Colors.black87,
+                  ),
+                ),
+              ),
             ],
           ),
           content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
@@ -171,7 +198,14 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: isDark ? Colors.grey.shade900 : null,
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
         content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
         actions: [
           TextButton(

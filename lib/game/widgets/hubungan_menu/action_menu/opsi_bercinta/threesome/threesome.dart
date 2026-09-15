@@ -146,16 +146,14 @@ class ThreesomeHelper {
                   builder: (context) => AlertDialog(
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                     insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     title: const Row(
                       children: [
-                        Icon(Icons.security, color: Colors.blue, size: 20),
+                        Icon(Icons.security, color: Colors.blue, size: 24),
                         SizedBox(width: 8),
                         Expanded(
                           child: Text(
                             'Gunakan Pengaman?',
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
@@ -163,16 +161,16 @@ class ThreesomeHelper {
                     ),
                     content: const Text(
                       'Apakah kamu ingin menggunakan pengaman (kondom) saat melakukan threesome untuk mencegah kehamilan?',
-                      style: TextStyle(fontSize: 12),
+                      style: TextStyle(fontSize: 14),
                     ),
                     actions: [
                       TextButton(
                         onPressed: () => Navigator.pop(context, true),
-                        child: const Text('Ya, pakai', style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold)),
+                        child: const Text('Ya, pakai', style: TextStyle(fontSize: 14, color: Colors.blue, fontWeight: FontWeight.bold)),
                       ),
                       TextButton(
                         onPressed: () => Navigator.pop(context, false),
-                        child: const Text('Tidak', style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)),
+                        child: const Text('Tidak', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
                       ),
                     ],
                   ),

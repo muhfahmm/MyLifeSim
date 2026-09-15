@@ -174,16 +174,14 @@ class _BercintaScreenState extends State<BercintaScreen> {
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-        contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
         title: Row(
           children: [
-            Icon(Icons.health_and_safety, color: isGay ? Colors.redAccent : Colors.blue, size: 20),
+            Icon(Icons.health_and_safety, color: isGay ? Colors.redAccent : Colors.blue, size: 24),
             const SizedBox(width: 8),
             Expanded(
               child: Text(
                 isGay ? 'Gunakan Pengaman (IMS)?' : 'Gunakan Pengaman?',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -197,12 +195,12 @@ class _BercintaScreenState extends State<BercintaScreen> {
               isGay
                   ? 'Apakah kamu ingin menggunakan pengaman (kondom) untuk melindungi diri dari Infeksi Menular Seksual (IMS)?'
                   : 'Apa kamu ingin menggunakan kondom untuk mencegah kehamilan?',
-              style: const TextStyle(fontSize: 12),
+              style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 12),
             Text(
               'Gender: Kamu (${widget.character.gender}) & ${_getTargetRoleLabel()} (${_getPartnerGender()})',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.blueGrey),
+              style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blueGrey),
             ),
             const SizedBox(height: 8),
             Container(
@@ -214,7 +212,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               ),
               child: Text(
                 riskInfo,
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: isGay ? Colors.red.shade900 : Colors.blue),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: isGay ? Colors.red.shade900 : Colors.blue),
               ),
             ),
           ],
@@ -226,7 +224,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               _useCondom = true;
               _executeMakeLove();
             },
-            child: const Text('Ya, pakai', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+            child: const Text('Ya, pakai', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           ),
           TextButton(
             onPressed: () {
@@ -234,7 +232,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
               _useCondom = false;
               _executeMakeLove();
             },
-            child: const Text('Tidak', style: TextStyle(fontSize: 12, color: Colors.red, fontWeight: FontWeight.bold)),
+            child: const Text('Tidak', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
