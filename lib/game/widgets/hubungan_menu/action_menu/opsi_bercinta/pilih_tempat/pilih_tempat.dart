@@ -57,18 +57,137 @@ class TempatBercintaHelper {
   ];
 
   // Menampilkan dialog pemilihan lokasi bercinta secara bertingkat
-  // Menyembunyikan opsi mobil jika usia user adalah 12 dan target (pasangan) kurang dari 18 tahun (belum bisa menyetir mobil)
+  static const List<LocationOption> theaterLocations = [
+    LocationOption(
+      name: 'Di Kamar Mandi Teater',
+      description: 'Di dalam bilik kamar mandi teater yang sepi.',
+      icon: Icons.bathtub,
+    ),
+    LocationOption(
+      name: 'Di Mobil',
+      description: 'Menyelinap di mobil pribadi yang terparkir di basement teater.',
+      icon: Icons.directions_car,
+    ),
+    LocationOption(
+      name: 'Di Hotel',
+      description: 'Menyewa kamar hotel dekat teater agar lebih nyaman.',
+      icon: Icons.hotel,
+    ),
+    LocationOption(
+      name: 'Di Ruang Ganti Idol (Backstage)',
+      description: 'Menyelinap ke ruang ganti idol yang terkunci saat jeda latihan.',
+      icon: Icons.dry_cleaning,
+    ),
+    LocationOption(
+      name: 'Di Ruang Gladi / Latihan Teater',
+      description: 'Di atas panggung atau ruang gladi teater saat pertunjukan selesai.',
+      icon: Icons.theater_comedy,
+    ),
+    LocationOption(
+      name: 'Di Ruang Penyimpanan Properti',
+      description: 'Tersembunyi di antara tumpukan kostum dan properti panggung.',
+      icon: Icons.inventory_2,
+    ),
+  ];
+
+  // Menampilkan dialog pemilihan lokasi bercinta secara bertingkat
   static Future<String?> showLocationChooser({
     required BuildContext context,
     required Character character,
     required String partnerName,
     required int userAge,
     required int targetAge,
+    bool isStaffWithIdol = false,
   }) async {
-    // Saring lokasi berdasarkan usia user:
-    // - Usia 12 - 16 tahun: Hanya "Di Rumah"
-    // - Usia 17 tahun: "Di Rumah" dan "Di Mobil"
-    // - Usia 18+ tahun: "Di Rumah", "Di Mobil", dan "Di Hotel"
+    if (isStaffWithIdol) {
+      LocationOption? selectedTheaterLoc = await showDialog<LocationOption>(
+        context: context,
+        barrierDismissible: false,
+        builder: (dialogContext) {
+          final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
+          return AlertDialog(
+            backgroundColor: isDark ? Colors.grey.shade900 : null,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            title: Row(
+              children: [
+                const Icon(Icons.location_on, color: Colors.pinkAccent, size: 20),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Pilih Tempat Rahasia dengan $partnerName',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: isDark ? Colors.white : Colors.black87,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            content: SizedBox(
+              width: double.maxFinite,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: theaterLocations.map((loc) {
+                    return Card(
+                      elevation: 0,
+                      color: isDark ? Colors.grey.shade800 : Colors.pink.shade50.withOpacity(0.3),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.pink.shade100),
+                      ),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: isDark ? Colors.pink.shade900 : Colors.pink.shade50,
+                          child: Icon(loc.icon, color: Colors.pinkAccent, size: 20),
+                        ),
+                        title: Text(
+                          loc.name,
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
+                        ),
+                        subtitle: Text(
+                          loc.description,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? Colors.white70 : Colors.black54,
+                          ),
+                        ),
+                        onTap: () => Navigator.pop(dialogContext, loc),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, null),
+                child: Text(
+                  'Batal',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? Colors.white70 : Colors.grey,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              )
+            ],
+          );
+        },
+      );
+      return selectedTheaterLoc?.name;
+    }
+
     final List<LocationOption> filteredLocations = mainLocations.where((loc) {
       if (userAge < 17 && loc.name != 'Di Rumah') {
         return false;

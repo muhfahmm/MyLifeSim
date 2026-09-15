@@ -108,20 +108,29 @@ class DesahanNpcPerempuanMasturbate {
     "Ngh... ahh...",
   ];
 
+  static final Map<NPCPerempuanPersonalityType, List<String>> _shuffledPools = {};
+
   static String getRandomMoan(Map<String, dynamic> npc) {
     final personality = _getNPCPersonality(npc);
-    List<String> pool;
-    switch (personality) {
-      case NPCPerempuanPersonalityType.shy:
-        pool = _shyMoans;
-        break;
-      case NPCPerempuanPersonalityType.bold:
-        pool = _boldMoans;
-        break;
-      case NPCPerempuanPersonalityType.kind:
-        pool = _kindMoans;
-        break;
+    List<String>? currentDeck = _shuffledPools[personality];
+
+    if (currentDeck == null || currentDeck.isEmpty) {
+      List<String> sourcePool;
+      switch (personality) {
+        case NPCPerempuanPersonalityType.shy:
+          sourcePool = _shyMoans;
+          break;
+        case NPCPerempuanPersonalityType.bold:
+          sourcePool = _boldMoans;
+          break;
+        case NPCPerempuanPersonalityType.kind:
+          sourcePool = _kindMoans;
+          break;
+      }
+      currentDeck = List<String>.from(sourcePool)..shuffle(_random);
+      _shuffledPools[personality] = currentDeck;
     }
-    return pool[_random.nextInt(pool.length)];
+
+    return currentDeck.removeLast();
   }
 }

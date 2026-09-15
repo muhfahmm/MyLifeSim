@@ -17,6 +17,7 @@ class BercintaScreen extends StatefulWidget {
   final Character character;
   final String targetName;
   final String targetRole;
+  final bool isStaffWithIdol;
   final VoidCallback onActionComplete;
 
   const BercintaScreen({
@@ -24,6 +25,7 @@ class BercintaScreen extends StatefulWidget {
     required this.character,
     required this.targetName,
     required this.targetRole,
+    this.isStaffWithIdol = false,
     required this.onActionComplete,
   });
 
@@ -998,6 +1000,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
           partnerName: widget.targetName,
           userAge: widget.character.age,
           targetAge: targetAge,
+          isStaffWithIdol: widget.isStaffWithIdol,
         );
 
         if (loc == null) {

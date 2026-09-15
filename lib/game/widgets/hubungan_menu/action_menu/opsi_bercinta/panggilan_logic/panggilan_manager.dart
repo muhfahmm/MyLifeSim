@@ -127,6 +127,7 @@ class PanggilanManager {
         isSpeakerPlayer: isSpeakerPlayer,
         userName: userName,
         userGender: userGender,
+        character: character,
       );
     }
 

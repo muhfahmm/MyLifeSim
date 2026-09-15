@@ -1,5 +1,6 @@
 // lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/aksi_intim/penetrasi.dart
 
+import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
@@ -51,14 +52,24 @@ class PenetrasiHelper {
       'role': targetRole,
     };
 
-    // Moan helpers
-    final String npcMoan = (partnerGender == 'laki-laki')
-        ? DesahanNpcLakiMakeLove.getRandomMoan(npcMap)
-        : DesahanNpcPerempuanMakeLove.getRandomMoan(npcMap);
+    // Function to get dynamic moan formatted with calls
+    String buildFormattedMoan(bool isMale, bool isPlayer, Map<String, dynamic> nMap, Character char, String callName) {
+      final String raw = isPlayer
+          ? (isMale ? DesahanUserLakiMakeLove.getRandomMoan(char) : DesahanUserPerempuanMakeLove.getRandomMoan(char))
+          : (isMale ? DesahanNpcLakiMakeLove.getRandomMoan(nMap) : DesahanNpcPerempuanMakeLove.getRandomMoan(nMap));
 
-    final String playerMoan = (myGender == 'laki-laki')
-        ? DesahanUserLakiMakeLove.getRandomMoan(character)
-        : DesahanUserPerempuanMakeLove.getRandomMoan(character);
+      final int style = Random().nextInt(4);
+      switch (style) {
+        case 0:
+          return '"$raw $callName..."';
+        case 1:
+          return '"$callName... $raw"';
+        case 2:
+          return '"$raw, $callName..."';
+        default:
+          return '"Ngh... $raw... $callName..."';
+      }
+    }
 
     // Panggilan intim
     final String callToNpc = PanggilanManager.getPanggilan(
@@ -89,7 +100,6 @@ class PenetrasiHelper {
           final String narasiText = useLubricant
               ? '($activeSpeakerName mengoleskan pelumas lembut pada alat bantu vibrator dengan getaran halus yang hangat, membelai pelan sebelum perlahan melakukan penetrasi getar...) 🍆⚡'
               : '($activeSpeakerName menyalakan alat bantu vibrator langsung tanpa pelumas, mendorongnya perlahan yang terasa kesat nan intens ke dalam vagina $targetSpeakerName...) 🍆⚡';
-          final String npcText = '"$npcMoan $callToPlayer..."';
 
           nodes = [
             VNDialogueNode(
@@ -102,7 +112,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: targetSpeakerName,
-              dialogueText: npcText,
+              dynamicDialogueText: () => buildFormattedMoan(false, false, npcMap, character, callToPlayer),
               emotion: VNEmotionType.blush,
               isPlayerSpeaking: false,
               outfit: VNOutfitType.casual,
@@ -110,7 +120,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: activeSpeakerName,
-              dialogueText: '"$playerMoan $callToNpc..."',
+              dynamicDialogueText: () => buildFormattedMoan(false, true, npcMap, character, callToNpc),
               emotion: VNEmotionType.happy,
               isPlayerSpeaking: true,
               outfit: VNOutfitType.casual,
@@ -141,7 +151,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: targetSpeakerName,
-              dialogueText: '"$npcMoan $callToPlayer..."',
+              dynamicDialogueText: () => buildFormattedMoan(false, false, npcMap, character, callToPlayer),
               emotion: VNEmotionType.blush,
               isPlayerSpeaking: false,
               outfit: VNOutfitType.casual,
@@ -149,7 +159,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: activeSpeakerName,
-              dialogueText: '"$playerMoan $callToNpc..."',
+              dynamicDialogueText: () => buildFormattedMoan(false, true, npcMap, character, callToNpc),
               emotion: VNEmotionType.happy,
               isPlayerSpeaking: true,
               outfit: VNOutfitType.casual,
@@ -170,7 +180,6 @@ class PenetrasiHelper {
           final String narasiText = useLubricant
               ? '($activeSpeakerName mengoleskan pelumas lembut pada alat bantu vibrator, mendorongnya perlahan ke dalam anus $targetSpeakerName dengan getaran hangat...) ⚡🔥'
               : '($activeSpeakerName perlahan mendorong alat bantu vibrator tanpa pelumas ke dalam anus $targetSpeakerName, menciptakan gesekan ketat nan menggelitik...) ⚡🔥';
-          final String npcText = '"$npcMoan $callToPlayer..."';
 
           nodes = [
             VNDialogueNode(
@@ -183,7 +192,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: targetSpeakerName,
-              dialogueText: npcText,
+              dynamicDialogueText: () => buildFormattedMoan(false, false, npcMap, character, callToPlayer),
               emotion: VNEmotionType.blush,
               isPlayerSpeaking: false,
               outfit: VNOutfitType.casual,
@@ -191,7 +200,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: activeSpeakerName,
-              dialogueText: '"$playerMoan $callToNpc..."',
+              dynamicDialogueText: () => buildFormattedMoan(false, true, npcMap, character, callToNpc),
               emotion: VNEmotionType.happy,
               isPlayerSpeaking: true,
               outfit: VNOutfitType.casual,
@@ -208,9 +217,8 @@ class PenetrasiHelper {
           ];
         } else { // finger
           final String narasiText = useLubricant
-              ? '($activeSpeakerName mengelus area belakang $targetSpeakerName dengan pelumas lembut, perlahan menyelipkan jarinya untuk penetrasi anal jari...) 🖐️🔥'
+              ? '($activeSpeakerName mengoleskan area belakang $targetSpeakerName dengan pelumas lembut, perlahan menyelipkan jarinya untuk penetrasi anal jari...) 🖐️🔥'
               : '($activeSpeakerName membelai area belakang $targetSpeakerName tanpa pelumas, perlahan meregangkan dan menyelipkan jarinya untuk penetrasi anal...) 🖐️🔥';
-          final String npcText = '"$npcMoan $callToPlayer..."';
 
           nodes = [
             VNDialogueNode(
@@ -223,7 +231,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: targetSpeakerName,
-              dialogueText: npcText,
+              dynamicDialogueText: () => buildFormattedMoan(false, false, npcMap, character, callToPlayer),
               emotion: VNEmotionType.blush,
               isPlayerSpeaking: false,
               outfit: VNOutfitType.casual,
@@ -231,7 +239,7 @@ class PenetrasiHelper {
             ),
             VNDialogueNode(
               speakerName: activeSpeakerName,
-              dialogueText: '"$playerMoan $callToNpc..."',
+              dynamicDialogueText: () => buildFormattedMoan(false, true, npcMap, character, callToNpc),
               emotion: VNEmotionType.happy,
               isPlayerSpeaking: true,
               outfit: VNOutfitType.casual,
@@ -253,24 +261,27 @@ class PenetrasiHelper {
       final String maleName = isPlayerMale ? character.name : targetName;
       final String femaleName = isPlayerMale ? targetName : character.name;
 
-      final String femaleMoan = isPlayerMale ? npcMoan : playerMoan;
-      final String maleMoan = isPlayerMale ? playerMoan : npcMoan;
-
       final String femaleCall = isPlayerMale ? callToPlayer : callToNpc;
       final String maleCall = isPlayerMale ? callToNpc : callToPlayer;
 
       if (targetPartId == 'vagina') {
-        final String narasiText = useLubricant
-            ? '($maleName mengoleskan pelumas lembut pada area intim, memposisikan pinggulnya perlahan sebelum melakukan penetrasi hangat, licin, dan dalam ke dalam vagina $femaleName...) 🌸'
-            : '($maleName memposisikan pinggulnya perlahan tanpa pelumas, menyentuh lembut area intim $femaleName sebelum melakukan penetrasi hangat nan kesat ke dalam vaginanya...) 🌸';
-
-        final String femaleText = '"$femaleMoan $femaleCall..."';
-        final String maleText = '"$maleMoan $maleCall..."';
+        final List<String> vaginaStartLubeNaration = [
+          '($maleName mengoleskan pelumas lembut pada area intim, memposisikan pinggulnya perlahan sebelum melakukan penetrasi hangat, licin, dan dalam ke dalam vagina $femaleName...) 🌸',
+          '($maleName meratakan pelumas halus di bibir intim $femaleName, lalu perlahan mendorong pinggulnya masuk dengan penetrasi licin nan mendalam...) 💧🌸',
+        ];
+        final List<String> vaginaStartNoLubeNaration = [
+          '($maleName memposisikan pinggulnya perlahan tanpa pelumas, menyentuh lembut area intim $femaleName sebelum melakukan penetrasi hangat nan kesat ke dalam vaginanya...) 🌸',
+          '($maleName merapatkan tubuhnya, membelai intim sebelum menekan perlahan masuk ke dalam vagina $femaleName tanpa pelumas...) 🌸',
+        ];
+        final List<String> vaginaEndNaration = [
+          '(Gerakan ritmis dan penyatuan hangat di area vagina menghantarkan guncangan desahan kenikmatan beruntun bagi keduanya...) ✨',
+          '(Hantaman lembut nan dalam di area vagina membangkitkan guncangan gairah yang meluap-luap...) 💖',
+        ];
 
         nodes = [
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: narasiText,
+            dynamicDialogueText: () => (useLubricant ? vaginaStartLubeNaration : vaginaStartNoLubeNaration)[Random().nextInt(useLubricant ? vaginaStartLubeNaration.length : vaginaStartNoLubeNaration.length)],
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,
@@ -278,7 +289,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: femaleName,
-            dialogueText: femaleText,
+            dynamicDialogueText: () => buildFormattedMoan(false, !isPlayerMale, npcMap, character, femaleCall),
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: !isPlayerMale,
             outfit: VNOutfitType.casual,
@@ -286,7 +297,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: maleName,
-            dialogueText: maleText,
+            dynamicDialogueText: () => buildFormattedMoan(true, isPlayerMale, npcMap, character, maleCall),
             emotion: VNEmotionType.happy,
             isPlayerSpeaking: isPlayerMale,
             outfit: VNOutfitType.casual,
@@ -294,7 +305,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: '(Gerakan ritmis dan penyatuan hangat di area vagina menghantarkan guncangan desahan kenikmatan beruntun bagi keduanya...) ✨',
+            dynamicDialogueText: () => vaginaEndNaration[Random().nextInt(vaginaEndNaration.length)],
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,
@@ -303,17 +314,25 @@ class PenetrasiHelper {
         ];
       } else {
         // anus
-        final String narasiText = useLubricant
-            ? '($maleName mengoleskan pelumas hangat yang licin, mengelus perlahan area belakang $femaleName sebelum memposisikan diri dan meresap pelan melakukan penetrasi ke dalam anus...) 🔥'
-            : '($maleName merenggangkan perlahan area belakang $femaleName tanpa pelumas, mendorong pelan namun pasti melakukan penetrasi kesat nan intens ke dalam anus...) 🔥';
-
-        final String femaleText = '"$femaleMoan $femaleCall..."';
-        final String maleText = '"$maleMoan $maleCall..."';
+        final List<String> anusStartLubeNaration = [
+          '($maleName mengoleskan pelumas hangat yang licin, mengelus perlahan area belakang $femaleName sebelum memposisikan diri dan meresap pelan melakukan penetrasi ke dalam anus...) 🔥',
+          '($maleName meratakan pelumas lembut di area intim belakang, mendorong masuk secara halus dan licin ke dalam anus $femaleName...) 💧🔥',
+        ];
+        final List<String> anusStartNoLubeNaration = [
+          '($maleName merenggangkan perlahan area belakang $femaleName tanpa pelumas, mendorong pelan namun pasti melakukan penetrasi kesat nan intens ke dalam anus...) 🔥',
+          '($maleName memposisikan pinggulnya rapat tanpa pelumas, perlahan menekan masuk melakukan penetrasi anal yang ketat dan penuh gairah...) 🔥',
+          '($maleName mengusap lembut panggul $femaleName, mendorong perlahan tanpa pelumas hingga sensasi kesat nan hangat memenuhi area belakang...) 🔥',
+        ];
+        final List<String> anusEndNaration = [
+          '(Penetrasi rapat nan mendalam di area belakang membawa letupan sensasi bergetar yang hebat...) ✨',
+          '(Penyatuan intensif di area belakang menghantarkan gelombang kenikmatan membakar bagi keduanya...) 💥',
+          '(Gesekan rapat dan ritme dorongan anal menghadirkan sensasi puncaknya yang menggairahkan...) 🔥',
+        ];
 
         nodes = [
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: narasiText,
+            dynamicDialogueText: () => (useLubricant ? anusStartLubeNaration : anusStartNoLubeNaration)[Random().nextInt(useLubricant ? anusStartLubeNaration.length : anusStartNoLubeNaration.length)],
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,
@@ -321,7 +340,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: femaleName,
-            dialogueText: femaleText,
+            dynamicDialogueText: () => buildFormattedMoan(false, !isPlayerMale, npcMap, character, femaleCall),
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: !isPlayerMale,
             outfit: VNOutfitType.casual,
@@ -329,7 +348,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: maleName,
-            dialogueText: maleText,
+            dynamicDialogueText: () => buildFormattedMoan(true, isPlayerMale, npcMap, character, maleCall),
             emotion: VNEmotionType.happy,
             isPlayerSpeaking: isPlayerMale,
             outfit: VNOutfitType.casual,
@@ -337,7 +356,7 @@ class PenetrasiHelper {
           ),
           VNDialogueNode(
             speakerName: 'Narasi',
-            dialogueText: '(Penetrasi rapat nan mendalam di area belakang membawa letupan sensasi bergetar yang hebat...) ✨',
+            dynamicDialogueText: () => anusEndNaration[Random().nextInt(anusEndNaration.length)],
             emotion: VNEmotionType.blush,
             isPlayerSpeaking: false,
             outfit: VNOutfitType.casual,

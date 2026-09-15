@@ -8,7 +8,7 @@ import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 
 class IdolsInteractionPage extends StatefulWidget {
   final Map<String, String> person;
@@ -148,6 +148,36 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                             ),
                           ),
                         ],
+                        (() {
+                          final String pregList = widget.character.pregnantByPartnerName ?? '';
+                          final List<String> pregnantNames = pregList
+                              .split(', ')
+                              .map((e) => AvatarAgeRules.getCleanNPCName(e))
+                              .toList();
+                          final String cleanName = AvatarAgeRules.getCleanNPCName(name);
+                          final bool isHamil = widget.character.partnerIsPregnant &&
+                              (pregList.contains(name) ||
+                               pregnantNames.contains(cleanName) ||
+                               (cleanName.isNotEmpty && pregList.contains(cleanName)));
+                          if (isHamil) {
+                            return Padding(
+                              padding: const EdgeInsets.only(left: 8.0),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: Colors.pink.shade50,
+                                  borderRadius: BorderRadius.circular(6),
+                                  border: Border.all(color: Colors.pink.shade200, width: 0.5),
+                                ),
+                                child: const Text(
+                                  'Hamil 🍼',
+                                  style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                            );
+                          }
+                          return const SizedBox.shrink();
+                        })(),
                       ],
                     ),
                     const SizedBox(height: 4),
@@ -307,8 +337,20 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                 onTap: () {
                   final success = relationship >= 50;
                   if (success) {
-                    widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
-                    _showOutcome('Bercinta', 'Kamu menghabiskan malam yang sangat romantis bersama pacarmu, $name. Hubungan terasa semakin erat.');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BercintaScreen(
+                          character: widget.character,
+                          targetName: name,
+                          targetRole: role,
+                          onActionComplete: () {
+                            if (mounted) setState(() {});
+                            widget.onRefresh();
+                          },
+                        ),
+                      ),
+                    );
                   } else {
                     _updateRelationship(-5);
                     _showOutcome('Bercinta Ditolak 🚫', '$name menolak ajakanmu karena hubungan kalian saat ini terasa kurang hangat (minimal 50%).');
@@ -322,12 +364,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   color: Colors.purple,
                   title: 'Ajak Masturbasi Bersama',
                   onTap: () {
-                    int successChance = PersentaseAjakan.getSuccessChance(
-                      character: widget.character,
-                      relationType: role, // 'Rekan Kerja', 'Atasan', 'Anggota Trainee', dll
-                      viewerName: name,
-                    );
-                    final bool success = _random.nextInt(100) < successChance;
+                    final bool success = relationship >= 50;
                     if (success) {
                       AjakanMasturbasiDialog.show(
                         context: context,
@@ -345,7 +382,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                       final change = 10 + _random.nextInt(11);
                       _updateRelationship(-change);
                       widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
-                      _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu secara mentah-mentah! (-$change% Hubungan, -15% Kebahagiaan).');
+                      _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu karena hubungan kalian saat ini belum cukup hangat (minimal 50%).');
                     }
                   },
                 ),

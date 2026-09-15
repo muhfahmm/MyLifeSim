@@ -93,7 +93,6 @@ class PanggilanKeluarga {
           pool.addAll(['Nenek', 'Oma']);
           break;
 
-        case 'Anak / Keponakan':
         case 'Anak':
         case 'Anak Kandung':
         case 'Anak Angkat':
@@ -106,8 +105,15 @@ class PanggilanKeluarga {
         case 'Putri':
         case 'Putra':
           pool.addAll(usePetName 
-              ? ['Anakku', 'Keponakanku', 'Nak', 'Sayang']
-              : ['Anakku', 'Keponakanku', 'Nak']);
+              ? ['Anakku', 'Nak', 'Sayang']
+              : ['Anakku', 'Nak']);
+          break;
+
+        case 'Anak / Keponakan':
+        case 'Keponakan':
+          pool.addAll(usePetName 
+              ? ['Keponakanku', 'Nak', 'Sayang']
+              : ['Keponakanku', 'Nak']);
           break;
 
         case 'Cucu':

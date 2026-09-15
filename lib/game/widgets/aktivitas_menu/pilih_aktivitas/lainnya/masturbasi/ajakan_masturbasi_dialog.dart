@@ -32,6 +32,15 @@ const List<_LokasiOption> _lokasiOptions = [
   _LokasiOption(name: 'Di Hotel', description: 'Kamar hotel mewah tanpa gangguan.', icon: Icons.hotel),
 ];
 
+const List<_LokasiOption> _lokasiTheaterOptions = [
+  _LokasiOption(name: 'Di Kamar Mandi Teater', description: 'Di dalam bilik kamar mandi teater yang sepi.', icon: Icons.bathtub),
+  _LokasiOption(name: 'Di Mobil', description: 'Tersembunyi di mobil di basement teater.', icon: Icons.directions_car),
+  _LokasiOption(name: 'Di Hotel', description: 'Di kamar hotel dekat lokasi teater.', icon: Icons.hotel),
+  _LokasiOption(name: 'Di Ruang Ganti Idol (Backstage)', description: 'Di ruang ganti idol yang terkunci.', icon: Icons.dry_cleaning),
+  _LokasiOption(name: 'Di Ruang Gladi Teater', description: 'Di ruang gladi / panggung teater setelah acara.', icon: Icons.theater_comedy),
+  _LokasiOption(name: 'Di Ruang Properti Panggung', description: 'Di antara kostum dan properti teater.', icon: Icons.inventory_2),
+];
+
 const List<_WaktuOption> _waktuOptions = [
   _WaktuOption(name: 'Pagi', description: 'Di pagi hari yang cerah dan segar.', icon: Icons.light_mode),
   _WaktuOption(name: 'Siang', description: 'Mencuri waktu di siang hari yang terik.', icon: Icons.wb_sunny),
@@ -48,6 +57,7 @@ class AjakanMasturbasiDialog {
     required VoidCallback? onComplete,
     String? targetGender,
     bool isUserInitiated = false,  // true = user mengajak, false = partner mengajak
+    bool isStaffWithIdol = false,
   }) {
     final String myGender = character.gender.trim().toLowerCase();
     final String relLower = relationType.toLowerCase();
@@ -258,7 +268,7 @@ class AjakanMasturbasiDialog {
                   onPressed: () {
                     Navigator.pop(dialogContext);
                     if (isUserInitiated) {
-                      _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete);
+                      _showPilihTempat(context, character, relationType, viewerName, partnerDesc, onComplete, isStaffWithIdol: isStaffWithIdol);
                     } else {
                       _executeAccept(context, character, relationType, viewerName, partnerDesc,
                           preGeneratedLokasi!, preGeneratedWaktu!, onComplete);
@@ -289,8 +299,10 @@ class AjakanMasturbasiDialog {
     String relationType,
     String viewerName,
     String partnerDesc,
-    VoidCallback? onComplete,
-  ) {
+    VoidCallback? onComplete, {
+    bool isStaffWithIdol = false,
+  }) {
+    final availableLocations = isStaffWithIdol ? _lokasiTheaterOptions : _lokasiOptions;
     showDialog<_LokasiOption>(
       context: context,
       barrierDismissible: false,
@@ -320,41 +332,43 @@ class AjakanMasturbasiDialog {
           ),
           content: SizedBox(
             width: double.maxFinite,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: _lokasiOptions.map((loc) {
-                return Card(
-                  elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                  ),
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: isDark ? Colors.purple.shade900 : Colors.purple.shade50,
-                      child: Icon(loc.icon, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: availableLocations.map((loc) {
+                  return Card(
+                    elevation: 0,
+                    color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
-                    title: Text(
-                      loc.name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: isDark ? Colors.white : Colors.black87,
+                    child: ListTile(
+                      leading: CircleAvatar(
+                        backgroundColor: isDark ? Colors.purple.shade900 : Colors.purple.shade50,
+                        child: Icon(loc.icon, color: isDark ? Colors.purpleAccent : Colors.deepPurple),
                       ),
-                    ),
-                    subtitle: Text(
-                      loc.description,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.white70 : Colors.black54,
+                      title: Text(
+                        loc.name,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
+                        ),
                       ),
+                      subtitle: Text(
+                        loc.description,
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                      onTap: () => Navigator.pop(ctx, loc),
                     ),
-                    onTap: () => Navigator.pop(ctx, loc),
-                  ),
-                );
-              }).toList(),
+                  );
+                }).toList(),
+              ),
             ),
           ),
           actions: [

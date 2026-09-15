@@ -401,7 +401,8 @@ class AjakMakeLoveDialogue {
         final n = ciumNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -493,7 +494,8 @@ class AjakMakeLoveDialogue {
         final n = vVibNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -519,7 +521,8 @@ class AjakMakeLoveDialogue {
         final n = vVibNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -559,7 +562,8 @@ class AjakMakeLoveDialogue {
         final n = vFinNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -585,7 +589,8 @@ class AjakMakeLoveDialogue {
         final n = vFinNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -639,7 +644,8 @@ class AjakMakeLoveDialogue {
         final n = aVibNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -665,7 +671,8 @@ class AjakMakeLoveDialogue {
         final n = aVibNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -705,7 +712,8 @@ class AjakMakeLoveDialogue {
         final n = aFinNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -731,7 +739,8 @@ class AjakMakeLoveDialogue {
         final n = aFinNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -770,7 +779,8 @@ class AjakMakeLoveDialogue {
         final n = vaginaNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -795,7 +805,8 @@ class AjakMakeLoveDialogue {
         final n = vaginaNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -834,7 +845,8 @@ class AjakMakeLoveDialogue {
         final n = anusNodesLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -859,7 +871,8 @@ class AjakMakeLoveDialogue {
         final n = anusNodesNoLube[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -886,7 +899,8 @@ class AjakMakeLoveDialogue {
         final n = pNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -915,7 +929,8 @@ class AjakMakeLoveDialogue {
         final n = eNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -1216,7 +1231,8 @@ class AjakMakeLoveDialogue {
         final n = fNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -1261,7 +1277,8 @@ class AjakMakeLoveDialogue {
         final n = pNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,

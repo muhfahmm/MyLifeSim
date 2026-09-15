@@ -27,7 +27,8 @@ class VNChoiceOption {
 
 class VNDialogueNode {
   final String speakerName;
-  final String dialogueText;
+  final String _dialogueText;
+  final String Function()? dynamicDialogueText;
   final VNEmotionType emotion;
   final VNOutfitType outfit;
   final bool isPlayerSpeaking;
@@ -51,7 +52,8 @@ class VNDialogueNode {
 
   VNDialogueNode({
     required this.speakerName,
-    required this.dialogueText,
+    String dialogueText = '',
+    this.dynamicDialogueText,
     this.emotion = VNEmotionType.neutral,
     this.outfit = VNOutfitType.casual,
     this.isPlayerSpeaking = false,
@@ -64,7 +66,9 @@ class VNDialogueNode {
     this.persistentPosisiChoices,
     this.persistentOralChoices,
     this.persistentEjakulasiChoices,
-  });
+  }) : _dialogueText = dialogueText;
+
+  String get dialogueText => dynamicDialogueText != null ? dynamicDialogueText!() : _dialogueText;
 }
 
 class VNLogItem {

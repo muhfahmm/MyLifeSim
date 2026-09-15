@@ -98,11 +98,12 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     }
 
     final currentNode = widget.nodes[index];
+    final String currentText = currentNode.dialogueText;
 
     // Catat ke Log History
     _historyLog.add(VNLogItem(
       speakerName: currentNode.speakerName,
-      text: currentNode.dialogueText,
+      text: currentText,
     ));
 
     setState(() {
@@ -111,7 +112,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       _isTyping = true;
     });
 
-    _startTypewriter(currentNode.dialogueText);
+    _startTypewriter(currentText);
   }
 
   void _startTypewriter(String fullText) {

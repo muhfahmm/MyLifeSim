@@ -96,6 +96,8 @@ class DesahanUserLakiMakeLove {
     "Ngh... ahh...",
   ];
 
+  static final Map<String, List<String>> _shuffledPools = {};
+
   static String getRandomMoan([dynamic player]) {
     String trait = '';
     if (player is Character) {
@@ -103,18 +105,32 @@ class DesahanUserLakiMakeLove {
     } else if (player is Map<String, dynamic>) {
       trait = (player['personality'] ?? player['trait'] ?? '').toString().toLowerCase();
     }
+
+    String poolKey = 'kind';
     if (trait.contains('pemalu') || trait.contains('shy') || trait.contains('pendiam')) {
-      return _shyMoans[_random.nextInt(_shyMoans.length)];
+      poolKey = 'shy';
+    } else if (trait.contains('ekstrovert') || trait.contains('bold') || trait.contains('gairah') || trait.contains('percaya diri')) {
+      poolKey = 'bold';
     }
-    if (trait.contains('ekstrovert') || trait.contains('bold') || trait.contains('gairah') || trait.contains('percaya diri')) {
-      return _boldMoans[_random.nextInt(_boldMoans.length)];
+
+    List<String>? currentDeck = _shuffledPools[poolKey];
+    if (currentDeck == null || currentDeck.isEmpty) {
+      List<String> sourcePool;
+      switch (poolKey) {
+        case 'shy':
+          sourcePool = _shyMoans;
+          break;
+        case 'bold':
+          sourcePool = _boldMoans;
+          break;
+        default:
+          sourcePool = _kindMoans;
+          break;
+      }
+      currentDeck = List<String>.from(sourcePool)..shuffle(_random);
+      _shuffledPools[poolKey] = currentDeck;
     }
-    if (trait.contains('penyayang') || trait.contains('kind') || trait.contains('baik')) {
-      return _kindMoans[_random.nextInt(_kindMoans.length)];
-    }
-    final int category = _random.nextInt(3);
-    if (category == 0) return _shyMoans[_random.nextInt(_shyMoans.length)];
-    if (category == 1) return _boldMoans[_random.nextInt(_boldMoans.length)];
-    return _kindMoans[_random.nextInt(_kindMoans.length)];
+
+    return currentDeck.removeLast();
   }
 }

@@ -7,6 +7,8 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_npc_perempuan/desahan_npc_perempuan_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_laki/desahan_user_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_perempuan/desahan_user_perempuan_makelove.dart';
 
 enum NPCPerempuanPersonalityType { shy, bold, kind }
 
@@ -293,7 +295,6 @@ class DialogNpcPerempuanMakeLove {
     required List<VNDialogueNode> playerMoanNodes,
   }) {
     final String npcName = npc['name'] ?? 'Pasangan';
-    final Random rand = Random();
     final bool isPlayerMale = player.gender.trim().toLowerCase().contains('laki');
 
     final List<String> narrationLines = [
@@ -308,7 +309,6 @@ class DialogNpcPerempuanMakeLove {
     ];
 
     final List<VNDialogueNode> sequence = [];
-    int playerIndex = 0;
 
     // Pattern Wajib: 1. Narasi -> 2. Dialog Laki-Laki -> 3. Dialog Perempuan
     for (int i = 0; i < 35; i++) {
@@ -325,25 +325,6 @@ class DialogNpcPerempuanMakeLove {
       );
 
       final String narrationText = narrationLines[i % narrationLines.length];
-      final String rawMoan = DesahanNpcPerempuanMakeLove.getRandomMoan(npc);
-      
-      final int opt = rand.nextInt(4);
-      String moanWithCall;
-      switch (opt) {
-        case 0:
-          moanWithCall = "$callNpcToPlayer... $rawMoan";
-          break;
-        case 1:
-          moanWithCall = "$rawMoan, $callNpcToPlayer";
-          break;
-        case 2:
-          moanWithCall = "$rawMoan, $callNpcToPlayer...";
-          break;
-        case 3:
-        default:
-          moanWithCall = "Ahh... $callNpcToPlayer... $rawMoan";
-          break;
-      }
 
       final VNDialogueNode narrationNode = VNDialogueNode(
         speakerName: 'Narasi',
@@ -356,24 +337,59 @@ class DialogNpcPerempuanMakeLove {
 
       final VNDialogueNode npcPerempuanNode = VNDialogueNode(
         speakerName: '$npcName ($targetRole)',
-        dialogueText: moanWithCall,
+        dynamicDialogueText: () {
+          final String rawMoan = DesahanNpcPerempuanMakeLove.getRandomMoan(npc);
+          final int opt = Random().nextInt(4);
+          switch (opt) {
+            case 0:
+              return "$callNpcToPlayer... $rawMoan";
+            case 1:
+              return "$rawMoan, $callNpcToPlayer";
+            case 2:
+              return "$rawMoan, $callNpcToPlayer...";
+            default:
+              return "Ahh... $callNpcToPlayer... $rawMoan";
+          }
+        },
         emotion: VNEmotionType.blush,
         isPlayerSpeaking: false,
         outfit: VNOutfitType.casual,
         background: VNBackgroundType.bedroom,
       );
 
-      final VNDialogueNode playerNode = playerMoanNodes.isNotEmpty
-          ? playerMoanNodes[playerIndex % playerMoanNodes.length]
-          : VNDialogueNode(
-              speakerName: player.name,
-              dialogueText: "Ahh... hah... aku menyukaimu...",
-              emotion: VNEmotionType.blush,
-              isPlayerSpeaking: true,
-              outfit: VNOutfitType.casual,
-              background: VNBackgroundType.bedroom,
-            );
-      playerIndex++;
+      final VNDialogueNode playerNode = VNDialogueNode(
+        speakerName: player.name,
+        dynamicDialogueText: () {
+          final bool isPlayerMale = player.gender.trim().toLowerCase() == 'laki-laki';
+          final String callPlayerToNpc = PanggilanManager.getPanggilan(
+            targetName: npcName,
+            targetRole: targetRole,
+            targetGender: npcGender,
+            isSpeakerPlayer: true,
+            userName: player.name,
+            userGender: player.gender,
+            isIntimate: true,
+          );
+          final String rawMoan = isPlayerMale
+              ? DesahanUserLakiMakeLove.getRandomMoan(player)
+              : DesahanUserPerempuanMakeLove.getRandomMoan(player);
+          final int opt = Random().nextInt(4);
+          switch (opt) {
+            case 0:
+              return "$callPlayerToNpc... $rawMoan";
+            case 1:
+              return "$rawMoan, $callPlayerToNpc";
+            case 2:
+              return "$rawMoan, $callPlayerToNpc...";
+            default:
+              return "Ahh... $callPlayerToNpc... $rawMoan";
+          }
+        },
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: true,
+        outfit: VNOutfitType.casual,
+        background: VNBackgroundType.bedroom,
+      );
 
       // 1. Narasi
       sequence.add(narrationNode);

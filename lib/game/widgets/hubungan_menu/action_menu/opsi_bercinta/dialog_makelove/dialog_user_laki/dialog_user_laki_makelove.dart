@@ -315,7 +315,7 @@ class DialogUserLakiMakeLove {
         // Desahan Pemain
         sequence.add(VNDialogueNode(
           speakerName: player.name,
-          dialogueText: DesahanUserLakiMakeLove.getRandomMoan(player),
+          dynamicDialogueText: () => DesahanUserLakiMakeLove.getRandomMoan(player),
           emotion: VNEmotionType.blush,
           isPlayerSpeaking: true,
           outfit: VNOutfitType.casual,

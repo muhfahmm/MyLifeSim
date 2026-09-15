@@ -190,7 +190,8 @@ class AjakMasturbateDialogue {
         final n = ciumNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -216,7 +217,8 @@ class AjakMasturbateDialogue {
       final n = oralNodes[k];
       allNodes.add(VNDialogueNode(
         speakerName: n.speakerName,
-        dialogueText: n.dialogueText,
+        dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+        dynamicDialogueText: n.dynamicDialogueText,
         emotion: n.emotion,
         outfit: n.outfit,
         isPlayerSpeaking: n.isPlayerSpeaking,
@@ -237,7 +239,8 @@ class AjakMasturbateDialogue {
       final n = manualNodes[k];
       allNodes.add(VNDialogueNode(
         speakerName: n.speakerName,
-        dialogueText: n.dialogueText,
+        dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+        dynamicDialogueText: n.dynamicDialogueText,
         emotion: n.emotion,
         outfit: n.outfit,
         isPlayerSpeaking: n.isPlayerSpeaking,
@@ -278,7 +281,8 @@ class AjakMasturbateDialogue {
         final n = fNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,
@@ -320,7 +324,8 @@ class AjakMasturbateDialogue {
         final n = pNodes[k];
         allNodes.add(VNDialogueNode(
           speakerName: n.speakerName,
-          dialogueText: n.dialogueText,
+          dialogueText: n.dynamicDialogueText == null ? n.dialogueText : '',
+          dynamicDialogueText: n.dynamicDialogueText,
           emotion: n.emotion,
           outfit: n.outfit,
           isPlayerSpeaking: n.isPlayerSpeaking,

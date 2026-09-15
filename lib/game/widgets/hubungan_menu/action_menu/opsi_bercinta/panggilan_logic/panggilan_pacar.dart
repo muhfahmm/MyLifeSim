@@ -1,6 +1,5 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_pacar.dart
-
 import 'dart:math';
+import 'package:mylifesim/pilih_karakter/character.dart';
 
 /// Logika panggilan untuk hubungan Pasangan (Pacar, Tunangan, Suami, Istri).
 class PanggilanPacar {
@@ -16,9 +15,26 @@ class PanggilanPacar {
     String? userName,
     String? userGender,
     bool includeName = true,
+    Character? character,
   }) {
     final bool isUserMale = (userGender ?? '').toLowerCase().contains('laki') || (userGender ?? '').toLowerCase().contains('male');
     final bool isTargetFemale = (targetGender == null || targetGender.isEmpty || targetGender.toLowerCase().contains('perempuan') || targetGender.toLowerCase().contains('female') || targetGender.toLowerCase().contains('cewek'));
+
+    // Jika User adalah Staf Laki-laki dan NPC adalah Idol Perempuan
+    final bool isUserStaff = character != null && character.isIdolStaff;
+    final bool isDating = character != null && character.isAnyPartnerNameMatching(targetName);
+
+    if (!isSpeakerPlayer && isUserMale && isTargetFemale && isUserStaff) {
+      if (isDating) {
+        // Sudah PACAR RESMI: Idol perempuan memanggil staf laki-laki dengan "Om Sayang", "Om", "Sayang", atau "Mas"
+        final List<String> omPool = ['Om Sayang', 'Om', 'Sayang', 'Mas'];
+        return omPool[_random.nextInt(omPool.length)];
+      } else {
+        // BELUM BERPACARAN (Formal/Biasa): Idol perempuan memanggil staf laki-laki dengan "Om" atau "Pak"
+        final List<String> formalPool = ['Om', 'Pak', 'Staf', 'Mas'];
+        return formalPool[_random.nextInt(formalPool.length)];
+      }
+    }
 
     // Jika NPC (perempuan) memanggil User (laki-laki) yang merupakan pacar
     if (!isSpeakerPlayer && isUserMale && isTargetFemale) {
