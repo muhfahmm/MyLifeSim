@@ -28,6 +28,7 @@ import 'special_carrier/politikus_job_logic/politik_menu.dart';
 import 'special_carrier/military_job_logic/army_menu.dart';
 import 'special_carrier/aktor_film_job_logic/aktor_film_menu.dart';
 import 'special_carrier/pembisnis_job_logic/pembisnis_menu.dart';
+import 'special_carrier/astronot_job_logic/astronot_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -300,28 +301,36 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
   }
 
   void _resign() {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Resign Pekerjaan'),
-        content: Text('Apakah kamu yakin ingin keluar dari pekerjaanmu sebagai ${widget.character.jobName}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                widget.character.resignJob();
-              });
-              widget.onRefresh();
-            },
-            child: const Text('Ya, Keluar', style: TextStyle(color: Colors.red)),
-          ),
-        ],
+      title: 'Resign Pekerjaan 🚪',
+      content: Text(
+        'Apakah kamu yakin ingin keluar dari pekerjaanmu sebagai ${widget.character.jobName}?',
+        style: const TextStyle(fontSize: 12),
       ),
+      showCloseButton: false,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context, rootNavigator: true).pop(),
+          child: const Text('Batal', style: TextStyle(color: Colors.grey)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () {
+            Navigator.of(context, rootNavigator: true).pop();
+            setState(() {
+              widget.character.resignJob();
+            });
+            widget.onRefresh();
+          },
+          child: const Text('Ya, Keluar', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
@@ -354,6 +363,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
       return PembisnisMenuHelper.buildRolePage(
         character,
         () {
+          if (mounted) setState(() {});
+          widget.onRefresh();
+        },
+      );
+    }
+
+    if (character.jobName != null && character.jobName!.startsWith('Astronot:')) {
+      return AstronotMenuPage(
+        character: character,
+        onRefresh: () {
           if (mounted) setState(() {});
           widget.onRefresh();
         },

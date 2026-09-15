@@ -98,7 +98,13 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                       ),
                       title: Row(
                         children: [
-                          Text(widget.character.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                          Flexible(
+                            child: Text(
+                              widget.character.name,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

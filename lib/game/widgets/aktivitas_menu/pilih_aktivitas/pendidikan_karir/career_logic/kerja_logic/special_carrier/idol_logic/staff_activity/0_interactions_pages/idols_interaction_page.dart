@@ -5,7 +5,6 @@ import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
@@ -297,7 +296,6 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-
             // Aksi 1: Bercinta / Make Love (Hanya jika berpacaran dengan rekan kerja/staff)
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
               _buildActionTile(
@@ -315,7 +313,6 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   }
                 },
               ),
-              // Aksi 1b: Ajak Masturbasi Bersama (Premium)
               if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
                 _buildActionTile(
                   icon: Icons.flash_on,
@@ -324,7 +321,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   onTap: () {
                     int successChance = PersentaseAjakan.getSuccessChance(
                       character: widget.character,
-                      relationType: role, // 'Rekan Kerja', 'Atasan', 'Anggota Trainee', dll
+                      relationType: role,
                       viewerName: name,
                     );
                     final bool success = _random.nextInt(100) < successChance;
@@ -498,46 +495,6 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
               ),
             ],
 
-            // Aksi Minta Naik Gaji (Khusus General Manager)
-            if (role == 'General Manager') ...[
-              _buildActionTile(
-                icon: Icons.monetization_on_outlined,
-                color: Colors.green,
-                title: 'Minta Naik Gaji',
-                onTap: () {
-                  if (widget.character.idolSalaryRaiseCount >= 2) {
-                    _showOutcome('Minta Naik Gaji 🚫', 'General Manager menolak mentah-mentah permintaanmu. Kamu sudah mencapai batas maksimal kenaikan gaji (1-2 kali)!');
-                    return;
-                  }
-
-                  final bool isTrainee = widget.character.jobName == 'Idol (Trainee)';
-                  final bool isMainTeam = widget.character.jobName == 'Idol (Main Performer)';
-
-                  int successChance = 0;
-                  if (isTrainee) {
-                    successChance = 20;
-                  } else if (isMainTeam) {
-                    successChance = 40;
-                  }
-
-                  final bool success = _random.nextInt(100) < successChance;
-                  if (success) {
-                    setState(() {
-                      widget.character.idolSalaryRaiseCount++;
-                      int currentSalary = widget.character.jobSalary ?? 1000;
-                      int raiseAmount = (currentSalary * 0.20).toInt(); // Naik 20%
-                      widget.character.jobSalary = currentSalary + raiseAmount;
-                    });
-                    _updateRelationship(10);
-                    _showOutcome('Naik Gaji Berhasil! 💰', 'Selamat! General Manager menyetujui permintaanmu. Gajimu naik menjadi \$${widget.character.jobSalary} per bulan!');
-                  } else {
-                    _updateRelationship(-8);
-                    _showOutcome('Naik Gaji Gagal ❌', 'General Manager menolak permintaan naik gajimu. Dia merasa kinerjamu saat ini belum cukup menonjol.');
-                  }
-                },
-              ),
-            ],
-
             // Aksi 3: Percakapan (Mengobrol)
             _buildActionTile(
               icon: Icons.chat_bubble_outline,
@@ -547,62 +504,46 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                 final change = 5 + _random.nextInt(6);
                 _updateRelationship(change);
                 widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                _showOutcome('Percakapan', 'Kamu mengobrol santai dengan $name mengenai persiapan event handshake mendatang. Hubungan meningkat!');
+                _showOutcome('Percakapan', 'Kamu mengobrol santai dengan $name mengenai koordinasi operasional dan manajemen agensi.');
               },
             ),
 
-            // Aksi 4: Latihan Bareng (Khusus Rekan Idol)
-            if (widget.category != 'Staff') ...[
-              _buildActionTile(
-                icon: Icons.accessibility_new,
-                color: Colors.pink,
-                title: 'Latihan Bareng',
-                onTap: () {
-                  final change = 6 + _random.nextInt(7);
-                  _updateRelationship(change);
-                  _showOutcome('Latihan Bareng 💃', 'Kamu mengajak $name latihan blocking panggung tambahan. Kerja sama tim kalian semakin meningkat!');
-                },
-              ),
-            ],
+            // Aksi 4: Pengarahan & Evaluasi Kinerja (Khusus Staff)
+            _buildActionTile(
+              icon: Icons.assignment_turned_in,
+              color: Colors.indigo,
+              title: 'Pengarahan & Evaluasi',
+              onTap: () {
+                final change = 4 + _random.nextInt(6);
+                _updateRelationship(change);
+                _showOutcome('Pengarahan & Evaluasi 📋', 'Kamu mendiskusikan evaluasi kinerja operasional bersama $name. Sinergi kerja tim semakin membaik!');
+              },
+            ),
 
-            // Aksi 5: Minta Masukan (Khusus Staff)
-            if (widget.category == 'Staff') ...[
-              _buildActionTile(
-                icon: Icons.feedback_outlined,
-                color: Colors.indigo,
-                title: 'Minta Masukan',
-                onTap: () {
-                  final change = 4 + _random.nextInt(5);
-                  _updateRelationship(change);
-                  _showOutcome('Minta Masukan 📋', 'Kamu meminta evaluasi penampilan teatermu kepada $name. Dia memberimu kiat-kiat yang sangat membantu!');
-                },
-              ),
-            ],
-
-            // Aksi 6: Cari Muka / Sanjung
+            // Aksi 5: Puji Kinerja
             _buildActionTile(
               icon: Icons.thumb_up_alt_outlined,
               color: Colors.teal,
-              title: widget.category == 'Staff' ? 'Cari Muka (Puji)' : 'Berikan Pujian',
+              title: 'Apresiasi Kinerja',
               onTap: () {
                 final success = _random.nextBool();
                 if (success) {
                   final change = 6 + _random.nextInt(6);
                   _updateRelationship(change);
-                  _showOutcome('Pujian Berhasil', 'Kamu memberikan pujian yang tulus kepada $name. Dia tersenyum senang dan menghargai perkataanmu!');
+                  _showOutcome('Apresiasi Berhasil ✨', 'Kamu memberikan pujian atas kerja keras $name. Dia merasa dihargai dan semakin bersemangat!');
                 } else {
                   final change = 5 + _random.nextInt(6);
                   _updateRelationship(-change);
-                  _showOutcome('Pujian Gagal', 'Kamu mencoba memuji $name, namun dia merasa kamu hanya mencari muka dan menanggapinya dengan dingin.');
+                  _showOutcome('Apresiasi Canggung', 'Kamu mencoba memberikan pujian, namun $name merasa tanggapanmu agak formal.');
                 }
               },
             ),
 
-            // Aksi 7: Gift
+            // Aksi 6: Berikan Hadiah
             _buildActionTile(
               icon: Icons.card_giftcard,
               color: Colors.purple,
-              title: 'Gift',
+              title: 'Berikan Hadiah',
               onTap: () {
                 if (widget.character.money < 20) {
                   _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki cukup uang untuk membelikan hadiah.');
@@ -612,53 +553,21 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                 widget.character.money -= 20;
                 _updateRelationship(change);
                 widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
-                _showOutcome('Memberi Hadiah 🎁', 'Kamu memberikan cinderamata kecil untuk $name. Dia sangat gembira menerima pemberianmu!');
+                _showOutcome('Memberi Hadiah 🎁', 'Kamu memberikan kenang-kenangan kecil untuk $name. Dia sangat gembira!');
               },
             ),
 
-            // Aksi 8: Menggoda
-            _buildActionTile(
-              icon: Icons.favorite_border,
-              color: Colors.pinkAccent,
-              title: 'Menggoda',
-              onTap: () {
-                if (_random.nextInt(100) < 40) {
-                  final change = 6 + _random.nextInt(6);
-                  _updateRelationship(-change);
-                  _showOutcome('Gagal Menggoda 💔', 'Kamu mencoba menggoda $name, tapi suasananya terasa agak canggung dan dia mengalihkan pembicaraan.');
-                } else {
-                  final change = 5 + _random.nextInt(11);
-                  _updateRelationship(change);
-                  widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
-                  _showOutcome('Menggoda Berhasil 💖', 'Kamu menggoda $name dengan candaan manis. Dia tersenyum tersipu malu!');
-                }
-              },
-            ),
-
-            // Aksi 9: Bertingkah Laku
-            _buildActionTile(
-              icon: Icons.emoji_people,
-              color: Colors.blueAccent,
-              title: 'Bertingkah Laku',
-              onTap: () {
-                final change = 3 + _random.nextInt(8);
-                _updateRelationship(change);
-                widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
-                _showOutcome('Bertingkah Laku', 'Kamu menunjukkan sikap sopan santun dan kedewasaan di depan $name. Dia sangat menghargaimu!');
-              },
-            ),
-
-            // Aksi 10: Hina
+            // Aksi 7: Hina
             _buildActionTile(
               icon: Icons.sentiment_very_dissatisfied,
               color: Colors.red,
-              title: 'Hina',
+              title: 'Kritik Pedas / Hina',
               onTap: () {
                 final change = 10 + _random.nextInt(11);
                 _updateRelationship(-change);
                 widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
                 widget.character.karma = (widget.character.karma - 5).clamp(0, 100);
-                _showOutcome('Menghina 😡', 'Kamu mengejek cara bernyanyi/kinerja $name. Dia sangat marah dan terluka atas perkataanmu.');
+                _showOutcome('Kritik Pedas 😡', 'Kamu memberikan kritik pedas atas kinerja $name. Dia merasa sangat kesal.');
               },
             ),
           ],

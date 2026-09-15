@@ -309,7 +309,43 @@ class Character {
 
   // --- FIELD PEKERJAAN IDOL ---
   bool get isIdol => jobName == 'Idol (Trainee)' || jobName == 'Idol (Main Performer)';
-  bool get isIdolStaff => jobName == 'General Manager Idol' || jobName == 'Deputy General Manager Idol' || jobName == 'Staf Operasional Idol';
+  bool get isIdolStaff =>
+      jobName == 'General Manager Idol' ||
+      jobName == 'Deputy General Manager Idol' ||
+      jobName == 'Staf Operasional Idol' ||
+      (jobName != null && _idolStaffRoleSet.contains(jobName));
+
+  static const Set<String> _idolStaffRoleSet = {
+    'General Manager',
+    'Deputy General Manager',
+    'Manajer Divisi Promosi',
+    'Manajer Divisi Operasional',
+    'Manajer Divisi Keuangan',
+    'Staf HRD',
+    'Staf Administrasi',
+    'Staf Administrasi Kontrak',
+    'Pelatih Tari (Koreografer)',
+    'Pelatih Vokal',
+    'Pelatih Akting/MC',
+    'Stage Manager',
+    'Sound Engineer',
+    'Lighting Engineer',
+    'Staf Backstage',
+    'Staf Properti Panggung',
+    'Fotografer Resmi',
+    'Videografer Resmi',
+    'Editor Video',
+    'Desainer Grafis',
+    'Pengelola Sosial Media',
+    'Koordinator Merchandise',
+    'Staf Merchandise',
+    'Staf Penjualan Toko',
+    'Makeup Artist (MUA)',
+    'Staf Kostum',
+    'Petugas Keamanan',
+    'Staf Tiket',
+    'Penjaga Pintu Masuk',
+  };
   bool get isIdolRelated => isIdol || isIdolStaff;
   bool get isEsport => (jobName ?? '').contains('Esport') || (jobName ?? '').contains('E-Sport');
   int yearsInTrainee = 0;

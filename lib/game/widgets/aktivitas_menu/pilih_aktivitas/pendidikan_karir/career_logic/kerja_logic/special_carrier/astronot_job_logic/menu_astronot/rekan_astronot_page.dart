@@ -1,25 +1,25 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/aktor_film_job_logic/menu_aktor/rekan_artis_page.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/astronot_job_logic/menu_astronot/rekan_astronot_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
-class RekanArtisPage extends StatefulWidget {
+class RekanAstronotPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
 
-  const RekanArtisPage({
+  const RekanAstronotPage({
     super.key,
     required this.character,
     required this.onRefresh,
   });
 
   @override
-  State<RekanArtisPage> createState() => _RekanArtisPageState();
+  State<RekanAstronotPage> createState() => _RekanAstronotPageState();
 }
 
-class _RekanArtisPageState extends State<RekanArtisPage> {
+class _RekanAstronotPageState extends State<RekanAstronotPage> {
   @override
   void initState() {
     super.initState();
@@ -39,8 +39,8 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Co-Star & Kru Produksi 🎬👥'),
-        backgroundColor: Colors.purple.shade900,
+        title: const Text('Rekan Kosmonot & Kru Stasiun 👨‍🚀🛰️'),
+        backgroundColor: Colors.indigo.shade900,
         foregroundColor: Colors.white,
       ),
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -52,13 +52,13 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
 
           const SizedBox(height: 12),
 
-          // KARTU REKAN ARTIS & KRU LAINNYA
+          // KARTU REKAN ASTRONOT LAINNYA
           if (coworkers.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.only(top: 32.0),
                 child: Text(
-                  'Belum ada data rekan artis / co-star di project ini.',
+                  'Belum ada data astronot / kosmonot di lembaga ini.',
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.grey,
                     fontSize: 14,
@@ -74,21 +74,21 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
   }
 
   Widget _buildUserCard(bool isDark, String userAvatarUrl) {
-    String userRole = widget.character.jobName ?? 'Aktor';
-    if (userRole.startsWith('Aktor Film:')) {
-      userRole = userRole.replaceAll('Aktor Film:', '').trim();
+    String userRole = widget.character.jobName ?? 'Astronot';
+    if (userRole.startsWith('Astronot:')) {
+      userRole = userRole.replaceAll('Astronot:', '').trim();
     }
 
     final String userTitleDisplay = '${widget.character.name} - $userRole';
 
     return Card(
       elevation: 0,
-      color: isDark ? Colors.grey.shade800 : Colors.purple.shade50,
+      color: isDark ? Colors.grey.shade800 : Colors.indigo.shade50,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isDark ? Colors.purple.shade400 : Colors.purple.shade300,
+          color: isDark ? Colors.indigo.shade400 : Colors.indigo.shade300,
           width: 1.5,
         ),
       ),
@@ -104,7 +104,7 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
                 userTitleDisplay,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
+                  color: isDark ? Colors.indigo.shade200 : Colors.indigo.shade900,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -112,7 +112,7 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(
-                color: Colors.purple.shade700,
+                color: Colors.indigo.shade700,
                 borderRadius: BorderRadius.circular(6),
               ),
               child: const Text(
@@ -137,12 +137,12 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
   }
 
   Widget _buildCoworkerCard(Map<String, String> cm, bool isDark) {
-    final String name = cm['name'] ?? 'Rekan Artis';
+    final String name = cm['name'] ?? 'Astronot';
     final String gender = cm['gender'] ?? 'Laki-laki';
-    final String role = cm['role'] ?? cm['title'] ?? 'Co-Star';
-    final int age = int.tryParse(cm['age'] ?? '30') ?? 30;
+    final String role = cm['role'] ?? cm['title'] ?? 'Kosmonot Senior';
+    final int age = int.tryParse(cm['age'] ?? '35') ?? 35;
     final int rel = int.tryParse(cm['relationship'] ?? '50') ?? 50;
-    final int intel = int.tryParse(cm['intelligence'] ?? '70') ?? 70;
+    final int intel = int.tryParse(cm['intelligence'] ?? '75') ?? 75;
 
     final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
       name: name,

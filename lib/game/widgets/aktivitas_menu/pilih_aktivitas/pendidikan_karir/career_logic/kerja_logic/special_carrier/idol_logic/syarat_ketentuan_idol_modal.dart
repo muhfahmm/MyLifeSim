@@ -7,15 +7,18 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'persentase_tawaran_idol.dart';
 import 'idol_manager.dart';
+import 'idol_menu.dart';
 
 class SyaratKetentuanIdolModal extends StatelessWidget {
   final Character character;
   final VoidCallback onRefresh;
+  final BuildContext parentContext;
 
   const SyaratKetentuanIdolModal({
     super.key,
     required this.character,
     required this.onRefresh,
+    required this.parentContext,
   });
 
   /// Static helper untuk menampilkan Modal Pendaftaran & Syarat Ketentuan Idol
@@ -30,6 +33,7 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
       builder: (ctx) => SyaratKetentuanIdolModal(
         character: character,
         onRefresh: onRefresh,
+        parentContext: context,
       ),
     );
   }
@@ -43,13 +47,13 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
     final int discipline = character.discipline;
     final bool hasGraduated = character.hasGraduatedIdol;
 
-    // Menentukan jenis posisi yang tersedia berdasarkan usia dan riwayat
-    final bool isStaffOnly = (age >= 18) || (hasGraduated && age >= 18);
+    // Menentukan jenis posisi yang tersedia berdasarkan gender, usia, dan riwayat
+    final bool isStaffOnly = !isPerempuan || (age >= 18) || hasGraduated;
     final String targetJobTitle = isStaffOnly ? 'Staf Operasional Idol' : 'Idol (Trainee)';
 
     // Syarat kelayakan dasar
     final bool isGenderValid = isPerempuan || isStaffOnly;
-    final bool isAgeValid = (age >= 10 && age <= 17) || (isStaffOnly && age >= 18);
+    final bool isAgeValid = (isStaffOnly && age >= 18) || (!isStaffOnly && age >= 10 && age <= 17);
     final bool isHealthValid = health >= 80;
     final bool isDisciplineValid = discipline >= 75;
     final bool isEligible = isGenderValid && isAgeValid && isHealthValid && isDisciplineValid;
@@ -88,7 +92,7 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Pendaftaran Audisi Idol',
+                          isStaffOnly ? 'Pendaftaran Staf Idol' : 'Pendaftaran Audisi Idol',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -149,7 +153,7 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Peluang Lolos Audisi',
+                            isStaffOnly ? 'Peluang Lolos Rekrutmen Staf' : 'Peluang Lolos Audisi',
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
@@ -313,7 +317,15 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
                         elevation: isEligible ? 3 : 0,
                       ),
                       onPressed: () {
-                        _prosesLamaran(context, targetJobTitle, baseSalary, chancePercent);
+                        if (!isEligible) {
+                          _prosesLamaran(context, targetJobTitle, baseSalary, chancePercent);
+                          return;
+                        }
+                        if (isStaffOnly) {
+                          _showPilihPosisiStafModal(context, chancePercent);
+                        } else {
+                          _prosesLamaran(context, targetJobTitle, baseSalary, chancePercent);
+                        }
                       },
                       child: Text(
                         isStaffOnly ? 'Daftar Staf Idol 💼' : 'Kirim Lamaran Audisi 🌟',
@@ -327,6 +339,231 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+
+  static const List<Map<String, dynamic>> _staffCategories = [
+    {
+      'dept': 'Manajemen Puncak & Admin',
+      'emoji': '🏢',
+      'roles': [
+        {'title': 'General Manager', 'salary': 1500, 'icon': Icons.stars},
+        {'title': 'Deputy General Manager', 'salary': 1200, 'icon': Icons.business_center},
+        {'title': 'Manajer Divisi Operasional', 'salary': 800, 'icon': Icons.settings},
+        {'title': 'Manajer Divisi Promosi', 'salary': 800, 'icon': Icons.campaign},
+        {'title': 'Manajer Divisi Keuangan', 'salary': 800, 'icon': Icons.attach_money},
+        {'title': 'Staf HRD', 'salary': 600, 'icon': Icons.people},
+        {'title': 'Staf Administrasi', 'salary': 500, 'icon': Icons.assignment},
+      ],
+    },
+    {
+      'dept': 'Tim Pelatihan (Trainer)',
+      'emoji': '🎓',
+      'roles': [
+        {'title': 'Pelatih Tari (Koreografer)', 'salary': 750, 'icon': Icons.directions_run},
+        {'title': 'Pelatih Vokal', 'salary': 750, 'icon': Icons.mic},
+        {'title': 'Pelatih Akting/MC', 'salary': 700, 'icon': Icons.theater_comedy},
+      ],
+    },
+    {
+      'dept': 'Tim Produksi Teater & Acara',
+      'emoji': '🎭',
+      'roles': [
+        {'title': 'Stage Manager', 'salary': 700, 'icon': Icons.movie},
+        {'title': 'Sound Engineer', 'salary': 650, 'icon': Icons.graphic_eq},
+        {'title': 'Lighting Engineer', 'salary': 600, 'icon': Icons.lightbulb},
+        {'title': 'Staf Backstage', 'salary': 450, 'icon': Icons.door_sliding},
+        {'title': 'Staf Properti Panggung', 'salary': 450, 'icon': Icons.inventory_2},
+      ],
+    },
+    {
+      'dept': 'Tim Kreatif & Konten Digital',
+      'emoji': '🎨',
+      'roles': [
+        {'title': 'Videografer Resmi', 'salary': 650, 'icon': Icons.videocam},
+        {'title': 'Fotografer Resmi', 'salary': 600, 'icon': Icons.camera_alt},
+        {'title': 'Pengelola Sosial Media', 'salary': 600, 'icon': Icons.smartphone},
+        {'title': 'Editor Video', 'salary': 600, 'icon': Icons.movie_edit},
+        {'title': 'Desainer Grafis', 'salary': 550, 'icon': Icons.palette},
+      ],
+    },
+    {
+      'dept': 'Tim Merchandise & Official Store',
+      'emoji': '🛍️',
+      'roles': [
+        {'title': 'Koordinator Merchandise', 'salary': 550, 'icon': Icons.card_giftcard},
+        {'title': 'Staf Merchandise', 'salary': 400, 'icon': Icons.shopping_bag},
+        {'title': 'Staf Penjualan Toko', 'salary': 400, 'icon': Icons.storefront},
+      ],
+    },
+    {
+      'dept': 'Tim MUA & Kostum',
+      'emoji': '💄',
+      'roles': [
+        {'title': 'Makeup Artist (MUA)', 'salary': 550, 'icon': Icons.brush},
+        {'title': 'Staf Kostum', 'salary': 450, 'icon': Icons.checkroom},
+      ],
+    },
+    {
+      'dept': 'Tim Keamanan & Operasional Teater',
+      'emoji': '🛡️',
+      'roles': [
+        {'title': 'Petugas Keamanan', 'salary': 500, 'icon': Icons.security},
+        {'title': 'Staf Tiket', 'salary': 400, 'icon': Icons.confirmation_number},
+        {'title': 'Penjaga Pintu Masuk', 'salary': 400, 'icon': Icons.sensor_door},
+      ],
+    },
+  ];
+
+  void _showPilihPosisiStafModal(BuildContext context, int chancePercent) {
+    showDialog(
+      context: context,
+      builder: (dialogCtx) {
+        final bool isDark = Theme.of(dialogCtx).brightness == Brightness.dark;
+
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+          backgroundColor: isDark ? const Color(0xFF1E1E2C) : Colors.white,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+          child: Container(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.of(context).size.height * 0.85,
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Colors.orange.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Text('👔', style: TextStyle(fontSize: 24)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Pilih Posisi Staf Idol 📋',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          Text(
+                            'Pilih spesialisasi / divisi pekerjaanmu',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: isDark ? Colors.white60 : Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(dialogCtx),
+                      icon: Icon(Icons.close, color: isDark ? Colors.white54 : Colors.grey),
+                    ),
+                  ],
+                ),
+                const Divider(),
+                const SizedBox(height: 8),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: _staffCategories.length,
+                    itemBuilder: (context, catIdx) {
+                      final category = _staffCategories[catIdx];
+                      final String deptName = category['dept'];
+                      final String emoji = category['emoji'];
+                      final List<Map<String, dynamic>> roles = category['roles'];
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+                            child: Row(
+                              children: [
+                                Text(emoji, style: const TextStyle(fontSize: 16)),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    deptName,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.pink.shade700,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          ...roles.map((role) {
+                            final String title = role['title'];
+                            final int salary = role['salary'];
+                            final IconData icon = role['icon'];
+
+                            return Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.only(bottom: 6),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                side: BorderSide(
+                                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade200,
+                                ),
+                              ),
+                              color: isDark ? Colors.grey.shade900 : const Color(0xFFFAFAFA),
+                              child: ListTile(
+                                dense: true,
+                                leading: CircleAvatar(
+                                  radius: 16,
+                                  backgroundColor: Colors.pink.shade50,
+                                  child: Icon(icon, size: 18, color: Colors.pink.shade700),
+                                ),
+                                title: Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 13,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                  ),
+                                ),
+                                subtitle: Text(
+                                  'Gaji: ${CurrencySettings.format(salary)} / bulan',
+                                  style: const TextStyle(
+                                    fontSize: 11,
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                trailing: const Icon(Icons.arrow_forward_ios, size: 12, color: Colors.grey),
+                                onTap: () {
+                                  Navigator.pop(dialogCtx); // Pop position selection dialog
+                                  _prosesLamaran(context, title, salary, chancePercent);
+                                },
+                              ),
+                            );
+                          }),
+                          const SizedBox(height: 8),
+                        ],
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -443,6 +680,7 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
 
       if (targetJobTitle == 'Idol (Trainee)' || character.isIdolStaff) {
         IdolManager.initializeTraineeTeam(character);
+        IdolManager.syncUserStaffRole(character);
       }
 
       if (!character.ownedLicenses.contains('Idol')) {
@@ -451,62 +689,66 @@ class SyaratKetentuanIdolModal extends StatelessWidget {
 
       onRefresh();
 
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (dialogCtx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Row(
-            children: [
-              Text('🎉', style: TextStyle(fontSize: 26)),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text('Selamat! Lolos Audisi! 🎤', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ],
-          ),
-          content: Text(
-            'Dewan juri terpesona dengan penampilanmu! '
-            'Kamu resmi diterima sebagai $targetJobTitle dengan gaji ${CurrencySettings.format(baseSalary)}/bulan.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                final nav = Navigator.of(context);
-                Navigator.pop(dialogCtx); // Pop alert dialog
-                Navigator.pop(context);   // Pop SyaratKetentuanIdolModal
-                nav.pop();                // Pop PekerjaanSpesialMenuScreen (returns to Pekerjaan & Karir)
-              },
-              child: const Text('Masuk ke Agensi Idol ⭐', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
+        title: '🎉 Selamat! Lolos Rekrutmen! 🎤',
+        content: Text(
+          'Dewan juri terpesona dengan kualifikasimu! '
+          'Kamu resmi diterima sebagai $targetJobTitle dengan gaji ${CurrencySettings.format(baseSalary)}/bulan.',
+          style: const TextStyle(fontSize: 12),
         ),
+        showCloseButton: false,
+        actions: [
+          Builder(
+            builder: (btnContext) => ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pink.shade700,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () {
+                // 1. Pop all popup dialogs (DialogHelper & SyaratKetentuanIdolModal) at once
+                Navigator.of(btnContext).popUntil((route) => route is! PopupRoute);
+                
+                // 2. Refresh state so parent KerjaMenu converts its view to IdolMenuScreen
+                onRefresh();
+
+                // 3. Pop PekerjaanSpesialMenuScreen to land directly on KerjaMenu (now IdolMenuScreen)
+                if (parentContext.mounted && Navigator.of(parentContext).canPop()) {
+                  Navigator.of(parentContext).pop();
+                }
+              },
+              child: const Text('Masuk ke Agensi Idol ⭐', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            ),
+          ),
+        ],
       );
     } else {
       // GAGAL AUDISI
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Row(
-            children: [
-              Text('📢', style: TextStyle(fontSize: 26)),
-              SizedBox(width: 8),
-              Expanded(
-                child: Text('Hasil Audisi Idol', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-              ),
-            ],
-          ),
-          content: const Text(
-            'Dewan juri mengapresiasi usahamu, namun persaingan generasi kali ini sangat ketat. '
-            'Tingkatkan atribut kecerdasan, kesehatan, dan kedisiplinanmu lalu coba lagi di kesempatan berikutnya!',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
+        title: '📢 Hasil Seleksi Idol',
+        content: const Text(
+          'Dewan juri mengapresiation usahamu, namun persaingan generasi kali ini sangat ketat. '
+          'Tingkatkan atribut kecerdasan, kesehatan, dan kedisiplinanmu lalu coba lagi di kesempatan berikutnya!',
+          style: TextStyle(fontSize: 12),
         ),
+        showCloseButton: false,
+        actions: [
+          Builder(
+            builder: (btnContext) => ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.grey.shade700,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              ),
+              onPressed: () => Navigator.pop(btnContext),
+              child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+            ),
+          ),
+        ],
       );
     }
   }

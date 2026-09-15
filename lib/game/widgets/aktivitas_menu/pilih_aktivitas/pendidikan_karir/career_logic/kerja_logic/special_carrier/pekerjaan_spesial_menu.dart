@@ -215,12 +215,15 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
             ValueListenableBuilder<bool>(
               valueListenable: GlobalSettings.isIdolUnlocked,
               builder: (context, isUnlocked, _) {
+                final bool isMale = character.gender.toLowerCase() == 'laki-laki';
                 return _buildMenuTile(
                   context: context,
-                  icon: Icons.mic,
-                  color: Colors.pinkAccent.shade400,
-                  title: 'Idol 🎤',
-                  subtitle: 'Latihan vokal & dance, konser panggung, dan agensi entertainment',
+                  icon: isMale ? Icons.badge : Icons.mic,
+                  color: isMale ? Colors.deepPurple : Colors.pinkAccent.shade400,
+                  title: isMale ? 'Staff Idol 🎤' : 'Idol 🎤',
+                  subtitle: isMale
+                      ? 'Manajemen agensi, perekrutan trainee, & operasional grup idol'
+                      : 'Latihan vokal & dance, konser panggung, dan agensi entertainment',
                   minAge: 10,
                   isPurchased: isUnlocked,
                   onTap: () async {

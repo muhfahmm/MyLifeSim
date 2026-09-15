@@ -197,7 +197,13 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                               ),
                               title: Row(
                                 children: [
-                                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  Flexible(
+                                    child: Text(
+                                      name,
+                                      style: const TextStyle(fontWeight: FontWeight.bold),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                   if (widget.character.isAnyPartnerNameMatching(name)) ...[
                                     const SizedBox(width: 8),
                                     Container(

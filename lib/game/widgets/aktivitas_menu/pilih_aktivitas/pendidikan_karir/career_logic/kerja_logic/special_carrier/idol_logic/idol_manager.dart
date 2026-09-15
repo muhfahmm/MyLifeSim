@@ -258,6 +258,18 @@ class IdolManager {
       final tiketRoles = ['Staf Tiket', 'Penjaga Pintu Masuk'];
       addStaff(tiketRoles[rand.nextInt(tiketRoles.length)], 'Tim Keamanan & Operasional Teater', minAge: 20, maxAge: 38);
     }
+
+    // Deduct 1 NPC holding the exact role the user occupies to respect capacity limits (e.g. GM, Deputy GM, Manager)
+    syncUserStaffRole(character);
+  }
+
+  static void syncUserStaffRole(Character character) {
+    if (character.isIdolStaff && character.jobName != null) {
+      final index = character.idolStaff.indexWhere((s) => s['role'] == character.jobName);
+      if (index != -1) {
+        character.idolStaff.removeAt(index);
+      }
+    }
   }
 
   // Core hook triggered during character's ageUp
@@ -393,9 +405,9 @@ class IdolManager {
       }
     }
     
-    // Ensure GM and Deputy GM exist
-    bool hasGM = character.idolStaff.any((s) => s['role'] == 'General Manager');
-    bool hasDeputy = character.idolStaff.any((s) => s['role'] == 'Deputy General Manager');
+    // Ensure GM and Deputy GM exist (unless filled by the user)
+    bool hasGM = character.idolStaff.any((s) => s['role'] == 'General Manager') || character.jobName == 'General Manager';
+    bool hasDeputy = character.idolStaff.any((s) => s['role'] == 'Deputy General Manager') || character.jobName == 'Deputy General Manager';
     if (!hasGM) {
       character.idolStaff.add({
         'name': _generateName(rand.nextBool() ? 'Laki-laki' : 'Perempuan', rand, character),

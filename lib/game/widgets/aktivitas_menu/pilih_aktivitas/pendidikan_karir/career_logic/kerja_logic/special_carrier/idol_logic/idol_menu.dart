@@ -4,11 +4,17 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'idol_manager.dart';
 
-import 'idol_activity/staff_manajemen/staf_manajemen.dart';
-import 'idol_activity/anggota_tim_utama/tim_utama.dart';
-import 'idol_activity/anggota_trainee/anggota_trainee.dart';
-import 'idol_activity/aktivitas/aktivitas_panggung.dart';
-import 'idol_activity/berita_idol/berita_idol.dart';
+import 'idol_activity/staff_manajemen/staf_manajemen.dart' as idol_staff;
+import 'idol_activity/anggota_tim_utama/tim_utama.dart' as idol_utama;
+import 'idol_activity/anggota_trainee/anggota_trainee.dart' as idol_trainee;
+import 'idol_activity/aktivitas/aktivitas_panggung.dart' as idol_akt;
+import 'idol_activity/berita_idol/berita_idol.dart' as idol_berita;
+
+import 'staff_activity/staff_manajemen/staf_manajemen.dart' as staff_man;
+import 'staff_activity/anggota_tim_utama/tim_utama.dart' as staff_utama;
+import 'staff_activity/anggota_trainee/anggota_trainee.dart' as staff_trainee;
+import 'staff_activity/aktivitas/aktivitas_manajemen.dart' as staff_akt;
+import 'staff_activity/berita_idol/berita_idol.dart' as staff_berita;
 
 class IdolMenuScreen extends StatefulWidget {
   final Character character;
@@ -49,67 +55,66 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
             : 'Apakah kamu yakin ingin mengundurkan diri sebagai Trainee Idol?')
         : 'Apakah kamu yakin ingin berhenti bekerja di grup Idol ini?';
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (dialogContext) {
-        final bool isDark = Theme.of(dialogContext).brightness == Brightness.dark;
-        return AlertDialog(
-          backgroundColor: isDark ? Colors.grey.shade900 : null,
-          title: Text(title, style: TextStyle(color: isDark ? Colors.white : Colors.black87)),
-          content: Text(content, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text('Batal', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-            ),
-            TextButton(
-              onPressed: () {
-                final bool wasIdol = char.isIdol;
-                final bool wasMain = isMain;
-                final navigator = Navigator.of(context);
-                Navigator.pop(dialogContext); // Pop confirmation dialog
+      title: title,
+      content: Text(content),
+      showCloseButton: false,
+      actions: [
+        Builder(
+          builder: (dialogContext) => TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal'),
+          ),
+        ),
+        Builder(
+          builder: (dialogContext) => TextButton(
+            onPressed: () {
+              final bool wasIdol = char.isIdol;
+              final bool wasMain = isMain;
+              final navigator = Navigator.of(context);
+              Navigator.pop(dialogContext); // Pop confirmation dialog
 
-                setState(() {
-                  if (wasIdol && wasMain) {
-                    widget.character.hasGraduatedIdol = true;
-                  }
-                  widget.character.resignJob();
-                  widget.character.idolTrainees.clear();
-                  widget.character.idolMainMembers.clear();
-                  widget.character.idolStaff.clear();
-                });
-                widget.onRefresh();
+              setState(() {
+                if (wasIdol && wasMain) {
+                  widget.character.hasGraduatedIdol = true;
+                }
+                widget.character.resignJob();
+                widget.character.idolTrainees.clear();
+                widget.character.idolMainMembers.clear();
+                widget.character.idolStaff.clear();
+              });
+              widget.onRefresh();
 
-                DialogHelper.show(
-                  context: context,
-                  title: wasIdol 
-                      ? (wasMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
-                      : 'Resign Kerja 📢',
-                  content: Text(
-                    wasIdol
-                        ? (wasMain
-                            ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
-                            : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
-                        : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
-                  ),
-                  actions: [
-                    Builder(
-                      builder: (btnContext) => TextButton(
-                        onPressed: () {
-                          Navigator.pop(btnContext); // Pop the dialog
-                          navigator.pop(); // Pop the IdolMenu screen
-                        },
-                        child: const Text('Mulai Langkah Baru'),
-                      ),
+              DialogHelper.show(
+                context: context,
+                title: wasIdol 
+                    ? (wasMain ? 'Kelulusan Resmi 🎉🎓' : 'Mengundurkan Diri 📢')
+                    : 'Resign Kerja 📢',
+                content: Text(
+                  wasIdol
+                      ? (wasMain
+                          ? 'Kamu telah mengadakan konser kelulusan terakhirmu yang mengharukan. Fans melambaikan lightstick mereka dan melepas kepergianmu menuju karir baru!'
+                          : 'Kamu resmi mengundurkan diri dari posisi Trainee Idol dan meninggalkan asrama.')
+                      : 'Kamu resmi mengundurkan diri dari pekerjaan staf manajemen.',
+                ),
+                actions: [
+                  Builder(
+                    builder: (btnContext) => TextButton(
+                      onPressed: () {
+                        Navigator.pop(btnContext); // Pop the dialog
+                        navigator.pop(); // Pop the IdolMenu screen
+                      },
+                      child: const Text('Mulai Langkah Baru'),
                     ),
-                  ],
-                );
-              },
-              child: const Text('Ya, Lakukan', style: TextStyle(color: Colors.red)),
-            ),
-          ],
-        );
-      },
+                  ),
+                ],
+              );
+            },
+            child: const Text('Ya, Lakukan', style: TextStyle(color: Colors.red)),
+          ),
+        ),
+      ],
     );
   }
 
@@ -274,7 +279,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
             const SizedBox(height: 24),
 
             Text(
-              'Aktivitas Idol',
+              char.isIdolStaff ? 'Aktivitas Staf' : 'Aktivitas Idol',
               style: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -290,13 +295,21 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.blue,
               title: 'Staf & Manajemen',
               subtitle: 'Berinteraksi dengan General Manager dan tim operasional',
-              page: StafManajemenPage(
-                character: char,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
+              page: char.isIdolStaff
+                  ? staff_man.StafManajemenPage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    )
+                  : idol_staff.StafManajemenPage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    ),
             ),
 
             // Anggota Tim Utama
@@ -306,13 +319,21 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.amber,
               title: 'Anggota Tim Utama',
               subtitle: 'Berinteraksi dengan anggota tim utama',
-              page: TimUtamaPage(
-                character: char,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
+              page: char.isIdolStaff
+                  ? staff_utama.TimUtamaPage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    )
+                  : idol_utama.TimUtamaPage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    ),
             ),
 
             // Anggota Trainee
@@ -322,24 +343,48 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.purple,
               title: 'Anggota Trainee',
               subtitle: 'Berinteraksi dengan sesama trainee',
-              page: AnggotaTraineePage(
-                character: char,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
+              page: char.isIdolStaff
+                  ? staff_trainee.AnggotaTraineePage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    )
+                  : idol_trainee.AnggotaTraineePage(
+                      character: char,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    ),
             ),
 
             if (char.isIdol) ...[
-              // Aktivitas Panggung (Sub-menu)
+              // Aktivitas Panggung (Sub-menu Idol)
               _buildMenuTile(
                 context: context,
                 icon: Icons.audiotrack,
                 color: Colors.pink,
                 title: 'Aktivitas',
                 subtitle: 'Latihan vokal & koreografi, teater, dan media sosial',
-                page: AktivitasPanggungPage(
+                page: idol_akt.AktivitasPanggungPage(
+                  character: char,
+                  onRefresh: () {
+                    if (mounted) setState(() {});
+                    widget.onRefresh();
+                  },
+                ),
+              ),
+            ] else if (char.isIdolStaff) ...[
+              // Aktivitas Manajemen (Sub-menu Staf)
+              _buildMenuTile(
+                context: context,
+                icon: Icons.work_history,
+                color: Colors.orange,
+                title: 'Aktivitas Manajemen',
+                subtitle: 'Perekrutan, evaluasi kinerja, konser, promosi, dan anggaran',
+                page: staff_akt.AktivitasManajemenPage(
                   character: char,
                   onRefresh: () {
                     if (mounted) setState(() {});
@@ -356,9 +401,13 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.teal,
               title: 'Berita Grup Idol',
               subtitle: 'Lihat berita generasi baru dan kelulusan anggota teater',
-              page: BeritaIdolPage(
-                character: char,
-              ),
+              page: char.isIdolStaff
+                  ? staff_berita.BeritaIdolPage(
+                      character: char,
+                    )
+                  : idol_berita.BeritaIdolPage(
+                      character: char,
+                    ),
             ),
 
             // Keluar / Resign
