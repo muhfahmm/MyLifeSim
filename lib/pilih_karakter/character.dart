@@ -1617,6 +1617,9 @@ class Character {
     }
 
     // Age up all NPCs
+    if (jobName != null && coworkers.isEmpty && !isIdolRelated) {
+      generateCoworkersIfEmpty();
+    }
     for (var list in [classmates, univClassmates, univLecturers, sdTeachers, smpTeachers, smaTeachers, coworkers]) {
       for (var npc in list) {
         if (npc['age'] != null) {

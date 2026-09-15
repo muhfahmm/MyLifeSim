@@ -326,8 +326,9 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // Aksi 1: Bercinta / Make Love (Hanya jika berpacaran dengan rekan kerja/staff)
-            if (widget.character.isAnyPartnerNameMatching(name)) ...[
+            // Aksi 1: Bercinta / Make Love (Dapat dilakukan jika berpacaran ATAU jika 18+ unlocked)
+            if (widget.character.isAnyPartnerNameMatching(name) ||
+                AdultFeatures.canMakeLove(userAge: widget.character.age, role: role, relation: role))
               _buildActionTile(
                 icon: Icons.favorite,
                 color: Colors.pink,
@@ -356,35 +357,37 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   }
                 },
               ),
-              if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
-                _buildActionTile(
-                  icon: Icons.flash_on,
-                  color: Colors.purple,
-                  title: 'Ajak Masturbasi Bersama',
-                  onTap: () {
-                    final bool success = relationship >= 50;
-                    if (success) {
-                      AjakanMasturbasiDialog.show(
-                        context: context,
-                        character: widget.character,
-                        relationType: role,
-                        viewerName: name,
-                        targetGender: gender,
-                        isUserInitiated: true,
-                        isStaffWithIdol: widget.category != 'Staff' || widget.character.isIdolStaff,
-                        onComplete: () {
-                          setState(() {});
-                          widget.onRefresh();
-                        },
-                      );
-                    } else {
-                      final change = 10 + _random.nextInt(11);
-                      _updateRelationship(-change);
-                      widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
-                      _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu karena hubungan kalian saat ini belum cukup hangat (minimal 50%).');
-                    }
-                  },
-                ),
+            // Aksi 1b: Ajak Masturbasi Bersama (Jika 18+ unlocked atau berpacaran)
+            if ((AdultFeatures.canMasturbateTogether() && widget.character.age >= 12) || widget.character.isAnyPartnerNameMatching(name))
+              _buildActionTile(
+                icon: Icons.flash_on,
+                color: Colors.purple,
+                title: 'Ajak Masturbasi Bersama',
+                onTap: () {
+                  final bool success = relationship >= 50;
+                  if (success) {
+                    AjakanMasturbasiDialog.show(
+                      context: context,
+                      character: widget.character,
+                      relationType: role,
+                      viewerName: name,
+                      targetGender: gender,
+                      isUserInitiated: true,
+                      isStaffWithIdol: widget.category != 'Staff' || widget.character.isIdolStaff,
+                      onComplete: () {
+                        setState(() {});
+                        widget.onRefresh();
+                      },
+                    );
+                  } else {
+                    final change = 10 + _random.nextInt(11);
+                    _updateRelationship(-change);
+                    widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+                    _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu karena hubungan kalian saat ini belum cukup hangat (minimal 50%).');
+                  }
+                },
+              ),
+            if (widget.character.isAnyPartnerNameMatching(name))
               _buildActionTile(
                 icon: Icons.heart_broken,
                 color: Colors.red,
@@ -455,7 +458,6 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   );
                 },
               ),
-            ],
 
             // Aksi 2: Ajak Pacaran (Jika belum pacaran)
             if (!widget.character.isAnyPartnerNameMatching(name)) ...[

@@ -274,7 +274,7 @@ class IdolManager {
 
   // Core hook triggered during character's ageUp
   static void ageUpIdol(Character character, List<String> events, List<String> inbox) {
-    if (!character.isIdol) return;
+    if (!character.isIdolRelated && character.idolTrainees.isEmpty && character.idolMainMembers.isEmpty && character.idolStaff.isEmpty) return;
 
     final rand = Random();
 
@@ -443,6 +443,8 @@ class IdolManager {
       });
       currentOps++;
     }
+
+    syncUserStaffRole(character);
 
     // 5. User graduation check (Disabled: User only graduates manually)
     /*
