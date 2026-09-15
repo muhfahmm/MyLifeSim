@@ -1,5 +1,5 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart
-
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/pilih_karakter/character.dart';
 import 'panggilan_pacar.dart';
 import 'panggilan_rekan_kerja.dart';
 import 'panggilan_idol.dart';
@@ -17,8 +17,59 @@ class PanggilanManager {
     String? userName,
     String? userGender,
     bool isIntimate = false,
+    Character? character,
   }) {
-    final String roleLower = targetRole.toLowerCase();
+    String effectiveRole = targetRole;
+    final String cleanTargetName = AvatarAgeRules.getCleanNPCName(targetName);
+
+    if (character != null) {
+      // 1. Cek anak di character.children
+      for (var child in character.children) {
+        final String cName = AvatarAgeRules.getCleanNPCName((child['name'] ?? '').toString());
+        if (cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName))) {
+          effectiveRole = 'Anak Kandung';
+          break;
+        }
+      }
+
+      // 2. Cek anak donor sperma / bayi tabung di character.donorRecipients
+      if (effectiveRole == targetRole) {
+        for (var recipient in character.donorRecipients) {
+          final String cName = AvatarAgeRules.getCleanNPCName((recipient['childName'] ?? '').toString());
+          final String rName = AvatarAgeRules.getCleanNPCName((recipient['name'] ?? '').toString());
+          if ((cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName))) ||
+              (rName.isNotEmpty && (rName == cleanTargetName || targetName.contains(rName)))) {
+            effectiveRole = 'Anak Anda (Donor)';
+            break;
+          }
+        }
+      }
+
+      // 3. Cek saudara di character.siblings
+      if (effectiveRole == targetRole) {
+        for (var sib in character.siblings) {
+          final String sName = AvatarAgeRules.getCleanNPCName((sib['name'] ?? '').toString());
+          if (sName.isNotEmpty && (sName == cleanTargetName || targetName.contains(sName))) {
+            effectiveRole = (sib['role'] ?? sib['relation'] ?? 'Saudara Kandung').toString();
+            break;
+          }
+        }
+      }
+
+      // 4. Cek keluarga besar di character.extendedFamily
+      if (effectiveRole == targetRole) {
+        for (var fam in character.extendedFamily) {
+          final String fName = AvatarAgeRules.getCleanNPCName((fam['name'] ?? '').toString());
+          if (fName.isNotEmpty && (fName == cleanTargetName || targetName.contains(fName))) {
+            effectiveRole = (fam['role'] ?? fam['relation'] ?? 'Keluarga').toString();
+            break;
+          }
+        }
+      }
+    }
+
+    final String roleLower = effectiveRole.toLowerCase();
+    final String targetNameLower = targetName.toLowerCase();
 
     // 0. Hubungan Keluarga (Prioritas Utama jika relasi mengandung unsur keluarga)
     final bool isFamilyRole = roleLower.contains('ayah') ||
@@ -46,12 +97,16 @@ class PanggilanManager {
         roleLower.contains('nenek') ||
         roleLower.contains('oma') ||
         roleLower.contains('cucu') ||
-        roleLower.contains('keponakan');
+        roleLower.contains('keponakan') ||
+        roleLower.contains('donor') ||
+        roleLower.contains('tabung') ||
+        targetNameLower.contains('donor') ||
+        targetNameLower.contains('anak anda');
 
     if (isFamilyRole) {
       return PanggilanKeluarga.getPanggilan(
         targetName: targetName,
-        relationKey: targetRole,
+        relationKey: effectiveRole,
         isSpeakerPlayer: isSpeakerPlayer,
         userName: userName,
         userGender: userGender,

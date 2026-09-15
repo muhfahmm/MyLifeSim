@@ -15,7 +15,7 @@ import 'age_base.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/percakapan_dispatcher.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/percakapan_dispatcher.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
 
 // ──────────────────────────────────────────────

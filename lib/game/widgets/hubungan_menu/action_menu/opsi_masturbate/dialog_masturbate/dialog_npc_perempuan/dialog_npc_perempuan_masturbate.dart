@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_npc_perempuan/dialog_npc_perempuan_masturbate.dart
+// lib/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_npc_perempuan/dialog_npc_perempuan_masturbate.dart
 
 import 'dart:math';
 import 'package:mylifesim/avatar/vn_character_view.dart';

@@ -49,13 +49,48 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
   }
 
   String _getTargetRoleLabel() {
-    final String cleanTargetName = widget.targetName;
+    final String cleanTargetName = AvatarAgeRules.getCleanNPCName(widget.targetName);
+
+    // 1. Cek anak di character.children
     for (var child in widget.character.children) {
-      if (child['name'] == cleanTargetName) {
-        return 'Anak';
+      final String cName = AvatarAgeRules.getCleanNPCName((child['name'] ?? '').toString());
+      if (cName.isNotEmpty && (cName == cleanTargetName || widget.targetName.contains(cName))) {
+        return 'Anak Kandung';
       }
     }
+
+    // 2. Cek anak donor sperma / bayi tabung di character.donorRecipients
+    for (var recipient in widget.character.donorRecipients) {
+      final String cName = AvatarAgeRules.getCleanNPCName((recipient['childName'] ?? '').toString());
+      final String rName = AvatarAgeRules.getCleanNPCName((recipient['name'] ?? '').toString());
+      if ((cName.isNotEmpty && (cName == cleanTargetName || widget.targetName.contains(cName))) ||
+          (rName.isNotEmpty && (rName == cleanTargetName || widget.targetName.contains(rName)))) {
+        return 'Anak Anda (Donor)';
+      }
+    }
+
+    // 3. Cek saudara di character.siblings
+    for (var sib in widget.character.siblings) {
+      final String sName = AvatarAgeRules.getCleanNPCName((sib['name'] ?? '').toString());
+      if (sName.isNotEmpty && (sName == cleanTargetName || widget.targetName.contains(sName))) {
+        return sib['role'] ?? sib['relation'] ?? 'Saudara Kandung';
+      }
+    }
+
+    // 4. Cek keluarga besar di character.extendedFamily
+    for (var fam in widget.character.extendedFamily) {
+      final String fName = AvatarAgeRules.getCleanNPCName((fam['name'] ?? '').toString());
+      if (fName.isNotEmpty && (fName == cleanTargetName || widget.targetName.contains(fName))) {
+        return fam['role'] ?? fam['relation'] ?? 'Keluarga';
+      }
+    }
+
     final String role = widget.targetRole;
+    final String roleLower = role.toLowerCase();
+    if (roleLower.contains('anak') || roleLower.contains('donor') || roleLower.contains('putri') || roleLower.contains('putra') || roleLower.contains('bayi tabung')) {
+      return 'Anak Anda (Donor)';
+    }
+
     if (role == 'Laki-laki' || role == 'Perempuan') {
       return 'Anak';
     }
@@ -71,7 +106,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
     if (startIndex != -1 && endIndex != -1) {
       return name.substring(startIndex + 1, endIndex).trim();
     }
-    return 'Saudara';
+    return widget.targetRole;
   }
 
   String _getPartnerGender() {
@@ -437,7 +472,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
     final Map<String, dynamic> npcMap = {
       'name': widget.targetName,
       'plainName': plainName,
-      'role': widget.targetRole,
+      'role': _getTargetRoleLabel(),
       'gender': partnerGender,
       'age': '$realTargetAge tahun',
       'relationship': relationshipValue.toString(),

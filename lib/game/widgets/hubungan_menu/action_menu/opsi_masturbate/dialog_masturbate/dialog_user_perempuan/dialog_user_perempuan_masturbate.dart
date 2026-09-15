@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_user_laki/dialog_user_laki_masturbate.dart
+// lib/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_user_perempuan/dialog_user_perempuan_masturbate.dart
 
 import 'dart:math';
 import 'package:mylifesim/avatar/vn_character_view.dart';
@@ -6,13 +6,13 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
 
-class DialogUserLakiMasturbate {
-  static const List<String> _userMaleMoans = [
-    "Hah... tatapanmu membuat gairahku makin tak terkendali...",
-    "Ugh... lihat apa yang terjadi padaku saat bersamamu...",
-    "Hah... ritme gerakanmu indah sekali...",
-    "Mmh... ah... aku senang kita melakukan ini bersama...",
-    "Hah... hah... aku sudah mau sampai...",
+class DialogUserPerempuanMasturbate {
+  static const List<String> _userFemaleMoans = [
+    "Ahh... m-sentuhanku sendiri terasa makin hangat saat kamu menatapku...",
+    "Hah... hah... desahanmu membuatku tak bisa menahan diri...",
+    "Mmh... ah... jangan berpaling ya...",
+    "Hah... ahh... rasanya... nikmat sekali...",
+    "Ahh... hah... aku hampir sampai...",
   ];
 
   static List<VNDialogueNode> getMoanNodes({
@@ -25,7 +25,7 @@ class DialogUserLakiMasturbate {
 
     final String npcName = npc['name'] ?? 'Pasangan';
     final String targetRole = npc['role'] ?? 'Pasangan';
-    final String npcGender = npc['gender'] ?? 'Perempuan';
+    final String npcGender = npc['gender'] ?? 'Laki-laki';
 
     final String callPlayerToNpc = PanggilanManager.getPanggilan(
       targetName: npcName,
@@ -38,7 +38,7 @@ class DialogUserLakiMasturbate {
     );
 
     for (int i = 0; i < count; i++) {
-      final String rawMoan = _userMaleMoans[random.nextInt(_userMaleMoans.length)];
+      final String rawMoan = _userFemaleMoans[random.nextInt(_userFemaleMoans.length)];
       final String moanWithCall = "$rawMoan $callPlayerToNpc...";
 
       nodes.add(

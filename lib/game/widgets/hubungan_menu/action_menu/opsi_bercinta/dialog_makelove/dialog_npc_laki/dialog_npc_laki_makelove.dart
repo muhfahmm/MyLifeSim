@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/dialog_npc_laki/dialog_npc_laki_makelove.dart
+// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/dialog_npc_laki/dialog_npc_laki_makelove.dart
 
 import 'dart:math';
 import 'package:flutter/material.dart'; // Tambahkan ini untuk Color

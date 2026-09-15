@@ -557,7 +557,6 @@ class PosisiSeksHelper {
     String targetRole = 'Pasangan',
   }) {
     final String myGender = character.gender.trim().toLowerCase();
-    final String partnerGender = targetGender.trim().toLowerCase();
     final bool isPlayerMale = myGender == 'laki-laki';
 
     // Panggilan intim
@@ -1055,8 +1054,6 @@ class PosisiSeksHelper {
     // 3. POSISI UMUM (69, MISSIONARY, DOGGY, COWGIRL, SPOONING HETERO / FALLBACK)
     // =========================================================================
     else if (posisiId == 'posisi_69') {
-      final String speaker1 = isPlayerMale ? character.name : targetName;
-      final String speaker2 = isPlayerMale ? targetName : character.name;
       nodes = [
         VNDialogueNode(
           speakerName: 'Narasi',

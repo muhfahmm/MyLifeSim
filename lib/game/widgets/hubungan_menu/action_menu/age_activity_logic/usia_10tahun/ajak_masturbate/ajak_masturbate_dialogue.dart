@@ -4,10 +4,10 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_npc_laki/dialog_npc_laki_masturbate.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_npc_perempuan/dialog_npc_perempuan_masturbate.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_user_laki/dialog_user_laki_masturbate.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/desahan_masturbate/dialog_user_perempuan/dialog_user_perempuan_masturbate.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_npc_laki/dialog_npc_laki_masturbate.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_npc_perempuan/dialog_npc_perempuan_masturbate.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_user_laki/dialog_user_laki_masturbate.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/dialog_masturbate/dialog_user_perempuan/dialog_user_perempuan_masturbate.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/panggilan_logic/panggilan_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/aksi_intim/ciuman.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/aksi_intim/oral.dart';
@@ -38,6 +38,7 @@ class AjakMasturbateDialogue {
       userName: player.name,
       userGender: player.gender,
       isIntimate: true,
+      character: player,
     );
 
     if (!isAccepted) {

@@ -4,8 +4,8 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/dialog_npc_laki/dialog_npc_laki_makelove.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/dialog_npc_perempuan/dialog_npc_perempuan_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/dialog_npc_laki/dialog_npc_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/dialog_npc_perempuan/dialog_npc_perempuan_makelove.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/aksi_intim/ciuman.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/aksi_intim/penetrasi.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/aksi_intim/posisi.dart';
@@ -57,6 +57,7 @@ class AjakMakeLoveDialogue {
       userName: player.name,
       userGender: player.gender,
       isIntimate: true,
+      character: player,
     );
 
     // 1. Jika ditolak oleh NPC

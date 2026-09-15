@@ -1,4 +1,4 @@
-// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/dialog_user_perempuan/dialog_user_perempuan_makelove.dart
+// lib/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/dialog_user_laki/dialog_user_laki_makelove.dart
 
 import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
@@ -6,8 +6,8 @@ import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
 
-class DialogUserPerempuanMakeLove {
-  /// Dialog pembuka ketika USER Perempuan mengajak pasangan
+class DialogUserLakiMakeLove {
+  /// Dialog pembuka ketika USER Laki-Laki mengajak pasangan
   static List<VNDialogueNode> getOpeningNodes({
     required Character player,
     required Map<String, dynamic> npc,
@@ -21,7 +21,7 @@ class DialogUserPerempuanMakeLove {
     return [
       VNDialogueNode(
         speakerName: player.name,
-        dialogueText: '$npcName... malam $chosenTime di $chosenLocation ini begitu romantis. Maukah kamu memeluk dan menciumku lebih dekat$condomText? 💖',
+        dialogueText: '$npcName... suasana di $chosenLocation pada $chosenTime ini sungguh tenang. Maukah kamu bermesraan denganku$condomText? 🔥',
         emotion: VNEmotionType.blush,
         isPlayerSpeaking: true,
         outfit: VNOutfitType.casual,
@@ -30,7 +30,7 @@ class DialogUserPerempuanMakeLove {
     ];
   }
 
-  /// Pilihan opsi aksi pemain Perempuan saat keintiman berlangsung
+  /// Pilihan opsi aksi pemain Laki-Laki saat keintiman berlangsung
   static List<VNChoiceOption> getIntimacyChoices({
     required Character player,
     required Map<String, dynamic> npc,
@@ -38,14 +38,14 @@ class DialogUserPerempuanMakeLove {
   }) {
     return [
       VNChoiceOption(
-        text: '💖 "Melingkarkan lengan di lehernya dan berbisik manja..."',
+        text: '🔥 "Bermesraan lembut dan memanjakannya..."',
         onSelect: (p, n) {
           onChoiceSelected(25, 2);
         },
         nextNodeIndex: 2, // Mengarah ke loop desahan
       ),
       VNChoiceOption(
-        text: '🔥 "Membiarkannya memegang tanganmu dengan lembut..."',
+        text: '💋 "Memeluk erat dan memberikan kehangatan..."',
         onSelect: (p, n) {
           onChoiceSelected(20, 1);
         },
@@ -55,42 +55,42 @@ class DialogUserPerempuanMakeLove {
   }
 
   // ==========================================================
-  // LIBRARY DESAHAN PEREMPUAN (DIPERBANYAK)
+  // LIBRARY DESAHAN LAKI-LAKI (DIPERBANYAK)
   // ==========================================================
   static const List<String> _shyMoans = [
-    "Hah... h-hah... aku sangat malu...",
-    "Mmh... ah... pelan-pelan ya...",
-    "Hah... jangan lihat aku... aku malu...",
-    "A-aku... ahh... tidak bisa berpikir...",
-    "Hah... hah... kamu membuat jantungku berdebar...",
-    "Ahh... a-aku mulai... hah... tidak bisa menahannya...",
-    "Hah... j-jangan sentuh di sana... ahh...",
-    "Mmh... ahh... aku takut... tapi senang...",
+    "Hah... hah... a-aku merasa sangat canggung...",
+    "Mmh... jangan tatap mataku seperti itu...",
+    "Hah... sentuhanmu... membuatku gemetar...",
+    "Ugh... pelan-pelan ya sayang...",
+    "Hah... hah... a-aku tidak bisa berpikir...",
+    "Mmh... ahh... jantungku berdebar sangat kencang...",
+    "Hah... hah... b-bagaimana jika kita ketahuan?",
+    "Ugh... aku sangat malu... tapi ingin terus...",
   ];
 
   static const List<String> _boldMoans = [
-    "Ahh! Ya, tepat di sana! Jangan berhenti!",
-    "Ahh! Lebih cepat! Aku mau lebih!",
-    "Hah! Kamu sangat hebat! Ahhh!",
-    "Ahh! Jangan pelan-pelan! Hah!",
-    "Ahh! Ya! Teruskan! Aku sangat dekat!",
-    "Hah! Aku suka saat kamu seperti ini!",
-    "Ahh! Kamu membuatku gila!",
-    "Hah! Jangan berhenti! Aku tidak bisa berpikir!",
+    "Hah! Kamu luar biasa malam ini! Jangan berhenti!",
+    "Ugh! Lebih erat lagi! Aku mau kamu sepenuhnya!",
+    "Hah! Tepat seperti itu! Teruskan sayang!",
+    "Ahh! Kamu membuatku semakin gila!",
+    "Hah! Tatap mataku! Kamu milikku malam ini!",
+    "Ugh! Ya! Jangan pelan-pelan!",
+    "Ahh! Suaramu membuatku semakin bernafsu!",
+    "Hah! Kamu tahu persis apa yang aku mau!",
   ];
 
   static const List<String> _kindMoans = [
-    "Ahh... sayang... aku sangat bahagia...",
-    "Hah... kamu nyaman? Aku ingin kamu bahagia...",
-    "Ahh... aku sayang kamu...",
-    "Hah... rasanya... hangat sekali...",
-    "Ahh... aku ingin selalu dekat denganmu...",
-    "Hah... peluk aku lebih erat...",
-    "Ahh... kamu sangat lembut...",
-    "Hah... aku ingin tertidur di pelukanmu...",
+    "Hah... aku ingin memastikan kamu nyaman...",
+    "Mmh... rasakan kehangatanku ya sayang...",
+    "Hah... aku mencintaimu lebih dari apapun...",
+    "Ugh... kehangatanmu menyatu dengan kehangatanku...",
+    "Hah... peluk aku erat-erat, aku di sini untukmu...",
+    "Mmh... aku merasa sangat beruntung memilikimu...",
+    "Hah... sandarkan kepalamu di dadaku...",
+    "Ugh... nikmati setiap detiknya bersama ya...",
   ];
 
-  /// Desahan User Perempuan
+  /// Desahan User Laki-Laki
   static List<VNDialogueNode> getMoanNodes({
     required Character player,
     required Map<String, dynamic> npc,
@@ -104,7 +104,7 @@ class DialogUserPerempuanMakeLove {
 
     final String npcName = npc['name'] ?? 'Pasangan';
     final String targetRole = (npc['role'] ?? npc['relation'] ?? npc['targetRole'] ?? 'Pasangan').toString();
-    final String npcGender = (npc['gender'] ?? 'Laki-laki').toString();
+    final String npcGender = (npc['gender'] ?? 'Perempuan').toString();
     final String callToNpc = PanggilanManager.getPanggilan(
       targetName: npcName,
       targetRole: targetRole,
