@@ -25,6 +25,7 @@ import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tenis/
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/tinju_mma/atlit_activities_page.dart';
 import 'special_carrier/politikus_job_logic/politik_career.dart';
 import 'special_carrier/politikus_job_logic/politik_menu.dart';
+import 'special_carrier/military_job_logic/army_menu.dart';
 
 class KerjaMenuScreen extends StatefulWidget {
   final Character character;
@@ -257,6 +258,8 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         coworkerRole = 'Talent Esports';
       } else if (PoliticalCareerData.isPoliticianJob(job)) {
         coworkerRole = 'Staf / Kolega Politik';
+      } else if (ArmyMenuHelper.isMilitaryJob(job)) {
+        coworkerRole = 'Prajurit Militer';
       }
       String? subject;
       if (job.startsWith('Guru SD')) {
@@ -559,6 +562,16 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
       if (PoliticalCareerData.isPoliticianJob(jobTitle)) {
         return PolitikMenuHelper.buildRolePage(
+          character,
+          () {
+            if (mounted) setState(() {});
+            widget.onRefresh();
+          },
+        );
+      }
+
+      if (ArmyMenuHelper.isMilitaryJob(jobTitle)) {
+        return ArmyMenuHelper.buildRolePage(
           character,
           () {
             if (mounted) setState(() {});

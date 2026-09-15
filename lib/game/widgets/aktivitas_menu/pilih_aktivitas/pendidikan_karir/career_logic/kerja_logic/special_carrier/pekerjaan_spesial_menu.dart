@@ -72,13 +72,16 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
               title: 'Militer',
               subtitle: 'Bergabung dengan karir militer pertahanan negara',
               minAge: 18,
-              page: ArmyMenuPage(
-                character: character,
-                onRefresh: () {
-                  if (mounted) setState(() {});
-                  widget.onRefresh();
-                },
-              ),
+              onTap: () {
+                ArmyMenuHelper.showArmyMenu(
+                  context,
+                  character,
+                  () {
+                    if (mounted) setState(() {});
+                    widget.onRefresh();
+                  },
+                );
+              },
             ),
             ValueListenableBuilder<bool>(
               valueListenable: GlobalSettings.isPolitikusUnlocked,

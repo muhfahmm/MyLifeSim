@@ -6,6 +6,65 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'aktivitas_peran/ad_page.dart';
+import 'aktivitas_peran/al_page.dart';
+import 'aktivitas_peran/au_page.dart';
+
+class ArmyMenuHelper {
+  static bool isMilitaryJob(String? jobName) {
+    if (jobName == null) return false;
+    return jobName.contains('Angkatan Darat') ||
+        jobName.contains('Angkatan Laut') ||
+        jobName.contains('Angkatan Udara') ||
+        jobName.contains('TNI') ||
+        jobName.contains('Prajurit') ||
+        jobName.contains('Sersan') ||
+        jobName.contains('Letnan') ||
+        jobName.contains('Kapten') ||
+        jobName.contains('Mayor') ||
+        jobName.contains('Jenderal') ||
+        jobName.contains('Laksamana') ||
+        jobName.contains('Marsekal') ||
+        jobName.contains('Kelasi');
+  }
+
+  static Widget buildRolePage(Character character, VoidCallback onRefresh) {
+    final String job = character.jobName ?? '';
+    if (job.contains('Angkatan Laut') || job.contains('AL') || job.contains('Laksamana') || job.contains('Kelasi')) {
+      return AlPage(character: character, onRefresh: onRefresh);
+    } else if (job.contains('Angkatan Udara') || job.contains('AU') || job.contains('Marsekal')) {
+      return AuPage(character: character, onRefresh: onRefresh);
+    }
+    return AdPage(character: character, onRefresh: onRefresh);
+  }
+
+  static void showArmyMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    if (isMilitaryJob(character.jobName)) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => buildRolePage(character, onComplete),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ArmyMenuPage(character: character, onRefresh: onComplete),
+        ),
+      );
+    }
+  }
+
+  static void showBranchMenu(BuildContext context, Character character, VoidCallback onComplete) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ArmyMenuPage(character: character, onRefresh: onComplete),
+      ),
+    );
+  }
+}
 
 class ArmyMenuPage extends StatefulWidget {
   final Character character;
