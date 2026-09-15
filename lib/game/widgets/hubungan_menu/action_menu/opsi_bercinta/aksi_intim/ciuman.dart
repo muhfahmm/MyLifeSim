@@ -64,7 +64,7 @@ class CiumanHelper {
     required String targetRole,
     required VoidCallback onActionComplete,
   }) async {
-    final String partnerGender = HubunganIntimLogic.getPartnerGender(targetName);
+    final String partnerGender = HubunganIntimLogic.getPartnerGender(targetName, character, targetRole);
     final int currentSatisfaction = HubunganIntimLogic.getRelationshipValue(character, targetName);
 
     // Cek persetujuan/kepuasan awal

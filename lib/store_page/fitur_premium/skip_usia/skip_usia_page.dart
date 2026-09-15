@@ -330,6 +330,8 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
             final res = SkipUsiaLogic.performSkipUsia(character, targetAge);
             final bool success = res['success'] == true;
             final String message = (res['message'] ?? '').toString();
+            final List<String> skippedEvents = List<String>.from(res['skippedEvents'] ?? []);
+            final bool isDeceased = !character.isAlive;
 
             if (success) {
               final int newAge = character.age;
@@ -341,13 +343,85 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
 
             DialogHelper.show(
               context: context,
-              title: success ? 'Lompat Usia Berhasil ⏩' : 'Gagal',
+              title: isDeceased ? 'Karakter Meninggal 💀' : (success ? 'Lompat Usia Berhasil ⏩' : 'Gagal'),
               content: Text(message),
+              actions: [
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Tutup dialog hasil
+                    if (skippedEvents.isNotEmpty && context.mounted) {
+                      _showSkippedEventsDialog(context, skippedEvents, onDismiss: () {
+                        if (isDeceased && context.mounted) {
+                          Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
+                        }
+                      });
+                    } else if (isDeceased && context.mounted) {
+                      Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
+                    }
+                  },
+                  child: const Text('OK'),
+                ),
+              ],
             );
           },
           child: const Text('Lompat Usia'),
         ),
       ],
+    );
+  }
+
+  void _showSkippedEventsDialog(BuildContext context, List<String> events, {VoidCallback? onDismiss}) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return PopScope(
+          canPop: false,
+          child: AlertDialog(
+            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Row(
+              children: [
+                Icon(Icons.notifications_active, color: Colors.orange, size: 20),
+                SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    'Kejadian Penting Selama Lompat Usia ⏩',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+            content: ConstrainedBox(
+              constraints: const BoxConstraints(maxHeight: 300),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: events.map((e) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(e, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500)),
+                    );
+                  }).toList(),
+                ),
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  onDismiss?.call();
+                },
+                child: const Text('Mengerti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

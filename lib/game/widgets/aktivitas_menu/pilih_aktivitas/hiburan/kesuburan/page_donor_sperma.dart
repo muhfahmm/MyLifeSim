@@ -47,34 +47,27 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
 
     if (berhasil) {
       final List<String> girls = (Character.globalFemaleFirstNames.isNotEmpty) ? Character.globalFemaleFirstNames : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra'];
-      final List<String> boys = (Character.globalMaleFirstNames.isNotEmpty) ? Character.globalMaleFirstNames : ['Rafi', 'Daffa', 'Gibran', 'Zian', 'Aldi'];
       final List<String> lastNamesList = (Character.globalLastNames.isNotEmpty) ? Character.globalLastNames : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
       
       final String ibuNama = '${girls[r.nextInt(girls.length)]} ${lastNamesList[r.nextInt(lastNamesList.length)]}';
-      final String anakGender = r.nextBool() ? 'Laki-laki' : 'Perempuan';
-      final String anakNamaDepan = anakGender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
-      final String anakNama = '$anakNamaDepan ${lastNamesList[r.nextInt(lastNamesList.length)]}';
-
-      widget.character.children.add({
-        'name': anakNama,
-        'gender': anakGender,
-        'relationship': '50',
-        'age': '0',
-        'father': widget.character.name,
-        'mother': ibuNama,
-        'isDeceased': 'false',
-      });
 
       widget.character.donorRecipients.add({
         'name': ibuNama,
         'age': (20 + r.nextInt(16)).toString(),
         'relationship': '50',
-        'childName': anakNama,
+        'isPregnant': 'true',
       });
 
+      widget.character.partnerIsPregnant = true;
+      if (widget.character.pregnantByPartnerName == null || widget.character.pregnantByPartnerName!.isEmpty) {
+        widget.character.pregnantByPartnerName = ibuNama;
+      } else if (!widget.character.pregnantByPartnerName!.contains(ibuNama)) {
+        widget.character.pregnantByPartnerName = '${widget.character.pregnantByPartnerName}, $ibuNama';
+      }
+
       title = 'Donor Sperma Berhasil! 🧬';
-      content = 'Penerima: Ibu $ibuNama\nBayi lahir: $anakGender bernama $anakNama.\n\nAnda mendapatkan ${CurrencySettings.format(150)} atas kontribusi ini!';
-      widget.character.inbox.add('🧬 Donor Sperma Berhasil! Ibu $ibuNama melahirkan bayi $anakGender bernama $anakNama dari sperma Anda.');
+      content = 'Penerima: Ibu $ibuNama telah menerima donor sperma Anda dan saat ini sedang hamil! Bayi akan lahir saat Anda menambah umur.\n\nAnda mendapatkan ${CurrencySettings.format(150)} atas kontribusi ini!';
+      widget.character.inbox.add('🧬 Donor Sperma Berhasil! Ibu $ibuNama menerima donor sperma Anda dan saat ini sedang hamil (bayi akan lahir tahun depan).');
     } else {
       title = 'Donor Sperma Tersimpan 🧪';
       content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(150)}!';

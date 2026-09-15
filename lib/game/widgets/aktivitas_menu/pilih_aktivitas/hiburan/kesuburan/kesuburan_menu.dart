@@ -106,21 +106,22 @@ class _KesuburanPageState extends State<KesuburanPage> {
         final List<String> lastNamesList = (Character.globalLastNames.isNotEmpty) ? Character.globalLastNames : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
         
         final String ibuNama = '${girls[r.nextInt(girls.length)]} ${lastNamesList[r.nextInt(lastNamesList.length)]}';
-        final String anakGender = r.nextBool() ? 'Laki-laki' : 'Perempuan';
-        final String anakNamaDepan = anakGender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
-        final String anakNama = '$anakNamaDepan ${lastNamesList[r.nextInt(lastNamesList.length)]}';
 
-        widget.character.children.add({
-          'name': anakNama,
-          'gender': anakGender,
+        widget.character.donorRecipients.add({
+          'name': ibuNama,
+          'age': (20 + r.nextInt(16)).toString(),
           'relationship': '50',
-          'age': '0',
-          'father': widget.character.name,
-          'mother': ibuNama,
-          'isDeceased': 'false',
+          'isPregnant': 'true',
         });
 
-        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda untuk melahirkan bayi $anakGender bernama $anakNama. Anda mendapatkan ${CurrencySettings.format(150)} untuk kontribusi ini!';
+        widget.character.partnerIsPregnant = true;
+        if (widget.character.pregnantByPartnerName == null || widget.character.pregnantByPartnerName!.isEmpty) {
+          widget.character.pregnantByPartnerName = ibuNama;
+        } else if (!widget.character.pregnantByPartnerName!.contains(ibuNama)) {
+          widget.character.pregnantByPartnerName = '${widget.character.pregnantByPartnerName}, $ibuNama';
+        }
+
+        msg = '🧬 Donor Sperma Berhasil!\n\nSeorang penerima bernama Ibu $ibuNama telah berhasil menggunakan sperma Anda dan saat ini sedang hamil. Anak akan lahir ketika Anda menambah umur! Anda mendapatkan ${CurrencySettings.format(150)} untuk kontribusi ini!';
       } else {
         msg = '🧬 Donor Anda disimpan di bank sperma, namun belum ada penerima yang berhasil membuahi dengannya tahun ini. Anda tetap mendapatkan ${CurrencySettings.format(150)} untuk donor ini!';
       }

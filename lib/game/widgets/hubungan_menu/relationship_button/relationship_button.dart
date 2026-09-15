@@ -1403,6 +1403,39 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
                             ),
                           ),
+                          if (!isDeceased && widget.character.partnerIsPregnant) ...[
+                            (() {
+                              final String pregList = widget.character.pregnantByPartnerName ?? '';
+                              final List<String> pregnantNames = pregList
+                                  .split(', ')
+                                  .map((e) => AvatarAgeRules.getCleanNPCName(e))
+                                  .toList();
+                              final String cleanLabel = AvatarAgeRules.getCleanNPCName(label);
+                              final bool isHamil = pregList.contains(label) ||
+                                  pregnantNames.contains(cleanLabel) ||
+                                  (cleanLabel.isNotEmpty && pregList.contains(cleanLabel));
+
+                              if (isHamil) {
+                                return Container(
+                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  decoration: BoxDecoration(
+                                    color: Colors.pink.withOpacity(0.15),
+                                    borderRadius: BorderRadius.circular(6),
+                                    border: Border.all(color: Colors.pink.withOpacity(0.3)),
+                                  ),
+                                  child: const Text(
+                                    'Hamil 🍼',
+                                    style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.pink,
+                                    ),
+                                  ),
+                                );
+                              }
+                              return const SizedBox.shrink();
+                            })(),
+                          ],
                           if (extraBadgeText != null && !isDeceased)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),

@@ -4312,10 +4312,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     // --- BADGE HAMIL (di bawah tingkat kesuburan) ---
                     Builder(
                       builder: (context) {
+                        final String pregList = widget.character.pregnantByPartnerName ?? '';
+                        final List<String> pregnantNames = pregList.split(', ').map((e) => AvatarAgeRules.getCleanNPCName(e)).toList();
+                        final String cleanTarget = AvatarAgeRules.getCleanNPCName(widget.targetName);
+
                         final bool targetIsPregnant = widget.character.partnerIsPregnant &&
-                            widget.character.pregnantByPartnerName == widget.targetName;
+                            (pregList.contains(widget.targetName) || pregnantNames.contains(cleanTarget));
                         final bool playerIsPregnant = widget.character.isPregnant &&
-                            widget.character.pregnantByPartnerName == widget.targetName;
+                            (pregList.contains(widget.targetName) || pregnantNames.contains(cleanTarget));
 
                         if (!targetIsPregnant && !playerIsPregnant)
                           return const SizedBox.shrink();

@@ -131,7 +131,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
         return child['gender'] ?? 'Perempuan';
       }
     }
-    return HubunganIntimLogic.getPartnerGender(widget.targetName);
+    return HubunganIntimLogic.getPartnerGender(widget.targetName, widget.character, widget.targetRole);
   }
 
   int _getTargetRelationship() {

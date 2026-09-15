@@ -2453,6 +2453,13 @@ class Character {
             'skinColor': childSkinColor,
           });
 
+          for (var donor in donorRecipients) {
+            if (donor['name'] == partnerNameClean) {
+              donor['childName'] = childName;
+              donor['isPregnant'] = 'false';
+            }
+          }
+
           String birthMsg = '👶 Anak Baru Lahir! Selamat, anak ${childGender == 'Laki-laki' ? 'Laki-laki' : 'Perempuan'} bernama $childName telah lahir ke dunia (Ibu: $partnerNameClean).';
           if (hasGeneticDefect) {
             birthMsg += ' (⚠️ Anak lahir cacat akibat kelainan genetik dari hubungan sedarah)';

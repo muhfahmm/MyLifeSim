@@ -23,12 +23,30 @@ class SkipUsiaLogic {
     final int oldAge = character.age;
     final int yearsSkipped = targetAge - oldAge;
 
-    // 1. Update usia karakter utama
+    // 1. Update usia karakter utama dan sync currentDate
     character.age = targetAge;
+    if (character.currentDate != null) {
+      character.currentDate = DateTime(
+        character.currentDate!.year + yearsSkipped,
+        character.currentDate!.month,
+        character.currentDate!.day,
+      );
+    }
 
-    // 2. Akumulasi gaji pekerjaan utama, part-time, dan bisnis selama tahun yang dilompati
+    // 2. Akumulasi gaji & jalankan simulasi tahunan (ageUp) selama tahun yang dilompati
     int totalIncomeEarned = 0;
     int currentJobSalary = character.jobSalary ?? 0;
+    final List<String> skippedEvents = [];
+
+    // Kembalikan dulu umur sementara ke oldAge agar ageUp() menaikkannya bertahap per tahun
+    character.age = oldAge;
+    if (character.currentDate != null) {
+      character.currentDate = DateTime(
+        character.currentDate!.year - yearsSkipped,
+        character.currentDate!.month,
+        character.currentDate!.day,
+      );
+    }
 
     for (int i = 0; i < yearsSkipped; i++) {
       if (!character.isImprisoned) {
@@ -50,7 +68,30 @@ class SkipUsiaLogic {
           totalIncomeEarned += character.businessAnnualProfit;
         }
       }
+
+      // Jalankan logika tahunan (ageUp) untuk memicu event perceraian ortu, kematian ortu/saudara, pernikahan, kelahiran adik, dll.
+      final yearEvents = character.ageUp();
+      if (yearEvents.isNotEmpty) {
+        skippedEvents.addAll(yearEvents);
+      }
+
+      // Jika kesehatan habis (<= 0) atau karakter meninggal, batasi kesehatan ke 0 dan hentikan proses skip usia
+      if (character.health <= 0 || !character.isAlive) {
+        character.health = 0;
+        character.isAlive = false;
+        final deathNotice = '💀 Karakter Meninggal: ${character.name} telah meninggal dunia pada usia ${character.age} tahun karena masalah kesehatan/usia.';
+        skippedEvents.add(deathNotice);
+        character.inbox.insert(0, deathNotice);
+        break;
+      }
     }
+
+    // Pastikan kesehatan tidak negatif
+    if (character.health < 0) {
+      character.health = 0;
+    }
+
+    final int finalAge = character.age;
 
     if (currentJobSalary > 0) {
       character.jobSalary = currentJobSalary;
@@ -60,8 +101,8 @@ class SkipUsiaLogic {
       character.money += totalIncomeEarned;
     }
 
-    // 3. Update usia seluruh NPC (Orang Tua, Mertua, Pasangan, Anak, Saudara, Teman, Dll.)
-    _updateAllNpcAges(character, yearsSkipped);
+    // 3. Sync umur NPC jika ada selisih yang belum ter-update
+    _updateAllNpcAges(character, 0);
 
     // 4. Sync riwayat pendidikan secara otomatis berdasarkan usia baru
     final history = character.educationHistory;
@@ -82,25 +123,29 @@ class SkipUsiaLogic {
 
     // Catat log inbox
     String incomeLog = totalIncomeEarned > 0 
-        ? ' 💰 Total akumulasi gaji & pendapatan usaha selama $yearsSkipped tahun sebesar ${CurrencySettings.format(totalIncomeEarned)} telah ditambahkan ke saldo keuanganmu!'
+        ? ' 💰 Total akumulasi gaji & pendapatan usaha sebesar ${CurrencySettings.format(totalIncomeEarned)} telah ditambahkan ke saldo keuanganmu!'
         : '';
 
     character.inbox.insert(
       0,
-      '⏩ Fast Forward Usia: Karakter kamu telah berhasil melompat dari usia $oldAge tahun ke $targetAge tahun (+$yearsSkipped tahun)!$incomeLog Seluruh anggota keluarga & kerabat ikut bertambah usia.',
+      '⏩ Fast Forward Usia: Karakter kamu telah melompat dari usia $oldAge tahun ke $finalAge tahun!$incomeLog Seluruh anggota keluarga & kerabat ikut bertambah usia.',
     );
 
-    final String resultMsg = totalIncomeEarned > 0
-        ? 'Berhasil melompat ke usia $targetAge tahun (+$yearsSkipped tahun)! Gaji & pendapatan sebesar ${CurrencySettings.format(totalIncomeEarned)} berhasil ditambahkan ke saldo.'
-        : 'Berhasil melompat ke usia $targetAge tahun (+$yearsSkipped tahun)!';
+    final String resultMsg = character.isAlive
+        ? (totalIncomeEarned > 0
+            ? 'Berhasil melompat ke usia $finalAge tahun! Gaji & pendapatan sebesar ${CurrencySettings.format(totalIncomeEarned)} berhasil ditambahkan ke saldo.'
+            : 'Berhasil melompat ke usia $finalAge tahun!')
+        : '⚠️ Karakter telah meninggal dunia pada usia $finalAge tahun saat proses lompat usia!';
 
     return {
       'success': true,
       'message': resultMsg,
       'oldAge': oldAge,
-      'newAge': targetAge,
-      'yearsSkipped': yearsSkipped,
+      'newAge': finalAge,
+      'yearsSkipped': finalAge - oldAge,
       'totalIncomeEarned': totalIncomeEarned,
+      'skippedEvents': skippedEvents,
+      'isDeceased': !character.isAlive,
     };
   }
 

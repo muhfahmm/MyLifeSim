@@ -109,19 +109,106 @@ class HubunganIntimLogic {
     return 50;
   }
 
-  /// Mengambil jenis kelamin pasangan/target berdasarkan nama
-  static String getPartnerGender(String targetName) {
+  /// Mengambil jenis kelamin pasangan/target berdasarkan nama & data karakter
+  static String getPartnerGender(String targetName, [Character? character, String? targetRole]) {
+    final String nameLower = targetName.trim().toLowerCase();
+    final String roleLower = (targetRole ?? '').trim().toLowerCase();
+
+    // 1. Cek Orang Tua Kandung & Tiri dulu
+    if (character != null) {
+      if (character.motherName != null &&
+          (nameLower.contains(character.motherName!.toLowerCase().trim()) ||
+           character.motherName!.toLowerCase().trim().contains(nameLower))) {
+        return 'Perempuan';
+      }
+      if (character.stepMotherName != null &&
+          (nameLower.contains(character.stepMotherName!.toLowerCase().trim()) ||
+           character.stepMotherName!.toLowerCase().trim().contains(nameLower))) {
+        return 'Perempuan';
+      }
+      if (character.fatherName != null &&
+          (nameLower.contains(character.fatherName!.toLowerCase().trim()) ||
+           character.fatherName!.toLowerCase().trim().contains(nameLower))) {
+        return 'Laki-laki';
+      }
+      if (character.stepFatherName != null &&
+          (nameLower.contains(character.stepFatherName!.toLowerCase().trim()) ||
+           character.stepFatherName!.toLowerCase().trim().contains(nameLower))) {
+        return 'Laki-laki';
+      }
+
+      // 2. Cek Pasangan & Selingkuhan
+      for (var p in [
+        character.partner,
+        character.secondPartner,
+        character.thirdPartner,
+        character.fourthPartner,
+        character.fifthPartner,
+      ]) {
+        if (p != null) {
+          final String pName = (p['name'] ?? '').trim().toLowerCase();
+          if (pName.isNotEmpty && (pName == nameLower || nameLower.contains(pName) || pName.contains(nameLower))) {
+            return p['gender'] ?? 'Perempuan';
+          }
+        }
+      }
+
+      // 3. Cari di seluruh list NPC (Saudara, Anak, Teman, Keluarga Besar, dll)
+      for (var list in [
+        character.siblings,
+        character.children,
+        character.extendedFamily,
+        character.friends,
+        character.classmates,
+        character.univClassmates,
+        character.coworkers,
+        character.secretPartners,
+        character.donorRecipients,
+        character.sdTeachers,
+        character.smpTeachers,
+        character.smaTeachers,
+        character.univLecturers,
+        character.idolTrainees,
+        character.idolMainMembers,
+        character.idolStaff,
+      ]) {
+        for (var npc in list) {
+          final String npcName = (npc['name'] ?? '').trim().toLowerCase();
+          if (npcName.isNotEmpty && (npcName == nameLower || nameLower.contains(npcName) || npcName.contains(nameLower))) {
+            if (npc['gender'] != null && npc['gender']!.toString().isNotEmpty) {
+              return npc['gender']!;
+            }
+          }
+        }
+      }
+    }
+
+    // 4. Cek keyword prefiks/nama
     if (targetName.startsWith('Ayah')) return 'Laki-laki';
     if (targetName.startsWith('Ibu')) return 'Perempuan';
 
+    // 5. Cek kurung relasi pada label (misal: "Nama (Adik Perempuan)")
     final int startIndex = targetName.indexOf('(');
     final int endIndex = targetName.indexOf(')');
     if (startIndex != -1 && endIndex != -1) {
       final String relationText = targetName.substring(startIndex + 1, endIndex).toLowerCase();
-      if (relationText.contains('perempuan')) return 'Perempuan';
-      if (relationText.contains('laki-laki')) return 'Laki-laki';
+      if (relationText.contains('perempuan') || relationText.contains('istri') || relationText.contains('ibu') || relationText.contains('kakak perempuan') || relationText.contains('adik perempuan')) {
+        return 'Perempuan';
+      }
+      if (relationText.contains('laki-laki') || relationText.contains('suami') || relationText.contains('ayah') || relationText.contains('kakak laki') || relationText.contains('adik laki')) {
+        return 'Laki-laki';
+      }
     }
-    return 'Laki-laki';
+
+    // 6. Cek targetRole
+    if (roleLower.contains('perempuan') || roleLower.contains('istri') || roleLower.contains('ibu') || roleLower.contains('bibi') || roleLower.contains('nenek')) {
+      return 'Perempuan';
+    }
+    if (roleLower.contains('laki') || roleLower.contains('suami') || roleLower.contains('ayah') || roleLower.contains('paman') || roleLower.contains('kakek')) {
+      return 'Laki-laki';
+    }
+
+    return 'Perempuan';
   }
 
   /// Menghitung tingkat kesuburan (fertility rate) dinamis berdasarkan usia dan jenis kelamin

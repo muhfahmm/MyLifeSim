@@ -1,6 +1,7 @@
 // lib/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_hamil.dart
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 
 class BeritahuKehamilanHelper {
   static Future<void> showTellOrNotDialog({
@@ -90,13 +91,46 @@ class BeritahuKehamilanHelper {
       }
     }
 
+    final String cleanPartner = AvatarAgeRules.getCleanNPCName(partnerName).toLowerCase().trim();
+
+    bool isSibling = false;
+    for (var sib in character.siblings) {
+      final String sName = AvatarAgeRules.getCleanNPCName(sib['name'] ?? '').toLowerCase().trim();
+      if (sName.isNotEmpty && (sName == cleanPartner || cleanPartner.contains(sName))) {
+        isSibling = true;
+        break;
+      }
+    }
+
+    bool isExtendedFamily = false;
+    for (var ext in character.extendedFamily) {
+      final String eName = AvatarAgeRules.getCleanNPCName(ext['name'] ?? '').toLowerCase().trim();
+      if (eName.isNotEmpty && (eName == cleanPartner || cleanPartner.contains(eName))) {
+        isExtendedFamily = true;
+        break;
+      }
+    }
+
+    final bool isFather = character.fatherName != null &&
+        AvatarAgeRules.getCleanNPCName(character.fatherName!).toLowerCase().trim() == cleanPartner;
+    final bool isMother = character.motherName != null &&
+        AvatarAgeRules.getCleanNPCName(character.motherName!).toLowerCase().trim() == cleanPartner;
+
     final bool isIncest = partnerRole.contains('Saudara') ||
         partnerRole.contains('Kandung') ||
         partnerRole.contains('Tiri') ||
-        partnerName.toLowerCase().contains('kakak') ||
-        partnerName.toLowerCase().contains('adik') ||
-        partnerName.toLowerCase().contains('ayah') ||
-        partnerName.toLowerCase().contains('ibu') ||
+        partnerRole.contains('Adik') ||
+        partnerRole.contains('Kakak') ||
+        partnerRole.contains('Ayah') ||
+        partnerRole.contains('Ibu') ||
+        cleanPartner.contains('kakak') ||
+        cleanPartner.contains('adik') ||
+        cleanPartner.contains('ayah') ||
+        cleanPartner.contains('ibu') ||
+        isSibling ||
+        isExtendedFamily ||
+        isFather ||
+        isMother ||
         isPartnerChild;
 
     String reactionTitle = '';

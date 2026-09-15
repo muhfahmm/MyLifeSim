@@ -128,7 +128,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
         return child['gender'] ?? 'Perempuan';
       }
     }
-    return HubunganIntimLogic.getPartnerGender(widget.targetName);
+    return HubunganIntimLogic.getPartnerGender(widget.targetName, widget.character, widget.targetRole);
   }
 
   bool _isCondomNeeded() {
@@ -603,8 +603,56 @@ class _BercintaScreenState extends State<BercintaScreen> {
             }
           }
         } else if (partnerGender == 'perempuan') {
-          // Cari usia partner jika tersedia
-          femaleAge = 22; // default usia subur partner
+          // Cari usia partner aktual
+          femaleAge = 18;
+          if (widget.targetName.startsWith('Ibu')) {
+            femaleAge = widget.character.motherAge ?? 38;
+          } else {
+            bool foundAge = false;
+            for (var p in [
+              widget.character.partner,
+              widget.character.secondPartner,
+              widget.character.thirdPartner,
+              widget.character.fourthPartner,
+              widget.character.fifthPartner,
+            ]) {
+              if (p != null && (p['name'] == widget.targetName || widget.targetName.contains(p['name'] ?? '___'))) {
+                femaleAge = int.tryParse(p['age'] ?? '18') ?? 18;
+                foundAge = true;
+                break;
+              }
+            }
+            if (!foundAge) {
+              for (var sib in widget.character.siblings) {
+                final String sName = sib['name'] ?? '';
+                final String expectedLabel = '$sName (${sib['relation']})';
+                if (sName == widget.targetName || expectedLabel == widget.targetName || widget.targetName.contains(sName)) {
+                  femaleAge = int.tryParse(sib['age'] ?? '18') ?? 18;
+                  foundAge = true;
+                  break;
+                }
+              }
+            }
+            if (!foundAge) {
+              for (var child in widget.character.children) {
+                if (child['name'] == widget.targetName || widget.targetName.contains(child['name'] ?? '___')) {
+                  femaleAge = int.tryParse(child['age'] ?? '18') ?? 18;
+                  foundAge = true;
+                  break;
+                }
+              }
+            }
+            if (!foundAge) {
+              for (var ext in widget.character.extendedFamily) {
+                if (ext['name'] == widget.targetName || widget.targetName.contains(ext['name'] ?? '___')) {
+                  femaleAge = int.tryParse(ext['age'] ?? '18') ?? 18;
+                  foundAge = true;
+                  break;
+                }
+              }
+            }
+          }
+
           femaleFertility = _getFertilityRate(femaleAge, 'perempuan');
 
           if (widget.character.partnerIsPregnant) {
@@ -614,7 +662,12 @@ class _BercintaScreenState extends State<BercintaScreen> {
               if (_random.nextDouble() < femaleFertility) {
                 isPartnerPregnant = true;
                 widget.character.partnerIsPregnant = true;
-                widget.character.pregnantByPartnerName = widget.targetName;
+                final String existingPreg = widget.character.pregnantByPartnerName ?? '';
+                if (existingPreg.isEmpty) {
+                  widget.character.pregnantByPartnerName = widget.targetName;
+                } else if (!existingPreg.split(', ').contains(widget.targetName)) {
+                  widget.character.pregnantByPartnerName = '$existingPreg, ${widget.targetName}';
+                }
                 widget.character.pregnantByPartnerRole = widget.targetRole;
                 
                 widget.character.inbox.add(
@@ -624,7 +677,7 @@ class _BercintaScreenState extends State<BercintaScreen> {
                 additionalMessage = 'Kali ini belum berhasil menghamili. (Kesuburan pasangan: ${(femaleFertility * 100).toInt()}%)';
               }
             } else {
-              additionalMessage = 'Pasanganmu berada di luar masa subur.';
+              additionalMessage = 'Pasanganmu ($femaleAge tahun) berada di luar masa subur (8-45 tahun).';
             }
           }
         }
@@ -848,8 +901,9 @@ class _BercintaScreenState extends State<BercintaScreen> {
       }
       if (!found) {
         for (var sib in widget.character.siblings) {
-          final String expectedLabel = '${sib['name']} (${sib['relation']})';
-          if (expectedLabel == widget.targetName) {
+          final String sName = sib['name'] ?? '';
+          final String expectedLabel = '$sName (${sib['relation']})';
+          if (sName == widget.targetName || expectedLabel == widget.targetName || widget.targetName.contains(sName)) {
             targetAge = int.tryParse(sib['age'] ?? '18') ?? 18;
             found = true;
             break;
