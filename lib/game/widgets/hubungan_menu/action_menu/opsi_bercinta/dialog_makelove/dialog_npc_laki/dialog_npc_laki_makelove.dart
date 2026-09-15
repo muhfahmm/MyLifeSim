@@ -6,6 +6,7 @@ import 'package:mylifesim/avatar/vn_character_view.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_npc_laki/desahan_npc_laki_makelove.dart';
 
 enum NPCLakiPersonalityType { shy, bold, kind }
 
@@ -25,111 +26,192 @@ class DialogNpcLakiMakeLove {
   }
 
   // ==========================================================
-  // LIBRARY DESAHAN LAKI-LAKI (DIPERBANYAK)
+  // LIBRARY 50 DIALOG PERCAKAPAN INTIM SHY (PEMALU)
   // ==========================================================
-  static const List<String> _shyMoans = [
-    "Hah... hah... a-aku merasa sangat canggung...",
-    "Mmh... jangan tatap mataku seperti itu...",
-    "Hah... sentuhanmu... membuatku gemetar...",
-    "Ugh... pelan-pelan ya sayang...",
-    "Hah... hah... aku... aku gugup sekali...",
-    "Mmh... ahh... bisakah kita pelukan saja dulu?",
-    "Hah... hah... jantungku berdegup sangat kencang...",
-    "Ugh... kamu... kamu sangat indah malam ini...",
-    "Hah... jangan berhenti... tapi aku malu...",
-    "Mmh... ahh... napasku... tersengal...",
-    "Hah... hah... a-aku mencintaimu...",
-    "Ugh... jangan di situ... terasa sensitif...",
-    "Hah... hah... genggam tanganku erat-erat...",
-    "Mmh... ah... aku tidak biasa seperti ini...",
-    "Hah... hah... kamu membuatku leleh...",
-    "Ugh... s-sentuh aku lagi...",
-    "Hah... hah... b-bagaimana jika ada yang mendengar?",
-    "Mmh... ahh... aku sangat menyukaimu...",
-    "Hah... hah... a-aku sudah tidak kuat...",
-    "Ugh... ahh... berbisiklah padaku...",
-    // Tambahan desahan baru
-    "Hah... hah... a-aku ingin bersandar padamu...",
-    "Mmh... ah... tubuhku gemetar karena sentuhanmu...",
-    "Ugh... hah... pelukanmu sangat hangat...",
-    "Hah... hah... a-aku merasa aman bersamamu...",
-    "Mmh... ahh... jangan tinggalkan aku malam ini...",
+  static const List<String> _shyDialogues = [
+    "Hah... aku merasa sangat canggung tapi hatiku begitu bahagia bersamamu...",
+    "Mmh... bisakah kita saling berpelukan erat seperti ini dulu?",
+    "Hah... sentuhan jarimu di dadaku membuat jantungku berdebar tak karuan...",
+    "Ugh... kamu terlihat begitu manis malam ini, membuatku makin malu...",
+    "Hah... bisikkan namaku lagi, aku suka mendengar suaramu yang lembut...",
+    "Mmh... genggam tanganku hangat-hangat ya, jangan dilepas...",
+    "Hah... aku selalu gugup setiap kali mata kita bertemu di keheningan ini...",
+    "Ugh... kehangatan tubuhmu sungguh menenangkan jiwaku...",
+    "Hah... bisakah kita perlambat ritmenya agar momen ini terasa lebih lama?",
+    "Mmh... kecupanmu di bibirku terasa begitu manis dan tulus...",
+    "Hah... jangan tatap aku seperti itu, wajahku rasanya merona sekali...",
+    "Ugh... bersamamu di sini adalah impian sederhana yang sangat kuinginkan...",
+    "Hah... rasakan betapa cepatnya detak dadaku saat memelukmu...",
+    "Mmh... pelan-pelan ya, aku ingin menikmati setiap detik kebersamaan kita...",
+    "Hah... rintihan kecilmu membuat gairah dan kasih sayangku menyatu...",
+    "Ugh... kamu sangat berarti bagiku, lebih dari apapun di dunia ini...",
+    "Hah... bersandarlah di bahuku jika kamu merasa lelah...",
+    "Mmh... aku berjanji akan selalu memperlakukanmu dengan lembut...",
+    "Hah... sentuhan lembut di pipimu ini adalah tanda betapa aku mencintaimu...",
+    "Ugh... bisakah kita tetap seperti ini tanpa perlu terburu-buru?",
+    "Hah... napas hangatmu di leherku membuat seluruh raga ini luluh...",
+    "Mmh... belai rambutku perlahan, aku merasa sangat aman di pelukanmu...",
+    "Hah... tatapan matamu yang penuh kasih selalu berhasil menyejukkan hatiku...",
+    "Ugh... setiap kecupan manis darimu membuatku merasa menjadi pria paling beruntung...",
+    "Hah... jangan lepaskan dekapan ini, kehangatanmu adalah kenyamanan utamaku...",
+    "Mmh... aku akan mendengarkan setiap desahan manis yang keluar dari bibirmu...",
+    "Hah... pelukan ini begitu hangat hingga aku enggan malam cepat berlalu...",
+    "Ugh... kelembutan caramu menyentuhku sungguh menyentuh lubuk hatiku...",
+    "Hah... bisikan sayangmu bagaikan melodi yang paling indah di telingaku...",
+    "Mmh... aku ingin menjaga momen romantis ini dengan segenap kasih sayangku...",
+    "Hah... terima kasih sudah hadir dan melengkapi hari-hari sepi dalam hidupku...",
+    "Ugh... usapan lembut jemarimu di jemariku terasa sungguh menentramkan...",
+    "Hah... tetaplah dekat denganku, aku tak ingin ada jarak di antara kita...",
+    "Mmh... senyuman tipismu di tengah malam ini selalu berhasil mencuri hatiku...",
+    "Hah... rasakan getaran cinta yang terus mengalir di antara kita berdua...",
+    "Ugh... bersamamu membuatku yakin bahwa cinta yang tulus itu sungguh nyata...",
+    "Hah... biarkan aku mendekapmu lebih erat agar kamu merasakan kehangatan ini...",
+    "Mmh... bimbing tanganku jika ada hal yang membuatmu merasa lebih nyaman...",
+    "Hah... embusan napasmu yang tersengal terdengar sangat menggemaskan bagiku...",
+    "Ugh... jangan pernah ragu untuk bersandar padaku kapanpun kamu butuh tempat berlabuh...",
+    "Hah... kecupan hangat di keningmu ini adalah bentuk rasa hormat dan cintaku...",
+    "Mmh... kelembutan rasa ini membuat malam kelam menjadi begitu bersinar...",
+    "Hah... aku merasa sangat diberkati bisa membagikan rasa intim ini bersamamu...",
+    "Ugh... berbisiklah pelan, aku akan selalu setia menyimak setiap bait kata-katamu...",
+    "Hah... desahan halusmu mengalir pelan mengisi keheningan malam yang sunyi...",
+    "Mmh... senandung mesramu terasa bagaikan doa kebahagiaan bagi hubungan kita...",
+    "Hah... tataplah aku dengan kedalaman rasa yang selalu berhasil membuaiku...",
+    "Ugh... kehangatan belaianmu meresap jauh hingga ke relung hatiku yang terdalam...",
+    "Hah... malam ini menjadi saksi betapa murninya cinta yang kita rajut bersama...",
+    "Mmh... tetaplah bersamaku dalam kehangatan pelukan mesra ini selamanya..."
   ];
 
-  static const List<String> _boldMoans = [
-    "Hah! Kamu luar biasa malam ini! Jangan berhenti!",
-    "Ugh! Lebih erat lagi! Aku mau kamu sepenuhnya!",
-    "Hah! Tepat seperti itu! Teruskan sayang!",
-    "Ahh! Kamu membuatku semakin gila!",
-    "Hah! Sentuhanmu selalu berhasil membakarku!",
-    "Ugh! Jangan pelan-pelan! Aku tidak sabar!",
-    "Hah! Tatap mataku! Kamu milikku malam ini!",
-    "Ahh! Ya! Seperti itu! Sungguh nikmat!",
-    "Hah! Aku suka saat kamu memegangku seperti ini!",
-    "Ugh! Hah! Suaramu membuatku semakin bernafsu!",
-    "Ahh! Biarkan aku memimpin ritmenya!",
-    "Hah! Kamu terasa sangat hangat dan sempurna!",
-    "Ugh! Aku tidak akan melepaskanmu malam ini!",
-    "Ahh! Terus dekatkan tubuhmu padaku!",
-    "Hah! Kamu sungguh hebat, sayang!",
-    "Ugh! Hah! Aku hampir sampai pada puncaknya!",
-    "Ahh! Rasakan detak jantungku yang membara!",
-    "Hah! Kita buat malam ini tak tertandingi!",
-    "Ugh! Ya! Jangan berhenti sampai kita lelah!",
-    "Ahh! Kamu adalah milikku yang paling berharga!",
-    // Tambahan desahan baru
-    "Ugh! Hah! Lebih cepat, lebih kuat!",
-    "Ahh! Kamu membuatku kehilangan kendali!",
-    "Hah! Aku ingin merasakan seluruh tubuhmu!",
-    "Ugh! Ahh! Jangan berhenti sampai aku puas!",
-    "Ahh! Kamu tahu persis bagaimana membuatku bergairah!",
+  // ==========================================================
+  // LIBRARY 50 DIALOG PERCAKAPAN INTIM BOLD (PERCAYA DIRI / GIGIH)
+  // ==========================================================
+  static const List<String> _boldDialogues = [
+    "Hah! Kamu terlihat luar biasa malam ini, membuatku tak ingin melepaskanmu!",
+    "Ugh! Lebih dekat lagi padaku, biarkan aku merasakan seluruh kehangatanmu!",
+    "Hah! Tatap mataku erat-erat, malam ini kamu sepenuhnya milikku!",
+    "Ahh! Sentuhanmu sungguh membakar gairahku, teruskan sayang!",
+    "Hah! Kamu tahu persis bagaimana cara membuatku bertekuk lutut di hadapanmu!",
+    "Ugh! Jangan tahan desahanmu, biarkan aku mendengar betapa nikmatnya malam ini!",
+    "Hah! Ikuti ritmeku, kita buat malam penuh cinta ini takkan pernah terlupakan!",
+    "Ahh! Kamu begitu menggoda, membuatku ingin memberikan semua energi cintaku!",
+    "Hah! Peluk leherku erat-erat dan rasakan betapa hebatnya gairah kita menyatu!",
+    "Ugh! Kebersamaan denganmu selalu berhasil memicu adrenalin kebahagiaan terbaik!",
+    "Hah! Jangan pelan-pelan, biarkan gairah mesra kita memuncak tanpa batas!",
+    "Ahh! Kecupan di bibirmu membuatku ketagihan untuk menikmatinya berulang kali!",
+    "Hah! Bisikkan kata-kata manjamu tepat di telingaku, aku menyukai keberanianmu!",
+    "Ugh! Setiap sentuhanmu di tubuhku menyalakan api percikan cinta yang membara!",
+    "Hah! Rangkul pinggangku dan biarkan aku membawamu ke puncak kebahagiaan malam ini!",
+    "Ahh! Suaramu yang penuh desahan membuatku semakin tak sabar memanjakanmu!",
+    "Hah! Kita diciptakan untuk saling melengkapi dalam momen intim penuh gairah ini!",
+    "Ugh! Jangan lepaskan pandanganmu, aku ingin melihat binar kebahagiaan di matamu!",
+    "Hah! Gerakanmu begitu indah dan penuh keyakinan, aku sangat menyukainya!",
+    "Ahh! Biarkan seluruh kehangatan ini memenuhi ruangan hingga pagi menjelang!",
+    "Hah! Kamu adalah kombinasi sempurna antara kecantikan dan gairah yang membara!",
+    "Ugh! Teruskan sentuhan manjamu di situ, kamu membuatku makin tak terkendali!",
+    "Hah! Dekatkan tubuhmu tanpa sisa jarak, kita buat malam ini milik kita berdua!",
+    "Ahh! Rintihanmu adalah musik paling menggebu yang pernah kudengar dalam hidupku!",
+    "Hah! Genggam bahuku erat-erat saat gairah ini membawa kita melayang tinggi!",
+    "Ugh! Kamu sungguh luar biasa, tidak ada yang bisa menandingi pesonamu!",
+    "Hah! Nikmati setiap hembusan gairah ini, aku ada di sini sepenuhnya untukmu!",
+    "Ahh! Kecupan panas di lehermu akan mengingatkanmu betapa dalamnya cintaku!",
+    "Hah! Jangan ragu untuk menunjukkan betapa besarnya rasa manjamu padaku!",
+    "Ugh! Keberanianmu merangkulku membuat suasana malam ini semakin memuncak!",
+    "Hah! Bisikkan apa yang paling kamu inginkan malam ini, aku akan mewujudkannya!",
+    "Ahh! Kehangatan kita menyatu bagaikan simfoni malam yang sangat megah!",
+    "Hah! Rasakan detak jantungku yang berpacu kencang menyambut keindahanmu!",
+    "Ugh! Kamu membuat malam biasa menjadi pengalaman percintaan yang sangat berharga!",
+    "Hah! Pegang tanganku dan rasakan getaran energi percintaan yang meluap-luap!",
+    "Ahh! Desahan manjamu memacu semangatku untuk memberikan yang terbaik bagimu!",
+    "Hah! Jangan biarkan momen penuh gairah ini berakhir terlalu cepat, sayang!",
+    "Ugh! Sentuhan memikatmu selalu berhasil melumpuhkan seluruh pertahananku!",
+    "Hah! Kebersamaan kita di sini adalah kombinasi cinta paling membara yang ada!",
+    "Ahh! Tatapan penuh gairahmu memberi sinyal bahwa malam ini sungguh sempurna!",
+    "Hah! Teruslah mengusap dadaku, aku menyukai sensasi hangat dari jemarimu!",
+    "Ugh! Kita adalah pasangan paling serasi saat menyatukan raga dalam cinta ini!",
+    "Hah! Dengarkan deru napasku yang tersengal, semuanya dipicu oleh kecantikanmu!",
+    "Ahh! Jangan berhenti memanjakanku, biarkan malam ini menjadi saksi cinta kita!",
+    "Hah! Kehangatan bibirmu di bibirku adalah kombinasi rasa paling memabukkan!",
+    "Ugh! Dekap tubuhku sekuat yang kamu bisa, kita arungi puncak kebahagiaan ini!",
+    "Hah! Rintihan penuh nikmatmu membuktikan betapa indahnya rasa saling memiliki!",
+    "Ahh! Nikmati setiap detik sapuan mesra ini, aku takkan membiarkanmu merasa sepi!",
+    "Hah! Kamu telah memenangkan seluruh hati dan gairahku secara mutlak malam ini!",
+    "Ugh! Mari kita tuntaskan kebersamaan intim ini dalam pelukan kemesraan sejati!"
   ];
 
-  static const List<String> _kindMoans = [
-    "Hah... kamu membuatku merasa sangat beruntung...",
-    "Mmh... rasakan kehangatanku ya sayang...",
-    "Hah... aku ingin kamu merasa bahagia malam ini...",
-    "Ugh... sentuhanmu begitu lembut dan menenangkan...",
-    "Hah... peluk aku erat-erat, aku di sini untukmu...",
-    "Mmh... ahh... kamu sangat cantik dan sempurna...",
-    "Hah... aku mencintaimu lebih dari apapun...",
-    "Ugh... nikmati setiap detiknya bersama ya...",
-    "Hah... bisikanmu terasa sangat manis di telingaku...",
-    "Mmh... bersamamu terasa sangat damai dan indah...",
-    "Hah... aku tidak ingin malam ini cepat berakhir...",
-    "Ugh... kehangatanmu menyatu dengan kehangatanku...",
-    "Hah... sandarkan kepalamu di dadaku...",
-    "Mmh... aku akan selalu menyayangimu...",
-    "Hah... ketenangan ini sungguh luar biasa...",
-    "Ugh... terima kasih sudah hadir di hidupku...",
-    "Hah... aku akan menjagamu dengan sepenuh hati...",
-    "Mmh... aku merasa utuh saat bersamamu...",
-    "Hah... mari kita lewati malam romantis ini...",
-    "Ugh... kamu adalah kebahagiaan terbesarku...",
-    // Tambahan desahan baru
-    "Mmh... ahh... rasanya seperti mimpi...",
-    "Hah... setiap sentuhanmu adalah doa...",
-    "Ugh... aku ingin mengabadikan momen ini...",
-    "Hah... tubuhmu dan jiwaku menyatu...",
-    "Mmh... tenanglah, aku akan selalu di sini...",
+  // ==========================================================
+  // LIBRARY 50 DIALOG PERCAKAPAN INTIM KIND (PENYAYANG / LEMBUT)
+  // ==========================================================
+  static const List<String> _kindDialogues = [
+    "Hah... kamu membuatku merasa menjadi pria paling bahagia di dunia ini...",
+    "Mmh... rasakan kehangatan dadaku ya sayang, aku di sini selalu memelukmu...",
+    "Hah... aku ingin memastikan kamu merasa nyaman dan dicintai di setiap detik...",
+    "Ugh... sentuhan jemarimu begitu lembut, memberikan kedamaian di hatiku...",
+    "Hah... peluk aku erat-erat, tidak ada tempat yang lebih aman dari dekapan ini...",
+    "Mmh... kecupan manis di bibirmu adalah bentuk ketulusan cintaku padamu...",
+    "Hah... aku mencintaimu lebih dari kata-kata yang bisa kuucapkan malam ini...",
+    "Ugh... nikmati setiap moment kebersamaan ini dengan tenang dan penuh kehangatan...",
+    "Hah... bisikan lembutmu terasa bagaikan embun sejuk yang menyegarkan jiwaku...",
+    "Mmh... bersamamu di sini membuat seluruh lelah di hariku sirnah seketika...",
+    "Hah... aku tidak ingin malam romantis yang tenang ini cepat berlalu begitu saja...",
+    "Ugh... kehangatan jiwamu menyatu sempurna dengan kehangatan ragaku...",
+    "Hah... sandarkan kepalamu di manapun kamu mau, aku akan menopangmu penuh kasih...",
+    "Mmh... aku akan selalu menyayangi dan menjagamu dalam kondisi apapun...",
+    "Hah... kedamaian di mata indahmu membuat hatiku bergetar penuh syukur...",
+    "Ugh... terima kasih sudah hadir dan membagikan kasih sayangmu yang tulus...",
+    "Hah... aku akan melindungimu dan memanjakanmu dengan sepenuh jiwa dan ragaku...",
+    "Mmh... aku merasa utuh dan sempurna setiap kali memelukmu seperti ini...",
+    "Hah... mari kita lewati malam mesra ini dengan rasa saling menghargai...",
+    "Ugh... kamu adalah kebahagiaan terbesar yang pernah dianugerahkan padaku...",
+    "Hah... kecupan lembut di keningmu adalah pengingat betapa berharganya kamu...",
+    "Mmh... dengarkan detak jantungku, setiap ketukannya menyuarakan namamu...",
+    "Hah... kelembutan usapanmu membuatku merasa sangat dihormati dan dicintai...",
+    "Ugh... tataplah aku dengan kasih sayangmu yang selalu memberikan kedamaian...",
+    "Hah... tidak ada hal yang lebih indah daripada melihat senyum bahagia di wajahmu...",
+    "Mmh... biarkan aku mengusap jemarimu dan memberikan kehangatan di tengah malam...",
+    "Hah... setiap helaan napas kita malam ini menguatkan ikatan cinta di antara kita...",
+    "Ugh... berada di sisimu membuatku mengerti arti sejati dari cinta yang tulus...",
+    "Hah... bisikan mesramu menenangkan setiap kegelapan dan keraguan dalam diriku...",
+    "Mmh... bersandarlah padaku, aku akan menjadi pelindung setia dalam hidupmu...",
+    "Hah... kecupan mesra ini adalah tanda betapa aku menghormati dan mengasihimu...",
+    "Ugh... ketulusan caramu mendekapku memberikan rasa damai yang belum pernah ada...",
+    "Hah... mari kita rajut kenangan indah yang akan terus membahagiakan kita...",
+    "Mmh... kehangatan batin kita menyatu bagaikan simfoni kebahagiaan abadi...",
+    "Hah... terima kasih sudah mempercayaiku untuk membagikan rasa intim yang suci ini...",
+    "Ugh... setiap detik yang dihabiskan bersamamu adalah berkah yang sangat kubanggakan...",
+    "Hah... belai pipiku pelan, aku menyukai kelembutan dari setiap usapan tanganmu...",
+    "Mmh... pelukan ini adalah rumah tempat hatiku akan selalu pulang padamu...",
+    "Hah... desahan lembut penuh rasa syukurmu adalah hadiah paling berharga untukku...",
+    "Ugh... aku akan selalu memastikan kebahagiaanmu menjadi prioritas utamaku...",
+    "Hah... tatapan ketulusan matamu selalu berhasil menghangatkan jiwaku yang sepi...",
+    "Mmh... usap rambutku dan biarkan aku menikmati momen kedamaian bersama ini...",
+    "Hah... tidak ada yang perlu dikhawatirkan, aku di sini selalu memelukmu hangat...",
+    "Ugh... rasakan kehangatan kasihku yang mengalir di setiap kecupan lembut ini...",
+    "Hah... kita akan selalu saling menopang dan mengasihi dalam alur kehidupan kita...",
+    "Mmh... senyum manismu di keheningan malam ini begitu memancar memikat hati...",
+    "Hah... aku ingin memberikan yang terbaik agar kamu merasa sangat beruntung...",
+    "Ugh... pelukan mesra ini akan menyelimuti kita hingga fajar menyapa besok pagi...",
+    "Hah... ketulusan cintamu adalah alasan terbesar bagiku untuk selalu tersenyum...",
+    "Mmh... mari kita lelap dalam dekapan penuh cinta yang tak terhingga ini..."
   ];
 
-  static List<String> _getMoanSequence(NPCLakiPersonalityType type, int count) {
-    final List<String> pool = type == NPCLakiPersonalityType.shy
-        ? _shyMoans
-        : type == NPCLakiPersonalityType.bold
-            ? _boldMoans
-            : _kindMoans;
-
-    final Random rand = Random();
-    final List<String> result = [];
-    final List<int> indices = List.generate(pool.length, (i) => i)..shuffle(rand);
-
-    for (int i = 0; i < count && i < pool.length; i++) {
-      result.add(pool[indices[i]]);
+  static String getRandomDialogue(Map<String, dynamic> npc) {
+    final personality = _getNPCPersonality(npc);
+    List<String> pool;
+    switch (personality) {
+      case NPCLakiPersonalityType.shy:
+        pool = _shyDialogues;
+        break;
+      case NPCLakiPersonalityType.bold:
+        pool = _boldDialogues;
+        break;
+      case NPCLakiPersonalityType.kind:
+        pool = _kindDialogues;
+        break;
     }
-    return result;
+    final rand = Random();
+    return pool[rand.nextInt(pool.length)];
   }
+
+
 
   static VNDialogueNode getRejectionNode({
     required Map<String, dynamic> npc,
@@ -212,8 +294,6 @@ class DialogNpcLakiMakeLove {
     required List<VNDialogueNode> playerMoanNodes,
   }) {
     final String npcName = npc['name'] ?? 'Pasangan';
-    final NPCLakiPersonalityType personality = _getNPCPersonality(npc);
-    final List<String> npcMoans = _getMoanSequence(personality, 50);
     final Random rand = Random();
     final bool isPlayerMale = player.gender.trim().toLowerCase().contains('laki');
 
@@ -246,7 +326,7 @@ class DialogNpcLakiMakeLove {
       );
 
       final String narrationText = narrationLines[i % narrationLines.length];
-      final String rawMoan = npcMoans[rand.nextInt(npcMoans.length)];
+      final String rawMoan = DesahanNpcLakiMakeLove.getRandomMoan(npc);
 
       final int opt = rand.nextInt(4);
       String moanWithCall;

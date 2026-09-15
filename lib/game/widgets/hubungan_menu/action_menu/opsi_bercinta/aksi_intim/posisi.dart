@@ -17,7 +17,7 @@ class PosisiSeksHelper {
     final String locLower = location.toLowerCase();
 
     // Tentukan kategori lokasi:
-    // 'kamar_mandi', 'ruang_tamu', 'dapur', 'kamar_tidur' (default rumah), atau 'luar_rumah'
+    // 'kamar_mandi', 'ruang_tamu', 'dapur', 'hotel', 'kamar_tidur' (default rumah), atau 'luar_rumah'
     String locCat = 'kamar_tidur';
     if (locLower.contains('mandi') || locLower.contains('bathtub') || locLower.contains('shower')) {
       locCat = 'kamar_mandi';
@@ -25,7 +25,9 @@ class PosisiSeksHelper {
       locCat = 'ruang_tamu';
     } else if (locLower.contains('dapur') || locLower.contains('meja makan')) {
       locCat = 'dapur';
-    } else if (locLower.contains('mobil') || locLower.contains('hotel') || locLower.contains('restoran') || locLower.contains('kafe') || locLower.contains('taman') || locLower.contains('kantor')) {
+    } else if (locLower.contains('hotel')) {
+      locCat = 'hotel';
+    } else if (locLower.contains('mobil') || locLower.contains('restoran') || locLower.contains('kafe') || locLower.contains('taman') || locLower.contains('kantor')) {
       locCat = 'luar_rumah';
     }
 
@@ -130,6 +132,39 @@ class PosisiSeksHelper {
             'label': 'Standing Back Embrace (Dekapan Belakang Dapur) 🌙',
             'icon': '🌙',
             'description': 'Berdiri merapat di dekat kulkas/counter dapur sambil memeluk & menggesekkan panggul dari belakang.',
+          },
+        ];
+      } else if (locCat == 'hotel') {
+        return [
+          {
+            'id': 'riding',
+            'label': 'Hotel Bed Riding (Memangku di Kasur Hotel) 🏨',
+            'icon': '🏨',
+            'description': 'Duduk memangku di atas paha pasangan di ranjang king size kamar hotel mewah.',
+          },
+          {
+            'id': 'standing_wall',
+            'label': 'Hotel Wall / Window Press (Menempel di Dinding/Kaca Hotel) 🏙️',
+            'icon': '🏙️',
+            'description': 'Menempelkan tubuh ke dinding / kaca privat hotel sambil merangkul paha pasangan.',
+          },
+          {
+            'id': 'face_sitting',
+            'label': 'Hotel Bed Cunnilingus (Duduk di Wajah di Kasur Hotel) 👑',
+            'icon': '👑',
+            'description': 'Duduk di atas wajah pasangan di tempat tidur hotel memberikan stimulasi oral bergairah.',
+          },
+          {
+            'id': 'spooning_lesbian',
+            'label': 'Hotel Suite Spooning (Dekapan Menyamping di Hotel) 🌙',
+            'icon': '🌙',
+            'description': 'Berbaring miring mendekap mesra dari belakang di bawah selimut hangat kamar hotel.',
+          },
+          {
+            'id': 'scissoring',
+            'label': 'Hotel Bed Scissoring (Gunting di Kasur Hotel) ✂️',
+            'icon': '✂️',
+            'description': 'Berbaring menyilang di kasur hotel empuk sambil mengunci paha & menggesekkan klitoris.',
           },
         ];
       } else if (locCat == 'luar_rumah') {
@@ -305,6 +340,39 @@ class PosisiSeksHelper {
             'description': 'Berdiri berpelukan di dekat meja dapur sambil menggesekkan penis intim.',
           },
         ];
+      } else if (locCat == 'hotel') {
+        return [
+          {
+            'id': 'cowgirl_gay',
+            'label': 'Hotel Suite Riding (Anal Memangku di Kasur Hotel) 🏨',
+            'icon': '🏨',
+            'description': 'Satu pria duduk memangku di atas penis pasangannya di kasur king size hotel mewah.',
+          },
+          {
+            'id': 'standing_gay',
+            'label': 'Hotel Wall Press Anal (Anal Berdiri di Dinding/Kaca Hotel) 🏙️',
+            'icon': '🏙️',
+            'description': 'Menempel ke dinding/kaca balkon privat hotel untuk penetrasi anal berdiri.',
+          },
+          {
+            'id': 'doggy_gay',
+            'label': 'Hotel Bed Doggy (Anal Dari Belakang di Kasur Hotel) 🐾',
+            'icon': '🐾',
+            'description': 'Merangkak/menungging di kasur empuk hotel dengan penetrasi anal mendalam.',
+          },
+          {
+            'id': 'missionary_gay',
+            'label': 'Hotel Suite Missionary (Anal Tatap Muka di Hotel) 👨‍❤️‍👨',
+            'icon': '👨‍❤️‍👨',
+            'description': 'Berbaring terlentang di ranjang hotel, pasangan menindih bertatap muka.',
+          },
+          {
+            'id': 'spooning_gay',
+            'label': 'Hotel Suite Spooning (Anal Menyamping di Hotel) 🌙',
+            'icon': '🌙',
+            'description': 'Berbaring miring mendekap erat dari belakang di bawah selimut kasur hotel.',
+          },
+        ];
       } else if (locCat == 'luar_rumah') {
         return [
           {
@@ -477,7 +545,40 @@ class PosisiSeksHelper {
           'description': 'Berdiri merapat di dekat counter dapur, penetrasi menyamping/belakang.',
         },
       ];
-    } else if (locCat == 'luar_rumah') {
+      } else if (locCat == 'hotel') {
+        return [
+          {
+            'id': 'cowgirl',
+            'label': 'Hotel Bed Cowgirl (Wanita Di Atas di Kasur Hotel) 🏨',
+            'icon': '🏨',
+            'description': 'Wanita memangku dan mengontrol tempo di atas kasur king size hotel yang mewah.',
+          },
+          {
+            'id': 'doggy',
+            'label': 'Hotel Reclined Doggy (Dari Belakang di Kasur Hotel) 🐾',
+            'icon': '🐾',
+            'description': 'Menungging santai di pinggir tempat tidur hotel dengan penetrasi mendalam dari belakang.',
+          },
+          {
+            'id': 'missionary',
+            'label': 'Hotel Suite Missionary (Tatap Muka di Kasur Hotel) 👩‍❤️‍👨',
+            'icon': '👩‍❤️‍👨',
+            'description': 'Berbaring telentang bertatap muka di atas seprei halus kamar hotel.',
+          },
+          {
+            'id': 'standing_wall',
+            'label': 'Hotel Balcony / Wall Press (Berdiri Menempel Dinding/Balkon Hotel) 🏙️',
+            'icon': '🏙️',
+            'description': 'Menempelkan tubuh ke dinding kamar / kaca balkon privat hotel dengan angkatan paha intim.',
+          },
+          {
+            'id': 'spooning',
+            'label': 'Hotel Suite Spooning (Dekapan Menyamping di Hotel) 🌙',
+            'icon': '🌙',
+            'description': 'Berbaring miring mendekap erat dari belakang di bawah selimut hangat kamar hotel.',
+          },
+        ];
+      } else if (locCat == 'luar_rumah') {
       return [
         {
           'id': 'cowgirl',
