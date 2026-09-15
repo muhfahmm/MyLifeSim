@@ -15,6 +15,7 @@ class VNDialogueOverlay extends StatefulWidget {
   final String? playerAvatarUrl;
   final String? npcAvatarUrl;
   final String? customLocation;
+  final String? finishButtonText;
 
   const VNDialogueOverlay({
     super.key,
@@ -25,6 +26,7 @@ class VNDialogueOverlay extends StatefulWidget {
     this.playerAvatarUrl,
     this.npcAvatarUrl,
     this.customLocation,
+    this.finishButtonText,
   });
 
   static Future<void> show({
@@ -36,6 +38,7 @@ class VNDialogueOverlay extends StatefulWidget {
     String? playerAvatarUrl,
     String? npcAvatarUrl,
     String? customLocation,
+    String? finishButtonText,
   }) {
     return showGeneralDialog(
       context: context,
@@ -52,6 +55,7 @@ class VNDialogueOverlay extends StatefulWidget {
           playerAvatarUrl: playerAvatarUrl,
           npcAvatarUrl: npcAvatarUrl ?? npc['avatarUrl']?.toString(),
           customLocation: customLocation,
+          finishButtonText: finishButtonText,
         );
       },
     );
@@ -73,26 +77,14 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
   Timer? _typewriterTimer;
   bool _isTyping = false;
 
-  // Pulse animation controller for skip text
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
-
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    )..repeat(reverse: true);
-    _pulseAnimation = Tween<double>(begin: 0.3, end: 1.0).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
-    );
     _loadNode(_currentIndex);
   }
 
   @override
   void dispose() {
-    _pulseController.dispose();
     _autoTimer?.cancel();
     _typewriterTimer?.cancel();
     super.dispose();
@@ -737,20 +729,50 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
           const SizedBox(height: 8),
-          // Tap hint icon on dialogue box (Menutup dialog jika ditekan)
+          // Tombol Selesaikan (Selesaikan Seks / Selesaikan Masturbasi) di kanan bawah dialog box
           Align(
             alignment: Alignment.bottomRight,
             child: InkWell(
               onTap: _finishDialogue,
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(2.0),
-                child: Icon(
-                  (_currentIndex >= widget.nodes.length - 1)
-                      ? Icons.check_circle
-                      : Icons.arrow_drop_down_circle,
-                  color: style.badgeBorderColor,
-                  size: 22,
+              borderRadius: BorderRadius.circular(10),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.red.shade900,
+                      Colors.deepOrange.shade800,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: Colors.amber.withValues(alpha: 0.8), width: 1.2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black54,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.stop_circle,
+                      size: 13,
+                      color: Colors.white,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      _getFinishButtonText(),
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 11.5,
+                        letterSpacing: 0.2,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ),
@@ -758,6 +780,41 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         ],
       ),
     );
+  }
+
+  String _getFinishButtonText() {
+    if (widget.finishButtonText != null && widget.finishButtonText!.isNotEmpty) {
+      return widget.finishButtonText!;
+    }
+
+    // Auto detect dari lokasi & narasi dialog
+    final String locLower = (widget.customLocation ?? '').toLowerCase();
+    String allNodesText = '';
+    for (var node in widget.nodes) {
+      allNodesText += '${node.dialogueText.toLowerCase()} ';
+    }
+
+    if (locLower.contains('masturbas') || locLower.contains('masturbat') || allNodesText.contains('masturbas') || allNodesText.contains('masturbat')) {
+      return 'Selesaikan Masturbasi';
+    }
+
+    if (locLower.contains('bercinta') ||
+        locLower.contains('seks') ||
+        allNodesText.contains('bercinta') ||
+        allNodesText.contains('seks') ||
+        allNodesText.contains('penismu') ||
+        allNodesText.contains('vaginamu') ||
+        allNodesText.contains('gairah') ||
+        allNodesText.contains('penetrasi') ||
+        allNodesText.contains('ejakulasi') ||
+        allNodesText.contains('oral') ||
+        allNodesText.contains('makelove') ||
+        allNodesText.contains('ciuman') ||
+        allNodesText.contains('genggaman tanganku')) {
+      return 'Selesaikan Seks';
+    }
+
+    return 'Selesaikan';
   }
 
   /// Panel Dropdown PERSISTEN: Ciuman & Penetrasi
@@ -1143,7 +1200,6 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             if (activePos != null && activePos.isNotEmpty) {
               final bool isCiuman = c.text.contains('1. Ciuman');
               final bool isOral = c.text.contains('2. Oral Seks');
-              final bool isAskStimulasi = c.text.contains('5.');
               final bool isDoStimulasi = c.text.contains('6.');
               final bool isPayudara = c.text.contains('7.') && c.text.contains('payudara');
 

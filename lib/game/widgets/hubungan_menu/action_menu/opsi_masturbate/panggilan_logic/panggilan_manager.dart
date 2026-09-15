@@ -17,6 +17,45 @@ class PanggilanManager {
   }) {
     final String roleLower = targetRole.toLowerCase();
 
+    // 0. Hubungan Keluarga (Prioritas Utama jika relasi mengandung unsur keluarga)
+    final bool isFamilyRole = roleLower.contains('ayah') ||
+        roleLower.contains('bapak') ||
+        roleLower.contains('papa') ||
+        roleLower.contains('ibu') ||
+        roleLower.contains('mama') ||
+        roleLower.contains('mami') ||
+        roleLower.contains('kakak') ||
+        roleLower.contains('mas') ||
+        roleLower.contains('mbak') ||
+        roleLower.contains('abang') ||
+        roleLower.contains('adik') ||
+        roleLower.contains('dek') ||
+        roleLower.contains('anak') ||
+        roleLower.contains('putri') ||
+        roleLower.contains('putra') ||
+        roleLower.contains('paman') ||
+        roleLower.contains('om') ||
+        roleLower.contains('bibi') ||
+        roleLower.contains('tante') ||
+        roleLower.contains('sepupu') ||
+        roleLower.contains('kakek') ||
+        roleLower.contains('opa') ||
+        roleLower.contains('nenek') ||
+        roleLower.contains('oma') ||
+        roleLower.contains('cucu') ||
+        roleLower.contains('keponakan');
+
+    if (isFamilyRole) {
+      return PanggilanKeluarga.getPanggilan(
+        targetName: targetName,
+        relationKey: targetRole,
+        isSpeakerPlayer: isSpeakerPlayer,
+        userName: userName,
+        userGender: userGender,
+        targetGender: targetGender,
+      );
+    }
+
     if (roleLower.contains('pacar') ||
         roleLower.contains('tunangan') ||
         roleLower.contains('suami') ||

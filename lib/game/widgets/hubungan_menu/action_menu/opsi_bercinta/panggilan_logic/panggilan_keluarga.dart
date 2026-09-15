@@ -101,7 +101,10 @@ class PanggilanKeluarga {
         case 'Anak Hasil Donor':
         case 'Anak Donor':
         case 'Anak (Donor)':
-        case 'Keponakan':
+        case 'Anak Perempuan':
+        case 'Anak Laki-laki':
+        case 'Putri':
+        case 'Putra':
           pool.addAll(usePetName 
               ? ['Anakku', 'Keponakanku', 'Nak', 'Sayang']
               : ['Anakku', 'Keponakanku', 'Nak']);
@@ -125,7 +128,7 @@ class PanggilanKeluarga {
             pool.addAll(['Paman', 'Om']);
           } else if (lower.contains('bibi') || lower.contains('tante')) {
             pool.addAll(['Bibi', 'Tante']);
-          } else if (lower.contains('anak') || lower.contains('keponakan')) {
+          } else if (lower.contains('anak') || lower.contains('keponakan') || lower.contains('putri') || lower.contains('putra')) {
             pool.addAll(['Nak', 'Anakku']);
           } else {
             pool.addAll(usePetName ? ['Sayang', 'Manisku'] : ['Sayang']);
@@ -222,10 +225,12 @@ class PanggilanKeluarga {
         case 'Anak Hasil Donor':
         case 'Anak Donor':
         case 'Anak (Donor)':
-          // NPC adalah Anak (termasuk Anak Donor) -> User adalah ORANG TUA / PAPAH
-          if (isUserMale && isTargetFemale) {
-            pool.add('papah');
-          } else if (isUserMale) {
+        case 'Anak Perempuan':
+        case 'Anak Laki-laki':
+        case 'Putri':
+        case 'Putra':
+          // NPC adalah Anak (termasuk Anak Donor) -> User adalah ORANG TUA / PAPAH / AYAH
+          if (isUserMale) {
             pool.addAll(['Ayah', 'Papa', 'Papi', 'Papah']);
           } else {
             pool.addAll(['Ibu', 'Mama', 'Mami', 'Mamah']);
@@ -264,11 +269,11 @@ class PanggilanKeluarga {
             } else {
               pool.addAll(usePetName ? [isUserMale ? 'Mas' : 'Mbak', 'Kakak', 'Kak', 'Sayang'] : [isUserMale ? 'Mas' : 'Mbak', 'Kakak', 'Kak']);
             }
-          } else if (lower.contains('anak') || lower.contains('donor')) {
-            if (isUserMale && isTargetFemale) {
-              pool.add('papah');
+          } else if (lower.contains('anak') || lower.contains('donor') || lower.contains('putri') || lower.contains('putra')) {
+            if (isUserMale) {
+              pool.addAll(['Ayah', 'Papa', 'Papi', 'Papah']);
             } else {
-              pool.addAll([isUserMale ? 'Ayah' : 'Ibu', isUserMale ? 'Papa' : 'Mama', isUserMale ? 'Om' : 'Tante']);
+              pool.addAll(['Ibu', 'Mama', 'Mami', 'Mamah']);
             }
           } else if (lower.contains('paman') || lower.contains('bibi') || lower.contains('om') || lower.contains('tante')) {
             pool.addAll(usePetName ? ['Keponakanku', 'Nak', 'Sayang'] : ['Keponakanku', 'Nak']);
