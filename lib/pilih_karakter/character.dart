@@ -52,6 +52,9 @@ class Character {
   int health;
   int happiness;
   int intelligence;
+  bool isHealthLocked = false;
+  bool isHappinessLocked = false;
+  bool isIntelligenceLocked = false;
   int money;
   int appearance;
   bool isAlive;
@@ -816,6 +819,9 @@ class Character {
     this.health = 100,
     this.happiness = 50,
     this.intelligence = 50,
+    this.isHealthLocked = false,
+    this.isHappinessLocked = false,
+    this.isIntelligenceLocked = false,
     this.money = 0,
     this.appearance = 50,
     this.isAlive = true,

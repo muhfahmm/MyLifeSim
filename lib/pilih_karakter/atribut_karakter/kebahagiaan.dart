@@ -3,10 +3,18 @@ import '../character.dart';
 
 extension KebahagiaanExtension on Character {
   void changeHappiness(int delta) {
+    if (isHappinessLocked) {
+      happiness = 100;
+      return;
+    }
     happiness = (happiness + delta).clamp(0, 100);
   }
 
   void updateHappinessDynamic() {
+    if (isHappinessLocked) {
+      happiness = 100;
+      return;
+    }
     final random = Random();
 
     // 1. Decay dasar acak halus (peluang 25% turun 1, 5% turun 2, sisanya 0)

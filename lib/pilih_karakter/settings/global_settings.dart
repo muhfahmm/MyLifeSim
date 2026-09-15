@@ -8,6 +8,7 @@ class GlobalSettings {
   static final ValueNotifier<bool> isPremium = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isSpecialCareerUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isSkipUsiaUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isMataSehatUnlocked = ValueNotifier<bool>(false);
 
   // Status Pembelian Karir Militer per Cabang
   static final ValueNotifier<bool> isMiliterADUnlocked = ValueNotifier<bool>(false);

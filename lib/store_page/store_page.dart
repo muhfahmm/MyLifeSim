@@ -40,6 +40,12 @@ class StorePage extends StatefulWidget {
     GlobalSettings.isSkipUsiaUnlocked.value = value;
   }
 
+  static bool get isMataSehatUnlocked => _StorePageState._mataSehatUnlocked || GlobalSettings.isMataSehatUnlocked.value;
+  static set isMataSehatUnlocked(bool value) {
+    _StorePageState._mataSehatUnlocked = value;
+    GlobalSettings.isMataSehatUnlocked.value = value;
+  }
+
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -51,6 +57,7 @@ class _StorePageState extends State<StorePage> {
   static bool _immunityUnlocked = false;
   static bool _specialCareerUnlocked = false;
   static bool _skipUsiaUnlocked = false;
+  static bool _mataSehatUnlocked = false;
 
   void _showNoCharacterMessage() {
     DialogHelper.show(
@@ -364,6 +371,8 @@ class _StorePageState extends State<StorePage> {
                 godModeUnlocked: _godModeUnlocked,
                 removeAdsUnlocked: _removeAdsUnlocked,
                 immunityUnlocked: _immunityUnlocked,
+                skipUsiaUnlocked: _skipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value,
+                mataSehatUnlocked: _mataSehatUnlocked || GlobalSettings.isMataSehatUnlocked.value,
               ),
               onPurchaseSuccess: () {
                 setState(() {
@@ -371,13 +380,11 @@ class _StorePageState extends State<StorePage> {
                   _godModeUnlocked = true;
                   _removeAdsUnlocked = true;
                   _immunityUnlocked = true;
+                  _skipUsiaUnlocked = true;
+                  _mataSehatUnlocked = true;
                   GlobalSettings.isPremium.value = true;
-                  if (character != null) {
-                    character.health = 100;
-                    character.happiness = 100;
-                    character.intelligence = 100;
-                    character.discipline = 100;
-                  }
+                  GlobalSettings.isSkipUsiaUnlocked.value = true;
+                  GlobalSettings.isMataSehatUnlocked.value = true;
                 });
                 if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
               },
@@ -489,15 +496,29 @@ class _StorePageState extends State<StorePage> {
                 }
               },
             ),
+            _buildStoreItem(
+              icon: Icons.remove_red_eye_rounded,
+              iconBgColor: Colors.cyan.shade600,
+              title: 'Mata Sehat Abadi (Bebas Tes Mata)',
+              description: 'Menjamin mata karakter 100% sehat selamanya, terhindar dari mata minus/silinder, dan bebas tes mata!',
+              price: 'Rp 99.000',
+              isUnlocked: _mataSehatUnlocked || GlobalSettings.isMataSehatUnlocked.value,
+              onTap: () {
+                _simulatePurchase('Mata Sehat Abadi (Bebas Tes Mata)', () {
+                  _mataSehatUnlocked = true;
+                  GlobalSettings.isMataSehatUnlocked.value = true;
+                });
+              },
+            ),
 
             // --- SEKSI PENINGKAT ATRIBUT ---
             _buildSectionHeader('Peningkat Atribut Instan', isDark),
             BundlePeningkatAtributCard(
               character: character,
               isUnlocked: character != null &&
-                  character.health >= 100 &&
-                  character.happiness >= 100 &&
-                  character.intelligence >= 100,
+                  (character.isHealthLocked || character.health >= 100) &&
+                  (character.isHappinessLocked || character.happiness >= 100) &&
+                  (character.isIntelligenceLocked || character.intelligence >= 100),
               onPurchaseSuccess: () {
                 setState(() {});
                 if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
@@ -507,13 +528,14 @@ class _StorePageState extends State<StorePage> {
               icon: Icons.favorite_rounded,
               iconBgColor: Colors.red.shade400,
               title: 'Serum Kesehatan Super',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Memulihkan kesehatan karakter menjadi 100% secara instan.',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Memulihkan & mengunci kesehatan karakter menjadi 100% terus tanpa bisa turun!',
               price: 'Rp 25.000',
-              isUnlocked: character != null && character.health >= 100,
+              isUnlocked: character != null && (character.isHealthLocked || character.health >= 100),
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kesehatan Super', () {
                   character.health = 100;
+                  character.isHealthLocked = true;
                 });
               },
             ),
@@ -521,13 +543,14 @@ class _StorePageState extends State<StorePage> {
               icon: Icons.emoji_emotions_rounded,
               iconBgColor: Colors.green.shade500,
               title: 'Pil Kebahagiaan Abadi',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Memaksimalkan level kebahagiaan karakter Anda menjadi 100%.',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Memaksimalkan & mengunci kebahagiaan karakter menjadi 100% terus tanpa bisa turun!',
               price: 'Rp 35.000',
-              isUnlocked: character != null && character.happiness >= 100,
+              isUnlocked: character != null && (character.isHappinessLocked || character.happiness >= 100),
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Pil Kebahagiaan Abadi', () {
                   character.happiness = 100;
+                  character.isHappinessLocked = true;
                 });
               },
             ),
@@ -535,13 +558,14 @@ class _StorePageState extends State<StorePage> {
               icon: Icons.psychology_rounded,
               iconBgColor: Colors.blue.shade500,
               title: 'Serum Kecerdasan Instan',
-              description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan kecerdasan karakter Anda menjadi 100%.',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan & mengunci kecerdasan karakter menjadi 100% terus tanpa bisa turun!',
               price: 'Rp 45.000',
-              isUnlocked: character != null && character.intelligence >= 100,
+              isUnlocked: character != null && (character.isIntelligenceLocked || character.intelligence >= 100),
               onTap: () {
                 if (character == null) return _showNoCharacterMessage();
                 _simulatePurchase('Serum Kecerdasan Instan', () {
                   character.intelligence = 100;
+                  character.isIntelligenceLocked = true;
                 });
               },
             ),
@@ -622,7 +646,19 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
               const SizedBox(height: 16),
               Text('Pembayaran Berhasil!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
               const SizedBox(height: 8),
-              Text('Item "${widget.itemName}" telah ditambahkan.', style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 13), textAlign: TextAlign.center),
+              Text(
+                widget.itemName.contains('Serum Kesehatan')
+                    ? 'Item "${widget.itemName}" telah ditambahkan. Bar Kesehatan Anda kini 100 terus tanpa bisa turun!'
+                    : widget.itemName.contains('Pil Kebahagiaan')
+                        ? 'Item "${widget.itemName}" telah ditambahkan. Bar Kebahagiaan Anda kini 100 terus tanpa bisa turun!'
+                        : widget.itemName.contains('Serum Kecerdasan')
+                            ? 'Item "${widget.itemName}" telah ditambahkan. Bar Kecerdasan Anda kini 100 terus tanpa bisa turun!'
+                            : widget.itemName.contains('Combo Atribut') || widget.itemName.contains('Bundle')
+                                ? 'Item "${widget.itemName}" telah ditambahkan. Semua bar status (Kesehatan, Kebahagiaan, Kecerdasan) kini 100 terus tanpa bisa turun!'
+                                : 'Item "${widget.itemName}" telah ditambahkan.',
+                style: TextStyle(color: isDark ? Colors.white70 : Colors.grey, fontSize: 13),
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: () => Navigator.pop(context, true),

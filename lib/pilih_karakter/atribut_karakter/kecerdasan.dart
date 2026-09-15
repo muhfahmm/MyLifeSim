@@ -3,10 +3,18 @@ import '../character.dart';
 
 extension KecerdasanExtension on Character {
   void changeIntelligence(int delta) {
+    if (isIntelligenceLocked) {
+      intelligence = 100;
+      return;
+    }
     intelligence = (intelligence + delta).clamp(0, 100);
   }
 
   void updateIntelligenceDynamic() {
+    if (isIntelligenceLocked) {
+      intelligence = 100;
+      return;
+    }
     final random = Random();
 
     // 1. Decay dasar acak halus (peluang 40% turun 1, 10% turun 2, sisanya 0)

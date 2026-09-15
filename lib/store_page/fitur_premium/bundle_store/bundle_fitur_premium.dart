@@ -7,12 +7,14 @@ class BundleFiturPremiumLogic {
   static const int item2Price = 249000;
   static const int item3Price = 49000;
   static const int item4Price = 129000;
+  static const int item5Price = 149000;
+  static const int item6Price = 99000;
 
   static const double baseDiscountRate = 0.15; // 15% base
 
   static double get effectiveDiscountRate => baseDiscountRate + PromoTwinDateLogic.getBonusDiscountRate();
 
-  static int get originalTotalPrice => item1Price + item2Price + item3Price + item4Price;
+  static int get originalTotalPrice => item1Price + item2Price + item3Price + item4Price + item5Price + item6Price;
   static int get bundlePrice => (originalTotalPrice * (1.0 - effectiveDiscountRate)).round();
   static int get savingsAmount => originalTotalPrice - bundlePrice;
 
@@ -40,8 +42,10 @@ class BundleFiturPremiumLogic {
     required bool godModeUnlocked,
     required bool removeAdsUnlocked,
     required bool immunityUnlocked,
+    required bool skipUsiaUnlocked,
+    required bool mataSehatUnlocked,
   }) {
-    return premiumUnlocked && godModeUnlocked && removeAdsUnlocked && immunityUnlocked;
+    return premiumUnlocked && godModeUnlocked && removeAdsUnlocked && immunityUnlocked && skipUsiaUnlocked && mataSehatUnlocked;
   }
 }
 
@@ -193,7 +197,7 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Akses 4 Fitur Sekaligus: Akses 18+, God Mode, Bebas Iklan, & Kekebalan Abadi!',
+                        'Akses 6 Fitur Sekaligus: Akses 18+, God Mode, Bebas Iklan, Kekebalan Abadi, Fast Forward Usia, & Mata Sehat Abadi!',
                         style: TextStyle(
                           fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,
@@ -378,7 +382,7 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Selamat! Seluruh Fitur Premium (Akses 18+, God Mode, Bebas Iklan, & Kekebalan Abadi) telah resmi aktif!',
+              'Selamat! Seluruh 6 Fitur Premium (Akses 18+, God Mode, Bebas Iklan, Kekebalan Abadi, Fast Forward Usia, & Mata Sehat Abadi) telah resmi aktif!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,

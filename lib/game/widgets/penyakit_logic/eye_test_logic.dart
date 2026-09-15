@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'dart:math';
 import 'dart:async';
 
@@ -78,6 +79,11 @@ class EyeTestLogic {
         !character.isMotherDeceased) {
       showCustodySelection(context, character.fatherName!, character.motherName!, onFinish);
       return;
+    }
+
+    if (GlobalSettings.isMataSehatUnlocked.value) {
+      onFinish();
+      return; // Bebas dari tes mata & mata minus
     }
 
     if (character.avatarAccessoriesType != 'blank' && character.avatarAccessoriesType != null) {

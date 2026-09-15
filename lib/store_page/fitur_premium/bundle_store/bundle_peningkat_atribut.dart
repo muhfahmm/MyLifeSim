@@ -39,8 +39,11 @@ class BundlePeningkatAtributLogic {
   static void applyAllBoosters(Character? character) {
     if (character != null) {
       character.health = 100;
+      character.isHealthLocked = true;
       character.happiness = 100;
+      character.isHappinessLocked = true;
       character.intelligence = 100;
+      character.isIntelligenceLocked = true;
     }
   }
 }
@@ -205,7 +208,7 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Memulihkan Kesehatan (100%), Kebahagiaan (100%), & Kecerdasan (100%) sekaligus!',
+                        'Memulihkan & mengunci Kesehatan (100%), Kebahagiaan (100%), & Kecerdasan (100%) sekaligus terus tanpa bisa turun!',
                         style: TextStyle(
                           fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,
@@ -387,7 +390,7 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
             ),
             const SizedBox(height: 10),
             Text(
-              'Selamat! Kesehatan, Kebahagiaan, dan Kecerdasan karaktermu kini 100% penuh!',
+              'Selamat! Bar Kesehatan, Kebahagiaan, dan Kecerdasan karaktermu kini 100% terus tanpa bisa turun!',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13.5,

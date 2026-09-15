@@ -3,10 +3,18 @@ import '../character.dart';
 
 extension KesehatanExtension on Character {
   void changeHealth(int delta) {
+    if (isHealthLocked) {
+      health = 100;
+      return;
+    }
     health = (health + delta).clamp(0, 100);
   }
 
   void updateHealthDynamic({bool isDaily = false}) {
+    if (isHealthLocked) {
+      health = 100;
+      return;
+    }
     final random = Random();
     
     // Ketika kebahagiaan 70++, maka kesehatan harus tetap naik dan turun secara fluktuatif
