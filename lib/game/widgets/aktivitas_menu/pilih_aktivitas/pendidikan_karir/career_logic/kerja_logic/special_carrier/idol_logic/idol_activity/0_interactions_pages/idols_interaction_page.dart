@@ -432,6 +432,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                                 'isDeceased': 'false',
                                 'breakInitiator': widget.character.gender,
                                 'breakReason': 'putus biasa',
+                                if (widget.person['skinColor'] != null) 'skinColor': widget.person['skinColor']!,
                               });
                             });
                             _updateRelationship(-40);
@@ -499,6 +500,8 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                   bool accepted = false;
                   if (relationship < 50) {
                     accepted = false;
+                  } else if (widget.character.isIdolStaff && (widget.category == 'Trainee' || widget.category == 'Main Team')) {
+                    accepted = true;
                   } else if (widget.category == 'Trainee' || widget.category == 'Main Team') {
                     accepted = _random.nextInt(100) < 50;
                   } else {
@@ -514,6 +517,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
                       'isDeceased': 'false',
                       'sexuality': sexuality,
                       'relation': 'Pacar',
+                      if (widget.person['skinColor'] != null) 'skinColor': widget.person['skinColor']!,
                     };
                     widget.character.addPartnerToFreeSlot(partnerMap);
                     _updateRelationship(20);

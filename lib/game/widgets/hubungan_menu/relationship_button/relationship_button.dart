@@ -807,6 +807,7 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           gender: gender,
                           age: exAge,
                           happiness: relVal,
+                          forcedSkinColor: ex['skinColor'] ?? character.getFamilyMemberSkinColor(name),
                         ),
                       );
                     }).toList(),

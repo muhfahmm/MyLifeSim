@@ -518,7 +518,8 @@ class _StorePageState extends State<StorePage> {
               isUnlocked: character != null &&
                   (character.isHealthLocked || character.health >= 100) &&
                   (character.isHappinessLocked || character.happiness >= 100) &&
-                  (character.isIntelligenceLocked || character.intelligence >= 100),
+                  (character.isIntelligenceLocked || character.intelligence >= 100) &&
+                  (character.isDisciplineLocked || character.discipline >= 100),
               onPurchaseSuccess: () {
                 setState(() {});
                 if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
@@ -566,6 +567,21 @@ class _StorePageState extends State<StorePage> {
                 _simulatePurchase('Serum Kecerdasan Instan', () {
                   character.intelligence = 100;
                   character.isIntelligenceLocked = true;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.fitness_center_rounded,
+              iconBgColor: Colors.amber.shade700,
+              title: 'Eliksir Kedisiplinan Instan',
+              description: character == null ? 'Membutuhkan karakter aktif' : 'Meningkatkan & mengunci kedisiplinan karakter menjadi 100% terus tanpa bisa turun!',
+              price: 'Rp 40.000',
+              isUnlocked: character != null && (character.isDisciplineLocked || character.discipline >= 100),
+              onTap: () {
+                if (character == null) return _showNoCharacterMessage();
+                _simulatePurchase('Eliksir Kedisiplinan Instan', () {
+                  character.discipline = 100;
+                  character.isDisciplineLocked = true;
                 });
               },
             ),

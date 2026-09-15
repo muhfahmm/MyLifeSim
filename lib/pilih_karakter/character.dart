@@ -10,6 +10,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 import 'package:mylifesim/game/widgets/penyakit_logic/incest_logic.dart';
 import 'package:mylifesim/avatar/skin_color_inheritance.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/idol_logic/idol_manager.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_handler.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/relationship_button/parent_remarriage.dart';
@@ -55,6 +56,7 @@ class Character {
   bool isHealthLocked = false;
   bool isHappinessLocked = false;
   bool isIntelligenceLocked = false;
+  bool isDisciplineLocked = false;
   int money;
   int appearance;
   bool isAlive;
@@ -615,32 +617,55 @@ class Character {
   }
 
   String? getFamilyMemberSkinColor(String targetName) {
-    final String lowerTarget = targetName.toLowerCase();
-    if (lowerTarget.startsWith('ibu') && !lowerTarget.contains('tiri')) {
+    final String cleanTarget = AvatarAgeRules.getCleanNPCName(targetName).toLowerCase().trim();
+    if (cleanTarget.isEmpty) return null;
+
+    if (motherName != null && AvatarAgeRules.getCleanNPCName(motherName!).toLowerCase().trim() == cleanTarget) {
       return motherSkinColor;
     }
-    if (lowerTarget.startsWith('ayah') && !lowerTarget.contains('tiri')) {
+    if (fatherName != null && AvatarAgeRules.getCleanNPCName(fatherName!).toLowerCase().trim() == cleanTarget) {
       return fatherSkinColor;
     }
-    if (lowerTarget.startsWith('ibu') && lowerTarget.contains('tiri')) {
+    if (stepMotherName != null && AvatarAgeRules.getCleanNPCName(stepMotherName!).toLowerCase().trim() == cleanTarget) {
       return stepMotherSkinColor;
     }
-    if (lowerTarget.startsWith('ayah') && lowerTarget.contains('tiri')) {
+    if (stepFatherName != null && AvatarAgeRules.getCleanNPCName(stepFatherName!).toLowerCase().trim() == cleanTarget) {
       return stepFatherSkinColor;
     }
-    for (var sib in siblings) {
-      final String sibName = sib['name'] ?? '';
-      final String expectedLabel = '$sibName (${sib['relation']})';
-      if (expectedLabel == targetName || sibName == targetName) {
-        return sib['skinColor'];
+
+    for (var p in [partner, secondPartner, thirdPartner, fourthPartner, fifthPartner]) {
+      if (p != null) {
+        final String pName = AvatarAgeRules.getCleanNPCName(p['name'] ?? '').toLowerCase().trim();
+        if (pName == cleanTarget && p['skinColor'] != null && p['skinColor']!.isNotEmpty) {
+          return p['skinColor'];
+        }
       }
     }
-    for (var child in children) {
-      final String childName = child['name'] ?? '';
-      if (childName.toLowerCase() == lowerTarget) {
-        return child['skinColor'];
+
+    final List<List<Map<String, dynamic>>> allDynamicLists = [
+      siblings,
+      extendedFamily,
+      children,
+      friends,
+      classmates,
+      univClassmates,
+      coworkers,
+      idolTrainees,
+      idolMainMembers,
+      idolStaff,
+    ];
+
+    for (var list in allDynamicLists) {
+      for (var item in list) {
+        final String itemName = AvatarAgeRules.getCleanNPCName((item['name'] ?? '').toString()).toLowerCase().trim();
+        if (itemName.isNotEmpty && (itemName == cleanTarget || cleanTarget.contains(itemName) || itemName.contains(cleanTarget))) {
+          if (item['skinColor'] != null && item['skinColor'].toString().isNotEmpty) {
+            return item['skinColor'].toString();
+          }
+        }
       }
     }
+
     return null;
   }
 
@@ -935,6 +960,7 @@ class Character {
     this.isHealthLocked = false,
     this.isHappinessLocked = false,
     this.isIntelligenceLocked = false,
+    this.isDisciplineLocked = false,
     this.money = 0,
     this.appearance = 50,
     this.isAlive = true,

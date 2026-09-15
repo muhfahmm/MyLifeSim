@@ -3,10 +3,18 @@ import '../character.dart';
 
 extension DisiplinExtension on Character {
   void changeDiscipline(int delta) {
+    if (isDisciplineLocked) {
+      discipline = 100;
+      return;
+    }
     discipline = (discipline + delta).clamp(0, 100);
   }
 
   void updateDisciplineDynamic() {
+    if (isDisciplineLocked) {
+      discipline = 100;
+      return;
+    }
     final random = Random();
 
     // 1. Decay dasar acak halus (peluang 30% turun 1, 10% turun 2, sisanya 0)

@@ -8,12 +8,13 @@ class BundlePeningkatAtributLogic {
   static const int item1Price = 25000;
   static const int item2Price = 35000;
   static const int item3Price = 45000;
+  static const int item4Price = 40000;
 
   static const double baseDiscountRate = 0.10; // 10% base
 
   static double get effectiveDiscountRate => baseDiscountRate + PromoTwinDateLogic.getBonusDiscountRate();
 
-  static int get originalTotalPrice => item1Price + item2Price + item3Price;
+  static int get originalTotalPrice => item1Price + item2Price + item3Price + item4Price;
   static int get bundlePrice => (originalTotalPrice * (1.0 - effectiveDiscountRate)).round();
   static int get savingsAmount => originalTotalPrice - bundlePrice;
 
@@ -44,6 +45,8 @@ class BundlePeningkatAtributLogic {
       character.isHappinessLocked = true;
       character.intelligence = 100;
       character.isIntelligenceLocked = true;
+      character.discipline = 100;
+      character.isDisciplineLocked = true;
     }
   }
 }
@@ -208,7 +211,7 @@ class _BundlePeningkatAtributCardState extends State<BundlePeningkatAtributCard>
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Memulihkan & mengunci Kesehatan (100%), Kebahagiaan (100%), & Kecerdasan (100%) sekaligus terus tanpa bisa turun!',
+                        'Memulihkan & mengunci Kesehatan (100%), Kebahagiaan (100%), Kecerdasan (100%), & Kedisiplinan (100%) sekaligus terus tanpa bisa turun!',
                         style: TextStyle(
                           fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,

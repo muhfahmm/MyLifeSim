@@ -172,10 +172,18 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                             final int rRel = int.tryParse(item['relationship'] ?? '50') ?? 50;
 
                             Map<String, String>? childData;
-                            for (var c in widget.character.children) {
-                              if (c['name'] == item['childName']) {
-                                childData = c;
-                                break;
+                            final String? rawChildName = item['childName'];
+                            final bool isChildBorn = rawChildName != null &&
+                                rawChildName != 'null' &&
+                                rawChildName.trim().isNotEmpty &&
+                                item['isPregnant'] != 'true';
+
+                            if (isChildBorn) {
+                              for (var c in widget.character.children) {
+                                if (c['name'] == rawChildName) {
+                                  childData = c;
+                                  break;
+                                }
                               }
                             }
                             final String cGender = childData?['gender'] ?? 'Laki-laki';
@@ -218,7 +226,9 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                                   ),
                                 ),
                                 subtitle: Text(
-                                  'Anak: ${item['childName']} ($cGender, Usia: $cAge thn)',
+                                  isChildBorn
+                                      ? 'Anak: $rawChildName ($cGender, Usia: $cAge thn)'
+                                      : 'Status: Sedang Hamil 🤰 (Menunggu Kelahiran)',
                                   style: TextStyle(
                                     fontSize: 12,
                                     color: isDark ? Colors.white70 : Colors.black54,
@@ -451,14 +461,23 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                       );
                     }),
                     const SizedBox(height: 4),
-                    Text(
-                      'Melahirkan anak Anda: $childName 👶',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: isDark ? Colors.lightBlueAccent : Colors.blue,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    (() {
+                      final String? rawChildName = widget.recipient['childName'];
+                      final bool isChildBorn = rawChildName != null &&
+                          rawChildName != 'null' &&
+                          rawChildName.trim().isNotEmpty &&
+                          widget.recipient['isPregnant'] != 'true';
+                      return Text(
+                        isChildBorn
+                            ? 'Melahirkan anak Anda: $rawChildName 👶'
+                            : 'Status Kehamilan: Sedang Hamil 🤰 (Menunggu Kelahiran)',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      );
+                    })(),
                     const SizedBox(height: 16),
                     Row(
                       children: [

@@ -2192,7 +2192,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     widget.character.isHavingAffair = false;
                   }
 
-                  // 2. Tambahkan ke exPartners (mantan pacar / mantan pasangan)
+                  final String? targetSkin = _getTargetSkinColor();
                   widget.character.exPartners.add({
                     'name': widget.targetName,
                     'gender': _getTargetGender(),
@@ -2204,6 +2204,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                     'isDeceased': 'false',
                     'breakInitiator': widget.character.gender,
                     'breakReason': 'putus biasa',
+                    if (targetSkin != null && targetSkin.isNotEmpty) 'skinColor': targetSkin,
                   });
 
                   // 3. Turunkan hubungan
