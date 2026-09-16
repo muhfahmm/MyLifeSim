@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
 class RekanAstronotPage extends StatefulWidget {
@@ -28,6 +29,25 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
     }
   }
 
+  Widget _buildRoleBadge(String role) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.indigo.shade700.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.indigo.shade500.withValues(alpha: 0.4), width: 0.8),
+      ),
+      child: Text(
+        role,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: Colors.indigo.shade800,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -39,7 +59,7 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rekan Kosmonot & Kru Stasiun 👨‍🚀🛰️'),
+        title: const Text('Rekan Kosmonot & Kru Stasiun 👨‍🚀🛰️', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
         backgroundColor: Colors.indigo.shade900,
         foregroundColor: Colors.white,
       ),
@@ -61,7 +81,7 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
                   'Belum ada data astronot / kosmonot di lembaga ini.',
                   style: TextStyle(
                     color: isDark ? Colors.white70 : Colors.grey,
-                    fontSize: 14,
+                    fontSize: 12,
                   ),
                 ),
               ),
@@ -79,38 +99,43 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
       userRole = userRole.replaceAll('Astronot:', '').trim();
     }
 
-    final String userTitleDisplay = '${widget.character.name} - $userRole';
-
     return Card(
       elevation: 0,
       color: isDark ? Colors.grey.shade800 : Colors.indigo.shade50,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         side: BorderSide(
           color: isDark ? Colors.indigo.shade400 : Colors.indigo.shade300,
-          width: 1.5,
+          width: 1.2,
         ),
       ),
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.transparent,
-          backgroundImage: NetworkImage(userAvatarUrl),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        leading: AvatarImageCache.buildAvatar(
+          url: userAvatarUrl,
+          width: 40,
+          height: 40,
+          gender: widget.character.gender,
         ),
         title: Row(
           children: [
             Expanded(
               child: Text(
-                userTitleDisplay,
+                widget.character.name,
                 style: TextStyle(
+                  fontSize: 13.5,
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.indigo.shade200 : Colors.indigo.shade900,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            const SizedBox(width: 6),
+            _buildRoleBadge(userRole),
+            const SizedBox(width: 4),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
               decoration: BoxDecoration(
                 color: Colors.indigo.shade700,
                 borderRadius: BorderRadius.circular(6),
@@ -119,7 +144,7 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
                 'Kamu',
                 style: TextStyle(
                   color: Colors.white,
-                  fontSize: 10,
+                  fontSize: 9.5,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -129,6 +154,7 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
         subtitle: Text(
           'Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
           style: TextStyle(
+            fontSize: 11,
             color: isDark ? Colors.white70 : Colors.black54,
           ),
         ),
@@ -152,38 +178,49 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
       happiness: rel,
     );
 
-    final String titleDisplay = '$name - $role';
-
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(10),
         side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
       ),
       color: isDark ? Colors.grey.shade800 : Colors.white,
       child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor: Colors.transparent,
-          backgroundImage: NetworkImage(avatarUrl),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        leading: AvatarImageCache.buildAvatar(
+          url: avatarUrl,
+          width: 40,
+          height: 40,
+          gender: gender,
         ),
-        title: Text(
-          titleDisplay,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-          overflow: TextOverflow.ellipsis,
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13.5,
+                  color: isDark ? Colors.white : Colors.black87,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(width: 6),
+            _buildRoleBadge(role),
+          ],
         ),
         subtitle: Text(
           'Umur: $age tahun • Hubungan: $rel% • Kecerdasan: $intel%',
           style: TextStyle(
+            fontSize: 11,
             color: isDark ? Colors.white70 : Colors.black54,
           ),
         ),
         trailing: Icon(
           Icons.chevron_right,
-          size: 16,
+          size: 14,
           color: isDark ? Colors.white70 : Colors.black87,
         ),
         onTap: () {
@@ -205,3 +242,4 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
     );
   }
 }
+

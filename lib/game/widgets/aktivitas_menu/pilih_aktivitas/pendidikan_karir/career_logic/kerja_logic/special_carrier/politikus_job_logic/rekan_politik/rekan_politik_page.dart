@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
 class RekanPolitikPage extends StatefulWidget {
@@ -81,6 +82,25 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
     return 'Tokoh senior dan mitra penting dalam kebijakan publik';
   }
 
+  Widget _buildRoleBadge(String role) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.amber.shade900.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.amber.shade800.withValues(alpha: 0.4), width: 0.8),
+      ),
+      child: Text(
+        role,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: Colors.amber.shade900,
+        ),
+      ),
+    );
+  }
+
   void _showAlert(String title, String msg) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
@@ -89,19 +109,13 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: isDark ? Colors.grey.shade900 : null,
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-              ),
-            ),
-          ],
+        title: Text(
+          title,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 16,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
         ),
         content: SizedBox(
           width: double.infinity,
@@ -109,14 +123,14 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
             msg,
             style: TextStyle(
               color: isDark ? Colors.white70 : Colors.black87,
-              fontSize: 14,
+              fontSize: 13,
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK', style: TextStyle(fontSize: 14)),
+            child: const Text('OK', style: TextStyle(fontSize: 13)),
           ),
         ],
       ),
@@ -184,16 +198,16 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
         children: [
           // Banner Info
           Container(
-            padding: const EdgeInsets.all(14),
+            padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
               color: isDark ? Colors.amber.shade900.withValues(alpha: 0.25) : Colors.amber.shade50,
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(12),
               border: Border.all(color: Colors.amber.shade700),
             ),
             child: Row(
               children: [
-                const Icon(Icons.account_balance, color: Colors.amber, size: 28),
-                const SizedBox(width: 12),
+                const Icon(Icons.account_balance, color: Colors.amber, size: 24),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +215,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                       Text(
                         'Jajaran Kolega $currentJob',
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.bold,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
@@ -221,19 +235,19 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
             ),
           ),
 
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // ================= SENIOR / TOKOH POLITIK SECTION =================
           if (supervisor != null) ...[
             Text(
               _getSeniorHeader(),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white70 : Colors.blueGrey,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             Text(
               _getSeniorSubtitle(),
               style: TextStyle(
@@ -241,31 +255,31 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                 color: isDark ? Colors.white54 : Colors.grey.shade600,
               ),
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 8),
             Card(
-              elevation: 2,
+              elevation: 1,
               color: isDark ? Colors.grey.shade800 : Colors.amber.shade50,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: Colors.amber.shade700),
               ),
               child: Padding(
-                padding: const EdgeInsets.all(14),
+                padding: const EdgeInsets.all(12),
                 child: Column(
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundImage: NetworkImage(
-                            AvatarAgeRules.getSchoolAvatarUrl(
-                              name: supervisor['name'] ?? 'Senior Politik',
-                              gender: supervisor['gender'] ?? 'Laki-laki',
-                              age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
-                              schoolLevel: 'SMA',
-                              happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
-                            ),
+                        AvatarImageCache.buildAvatar(
+                          url: AvatarAgeRules.getSchoolAvatarUrl(
+                            name: supervisor['name'] ?? 'Senior Politik',
+                            gender: supervisor['gender'] ?? 'Laki-laki',
+                            age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
+                            schoolLevel: 'SMA',
+                            happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
                           ),
+                          width: 44,
+                          height: 44,
+                          gender: supervisor['gender'] ?? 'Laki-laki',
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -275,7 +289,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                               Text(
                                 supervisor['name'] ?? 'Senior Politik',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 13.5,
                                   fontWeight: FontWeight.bold,
                                   color: isDark ? Colors.white : Colors.black87,
                                 ),
@@ -284,17 +298,17 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                               Text(
                                 'Senior Politik • Usia ${supervisor['age']} thn',
                                 style: TextStyle(
-                                  fontSize: 12,
+                                  fontSize: 11,
                                   color: isDark ? Colors.white70 : Colors.black54,
                                 ),
                               ),
-                              const SizedBox(height: 6),
+                              const SizedBox(height: 4),
                               Row(
                                 children: [
                                   Text(
                                     'Hubungan: ',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white70 : Colors.black87,
                                     ),
@@ -304,7 +318,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                                       borderRadius: BorderRadius.circular(6),
                                       child: LinearProgressIndicator(
                                         value: (int.tryParse(supervisor['relationship'] ?? '50') ?? 50) / 100.0,
-                                        minHeight: 8,
+                                        minHeight: 6,
                                         backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                         valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
                                       ),
@@ -314,7 +328,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                                   Text(
                                     '${supervisor['relationship']}%',
                                     style: TextStyle(
-                                      fontSize: 11,
+                                      fontSize: 10.5,
                                       fontWeight: FontWeight.bold,
                                       color: isDark ? Colors.white70 : Colors.black87,
                                     ),
@@ -326,7 +340,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Row(
                       children: [
                         Expanded(
@@ -342,7 +356,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                             icon: const Icon(Icons.chat, size: 12),
                             label: const Text(
                               'Diskusi 💬',
-                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -362,7 +376,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                             icon: const Icon(Icons.handshake, size: 12),
                             label: const Text(
                               'Koalisi 🤝',
-                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -382,7 +396,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                             icon: const Icon(Icons.card_giftcard, size: 12),
                             label: const Text(
                               'Apresiasi 🎁',
-                              style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -394,19 +408,19 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
           ],
 
           // ================= DAFTAR KOLEGA POLITIK =================
           Text(
             'Daftar Kolega & Staf Politik 👥',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white70 : Colors.blueGrey,
             ),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 8),
 
           if (coworkers.isEmpty)
             Center(
@@ -414,7 +428,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                 padding: const EdgeInsets.all(24),
                 child: Text(
                   'Belum ada data kolega politik.',
-                  style: TextStyle(color: isDark ? Colors.white54 : Colors.grey.shade600),
+                  style: TextStyle(color: isDark ? Colors.white54 : Colors.grey.shade600, fontSize: 12),
                 ),
               ),
             )
@@ -440,34 +454,47 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                 );
 
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
+                  margin: const EdgeInsets.only(bottom: 8),
                   elevation: 0,
                   color: isDark ? Colors.grey.shade800 : Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(10),
                     side: BorderSide(
                       color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                     ),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    leading: CircleAvatar(
-                      radius: 22,
-                      backgroundImage: NetworkImage(avatarUrl),
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                    leading: AvatarImageCache.buildAvatar(
+                      url: avatarUrl,
+                      width: 40,
+                      height: 40,
+                      gender: gender,
                     ),
-                    title: Text(
-                      name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
+                    title: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13.5,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
+                        _buildRoleBadge(role),
+                      ],
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        const SizedBox(height: 2),
                         Text(
-                          '$role • $gender, $age thn',
+                          '$gender, $age thn',
                           style: TextStyle(
                             fontSize: 11,
                             color: isDark ? Colors.white70 : Colors.black54,
@@ -489,7 +516,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                                 borderRadius: BorderRadius.circular(4),
                                 child: LinearProgressIndicator(
                                   value: rel / 100.0,
-                                  minHeight: 6,
+                                  minHeight: 5,
                                   backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
                                   valueColor: AlwaysStoppedAnimation<Color>(
                                     rel >= 70 ? Colors.green : (rel >= 40 ? Colors.amber : Colors.red),
@@ -510,7 +537,7 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
                         ),
                       ],
                     ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    trailing: const Icon(Icons.chevron_right, size: 14),
                     onTap: () {
                       Navigator.push(
                         context,
@@ -535,3 +562,4 @@ class _RekanPolitikPageState extends State<RekanPolitikPage> {
     );
   }
 }
+

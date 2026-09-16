@@ -292,7 +292,6 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
     final query = _searchQuery.toLowerCase();
     final staffList = widget.character.idolStaff;
     final isUserStaff = widget.character.isIdolStaff;
-    final userJob = widget.character.jobName ?? '';
 
     final filteredStaffList = staffList.where((staff) {
       final name = (staff['name'] ?? '').toLowerCase();

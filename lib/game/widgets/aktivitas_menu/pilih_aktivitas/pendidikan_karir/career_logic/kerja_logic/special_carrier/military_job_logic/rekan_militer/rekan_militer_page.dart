@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
 class RekanMiliterPage extends StatefulWidget {
@@ -67,6 +68,35 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
       return 'Komando pangkalan udara dan skuadron skuadron tempur';
     }
     return 'Komando Markas Besar Batalyon dan Infanteri AD';
+  }
+
+  Widget _buildRoleBadge(String role) {
+    Color color = Colors.green.shade800;
+    Color bgColor = Colors.green.shade50;
+    if (role.contains('Laksamana') || role.contains('Marsekal') || role.contains('Mayor') || role.contains('Kapten') || role.contains('Komandan')) {
+      color = Colors.amber.shade900;
+      bgColor = Colors.amber.shade50;
+    } else if (role.contains('Letnan') || role.contains('Sersan')) {
+      color = Colors.blue.shade800;
+      bgColor = Colors.blue.shade50;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withAlpha(102), width: 0.5),
+      ),
+      child: Text(
+        role,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
   }
 
   void _showAlert(String title, String msg) {
@@ -162,6 +192,7 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
     final supervisor = character.supervisor;
 
     return Scaffold(
+      backgroundColor: isDark ? Colors.grey.shade900 : null,
       appBar: AppBar(
         title: const Text('Rekan Dinas & Komandan 🪖'),
         backgroundColor: Colors.green.shade900,
@@ -174,9 +205,9 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(
-              color: isDark ? Colors.green.shade900.withValues(alpha: 0.25) : Colors.green.shade50,
+              color: isDark ? Colors.green.shade900.withAlpha(64) : Colors.green.shade50,
               borderRadius: BorderRadius.circular(14),
-              border: Border.all(color: Colors.green.shade700),
+              border: Border.all(color: Colors.green.shade700, width: 1),
             ),
             child: Row(
               children: [
@@ -216,7 +247,7 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
             Text(
               _getCommanderHeader(),
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 15,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white70 : Colors.blueGrey,
               ),
@@ -231,11 +262,11 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
             ),
             const SizedBox(height: 10),
             Card(
-              elevation: 2,
-              color: isDark ? Colors.grey.shade800 : Colors.green.shade50,
+              elevation: 0,
+              color: isDark ? Colors.grey.shade800 : Colors.green.shade50.withAlpha(50),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.green.shade700),
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(color: Colors.green.shade700, width: 1),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(14),
@@ -243,17 +274,17 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                   children: [
                     Row(
                       children: [
-                        CircleAvatar(
-                          radius: 26,
-                          backgroundImage: NetworkImage(
-                            AvatarAgeRules.getSchoolAvatarUrl(
-                              name: supervisor['name'] ?? 'Komandan Atasan',
-                              gender: supervisor['gender'] ?? 'Laki-laki',
-                              age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
-                              schoolLevel: 'SMA',
-                              happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
-                            ),
+                        AvatarImageCache.buildAvatar(
+                          url: AvatarAgeRules.getSchoolAvatarUrl(
+                            name: supervisor['name'] ?? 'Komandan Atasan',
+                            gender: supervisor['gender'] ?? 'Laki-laki',
+                            age: int.tryParse(supervisor['age'] ?? '45') ?? 45,
+                            schoolLevel: 'SMA',
+                            happiness: int.tryParse(supervisor['relationship'] ?? '50') ?? 50,
                           ),
+                          width: 44,
+                          height: 44,
+                          gender: supervisor['gender'] ?? 'Laki-laki',
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -262,52 +293,35 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                             children: [
                               Text(
                                 supervisor['name'] ?? 'Komandan Atasan',
-                                style: TextStyle(
-                                  fontSize: 16,
+                                style: const TextStyle(
+                                  fontSize: 13.5,
                                   fontWeight: FontWeight.bold,
-                                  color: isDark ? Colors.white : Colors.black87,
                                 ),
+                                overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 2),
-                              Text(
-                                'Komandan Kedinasan • Usia ${supervisor['age']} thn',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: isDark ? Colors.white70 : Colors.black54,
-                                ),
-                              ),
-                              const SizedBox(height: 6),
                               Row(
                                 children: [
-                                  Text(
-                                    'Loyalitas: ',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white70 : Colors.black87,
-                                    ),
-                                  ),
-                                  Expanded(
-                                    child: ClipRRect(
-                                      borderRadius: BorderRadius.circular(6),
-                                      child: LinearProgressIndicator(
-                                        value: (int.tryParse(supervisor['relationship'] ?? '50') ?? 50) / 100.0,
-                                        minHeight: 8,
-                                        backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                                        valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
-                                      ),
-                                    ),
-                                  ),
+                                  _buildRoleBadge('Komandan'),
                                   const SizedBox(width: 6),
-                                  Text(
-                                    '${supervisor['relationship']}%',
-                                    style: TextStyle(
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold,
-                                      color: isDark ? Colors.white70 : Colors.black87,
+                                  Expanded(
+                                    child: Text(
+                                      'Umur: ${supervisor['age']} th • Hubungan: ${supervisor['relationship']}%',
+                                      style: const TextStyle(fontSize: 11),
+                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
                                 ],
+                              ),
+                              const SizedBox(height: 6),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(4),
+                                child: LinearProgressIndicator(
+                                  value: (int.tryParse(supervisor['relationship'] ?? '50') ?? 50) / 100.0,
+                                  minHeight: 4,
+                                  backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(Colors.green),
+                                ),
                               ),
                             ],
                           ),
@@ -389,7 +403,7 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
           Text(
             'Daftar Prajurit & Rekan Skuad 👥',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 15,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white70 : Colors.blueGrey,
             ),
@@ -428,9 +442,8 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                 );
 
                 return Card(
-                  margin: const EdgeInsets.only(bottom: 10),
                   elevation: 0,
-                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  margin: const EdgeInsets.only(bottom: 8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                     side: BorderSide(
@@ -438,67 +451,55 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                     ),
                   ),
                   child: ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    leading: CircleAvatar(
-                      radius: 22,
-                      backgroundImage: NetworkImage(avatarUrl),
+                    leading: AvatarImageCache.buildAvatar(
+                      url: avatarUrl,
+                      width: 40,
+                      height: 40,
+                      gender: gender,
                     ),
-                    title: Text(
-                      name,
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                        color: isDark ? Colors.white : Colors.black87,
-                      ),
+                    title: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          '$role • $gender, $age thn',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: isDark ? Colors.white70 : Colors.black54,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: 2),
                         Row(
                           children: [
-                            Text(
-                              'Solidaritas: ',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white70 : Colors.black54,
-                              ),
-                            ),
-                            Expanded(
-                              child: ClipRRect(
-                                borderRadius: BorderRadius.circular(4),
-                                child: LinearProgressIndicator(
-                                  value: rel / 100.0,
-                                  minHeight: 6,
-                                  backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    rel >= 70 ? Colors.green : (rel >= 40 ? Colors.amber : Colors.red),
-                                  ),
-                                ),
-                              ),
-                            ),
+                            _buildRoleBadge(role),
                             const SizedBox(width: 6),
-                            Text(
-                              '$rel%',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: isDark ? Colors.white70 : Colors.black54,
+                            Expanded(
+                              child: Text(
+                                'Umur: $age th • Solidaritas: $rel%',
+                                style: const TextStyle(fontSize: 11),
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ),
                           ],
                         ),
+                        const SizedBox(height: 6),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(4),
+                          child: LinearProgressIndicator(
+                            value: rel / 100.0,
+                            minHeight: 4,
+                            backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              rel >= 70 ? Colors.green : (rel >= 40 ? Colors.orange : Colors.red),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
-                    trailing: const Icon(Icons.chevron_right, size: 20),
+                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
                     onTap: () {
                       Navigator.push(
                         context,

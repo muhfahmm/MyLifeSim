@@ -61,7 +61,6 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
 
   String _getAvatarUrl(String name, String genderStr) {
     final gender = genderStr == 'Perempuan' ? 'female' : 'male';
-    final random = Random(name.hashCode);
     final avatarData = AvatarGenerator.generateRandomAvatar(gender);
 
     return AvatarGenerator.buildCustomAvatarUrl(
@@ -117,7 +116,7 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
             context: context,
             isDark: isDark,
             name: baName,
-            role: 'Brand Ambassador • Umur: ${personMap['age']} tahun • Hubungan: ${personMap['relationship']}% • Kecerdasan: ${personMap['intelligence']}%',
+            role: 'Brand Ambassador • Umur: ${personMap['age']} thn • Hubungan: ${personMap['relationship']}% • Kecerdasan: ${personMap['intelligence']}%',
             badgeText: null,
             showArrow: true,
             onTap: () => _navigateToInteraction(personMap),
@@ -157,13 +156,11 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
         accentColor = Colors.indigo;
       }
 
-      // Filter out the supervisor from the division roster list if they are in it,
-      // so they are not shown twice (both at top as supervisor and inside division list).
       final List<String> filteredPlayers = players.where((p) => p != supervisorName).toList();
 
       divisionWidgets.add(
         Padding(
-          padding: const EdgeInsets.only(top: 24.0),
+          padding: const EdgeInsets.only(top: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -175,14 +172,14 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
                 badgeText: 'Pro Player 🎮',
                 badgeColor: accentColor,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 6),
               ...filteredPlayers.map((playerName) {
                 final personMap = _getPersonMap(playerName, false);
                 return _buildPersonCard(
                   context: context,
                   isDark: isDark,
                   name: playerName,
-                  role: 'Rekan Kerja • Umur: ${personMap['age']} tahun • Hubungan: ${personMap['relationship']}% • Kecerdasan: ${personMap['intelligence']}%',
+                  role: 'Rekan Kerja • Umur: ${personMap['age']} thn • Hubungan: ${personMap['relationship']}% • Kecerdasan: ${personMap['intelligence']}%',
                   badgeText: null,
                   showArrow: true,
                   onTap: () => _navigateToInteraction(personMap),
@@ -206,12 +203,12 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
           badgeText: 'Supervisor',
           badgeColor: Colors.blue,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 6),
         _buildPersonCard(
           context: context,
           isDark: isDark,
           name: supervisorName,
-          role: 'Atasan • Umur: ${supervisorMap['age']} tahun • Hubungan: ${supervisorMap['relationship']}% • Kecerdasan: ${supervisorMap['intelligence']}%',
+          role: 'Atasan • Umur: ${supervisorMap['age']} thn • Hubungan: ${supervisorMap['relationship']}% • Kecerdasan: ${supervisorMap['intelligence']}%',
           badgeText: 'Supervisor',
           showArrow: true,
           onTap: () => _navigateToInteraction(supervisorMap),
@@ -250,7 +247,7 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
       padding: const EdgeInsets.only(bottom: 4.0),
       child: Row(
         children: [
-          Icon(icon, color: titleColor, size: 20),
+          Icon(icon, color: titleColor, size: 18),
           const SizedBox(width: 6),
           Text(
             title,
@@ -262,16 +259,16 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
           ),
           const SizedBox(width: 8),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
             decoration: BoxDecoration(
-              color: badgeColor.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: badgeColor.withOpacity(0.3)),
+              color: badgeColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: badgeColor.withValues(alpha: 0.3)),
             ),
             child: Text(
               badgeText,
               style: TextStyle(
-                fontSize: 11,
+                fontSize: 10,
                 fontWeight: FontWeight.bold,
                 color: badgeColor,
               ),
@@ -293,104 +290,84 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
     required VoidCallback onTap,
   }) {
     final gender = _getPersonMap(name, badgeText != 'Supervisor')['gender']!;
+    final avatarUrl = _getAvatarUrl(name, gender);
+
     return Card(
-      elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      color: isDark ? Colors.grey.shade900 : Colors.white,
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+      ),
+      color: isDark ? Colors.grey.shade800 : Colors.white,
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Avatar
-              CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.transparent,
-                child: ClipOval(
-                  child: Image.network(
-                    _getAvatarUrl(name, gender),
-                    width: 48,
-                    height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) => 
-                        const Icon(Icons.person, color: Colors.grey, size: 24),
+        leading: AvatarImageCache.buildAvatar(
+          url: avatarUrl,
+          width: 40,
+          height: 40,
+          gender: gender,
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                name,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 13.5,
+                  color: badgeText == 'Supervisor' 
+                      ? Colors.blue 
+                      : (isDark ? Colors.white : Colors.black87),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (badgeText != null) ...[
+              const SizedBox(width: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: badgeText == 'Supervisor' 
+                      ? Colors.blue.withValues(alpha: 0.15) 
+                      : Colors.green.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(6),
+                  border: Border.all(
+                    color: badgeText == 'Supervisor' 
+                        ? Colors.blue.withValues(alpha: 0.4) 
+                        : Colors.green.withValues(alpha: 0.4),
+                  ),
+                ),
+                child: Text(
+                  badgeText,
+                  style: TextStyle(
+                    color: badgeText == 'Supervisor' 
+                        ? Colors.blue 
+                        : Colors.green,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              // Bagian Tengah (Nama + Info)
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            name,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                              color: badgeText == 'Supervisor' 
-                                  ? Colors.blue 
-                                  : (isDark ? Colors.white : Colors.black87),
-                            ),
-                          ),
-                        ),
-                        if (badgeText != null) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: badgeText == 'Supervisor' 
-                                  ? Colors.blue.withOpacity(0.1) 
-                                  : Colors.green.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                              border: Border.all(
-                                color: badgeText == 'Supervisor' 
-                                    ? Colors.blue.withOpacity(0.3) 
-                                    : Colors.green.withOpacity(0.3),
-                              ),
-                            ),
-                            child: Text(
-                              badgeText,
-                              style: TextStyle(
-                                color: badgeText == 'Supervisor' 
-                                    ? Colors.blue 
-                                    : Colors.green,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      role,
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: isDark ? Colors.white70 : Colors.grey.shade700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Panah di Kanan (Jika ada)
-              if (showArrow)
-                const Padding(
-                  padding: EdgeInsets.only(top: 4.0),
-                  child: Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                ),
             ],
-          ),
+          ],
         ),
+        subtitle: Text(
+          role,
+          style: TextStyle(
+            fontSize: 11,
+            color: isDark ? Colors.white70 : Colors.grey.shade700,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        trailing: showArrow
+            ? Icon(Icons.chevron_right, size: 14, color: isDark ? Colors.white70 : Colors.black87)
+            : null,
       ),
     );
   }
 }
+

@@ -7,7 +7,6 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'persentase_tawaran_idol.dart';
 import 'idol_manager.dart';
-import 'idol_menu.dart';
 
 class SyaratKetentuanIdolModal extends StatelessWidget {
   final Character character;

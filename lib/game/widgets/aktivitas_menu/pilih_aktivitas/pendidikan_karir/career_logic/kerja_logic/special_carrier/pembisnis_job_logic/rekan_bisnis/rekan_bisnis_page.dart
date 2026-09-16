@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
 
 class RekanBisnisPage extends StatefulWidget {
@@ -60,6 +61,25 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
     }
   }
 
+  Widget _buildRoleBadge(String role) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: Colors.green.shade800.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: Colors.green.shade700.withValues(alpha: 0.4), width: 0.8),
+      ),
+      child: Text(
+        role,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight: FontWeight.w600,
+          color: Colors.green.shade800,
+        ),
+      ),
+    );
+  }
+
   void _showAlert(String title, String msg) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     showDialog(
@@ -68,15 +88,15 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         backgroundColor: isDark ? Colors.grey.shade900 : null,
-        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : Colors.black87)),
+        title: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
         content: SizedBox(
           width: double.infinity,
-          child: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14)),
+          child: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 13)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK', style: TextStyle(fontSize: 14)),
+            child: const Text('OK', style: TextStyle(fontSize: 13)),
           ),
         ],
       ),
@@ -168,7 +188,7 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tim & Karyawan Usaha 🏢', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Tim & Karyawan Usaha 🏢', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
         backgroundColor: Colors.green.shade800,
         foregroundColor: Colors.white,
       ),
@@ -178,24 +198,24 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
         children: [
           // KARTU ATASAN: USER SEBAGAI PEMILIK USAHA & CEO 👑
           Card(
-            elevation: 2,
+            elevation: 1,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-              side: BorderSide(color: Colors.green.shade700, width: 1.5),
+              borderRadius: BorderRadius.circular(12),
+              side: BorderSide(color: Colors.green.shade700, width: 1.2),
             ),
             color: isDark ? Colors.grey.shade800 : Colors.white,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(12),
               child: Column(
                 children: [
                   Row(
                     children: [
                       CircleAvatar(
-                        radius: 28,
+                        radius: 24,
                         backgroundColor: Colors.amber.shade100,
-                        child: const Icon(Icons.star, color: Colors.amber, size: 32),
+                        child: const Icon(Icons.star, color: Colors.amber, size: 28),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 10),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -208,7 +228,7 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
                                 Text(
                                   character.name,
                                   style: TextStyle(
-                                    fontSize: 16,
+                                    fontSize: 13.5,
                                     fontWeight: FontWeight.bold,
                                     color: isDark ? Colors.white : Colors.black87,
                                   ),
@@ -219,21 +239,21 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
                                     color: Colors.amber.shade100,
                                     borderRadius: BorderRadius.circular(6),
                                   ),
-                                  child: const Text('PEMILIK USAHA & CEO 👑', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.brown)),
+                                  child: const Text('PEMILIK USAHA & CEO 👑', style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.bold, color: Colors.brown)),
                                 ),
                               ],
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 2),
                             Text(
                               'Pendiri & Pemilik Utama: ${character.businessName ?? "Usaha Mandiri"}',
-                              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade700),
+                              style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.grey.shade700),
                             ),
                           ],
                         ),
                       ),
                     ],
                   ),
-                  const Divider(height: 20),
+                  const Divider(height: 16),
                   Row(
                     children: [
                       Expanded(
@@ -241,12 +261,12 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.green.shade700,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           onPressed: _instruksiKebijakan,
-                          icon: const Icon(Icons.assignment, size: 15),
-                          label: const Text('Instruksi Kebijakan', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          icon: const Icon(Icons.assignment, size: 13),
+                          label: const Text('Instruksi Kebijakan', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -255,12 +275,12 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.amber.shade800,
                             foregroundColor: Colors.white,
-                            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                           ),
                           onPressed: _beriBonusSemua,
-                          icon: const Icon(Icons.card_giftcard, size: 15),
-                          label: const Text('Bonus Semua Tim', style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          icon: const Icon(Icons.card_giftcard, size: 13),
+                          label: const Text('Bonus Semua Tim', style: TextStyle(fontSize: 10.5, fontWeight: FontWeight.bold), maxLines: 1, overflow: TextOverflow.ellipsis),
                         ),
                       ),
                     ],
@@ -269,25 +289,25 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 16),
 
           // SUB-HEADER DAFTAR KARYAWAN
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: Text(
                     'Daftar Staf & Karyawan (${character.coworkers.length}):',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: isDark ? Colors.white : Colors.black87),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
                 const SizedBox(width: 8),
                 Text(
                   'Bawahan Langsung',
-                  style: TextStyle(fontSize: 12, color: Colors.green.shade700, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 11, color: Colors.green.shade700, fontWeight: FontWeight.w600),
                 ),
               ],
             ),
@@ -306,82 +326,97 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
               final ageVal = int.tryParse(cw['age'] ?? '25') ?? 25;
               final rel = int.tryParse(cw['relationship'] ?? '50') ?? 50;
               final role = cw['role'] ?? 'Staf Karyawan';
+              final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
+                name: name,
+                gender: gender,
+                age: ageVal,
+                schoolLevel: 'SMA',
+                happiness: rel,
+              );
 
               return Card(
                 elevation: 0,
-                margin: const EdgeInsets.only(bottom: 10),
+                margin: const EdgeInsets.only(bottom: 8),
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(10),
                   side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                 ),
                 color: isDark ? Colors.grey.shade800 : Colors.white,
                 child: Padding(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(10),
                   child: Column(
                     children: [
                       Row(
                         children: [
-                          CircleAvatar(
-                            radius: 22,
-                            backgroundImage: NetworkImage(
-                              AvatarAgeRules.getSchoolAvatarUrl(
-                                name: name,
-                                gender: gender,
-                                age: ageVal,
-                                schoolLevel: 'SMA',
-                                happiness: rel,
-                              ),
-                            ),
+                          AvatarImageCache.buildAvatar(
+                            url: avatarUrl,
+                            width: 40,
+                            height: 40,
+                            gender: gender,
                           ),
-                          const SizedBox(width: 12),
+                          const SizedBox(width: 10),
                           Expanded(
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(name, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black87)),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        name,
+                                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: isDark ? Colors.white : Colors.black87),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 6),
+                                    _buildRoleBadge(role),
+                                  ],
+                                ),
                                 const SizedBox(height: 2),
-                                Text('$role • Usia $ageVal thn', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade700)),
+                                Text('$gender, Usia $ageVal thn', style: TextStyle(fontSize: 11, color: isDark ? Colors.white70 : Colors.grey.shade700)),
                               ],
                             ),
                           ),
+                          const SizedBox(width: 6),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
                             decoration: BoxDecoration(
                               color: Colors.green.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(6),
                             ),
-                            child: Text('Hubungan: $rel%', style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: Colors.green)),
+                            child: Text('Hubungan: $rel%', style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green)),
                           ),
                         ],
                       ),
-                      const Divider(height: 16),
+                      const Divider(height: 14),
                       Wrap(
                         spacing: 6,
                         runSpacing: 6,
                         children: [
                           OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
                             onPressed: () => _interactWithEmployee(cw, 'puji'),
-                            icon: const Icon(Icons.thumb_up, size: 14, color: Colors.blue),
-                            label: const Text('Puji Kinerja', style: TextStyle(fontSize: 11)),
+                            icon: const Icon(Icons.thumb_up, size: 12, color: Colors.blue),
+                            label: const Text('Puji Kinerja', style: TextStyle(fontSize: 10.5)),
                           ),
                           OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
                             onPressed: () => _interactWithEmployee(cw, 'traktir'),
-                            icon: const Icon(Icons.local_pizza, size: 14, color: Colors.orange),
-                            label: const Text('Traktir Makan', style: TextStyle(fontSize: 11)),
+                            icon: const Icon(Icons.local_pizza, size: 12, color: Colors.orange),
+                            label: const Text('Traktir Makan', style: TextStyle(fontSize: 10.5)),
                           ),
                           OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
                             onPressed: () => _interactWithEmployee(cw, 'bonus'),
-                            icon: const Icon(Icons.attach_money, size: 14, color: Colors.green),
-                            label: const Text('Beri Bonus', style: TextStyle(fontSize: 11)),
+                            icon: const Icon(Icons.attach_money, size: 12, color: Colors.green),
+                            label: const Text('Beri Bonus', style: TextStyle(fontSize: 10.5)),
                           ),
                           OutlinedButton.icon(
-                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6)),
+                            style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4)),
                             onPressed: () => _interactWithEmployee(cw, 'interaksi'),
-                            icon: const Icon(Icons.favorite, size: 14, color: Colors.pink),
-                            label: const Text('Interaksi Dekat', style: TextStyle(fontSize: 11)),
+                            icon: const Icon(Icons.favorite, size: 12, color: Colors.pink),
+                            label: const Text('Interaksi Dekat', style: TextStyle(fontSize: 10.5)),
                           ),
                         ],
                       ),
@@ -396,3 +431,4 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
     );
   }
 }
+

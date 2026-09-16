@@ -68,7 +68,6 @@ class _KorporasiPageState extends State<KorporasiPage> {
   }
 
   void _pitchingInvestor() {
-    final r = Random();
     final profitBoost = (character.businessAnnualProfit * 0.12).round() + 1500;
     character.businessAnnualProfit += profitBoost;
     setState(() {});
