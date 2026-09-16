@@ -149,22 +149,22 @@ class _UmkmPageState extends State<UmkmPage> {
         title: Text(businessTitle, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: Colors.green.shade700,
         foregroundColor: Colors.white,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.people),
-            tooltip: 'Tim Karyawan',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => RekanBisnisPage(character: character, onRefresh: widget.onRefresh),
-                ),
-              );
-            },
-          ),
-        ],
-      ),
-      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.people),
+              tooltip: 'Tim Karyawan',
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RekanBisnisPage(character: character, onRefresh: widget.onRefresh),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [

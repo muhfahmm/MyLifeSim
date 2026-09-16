@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 
+
 class BuatUsahaMenuPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -181,14 +182,14 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
 
     showDialog(
       context: context,
-      builder: (ctx) {
+      builder: (inputDialogCtx) {
         final TextEditingController nameController = TextEditingController(text: businessType);
         String selectedLocation = widget.character.location.isNotEmpty 
             ? widget.character.location 
             : (widget.character.birthCountry ?? 'Indonesia');
 
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (dialogStateContext, setDialogState) {
             return AlertDialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -254,7 +255,7 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                             .map((e) => DropdownMenuItem(value: e, child: Text(e)))
                             .toList(),
                         onChanged: (val) {
-                          if (val != null) setState(() => selectedLocation = val);
+                          if (val != null) setDialogState(() => selectedLocation = val);
                         },
                       ),
                     ],
@@ -262,7 +263,7 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                 ),
               ),
               actions: [
-                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Batal')),
+                TextButton(onPressed: () => Navigator.pop(inputDialogCtx), child: const Text('Batal')),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.green.shade700,
@@ -293,19 +294,32 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                     widget.character.setActiveBusiness(newBusiness);
 
                     if (mounted) setState(() {});
-                    Navigator.pop(ctx);
+                    Navigator.pop(inputDialogCtx);
                     widget.onRefresh();
 
+                    final pageContext = context;
+
                     showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
+                      context: pageContext,
+                      builder: (successDialogCtx) => AlertDialog(
                         insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         title: const Text('Usaha Berhasil Didirikan! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
                         content: Text(
                           'Selamat! $businessType ("${nameController.text}") di $selectedLocation telah resmi menjadi bisnismu.\n\nKeuntungan sekitar ${_formatCurrency(annualProfitVal)}/tahun akan masuk ke saldo keuangannmu setiap bertambah usia!',
                         ),
-                        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(successDialogCtx);
+                              widget.onRefresh();
+                              if (mounted) {
+                                Navigator.of(pageContext).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+                              }
+                            },
+                            child: const Text('OK'),
+                          ),
+                        ],
                       ),
                     );
                   },
@@ -318,6 +332,7 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
       },
     );
   }
+
 
   @override
   Widget build(BuildContext context) {

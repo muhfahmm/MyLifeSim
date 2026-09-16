@@ -118,13 +118,19 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
                   subtitle: 'Mulai startup, kelola bisnis, dan bangun kekayaan impian',
                   minAge: 18,
                   isPurchased: isUnlocked,
-                  page: PembisnisMenuPage(
-                    character: character,
-                    onRefresh: () {
-                      if (mounted) setState(() {});
-                      widget.onRefresh();
-                    },
-                  ),
+                  onTap: () {
+                    final rolePage = PembisnisMenuHelper.buildRolePage(
+                      character,
+                      () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    );
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => rolePage),
+                    );
+                  },
                 );
               },
             ),
