@@ -78,6 +78,8 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
     widget.onRefresh();
   }
 
+  bool _isStatsVisible = false;
+
   @override
   Widget build(BuildContext context) {
     final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
@@ -87,233 +89,278 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
       happiness: relationship,
       forcedSkinColor: widget.person['skinColor'],
     );
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(name),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
       ),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Header Profile Card
+            // Target Card Info (Disamakan dengan Action Menu)
             Card(
               elevation: 0,
-              color: Colors.grey.shade50,
+              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Colors.grey.shade200),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 40,
-                      backgroundColor: Colors.transparent,
-                      child: ClipOval(
-                        child: Image(
-                          image: AvatarImageCache.getImageProvider(avatarUrl),
-                          width: 80,
-                          height: 80,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
                     Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          name,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                        ),
-                        if (widget.character.isAnyPartnerNameMatching(name)) ...[
-                          const SizedBox(width: 8),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: Colors.pink.shade50,
-                              borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: Colors.pink.shade200, width: 0.5),
-                            ),
-                            child: const Text(
-                              'Pacar ❤️',
-                              style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                        CircleAvatar(
+                          backgroundColor: Colors.blue.shade100,
+                          radius: 22,
+                          child: ClipOval(
+                            child: Image(
+                              image: AvatarImageCache.getImageProvider(avatarUrl),
+                              width: 44,
+                              height: 44,
+                              fit: BoxFit.cover,
                             ),
                           ),
-                        ],
-                        (() {
-                          final String pregList = widget.character.pregnantByPartnerName ?? '';
-                          final List<String> pregnantNames = pregList
-                              .split(', ')
-                              .map((e) => AvatarAgeRules.getCleanNPCName(e))
-                              .toList();
-                          final String cleanName = AvatarAgeRules.getCleanNPCName(name);
-                          final bool isHamil = widget.character.partnerIsPregnant &&
-                              (pregList.contains(name) ||
-                               pregnantNames.contains(cleanName) ||
-                               (cleanName.isNotEmpty && pregList.contains(cleanName)));
-                          if (isHamil) {
-                            return Padding(
-                              padding: const EdgeInsets.only(left: 8.0),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                decoration: BoxDecoration(
-                                  color: Colors.pink.shade50,
-                                  borderRadius: BorderRadius.circular(6),
-                                  border: Border.all(color: Colors.pink.shade200, width: 0.5),
-                                ),
-                                child: const Text(
-                                  'Hamil 🍼',
-                                  style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
-                                ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Builder(builder: (context) {
+                                final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
+                                final birthYear = currentYear - age;
+                                return Text(
+                                  'Tanggal Lahir: 4 September $birthYear | $age tahun',
+                                  style: TextStyle(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 1),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      name,
+                                      style: TextStyle(
+                                        fontSize: 15.5,
+                                        fontWeight: FontWeight.bold,
+                                        color: isDark ? Colors.white : Colors.black87,
+                                      ),
+                                    ),
+                                  ),
+                                  if (widget.character.isAnyPartnerNameMatching(name)) ...[
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.pink.shade50,
+                                        borderRadius: BorderRadius.circular(6),
+                                        border: Border.all(color: Colors.pink.shade200, width: 0.5),
+                                      ),
+                                      child: const Text(
+                                        'Pacar ❤️',
+                                        style: TextStyle(color: Colors.pink, fontSize: 10, fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ],
+                                ],
                               ),
-                            );
-                          }
-                          return const SizedBox.shrink();
-                        })(),
+                              const SizedBox(height: 2),
+                              Builder(builder: (context) {
+                                final String bCountry = widget.character.birthCountry ?? widget.character.location;
+                                final String bFlag = CountryHelper.getFlagEmoji(bCountry);
+                                final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
+                                final String lCountry = widget.character.location;
+                                final String lFlag = CountryHelper.getFlagEmoji(lCountry);
+                                final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
+                                final String cityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
+                                return Text(
+                                  'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
+                                  style: TextStyle(
+                                    fontSize: 11.5,
+                                    color: isDark ? Colors.white70 : Colors.black54,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                );
+                              }),
+                              const SizedBox(height: 2),
+                              Builder(builder: (context) {
+                                final bool isFemale = gender.trim().toLowerCase() == 'perempuan';
+                                final String displayRole = widget.category == 'Staff' ? role : 'Anggota Grup Idol';
+                                return Row(
+                                  children: [
+                                    Text(
+                                      'Hubungan: $displayRole • ',
+                                      style: TextStyle(
+                                        fontSize: 11.5,
+                                        color: isDark ? Colors.white60 : Colors.black54,
+                                      ),
+                                    ),
+                                    Icon(
+                                      isFemale ? Icons.female : Icons.male,
+                                      size: 16,
+                                      color: isFemale ? Colors.pinkAccent : Colors.blueAccent,
+                                    ),
+                                  ],
+                                );
+                              }),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
-                    const SizedBox(height: 4),
-                    Builder(builder: (context) {
-                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
-                      final birthYear = currentYear - age;
-                      final bool isDark = Theme.of(context).brightness == Brightness.dark;
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Tanggal Lahir: 4 September $birthYear',
-                            style: TextStyle(
-                              fontSize: 11,
-                              fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          (() {
-                            final String bCountry = widget.character.birthCountry ?? widget.character.location;
-                            final String bFlag = CountryHelper.getFlagEmoji(bCountry);
-                            final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
-                            final String lCountry = widget.character.location;
-                            final String lFlag = CountryHelper.getFlagEmoji(lCountry);
-                            final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
-                            final String cityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
-                            return Text(
-                              'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
+                    const SizedBox(height: 12),
+                    InkWell(
+                      onTap: () {
+                        setState(() {
+                          _isStatsVisible = !_isStatsVisible;
+                        });
+                      },
+                      borderRadius: BorderRadius.circular(6),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Detail & Statistik',
                               style: TextStyle(
-                                fontSize: 12,
-                                color: isDark ? Colors.white70 : Colors.black54,
-                                fontWeight: FontWeight.w500,
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.bold,
+                                color: isDark ? Colors.white70 : Colors.black87,
                               ),
-                            );
-                          })(),
-                          const SizedBox(height: 2),
-                          Text(
-                            '$role • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $relationship%',
-                            style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54),
-                          ),
-                        ],
-                      );
-                    }),
-                    const SizedBox(height: 16),
-                    Row(
-                      children: [
-                        const Text('Tingkat Hubungan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: relationship / 100.0,
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
-                              ),
-                              minHeight: 10,
                             ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '$relationship%',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Text('Tingkat Kecerdasan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: intelligence / 100.0,
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
-                              minHeight: 10,
+                            Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  _isStatsVisible ? 'Sembunyikan' : 'Tampilkan',
+                                  style: const TextStyle(
+                                    fontSize: 11.5,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.blue,
+                                  ),
+                                ),
+                                const SizedBox(width: 2),
+                                Icon(
+                                  _isStatsVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                  size: 18,
+                                  color: Colors.blue,
+                                ),
+                              ],
                             ),
-                          ),
+                          ],
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '$intelligence%',
-                          style: const TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.blue,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        const Text('Nilai Kekayaan: ', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                        Expanded(
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(4),
-                            child: LinearProgressIndicator(
-                              value: (wealth / 10000.0).clamp(0.0, 1.0),
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                wealth > 5000 ? Colors.green : (wealth >= 1000 ? Colors.amber : Colors.red),
-                              ),
-                              minHeight: 10,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Text(
-                          '\$$wealth',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: wealth > 5000 ? Colors.green : (wealth >= 1000 ? Colors.amber : Colors.red),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      widget.category == 'Staff' 
-                          ? 'Pekerjaan: $role' 
-                          : 'Status: Anggota Grup Idol',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
                       ),
                     ),
+                    if (_isStatsVisible) ...[
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Text('Tingkat Hubungan: ',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white70 : Colors.black87)),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: relationship / 100.0,
+                                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
+                                ),
+                                minHeight: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '$relationship%',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text('Tingkat Kecerdasan: ',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white70 : Colors.black87)),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: intelligence / 100.0,
+                                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                valueColor: const AlwaysStoppedAnimation<Color>(Colors.blue),
+                                minHeight: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '$intelligence%',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.blue,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          Text('Nilai Kekayaan: ',
+                              style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white70 : Colors.black87)),
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: (wealth / 10000.0).clamp(0.0, 1.0),
+                                backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                  wealth > 5000 ? Colors.green : (wealth >= 1000 ? Colors.amber : Colors.red),
+                                ),
+                                minHeight: 10,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Text(
+                            '\$$wealth',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: wealth > 5000 ? Colors.green : (wealth >= 1000 ? Colors.amber : Colors.red),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -321,7 +368,7 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
             const SizedBox(height: 24),
 
             const Text(
-              'PILIH AKSI INTERAKSI',
+              'PILIH AKSI INTERAKSI IDOL',
               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
@@ -627,17 +674,24 @@ class _IdolsInteractionPageState extends State<IdolsInteractionPage> {
     required String title,
     required VoidCallback onTap,
   }) {
-    return Card(
-      elevation: 0,
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    return Container(
       margin: const EdgeInsets.only(bottom: 8),
-      shape: RoundedRectangleBorder(
+      decoration: BoxDecoration(
+        color: isDark ? Colors.grey.shade800 : Colors.white,
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: Colors.grey.shade100),
+        border: Border.all(
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+        ),
       ),
       child: ListTile(
         leading: Icon(icon, color: color),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        title: Text(title,
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                color: isDark ? Colors.white : Colors.black87)),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: 14, color: isDark ? Colors.white54 : Colors.grey),
         onTap: onTap,
       ),
     );

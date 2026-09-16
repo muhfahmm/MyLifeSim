@@ -520,7 +520,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
             const SizedBox(height: 24),
 
             Text(
-              'PILIH AKSI INTERAKSI',
+              'PILIH AKSI INTERAKSI PENERIMA DONOR',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
-import '../0_interactions_pages/idols_interaction_page.dart';
+import '../../staff_activity/0_interactions_pages/staff_interaction_page.dart';
 
 class StafManajemenPage extends StatefulWidget {
   final Character character;
@@ -264,10 +264,9 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => IdolsInteractionPage(
+              builder: (context) => StaffInteractionPage(
                 character: widget.character,
                 person: staff,
-                category: 'Staff',
                 onRefresh: () {
                   if (mounted) setState(() {});
                   widget.onRefresh();

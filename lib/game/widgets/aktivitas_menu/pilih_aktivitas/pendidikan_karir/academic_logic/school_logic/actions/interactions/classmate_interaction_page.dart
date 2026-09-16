@@ -445,15 +445,28 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 24),
 
-            Text(
-              'PILIH AKSI INTERAKSI',
-              style: TextStyle(
-                fontSize: 12, 
-                fontWeight: FontWeight.bold, 
-                color: isDark ? Colors.white70 : Colors.grey, 
-                letterSpacing: 1.0,
-              ),
-            ),
+            Builder(builder: (context) {
+              if (widget.character.coworkers.any((e) => e['name'] == name)) {
+                return Text(
+                  'PILIH AKSI INTERAKSI REKAN KERJA',
+                  style: TextStyle(
+                    fontSize: 12, 
+                    fontWeight: FontWeight.bold, 
+                    color: isDark ? Colors.white70 : Colors.grey, 
+                    letterSpacing: 1.0,
+                  ),
+                );
+              }
+              return Text(
+                'PILIH AKSI INTERAKSI TEMAN KELAS',
+                style: TextStyle(
+                  fontSize: 12, 
+                  fontWeight: FontWeight.bold, 
+                  color: isDark ? Colors.white70 : Colors.grey, 
+                  letterSpacing: 1.0,
+                ),
+              );
+            }),
             const SizedBox(height: 12),
             const SizedBox(height: 8),
 
