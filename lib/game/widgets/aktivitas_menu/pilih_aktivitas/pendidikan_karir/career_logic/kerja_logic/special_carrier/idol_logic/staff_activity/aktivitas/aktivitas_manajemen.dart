@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'pages_menu/halaman_rekrut_trainee_baru.dart';
 
 class AktivitasManajemenPage extends StatefulWidget {
   final Character character;
@@ -33,6 +34,22 @@ class _AktivitasManajemenPageState extends State<AktivitasManajemenPage> {
         final person = sourceList[idx];
         int currentRel = int.tryParse(person['relationship'] ?? '50') ?? 50;
         person['relationship'] = (currentRel + rand.nextInt(5) + 3).clamp(0, 100).toString();
+      }
+
+      // Add news entry based on management activity
+      String newsText = '';
+      if (tipe.contains('Evaluasi')) {
+        newsText = '📊 Evaluasi Agensi: Sesi evaluasi kinerja idol dan trainer diselesaikan oleh manajemen demi performa optimal.';
+      } else if (tipe.contains('Perencanaan') || tipe.contains('Konser')) {
+        newsText = '🎪 Pengumuman Konser: Konsep pertunjukan panggung dan show teater baru telah resmi disusun oleh tim manajemen agensi!';
+      } else if (tipe.contains('Promosi') || tipe.contains('Media')) {
+        newsText = '📣 Liputan Media: Kampanye promosi besar-besaran dan jadwal media digital resmi dirilis oleh agensi idol!';
+      } else {
+        newsText = '💰 Rapat Keuangan: Rapat alokasi anggaran operasional dan fasilitas agensi sukses dilaksanakan oleh manajemen.';
+      }
+      widget.character.idolNews.add(newsText);
+      if (widget.character.idolNews.length > 50) {
+        widget.character.idolNews.removeAt(0);
       }
     });
     widget.onRefresh();
@@ -66,11 +83,50 @@ class _AktivitasManajemenPageState extends State<AktivitasManajemenPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          _buildActionCard(
-            title: 'Perekrutan Generasi Trainee Baru 📋',
-            desc: 'Mengorganisir audisi dan seleksi kandidat member idol generasi baru (Disiplin +6%, Kebahagiaan -4%)',
-            onTap: () => _lakukanAktivitasStaf('Perekrutan Generasi Trainee Baru', 4, 6),
-          ),
+          Builder(builder: (context) {
+            final bool alreadyRecruitedThisYear =
+                widget.character.lastRecruitAge != null &&
+                    widget.character.lastRecruitAge == widget.character.age;
+
+            return _buildActionCard(
+              title: 'Perekrutan Generasi Trainee Baru 📋',
+              desc: alreadyRecruitedThisYear
+                  ? '🔒 Perekrutan generasi trainee baru telah dilaksanakan tahun ini (1 kali / tahun).'
+                  : 'Mengorganisir audisi dan seleksi kandidat member idol generasi baru (Disiplin +6%, Kebahagiaan -4%)',
+              isDisabled: alreadyRecruitedThisYear,
+              onTap: () {
+                if (alreadyRecruitedThisYear) {
+                  DialogHelper.show(
+                    context: context,
+                    title: 'Audisi Sudah Dilaksanakan 🔒',
+                    content: const Text(
+                      'Perekrutan generasi trainee baru hanya dapat dilaksanakan 1 kali dalam 1 tahun.\n\n'
+                      'Tunggu hingga usia Anda bertambah (tahun berikutnya) untuk membuka audisi generasi baru kembali.',
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text('Mengerti'),
+                      ),
+                    ],
+                  );
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => HalamanRekrutTraineeBaru(
+                        character: widget.character,
+                        onRefresh: () {
+                          if (mounted) setState(() {});
+                          widget.onRefresh();
+                        },
+                      ),
+                    ),
+                  );
+                }
+              },
+            );
+          }),
           _buildActionCard(
             title: 'Evaluasi Kinerja Idol & Trainer 📊',
             desc: 'Meninjau perkembangan kemampuan vokal, tari, dan performa teater member (Disiplin +5%, Kebahagiaan -3%)',
@@ -100,6 +156,7 @@ class _AktivitasManajemenPageState extends State<AktivitasManajemenPage> {
     required String title,
     required String desc,
     required VoidCallback onTap,
+    bool isDisabled = false,
   }) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
@@ -108,30 +165,38 @@ class _AktivitasManajemenPageState extends State<AktivitasManajemenPage> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
         side: BorderSide(
-          color: isDark ? Colors.pink.shade700 : Colors.pink.shade100.withOpacity(0.5),
+          color: isDisabled
+              ? Colors.grey.shade300
+              : (isDark ? Colors.pink.shade700 : Colors.pink.shade100.withOpacity(0.5)),
         ),
       ),
-      color: isDark ? Colors.grey.shade800 : Colors.white,
+      color: isDisabled
+          ? (isDark ? Colors.grey.shade900 : Colors.grey.shade100)
+          : (isDark ? Colors.grey.shade800 : Colors.white),
       child: ListTile(
         title: Text(
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             fontSize: 15,
-            color: isDark ? Colors.white : Colors.black87,
+            color: isDisabled
+                ? Colors.grey
+                : (isDark ? Colors.white : Colors.black87),
           ),
         ),
         subtitle: Text(
           desc,
           style: TextStyle(
             fontSize: 12,
-            color: isDark ? Colors.white70 : Colors.grey,
+            color: isDisabled ? Colors.grey.shade500 : (isDark ? Colors.white70 : Colors.grey),
           ),
         ),
         trailing: Icon(
-          Icons.arrow_forward_ios,
+          isDisabled ? Icons.lock : Icons.arrow_forward_ios,
           size: 14,
-          color: isDark ? Colors.white54 : Colors.grey,
+          color: isDisabled
+              ? Colors.grey
+              : (isDark ? Colors.white54 : Colors.grey),
         ),
         onTap: onTap,
       ),

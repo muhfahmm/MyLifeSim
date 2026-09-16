@@ -46,10 +46,15 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
     String content;
 
     if (berhasil) {
-      final List<String> girls = (Character.globalFemaleFirstNames.isNotEmpty) ? Character.globalFemaleFirstNames : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra'];
-      final List<String> lastNamesList = (Character.globalLastNames.isNotEmpty) ? Character.globalLastNames : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
-      
-      final String ibuNama = '${girls[r.nextInt(girls.length)]} ${lastNamesList[r.nextInt(lastNamesList.length)]}';
+      final List<String> girls = (Character.globalFemaleFirstNames.isNotEmpty)
+          ? Character.globalFemaleFirstNames
+          : ['Aura', 'Nadia', 'Sania', 'Fatimah', 'Zahra'];
+      final List<String> lastNamesList = (Character.globalLastNames.isNotEmpty)
+          ? Character.globalLastNames
+          : ['Pratama', 'Saputra', 'Wijaya', 'Kusuma'];
+
+      final String ibuNama =
+          '${girls[r.nextInt(girls.length)]} ${lastNamesList[r.nextInt(lastNamesList.length)]}';
 
       widget.character.donorRecipients.add({
         'name': ibuNama,
@@ -59,19 +64,25 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
       });
 
       widget.character.partnerIsPregnant = true;
-      if (widget.character.pregnantByPartnerName == null || widget.character.pregnantByPartnerName!.isEmpty) {
+      if (widget.character.pregnantByPartnerName == null ||
+          widget.character.pregnantByPartnerName!.isEmpty) {
         widget.character.pregnantByPartnerName = ibuNama;
       } else if (!widget.character.pregnantByPartnerName!.contains(ibuNama)) {
-        widget.character.pregnantByPartnerName = '${widget.character.pregnantByPartnerName}, $ibuNama';
+        widget.character.pregnantByPartnerName =
+            '${widget.character.pregnantByPartnerName}, $ibuNama';
       }
 
       title = 'Donor Sperma Berhasil! 🧬';
-      content = 'Penerima: Ibu $ibuNama telah menerima donor sperma Anda dan saat ini sedang hamil! Bayi akan lahir saat Anda menambah umur.\n\nAnda mendapatkan ${CurrencySettings.format(150)} atas kontribusi ini!';
-      widget.character.inbox.add('🧬 Donor Sperma Berhasil! Ibu $ibuNama menerima donor sperma Anda dan saat ini sedang hamil (bayi akan lahir tahun depan).');
+      content =
+          'Penerima: Ibu $ibuNama telah menerima donor sperma Anda dan saat ini sedang hamil! Bayi akan lahir saat Anda menambah umur.\n\nAnda mendapatkan ${CurrencySettings.format(150)} atas kontribusi ini!';
+      widget.character.inbox.add(
+          '🧬 Donor Sperma Berhasil! Ibu $ibuNama menerima donor sperma Anda dan saat ini sedang hamil (bayi akan lahir tahun depan).');
     } else {
       title = 'Donor Sperma Tersimpan 🧪';
-      content = 'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(150)}!';
-      widget.character.inbox.add('🧬 Donor Sperma: Sperma Anda berhasil disimpan di bank sperma.');
+      content =
+          'Sperma Anda berhasil disimpan di bank sperma, namun belum ada penerima yang cocok tahun ini. Anda tetap menerima ${CurrencySettings.format(150)}!';
+      widget.character.inbox
+          .add('🧬 Donor Sperma: Sperma Anda berhasil disimpan di bank sperma.');
     }
 
     DialogHelper.show(
@@ -88,7 +99,8 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
     return Scaffold(
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
       appBar: AppBar(
-        title: const Text('Donor Sperma 🧬', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Donor Sperma 🧬',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
@@ -101,7 +113,9 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Icon(Icons.biotech, size: 48, color: isDark ? Colors.lightBlueAccent : Colors.blue),
+                Icon(Icons.biotech,
+                    size: 48,
+                    color: isDark ? Colors.lightBlueAccent : Colors.blue),
                 const SizedBox(height: 8),
                 Text(
                   'Bantu Pasangan Lain Mendapatkan Anak',
@@ -124,24 +138,27 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                 ElevatedButton.icon(
                   onPressed: _doDonor,
                   icon: const Icon(Icons.favorite, size: 18),
-                  label: const Text('MULAI DONOR SPERMA', style: TextStyle(fontWeight: FontWeight.bold)),
+                  label: const Text('MULAI DONOR SPERMA',
+                      style: TextStyle(fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blue,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 24, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
               ],
             ),
           ),
-          
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(left: 16, top: 16, bottom: 8),
+                  padding:
+                      const EdgeInsets.only(left: 16, top: 16, bottom: 8),
                   child: Text(
                     'Riwayat Penerima & Hasil Donor',
                     style: TextStyle(
@@ -164,12 +181,17 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                           ),
                         )
                       : ListView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          padding:
+                              const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: widget.character.donorRecipients.length,
                           itemBuilder: (ctx, i) {
-                            final item = widget.character.donorRecipients[i];
-                            final int rAge = int.tryParse(item['age'] ?? '25') ?? 25;
-                            final int rRel = int.tryParse(item['relationship'] ?? '50') ?? 50;
+                            final item =
+                                widget.character.donorRecipients[i];
+                            final int rAge =
+                                int.tryParse(item['age'] ?? '25') ?? 25;
+                            final int rRel =
+                                int.tryParse(item['relationship'] ?? '50') ??
+                                    50;
 
                             Map<String, String>? childData;
                             final String? rawChildName = item['childName'];
@@ -186,10 +208,12 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                                 }
                               }
                             }
-                            final String cGender = childData?['gender'] ?? 'Laki-laki';
+                            final String cGender =
+                                childData?['gender'] ?? 'Laki-laki';
                             final String cAge = childData?['age'] ?? '0';
 
-                            final avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                            final avatarUrl = AvatarAgeRules
+                                .getAgeBasedAvatarUrlForNPC(
                               name: item['name'] ?? 'Penerima',
                               gender: 'Perempuan',
                               age: rAge,
@@ -199,18 +223,24 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
 
                             return Card(
                               elevation: 0,
-                              color: isDark ? Colors.grey.shade800 : Colors.white,
+                              color: isDark
+                                  ? Colors.grey.shade800
+                                  : Colors.white,
                               margin: const EdgeInsets.only(bottom: 8),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                                side: BorderSide(
+                                    color: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade200),
                               ),
                               child: ListTile(
                                 leading: CircleAvatar(
                                   backgroundColor: Colors.transparent,
                                   child: ClipOval(
                                     child: Image(
-                                      image: AvatarImageCache.getImageProvider(avatarUrl),
+                                      image: AvatarImageCache.getImageProvider(
+                                          avatarUrl),
                                       width: 40,
                                       height: 40,
                                       fit: BoxFit.cover,
@@ -222,7 +252,9 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 13,
-                                    color: isDark ? Colors.white : Colors.black87,
+                                    color: isDark
+                                        ? Colors.white
+                                        : Colors.black87,
                                   ),
                                 ),
                                 subtitle: Text(
@@ -231,19 +263,23 @@ class _PageDonorSpermaState extends State<PageDonorSperma> {
                                       : 'Status: Sedang Hamil 🤰 (Menunggu Kelahiran)',
                                   style: TextStyle(
                                     fontSize: 12,
-                                    color: isDark ? Colors.white70 : Colors.black54,
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.black54,
                                   ),
                                 ),
                                 trailing: Icon(
                                   Icons.arrow_forward_ios,
                                   size: 14,
-                                  color: isDark ? Colors.white54 : Colors.grey,
+                                  color:
+                                      isDark ? Colors.white54 : Colors.grey,
                                 ),
                                 onTap: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => RecipientInteractionPage(
+                                      builder: (context) =>
+                                          RecipientInteractionPage(
                                         recipient: item,
                                         character: widget.character,
                                         onRefresh: () {
@@ -280,7 +316,8 @@ class RecipientInteractionPage extends StatefulWidget {
   });
 
   @override
-  State<RecipientInteractionPage> createState() => _RecipientInteractionPageState();
+  State<RecipientInteractionPage> createState() =>
+      _RecipientInteractionPageState();
 }
 
 class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
@@ -297,7 +334,8 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
     name = widget.recipient['name'] ?? 'Penerima Donor';
     gender = 'Perempuan';
     age = int.tryParse(widget.recipient['age'] ?? '25') ?? 25;
-    relationship = int.tryParse(widget.recipient['relationship'] ?? '50') ?? 50;
+    relationship =
+        int.tryParse(widget.recipient['relationship'] ?? '50') ?? 50;
     childName = widget.recipient['childName'] ?? 'Anak Donor';
   }
 
@@ -355,7 +393,7 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -365,7 +403,10 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
               color: isDark ? Colors.grey.shade800 : Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                side: BorderSide(
+                    color: isDark
+                        ? Colors.grey.shade700
+                        : Colors.grey.shade200),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -376,7 +417,8 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                       backgroundColor: Colors.transparent,
                       child: ClipOval(
                         child: Image(
-                          image: AvatarImageCache.getImageProvider(avatarUrl),
+                          image:
+                              AvatarImageCache.getImageProvider(avatarUrl),
                           width: 80,
                           height: 80,
                           fit: BoxFit.cover,
@@ -398,16 +440,26 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                         if (isPartner) ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
-                              color: isDark ? Colors.pink.shade900 : Colors.pink.shade50,
+                              color: isDark
+                                  ? Colors.pink.shade900
+                                  : Colors.pink.shade50,
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: isDark ? Colors.pink.shade700 : Colors.pink.shade200, width: 0.5),
+                              border: Border.all(
+                                color: isDark
+                                    ? Colors.pink.shade700
+                                    : Colors.pink.shade200,
+                                width: 0.5,
+                              ),
                             ),
                             child: Text(
                               'Pacar ❤️',
                               style: TextStyle(
-                                color: isDark ? Colors.pinkAccent : Colors.pink,
+                                color: isDark
+                                    ? Colors.pinkAccent
+                                    : Colors.pink,
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -418,7 +470,10 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     Builder(builder: (context) {
-                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
+                      final currentYear =
+                          widget.character.currentDate?.year ??
+                              widget.character.birthDate?.year ??
+                              DateTime.now().year;
                       final birthYear = currentYear - age;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -428,23 +483,36 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                              color: isDark
+                                  ? Colors.blueGrey.shade300
+                                  : Colors.blueGrey.shade600,
                             ),
                           ),
                           const SizedBox(height: 2),
                           (() {
-                            final String bCountry = widget.character.birthCountry ?? widget.character.location;
-                            final String bFlag = CountryHelper.getFlagEmoji(bCountry);
-                            final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
-                            final String lCountry = widget.character.location;
-                            final String lFlag = CountryHelper.getFlagEmoji(lCountry);
-                            final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
-                            final String cityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
+                            final String bCountry =
+                                widget.character.birthCountry ??
+                                    widget.character.location;
+                            final String bFlag =
+                                CountryHelper.getFlagEmoji(bCountry);
+                            final String bFlagStr =
+                                bFlag.isNotEmpty ? ' $bFlag' : '';
+                            final String lCountry =
+                                widget.character.location;
+                            final String lFlag =
+                                CountryHelper.getFlagEmoji(lCountry);
+                            final String lFlagStr =
+                                lFlag.isNotEmpty ? ' $lFlag' : '';
+                            final String cityStr =
+                                widget.character.currentCity != null
+                                    ? '${widget.character.currentCity}, '
+                                    : '';
                             return Text(
                               'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? Colors.white70 : Colors.black54,
+                                color:
+                                    isDark ? Colors.white70 : Colors.black54,
                                 fontWeight: FontWeight.w500,
                               ),
                             );
@@ -462,7 +530,8 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                     }),
                     const SizedBox(height: 4),
                     (() {
-                      final String? rawChildName = widget.recipient['childName'];
+                      final String? rawChildName =
+                          widget.recipient['childName'];
                       final bool isChildBorn = rawChildName != null &&
                           rawChildName != 'null' &&
                           rawChildName.trim().isNotEmpty &&
@@ -473,7 +542,8 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                             : 'Status Kehamilan: Sedang Hamil 🤰 (Menunggu Kelahiran)',
                         style: TextStyle(
                           fontSize: 13,
-                          color: isDark ? Colors.lightBlueAccent : Colors.blue,
+                          color:
+                              isDark ? Colors.lightBlueAccent : Colors.blue,
                           fontWeight: FontWeight.w600,
                         ),
                       );
@@ -494,9 +564,15 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: relationship / 100.0,
-                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                              backgroundColor: isDark
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
+                                relationship > 70
+                                    ? Colors.green
+                                    : (relationship > 40
+                                        ? Colors.amber
+                                        : Colors.red),
                               ),
                               minHeight: 10,
                             ),
@@ -508,344 +584,497 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: relationship > 70 ? Colors.green : (relationship > 40 ? Colors.amber : Colors.red),
+                            color: relationship > 70
+                                ? Colors.green
+                                : (relationship > 40
+                                    ? Colors.amber
+                                    : Colors.red),
                           ),
                         ),
                       ],
                     ),
+                    const SizedBox(height: 12),
+                    Builder(builder: (context) {
+                      final int wealthVal = widget.character.getTargetWealth(
+                          name, 'Penerima Donor');
+                      final double progressVal =
+                          (wealthVal / 1000.0).clamp(0.0, 1.0);
+                      Color barColor = Colors.red;
+                      if (wealthVal > 500) {
+                        barColor = Colors.green;
+                      } else if (wealthVal >= 100) {
+                        barColor = Colors.amber;
+                      }
+
+                      final jobInfo = widget.character.getNPCJobInfo(
+                          name, 'Penerima Donor');
+                      final String statusText =
+                          jobInfo['status'] == 'Sekolah/Kuliah'
+                              ? 'Status: Sekolah/Kuliah'
+                              : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Text(
+                                'Nilai Kekayaan: ',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark
+                                      ? Colors.white
+                                      : Colors.black87,
+                                ),
+                              ),
+                              Expanded(
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: progressVal,
+                                    backgroundColor: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade200,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(
+                                            barColor),
+                                    minHeight: 10,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                              Text(
+                                CurrencySettings.format(wealthVal),
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: barColor,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            statusText,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                        ],
+                      );
+                    }),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: 24),
-
             Text(
               'PILIH AKSI INTERAKSI PENERIMA DONOR',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
-                color: isDark ? Colors.white70 : Colors.grey,
+                color: isDark ? Colors.white54 : Colors.grey,
                 letterSpacing: 1.0,
               ),
             ),
-            const SizedBox(height: 12),
-
-
-            if (isPartner) ...[
-              _buildActionTile(
-                icon: Icons.favorite,
-                color: Colors.pink,
-                title: 'Bercinta / Make Love',
-                onTap: () {
-                  final success = relationship >= 60;
-                  if (success) {
-                    widget.character.happiness = (widget.character.happiness + 20).clamp(0, 100);
-                    _showOutcome('Bercinta 💖', 'Kamu menghabiskan waktu bersama Ibu $name. Hubungan kalian berdua terasa semakin hangat.');
-                  } else {
-                    _updateRelationship(-5);
-                    _showOutcome('Bercinta Ditolak 🚫', '$name menolak ajakanmu karena hubungan kalian saat ini terasa kurang dekat.');
-                  }
-                },
-              ),
-              if (AdultFeatures.canMasturbateTogether())
-                _buildActionTile(
-                  icon: Icons.flash_on,
-                  color: Colors.purple,
-                  title: 'Ajak Masturbasi Bersama',
-                  onTap: () {
-                    if (widget.character.age < 12) {
-                      showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Terlalu Muda 👶'),
-                          content: const Text('Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text('OK'),
-                            ),
-                          ],
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildActionTile(
+                    icon: Icons.family_restroom,
+                    color: Colors.indigo,
+                    title: 'Lihat Keluarga',
+                    onTap: () {
+                      final int recipientAge = int.tryParse(
+                              widget.recipient['age'] ?? '25') ??
+                          25;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NpcFamilyViewScreen(
+                            npcName: name,
+                            npcGender: 'Perempuan',
+                            npcAge: recipientAge,
+                            npcRole: 'Penerima Donor',
+                            character: widget.character,
+                          ),
                         ),
                       );
-                      return;
-                    }
-
-                    int successChance = 50;
-                    if (widget.character.happiness > 60) {
-                      successChance = 100;
-                    }
-
-                    final bool success = _random.nextInt(100) < successChance;
-                    if (success) {
-                      AjakanMasturbasiDialog.show(
-                        context: context,
-                        character: widget.character,
-                        relationType: 'Pacar',
-                        viewerName: name,
-                        targetGender: 'Perempuan',
-                        isUserInitiated: true,
-                        onComplete: () {
-                          setState(() {});
-                          widget.onRefresh();
-                        },
-                      );
-                    } else {
-                      _updateRelationship(-10);
-                      _showOutcome('Ajakan Ditolak 🚫', '$name menolak ajakan masturbasi bersamamu.');
-                    }
-                  },
-                ),
-              if (widget.character.age >= 18)
-                _buildActionTile(
-                  icon: Icons.diamond,
-                  color: Colors.amber,
-                  title: 'Lamar',
-                  onTap: () {
-                    bool accepted = relationship >= 60 ? (_random.nextInt(100) < 80) : (_random.nextInt(100) < 30);
-                    if (accepted) {
-                      setState(() {
-                        if (widget.character.partner != null && widget.character.partner!['name'] == name) {
-                          widget.character.partner!['relation'] = 'Tunangan';
-                        } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
-                          widget.character.secondPartner!['relation'] = 'Tunangan';
+                    },
+                  ),
+                  if (isPartner) ...[
+                    _buildActionTile(
+                      icon: Icons.favorite,
+                      color: Colors.pink,
+                      title: 'Bercinta / Make Love',
+                      onTap: () {
+                        final success = relationship >= 60;
+                        if (success) {
+                          widget.character.happiness =
+                              (widget.character.happiness + 20)
+                                  .clamp(0, 100);
+                          _showOutcome('Bercinta 💖',
+                              'Kamu menghabiskan waktu bersama Ibu $name. Hubungan kalian berdua terasa semakin hangat.');
+                        } else {
+                          _updateRelationship(-5);
+                          _showOutcome('Bercinta Ditolak 🚫',
+                              '$name menolak ajakanmu karena hubungan kalian saat ini terasa kurang dekat.');
                         }
-                      });
-                      _updateRelationship(15);
-                      widget.character.happiness = (widget.character.happiness + 30).clamp(0, 100);
-                      _showOutcome('Lamaran Diterima! 💍', '$name menerima lamaran pernikahanmu dengan air mata bahagia! Status hubungan kalian kini adalah Tunangan.');
-                    } else {
-                      _updateRelationship(-10);
-                      _showOutcome('Lamaran Ditolak 💔', '$name menolak lamaranmu karena merasa hubungan kalian belum cukup matang.');
-                    }
-                  },
-                ),
-              _buildActionTile(
-                icon: Icons.heart_broken,
-                color: Colors.red,
-                title: 'Putuskan Pacar',
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (confirmContext) => AlertDialog(
-                      title: const Text('Putuskan Hubungan', style: TextStyle(fontWeight: FontWeight.bold)),
-                      content: Text('Apakah kamu yakin ingin memutuskan hubungan dengan $name?'),
-                      actions: [
-                        TextButton(
-                          onPressed: () => Navigator.pop(confirmContext),
-                          child: const Text('Batal'),
-                        ),
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pop(confirmContext);
+                      },
+                    ),
+                    if (AdultFeatures.canMasturbateTogether())
+                      _buildActionTile(
+                        icon: Icons.flash_on,
+                        color: Colors.purple,
+                        title: 'Ajak Masturbasi Bersama',
+                        onTap: () {
+                          if (widget.character.age < 12) {
+                            showDialog(
+                              context: context,
+                              builder: (context) => AlertDialog(
+                                title: const Text('Terlalu Muda 👶'),
+                                content: const Text(
+                                    'Kamu harus berusia minimal 12 tahun untuk mengajak melakukan hal ini.'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                            return;
+                          }
+
+                          int successChance = 50;
+                          if (widget.character.happiness > 60) {
+                            successChance = 100;
+                          }
+
+                          final bool success =
+                              _random.nextInt(100) < successChance;
+                          if (success) {
+                            AjakanMasturbasiDialog.show(
+                              context: context,
+                              character: widget.character,
+                              relationType: 'Pacar',
+                              viewerName: name,
+                              targetGender: 'Perempuan',
+                              isUserInitiated: true,
+                              onComplete: () {
+                                setState(() {});
+                                widget.onRefresh();
+                              },
+                            );
+                          } else {
+                            _updateRelationship(-10);
+                            _showOutcome('Ajakan Ditolak 🚫',
+                                '$name menolak ajakan masturbasi bersamamu.');
+                          }
+                        },
+                      ),
+                    if (widget.character.age >= 18)
+                      _buildActionTile(
+                        icon: Icons.diamond,
+                        color: Colors.amber,
+                        title: 'Lamar',
+                        onTap: () {
+                          bool accepted = relationship >= 60
+                              ? (_random.nextInt(100) < 80)
+                              : (_random.nextInt(100) < 30);
+                          if (accepted) {
                             setState(() {
-                              if (widget.character.partner != null && widget.character.partner!['name'] == name) {
-                                widget.character.partner = null;
-                              } else if (widget.character.secondPartner != null && widget.character.secondPartner!['name'] == name) {
-                                widget.character.secondPartner = null;
+                              if (widget.character.partner != null &&
+                                  widget.character.partner!['name'] ==
+                                      name) {
+                                widget.character.partner!['relation'] =
+                                    'Tunangan';
+                              } else if (widget.character.secondPartner !=
+                                      null &&
+                                  widget
+                                          .character.secondPartner!['name'] ==
+                                      name) {
+                                widget
+                                    .character.secondPartner!['relation'] =
+                                    'Tunangan';
                               }
                             });
-                            _updateRelationship(-40);
-                            
-                            DialogHelper.show(
-                              context: context,
-                              title: 'Putus Hubungan 💔',
-                              content: Text('Kamu telah memutuskan hubungan dengan $name.'),
-                              actions: [
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    Navigator.pop(context);
-                                  },
-                                  child: const Text('Mengerti'),
-                                ),
-                              ],
-                            );
-                          },
-                          child: const Text('Ya, Putuskan', style: TextStyle(color: Colors.red)),
-                        ),
-                      ],
+                            _updateRelationship(15);
+                            widget.character.happiness =
+                                (widget.character.happiness + 30)
+                                    .clamp(0, 100);
+                            _showOutcome('Lamaran Diterima! 💍',
+                                '$name menerima lamaran pernikahanmu dengan air mata bahagia! Status hubungan kalian kini adalah Tunangan.');
+                          } else {
+                            _updateRelationship(-10);
+                            _showOutcome('Lamaran Ditolak 💔',
+                                '$name menolak lamaranmu karena merasa hubungan kalian belum cukup matang.');
+                          }
+                        },
+                      ),
+                    _buildActionTile(
+                      icon: Icons.heart_broken,
+                      color: Colors.red,
+                      title: 'Putuskan Pacar',
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (confirmContext) => AlertDialog(
+                            title: const Text('Putuskan Hubungan',
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold)),
+                            content: Text(
+                                'Apakah kamu yakin ingin memutuskan hubungan dengan $name?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () =>
+                                    Navigator.pop(confirmContext),
+                                child: const Text('Batal'),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(confirmContext);
+                                  setState(() {
+                                    if (widget.character.partner != null &&
+                                        widget.character.partner!['name'] ==
+                                            name) {
+                                      widget.character.partner = null;
+                                    } else if (widget.character.secondPartner !=
+                                            null &&
+                                        widget.character
+                                                .secondPartner!['name'] ==
+                                            name) {
+                                      widget.character.secondPartner = null;
+                                    }
+                                  });
+                                  _updateRelationship(-40);
+
+                                  DialogHelper.show(
+                                    context: context,
+                                    title: 'Putus Hubungan 💔',
+                                    content: Text(
+                                        'Kamu telah memutuskan hubungan dengan $name.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        },
+                                        child: const Text('Mengerti'),
+                                      ),
+                                    ],
+                                  );
+                                },
+                                child: const Text('Ya, Putuskan',
+                                    style: TextStyle(color: Colors.red)),
+                              ),
+                            ],
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                  ] else ...[
+                    _buildActionTile(
+                      icon: Icons.favorite_border,
+                      color: Colors.redAccent,
+                      title: 'Ajak Pacaran',
+                      onTap: () {
+                        bool accepted = relationship >= 65 &&
+                            _random.nextInt(100) < 50;
+                        if (accepted) {
+                          final partnerMap = {
+                            'name': name,
+                            'gender': gender,
+                            'relationship': relationship.toString(),
+                            'age': age.toString(),
+                            'isDeceased': 'false',
+                            'relation': 'Pacar',
+                          };
+                          widget.character.addPartnerToFreeSlot(partnerMap);
+                          _updateRelationship(20);
+                          _showOutcome('Pacaran Sukses! ❤️',
+                              'Luar biasa! Ibu $name menerima ajakan pacaranmu. 😍');
+                        } else {
+                          _updateRelationship(-10);
+                          _showOutcome('Ajakan Ditolak 💔',
+                              '$name menolak ajakan pacaranmu secara halus.');
+                        }
+                      },
+                    ),
+                  ],
+                  _buildActionTile(
+                    icon: Icons.chat_bubble_outline,
+                    color: Colors.blue,
+                    title: 'Percakapan',
+                    onTap: () {
+                      final change = 5 + _random.nextInt(6);
+                      _updateRelationship(change);
+                      widget.character.happiness =
+                          (widget.character.happiness + 5).clamp(0, 100);
+                      _showOutcome('Percakapan 💬',
+                          'Kamu mengobrol mengenai perkembangan $childName. Hubungan meningkat!');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.access_time,
+                    color: Colors.blueAccent,
+                    title: 'Habiskan Waktu Bersama',
+                    onTap: () {
+                      final change = 8 + _random.nextInt(8);
+                      _updateRelationship(change);
+                      widget.character.happiness =
+                          (widget.character.happiness + 10).clamp(0, 100);
+                      _showOutcome('Habiskan Waktu Bersama 🕒',
+                          'Kamu mengajak Ibu $name jalan-jalan santai di taman. Kalian bersenang-senang membahas tumbuh kembang anak.');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.movie_outlined,
+                    color: Colors.indigo,
+                    title: 'Ajak Nonton Bioskop',
+                    onTap: () {
+                      if (widget.character.money < 30) {
+                        _showOutcome('Uang Tidak Cukup',
+                            'Kamu tidak memiliki uang (${CurrencySettings.format(30)}) untuk membeli tiket bioskop.');
+                        return;
+                      }
+                      widget.character.money -= 30;
+                      final change = 12 + _random.nextInt(9);
+                      _updateRelationship(change);
+                      widget.character.happiness =
+                          (widget.character.happiness + 15).clamp(0, 100);
+                      _showOutcome('Nonton Bioskop 🎬',
+                          'Kamu membelikan tiket bioskop (${CurrencySettings.format(30)}) untuk Ibu $name. Kalian menikmati film komedi romantis bersama.');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.thumb_up_alt_outlined,
+                    color: Colors.teal,
+                    title: 'Berikan Pujian',
+                    onTap: () {
+                      final change = 6 + _random.nextInt(6);
+                      _updateRelationship(change);
+                      _showOutcome('Pujian ⭐️',
+                          'Kamu memuji Ibu $name sebagai ibu yang hebat dalam mengasuh anak.');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.card_giftcard,
+                    color: Colors.purple,
+                    title: 'Beri Hadiah (${CurrencySettings.format(20)})',
+                    onTap: () {
+                      if (widget.character.money < 20) {
+                        _showOutcome('Uang Tidak Cukup',
+                            'Kamu tidak memiliki cukup uang.');
+                        return;
+                      }
+                      final change = 10 + _random.nextInt(11);
+                      widget.character.money -= 20;
+                      _updateRelationship(change);
+                      widget.character.happiness =
+                          (widget.character.happiness + 15).clamp(0, 100);
+                      _showOutcome('Memberi Hadiah 🎁',
+                          'Kamu memberikan hadiah untuk $name. Dia sangat senang!');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.face_retouching_natural,
+                    color: Colors.pink,
+                    title: 'Cium',
+                    onTap: () {
+                      if (relationship >= 60) {
+                        final change = 10 + _random.nextInt(11);
+                        _updateRelationship(change);
+                        widget.character.happiness =
+                            (widget.character.happiness + 5).clamp(0, 100);
+                        _showOutcome('Ciuman Diterima 💋',
+                            'Kamu mencium pipi Ibu $name. Dia tersenyum merona dan menyambutnya dengan hangat.');
+                      } else {
+                        final change = 8 + _random.nextInt(8);
+                        _updateRelationship(-change);
+                        _showOutcome('Ciuman Ditolak 🚫',
+                            'Kamu mencoba mencium $name, tetapi dia menghindar karena hubungan kalian belum cukup dekat.');
+                      }
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.favorite_border,
+                    color: Colors.pinkAccent,
+                    title: 'Menggoda',
+                    onTap: () {
+                      if (_random.nextInt(100) < 40) {
+                        final change = 6 + _random.nextInt(6);
+                        _updateRelationship(-change);
+                        _showOutcome('Gagal Menggoda 💔',
+                            'Kamu mencoba menggoda Ibu $name, tapi suasananya terasa agak canggung.');
+                      } else {
+                        final change = 5 + _random.nextInt(11);
+                        _updateRelationship(change);
+                        widget.character.happiness =
+                            (widget.character.happiness + 10).clamp(0, 100);
+                        _showOutcome('Menggoda Berhasil 💖',
+                            'Kamu melontarkan rayuan manis. Dia tersenyum tersipu malu!');
+                      }
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.monetization_on_outlined,
+                    color: Colors.green,
+                    title: 'Minta Uang',
+                    onTap: () {
+                      if (relationship < 50) {
+                        _updateRelationship(-5);
+                        _showOutcome('Minta Uang Ditolak ❌',
+                            '$name menolak memberi uang karena dia merasa hubungan kalian belum cukup akrab.');
+                      } else {
+                        final amount = 100 + _random.nextInt(401);
+                        widget.character.money += amount;
+                        _updateRelationship(-8);
+                        _showOutcome('Minta Uang Berhasil 💰',
+                            '$name memberikanmu uang jajan sebesar \$$amount untuk kebutuhan pribadimu.');
+                      }
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.sentiment_very_dissatisfied,
+                    color: Colors.red,
+                    title: 'Hina',
+                    onTap: () {
+                      final change = 10 + _random.nextInt(11);
+                      _updateRelationship(-change);
+                      widget.character.happiness =
+                          (widget.character.happiness - 10).clamp(0, 100);
+                      _showOutcome('Menghina 😡',
+                          'Kamu menghina $name. Hubungan kalian memburuk secara signifikan.');
+                    },
+                  ),
+                  _buildActionTile(
+                    icon: Icons.gavel,
+                    color: Colors.deepOrange,
+                    title: 'Buat Keributan',
+                    onTap: () {
+                      final win = _random.nextBool();
+                      final relChange = 15 + _random.nextInt(16);
+                      if (win) {
+                        _updateRelationship(-relChange);
+                        widget.character.health =
+                            (widget.character.health - 5).clamp(0, 100);
+                        _showOutcome('Keributan 🥊',
+                            'Kamu berdebat keras dengan $name mengenai hak asuh anak dan kamu memenangkan perdebatan tersebut, meski hubungan kalian memburuk.');
+                      } else {
+                        _updateRelationship(-relChange);
+                        widget.character.health =
+                            (widget.character.health - 12).clamp(0, 100);
+                        _showOutcome('Kalah Berdebat 🤕',
+                            'Kamu berdebat dengan $name dan dia mendiamkanmu begitu saja. Kamu merasa kesal dan lelah.');
+                      }
+                    },
+                  ),
+                ],
               ),
-            ] else ...[
-              _buildActionTile(
-                icon: Icons.favorite_border,
-                color: Colors.redAccent,
-                title: 'Ajak Pacaran',
-                onTap: () {
-                  bool accepted = relationship >= 65 && _random.nextInt(100) < 50;
-                  if (accepted) {
-                    final partnerMap = {
-                      'name': name,
-                      'gender': gender,
-                      'relationship': relationship.toString(),
-                      'age': age.toString(),
-                      'isDeceased': 'false',
-                      'relation': 'Pacar',
-                    };
-                    widget.character.addPartnerToFreeSlot(partnerMap);
-                    _updateRelationship(20);
-                    _showOutcome('Pacaran Sukses! ❤️', 'Luar biasa! Ibu $name menerima ajakan pacaranmu. 😍');
-                  } else {
-                    _updateRelationship(-10);
-                    _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakan pacaranmu secara halus.');
-                  }
-                },
-              ),
-            ],
-
-            _buildActionTile(
-              icon: Icons.chat_bubble_outline,
-              color: Colors.blue,
-              title: 'Percakapan',
-              onTap: () {
-                final change = 5 + _random.nextInt(6);
-                _updateRelationship(change);
-                widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                _showOutcome('Percakapan 💬', 'Kamu mengobrol mengenai perkembangan $childName. Hubungan meningkat!');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.access_time,
-              color: Colors.blueAccent,
-              title: 'Habiskan Waktu Bersama',
-              onTap: () {
-                final change = 8 + _random.nextInt(8);
-                _updateRelationship(change);
-                widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
-                _showOutcome('Habiskan Waktu Bersama 🕒', 'Kamu mengajak Ibu $name jalan-jalan santai di taman. Kalian bersenang-senang membahas tumbuh kembang anak.');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.movie_outlined,
-              color: Colors.indigo,
-              title: 'Ajak Nonton Bioskop',
-              onTap: () {
-                if (widget.character.money < 30) {
-                  _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki uang (${CurrencySettings.format(30)}) untuk membeli tiket bioskop.');
-                  return;
-                }
-                widget.character.money -= 30;
-                final change = 12 + _random.nextInt(9);
-                _updateRelationship(change);
-                widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
-                _showOutcome('Nonton Bioskop 🎬', 'Kamu membelikan tiket bioskop (${CurrencySettings.format(30)}) untuk Ibu $name. Kalian menikmati film komedi romantis bersama.');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.thumb_up_alt_outlined,
-              color: Colors.teal,
-              title: 'Berikan Pujian',
-              onTap: () {
-                final change = 6 + _random.nextInt(6);
-                _updateRelationship(change);
-                _showOutcome('Pujian ⭐️', 'Kamu memuji Ibu $name sebagai ibu yang hebat dalam mengasuh anak.');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.card_giftcard,
-              color: Colors.purple,
-              title: 'Beri Hadiah (${CurrencySettings.format(20)})',
-              onTap: () {
-                if (widget.character.money < 20) {
-                  _showOutcome('Uang Tidak Cukup', 'Kamu tidak memiliki cukup uang.');
-                  return;
-                }
-                final change = 10 + _random.nextInt(11);
-                widget.character.money -= 20;
-                _updateRelationship(change);
-                widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
-                _showOutcome('Memberi Hadiah 🎁', 'Kamu memberikan hadiah untuk $name. Dia sangat senang!');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.face_retouching_natural,
-              color: Colors.pink,
-              title: 'Cium',
-              onTap: () {
-                if (relationship >= 60) {
-                  final change = 10 + _random.nextInt(11);
-                  _updateRelationship(change);
-                  widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                  _showOutcome('Ciuman Diterima 💋', 'Kamu mencium pipi Ibu $name. Dia tersenyum merona dan menyambutnya dengan hangat.');
-                } else {
-                  final change = 8 + _random.nextInt(8);
-                  _updateRelationship(-change);
-                  _showOutcome('Ciuman Ditolak 🚫', 'Kamu mencoba mencium $name, tetapi dia menghindar karena hubungan kalian belum cukup dekat.');
-                }
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.favorite_border,
-              color: Colors.pinkAccent,
-              title: 'Menggoda',
-              onTap: () {
-                if (_random.nextInt(100) < 40) {
-                  final change = 6 + _random.nextInt(6);
-                  _updateRelationship(-change);
-                  _showOutcome('Gagal Menggoda 💔', 'Kamu mencoba menggoda Ibu $name, tapi suasananya terasa agak canggung.');
-                } else {
-                  final change = 5 + _random.nextInt(11);
-                  _updateRelationship(change);
-                  widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
-                  _showOutcome('Menggoda Berhasil 💖', 'Kamu melontarkan rayuan manis. Dia tersenyum tersipu malu!');
-                }
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.monetization_on_outlined,
-              color: Colors.green,
-              title: 'Minta Uang',
-              onTap: () {
-                if (relationship < 50) {
-                  _updateRelationship(-5);
-                  _showOutcome('Minta Uang Ditolak ❌', '$name menolak memberi uang karena dia merasa hubungan kalian belum cukup akrab.');
-                } else {
-                  final amount = 100 + _random.nextInt(401);
-                  widget.character.money += amount;
-                  _updateRelationship(-8);
-                  _showOutcome('Minta Uang Berhasil 💰', '$name memberikanmu uang jajan sebesar \$$amount untuk kebutuhan pribadimu.');
-                }
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.sentiment_very_dissatisfied,
-              color: Colors.red,
-              title: 'Hina',
-              onTap: () {
-                final change = 10 + _random.nextInt(11);
-                _updateRelationship(-change);
-                widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
-                _showOutcome('Menghina 😡', 'Kamu menghina $name. Hubungan kalian memburuk secara signifikan.');
-              },
-            ),
-
-            _buildActionTile(
-              icon: Icons.gavel,
-              color: Colors.deepOrange,
-              title: 'Buat Keributan',
-              onTap: () {
-                final win = _random.nextBool();
-                final relChange = 15 + _random.nextInt(16);
-                if (win) {
-                  _updateRelationship(-relChange);
-                  widget.character.health = (widget.character.health - 5).clamp(0, 100);
-                  _showOutcome('Keributan 🥊', 'Kamu berdebat keras dengan $name mengenai hak asuh anak dan kamu memenangkan perdebatan tersebut, meski hubungan kalian memburuk.');
-                } else {
-                  _updateRelationship(-relChange);
-                  widget.character.health = (widget.character.health - 12).clamp(0, 100);
-                  _showOutcome('Kalah Berdebat 🤕', 'Kamu berdebat dengan $name dan dia mendiamkanmu begitu saja. Kamu merasa kesal dan lelah.');
-                }
-              },
             ),
           ],
         ),
@@ -862,10 +1091,13 @@ class _RecipientInteractionPageState extends State<RecipientInteractionPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade100),
+        side: BorderSide(
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+        ),
       ),
       child: ListTile(
         leading: Icon(icon, color: color),

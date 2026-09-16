@@ -3828,6 +3828,31 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       }
     }
 
+    // Tombol "Lihat Keluarga" selalu ada di paling atas (nomor 1)
+    actions.insert(
+      0,
+      ActionItem(
+        label: 'Lihat Keluarga',
+        icon: Icons.family_restroom,
+        color: Colors.indigo,
+        onTap: () {
+          final String targetGen = _getTargetGender();
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => NpcFamilyViewScreen(
+                npcName: widget.targetName,
+                npcGender: targetGen,
+                npcAge: targetAge,
+                npcRole: widget.targetRole,
+                character: widget.character,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+
     final int relationshipVal = _getCurrentRelationshipValue();
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 

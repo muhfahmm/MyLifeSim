@@ -11,8 +11,6 @@ import 'idol_activity/aktivitas/aktivitas_panggung.dart' as idol_akt;
 import 'idol_activity/berita_idol/berita_idol.dart' as idol_berita;
 
 import 'staff_activity/staff_manajemen/staf_manajemen.dart' as staff_man;
-import 'staff_activity/anggota_tim_utama/tim_utama.dart' as staff_utama;
-import 'staff_activity/anggota_trainee/anggota_trainee.dart' as staff_trainee;
 import 'staff_activity/aktivitas/aktivitas_manajemen.dart' as staff_akt;
 import 'staff_activity/berita_idol/berita_idol.dart' as staff_berita;
 
@@ -319,21 +317,13 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.amber,
               title: 'Anggota Tim Utama',
               subtitle: 'Berinteraksi dengan anggota tim utama',
-              page: char.isIdolStaff
-                  ? staff_utama.TimUtamaPage(
-                      character: char,
-                      onRefresh: () {
-                        if (mounted) setState(() {});
-                        widget.onRefresh();
-                      },
-                    )
-                  : idol_utama.TimUtamaPage(
-                      character: char,
-                      onRefresh: () {
-                        if (mounted) setState(() {});
-                        widget.onRefresh();
-                      },
-                    ),
+              page: idol_utama.TimUtamaPage(
+                character: char,
+                onRefresh: () {
+                  if (mounted) setState(() {});
+                  widget.onRefresh();
+                },
+              ),
             ),
 
             // Anggota Trainee
@@ -343,21 +333,13 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
               color: Colors.purple,
               title: 'Anggota Trainee',
               subtitle: 'Berinteraksi dengan sesama trainee',
-              page: char.isIdolStaff
-                  ? staff_trainee.AnggotaTraineePage(
-                      character: char,
-                      onRefresh: () {
-                        if (mounted) setState(() {});
-                        widget.onRefresh();
-                      },
-                    )
-                  : idol_trainee.AnggotaTraineePage(
-                      character: char,
-                      onRefresh: () {
-                        if (mounted) setState(() {});
-                        widget.onRefresh();
-                      },
-                    ),
+              page: idol_trainee.AnggotaTraineePage(
+                character: char,
+                onRefresh: () {
+                  if (mounted) setState(() {});
+                  widget.onRefresh();
+                },
+              ),
             ),
 
             if (char.isIdol) ...[

@@ -4,6 +4,8 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import '../0_interactions_pages/idols_interaction_page.dart';
 
+import 'detail_performa_trainee.dart';
+
 class AnggotaTraineePage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -21,8 +23,45 @@ class AnggotaTraineePage extends StatefulWidget {
 class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
   String _searchQuery = '';
 
+  Widget _buildGenBadge(int age, {String? genStr, bool isUser = false}) {
+    int genNumber;
+    if (genStr != null && int.tryParse(genStr) != null) {
+      genNumber = int.parse(genStr);
+    } else {
+      if (age >= 16) {
+        genNumber = 5;
+      } else if (age >= 14) {
+        genNumber = 6;
+      } else {
+        genNumber = 7;
+      }
+    }
+
+    final String text = 'Gen $genNumber';
+    final Color color = isUser ? Colors.orange.shade800 : Colors.deepPurple.shade700;
+    final Color bgColor = isUser ? Colors.orange.shade50 : Colors.deepPurple.shade50;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withAlpha(102), width: 0.5),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final members = widget.character.idolTrainees;
 
     final isUserInTeam = widget.character.jobName == 'Idol (Trainee)';
@@ -37,61 +76,70 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
 
     final membersCount = filteredMembers.length + (includeUser ? 1 : 0);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Anggota Trainee ⭐'),
-        backgroundColor: Colors.pink.shade700,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: TextField(
-              onChanged: (value) {
-                setState(() {
-                  _searchQuery = value;
-                });
-              },
-              decoration: InputDecoration(
-                hintText: 'Cari anggota trainee...',
-                prefixIcon: const Icon(Icons.search),
-                suffixIcon: _searchQuery.isNotEmpty
-                    ? IconButton(
-                        icon: const Icon(Icons.clear),
-                        onPressed: () {
-                          setState(() {
-                            _searchQuery = '';
-                          });
-                        },
-                      )
-                    : null,
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey.shade300),
-                ),
-                filled: true,
-                fillColor: Theme.of(context).cardColor,
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
+        appBar: AppBar(
+          title: const Text('Anggota Trainee ⭐'),
+          backgroundColor: Colors.pink.shade700,
+          foregroundColor: Colors.white,
+          bottom: const TabBar(
+            indicatorColor: Colors.white,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: [
+              Tab(
+                icon: Icon(Icons.people_alt_outlined, size: 20),
+                text: 'Member Trainee',
               ),
-            ),
+              Tab(
+                icon: Icon(Icons.analytics_outlined, size: 20),
+                text: 'Detail Performa',
+              ),
+            ],
           ),
-          Expanded(
-            child: members.isEmpty && !isUserInTeam
-                ? const Center(
-                    child: Text(
-                      'Tidak ada anggota trainee.',
-                      style: TextStyle(color: Colors.grey),
+        ),
+        body: TabBarView(
+          children: [
+            Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  color: isDark ? Colors.grey.shade800 : Colors.white,
+                  child: TextField(
+                    onChanged: (val) => setState(() => _searchQuery = val),
+                    style: TextStyle(color: isDark ? Colors.white : Colors.black87),
+                    decoration: InputDecoration(
+                      hintText: 'Cari anggota trainee...',
+                      prefixIcon: const Icon(Icons.search, size: 20),
+                      isDense: true,
+                      filled: true,
+                      fillColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
-                  )
-                : membersCount == 0
-                    ? const Center(
-                        child: Text(
-                          'Anggota tidak ditemukan.',
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      )
-                    : ListView.builder(
+                  ),
+                ),
+                Expanded(
+                  child: members.isEmpty && !isUserInTeam
+                      ? const Center(
+                          child: Text(
+                            'Tidak ada anggota trainee.',
+                            style: TextStyle(color: Colors.grey),
+                          ),
+                        )
+                      : membersCount == 0
+                          ? const Center(
+                              child: Text(
+                                'Anggota tidak ditemukan.',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                         itemCount: membersCount,
                         itemBuilder: (context, index) {
@@ -140,7 +188,25 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                                     ),
                                   ],
                                 ),
-                                subtitle: Text('Anggota Trainee • Umur: ${widget.character.age} tahun • Disiplin: ${widget.character.discipline}%'),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        _buildGenBadge(widget.character.age, isUser: true),
+                                        const SizedBox(width: 6),
+                                        Expanded(
+                                          child: Text(
+                                            'Anggota Trainee • Umur: ${widget.character.age} th • Disiplin: ${widget.character.discipline}%',
+                                            style: const TextStyle(fontSize: 11),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
                                 trailing: const Icon(Icons.star, color: Colors.orangeAccent),
                                 onTap: () {
                                   showDialog(
@@ -197,7 +263,13 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                               ),
                               title: Row(
                                 children: [
-                                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                  Flexible(
+                                    child: Text(
+                                      name,
+                                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
                                   if (widget.character.isAnyPartnerNameMatching(name)) ...[
                                     const SizedBox(width: 8),
                                     Container(
@@ -218,7 +290,20 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                               subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text('Rekan Trainee • Umur: $age tahun • Hubungan: $rel%'),
+                                  const SizedBox(height: 2),
+                                  Row(
+                                    children: [
+                                      _buildGenBadge(age, genStr: member['generation']),
+                                      const SizedBox(width: 6),
+                                      Expanded(
+                                        child: Text(
+                                          'Umur: $age th • Hubungan: $rel%',
+                                          style: const TextStyle(fontSize: 11),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                   const SizedBox(height: 6),
                                   ClipRRect(
                                     borderRadius: BorderRadius.circular(4),
@@ -252,8 +337,17 @@ class _AnggotaTraineePageState extends State<AnggotaTraineePage> {
                           );
                         },
                       ),
-          ),
-        ],
+                ),
+              ],
+            ),
+
+            // Tab 2: Detail Performa
+            DetailPerformaTraineePage(
+              character: widget.character,
+              searchQuery: _searchQuery,
+            ),
+          ],
+        ),
       ),
     );
   }

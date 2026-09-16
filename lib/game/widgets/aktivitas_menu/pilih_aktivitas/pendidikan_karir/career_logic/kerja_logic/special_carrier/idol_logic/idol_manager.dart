@@ -29,7 +29,7 @@ class IdolManager {
     }
   }
 
-  // Initialize trainees (8 to 15 members, aged 12-15) and staff
+  // Initialize trainees (Gen 6, Gen 7, dan 30% peluang Gen 8) and staff
   static void initializeTraineeTeam(Character character) {
     final rand = Random();
     character.idolTrainees.clear();
@@ -37,57 +37,86 @@ class IdolManager {
     character.idolStaff.clear();
     character.yearsInTrainee = 0;
 
-    // Generate Trainee members (8 to 15)
-    final numTrainees = 8 + rand.nextInt(8); // 8 to 15
-    for (int i = 0; i < numTrainees; i++) {
-      character.idolTrainees.add({
-        'name': _generateName('Perempuan', rand, character),
-        'gender': 'Perempuan',
-        'age': (12 + rand.nextInt(4)).toString(), // 12 to 15
-        'relationship': (40 + rand.nextInt(41)).toString(), // 40% to 80%
-        'skinColor': _generateSkinColor(rand),
-      });
+    // Generasi Trainee Awal: Gen 6 & Gen 7 selalu ada. Gen 8 ada dengan 30% peluang.
+    int numGenerations = 2; // Gen 6 & Gen 7
+    if (rand.nextDouble() < 0.30) {
+      numGenerations = 3; // Gen 6, Gen 7, & Gen 8
     }
 
-    // Initialize Main Team too, so Trainee user can see them
-    final numMain = 20 + rand.nextInt(11); // 20 to 30
-    for (int i = 0; i < numMain; i++) {
-      int memberAge = 16 + rand.nextInt(10); // 16 to 25
-      if (rand.nextDouble() < 0.05) {
-        memberAge = 26 + rand.nextInt(5); // 26 to 30
+    // Tiap generasi trainee 8 hingga 15 anggota
+    for (int g = 0; g < numGenerations; g++) {
+      final int numTrainees = 8 + rand.nextInt(8); // 8 to 15 per generasi
+      final int genNum = 6 + g; // Gen 6, Gen 7, Gen 8
+      
+      // Masa pelatihan & usia berurutan sesuai generasi:
+      // Gen 6 (terlama di trainee) -> pelatihan 2 th (usia 15)
+      // Gen 7                     -> pelatihan 1 th (usia 13-14)
+      // Gen 8 (terbaru)           -> pelatihan 0 th (usia 12)
+      int yearsInTrainee;
+      int traineeAge;
+      if (genNum == 6) {
+        yearsInTrainee = 2;
+        traineeAge = 15;
+      } else if (genNum == 7) {
+        yearsInTrainee = 1;
+        traineeAge = 13 + rand.nextInt(2); // 13-14
+      } else {
+        yearsInTrainee = 0;
+        traineeAge = 12;
       }
-      character.idolMainMembers.add({
-        'name': _generateName('Perempuan', rand, character),
-        'gender': 'Perempuan',
-        'age': memberAge.toString(),
-        'relationship': (40 + rand.nextInt(41)).toString(),
-        'skinColor': _generateSkinColor(rand),
-      });
+
+      for (int i = 0; i < numTrainees; i++) {
+        character.idolTrainees.add({
+          'name': _generateName('Perempuan', rand, character),
+          'gender': 'Perempuan',
+          'age': traineeAge.toString(),
+          'yearsInTrainee': yearsInTrainee.toString(),
+          'generation': genNum.toString(),
+          'relationship': (40 + rand.nextInt(41)).toString(), // 40% to 80%
+          'skinColor': _generateSkinColor(rand),
+        });
+      }
     }
+
+    // Initialize Tim Utama (Gen 1, Gen 2, Gen 3, Gen 4, Gen 5)
+    initializeMainTeam(character);
 
     // Generate staff
     _generateManagementStaff(character, rand);
   }
 
-  // Initialize main team (20 to 30 members, aged 16-25, 5% up to 30)
+  // Initialize main team (Gen 1 s/d Gen 5)
   static void initializeMainTeam(Character character) {
     final rand = Random();
     character.idolMainMembers.clear();
     character.yearsInTrainee = 0;
 
-    final numMembers = 20 + rand.nextInt(11); // 20 to 30
-    for (int i = 0; i < numMembers; i++) {
-      int memberAge = 16 + rand.nextInt(10); // 16 to 25
-      if (rand.nextDouble() < 0.05) {
-        memberAge = 26 + rand.nextInt(5); // 26 to 30
+    // Tim Utama terdiri dari Gen 1, Gen 2, Gen 3, Gen 4, Gen 5 (masing-masing 8-15 anggota)
+    for (int genNum = 1; genNum <= 5; genNum++) {
+      final int count = 8 + rand.nextInt(8); // 8 sampai 15 member per generasi
+      int memberAge;
+      if (genNum == 1) {
+        memberAge = 26 + rand.nextInt(5); // 26-30
+      } else if (genNum == 2) {
+        memberAge = 23 + rand.nextInt(3); // 23-25
+      } else if (genNum == 3) {
+        memberAge = 20 + rand.nextInt(3); // 20-22
+      } else if (genNum == 4) {
+        memberAge = 17 + rand.nextInt(3); // 17-19
+      } else {
+        memberAge = 15 + rand.nextInt(2); // 15-16
       }
-      character.idolMainMembers.add({
-        'name': _generateName('Perempuan', rand, character),
-        'gender': 'Perempuan',
-        'age': memberAge.toString(),
-        'relationship': (40 + rand.nextInt(41)).toString(),
-        'skinColor': _generateSkinColor(rand),
-      });
+
+      for (int i = 0; i < count; i++) {
+        character.idolMainMembers.add({
+          'name': _generateName('Perempuan', rand, character),
+          'gender': 'Perempuan',
+          'age': memberAge.toString(),
+          'generation': genNum.toString(),
+          'relationship': (40 + rand.nextInt(41)).toString(),
+          'skinColor': _generateSkinColor(rand),
+        });
+      }
     }
 
     // Ensure staff exists
@@ -305,6 +334,8 @@ class IdolManager {
     for (var member in character.idolTrainees) {
       final currentAge = int.tryParse(member['age'] ?? '13') ?? 13;
       member['age'] = (currentAge + 1).toString();
+      final currentYears = int.tryParse(member['yearsInTrainee'] ?? '0') ?? 0;
+      member['yearsInTrainee'] = (currentYears + 1).toString();
     }
     for (var member in character.idolMainMembers) {
       final currentAge = int.tryParse(member['age'] ?? '18') ?? 18;
@@ -316,12 +347,29 @@ class IdolManager {
     }
 
     // 3. Trainee Graduation / Leaving & Replacements
+    final bool isGMUser = character.jobName == 'General Manager';
     final List<Map<String, String>> activeTrainees = List.from(character.idolTrainees);
     character.idolTrainees.clear();
 
     for (var member in activeTrainees) {
       final ageVal = int.tryParse(member['age'] ?? '15') ?? 15;
-      if (ageVal >= 16) {
+      final yearsVal = int.tryParse(member['yearsInTrainee'] ?? '1') ?? 1;
+
+      // Jika BUKAN GM, NPC/AI mempromosikan otomatis trainee berpengalaman ke tim utama
+      bool promotedByAI = false;
+      if (!isGMUser && yearsVal >= 2 && rand.nextDouble() < 0.35) {
+        promotedByAI = true;
+        character.idolMainMembers.add(member);
+        final promoNotice = '⭐ Promosi Tim Utama: ${member['name']} telah dipromosikan ke Tim Utama oleh manajemen!';
+        character.idolNews.add(promoNotice);
+        inbox.add(promoNotice);
+      }
+
+      if (promotedByAI) {
+        continue;
+      }
+
+      if (ageVal >= 17) {
         final gradNotice = '📢 Trainee Keluar: Trainee ${member['name']} (${member['age']} tahun) telah meninggalkan grup trainee.';
         character.idolNews.add(gradNotice);
         inbox.add(gradNotice);
@@ -333,15 +381,26 @@ class IdolManager {
     // Replenish trainee team: 8 to 15 members
     final targetTrainees = 8 + rand.nextInt(8);
     while (character.idolTrainees.length < targetTrainees) {
+      int maxGen = 7;
+      for (var list in [character.idolTrainees, character.idolMainMembers, character.idolGraduatedMembers]) {
+        for (var m in list) {
+          final g = int.tryParse(m['generation'] ?? '0') ?? 0;
+          if (g > maxGen) maxGen = g;
+        }
+      }
+      final newGen = maxGen + 1;
+
       final name = _generateName('Perempuan', rand, character);
       character.idolTrainees.add({
         'name': name,
         'gender': 'Perempuan',
         'age': '12', // fresh trainee
+        'yearsInTrainee': '0', // benar-benar gen/rekruitan baru
+        'generation': newGen.toString(),
         'relationship': (40 + rand.nextInt(41)).toString(),
         'skinColor': _generateSkinColor(rand),
       });
-      final entryNotice = '🆕 Generasi Baru: Trainee Baru $name (12 tahun) telah bergabung ke tim Trainee!';
+      final entryNotice = '🆕 Generasi Baru: Trainee Baru $name (12 th, Gen $newGen) telah bergabung ke tim Trainee!';
       character.idolNews.add(entryNotice);
       inbox.add(entryNotice);
     }
@@ -370,25 +429,13 @@ class IdolManager {
         final gradNotice = '🎓 Anggota Lulus: Anggota tim utamamu, ${member['name']} (${member['age']} tahun), telah resmi lulus (graduate) dari grup Idol.';
         character.idolNews.add(gradNotice);
         inbox.add(gradNotice);
+        
+        final gradMember = Map<String, String>.from(member);
+        gradMember['graduatedAge'] = member['age'] ?? '20';
+        character.idolGraduatedMembers.add(gradMember);
       } else {
         character.idolMainMembers.add(member);
       }
-    }
-
-    // Replenish main team: 20 to 30 members
-    final targetMain = 20 + rand.nextInt(11);
-    while (character.idolMainMembers.length < targetMain) {
-      final name = _generateName('Perempuan', rand, character);
-      character.idolMainMembers.add({
-        'name': name,
-        'gender': 'Perempuan',
-        'age': '16', // fresh main member
-        'relationship': (40 + rand.nextInt(41)).toString(),
-        'skinColor': _generateSkinColor(rand),
-      });
-      final entryNotice = '🆕 Promosi Tim Utama: $name (16 tahun) resmi bergabung ke Tim Utama!';
-      character.idolNews.add(entryNotice);
-      inbox.add(entryNotice);
     }
 
     // Replenish staff if they get too old (> 65) or leave

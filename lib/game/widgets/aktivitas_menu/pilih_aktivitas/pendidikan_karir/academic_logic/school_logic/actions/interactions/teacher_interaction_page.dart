@@ -9,6 +9,7 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
 import 'dart:math';
 
 class TeacherInteractionPage extends StatefulWidget {
@@ -73,7 +74,8 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
 
     if (!_isSexualityCompatible(userGen, teacherGen)) {
-      _showOutcome('Tidak Sesuai 🚫', '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu.');
+      _showOutcome('Tidak Sesuai 🚫',
+          '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu.');
       return;
     }
 
@@ -82,16 +84,22 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
 
     if (success) {
       final int change = 15 + Random().nextInt(11);
-      widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-      widget.character.happiness = (widget.character.happiness + 10).clamp(0, 100);
+      widget.teacher['relationship'] =
+          (rel + change).clamp(0, 100).toString();
+      widget.character.happiness =
+          (widget.character.happiness + 10).clamp(0, 100);
       widget.onRefresh();
-      _showOutcome('Berhasil 💖', 'Kamu berhasil melakukan hubungan intim dengan $name! Hubungan kalian meningkat pesat.');
+      _showOutcome('Berhasil 💖',
+          'Kamu berhasil melakukan hubungan intim dengan $name! Hubungan kalian meningkat pesat.');
     } else {
       final int change = 10 + Random().nextInt(16);
-      widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-      widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
+      widget.teacher['relationship'] =
+          (rel - change).clamp(0, 100).toString();
+      widget.character.happiness =
+          (widget.character.happiness - 10).clamp(0, 100);
       widget.onRefresh();
-      _showOutcome('Ditolak 💔', '$name menolak ajakanmu dan merasa sangat terkejut. Hubungan menurun.');
+      _showOutcome('Ditolak 💔',
+          '$name menolak ajakanmu dan merasa sangat terkejut. Hubungan menurun.');
     }
   }
 
@@ -102,12 +110,14 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     final int rel = int.tryParse(widget.teacher['relationship'] ?? '50') ?? 50;
 
     if (widget.character.isAnyPartnerNameMatching(name)) {
-      _showOutcome('Sudah Berpacaran 💑', 'Kamu sudah memiliki hubungan dengan $name.');
+      _showOutcome('Sudah Berpacaran 💑',
+          'Kamu sudah memiliki hubungan dengan $name.');
       return;
     }
 
     if (!_isSexualityCompatible(userGen, teacherGen)) {
-      _showOutcome('Tidak Sesuai 🚫', '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu untuk berpacaran.');
+      _showOutcome('Tidak Sesuai 🚫',
+          '$name (${_getTeacherSexuality()}) tidak tertarik dengan jenis kelaminmu untuk berpacaran.');
       return;
     }
 
@@ -116,8 +126,9 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
 
     if (success) {
       final int change = 10 + Random().nextInt(11);
-      widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-      
+      widget.teacher['relationship'] =
+          (rel + change).clamp(0, 100).toString();
+
       final Map<String, String> newPartnerMap = {
         'name': name,
         'gender': teacherGen,
@@ -137,15 +148,20 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
         widget.character.isHavingAffair = true;
       }
 
-      widget.character.happiness = (widget.character.happiness + 15).clamp(0, 100);
+      widget.character.happiness =
+          (widget.character.happiness + 15).clamp(0, 100);
       widget.onRefresh();
-      _showOutcome('Pacaran Baru! ❤️', 'Kamu berhasil mengajak $name untuk berpacaran dan dia menerimanya!');
+      _showOutcome('Pacaran Baru! ❤️',
+          'Kamu berhasil mengajak $name untuk berpacaran dan dia menerimanya!');
     } else {
       final int change = 10 + Random().nextInt(11);
-      widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-      widget.character.happiness = (widget.character.happiness - 10).clamp(0, 100);
+      widget.teacher['relationship'] =
+          (rel - change).clamp(0, 100).toString();
+      widget.character.happiness =
+          (widget.character.happiness - 10).clamp(0, 100);
       widget.onRefresh();
-      _showOutcome('Ajakan Ditolak 💔', '$name menolak ajakanmu dan mengingatkanmu untuk menjaga sikap sebagai murid.');
+      _showOutcome('Ajakan Ditolak 💔',
+          '$name menolak ajakanmu dan mengingatkanmu untuk menjaga sikap sebagai murid.');
     }
   }
   // ==========================================================
@@ -173,7 +189,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
         elevation: 0,
       ),
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
-      body: SingleChildScrollView(
+      body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -183,7 +199,9 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
               color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                side: BorderSide(
+                  color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                ),
               ),
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -205,9 +223,13 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                     ),
                     const SizedBox(height: 4),
                     () {
-                      final String sexuality = widget.teacher['sexuality'] ?? 'Heteroseksual';
-                      final String gender = widget.teacher['gender'] ?? 'Laki-laki';
-                      final currentYear = widget.character.currentDate?.year ?? widget.character.birthDate?.year ?? DateTime.now().year;
+                      final String sexuality =
+                          widget.teacher['sexuality'] ?? 'Heteroseksual';
+                      final String teacherGender =
+                          widget.teacher['gender'] ?? 'Laki-laki';
+                      final currentYear = widget.character.currentDate?.year ??
+                          widget.character.birthDate?.year ??
+                          DateTime.now().year;
                       final birthYear = currentYear - age;
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,18 +239,29 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                             style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: isDark ? Colors.blueGrey.shade300 : Colors.blueGrey.shade600,
+                              color: isDark
+                                  ? Colors.blueGrey.shade300
+                                  : Colors.blueGrey.shade600,
                             ),
                           ),
                           const SizedBox(height: 2),
                           (() {
-                            final String bCountry = widget.character.birthCountry ?? widget.character.location;
-                            final String bFlag = CountryHelper.getFlagEmoji(bCountry);
-                            final String bFlagStr = bFlag.isNotEmpty ? ' $bFlag' : '';
+                            final String bCountry =
+                                widget.character.birthCountry ??
+                                    widget.character.location;
+                            final String bFlag =
+                                CountryHelper.getFlagEmoji(bCountry);
+                            final String bFlagStr =
+                                bFlag.isNotEmpty ? ' $bFlag' : '';
                             final String lCountry = widget.character.location;
-                            final String lFlag = CountryHelper.getFlagEmoji(lCountry);
-                            final String lFlagStr = lFlag.isNotEmpty ? ' $lFlag' : '';
-                            final String cityStr = widget.character.currentCity != null ? '${widget.character.currentCity}, ' : '';
+                            final String lFlag =
+                                CountryHelper.getFlagEmoji(lCountry);
+                            final String lFlagStr =
+                                lFlag.isNotEmpty ? ' $lFlag' : '';
+                            final String cityStr =
+                                widget.character.currentCity != null
+                                    ? '${widget.character.currentCity}, '
+                                    : '';
                             return Text(
                               'Kebangsaan: $bCountry$bFlagStr • Tinggal di: $cityStr$lCountry$lFlagStr',
                               style: TextStyle(
@@ -240,7 +273,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                           })(),
                           const SizedBox(height: 2),
                           Text(
-                            '${widget.role} • Gender: $gender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
+                            '${widget.role} • Gender: $teacherGender • Umur: $age tahun • Seksualitas: $sexuality • Hubungan: $rel%',
                             style: TextStyle(
                               fontSize: 13,
                               color: isDark ? Colors.white70 : Colors.black54,
@@ -254,16 +287,24 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                       children: [
                         Text(
                           'Tingkat Hubungan: ',
-                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                            color: isDark ? Colors.white : Colors.black87,
+                          ),
                         ),
                         Expanded(
                           child: ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: LinearProgressIndicator(
                               value: rel / 100.0,
-                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                              backgroundColor: isDark
+                                  ? Colors.grey.shade700
+                                  : Colors.grey.shade200,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                rel > 70 ? Colors.green : (rel > 40 ? Colors.amber : Colors.red),
+                                rel > 70
+                                    ? Colors.green
+                                    : (rel > 40 ? Colors.amber : Colors.red),
                               ),
                               minHeight: 10,
                             ),
@@ -275,15 +316,19 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
-                            color: rel > 70 ? Colors.green : (rel > 40 ? Colors.amber : Colors.red),
+                            color: rel > 70
+                                ? Colors.green
+                                : (rel > 40 ? Colors.amber : Colors.red),
                           ),
                         ),
                       ],
                     ),
                     const SizedBox(height: 12),
                     Builder(builder: (context) {
-                      final int wealthVal = widget.character.getTargetWealth(name, 'Guru');
-                      final double progressVal = (wealthVal / 1000.0).clamp(0.0, 1.0);
+                      final int wealthVal =
+                          widget.character.getTargetWealth(name, 'Guru');
+                      final double progressVal =
+                          (wealthVal / 1000.0).clamp(0.0, 1.0);
                       Color barColor = Colors.red;
                       if (wealthVal > 500) {
                         barColor = Colors.green;
@@ -291,10 +336,12 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                         barColor = Colors.amber;
                       }
 
-                      final jobInfo = widget.character.getNPCJobInfo(name, 'Guru');
-                      final String statusText = jobInfo['status'] == 'Sekolah/Kuliah'
-                          ? 'Status: Sekolah/Kuliah'
-                          : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
+                      final jobInfo =
+                          widget.character.getNPCJobInfo(name, 'Guru');
+                      final String statusText =
+                          jobInfo['status'] == 'Sekolah/Kuliah'
+                              ? 'Status: Sekolah/Kuliah'
+                              : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
 
                       return Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -314,8 +361,11 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                                   borderRadius: BorderRadius.circular(4),
                                   child: LinearProgressIndicator(
                                     value: progressVal,
-                                    backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                                    valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                                    backgroundColor: isDark
+                                        ? Colors.grey.shade700
+                                        : Colors.grey.shade200,
+                                    valueColor:
+                                        AlwaysStoppedAnimation<Color>(barColor),
                                     minHeight: 10,
                                   ),
                                 ),
@@ -356,7 +406,7 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
-                    color: isDark ? Colors.white70 : Colors.grey,
+                    color: isDark ? Colors.white54 : Colors.grey,
                     letterSpacing: 1.0,
                   ),
                 );
@@ -366,187 +416,280 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
                 style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.white70 : Colors.grey,
+                  color: isDark ? Colors.white54 : Colors.grey,
                   letterSpacing: 1.0,
                 ),
               );
             }),
             const SizedBox(height: 12),
-            const SizedBox(height: 8),
 
-            if (widget.character.age >= 10) ...[
-              if (AdultFeatures.canMakeLove(
-                userAge: widget.character.age,
-                role: widget.role,
-                relation: widget.role,
-              ))
-                _buildActionTile(
-                  icon: Icons.favorite,
-                  color: Colors.pink,
-                  title: 'Bercinta / Make Love',
-                  onTap: _handleBercinta,
-                ),
-              if (AdultFeatures.canMasturbateTogether() && widget.character.age >= 12)
-                _buildActionTile(
-                  icon: Icons.flash_on,
-                  color: Colors.purple,
-                  title: 'Ajak Masturbasi Bersama',
-                  onTap: () {
-                    int successChance = PersentaseAjakan.getSuccessChance(
-                      character: widget.character,
-                      relationType: widget.role,
-                      viewerName: name,
-                    );
-                    final bool success = Random().nextInt(100) < successChance;
-                    if (success) {
-                      AjakanMasturbasiDialog.show(
-                        context: context,
-                        character: widget.character,
-                        relationType: widget.role,
-                        viewerName: name,
-                        targetGender: gender,
-                        isUserInitiated: true,
-                        onComplete: () {
-                          setState(() {});
-                          widget.onRefresh();
-                        },
-                      );
-                    } else {
-                      if (widget.role == 'Guru' || widget.role == 'Guru BK' || widget.role == 'Kepala Sekolah') {
-                        widget.character.happiness = (widget.character.happiness - 50).clamp(0, 100);
-                        widget.character.money = (widget.character.money * 0.5).round();
-                        widget.character.inbox.add('🚨 DIKELUARKAN: Kamu dilaporkan melakukan pelecehan/tindakan asusila kepada ${widget.role} ($name) dan dikeluarkan dari sekolah!');
-                        widget.teacher['relationship'] = '0';
-                        
-                        showDialog(
-                          context: context,
-                          builder: (ctx) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                            titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                            contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                            title: const Text('Rayuan Ditolak (Tragedi) 🚨', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
-                            content: Text('$name marah besar dan merasa sangat terganggu! Kamu langsung dilaporkan ke pihak sekolah dan dikeluarkan secara tidak terhormat! (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).', style: const TextStyle(fontSize: 12)),
-                            actions: [
-                              TextButton(
-                                onPressed: () {
-                                  Navigator.pop(ctx);
-                                  Navigator.pop(context);
-                                  widget.onRefresh();
-                                },
-                                child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
-                              )
-                            ],
+            Expanded(
+              child: ListView(
+                children: [
+                  _buildActionTile(
+                    icon: Icons.family_restroom,
+                    color: Colors.indigo,
+                    title: 'Lihat Keluarga',
+                    onTap: () {
+                      final String teacherName =
+                          widget.teacher['name'] ?? 'Guru';
+                      final String teacherGender =
+                          widget.teacher['gender'] ?? 'Laki-laki';
+                      final int teacherAge =
+                          int.tryParse(widget.teacher['age'] ?? '35') ?? 35;
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NpcFamilyViewScreen(
+                            npcName: teacherName,
+                            npcGender: teacherGender,
+                            npcAge: teacherAge,
+                            npcRole: widget.role,
+                            character: widget.character,
                           ),
-                        );
-                      } else {
-                        final change = 15 + Random().nextInt(11);
-                        widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-                        widget.character.happiness = (widget.character.happiness - 15).clamp(0, 100);
+                        ),
+                      );
+                    },
+                  ),
+
+                  if (widget.character.age >= 10) ...[
+                    if (AdultFeatures.canMakeLove(
+                      userAge: widget.character.age,
+                      role: widget.role,
+                      relation: widget.role,
+                    ))
+                      _buildActionTile(
+                        icon: Icons.favorite,
+                        color: Colors.pink,
+                        title: 'Bercinta / Make Love',
+                        onTap: _handleBercinta,
+                      ),
+                    if (AdultFeatures.canMasturbateTogether() &&
+                        widget.character.age >= 12)
+                      _buildActionTile(
+                        icon: Icons.flash_on,
+                        color: Colors.purple,
+                        title: 'Ajak Masturbasi Bersama',
+                        onTap: () {
+                          int successChance =
+                              PersentaseAjakan.getSuccessChance(
+                            character: widget.character,
+                            relationType: widget.role,
+                            viewerName: name,
+                          );
+                          final bool success =
+                              Random().nextInt(100) < successChance;
+                          if (success) {
+                            AjakanMasturbasiDialog.show(
+                              context: context,
+                              character: widget.character,
+                              relationType: widget.role,
+                              viewerName: name,
+                              targetGender: gender,
+                              isUserInitiated: true,
+                              onComplete: () {
+                                setState(() {});
+                                widget.onRefresh();
+                              },
+                            );
+                          } else {
+                            if (widget.role == 'Guru' ||
+                                widget.role == 'Guru BK' ||
+                                widget.role == 'Kepala Sekolah') {
+                              widget.character.happiness =
+                                  (widget.character.happiness - 50)
+                                      .clamp(0, 100);
+                              widget.character.money =
+                                  (widget.character.money * 0.5).round();
+                              widget.character.inbox.add(
+                                  '🚨 DIKELUARKAN: Kamu dilaporkan melakukan pelecehan/tindakan asusila kepada ${widget.role} ($name) dan dikeluarkan dari sekolah!');
+                              widget.teacher['relationship'] = '0';
+
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16)),
+                                  insetPadding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 16),
+                                  titlePadding:
+                                      const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                                  contentPadding:
+                                      const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                                  title: const Text(
+                                    'Rayuan Ditolak (Tragedi) 🚨',
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  content: Text(
+                                    '$name marah besar dan merasa sangat terganggu! Kamu langsung dilaporkan ke pihak sekolah dan dikeluarkan secara tidak terhormat! (-50% Kebahagiaan, uangmu terpotong 50%, -100% Hubungan).',
+                                    style: const TextStyle(fontSize: 12),
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () {
+                                        Navigator.pop(ctx);
+                                        Navigator.pop(context);
+                                        widget.onRefresh();
+                                      },
+                                      child: const Text(
+                                        'OK',
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              );
+                            } else {
+                              final change = 15 + Random().nextInt(11);
+                              widget.teacher['relationship'] =
+                                  (rel - change).clamp(0, 100).toString();
+                              widget.character.happiness =
+                                  (widget.character.happiness - 15)
+                                      .clamp(0, 100);
+                              widget.onRefresh();
+                              _showOutcome('Ajakan Ditolak ❌',
+                                  '$name menolak ajakan masturbasi bersamamu secara mentah-mentah! (-$change% Hubungan, -15% Kebahagiaan).');
+                            }
+                          }
+                        },
+                      ),
+                    if (AdultFeatures.canProposeDating(
+                      widget.role,
+                      widget.role,
+                      userAge: widget.character.age,
+                    ))
+                      _buildActionTile(
+                        icon: widget.character.partner != null
+                            ? Icons.heart_broken
+                            : Icons.favorite_border,
+                        color: widget.character.partner != null
+                            ? Colors.deepOrange
+                            : Colors.redAccent,
+                        title: widget.character.partner != null
+                            ? 'Ajak Pacaran (Selingkuh?)'
+                            : 'Ajak Pacaran',
+                        onTap: _handleAjakPacaran,
+                      ),
+                  ],
+
+                  _buildActionTile(
+                    icon: Icons.thumb_up_alt_outlined,
+                    color: Colors.teal,
+                    title: 'Cari Muka (Puji)',
+                    onTap: () {
+                      final success = Random().nextBool();
+                      if (success) {
+                        final change = 8 + Random().nextInt(11);
+                        widget.teacher['relationship'] =
+                            (rel + change).clamp(0, 100).toString();
                         widget.onRefresh();
-                        _showOutcome('Ajakan Ditolak ❌', '$name menolak ajakan masturbasi bersamamu secara mentah-mentah! (-$change% Hubungan, -15% Kebahagiaan).');
+                        _showOutcome('Cari Muka',
+                            'Kamu memuji gaya mengajar $name. Dia tersenyum bangga dan menyukaimu!');
+                      } else {
+                        final change = 5 + Random().nextInt(11);
+                        widget.teacher['relationship'] =
+                            (rel - change).clamp(0, 100).toString();
+                        widget.onRefresh();
+                        _showOutcome('Cari Muka Gagal',
+                            'Kamu mencoba memuji $name, tapi dia tahu kamu hanya berpura-pura dan menegurmu!');
                       }
-                    }
-                  },
-                ),
-              if (AdultFeatures.canProposeDating(widget.role, widget.role, userAge: widget.character.age))
-                _buildActionTile(
-                  icon: widget.character.partner != null ? Icons.heart_broken : Icons.favorite_border,
-                  color: widget.character.partner != null ? Colors.deepOrange : Colors.redAccent,
-                  title: widget.character.partner != null ? 'Ajak Pacaran (Selingkuh?)' : 'Ajak Pacaran',
-                  onTap: _handleAjakPacaran,
-                ),
-            ],
+                    },
+                  ),
 
-            _buildActionTile(
-              icon: Icons.thumb_up_alt_outlined,
-              color: Colors.teal,
-              title: 'Cari Muka (Puji)',
-              onTap: () {
-                final success = Random().nextBool();
-                if (success) {
-                  final change = 8 + Random().nextInt(11);
-                  widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-                  widget.onRefresh();
-                  _showOutcome('Cari Muka', 'Kamu memuji gaya mengajar $name. Dia tersenyum bangga dan menyukaimu!');
-                } else {
-                  final change = 5 + Random().nextInt(11);
-                  widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-                  widget.onRefresh();
-                  _showOutcome('Cari Muka Gagal', 'Kamu mencoba memuji $name, tapi dia tahu kamu hanya berpura-pura dan menegurmu!');
-                }
-              },
-            ),
+                  _buildActionTile(
+                    icon: Icons.emoji_people,
+                    color: Colors.blueAccent,
+                    title: 'Bertingkah Laku',
+                    onTap: () {
+                      final change = 3 + Random().nextInt(8);
+                      widget.teacher['relationship'] =
+                          (rel + change).clamp(0, 100).toString();
+                      widget.character.karma =
+                          (widget.character.karma + 3).clamp(0, 100);
+                      widget.onRefresh();
+                      _showOutcome('Bertingkah Laku',
+                          'Kamu menunjukkan sikap sopan dan membantu $name. Dia sangat menghargai perilakumu!');
+                    },
+                  ),
 
-            _buildActionTile(
-              icon: Icons.emoji_people,
-              color: Colors.blueAccent,
-              title: 'Bertingkah Laku',
-              onTap: () {
-                final change = 3 + Random().nextInt(8);
-                widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-                widget.character.karma = (widget.character.karma + 3).clamp(0, 100);
-                widget.onRefresh();
-                _showOutcome('Bertingkah Laku', 'Kamu menunjukkan sikap sopan dan membantu $name. Dia sangat menghargai perilakumu!');
-              },
-            ),
+                  _buildActionTile(
+                    icon: Icons.card_giftcard,
+                    color: Colors.orange,
+                    title: 'Gift',
+                    onTap: () {
+                      const int giftCost = 100;
+                      if (widget.character.money >= giftCost) {
+                        final change = 10 + Random().nextInt(11);
+                        widget.teacher['relationship'] =
+                            (rel + change).clamp(0, 100).toString();
+                        widget.character.money -= giftCost;
+                        widget.onRefresh();
+                        _showOutcome('Memberi Hadiah',
+                            'Kamu memberikan hadiah istimewa kepada $name. Dia sangat senang dan hubunganmu membaik!');
+                      } else {
+                        _showOutcome('Gagal Memberi Hadiah',
+                            'Kamu tidak memiliki cukup uang untuk membeli hadiah. (Butuh $giftCost)');
+                      }
+                    },
+                  ),
 
-            _buildActionTile(
-              icon: Icons.card_giftcard,
-              color: Colors.orange,
-              title: 'Gift',
-              onTap: () {
-                const int giftCost = 100;
-                if (widget.character.money >= giftCost) {
-                  final change = 10 + Random().nextInt(11);
-                  widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-                  widget.character.money -= giftCost;
-                  widget.onRefresh();
-                  _showOutcome('Memberi Hadiah', 'Kamu memberikan hadiah istimewa kepada $name. Dia sangat senang dan hubunganmu membaik!');
-                } else {
-                  _showOutcome('Gagal Memberi Hadiah', 'Kamu tidak memiliki cukup uang untuk membeli hadiah. (Butuh $giftCost)');
-                }
-              },
-            ),
+                  if (AdultFeatures.canMakeLove(
+                    userAge: widget.character.age,
+                    role: widget.role,
+                    relation: widget.role,
+                  ))
+                    _buildActionTile(
+                      icon: Icons.favorite,
+                      color: Colors.pinkAccent,
+                      title: 'Cium',
+                      onTap: () {
+                        if (rel >= 60) {
+                          final change = 10 + Random().nextInt(11);
+                          widget.teacher['relationship'] =
+                              (rel + change).clamp(0, 100).toString();
+                          widget.character.happiness =
+                              (widget.character.happiness + 5)
+                                  .clamp(0, 100);
+                          widget.onRefresh();
+                          _showOutcome('Ciuman Diterima',
+                              'Kamu mencium pipi $name. Dia tersipu dan merasa disayangi! Hubungan kalian semakin dekat.');
+                        } else {
+                          final change = 10 + Random().nextInt(11);
+                          widget.teacher['relationship'] =
+                              (rel - change).clamp(0, 100).toString();
+                          widget.character.happiness =
+                              (widget.character.happiness - 5)
+                                  .clamp(0, 100);
+                          widget.onRefresh();
+                          _showOutcome('Ciuman Ditolak',
+                              'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
+                        }
+                      },
+                    ),
 
-            if (AdultFeatures.canMakeLove(
-              userAge: widget.character.age,
-              role: widget.role,
-              relation: widget.role,
-            ))
-              _buildActionTile(
-                icon: Icons.favorite,
-                color: Colors.pinkAccent,
-                title: 'Cium',
-                onTap: () {
-                  if (rel >= 60) {
-                    final change = 10 + Random().nextInt(11);
-                    widget.teacher['relationship'] = (rel + change).clamp(0, 100).toString();
-                    widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
-                    widget.onRefresh();
-                    _showOutcome('Ciuman Diterima', 'Kamu mencium pipi $name. Dia tersipu dan merasa disayangi! Hubungan kalian semakin dekat.');
-                  } else {
-                    final change = 10 + Random().nextInt(11);
-                    widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-                    widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-                    widget.onRefresh();
-                    _showOutcome('Ciuman Ditolak', 'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
-                  }
-                },
+                  _buildActionTile(
+                    icon: Icons.sentiment_very_dissatisfied,
+                    color: Colors.red,
+                    title: 'Menghina',
+                    onTap: () {
+                      final change = 15 + Random().nextInt(16);
+                      widget.teacher['relationship'] =
+                          (rel - change).clamp(0, 100).toString();
+                      widget.character.karma =
+                          (widget.character.karma - 5).clamp(0, 100);
+                      widget.character.happiness =
+                          (widget.character.happiness - 5).clamp(0, 100);
+                      widget.onRefresh();
+                      _showOutcome('Menghina Guru',
+                          'Kamu mengejek cara berpakaian $name. Dia sangat marah dan kamu dihukum berdiri di depan kelas!');
+                    },
+                  ),
+                ],
               ),
-
-            _buildActionTile(
-              icon: Icons.sentiment_very_dissatisfied,
-              color: Colors.red,
-              title: 'Menghina',
-              onTap: () {
-                final change = 15 + Random().nextInt(16);
-                widget.teacher['relationship'] = (rel - change).clamp(0, 100).toString();
-                widget.character.karma = (widget.character.karma - 5).clamp(0, 100);
-                widget.character.happiness = (widget.character.happiness - 5).clamp(0, 100);
-                widget.onRefresh();
-                _showOutcome('Menghina Guru', 'Kamu mengejek cara berpakaian $name. Dia sangat marah dan kamu dihukum berdiri di depan kelas!');
-              },
             ),
           ],
         ),
@@ -563,12 +706,14 @@ class _TeacherInteractionPageState extends State<TeacherInteractionPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       margin: const EdgeInsets.only(bottom: 8),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade100),
+        side: BorderSide(
+          color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+        ),
       ),
-      color: isDark ? Colors.grey.shade800 : null,
       child: ListTile(
         leading: Icon(icon, color: color),
         title: Text(

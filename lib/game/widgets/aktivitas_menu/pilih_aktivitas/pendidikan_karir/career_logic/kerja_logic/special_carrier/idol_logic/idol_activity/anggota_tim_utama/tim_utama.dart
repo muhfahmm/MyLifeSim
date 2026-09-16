@@ -4,6 +4,8 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import '../0_interactions_pages/idols_interaction_page.dart';
 
+import 'rekam_jejak_generasi.dart';
+
 class TimUtamaPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -21,6 +23,46 @@ class TimUtamaPage extends StatefulWidget {
 class _TimUtamaPageState extends State<TimUtamaPage> {
   String _searchQuery = '';
 
+  Widget _buildGenBadge(int age, {String? genStr, bool isUser = false}) {
+    int genNumber;
+    if (genStr != null && int.tryParse(genStr) != null) {
+      genNumber = int.parse(genStr);
+    } else {
+      if (age >= 26) {
+        genNumber = 1;
+      } else if (age >= 23) {
+        genNumber = 2;
+      } else if (age >= 20) {
+        genNumber = 3;
+      } else if (age >= 17) {
+        genNumber = 4;
+      } else {
+        genNumber = 5;
+      }
+    }
+
+    final String text = 'Gen $genNumber';
+    final Color color = isUser ? Colors.orange.shade800 : Colors.purple.shade700;
+    final Color bgColor = isUser ? Colors.orange.shade50 : Colors.purple.shade50;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+        border: Border.all(color: color.withAlpha(102), width: 0.5),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 10,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -34,15 +76,35 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
     final bool showUser = isUserInTeam && widget.character.name.toLowerCase().contains(query);
     final membersCount = members.length + (showUser ? 1 : 0);
 
-    return Scaffold(
-      backgroundColor: isDark ? Colors.grey.shade900 : null,
-      appBar: AppBar(
-        title: const Text('Anggota Tim Utama ⭐'),
-        backgroundColor: Colors.pink.shade700,
-        foregroundColor: Colors.white,
-      ),
-      body: Column(
-        children: [
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        backgroundColor: isDark ? Colors.grey.shade900 : null,
+        appBar: AppBar(
+          title: const Text('Anggota Tim Utama ⭐'),
+          backgroundColor: Colors.pink.shade700,
+          foregroundColor: Colors.white,
+          bottom: const TabBar(
+            indicatorColor: Colors.white,
+            indicatorWeight: 3,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            tabs: [
+              Tab(
+                icon: Icon(Icons.people, size: 20),
+                text: 'Anggota Aktif',
+              ),
+              Tab(
+                icon: Icon(Icons.history_edu, size: 20),
+                text: 'Rekam Jejak Generasi',
+              ),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            Column(
+              children: [
           Container(
             padding: const EdgeInsets.all(12),
             color: isDark ? Colors.grey.shade800 : Colors.white,
@@ -119,7 +181,25 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                           ),
                         ],
                       ),
-                      subtitle: Text('Anggota Utama • Umur: ${widget.character.age} tahun • Disiplin: ${widget.character.discipline}%'),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const SizedBox(height: 2),
+                          Row(
+                            children: [
+                              _buildGenBadge(widget.character.age, isUser: true),
+                              const SizedBox(width: 6),
+                              Expanded(
+                                child: Text(
+                                  'Anggota Utama • Umur: ${widget.character.age} th • Disiplin: ${widget.character.discipline}%',
+                                  style: const TextStyle(fontSize: 11),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                       trailing: const Icon(Icons.star, color: Colors.pinkAccent),
                       onTap: () {
                         showDialog(
@@ -176,7 +256,13 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                     ),
                     title: Row(
                       children: [
-                        Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Flexible(
+                          child: Text(
+                            name,
+                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
                         if (widget.character.isAnyPartnerNameMatching(name)) ...[
                           const SizedBox(width: 8),
                           Container(
@@ -197,7 +283,20 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Rekan Utama • Umur: $age tahun • Hubungan: $rel%'),
+                        const SizedBox(height: 2),
+                        Row(
+                          children: [
+                            _buildGenBadge(age, genStr: member['generation']),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                'Umur: $age th • Hubungan: $rel%',
+                                style: const TextStyle(fontSize: 11),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
                         const SizedBox(height: 6),
                         ClipRRect(
                           borderRadius: BorderRadius.circular(4),
@@ -234,6 +333,10 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
           ),
         ],
       ),
-    );
-  }
+      RekamJejakGenerasiPage(character: widget.character),
+    ],
+  ),
+),
+);
+}
 }

@@ -92,6 +92,7 @@ class Character {
   int eyeTestsCountOld = 0;
   int idolStaffDatingFailures = 0;
   int idolSalaryRaiseCount = 0;
+  int? lastRecruitAge;
   bool disableSameSexProposals = false;
   int countAjakanPacaran = 0;
   int countAjakanMakeLove = 0;
@@ -353,6 +354,7 @@ class Character {
   int yearsInTrainee = 0;
   List<Map<String, String>> idolTrainees = [];
   List<Map<String, String>> idolMainMembers = [];
+  List<Map<String, String>> idolGraduatedMembers = [];
   List<Map<String, String>> idolStaff = [];
   List<String> idolNews = [];
   bool hasGraduatedIdol = false;

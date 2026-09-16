@@ -145,7 +145,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
             Flexible(
               child: Text(
                 widget.character.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -165,7 +165,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         subtitle: Row(
           children: [
-            Expanded(child: Text('$role • Umur: ${widget.character.age} tahun')),
+            Expanded(child: Text('Umur: ${widget.character.age} th')),
             _buildRoleBadge(role),
           ],
         ),
@@ -220,8 +220,15 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         title: Row(
           children: [
-            Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold))),
+            Flexible(
+              child: Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -242,7 +249,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
           children: [
             Row(
               children: [
-                Expanded(child: Text('$role • $age tahun')),
+                Expanded(child: Text('Umur: $age th')),
                 _buildRoleBadge(role),
               ],
             ),

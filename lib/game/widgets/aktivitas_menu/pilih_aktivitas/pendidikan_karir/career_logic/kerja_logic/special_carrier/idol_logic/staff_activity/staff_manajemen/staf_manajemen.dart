@@ -4,6 +4,8 @@ import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import '../0_interactions_pages/staff_interaction_page.dart';
 
+import 'modal_cari_kandidat_staf.dart';
+
 class StafManajemenPage extends StatefulWidget {
   final Character character;
   final VoidCallback onRefresh;
@@ -20,6 +22,51 @@ class StafManajemenPage extends StatefulWidget {
 
 class _StafManajemenPageState extends State<StafManajemenPage> {
   String _searchQuery = '';
+
+  // Standard roles per department for GM recruitment
+  static const Map<String, List<String>> _departmentStandardRoles = {
+    'Manajemen Puncak & Admin': [
+      'Deputy General Manager',
+      'Manajer Divisi Promosi',
+      'Manajer Divisi Operasional',
+      'Manajer Divisi Keuangan',
+      'Staf Administrasi',
+      'Staf HRD',
+    ],
+    'Tim Pelatihan (Trainer)': [
+      'Pelatih Tari (Koreografer)',
+      'Pelatih Vokal',
+      'Pelatih Akting/MC',
+    ],
+    'Tim Produksi Teater & Acara': [
+      'Sound Engineer',
+      'Lighting Engineer',
+      'Stage Manager',
+      'Staf Backstage',
+      'Staf Properti Panggung',
+    ],
+    'Tim Kreatif & Konten Digital': [
+      'Fotografer Resmi',
+      'Videografer Resmi',
+      'Editor Video',
+      'Desainer Grafis',
+      'Pengelola Sosial Media',
+    ],
+    'Tim Merchandise & Official Store': [
+      'Staf Merchandise',
+      'Staf Penjualan Toko',
+      'Koordinator Merchandise',
+    ],
+    'Tim MUA & Kostum': [
+      'Makeup Artist (MUA)',
+      'Staf Kostum',
+    ],
+    'Tim Keamanan & Operasional Teater': [
+      'Petugas Keamanan',
+      'Staf Tiket',
+      'Penjaga Pintu Masuk',
+    ],
+  };
 
   // --- BADGE CONFIGS: role → (text, color) ---
   static const Map<String, Map<String, dynamic>> _badgeConfigs = {
@@ -145,7 +192,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
             Flexible(
               child: Text(
                 widget.character.name,
-                style: const TextStyle(fontWeight: FontWeight.bold),
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -165,7 +212,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         subtitle: Row(
           children: [
-            Expanded(child: Text('$role • Umur: ${widget.character.age} tahun')),
+            Expanded(child: Text('Umur: ${widget.character.age} th')),
             _buildRoleBadge(role),
           ],
         ),
@@ -220,8 +267,15 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
         ),
         title: Row(
           children: [
-            Expanded(child: Text(name, style: const TextStyle(fontWeight: FontWeight.bold))),
+            Flexible(
+              child: Text(
+                name,
+                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
             if (widget.character.isAnyPartnerNameMatching(name)) ...[
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
@@ -242,7 +296,7 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
           children: [
             Row(
               children: [
-                Expanded(child: Text('$role • $age tahun')),
+                Expanded(child: Text('Umur: $age th')),
                 _buildRoleBadge(role),
               ],
             ),
@@ -377,12 +431,23 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
       final deptStaff = byDept[dept] ?? [];
       final showUserHere = isUserStaff && isGMRole && dept == 'Manajemen Puncak & Admin';
 
-      if (deptStaff.isEmpty && !showUserHere) continue;
+      if (deptStaff.isEmpty && !showUserHere && !isGMRole) continue;
 
       result.add(_buildDeptHeader(dept));
       if (showUserHere) result.add(_buildUserStaffCard(context));
       for (final staff in deptStaff) {
         result.add(_buildNPCStaffCard(context, staff));
+      }
+
+      // Jika user adalah General Manager, tampilkan opsi slot kosong (+) untuk merekrut staf baru
+      if (isGMRole) {
+        final rolesInDept = _departmentStandardRoles[dept] ?? ['Staf Operasional'];
+        for (final role in rolesInDept) {
+          final exists = deptStaff.any((s) => s['role'] == role);
+          if (!exists) {
+            result.add(_buildEmptySlotCard(context, role, dept));
+          }
+        }
       }
     }
 
@@ -392,5 +457,72 @@ class _StafManajemenPageState extends State<StafManajemenPage> {
     }
 
     return result;
+  }
+
+  Widget _buildEmptySlotCard(BuildContext context, String role, String dept) {
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return Card(
+      elevation: 0,
+      margin: const EdgeInsets.only(bottom: 8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+        side: BorderSide(
+          color: isDark ? Colors.purple.shade700 : Colors.purple.shade200,
+          style: BorderStyle.solid,
+          width: 1.2,
+        ),
+      ),
+      color: isDark ? Colors.purple.shade900.withOpacity(0.2) : Colors.purple.shade50.withOpacity(0.4),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: Colors.purple.shade100,
+          child: const Icon(Icons.add, color: Colors.purple, size: 24),
+        ),
+        title: Text(
+          'Kosong - $role',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
+          ),
+        ),
+        subtitle: Text(
+          'Klik untuk mencari kandidat staf baru',
+          style: TextStyle(
+            fontSize: 11,
+            color: isDark ? Colors.white60 : Colors.black54,
+          ),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: Colors.purple,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: const Text(
+            '+ Rekrut',
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        onTap: () {
+          ModalCariKandidatStaf.show(
+            context: context,
+            character: widget.character,
+            targetRole: role,
+            targetDepartment: dept,
+            onCandidateSelected: (newCandidate) {
+              setState(() {
+                widget.character.idolStaff.add(newCandidate);
+              });
+              widget.onRefresh();
+            },
+          );
+        },
+      ),
+    );
   }
 }

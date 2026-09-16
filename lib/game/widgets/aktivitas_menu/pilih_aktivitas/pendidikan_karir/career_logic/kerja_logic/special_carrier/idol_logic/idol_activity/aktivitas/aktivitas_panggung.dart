@@ -34,6 +34,20 @@ class _AktivitasPanggungPageState extends State<AktivitasPanggungPage> {
         int currentRel = int.tryParse(member['relationship'] ?? '50') ?? 50;
         member['relationship'] = (currentRel + rand.nextInt(5) + 3).clamp(0, 100).toString();
       }
+
+      // Add news entry based on stage activity
+      String newsText = '';
+      if (tipe.contains('Vokal')) {
+        newsText = '🎤 Latihan Intensif: ${widget.character.name} dan para idol baru saja menyelesaikan sesi Latihan Vokal & Koreografi secara maksimal!';
+      } else if (tipe.contains('Teater')) {
+        newsText = '🎪 Pertunjukan Teater: Pertunjukan panggung teater sukses digelar dengan meriah oleh ${widget.character.name} dan tim idol!';
+      } else {
+        newsText = '📱 Media Digital: Kampanye promosi media sosial resmi diluncurkan oleh ${widget.character.name} untuk menyapa para penggemar!';
+      }
+      widget.character.idolNews.add(newsText);
+      if (widget.character.idolNews.length > 50) {
+        widget.character.idolNews.removeAt(0);
+      }
     });
     widget.onRefresh();
 
