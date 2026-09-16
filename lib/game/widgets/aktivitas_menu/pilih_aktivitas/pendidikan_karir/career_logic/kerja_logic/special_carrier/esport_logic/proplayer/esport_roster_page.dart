@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/esport_logic/menu_esport/rekan_esport_interaction_page.dart';
 import 'esport_roster.dart';
 
 class EsportRosterPage extends StatefulWidget {
@@ -222,8 +222,8 @@ class _EsportRosterPageState extends State<EsportRosterPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ClassmateInteractionPage(
-          classmate: personMap,
+        builder: (context) => RekanEsportInteractionPage(
+          coworker: personMap,
           character: widget.character,
           onRefresh: () {
             if (mounted) setState(() {});

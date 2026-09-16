@@ -1,36 +1,39 @@
-// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/models_job_logic/rekan_model_interaction_page.dart
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/ajakan_masturbasi_dialog.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/npc_family_view.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/bercinta.dart';
 import 'dart:math';
 
-class ClassmateInteractionPage extends StatefulWidget {
-  final Map<String, String> classmate;
+class RekanModelInteractionPage extends StatefulWidget {
+  final Map<String, String> coworker;
   final Character character;
   final VoidCallback onRefresh;
 
-  const ClassmateInteractionPage({
+  const RekanModelInteractionPage({
     super.key,
-    required this.classmate,
+    required this.coworker,
     required this.character,
     required this.onRefresh,
   });
 
   @override
-  State<ClassmateInteractionPage> createState() =>
-      _ClassmateInteractionPageState();
+  State<RekanModelInteractionPage> createState() =>
+      _RekanModelInteractionPageState();
 }
 
-class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
+class _RekanModelInteractionPageState
+    extends State<RekanModelInteractionPage> {
   bool _isStatsVisible = true;
 
   void _showOutcome(String title, String content) {
@@ -43,7 +46,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
           builder: (dialogContext) => TextButton(
             onPressed: () {
               Navigator.pop(dialogContext);
-              setState(() {}); // Refresh current screen
+              setState(() {});
             },
             child: const Text('OK'),
           ),
@@ -52,36 +55,15 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
     );
   }
 
-  // ==========================================================
-  // LOGIKA INTERNAL PENGGANTI SCHOOL_SEXUALITY_LOGIC
-  // ==========================================================
-  bool _shouldShowRomanceButtons(int userAge, int classmateAge) {
-    return userAge >= 12 && classmateAge >= 12;
-  }
-
-  /// Helper: tentukan role berdasarkan konteks karakter
-  String _resolveRole(String name) {
-    if (widget.character.univClassmates.any((e) => e['name'] == name)) {
-      return 'Teman Kuliah';
-    }
-    return 'Teman Sekelas';
-  }
-
-  /// Helper: tentukan relation berdasarkan konteks karakter
-  String _resolveRelation(String name) {
-    if (widget.character.univClassmates.any((e) => e['name'] == name)) {
-      return 'Teman Kuliah';
-    }
-    return 'Teman Sekolah';
+  bool _shouldShowRomanceButtons(int userAge, int mateAge) {
+    return userAge >= 12 && mateAge >= 12;
   }
 
   void _handleBercinta() {
-    final userGen = widget.character.gender;
-    final mateGen = widget.classmate['gender'] ?? 'Laki-laki';
-    final String name = widget.classmate['name']!;
+    final String name = widget.coworker['name']!;
 
-    final String role = _resolveRole(name);
-    final String relation = _resolveRelation(name);
+    const String role = 'Rekan Kerja';
+    const String relation = 'Rekan Kerja';
 
     if (!AdultFeatures.canMakeLove(
       userAge: widget.character.age,
@@ -94,23 +76,39 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
     }
 
     final int relVal =
-        int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
-    final bool isSameSex = userGen == mateGen;
-    final int successChance = isSameSex ? 50 : 65;
-    final bool success = Random().nextInt(100) < successChance;
+        int.tryParse(widget.coworker['relationship'] ?? '50') ?? 50;
+
+    final int successChance = relVal >= 50
+        ? 100
+        : PersentaseAjakan.getSuccessChance(
+            character: widget.character,
+            relationType: 'Rekan Kerja',
+            viewerName: name,
+          );
+    final bool success =
+        relVal >= 50 || Random().nextInt(100) < successChance;
 
     if (success) {
-      final int change = 15 + Random().nextInt(11);
-      widget.classmate['relationship'] =
-          (relVal + change).clamp(0, 100).toString();
-      widget.character.happiness =
-          (widget.character.happiness + 10).clamp(0, 100);
-      widget.onRefresh();
-      _showOutcome('Berhasil 💖',
-          'Kamu berhasil melakukan hubungan intim dengan $name! Hubungan kalian meningkat pesat.');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => BercintaScreen(
+            character: widget.character,
+            targetName: name,
+            targetRole: role,
+            onActionComplete: () {
+              final int change = 5 + Random().nextInt(6);
+              widget.coworker['relationship'] =
+                  (relVal + change).clamp(0, 100).toString();
+              if (mounted) setState(() {});
+              widget.onRefresh();
+            },
+          ),
+        ),
+      );
     } else {
       final int change = 10 + Random().nextInt(11);
-      widget.classmate['relationship'] =
+      widget.coworker['relationship'] =
           (relVal - change).clamp(0, 100).toString();
       widget.character.happiness =
           (widget.character.happiness - 10).clamp(0, 100);
@@ -122,11 +120,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
 
   void _handleAjakPacaran() {
     final userGen = widget.character.gender;
-    final mateGen = widget.classmate['gender'] ?? 'Laki-laki';
-    final String name = widget.classmate['name']!;
+    final mateGen = widget.coworker['gender'] ?? 'Laki-laki';
+    final String name = widget.coworker['name']!;
 
-    final String role = _resolveRole(name);
-    final String relation = _resolveRelation(name);
+    const String role = 'Rekan Kerja';
+    const String relation = 'Rekan Kerja';
 
     if (!AdultFeatures.canProposeDating(
       role,
@@ -144,17 +142,16 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
 
     if (success) {
       final int relVal =
-          int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
-      widget.classmate['relationship'] =
+          int.tryParse(widget.coworker['relationship'] ?? '50') ?? 50;
+      widget.coworker['relationship'] =
           (relVal + 20).clamp(0, 100).toString();
 
-      // PERBAIKAN: Tambahkan ! pada akses map agar sesuai Map<String, String>
       if (widget.character.partner == null) {
         widget.character.partner = {
           'name': name,
           'gender': mateGen,
-          'age': widget.classmate['age']!,
-          'relationship': widget.classmate['relationship']!,
+          'age': widget.coworker['age'] ?? '22',
+          'relationship': widget.coworker['relationship']!,
           'relation': 'Pacar',
           'isDeceased': 'false',
         };
@@ -162,8 +159,8 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
         widget.character.secondPartner = {
           'name': name,
           'gender': mateGen,
-          'age': widget.classmate['age']!,
-          'relationship': widget.classmate['relationship']!,
+          'age': widget.coworker['age'] ?? '22',
+          'relationship': widget.coworker['relationship']!,
           'relation': 'Pacar (Selingkuhan)',
           'isDeceased': 'false',
         };
@@ -177,8 +174,8 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
           'Kamu berhasil mengajak $name untuk berpacaran dan dia menerimanya!');
     } else {
       final int change = 10 + Random().nextInt(11);
-      widget.classmate['relationship'] =
-          ((int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50) -
+      widget.coworker['relationship'] =
+          ((int.tryParse(widget.coworker['relationship'] ?? '50') ?? 50) -
                   change)
               .clamp(0, 100)
               .toString();
@@ -189,12 +186,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
           '$name menolak ajakanmu untuk berpacaran. Hubungan kalian sedikit canggung.');
     }
   }
-  // ==========================================================
 
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final name = widget.classmate['name']!;
+    final name = widget.coworker['name'] ?? 'Rekan Model';
 
     final bool isPartner = widget.character.isAnyPartnerNameMatching(name);
     if (isPartner) {
@@ -205,15 +201,6 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
       } else if (widget.character.secondPartner != null &&
           widget.character.secondPartner!['name'] == name) {
         partnerRole = widget.character.secondPartner!['relation'] ?? 'Pacar';
-      } else if (widget.character.thirdPartner != null &&
-          widget.character.thirdPartner!['name'] == name) {
-        partnerRole = widget.character.thirdPartner!['relation'] ?? 'Pacar';
-      } else if (widget.character.fourthPartner != null &&
-          widget.character.fourthPartner!['name'] == name) {
-        partnerRole = widget.character.fourthPartner!['relation'] ?? 'Pacar';
-      } else if (widget.character.fifthPartner != null &&
-          widget.character.fifthPartner!['name'] == name) {
-        partnerRole = widget.character.fifthPartner!['relation'] ?? 'Pacar';
       }
 
       return ActionMenuScreen(
@@ -223,26 +210,20 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
       );
     }
 
-    final gender = widget.classmate['gender']!;
-    final int age = int.tryParse(widget.classmate['age'] ?? '0') ??
-        widget.character.age;
+    final gender = widget.coworker['gender'] ?? 'Laki-laki';
+    final int age = int.tryParse(widget.coworker['age'] ?? '22') ?? 22;
     final int rel =
-        int.tryParse(widget.classmate['relationship'] ?? '50') ?? 50;
-    final String schoolLevel = widget.character.age <= 12
-        ? 'SD'
-        : widget.character.age <= 15
-            ? 'SMP'
-            : 'SMA';
+        int.tryParse(widget.coworker['relationship'] ?? '50') ?? 50;
+
     final avatarUrl = AvatarAgeRules.getSchoolAvatarUrl(
       name: name,
       gender: gender,
       age: age,
-      schoolLevel: schoolLevel,
+      schoolLevel: 'SMA',
       happiness: rel,
     );
 
-    final String resolvedRole = _resolveRole(name);
-    final String resolvedRelation = _resolveRelation(name);
+    final String roleTag = widget.coworker['role'] ?? widget.coworker['title'] ?? 'Supermodel / Model Fashion';
     final bool isFemale = gender.toLowerCase() == 'perempuan';
 
     return Scaffold(
@@ -258,7 +239,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Profile Card Header (Family-style layout)
+            // Profile Header Card (Family-style layout)
             Container(
               decoration: BoxDecoration(
                 color: isDark ? const Color(0xFF242424) : Colors.white,
@@ -282,10 +263,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: Colors.transparent,
-                          backgroundImage: NetworkImage(avatarUrl),
+                        AvatarImageCache.buildAvatar(
+                          url: avatarUrl,
+                          width: 56,
+                          height: 56,
+                          gender: gender,
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -348,7 +330,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                               Row(
                                 children: [
                                   Text(
-                                    'Hubungan: $resolvedRole • ',
+                                    'Hubungan: Rekan Kerja • ',
                                     style: TextStyle(
                                       fontSize: 11.5,
                                       color: isDark ? Colors.white60 : Colors.black54,
@@ -434,7 +416,9 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                                 valueColor: AlwaysStoppedAnimation<Color>(
                                   rel > 70
                                       ? Colors.amber.shade700
-                                      : (rel > 40 ? Colors.amber.shade600 : Colors.red),
+                                      : (rel > 40
+                                          ? Colors.amber.shade600
+                                          : Colors.red),
                                 ),
                                 minHeight: 8,
                               ),
@@ -469,7 +453,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                               borderRadius: BorderRadius.circular(6),
                               child: LinearProgressIndicator(
                                 value: int.parse(
-                                        widget.classmate['intelligence'] ?? '50') /
+                                        widget.coworker['intelligence'] ?? '50') /
                                     100.0,
                                 backgroundColor: isDark
                                     ? Colors.grey.shade800
@@ -482,7 +466,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            '${widget.classmate['intelligence'] ?? '50'}%',
+                            '${widget.coworker['intelligence'] ?? '50'}%',
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.bold,
@@ -495,18 +479,14 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
 
                       // Bar: Nilai Kekayaan
                       Builder(builder: (context) {
-                        final int wealthVal =
-                            widget.character.getTargetWealth(name, resolvedRole);
+                        final int wealthVal = widget.character
+                            .getTargetWealth(name, 'Rekan Kerja');
                         final double progressVal =
                             (wealthVal / 10000.0).clamp(0.0, 1.0);
                         Color barColor = Colors.green;
 
-                        final jobInfo =
-                            widget.character.getNPCJobInfo(name, resolvedRole);
                         final String statusText =
-                            jobInfo['status'] == 'Sekolah/Kuliah'
-                                ? 'Status: Sekolah/Kuliah'
-                                : 'Pekerjaan: ${jobInfo['job']} (Gaji: ${CurrencySettings.format(jobInfo['salary'] as int)}/bln)';
+                            'Pekerjaan: $roleTag (Gaji: ${CurrencySettings.format(4000)}/bln)';
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -565,11 +545,9 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 20),
 
-            // ============================
             // Section Title
-            // ============================
             Text(
-              'PILIH AKSI INTERAKSI TEMAN KELAS',
+              'PILIH AKSI INTERAKSI REKAN KERJA',
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
@@ -579,20 +557,17 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
             ),
             const SizedBox(height: 12),
 
-            // ============================
             // List Aksi
-            // ============================
             Expanded(
               child: ListView(
                 children: [
-                  // -------- Lihat Keluarga --------
                   _buildActionTile(
                     icon: Icons.family_restroom,
                     color: Colors.indigo,
                     title: 'Lihat Keluarga',
                     onTap: () {
                       final String mateGender =
-                          widget.classmate['gender'] ?? 'Laki-laki';
+                          widget.coworker['gender'] ?? 'Laki-laki';
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -600,7 +575,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                             npcName: name,
                             npcGender: mateGender,
                             npcAge: age,
-                            npcRole: resolvedRole,
+                            npcRole: 'Rekan Kerja',
                             character: widget.character,
                           ),
                         ),
@@ -608,12 +583,11 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                     },
                   ),
 
-                  // -------- Romance Actions --------
                   if (_shouldShowRomanceButtons(widget.character.age, age)) ...[
                     if (AdultFeatures.canMakeLove(
                       userAge: widget.character.age,
-                      role: resolvedRole,
-                      relation: resolvedRelation,
+                      role: 'Rekan Kerja',
+                      relation: 'Rekan Kerja',
                     ))
                       _buildActionTile(
                         icon: Icons.favorite,
@@ -630,21 +604,22 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                         title: 'Ajak Masturbasi Bersama',
                         onTap: () {
                           final int relVal = int.tryParse(
-                                  widget.classmate['relationship'] ?? '50') ??
+                                  widget.coworker['relationship'] ?? '50') ??
                               50;
-                          int successChance =
-                              PersentaseAjakan.getSuccessChance(
-                            character: widget.character,
-                            relationType: resolvedRole,
-                            viewerName: name,
-                          );
+                          final int successChance = relVal >= 50
+                              ? 100
+                              : PersentaseAjakan.getSuccessChance(
+                                  character: widget.character,
+                                  relationType: 'Rekan Kerja',
+                                  viewerName: name,
+                                );
                           final bool success =
-                              Random().nextInt(100) < successChance;
+                              relVal >= 50 || Random().nextInt(100) < successChance;
                           if (success) {
                             AjakanMasturbasiDialog.show(
                               context: context,
                               character: widget.character,
-                              relationType: resolvedRole,
+                              relationType: 'Rekan Kerja',
                               viewerName: name,
                               targetGender: gender,
                               isUserInitiated: true,
@@ -655,7 +630,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                             );
                           } else {
                             final change = 10 + Random().nextInt(11);
-                            widget.classmate['relationship'] =
+                            widget.coworker['relationship'] =
                                 (relVal - change).clamp(0, 100).toString();
                             widget.character.happiness =
                                 (widget.character.happiness - 15)
@@ -668,266 +643,120 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
                       ),
 
                     if (AdultFeatures.canProposeDating(
-                      resolvedRole,
-                      resolvedRelation,
+                      'Rekan Kerja',
+                      'Rekan Kerja',
                       userAge: widget.character.age,
                     ))
                       _buildActionTile(
-                        icon: widget.character.partner != null
-                            ? Icons.heart_broken
-                            : Icons.favorite_border,
-                        color: widget.character.partner != null
-                            ? Colors.deepOrange
-                            : Colors.redAccent,
-                        title: widget.character.partner != null
-                            ? 'Ajak Pacaran (Selingkuh?)'
-                            : 'Ajak Pacaran',
+                        icon: Icons.favorite_border,
+                        color: Colors.redAccent,
+                        title: 'Ajak Pacaran',
                         onTap: _handleAjakPacaran,
                       ),
                   ],
 
-                  // -------- Berteman --------
-                  _buildActionTile(
-                    icon: Icons.group_add,
-                    color: Colors.teal,
-                    title: 'Berteman',
-                    onTap: () {
-                      final int currentRel =
-                          int.tryParse(widget.classmate['relationship'] ?? '50') ??
-                              50;
-                      // 60% jika hubungannya >= 50, dan 40% jika di bawah 50
-                      final int successChance =
-                          currentRel >= 50 ? 60 : 40;
-                      final bool isAccepted =
-                          Random().nextInt(100) < successChance;
-
-                      if (isAccepted) {
-                        final int change = 10 + Random().nextInt(11);
-                        widget.classmate['relationship'] =
-                            (currentRel + change).clamp(0, 100).toString();
-                        widget.classmate['isFriend'] = 'true';
-                        widget.classmate['relation'] = 'Teman';
-
-                        // Tambahkan ke daftar teman karakter (jika belum ada)
-                        final bool alreadyInFriends = widget
-                            .character.friends
-                            .any((f) => f['name'] == name);
-                        if (!alreadyInFriends) {
-                          widget.character.friends.add(widget.classmate);
-                        }
-
-                        widget.character.happiness =
-                            (widget.character.happiness + 10).clamp(0, 100);
-                        widget.character.inbox.add(
-                            '🤝 Pertemanan Baru: $name menerima ajakan berteman darimu!');
-                        widget.onRefresh();
-                        _showOutcome(
-                          'Ajakan Berteman Diterima! 🤝',
-                          'Kamu mengajak $name untuk berteman dan dia merespon dengan hangat! $name sekarang telah menjadi teman dekatmu.',
-                        );
-                      } else {
-                        final int change = 5 + Random().nextInt(6);
-                        widget.classmate['relationship'] =
-                            (currentRel - change).clamp(0, 100).toString();
-                        widget.character.happiness =
-                            (widget.character.happiness - 5).clamp(0, 100);
-                        widget.character.inbox.add(
-                            '💔 Pertemanan Ditolak: $name menolak ajakan berteman darimu.');
-                        widget.onRefresh();
-                        _showOutcome(
-                          'Ajakan Berteman Ditolak 💔',
-                          'Kamu mengajak $name untuk berteman, namun dia menolak ajakanmu secara halus. Hubungan kalian sedikit merenggang.',
-                        );
-                      }
-                    },
-                  ),
-
-                  // -------- Berikan Pujian --------
-                  _buildActionTile(
-                    icon: Icons.thumb_up,
-                    color: Colors.blueAccent,
-                    title: 'Berikan Pujian',
-                    onTap: () {
-                      final change = 5 + Random().nextInt(6);
-                      widget.classmate['relationship'] =
-                          (rel + change).clamp(0, 100).toString();
-                      widget.character.happiness =
-                          (widget.character.happiness + 5).clamp(0, 100);
-                      widget.onRefresh();
-                      _showOutcome('Pujian',
-                          'Kamu memuji penampilan $name. Dia tersenyum dan terlihat sangat senang!');
-                    },
-                  ),
-
-                  // -------- Percakapan --------
                   _buildActionTile(
                     icon: Icons.chat_bubble_outline,
                     color: Colors.blue,
-                    title: 'Percakapan',
+                    title: 'Ngobrol',
                     onTap: () {
-                      final change = 5 + Random().nextInt(11);
-                      widget.classmate['relationship'] =
-                          (rel + change).clamp(0, 100).toString();
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal + 5).clamp(0, 100).toString();
                       widget.character.happiness =
-                          (widget.character.happiness + 5).clamp(0, 100);
+                          (widget.character.happiness + 2).clamp(0, 100);
                       widget.onRefresh();
-                      _showOutcome('Percakapan',
-                          'Kamu mengobrol seru dengan $name tentang game kesukaan kalian. Hubungan kalian meningkat!');
+                      _showOutcome(
+                          'Ngobrol Santai 💬', 'Obrolan hangat dengan $name berjalan seru.');
                     },
                   ),
-
-                  // -------- Menggoda --------
                   _buildActionTile(
-                    icon: Icons.favorite_border,
-                    color: Colors.pink,
-                    title: 'Menggoda',
+                    icon: Icons.emoji_emotions,
+                    color: Colors.amber.shade700,
+                    title: 'Bercanda',
                     onTap: () {
-                      final int chance = Random().nextInt(100);
-                      if (chance < 30) {
-                        final change = 5 + Random().nextInt(11);
-                        widget.classmate['relationship'] =
-                            (rel - change).clamp(0, 100).toString();
-                        widget.character.happiness =
-                            (widget.character.happiness - 5).clamp(0, 100);
-                        widget.onRefresh();
-                        _showOutcome('Gagal Menggoda',
-                            'Kamu mencoba menggoda $name tetapi dia merasa tidak nyaman dan menjauh. Hubungan menurun!');
-                      } else {
-                        final change = 5 + Random().nextInt(11);
-                        widget.classmate['relationship'] =
-                            (rel + change).clamp(0, 100).toString();
-                        widget.character.happiness =
-                            (widget.character.happiness + 10).clamp(0, 100);
-                        widget.onRefresh();
-                        _showOutcome('Menggoda Berhasil',
-                            'Kamu menggoda $name dengan cara yang lucu dan dia tersipu! Hubungan meningkat!');
-                      }
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal + 8).clamp(0, 100).toString();
+                      widget.character.happiness =
+                          (widget.character.happiness + 4).clamp(0, 100);
+                      widget.onRefresh();
+                      _showOutcome('Bercanda Bersama 😄',
+                          'Leluconmu membuat $name tertawa terbahak-bahak!');
                     },
                   ),
-
-                  // -------- Gift --------
+                  _buildActionTile(
+                    icon: Icons.volunteer_activism,
+                    color: Colors.purple,
+                    title: 'Puji',
+                    onTap: () {
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal + 10).clamp(0, 100).toString();
+                      widget.onRefresh();
+                      _showOutcome('Memberikan Pujian 👏',
+                          'Pujianmu membuat $name merasa sangat dihargai.');
+                    },
+                  ),
                   _buildActionTile(
                     icon: Icons.card_giftcard,
-                    color: Colors.purple,
-                    title: 'Gift',
+                    color: Colors.teal,
+                    title: 'Beri Hadiah',
                     onTap: () {
-                      if (widget.character.money < 20) {
-                        _showOutcome('Uang Tidak Cukup',
-                            'Kamu tidak punya uang untuk membeli hadiah. Kumpulkan uang terlebih dahulu!');
+                      if (widget.character.money < 50) {
+                        _showOutcome('Uang Tidak Cukup 💸',
+                            'Kamu butuh minimal \$50 untuk memberi hadiah.');
                         return;
                       }
-                      final change = 10 + Random().nextInt(16);
-                      widget.character.money -= 20;
-                      widget.classmate['relationship'] =
-                          (rel + change).clamp(0, 100).toString();
-                      widget.character.happiness =
-                          (widget.character.happiness + 15).clamp(0, 100);
+                      widget.character.money -= 50;
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal + 15).clamp(0, 100).toString();
                       widget.onRefresh();
-                      _showOutcome('Gift Diberikan',
-                          'Kamu memberikan hadiah kecil kepada $name. Dia sangat terharu dan berterima kasih! Hubungan meningkat pesat!');
+                      _showOutcome('Memberikan Hadiah 🎁',
+                          '$name sangat senang menerima hadiah darimu!');
                     },
                   ),
-
-                  // -------- Bertingkah Laku --------
                   _buildActionTile(
-                    icon: Icons.emoji_people,
-                    color: Colors.blueAccent,
-                    title: 'Bertingkah Laku',
-                    onTap: () {
-                      final change = 3 + Random().nextInt(8);
-                      widget.classmate['relationship'] =
-                          (rel + change).clamp(0, 100).toString();
-                      widget.character.karma =
-                          (widget.character.karma + 3).clamp(0, 100);
-                      widget.onRefresh();
-                      _showOutcome('Bertingkah Laku',
-                          'Kamu menunjukkan sikap ramah dan membantu $name. Dia sangat menghargai perilakumu!');
-                    },
-                  ),
-
-                  // -------- Cium --------
-                  if (AdultFeatures.canMakeLove(
-                    userAge: widget.character.age,
-                    role: resolvedRole,
-                    relation: resolvedRelation,
-                  ))
-                    _buildActionTile(
-                      icon: Icons.favorite,
-                      color: Colors.pinkAccent,
-                      title: 'Cium',
-                      onTap: () {
-                        if (rel >= 60) {
-                          final change = 10 + Random().nextInt(11);
-                          widget.classmate['relationship'] =
-                              (rel + change).clamp(0, 100).toString();
-                          widget.character.happiness =
-                              (widget.character.happiness + 5)
-                                  .clamp(0, 100);
-                          widget.onRefresh();
-                          _showOutcome('Ciuman Diterima',
-                              'Kamu mencium pipi $name. Dia tersipu dan merasa senang! Hubungan kalian semakin dekat.');
-                        } else {
-                          final change = 10 + Random().nextInt(11);
-                          widget.classmate['relationship'] =
-                              (rel - change).clamp(0, 100).toString();
-                          widget.character.happiness =
-                              (widget.character.happiness - 5)
-                                  .clamp(0, 100);
-                          widget.onRefresh();
-                          _showOutcome('Ciuman Ditolak',
-                              'Kamu mencoba mencium $name, tapi dia mundur dengan tatapan tidak nyaman. Kamu merasa malu!');
-                        }
-                      },
-                    ),
-
-                  // -------- Hina --------
-                  _buildActionTile(
-                    icon: Icons.sentiment_very_dissatisfied,
-                    color: Colors.red,
+                    icon: Icons.sentiment_dissatisfied,
+                    color: Colors.deepOrange,
                     title: 'Hina',
                     onTap: () {
-                      final change = 10 + Random().nextInt(16);
-                      widget.classmate['relationship'] =
-                          (rel - change).clamp(0, 100).toString();
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal - 15).clamp(0, 100).toString();
                       widget.character.happiness =
-                          (widget.character.happiness - 10).clamp(0, 100);
-                      widget.character.karma =
-                          (widget.character.karma - 5).clamp(0, 100);
+                          (widget.character.happiness - 5).clamp(0, 100);
                       widget.onRefresh();
-                      _showOutcome('Menghina',
-                          'Kamu mengucapkan kata-kata kasar kepada $name. Dia terlihat sangat tersinggung dan hubungan memburuk!');
+                      _showOutcome('Menghina 😡',
+                          'Perkataanmu yang pedas membuat $name sangat tersinggung.');
                     },
                   ),
-
-                  // -------- Buat Keributan --------
                   _buildActionTile(
-                    icon: Icons.gavel,
-                    color: Colors.orange,
+                    icon: Icons.flash_on,
+                    color: Colors.red,
                     title: 'Buat Keributan',
                     onTap: () {
-                      final win = Random().nextBool();
-                      final relChange = 20 + Random().nextInt(21);
-                      if (win) {
-                        widget.classmate['relationship'] =
-                            (rel - relChange).clamp(0, 100).toString();
-                        widget.character.health =
-                            (widget.character.health - 5).clamp(0, 100);
-                        widget.character.happiness =
-                            (widget.character.happiness + 5).clamp(0, 100);
-                        widget.onRefresh();
-                        _showOutcome('Keributan',
-                            'Kamu terlibat perkelahian dengan $name karena adu mulut dan kamu berhasil memenangkannya! Namun tubuhmu sedikit memar.');
-                      } else {
-                        widget.classmate['relationship'] =
-                            (rel - relChange).clamp(0, 100).toString();
-                        widget.character.health =
-                            (widget.character.health - 15).clamp(0, 100);
-                        widget.character.happiness =
-                            (widget.character.happiness - 10).clamp(0, 100);
-                        widget.onRefresh();
-                        _showOutcome('Kalah Keributan',
-                            'Kamu berkelahi dengan $name dan kalah telak. Kamu menderita memar parah dan merasa sangat malu!');
-                      }
+                      final int relVal = int.tryParse(
+                              widget.coworker['relationship'] ?? '50') ??
+                          50;
+                      widget.coworker['relationship'] =
+                          (relVal - 25).clamp(0, 100).toString();
+                      widget.character.happiness =
+                          (widget.character.happiness - 10).clamp(0, 100);
+                      widget.onRefresh();
+                      _showOutcome('Keributan 💥',
+                          'Kamu terlibat pertengkaran hebat dengan $name!');
                     },
                   ),
                 ],

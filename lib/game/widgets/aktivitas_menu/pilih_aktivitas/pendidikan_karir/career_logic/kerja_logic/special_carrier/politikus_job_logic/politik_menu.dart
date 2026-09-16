@@ -79,10 +79,6 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
       _showAlert('Syarat Gelar Pendidikan 🎓', 'Posisi ${level.title} membutuhkan gelar Sarjana/Universitas.');
       return;
     }
-    if (character.karma < level.minKarma) {
-      _showAlert('Reputasi Rendah ⚠️', 'Karma/reputasimu terlalu rendah (${character.karma}%). Minimal ${level.minKarma}% untuk meyakinkan partai.');
-      return;
-    }
     if (character.money < level.campaignCost) {
       _showAlert('Dana Kampanye Kurang 💸', 'Kamu membutuhkan dana kampanye minimal \$${_fmt(level.campaignCost)}.');
       return;
@@ -116,7 +112,7 @@ class _PolitikMenuPageState extends State<PolitikMenuPage> {
             'Apakah kamu siap mencalonkan diri sebagai ${level.title}?\n\n'
             '• Biaya Kampanye: \$${_fmt(level.campaignCost)}\n'
             '• Estimasi Gaji: \$${_fmt(level.baseSalary)}/tahun\n\n'
-            'Peluang kemenangan ditentukan oleh Kecerdasan, Karma, dan Kebahagiaanmu.',
+            'Peluang kemenangan ditentukan oleh Kecerdasan, Kebahagiaan, dan Keberuntunganmu.',
             style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontSize: 14),
           ),
         ),

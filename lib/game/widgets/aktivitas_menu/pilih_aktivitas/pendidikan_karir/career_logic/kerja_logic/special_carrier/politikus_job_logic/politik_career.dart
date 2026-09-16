@@ -17,7 +17,7 @@ class PoliticalLevel {
     required this.campaignCost,
     required this.baseSalary,
     required this.description,
-    required this.minKarma,
+    this.minKarma = 0,
   });
 }
 
@@ -31,7 +31,6 @@ class PoliticalCareerData {
       campaignCost: 250000,
       baseSalary: 95000,
       description: 'Mewakili suara rakyat di dewan lokal dan menyusun undang-undang daerah.',
-      minKarma: 40,
     ),
     PoliticalLevel(
       title: 'Walikota / Bupati',
@@ -41,7 +40,6 @@ class PoliticalCareerData {
       campaignCost: 1500000,
       baseSalary: 280000,
       description: 'Memimpin pemerintahan kota dan mengelola anggaran daerah.',
-      minKarma: 45,
     ),
     PoliticalLevel(
       title: 'Gubernur / Senator',
@@ -51,7 +49,6 @@ class PoliticalCareerData {
       campaignCost: 8000000,
       baseSalary: 750000,
       description: 'Penguasa wilayah provinsi/bagian dan memegang pengaruh kebijakan nasional.',
-      minKarma: 50,
     ),
     PoliticalLevel(
       title: 'Presiden / Perdana Menteri',
@@ -61,7 +58,6 @@ class PoliticalCareerData {
       campaignCost: 40000000,
       baseSalary: 2500000,
       description: 'Pemimpin tertinggi negara. Memegang tongkat kekuasaan nasional & diplomatik.',
-      minKarma: 50,
     ),
   ];
 

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/aktor_film_job_logic/menu_aktor/rekan_artis_interaction_page.dart';
 
 class RekanArtisPage extends StatefulWidget {
   final Character character;
@@ -227,8 +227,8 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ClassmateInteractionPage(
-                classmate: cm,
+              builder: (context) => RekanArtisInteractionPage(
+                coworker: cm,
                 character: widget.character,
                 onRefresh: () {
                   setState(() {});

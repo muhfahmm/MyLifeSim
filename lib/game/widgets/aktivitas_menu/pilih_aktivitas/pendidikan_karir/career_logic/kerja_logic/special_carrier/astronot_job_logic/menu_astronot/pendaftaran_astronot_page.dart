@@ -96,8 +96,7 @@ class _PendaftaranAstronotPageState extends State<PendaftaranAstronotPage> {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
           onPressed: () {
-            Navigator.of(context, rootNavigator: true).pop(); // Tutup modal notification
-            Navigator.of(context).pop(); // Kembali ke halaman utama AstronotMenuPage
+            Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
           },
           child: const Text('Oke', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
         ),

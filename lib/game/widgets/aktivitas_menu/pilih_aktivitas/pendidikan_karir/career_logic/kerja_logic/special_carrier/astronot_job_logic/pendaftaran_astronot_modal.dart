@@ -275,8 +275,9 @@ class PendaftaranAstronotModal {
     character.generateCoworkersIfEmpty();
     onRefresh();
 
+    final pageContext = context;
     DialogHelper.show(
-      context: context,
+      context: pageContext,
       title: 'Kontrak Resmi Diteken! 👨‍🚀📜',
       content: Text(
         'Kamu resmi bergabung dengan $agencyName sebagai $rank!\n\n'
@@ -284,6 +285,21 @@ class PendaftaranAstronotModal {
         '• Gaji Per Tahun: ${CurrencySettings.format(salary.toDouble())}\n'
         '• Popularitas: +10%',
       ),
+      showCloseButton: false,
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo.shade800,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.of(pageContext).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+          },
+          child: const Text('Oke', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+        ),
+      ],
     );
   }
 }

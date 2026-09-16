@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/action_menu/rekan_tim/rekan_atlet_interaction_page.dart';
 
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/sepakbola_logic/database_formasi_pelatih.dart';
@@ -452,8 +452,8 @@ class _RekanTimPageState extends State<RekanTimPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ClassmateInteractionPage(
-                classmate: coachData,
+              builder: (context) => RekanAtletInteractionPage(
+                coworker: coachData,
                 character: widget.character,
                 onRefresh: () {
                   setState(() {});
@@ -577,8 +577,8 @@ class _RekanTimPageState extends State<RekanTimPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => ClassmateInteractionPage(
-                classmate: cm,
+              builder: (context) => RekanAtletInteractionPage(
+                coworker: cm,
                 character: widget.character,
                 onRefresh: () {
                   setState(() {});

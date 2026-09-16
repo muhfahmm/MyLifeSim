@@ -21,13 +21,21 @@ class PersentaseAjakan {
       } else {
         int baseChance = 40;
         final int age = character.age;
-        if (age == 12) baseChance = 40;
-        else if (age == 13) baseChance = 45;
-        else if (age == 14) baseChance = 50;
-        else if (age == 15) baseChance = 55;
-        else if (age == 16) baseChance = 60;
-        else if (age == 17) baseChance = 65;
-        else if (age >= 18) baseChance = 70;
+        if (age == 12) {
+          baseChance = 40;
+        } else if (age == 13) {
+          baseChance = 45;
+        } else if (age == 14) {
+          baseChance = 50;
+        } else if (age == 15) {
+          baseChance = 55;
+        } else if (age == 16) {
+          baseChance = 60;
+        } else if (age == 17) {
+          baseChance = 65;
+        } else if (age >= 18) {
+          baseChance = 70;
+        }
 
         // Bonus/Min limit jika ikut Ayah
         if (character.custodyParent == 'Ayah' || character.custodyParent == 'Ayah Tiri') {
@@ -44,6 +52,8 @@ class PersentaseAjakan {
       }
     } else if (relLower == 'ibu' || relLower == 'ibu tiri') {
       chance = isMalePlayer ? 5 : 15;
+    } else if (relLower.contains('rekan') || relLower.contains('coworker')) {
+      chance = 100;
     } else if (relLower.contains('kakak') && relLower.contains('laki')) {
       chance = isMalePlayer ? 10 : 25;
     } else if (relLower.contains('kakak') && relLower.contains('perempuan')) {

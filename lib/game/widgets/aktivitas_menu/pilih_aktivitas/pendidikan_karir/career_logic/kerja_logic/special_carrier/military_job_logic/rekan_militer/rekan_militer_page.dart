@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/military_job_logic/rekan_militer/rekan_militer_interaction_page.dart';
 
 class RekanMiliterPage extends StatefulWidget {
   final Character character;
@@ -441,80 +441,97 @@ class _RekanMiliterPageState extends State<RekanMiliterPage> {
                   happiness: rel,
                 );
 
-                return Card(
-                  elevation: 0,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    side: BorderSide(
-                      color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
-                    ),
-                  ),
-                  child: ListTile(
-                    leading: AvatarImageCache.buildAvatar(
-                      url: avatarUrl,
-                      width: 40,
-                      height: 40,
-                      gender: gender,
-                    ),
-                    title: Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            name,
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5),
-                            overflow: TextOverflow.ellipsis,
-                          ),
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (ctx) => RekanMiliterInteractionPage(
+                          character: character,
+                          coworker: c,
+                          onRefresh: () {
+                            if (mounted) setState(() {});
+                            widget.onRefresh();
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 2),
-                        Row(
-                          children: [
-                            _buildRoleBadge(role),
-                            const SizedBox(width: 6),
-                            Expanded(
-                              child: Text(
-                                'Umur: $age th • Solidaritas: $rel%',
-                                style: const TextStyle(fontSize: 11),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 6),
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: rel / 100.0,
-                            minHeight: 4,
-                            backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade100,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              rel >= 70 ? Colors.green : (rel >= 40 ? Colors.orange : Colors.red),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                      child: Row(
+                        children: [
+                          AvatarImageCache.buildAvatar(
+                            url: avatarUrl,
+                            width: 48,
+                            height: 48,
+                            gender: gender,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  name,
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.grey.shade900,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 4),
+                                _buildRoleBadge(role),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Umur: $age th • Solidaritas: $rel%',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    color: isDark ? Colors.white70 : Colors.grey.shade700,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                const SizedBox(height: 6),
+                                ClipRRect(
+                                  borderRadius: BorderRadius.circular(4),
+                                  child: LinearProgressIndicator(
+                                    value: (rel.clamp(0, 100)) / 100.0,
+                                    backgroundColor: isDark ? Colors.grey.shade700 : Colors.grey.shade200,
+                                    color: Colors.orange.shade700,
+                                    minHeight: 5,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.chevron_right,
+                            size: 18,
+                            color: isDark ? Colors.white54 : Colors.grey.shade400,
+                          ),
+                        ],
+                      ),
                     ),
-                    trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (ctx) => ClassmateInteractionPage(
-                            character: character,
-                            classmate: c,
-                            onRefresh: () {
-                              if (mounted) setState(() {});
-                              widget.onRefresh();
-                            },
-                          ),
-                        ),
-                      );
-                    },
                   ),
                 );
               },

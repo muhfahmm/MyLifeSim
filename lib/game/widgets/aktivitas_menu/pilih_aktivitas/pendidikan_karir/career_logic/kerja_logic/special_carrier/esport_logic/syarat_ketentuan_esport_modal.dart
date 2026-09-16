@@ -548,7 +548,6 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
                         ),
                         onPressed: _selectedTeam != null
                             ? () {
-                                Navigator.pop(context);
                                 _submitEsportApplication(
                                   context,
                                   _selectedRole,
@@ -638,10 +637,10 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
           actions: [
             TextButton(
               onPressed: () {
-                final nav = Navigator.of(context);
-                Navigator.pop(dialogCtx); // Pop alert dialog
-                Navigator.pop(context);   // Pop SyaratKetentuanEsportModal
-                nav.pop();                // Pop PekerjaanSpesialMenuScreen (returns to Pekerjaan & Karir)
+                Navigator.pop(dialogCtx);
+                Navigator.pop(context);
+                widget.onRefresh();
+                Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
               },
               child: const Text('Buka HQ Esport 🚀', style: TextStyle(fontWeight: FontWeight.bold)),
             ),

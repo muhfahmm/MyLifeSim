@@ -6,7 +6,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/career_logic/kerja_logic/special_carrier/pembisnis_job_logic/rekan_bisnis/rekan_bisnis_interaction_page.dart';
 
 class RekanBisnisPage extends StatefulWidget {
   final Character character;
@@ -165,9 +165,9 @@ class _RekanBisnisPageState extends State<RekanBisnisPage> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (_) => ClassmateInteractionPage(
+          builder: (_) => RekanBisnisInteractionPage(
             character: character,
-            classmate: employee,
+            coworker: employee,
             onRefresh: () {
               setState(() {});
               widget.onRefresh();

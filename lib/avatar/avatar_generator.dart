@@ -120,7 +120,7 @@ class AvatarGenerator {
   }) {
     final uri = Uri.https(
       'api.dicebear.com',
-      '/5.x/avataaars/png',
+      '/7.x/avataaars/png',
       {
         'seed': seed,
         'eyes': eyeType,
@@ -150,7 +150,7 @@ class AvatarGenerator {
 
     final uri = Uri.https(
       'api.dicebear.com',
-      '/5.x/avataaars/png',
+      '/7.x/avataaars/png',
       {
         'top': finalTopType,
         'topProbability': topProb.toString(),
@@ -198,7 +198,8 @@ class AvatarGenerator {
   }
 
   static Map<String, String> generateRandomAvatar(String gender, {String? seedName}) {
-    final isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
+    final g = gender.toLowerCase().trim();
+    final isMale = g == 'laki-laki' || g == 'male' || g == 'pria' || g == 'l' || g.startsWith('laki');
     final topMap = isMale ? topsMale : topsFemale;
     final seed = seedName != null ? seedName.hashCode : null;
     final random = seed != null ? Random(seed) : Random();
@@ -221,6 +222,8 @@ class AvatarGenerator {
     String gender = 'Perempuan',
     BoxFit fit = BoxFit.cover,
   }) {
+    final g = gender.toLowerCase().trim();
+    final bool isMale = g == 'laki-laki' || g == 'male' || g == 'pria' || g == 'l' || g.startsWith('laki');
     return ClipOval(
       child: Image.network(
         url,
@@ -246,7 +249,6 @@ class AvatarGenerator {
           );
         },
         errorBuilder: (context, error, stackTrace) {
-          final isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
           return Container(
             width: width,
             height: height,
@@ -254,10 +256,12 @@ class AvatarGenerator {
               color: isMale ? Colors.blue.shade50 : Colors.pink.shade50,
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              isMale ? Icons.face : Icons.face_3,
-              color: isMale ? Colors.blue.shade300 : Colors.pink.shade300,
-              size: width * 0.65,
+            child: Center(
+              child: Icon(
+                isMale ? Icons.face : Icons.face_3,
+                color: isMale ? Colors.blue.shade300 : Colors.pink.shade300,
+                size: width * 0.65,
+              ),
             ),
           );
         },
@@ -284,7 +288,8 @@ class AvatarImageCache {
     String gender = 'Perempuan',
     BoxFit fit = BoxFit.cover,
   }) {
-    final bool isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
+    final g = gender.toLowerCase().trim();
+    final bool isMale = g == 'laki-laki' || g == 'male' || g == 'pria' || g == 'l' || g.startsWith('laki');
     return ClipOval(
       child: Image(
         image: getImageProvider(url),

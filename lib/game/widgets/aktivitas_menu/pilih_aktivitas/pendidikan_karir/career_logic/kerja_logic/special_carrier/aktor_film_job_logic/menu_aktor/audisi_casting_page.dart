@@ -93,13 +93,28 @@ class _AudisiCastingPageState extends State<AudisiCastingPage> {
           if (mounted) setState(() {});
           widget.onRefresh();
 
-          _showAlert(
-            'Lolos Casting & Kontrak Diteken! 🎬🌟',
-            'Selamat! Sutradara sangat terkesan dengan aktingmu!\n\n'
-            '• Peran Resmi: $roleName ($filmGenre)\n'
-            '• Durasi Kontrak: $contractYears Tahun\n'
-            '• Gaji Per Film: ${CurrencySettings.format(salary.toDouble())}\n'
-            '• Popularitas: +6%',
+          final pageContext = context;
+          DialogHelper.show(
+            context: pageContext,
+            title: 'Lolos Casting & Kontrak Diteken! 🎬🌟',
+            content: Text(
+              'Selamat! Sutradara sangat terkesan dengan aktingmu!\n\n'
+              '• Peran Resmi: $roleName ($filmGenre)\n'
+              '• Durasi Kontrak: $contractYears Tahun\n'
+              '• Gaji Per Film: ${CurrencySettings.format(salary.toDouble())}\n'
+              '• Popularitas: +6%',
+              style: const TextStyle(fontSize: 13),
+            ),
+            showCloseButton: false,
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(pageContext);
+                  Navigator.of(pageContext).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+                },
+                child: const Text('OK'),
+              ),
+            ],
           );
         },
       );

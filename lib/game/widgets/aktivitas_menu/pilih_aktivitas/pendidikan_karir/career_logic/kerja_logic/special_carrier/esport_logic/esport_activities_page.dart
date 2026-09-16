@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'menu_esport/rekan_esport_page.dart';
 
 class EsportActivitiesPage extends StatefulWidget {
   final Character character;
@@ -28,31 +30,37 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
     required IconData icon,
     required Color color,
   }) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Icon(icon, color: color, size: 28),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(title, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+      title: title,
+      content: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              content,
+              style: const TextStyle(fontSize: 13, height: 1.4),
             ),
-          ],
-        ),
-        content: Text(content, style: const TextStyle(fontSize: 14)),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onRefresh();
-              if (mounted) setState(() {});
-            },
-            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo.shade800,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onRefresh();
+            if (mounted) setState(() {});
+          },
+          child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+        ),
+      ],
     );
   }
 
@@ -332,6 +340,39 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
     );
   }
 
+  void _doResign() {
+    DialogHelper.show(
+      context: context,
+      title: 'Resign / Keluar Tim Esport 🚪🎮',
+      content: Text(
+        'Apakah kamu yakin ingin mengundurkan diri dari ${widget.character.jobName}?',
+        style: const TextStyle(fontSize: 13),
+      ),
+      showCloseButton: false,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade600,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            widget.character.resignJob();
+            widget.character.contractYears = null;
+            if (mounted) setState(() {});
+            widget.onRefresh();
+          },
+          child: const Text('Ya, Resign', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -344,6 +385,26 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
         title: const Text('Aktivitas Karir Esport 🎮', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         backgroundColor: Colors.indigo.shade800,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.people),
+            tooltip: 'Rekan Kerja & Tim Esport',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => RekanEsportPage(
+                    character: widget.character,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -400,6 +461,28 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
               ),
             ),
             const SizedBox(height: 12),
+
+            _buildActivityButton(
+              context: context,
+              icon: Icons.people,
+              color: Colors.teal,
+              title: 'Rekan Kerja & Tim Esport 👥',
+              desc: 'Interaksi & hubungan dengan rekan sesama pro player, talent, & staf manajemen tim.',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => RekanEsportPage(
+                      character: widget.character,
+                      onRefresh: () {
+                        if (mounted) setState(() {});
+                        widget.onRefresh();
+                      },
+                    ),
+                  ),
+                );
+              },
+            ),
 
             if (isBAOrTalent) ...[
               _buildActivityButton(
@@ -492,6 +575,22 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
                 onTap: _doLiveStream,
               ),
             ],
+
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red.shade600,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+                icon: const Icon(Icons.logout, size: 18),
+                label: const Text('Resign / Keluar Tim Esport 🚪', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                onPressed: _doResign,
+              ),
+            ),
           ],
         ),
       ),
