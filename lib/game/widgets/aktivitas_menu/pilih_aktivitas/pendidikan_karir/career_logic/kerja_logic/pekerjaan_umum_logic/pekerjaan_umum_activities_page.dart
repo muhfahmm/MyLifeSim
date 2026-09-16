@@ -532,20 +532,13 @@ class _PekerjaanUmumActivitiesPageState extends State<PekerjaanUmumActivitiesPag
             onTap: _showEvaluationReport,
           ),
 
-          const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red.shade600,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-              ),
-              icon: const Icon(Icons.logout, size: 18),
-              label: const Text('Resign / Keluar Pekerjaan 🚪', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-              onPressed: _resign,
-            ),
+          _buildActivityButton(
+            context: context,
+            icon: Icons.exit_to_app,
+            color: Colors.red,
+            title: 'Resign / Keluar Kerja',
+            desc: 'Berhenti bekerja dari pekerjaan umum saat ini',
+            onTap: _resign,
           ),
         ],
       ),
