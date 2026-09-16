@@ -29,12 +29,29 @@ class IdolManager {
     }
   }
 
+  static void ensureWelcomeNews(Character character) {
+    if (character.idolNews.isNotEmpty) return;
+
+    final String jobRole = (character.jobName ?? '').isNotEmpty ? character.jobName! : 'Anggota Agensi';
+    String welcomeNews = '';
+    if (jobRole.contains('Manager') || jobRole.contains('GM')) {
+      welcomeNews = '📢 Pengumuman Manajemen: Selamat datang! ${character.name} resmi bergabung dan menjabat sebagai $jobRole baru di agensi idol!';
+    } else if (jobRole.contains('Idol') || jobRole.contains('Trainee')) {
+      welcomeNews = '🌟 Anggota Baru: Selamat datang! ${character.name} resmi bergabung sebagai $jobRole di grup idol!';
+    } else {
+      welcomeNews = '💼 Staf Baru: Selamat datang! ${character.name} resmi bergabung ke tim operasional agensi sebagai $jobRole!';
+    }
+    character.idolNews.add(welcomeNews);
+  }
+
   // Initialize trainees (Gen 6, Gen 7, dan 30% peluang Gen 8) and staff
   static void initializeTraineeTeam(Character character) {
     final rand = Random();
     character.idolTrainees.clear();
     character.idolMainMembers.clear();
     character.idolStaff.clear();
+    character.idolGraduatedMembers.clear();
+    character.idolNews.clear();
     character.yearsInTrainee = 0;
 
     // Generasi Trainee Awal: Gen 6 & Gen 7 selalu ada. Gen 8 ada dengan 30% peluang.
@@ -83,6 +100,9 @@ class IdolManager {
 
     // Generate staff
     _generateManagementStaff(character, rand);
+
+    // Tambahkan berita sambutan selamat datang untuk pengguna
+    ensureWelcomeNews(character);
   }
 
   // Initialize main team (Gen 1 s/d Gen 5)

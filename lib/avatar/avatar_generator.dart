@@ -276,4 +276,39 @@ class AvatarImageCache {
     }
     return _cache[url]!;
   }
+
+  static Widget buildAvatar({
+    required String url,
+    double width = 40,
+    double height = 40,
+    String gender = 'Perempuan',
+    BoxFit fit = BoxFit.cover,
+  }) {
+    final bool isMale = gender.toLowerCase() == 'laki-laki' || gender.toLowerCase() == 'male';
+    return ClipOval(
+      child: Image(
+        image: getImageProvider(url),
+        width: width,
+        height: height,
+        fit: fit,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            width: width,
+            height: height,
+            decoration: BoxDecoration(
+              color: isMale ? Colors.blue.shade50 : Colors.pink.shade50,
+              shape: BoxShape.circle,
+            ),
+            child: Center(
+              child: Icon(
+                isMale ? Icons.face : Icons.face_3,
+                color: isMale ? Colors.blue.shade400 : Colors.pink.shade400,
+                size: width * 0.65,
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }

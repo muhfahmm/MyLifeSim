@@ -298,20 +298,15 @@ class _RekamJejakGenerasiPageState extends State<RekamJejakGenerasiPage> {
       ),
       child: ListTile(
         dense: true,
-        leading: CircleAvatar(
-          backgroundColor: isGraduated ? Colors.grey.shade200 : Colors.pink.shade50,
-          child: ClipOval(
-            child: ColorFiltered(
-              colorFilter: isGraduated
-                  ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
-                  : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
-              child: Image(
-                image: AvatarImageCache.getImageProvider(avatarUrl),
-                width: 36,
-                height: 36,
-                fit: BoxFit.cover,
-              ),
-            ),
+        leading: ColorFiltered(
+          colorFilter: isGraduated
+              ? const ColorFilter.mode(Colors.grey, BlendMode.saturation)
+              : const ColorFilter.mode(Colors.transparent, BlendMode.dst),
+          child: AvatarImageCache.buildAvatar(
+            url: avatarUrl,
+            width: 36,
+            height: 36,
+            gender: gender,
           ),
         ),
         title: Text(

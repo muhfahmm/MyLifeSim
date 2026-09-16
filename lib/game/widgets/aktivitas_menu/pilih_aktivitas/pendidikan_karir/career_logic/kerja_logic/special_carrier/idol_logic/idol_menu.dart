@@ -39,6 +39,7 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
         IdolManager.initializeTraineeTeam(widget.character);
       }
     }
+    IdolManager.ensureWelcomeNews(widget.character);
   }
 
   void _resignOrGraduate() {
@@ -359,21 +360,47 @@ class _IdolMenuScreenState extends State<IdolMenuScreen> {
                 ),
               ),
             ] else if (char.isIdolStaff) ...[
-              // Aktivitas Manajemen (Sub-menu Staf)
-              _buildMenuTile(
-                context: context,
-                icon: Icons.work_history,
-                color: Colors.orange,
-                title: 'Aktivitas Manajemen',
-                subtitle: 'Perekrutan, evaluasi kinerja, konser, promosi, dan anggaran',
-                page: staff_akt.AktivitasManajemenPage(
-                  character: char,
-                  onRefresh: () {
-                    if (mounted) setState(() {});
-                    widget.onRefresh();
-                  },
-                ),
-              ),
+              Builder(builder: (context) {
+                final role = (char.jobName ?? '').toLowerCase();
+                final bool isGM = role == 'general manager' || role == 'deputy general manager' || role.contains('gm');
+                final bool isTrainer = role.contains('pelatih') || role.contains('trainer') || role.contains('koreografer');
+                final bool isProd = role.contains('engineer') || role.contains('kreatif') || role.contains('editor') ||
+                    role.contains('fotografer') || role.contains('videografer') || role.contains('desainer') ||
+                    role.contains('medsos') || role.contains('stage') || role.contains('sound') || role.contains('lighting');
+
+                IconData iconData = Icons.assignment;
+                String titleText = 'Aktivitas Operasional Staf';
+                String subtitleText = 'Pelayanan merchandise, perawatan kostum, dan fasilitas teater';
+
+                if (isGM) {
+                  iconData = Icons.work_history;
+                  titleText = 'Aktivitas Manajemen';
+                  subtitleText = 'Perekrutan, evaluasi kinerja, konser, promosi, dan anggaran';
+                } else if (isTrainer) {
+                  iconData = Icons.model_training;
+                  titleText = 'Aktivitas Pelatihan Idol';
+                  subtitleText = 'Latihan olah vokal, koreografi tari, dan bimbingan mental member';
+                } else if (isProd) {
+                  iconData = Icons.movie_creation;
+                  titleText = 'Aktivitas Produksi & Media';
+                  subtitleText = 'Gladi bersih panggung, sound check, lighting, dan dokumentasi visual';
+                }
+
+                return _buildMenuTile(
+                  context: context,
+                  icon: iconData,
+                  color: Colors.orange,
+                  title: titleText,
+                  subtitle: subtitleText,
+                  page: staff_akt.AktivitasManajemenPage(
+                    character: char,
+                    onRefresh: () {
+                      if (mounted) setState(() {});
+                      widget.onRefresh();
+                    },
+                  ),
+                );
+              }),
             ],
 
             // Berita Grup Idol

@@ -186,17 +186,11 @@ class DetailPerformaTraineePage extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    CircleAvatar(
-                      backgroundColor: Colors.pink.shade100,
-                      radius: 22,
-                      child: ClipOval(
-                        child: Image(
-                          image: AvatarImageCache.getImageProvider(avatarUrl),
-                          width: 44,
-                          height: 44,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
+                    AvatarImageCache.buildAvatar(
+                      url: avatarUrl,
+                      width: 44,
+                      height: 44,
+                      gender: gender,
                     ),
                     const SizedBox(width: 12),
                     Expanded(

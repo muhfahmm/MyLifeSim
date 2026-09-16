@@ -147,16 +147,11 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                     ),
                     color: Colors.pink.shade50.withAlpha(76),
                     child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.pink.shade100,
-                        child: ClipOval(
-                          child: Image(
-                            image: AvatarImageCache.getImageProvider(avatarUrl),
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
+                      leading: AvatarImageCache.buildAvatar(
+                        url: avatarUrl,
+                        width: 40,
+                        height: 40,
+                        gender: widget.character.gender,
                       ),
                       title: Row(
                         children: [
@@ -243,17 +238,12 @@ class _TimUtamaPageState extends State<TimUtamaPage> {
                     side: BorderSide(color: Colors.grey.shade200),
                   ),
                   child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.pink.shade50,
-                      child: ClipOval(
-                        child: Image(
-                          image: AvatarImageCache.getImageProvider(avatarUrl),
-                          width: 40,
-                          height: 40,
-                          fit: BoxFit.cover,
-                        ),
+                      leading: AvatarImageCache.buildAvatar(
+                        url: avatarUrl,
+                        width: 40,
+                        height: 40,
+                        gender: gender,
                       ),
-                    ),
                     title: Row(
                       children: [
                         Flexible(
