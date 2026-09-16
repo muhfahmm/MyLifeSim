@@ -106,6 +106,13 @@ class NpcRelationshipHelper {
     }
 
     // 3. Cek Seluruh List NPC
+    if (!matched && character.supervisor != null) {
+      final sup = character.supervisor!;
+      final String n = (sup['name'] ?? '').toString().toLowerCase().trim();
+      if (n.isNotEmpty && (cleanTarget.contains(n) || n.contains(cleanTarget) || plainName.contains(n) || isNameMatch(n))) {
+        updateMap(sup);
+      }
+    }
     if (!matched) {
       for (var list in [
         character.siblings,

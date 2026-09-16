@@ -39,6 +39,8 @@ class _RekanAstronotPageState extends State<RekanAstronotPage> {
       ),
       child: Text(
         role,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,

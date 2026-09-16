@@ -329,19 +329,6 @@ class _GubernurPageState extends State<GubernurPage> {
                       Text('${character.karma}%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                     ],
                   ),
-
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                    onPressed: _resign,
-                    icon: const Icon(Icons.exit_to_app, size: 16),
-                    label: const Text('Resign / Keluar Kerja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  ),
                 ],
               ),
             ),
@@ -411,7 +398,7 @@ class _GubernurPageState extends State<GubernurPage> {
             icon: Icons.how_to_vote,
             color: Colors.deepOrange,
             title: 'Ikuti Pemilu Presiden / Tingkat Lanjut 🗳️',
-            subtitle: 'Mencalonkan diri sebagai Pemimpin Tertinggi Negara',
+            subtitle: 'Mencalonkan diri ke jenjang politik yang lebih tinggi',
             onTap: () {
               PolitikMenuHelper.showElectionMenu(
                 context,
@@ -422,6 +409,14 @@ class _GubernurPageState extends State<GubernurPage> {
                 },
               );
             },
+          ),
+
+          _buildTile(
+            icon: Icons.exit_to_app,
+            color: Colors.red,
+            title: 'Resign / Keluar Kerja',
+            subtitle: 'Berhenti dari jabatan Gubernur',
+            onTap: _resign,
           ),
         ],
       ),

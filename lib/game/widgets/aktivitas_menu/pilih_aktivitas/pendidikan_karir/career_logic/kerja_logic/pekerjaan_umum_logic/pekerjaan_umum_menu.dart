@@ -5,6 +5,7 @@ import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'dart:math';
 import '../database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import '../special_carrier/idol_logic/idol_manager.dart';
 import '../special_carrier/idol_logic/syarat_ketentuan_idol_modal.dart';
 
@@ -92,20 +93,24 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
     }
 
     if (character.intelligence < (job['minIntel'] ?? 0)) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Lamaran Ditolak 🚫'),
-          content: Text(
-            'Kecerdasanmu (${character.intelligence}%) kurang mencukupi untuk posisi ${job['title']}. Minimal ${job['minIntel']}%.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
+        title: 'Lamaran Ditolak 🚫',
+        content: Text(
+          'Kecerdasanmu (${character.intelligence}%) kurang mencukupi untuk posisi ${job['title']}. Minimal ${job['minIntel']}%.',
+          style: const TextStyle(fontSize: 14, height: 1.4),
         ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       );
       return;
     }
@@ -125,25 +130,30 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
       }
     });
     widget.onRefresh();
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Lamaran Diterima! 🎉💼'),
-        content: Text(
-          isGraduatedRedirect
-              ? 'Karena kamu sudah pernah melangsungkan kelulusan sebagai Idol, manajemen merekrutmu sebagai Staf Operasional Idol dengan gaji ${CurrencySettings.format(500)}/tahun!'
-              : 'Selamat! Kamu resmi bekerja sebagai $finalTitle$teamText dengan gaji ${CurrencySettings.format(finalSalary)}/tahun.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // kembali ke menu utama pekerjaan
-            },
-            child: const Text('Luar Biasa!'),
-          ),
-        ],
+      title: 'Lamaran Diterima! 🎉💼',
+      content: Text(
+        isGraduatedRedirect
+            ? 'Karena kamu sudah pernah melangsungkan kelulusan sebagai Idol, manajemen merekrutmu sebagai Staf Operasional Idol dengan gaji ${CurrencySettings.format(500)}/tahun!'
+            : 'Selamat! Kamu resmi bekerja sebagai $finalTitle$teamText dengan gaji ${CurrencySettings.format(finalSalary)}/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
+        style: const TextStyle(fontSize: 14, height: 1.4),
       ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.green.shade700,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context); // kembali ke menu utama pekerjaan
+          },
+          child: const Text('Luar Biasa!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        ),
+      ],
     );
   }
 
@@ -262,19 +272,24 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
                           ),
                           onPressed: () {
                             if (!meetsIntel) {
-                              showDialog(
+                              DialogHelper.show(
                                 context: context,
-                                builder: (c) => AlertDialog(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                  title: const Text('Persyaratan Belum Terpenuhi'),
-                                  content: Text('Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () => Navigator.pop(c),
-                                      child: const Text('OK'),
-                                    ),
-                                  ],
+                                title: 'Persyaratan Belum Terpenuhi',
+                                content: Text(
+                                  'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%',
+                                  style: const TextStyle(fontSize: 14, height: 1.4),
                                 ),
+                                actions: [
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green.shade700,
+                                      foregroundColor: Colors.white,
+                                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                    ),
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  ),
+                                ],
                               );
                               return;
                             }

@@ -12,7 +12,9 @@ import 'database_nama_pekerjaan.dart';
 import 'special_carrier/esport_logic/proplayer/esport_roster_page.dart';
 import 'special_carrier/esport_logic/esport_activities_page.dart';
 import 'pekerjaan_umum_logic/pekerjaan_umum_menu.dart';
+import 'pekerjaan_umum_logic/pekerjaan_umum_activities_page.dart';
 import 'pekerjaan_profesional_logic/pekerjaan_profesional_menu.dart';
+import 'pekerjaan_profesional_logic/pekerjaan_profesional_activities_page.dart';
 import 'special_carrier/pekerjaan_spesial_menu.dart';
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/sepakbola_logic/logika_usia_rekan_tim.dart';
 import 'special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/atlit_activities_page.dart';
@@ -615,6 +617,26 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
         return ArmyMenuHelper.buildRolePage(
           character,
           () {
+            if (mounted) setState(() {});
+            widget.onRefresh();
+          },
+        );
+      }
+
+      if (currentCategory == 'Profesional' || currentCategory == 'Prestise') {
+        return PekerjaanProfesionalActivitiesPage(
+          character: character,
+          onRefresh: () {
+            if (mounted) setState(() {});
+            widget.onRefresh();
+          },
+        );
+      }
+
+      if (!isAthlete) {
+        return PekerjaanUmumActivitiesPage(
+          character: character,
+          onRefresh: () {
             if (mounted) setState(() {});
             widget.onRefresh();
           },

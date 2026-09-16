@@ -766,29 +766,6 @@ List<ActionItem> getAge12PlusActions(
     ));
   }
 
-  // 5. Minta Uang
-  actions.add(ActionItem(
-    label: 'Minta Uang Saku',
-    icon: Icons.monetization_on,
-    color: Colors.amber,
-    onTap: () {
-      PercakapanDispatcher.dispatchAction(
-        context: context,
-        character: character,
-        targetName: targetName,
-        targetRole: targetRole,
-        targetAge: targetAge != null ? '$targetAge' : '$age',
-        relationshipValue: _getCurrentRelationshipValue(),
-        actionType: 'Minta Uang Saku',
-        onActionComplete: updateState,
-        targetAvatarUrl: targetAvatarUrl,
-        playerAvatarUrl: playerAvatarUrl,
-        targetGender: targetGender,
-      );
-    },
-  ));
-
-  // Minta Kendaraan
   final String cleanName = targetName.toLowerCase();
   final String cleanRole = targetRole.toLowerCase();
   final bool isParent = cleanName.startsWith('ayah') ||
@@ -802,6 +779,29 @@ List<ActionItem> getAge12PlusActions(
                         (character.stepMotherName != null && cleanName.contains(character.stepMotherName!.toLowerCase()));
 
   if (isParent) {
+    // 5. Minta Uang Saku
+    actions.add(ActionItem(
+      label: 'Minta Uang Saku',
+      icon: Icons.monetization_on,
+      color: Colors.amber,
+      onTap: () {
+        PercakapanDispatcher.dispatchAction(
+          context: context,
+          character: character,
+          targetName: targetName,
+          targetRole: targetRole,
+          targetAge: targetAge != null ? '$targetAge' : '$age',
+          relationshipValue: _getCurrentRelationshipValue(),
+          actionType: 'Minta Uang Saku',
+          onActionComplete: updateState,
+          targetAvatarUrl: targetAvatarUrl,
+          playerAvatarUrl: playerAvatarUrl,
+          targetGender: targetGender,
+        );
+      },
+    ));
+
+    // Minta Kendaraan
     actions.add(ActionItem(
       label: 'Minta Kendaraan',
       icon: Icons.directions_car,

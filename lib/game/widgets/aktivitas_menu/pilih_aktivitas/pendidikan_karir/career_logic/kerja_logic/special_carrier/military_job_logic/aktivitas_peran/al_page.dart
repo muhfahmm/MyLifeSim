@@ -305,19 +305,6 @@ class _AlPageState extends State<AlPage> {
                       Text('$_jobPerformance%', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black87)),
                     ],
                   ),
-
-                  const SizedBox(height: 16),
-                  ElevatedButton.icon(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade600,
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    ),
-                    onPressed: _resign,
-                    icon: const Icon(Icons.exit_to_app, size: 16),
-                    label: const Text('Mundur dari Dinas Militer', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                  ),
                 ],
               ),
             ),
@@ -398,6 +385,14 @@ class _AlPageState extends State<AlPage> {
                 },
               );
             },
+          ),
+
+          _buildTile(
+            icon: Icons.exit_to_app,
+            color: Colors.red,
+            title: 'Resign / Keluar Kerja',
+            subtitle: 'Mundur dari dinas militer Angkatan Laut',
+            onTap: _resign,
           ),
         ],
       ),

@@ -133,132 +133,100 @@ class _ArmyMenuPageState extends State<ArmyMenuPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final List<Map<String, dynamic>> ranks = branchData['ranks'];
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Row(
-          children: [
-            Icon(branchData['icon'] as IconData, color: branchData['color'] as Color),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(
-                branchData['branch'],
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87),
+      title: branchData['branch'] ?? 'Angkatan Militer',
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView.builder(
+          shrinkWrap: true,
+          physics: const ClampingScrollPhysics(),
+          itemCount: ranks.length,
+          itemBuilder: (context, index) {
+            final r = ranks[index];
+            final String rankTitle = '${branchData['branch']} - ${r['rank']}';
+            final int salary = r['salary'];
+            final int minIntel = r['minIntel'];
+            final bool isEligible = widget.character.intelligence >= minIntel;
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 8),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
               ),
-            ),
-          ],
-        ),
-        content: SizedBox(
-          width: double.maxFinite,
-          child: ListView.builder(
-            shrinkWrap: true,
-            itemCount: ranks.length,
-            itemBuilder: (context, index) {
-              final r = ranks[index];
-              final String rankTitle = '${branchData['branch']} - ${r['rank']}';
-              final int salary = r['salary'];
-              final int minIntel = r['minIntel'];
-              final bool isEligible = widget.character.intelligence >= minIntel;
-
-              return Container(
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(10),
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                title: Text(
+                  r['rank'],
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
                 ),
-                child: ListTile(
-                  title: Text(
-                    r['rank'],
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                subtitle: Text(
+                  'Gaji: ${CurrencySettings.format(salary)}/tahun\n| Min Intel: $minIntel%',
+                  style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey.shade700),
+                ),
+                trailing: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isEligible ? (branchData['color'] as Color) : Colors.grey,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                   ),
-                  subtitle: Text('Gaji: ${CurrencySettings.format(salary)}/tahun | Min Intel: $minIntel%', style: const TextStyle(fontSize: 12)),
-                  trailing: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isEligible ? (branchData['color'] as Color) : Colors.grey,
-                      foregroundColor: Colors.white,
-                    ),
-                    onPressed: () {
-                      final bool hasMilitaryJob = widget.character.jobName != null &&
-                          (widget.character.jobName!.contains('Angkatan Darat') ||
-                              widget.character.jobName!.contains('Angkatan Laut') ||
-                              widget.character.jobName!.contains('Angkatan Udara'));
+                  onPressed: () {
+                    final bool hasMilitaryJob = widget.character.jobName != null &&
+                        (widget.character.jobName!.contains('Angkatan Darat') ||
+                            widget.character.jobName!.contains('Angkatan Laut') ||
+                            widget.character.jobName!.contains('Angkatan Udara'));
 
-                      if (hasMilitaryJob) {
-                        showDialog(
-                          context: context,
-                          builder: (c) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            title: const Text('Perhatian'),
-                            content: Text('⚠️ Kamu saat ini sedang aktif bertugas sebagai ${widget.character.jobName}. Mundur terlebih dahulu jika ingin mendaftar ke cabang militer lain.'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(c),
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ),
-                        );
-                        return;
-                      }
-
-                      if (!isEligible) {
-                        showDialog(
-                          context: context,
-                          builder: (c) => AlertDialog(
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                            title: const Text('Persyaratan Belum Terpenuhi'),
-                            content: Text('Kecerdasanmu (${widget.character.intelligence}%) belum memenuhi syarat minimal $minIntel%!'),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.pop(c),
-                                child: const Text('OK'),
-                              ),
-                            ],
-                          ),
-                        );
-                        return;
-                      }
-
-                      Navigator.pop(ctx);
-                      setState(() {
-                        widget.character.jobName = rankTitle;
-                        widget.character.jobSalary = salary;
-                        widget.character.inbox.add('🪖 Karir Militer: Kamu resmi mendaftar dan diterima sebagai $rankTitle dengan gaji \$$salary/tahun!');
-                      });
-                      widget.onRefresh();
-
-                      showDialog(
+                    if (hasMilitaryJob) {
+                      DialogHelper.show(
                         context: context,
-                        builder: (c) => AlertDialog(
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                          title: const Text('Pendaftaran Berhasil'),
-                          content: Text('🎖️ Selamat! Kamu kini bergabung dengan $rankTitle!'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(c),
-                              child: const Text('OK'),
-                            ),
-                          ],
+                        title: 'Perhatian',
+                        content: Text(
+                          '⚠️ Kamu saat ini sedang aktif bertugas sebagai ${widget.character.jobName}. Mundur terlebih dahulu jika ingin mendaftar ke cabang militer lain.',
+                          style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
                         ),
                       );
+                      return;
+                    }
 
-                      Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
-                    },
-                    child: const Text('Daftar'),
-                  ),
+                    if (!isEligible) {
+                      DialogHelper.show(
+                        context: context,
+                        title: 'Persyaratan Belum Terpenuhi',
+                        content: Text(
+                          'Kecerdasanmu (${widget.character.intelligence}%) belum memenuhi syarat minimal $minIntel%!',
+                          style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+                        ),
+                      );
+                      return;
+                    }
+
+                    Navigator.of(context, rootNavigator: true).pop(); // close modal
+                    setState(() {
+                      widget.character.jobName = rankTitle;
+                      widget.character.jobSalary = salary;
+                      widget.character.inbox.add('🪖 Karir Militer: Kamu resmi mendaftar dan diterima sebagai $rankTitle dengan gaji \$$salary/tahun!');
+                    });
+                    widget.onRefresh();
+
+                    DialogHelper.show(
+                      context: context,
+                      title: 'Pendaftaran Berhasil',
+                      content: Text(
+                        '🎖️ Selamat! Kamu kini bergabung dengan $rankTitle!',
+                        style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    );
+
+                    Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+                  },
+                  child: const Text('Daftar'),
                 ),
-              );
-            },
-          ),
+              ),
+            );
+          },
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Tutup'),
-          ),
-        ],
       ),
     );
   }

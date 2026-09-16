@@ -145,22 +145,23 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
           // SEKSI MENU AKTOR FILM
           _buildSectionTitle('Manajemen & Modul Karir Aktor 🎭', isDark),
 
-          _buildActionCard(
-            title: 'Audisi & Casting Film Terbuka 🎬',
-            desc: 'Pilih peran film & ikuti audisi Action, Drama, Thriller, atau Figuran',
-            icon: Icons.theater_comedy,
-            color: Colors.purple,
-            isLocked: false,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => AudisiCastingPage(character: character, onRefresh: _triggerRefresh),
-                ),
-              );
-            },
-            isDark: isDark,
-          ),
+          if (!hasActorRole)
+            _buildActionCard(
+              title: 'Audisi & Casting Film Terbuka 🎬',
+              desc: 'Pilih peran film & ikuti audisi Action, Drama, Thriller, atau Figuran',
+              icon: Icons.theater_comedy,
+              color: Colors.purple,
+              isLocked: false,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => AudisiCastingPage(character: character, onRefresh: _triggerRefresh),
+                  ),
+                );
+              },
+              isDark: isDark,
+            ),
 
           _buildActionCard(
             title: 'Lokasi Syuting & Produksi Film 🎥',
@@ -254,24 +255,15 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
             isDark: isDark,
           ),
 
-          if (hasActorRole) ...[
-            const SizedBox(height: 16),
-            // BUTTON RESIGN / KELUAR KARIR AKTOR
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.logout, size: 18),
-                label: const Text('Resign / Keluar Pekerjaan Aktor 🚪', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                onPressed: () => _showResignModal(context, character),
-              ),
+          if (hasActorRole)
+            _buildActionCard(
+              title: 'Resign / Keluar Kerja',
+              desc: 'Berhenti bekerja sebagai Aktor Film',
+              icon: Icons.exit_to_app,
+              color: Colors.red,
+              onTap: () => _showResignModal(context, character),
+              isDark: isDark,
             ),
-          ],
         ],
       ),
     );

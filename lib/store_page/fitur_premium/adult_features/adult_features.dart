@@ -54,22 +54,19 @@ class AdultFeatures {
     final rLower = role.toLowerCase();
     final relLower = relation.toLowerCase();
 
-    // Hanya boleh dengan teman sekelas / teman kuliah / partner pacar/istri/suami biasa
-    if (rLower == 'teman sekelas' || rLower == 'teman kuliah' ||
-        relLower == 'teman sekolah' || relLower == 'teman kuliah') {
-      return true;
-    }
-    if (rLower == 'partner') {
+    // Boleh dengan teman sekelas / teman kuliah / rekan kerja / partner biasa
+    if (rLower.contains('teman') || relLower.contains('teman') ||
+        rLower.contains('rekan') || relLower.contains('rekan') ||
+        rLower.contains('coworker') || relLower.contains('coworker') ||
+        rLower == 'partner') {
       return true;
     }
 
-    return false;
+    return true;
   }
 
   /// Memeriksa apakah user diizinkan melakukan Masturbasi Bersama.
-  /// Non-Premium: Dilarang total untuk semua role.
   static bool canMasturbateTogether() {
-    if (isPremiumUnlocked) return true;
-    return false;
+    return true;
   }
 }

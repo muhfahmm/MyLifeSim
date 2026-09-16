@@ -183,24 +183,25 @@ class _AstronotMenuPageState extends State<AstronotMenuPage> {
           // SEKSI DOKUMEN & AUDISI
           _buildSectionTitle('Rekrutmen & Misi Antariksa 👨‍🚀', isDark),
 
-          _buildMenuCard(
-            title: 'Rekrutmen & Seleksi Astronot Baru 🛰️',
-            subtitle: 'Daftar rekrutmen astronot NASA, ESA, JAXA & BRIN Antariksa',
-            icon: Icons.assignment_ind_rounded,
-            color: Colors.indigo,
-            isDark: isDark,
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => PendaftaranAstronotPage(
-                    character: character,
-                    onRefresh: _triggerRefresh,
+          if (!hasAstronotJob)
+            _buildMenuCard(
+              title: 'Rekrutmen & Seleksi Astronot Baru 🛰️',
+              subtitle: 'Daftar rekrutmen astronot NASA, ESA, JAXA & BRIN Antariksa',
+              icon: Icons.assignment_ind_rounded,
+              color: Colors.indigo,
+              isDark: isDark,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => PendaftaranAstronotPage(
+                      character: character,
+                      onRefresh: _triggerRefresh,
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
 
           _buildMenuCard(
             title: 'Pusat Pelatihan Kosmonot & G-Force 🌀',
@@ -298,23 +299,15 @@ class _AstronotMenuPageState extends State<AstronotMenuPage> {
             },
           ),
 
-          if (hasAstronotJob) ...[
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: OutlinedButton.icon(
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.red,
-                  side: const BorderSide(color: Colors.red),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.exit_to_app_rounded, size: 18),
-                label: const Text('Mengundurkan Diri (Resign)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                onPressed: _showResignDialog,
-              ),
+          if (hasAstronotJob)
+            _buildMenuCard(
+              title: 'Resign / Keluar Kerja',
+              subtitle: 'Berhenti bekerja sebagai Astronot',
+              icon: Icons.exit_to_app,
+              color: Colors.red,
+              isDark: isDark,
+              onTap: _showResignDialog,
             ),
-          ],
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import '../database_nama_pekerjaan.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/daftar_negara.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 
 
@@ -245,43 +246,51 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
     final character = widget.character;
 
     if (character.intelligence < (job['minIntel'] ?? 0)) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Lamaran Ditolak 🚫'),
-          content: Text(
-            'Kecerdasanmu (${character.intelligence}%) kurang mencukupi untuk posisi ${job['title']}. Minimal ${job['minIntel']}%.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
+        title: 'Lamaran Ditolak 🚫',
+        content: Text(
+          'Kecerdasanmu (${character.intelligence}%) kurang mencukupi untuk posisi ${job['title']}. Minimal ${job['minIntel']}%.',
+          style: const TextStyle(fontSize: 14, height: 1.4),
         ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       );
       return;
     }
 
     final allowed = _getAllowedMajors(job['title']);
     if (!_hasMatchingMajor(character, allowed)) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('Gelar Tidak Sesuai 🎓'),
-          content: Text(
-            'Posisi ${job['title']} membutuhkan gelar sarjana yang sesuai.\n\n'
-            'Gelar/Jurusan yang diterima:\n'
-            '• ${allowed.join("\n• ")}\n\n'
-            'Jurusanmu: $_currentMajorsStr.',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
+        title: 'Gelar Tidak Sesuai 🎓',
+        content: Text(
+          'Posisi ${job['title']} membutuhkan gelar sarjana yang sesuai.\n\n'
+          'Gelar/Jurusan yang diterima:\n'
+          '• ${allowed.join("\n• ")}\n\n'
+          'Jurusanmu: $_currentMajorsStr.',
+          style: const TextStyle(fontSize: 14, height: 1.4),
         ),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.indigo.shade700,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+          ),
+        ],
       );
       return;
     }
@@ -294,23 +303,28 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
       character.setJob(finalTitle, finalSalary);
     });
     widget.onRefresh();
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Lamaran Diterima! 🎉💼'),
-        content: Text(
-          'Selamat! Kamu resmi bekerja sebagai $finalTitle dengan gaji ${CurrencySettings.format(finalSalary)}/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context); // kembali ke menu utama pekerjaan
-            },
-            child: const Text('Luar Biasa!'),
-          ),
-        ],
+      title: 'Lamaran Diterima! 🎉💼',
+      content: Text(
+        'Selamat! Kamu resmi bekerja sebagai $finalTitle dengan gaji ${CurrencySettings.format(finalSalary)}/tahun.\n\nGaji akan dibayarkan setiap kali kamu bertambah umur.',
+        style: const TextStyle(fontSize: 14, height: 1.4),
       ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.indigo.shade700,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            Navigator.pop(context); // kembali ke menu utama pekerjaan
+          },
+          child: const Text('Luar Biasa!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+        ),
+      ],
     );
   }
 
@@ -421,25 +435,28 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
                                     ),
                                     onPressed: () {
                                       if (!canApply) {
-                                        showDialog(
+                                        DialogHelper.show(
                                           context: context,
-                                          builder: (c) => AlertDialog(
-                                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                                            title: const Text('Persyaratan Belum Terpenuhi'),
-                                            content: Text(
-                                              !meetsIntel
-                                                  ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
-                                                  : (!_isUnivGraduated
-                                                      ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
-                                                      : 'Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}'),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () => Navigator.pop(c),
-                                                child: const Text('OK'),
-                                              ),
-                                            ],
+                                          title: 'Persyaratan Belum Terpenuhi',
+                                          content: Text(
+                                            !meetsIntel
+                                                ? 'Kecerdasan ${character.intelligence}% < ${job['minIntel']}%'
+                                                : (!_isUnivGraduated
+                                                    ? 'Butuh gelar Sarjana S1 di bidang: ${_formatAllowedMajors(allowed)}'
+                                                    : 'Gelar tidak sesuai. Dibutuhkan: ${_formatAllowedMajors(allowed)}'),
+                                            style: const TextStyle(fontSize: 14, height: 1.4),
                                           ),
+                                          actions: [
+                                            ElevatedButton(
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.indigo.shade700,
+                                                foregroundColor: Colors.white,
+                                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                                              ),
+                                              onPressed: () => Navigator.pop(context),
+                                              child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                                            ),
+                                          ],
                                         );
                                         return;
                                       }

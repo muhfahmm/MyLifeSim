@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
-import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/interactions/classmate_interaction_page.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/action_menu.dart';
 import '../special_carrier/atlit_profesional_job_logic/aktivitas_karir_atlet/sepakbola/action_menu/rekan_tim/rekan_tim_page.dart';
 import '../special_carrier/politikus_job_logic/politik_career.dart';
 import '../special_carrier/politikus_job_logic/rekan_politik/rekan_politik_page.dart';
@@ -147,19 +147,20 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                       ),
                       trailing: Icon(Icons.chevron_right, size: 16, color: isDark ? Colors.white70 : Colors.blue),
                       onTap: () {
+                        final String sRole = supervisor['role'] ?? supervisorLabel;
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ClassmateInteractionPage(
-                              classmate: supervisor,
+                            builder: (context) => ActionMenuScreen(
                               character: widget.character,
-                              onRefresh: () {
-                                setState(() {});
-                                widget.onRefresh();
-                              },
+                              targetName: name,
+                              targetRole: sRole,
                             ),
                           ),
-                        );
+                        ).then((_) {
+                          setState(() {});
+                          widget.onRefresh();
+                        });
                       },
                     ),
                   ),
@@ -353,16 +354,16 @@ class _RekanKerjaPageState extends State<RekanKerjaPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ClassmateInteractionPage(
-                              classmate: cm,
+                            builder: (context) => ActionMenuScreen(
                               character: widget.character,
-                              onRefresh: () {
-                                setState(() {});
-                                widget.onRefresh();
-                              },
+                              targetName: name,
+                              targetRole: cm['role'] ?? 'Rekan Kerja',
                             ),
                           ),
-                        );
+                        ).then((_) {
+                          setState(() {});
+                          widget.onRefresh();
+                        });
                       },
                     ),
                   );

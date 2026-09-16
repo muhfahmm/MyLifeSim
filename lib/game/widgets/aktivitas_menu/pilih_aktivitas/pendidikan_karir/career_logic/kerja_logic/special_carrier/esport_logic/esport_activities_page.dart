@@ -575,22 +575,14 @@ class _EsportActivitiesPageState extends State<EsportActivitiesPage> {
                 onTap: _doLiveStream,
               ),
             ],
-
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-                icon: const Icon(Icons.logout, size: 18),
-                label: const Text('Resign / Keluar Tim Esport 🚪', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
-                onPressed: _doResign,
+              _buildActivityButton(
+                context: context,
+                icon: Icons.exit_to_app,
+                color: Colors.red,
+                title: 'Resign / Keluar Kerja',
+                desc: 'Berhenti bekerja & keluar dari tim Esport',
+                onTap: _doResign,
               ),
-            ),
           ],
         ),
       ),

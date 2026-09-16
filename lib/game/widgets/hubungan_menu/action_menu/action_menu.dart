@@ -232,8 +232,16 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
           return '$ucmAge tahun';
         }
       }
+      if (widget.character.supervisor != null) {
+        final sup = widget.character.supervisor!;
+        final String? supName = sup['name'];
+        if (supName != null && (supName == name || name.contains(supName) || supName.contains(name))) {
+          int supAge = int.tryParse(sup['age'] ?? '0') ?? 0;
+          return '$supAge tahun';
+        }
+      }
       for (var cw in widget.character.coworkers) {
-        if (cw['name'] == name || (cw['name'] != null && name.contains(cw['name']!))) {
+        if (cw['name'] == name || (cw['name'] != null && (name.contains(cw['name']!) || cw['name']!.contains(name)))) {
           int cwAge = int.tryParse(cw['age'] ?? '0') ?? 0;
           return '$cwAge tahun';
         }
@@ -348,6 +356,18 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         }
       }
     } else {
+      if (widget.character.supervisor != null) {
+        final supName = widget.character.supervisor!['name'];
+        if (supName != null && supName.isNotEmpty && (name.contains(supName) || supName.contains(name))) {
+          return supName;
+        }
+      }
+      for (var cw in widget.character.coworkers) {
+        final String cwName = cw['name'] ?? '';
+        if (cwName.isNotEmpty && (name.contains(cwName) || cwName.contains(name))) {
+          return cwName;
+        }
+      }
       // Cek di extended family
       for (var ext in widget.character.extendedFamily) {
         if (name.contains(ext['name'] ?? '')) {
@@ -498,6 +518,13 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     // 4. Cari di semua list NPC
+    if (widget.character.supervisor != null) {
+      final sup = widget.character.supervisor!;
+      final String? supName = sup['name']?.toLowerCase().trim();
+      if (supName != null && supName.isNotEmpty && (supName == nameLower || nameLower.contains(supName) || supName.contains(nameLower))) {
+        return sup['gender'] ?? 'Laki-laki';
+      }
+    }
     for (var list in [
       widget.character.siblings,
       widget.character.extendedFamily,
@@ -660,6 +687,23 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
     }
 
     return role;
+  }
+
+  String _getActionHeaderTitle(String role, String name) {
+    final String r = role.toLowerCase().trim();
+    if (r.contains('rekan') || r.contains('supervisor') || r.contains('atasan') || r.contains('bos') || r.contains('kolega') || r.contains('pekerjaan') || r.contains('direksi') || r.contains('staf')) {
+      return 'PILIH AKSI INTERAKSI REKAN KERJA';
+    }
+    if (r.contains('teman') || r.contains('sahabat') || r.contains('sekelas') || r.contains('kuliah')) {
+      return 'PILIH AKSI INTERAKSI TEMAN';
+    }
+    if (r.contains('pacar') || r.contains('tunangan') || r.contains('suami') || r.contains('istri')) {
+      return 'PILIH AKSI INTERAKSI PASANGAN';
+    }
+    if (r.contains('guru') || r.contains('dosen')) {
+      return 'PILIH AKSI INTERAKSI GURU & DOSEN';
+    }
+    return 'PILIH AKSI INTERAKSI KELUARGA';
   }
 
   @override
@@ -4383,15 +4427,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                         );
                       },
                     ),
-                    ],
                   ],
-                ),
+                ],
               ),
             ),
+          ),
             const SizedBox(height: 24),
-
             Text(
-              'PILIH AKSI INTERAKSI KELUARGA',
+              _getActionHeaderTitle(widget.targetRole, widget.targetName),
               style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
@@ -4399,8 +4442,7 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
                   letterSpacing: 1.0),
             ),
             const SizedBox(height: 12),
-
-            // --- MENU ACTION LIST (HASIL DARI AGE FILE) ---
+                    // --- MENU ACTION LIST (HASIL DARI AGE FILE) ---
             Expanded(
               child: actions.isEmpty
                   ? Center(

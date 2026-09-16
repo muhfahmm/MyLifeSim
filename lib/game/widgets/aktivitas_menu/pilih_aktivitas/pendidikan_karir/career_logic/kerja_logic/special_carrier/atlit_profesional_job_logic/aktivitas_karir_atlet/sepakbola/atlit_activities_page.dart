@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'action_menu/rekan_tim/rekan_tim_page.dart';
 import 'sepakbola_logic/logika_usia_rekan_tim.dart';
 
@@ -560,8 +561,50 @@ class _AtlitActivitiesPageState extends State<AtlitActivitiesPage> {
             },
             isDark: isDark,
           ),
+          _buildActionCard(
+            title: 'Resign / Keluar Kerja',
+            subtitle: 'Berhenti bekerja & keluar sebagai Atlit Profesional',
+            icon: Icons.exit_to_app,
+            color: Colors.red,
+            onTap: _doResign,
+            isDark: isDark,
+          ),
         ],
       ),
+    );
+  }
+
+  void _doResign() {
+    DialogHelper.show(
+      context: context,
+      title: 'Resign / Keluar Klub 🚪⚽',
+      content: Text(
+        'Apakah kamu yakin ingin mengundurkan diri dari ${widget.character.jobName}?',
+        style: const TextStyle(fontSize: 13),
+      ),
+      showCloseButton: false,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal', style: TextStyle(color: Colors.grey, fontSize: 12, fontWeight: FontWeight.bold)),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade600,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            widget.character.resignJob();
+            widget.character.contractYears = null;
+            if (mounted) setState(() {});
+            _triggerRefresh();
+            Navigator.of(context).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
+          },
+          child: const Text('Ya, Resign', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 

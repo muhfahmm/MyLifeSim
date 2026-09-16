@@ -71,7 +71,7 @@ class DialogHelper {
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontSize: 14, 
+                            fontSize: 16, 
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Colors.black87,
                             height: 1.2,
@@ -83,7 +83,6 @@ class DialogHelper {
                         InkWell(
                           onTap: () {
                             Navigator.of(dialogContext).pop();
-                            onClose?.call();
                           },
                           borderRadius: BorderRadius.circular(16),
                           child: Container(
@@ -102,15 +101,15 @@ class DialogHelper {
                       ],
                     ],
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   Flexible(
                     child: SingleChildScrollView(
                       physics: const BouncingScrollPhysics(),
                       child: DefaultTextStyle(
                         style: TextStyle(
-                          fontSize: 12,
+                          fontSize: 13,
                           color: isDark ? Colors.white70 : Colors.black87,
-                          height: 1.35,
+                          height: 1.4,
                         ),
                         child: content,
                       ),

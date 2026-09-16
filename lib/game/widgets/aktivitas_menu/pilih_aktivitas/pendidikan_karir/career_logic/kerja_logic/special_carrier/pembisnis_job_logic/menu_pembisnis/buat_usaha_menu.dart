@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 
 class BuatUsahaMenuPage extends StatefulWidget {
@@ -145,36 +146,36 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
     final String profitFormattedStr = '${_formatCurrency(minProfitVal)} - ${_formatCurrency(maxProfitVal)}';
 
     if (widget.character.money < modal) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Modal Tidak Cukup 💸'),
-          content: Text('Kamu membutuhkan ${_formatCurrency(modal)} untuk memulai $businessType. Uangmu saat ini hanya ${_formatCurrency(widget.character.money)}.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        title: 'Modal Tidak Cukup 💸',
+        content: Text(
+          'Kamu membutuhkan ${_formatCurrency(modal)} untuk memulai $businessType. Uangmu saat ini hanya ${_formatCurrency(widget.character.money)}.',
+          style: const TextStyle(fontSize: 14),
         ),
       );
       return;
     }
 
     if (widget.character.intelligence < minIntel) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Kecerdasan Kurang 🧠'),
-          content: Text('Kamu membutuhkan Kecerdasan minimal $minIntel untuk mengelola $businessType. Tingkatkan dulu Kecerdasanmu!'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        title: 'Kecerdasan Kurang 🧠',
+        content: Text(
+          'Kamu membutuhkan Kecerdasan minimal $minIntel untuk mengelola $businessType. Tingkatkan dulu Kecerdasanmu!',
+          style: const TextStyle(fontSize: 14),
         ),
       );
       return;
     }
 
     if (widget.character.health < minHealth) {
-      showDialog(
+      DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Kesehatan Kurang 💪'),
-          content: Text('Kamu membutuhkan Kesehatan minimal $minHealth untuk menjalankan $businessType. Istirahat dan berolahragalah!'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+        title: 'Kesehatan Kurang 💪',
+        content: Text(
+          'Kamu membutuhkan Kesehatan minimal $minHealth untuk menjalankan $businessType. Istirahat dan berolahragalah!',
+          style: const TextStyle(fontSize: 14),
         ),
       );
       return;
@@ -193,7 +194,7 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
             return AlertDialog(
               insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              title: Text('Mulai $businessType 💼', style: const TextStyle(fontWeight: FontWeight.bold)),
+              title: Text('Mulai $businessType 💼', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               content: SizedBox(
                 width: double.infinity,
                 child: SingleChildScrollView(
@@ -298,29 +299,42 @@ class _BuatUsahaMenuPageState extends State<BuatUsahaMenuPage> {
                     widget.onRefresh();
 
                     final pageContext = context;
+                    final String customName = nameController.text.trim();
+                    final String displayName = (customName.isEmpty || customName.toLowerCase() == businessType.toLowerCase())
+                        ? businessType
+                        : '$customName ($businessType)';
 
-                    showDialog(
+                    DialogHelper.show(
                       context: pageContext,
-                      builder: (successDialogCtx) => AlertDialog(
-                        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                        title: const Text('Usaha Berhasil Didirikan! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
-                        content: Text(
-                          'Selamat! $businessType ("${nameController.text}") di $selectedLocation telah resmi menjadi bisnismu.\n\nKeuntungan sekitar ${_formatCurrency(annualProfitVal)}/tahun akan masuk ke saldo keuangannmu setiap bertambah usia!',
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(successDialogCtx);
-                              widget.onRefresh();
-                              if (mounted) {
-                                Navigator.of(pageContext).popUntil((route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst);
-                              }
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
+                      title: 'Usaha Berhasil Didirikan! 🎉',
+                      content: Text(
+                        'Selamat! $displayName di $selectedLocation telah resmi menjadi bisnismu.\n\nKeuntungan sekitar ${_formatCurrency(annualProfitVal)}/tahun akan masuk ke saldo keuanganmu setiap bertambah usia!',
+                        style: const TextStyle(fontSize: 14, height: 1.4),
                       ),
+                      actions: [
+                        ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue.shade700,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                          ),
+                          onPressed: () {
+                            Navigator.of(pageContext, rootNavigator: true).pop();
+                          },
+                          child: const Text('OK', style: TextStyle(fontWeight: FontWeight.bold)),
+                        ),
+                      ],
+                      onClose: () {
+                        widget.onRefresh();
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          if (mounted) {
+                            Navigator.of(pageContext).popUntil(
+                              (route) => route.settings.name == 'KerjaMenuScreen' || route.isFirst,
+                            );
+                          }
+                        });
+                      },
                     );
                   },
                   child: const Text('Bayar & Mulai Usaha'),

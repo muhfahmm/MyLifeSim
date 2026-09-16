@@ -95,6 +95,9 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
 
   Widget _buildUserCard(bool isDark, String userAvatarUrl) {
     String userRole = widget.character.jobName ?? 'Aktor';
+    if (userRole.contains('(')) {
+      userRole = userRole.split('(').first.trim();
+    }
     if (userRole.startsWith('Aktor Film:')) {
       userRole = userRole.replaceAll('Aktor Film:', '').trim();
     }
@@ -111,51 +114,57 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
         ),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         leading: AvatarImageCache.buildAvatar(
           url: userAvatarUrl,
           width: 40,
           height: 40,
           gender: widget.character.gender,
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                widget.character.name,
-                style: TextStyle(
-                  fontSize: 13.5,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 6),
-            _buildRoleBadge(userRole),
-            const SizedBox(width: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-              decoration: BoxDecoration(
-                color: Colors.purple.shade700,
-                borderRadius: BorderRadius.circular(6),
-              ),
-              child: const Text(
-                'Kamu',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ],
-        ),
-        subtitle: Text(
-          'Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
+        title: Text(
+          widget.character.name,
           style: TextStyle(
-            fontSize: 11,
-            color: isDark ? Colors.white70 : Colors.black54,
+            fontSize: 14,
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildRoleBadge(userRole),
+                  const SizedBox(width: 4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: Colors.purple.shade700,
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: const Text(
+                      'Kamu',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Umur: ${widget.character.age} tahun • Kinerja: Maksimal',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -187,35 +196,36 @@ class _RekanArtisPageState extends State<RekanArtisPage> {
       ),
       color: isDark ? Colors.grey.shade800 : Colors.white,
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
         leading: AvatarImageCache.buildAvatar(
           url: avatarUrl,
           width: 40,
           height: 40,
           gender: gender,
         ),
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                name,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 13.5,
-                  color: isDark ? Colors.white : Colors.black87,
-                ),
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-            const SizedBox(width: 6),
-            _buildRoleBadge(role),
-          ],
-        ),
-        subtitle: Text(
-          'Umur: $age tahun • Hubungan: $rel% • Kecerdasan: $intel%',
+        title: Text(
+          name,
           style: TextStyle(
-            fontSize: 11,
-            color: isDark ? Colors.white70 : Colors.black54,
+            fontWeight: FontWeight.bold,
+            fontSize: 14,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
+        subtitle: Padding(
+          padding: const EdgeInsets.only(top: 4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildRoleBadge(role),
+              const SizedBox(height: 4),
+              Text(
+                'Umur: $age tahun • Hubungan: $rel% • Kecerdasan: $intel%',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: isDark ? Colors.white70 : Colors.black54,
+                ),
+              ),
+            ],
           ),
         ),
         trailing: Icon(
