@@ -278,35 +278,50 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
     final int currentAge = character.age;
     final int targetAge = _selectedAge;
     final int yearsSkipped = targetAge - currentAge;
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     DialogHelper.show(
       context: context,
       title: 'Konfirmasi Lompat Usia ⏩',
-      isNotification: false,
+      isNotification: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Apakah kamu yakin ingin melompati usia karakter dari $currentAge tahun menjadi $targetAge tahun (+$yearsSkipped tahun)?',
-            style: const TextStyle(fontSize: 14, height: 1.4),
-          ),
-          const SizedBox(height: 12),
-          Container(
-            padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(
-              color: Colors.purple.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.purple.withValues(alpha: 0.3)),
+            style: TextStyle(
+              fontSize: 14,
+              height: 1.4,
+              color: isDark ? Colors.white70 : Colors.black87,
             ),
-            child: const Row(
+          ),
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            decoration: BoxDecoration(
+              color: isDark ? Colors.purple.shade900.withValues(alpha: 0.3) : Colors.purple.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: isDark ? Colors.purple.shade700 : Colors.purple.shade200,
+              ),
+            ),
+            child: Row(
               children: [
-                Icon(Icons.info_outline, color: Colors.purple, size: 20),
-                SizedBox(width: 8),
+                Icon(
+                  Icons.info_outline_rounded,
+                  color: isDark ? Colors.purple.shade300 : Colors.purple.shade700,
+                  size: 20,
+                ),
+                const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     'Seluruh keluarga, pasangan, dan teman akan ikut bertambah usia secara otomatis.',
-                    style: TextStyle(fontSize: 11, color: Colors.purple),
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark ? Colors.purple.shade200 : Colors.purple.shade900,
+                      height: 1.3,
+                    ),
                   ),
                 ),
               ],
@@ -315,56 +330,87 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
         ],
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Batal'),
-        ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.purple,
-            foregroundColor: Colors.white,
-          ),
-          onPressed: () {
-            Navigator.pop(context); // Tutup konfirmasi dialog
-            
-            final res = SkipUsiaLogic.performSkipUsia(character, targetAge);
-            final bool success = res['success'] == true;
-            final String message = (res['message'] ?? '').toString();
-            final List<String> skippedEvents = List<String>.from(res['skippedEvents'] ?? []);
-            final bool isDeceased = !character.isAlive;
-
-            if (success) {
-              final int newAge = character.age;
-              setState(() {
-                _selectedAge = (newAge + 1).clamp(newAge + 1, 100);
-              });
-              widget.onAgeChanged?.call();
-            }
-
-            DialogHelper.show(
-              context: context,
-              title: isDeceased ? 'Karakter Meninggal 💀' : (success ? 'Lompat Usia Berhasil ⏩' : 'Gagal'),
-              content: Text(message),
-              actions: [
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Tutup dialog hasil
-                    if (skippedEvents.isNotEmpty && context.mounted) {
-                      _showSkippedEventsDialog(context, skippedEvents, onDismiss: () {
-                        if (isDeceased && context.mounted) {
-                          Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
-                        }
-                      });
-                    } else if (isDeceased && context.mounted) {
-                      Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
-                    }
-                  },
-                  child: const Text('OK'),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: isDark ? Colors.white70 : Colors.grey.shade800,
+                  side: BorderSide(
+                    color: isDark ? Colors.grey.shade700 : Colors.grey.shade400,
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ],
-            );
-          },
-          child: const Text('Lompat Usia'),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Batal',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF9C27B0),
+                  foregroundColor: Colors.white,
+                  elevation: 2,
+                  padding: const EdgeInsets.symmetric(vertical: 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Tutup konfirmasi dialog
+                  
+                  final res = SkipUsiaLogic.performSkipUsia(character, targetAge);
+                  final bool success = res['success'] == true;
+                  final String message = (res['message'] ?? '').toString();
+                  final List<String> skippedEvents = List<String>.from(res['skippedEvents'] ?? []);
+                  final bool isDeceased = !character.isAlive;
+
+                  if (success) {
+                    final int newAge = character.age;
+                    setState(() {
+                      _selectedAge = (newAge + 1).clamp(newAge + 1, 100);
+                    });
+                    widget.onAgeChanged?.call();
+                  }
+
+                  DialogHelper.show(
+                    context: context,
+                    title: isDeceased ? 'Karakter Meninggal 💀' : (success ? 'Lompat Usia Berhasil ⏩' : 'Gagal'),
+                    content: Text(message),
+                    actions: [
+                      ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // Tutup dialog hasil
+                          if (skippedEvents.isNotEmpty && context.mounted) {
+                            _showSkippedEventsDialog(context, skippedEvents, onDismiss: () {
+                              if (isDeceased && context.mounted) {
+                                Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
+                              }
+                            });
+                          } else if (isDeceased && context.mounted) {
+                            Navigator.pop(context); // Tutup SkipUsiaPage agar kembali ke layar utama
+                          }
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                },
+                icon: const Icon(Icons.fast_forward_rounded, size: 18),
+                label: const Text(
+                  'Lompat Usia',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

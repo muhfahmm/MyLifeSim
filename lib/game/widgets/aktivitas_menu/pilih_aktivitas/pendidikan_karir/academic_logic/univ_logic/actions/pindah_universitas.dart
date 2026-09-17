@@ -69,7 +69,7 @@ class PindahUnivActionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pindah Universitas'),
+        title: const Text('Pindah Universitas', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),

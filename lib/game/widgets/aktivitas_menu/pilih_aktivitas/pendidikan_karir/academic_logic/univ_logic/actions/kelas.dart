@@ -44,7 +44,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Rekan Mahasiswa (Kelas)'),
+        title: const Text('Rekan Mahasiswa (Kelas)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),

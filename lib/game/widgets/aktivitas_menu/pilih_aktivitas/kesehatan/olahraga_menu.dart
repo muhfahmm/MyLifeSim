@@ -2,6 +2,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class OlahragaMenuHelper {
   static void showOlahragaMenu(BuildContext context, Character character, VoidCallback onComplete) {
@@ -87,7 +88,7 @@ class _OlahragaPageState extends State<OlahragaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pilih Jenis Olahraga'),
+        title: const Text('Pilih Jenis Olahraga', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
       ),
@@ -121,7 +122,7 @@ class _OlahragaPageState extends State<OlahragaPage> {
                 o['name'],
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 13,
+                  fontSize: 15,
                   color: isDark ? Colors.white : Colors.black87,
                 ),
               ),
@@ -164,35 +165,21 @@ class _OlahragaPageState extends State<OlahragaPage> {
 
     character.inbox.add(resultMsg);
 
-    // Tampilkan dialog hasil
-    showDialog(
+    // Tampilkan dialog hasil menggunakan DialogHelper
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(
-          children: [
-            Icon(
-              cedera ? Icons.warning : Icons.check_circle,
-              color: cedera ? Colors.orange : Colors.green,
-            ),
-            const SizedBox(width: 8),
-            Text(
-              cedera ? 'Cedera!' : 'Olahraga Selesai',
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
-          ],
+      title: cedera ? 'Cedera! ⚠️' : 'Olahraga Selesai',
+      isNotification: true,
+      content: Text(resultMsg),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+            widget.onComplete();
+          },
+          child: const Text('OK'),
         ),
-        content: Text(resultMsg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx); // tutup dialog hasil saja
-              widget.onComplete(); // panggil callback untuk refresh
-              // JANGAN panggil Navigator.pop(context) di sini agar tetap di halaman
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      ],
     );
   }
 }

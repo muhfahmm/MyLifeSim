@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'database_part_time.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class PartTimeMenuPage extends StatefulWidget {
   final Character character;
@@ -96,148 +97,116 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
 
     widget.onRefresh();
 
-    showDialog(
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: const Color(0xFF1E1E2C),
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: (job['color'] as Color).withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: (job['color'] as Color).withValues(alpha: 0.4), width: 2),
-                ),
-                child: Icon(job['icon'] as IconData, color: job['color'] as Color, size: 36),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Diterima Bekerja! 🎉',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 13, color: Colors.white70, height: 1.4),
-                  children: [
-                    const TextSpan(text: 'Selamat! Kamu resmi diterima sebagai '),
-                    TextSpan(text: '"${job['title']}"', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                    const TextSpan(text: ' secara Part-Time dengan tambahan penghasilan '),
-                    TextSpan(text: '${CurrencySettings.format(salary)}/tahun', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.tealAccent)),
-                    const TextSpan(text: '.'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal.shade600,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                    elevation: 0,
-                  ),
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Mulai Bekerja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
-                ),
-              ),
-            ],
+      title: 'Diterima Bekerja! 🎉',
+      isNotification: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: (job['color'] as Color).withValues(alpha: 0.2),
+              shape: BoxShape.circle,
+              border: Border.all(color: (job['color'] as Color).withValues(alpha: 0.4), width: 2),
+            ),
+            child: Icon(job['icon'] as IconData, color: job['color'] as Color, size: 36),
           ),
-        ),
+          const SizedBox(height: 12),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? Colors.white70 : Colors.black87,
+                height: 1.4,
+              ),
+              children: [
+                const TextSpan(text: 'Selamat! Kamu resmi diterima sebagai '),
+                TextSpan(text: '"${job['title']}"', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                const TextSpan(text: ' secara Part-Time dengan tambahan penghasilan '),
+                TextSpan(text: '${CurrencySettings.format(salary)}/tahun', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.tealAccent : Colors.teal.shade700)),
+                const TextSpan(text: '.'),
+              ],
+            ),
+          ),
+        ],
       ),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.teal.shade600,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Mulai Bekerja', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
   void _quitPartTimeJob() {
-    showDialog(
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        backgroundColor: const Color(0xFF1E1E2C),
-        child: Padding(
-          padding: const EdgeInsets.all(22),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.red.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 2),
-                ),
-                child: const Icon(Icons.exit_to_app_rounded, color: Colors.redAccent, size: 36),
-              ),
-              const SizedBox(height: 16),
-              const Text(
-                'Berhenti Kerja Part-Time',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.white),
-              ),
-              const SizedBox(height: 10),
-              RichText(
-                textAlign: TextAlign.center,
-                text: TextSpan(
-                  style: const TextStyle(fontSize: 13, color: Colors.white70, height: 1.4),
-                  children: [
-                    const TextSpan(text: 'Apakah kamu yakin ingin berhenti dari pekerjaan part-time '),
-                    TextSpan(text: '"${widget.character.partTimeJobName}"', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-                    const TextSpan(text: '?'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white70,
-                        side: const BorderSide(color: Colors.white24),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                      ),
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Batal', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red.shade600,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
-                        elevation: 0,
-                      ),
-                      onPressed: () {
-                        Navigator.pop(ctx);
-                        setState(() {
-                          widget.character.inbox.add('⏱️ Kamu berhenti dari pekerjaan part-time "${widget.character.partTimeJobName}".');
-                          widget.character.partTimeJobName = null;
-                          widget.character.partTimeJobSalary = null;
-                        });
-                        widget.onRefresh();
-                      },
-                      child: const Text('Berhenti', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      title: 'Berhenti Kerja Part-Time 🚪',
+      isNotification: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.red.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.red.withValues(alpha: 0.3), width: 2),
+            ),
+            child: const Icon(Icons.exit_to_app_rounded, color: Colors.redAccent, size: 36),
           ),
-        ),
+          const SizedBox(height: 12),
+          RichText(
+            textAlign: TextAlign.center,
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark ? Colors.white70 : Colors.black87,
+                height: 1.4,
+              ),
+              children: [
+                const TextSpan(text: 'Apakah kamu yakin ingin berhenti dari pekerjaan part-time '),
+                TextSpan(text: '"${widget.character.partTimeJobName}"', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                const TextSpan(text: '?'),
+              ],
+            ),
+          ),
+        ],
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.red.shade600,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () {
+            Navigator.pop(context);
+            setState(() {
+              widget.character.inbox.add('⏱️ Kamu berhenti dari pekerjaan part-time "${widget.character.partTimeJobName}".');
+              widget.character.partTimeJobName = null;
+              widget.character.partTimeJobSalary = null;
+            });
+            widget.onRefresh();
+          },
+          child: const Text('Berhenti', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
@@ -250,7 +219,7 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pekerjaan Part-Time ⏱️', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Pekerjaan Part-Time ⏱️', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -360,7 +329,7 @@ class _PartTimeMenuPageState extends State<PartTimeMenuPage> {
                             Text(
                               job['title'],
                               style: TextStyle(
-                                fontSize: isMobile ? 13 : 15,
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? Colors.white : Colors.black87,
                               ),

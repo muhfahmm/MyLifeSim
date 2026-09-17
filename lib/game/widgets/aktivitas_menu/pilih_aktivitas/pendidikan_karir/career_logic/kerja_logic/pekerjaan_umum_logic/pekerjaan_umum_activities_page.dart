@@ -328,7 +328,7 @@ class _PekerjaanUmumActivitiesPageState extends State<PekerjaanUmumActivitiesPag
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Karir Pekerjaan Umum 💼', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: const Text('Karir Pekerjaan Umum 💼', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.teal.shade700,
         foregroundColor: Colors.white,
         elevation: 0,

@@ -167,7 +167,7 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(schoolType + typeSuffix),
+        title: Text(schoolType + typeSuffix, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: themeColor,
         foregroundColor: Colors.white,
       ),
@@ -305,7 +305,7 @@ class _SchoolMenuPageState extends State<SchoolMenuPage> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
         leading: Icon(icon, color: color, size: 28),
-        title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
+        title: Text(title, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         subtitle: Text(subtitle, style: const TextStyle(fontSize: 12)),
         trailing: const Icon(Icons.chevron_right, color: Colors.grey),
         onTap: () async {

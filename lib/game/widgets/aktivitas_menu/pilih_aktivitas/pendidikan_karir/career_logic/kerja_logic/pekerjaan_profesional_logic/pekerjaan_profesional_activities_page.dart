@@ -341,7 +341,7 @@ class _PekerjaanProfesionalActivitiesPageState extends State<PekerjaanProfesiona
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Karir Pekerjaan Profesional 💎', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+        title: const Text('Karir Pekerjaan Profesional 💎', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.indigo.shade800,
         foregroundColor: Colors.white,
         elevation: 0,

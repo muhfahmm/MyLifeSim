@@ -18,6 +18,7 @@ import 'country_education_rules.dart';
 import 'package:mylifesim/utils/country_helper.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/lisensi/lisensi_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 // ============================================================================
 // HALAMAN PILIH JURUSAN (tanpa emoji, pakai ikon)
@@ -1470,7 +1471,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
       if (level == 'Complete') {
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Universitas (Kuliah) 🎓'),
+            title: const Text('Universitas (Kuliah) 🎓', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             backgroundColor: Colors.indigo,
             foregroundColor: Colors.white,
           ),
@@ -1519,7 +1520,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
       }
       return Scaffold(
         appBar: AppBar(
-          title: Text('Daftar Kuliah ($level) 🎓'),
+          title: Text('Daftar Kuliah ($level) 🎓', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.indigo,
           foregroundColor: Colors.white,
         ),
@@ -1597,7 +1598,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
     const Color themeColor = Colors.indigo;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Universitas (Kuliah) 🎓'),
+        title: const Text('Universitas (Kuliah) 🎓', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: themeColor,
         foregroundColor: Colors.white,
       ),
@@ -1683,7 +1684,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
             Text(
               'Aktivitas Perkuliahan',
               style: TextStyle(
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
                 color: isDark ? Colors.white70 : Colors.blueGrey,
               ),
@@ -1756,41 +1757,28 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showBolosDialog(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
+    DialogHelper.show(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          'Rencana Bolos Kuliah 🏃‍♂️',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        content: Text(
-          'Apakah kamu yakin ingin membolos kuliah hari ini? '
-          'Tindakan ini berisiko ketahuan dosen dan merusak reputasi absensimu.',
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Batal',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _executeBolosKelas(context);
-            },
-            child: const Text('Bolos Kuliah', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+      title: 'Rencana Bolos Kuliah 🏃‍♂️',
+      isNotification: true,
+      content: const Text(
+        'Apakah kamu yakin ingin membolos kuliah hari ini? '
+        'Tindakan ini berisiko ketahuan dosen dan merusak reputasi absensimu.',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () {
+            Navigator.pop(context);
+            _executeBolosKelas(context);
+          },
+          child: const Text('Bolos Kuliah', style: TextStyle(color: Colors.white)),
+        ),
+      ],
     );
   }
 
@@ -1821,41 +1809,28 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showKeluarDialog(BuildContext context) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
+    DialogHelper.show(
       context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(
-          'Peringatan Drop Out 🚪',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
-        ),
-        content: Text(
-          'Meninggalkan perkuliahan secara sepihak berarti merelakan gelar akademikmu dan menutup peluang kerja profesional berstandar ijazah sarjana. '
-          'Apakah kamu yakin ingin drop out kuliah sekarang?',
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext),
-            child: Text(
-              'Batal',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.grey),
-            ),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              _executeKeluarUniv(context);
-            },
-            child: const Text('Drop Out Sekarang', style: TextStyle(color: Colors.white)),
-          ),
-        ],
+      title: 'Peringatan Drop Out 🚪',
+      isNotification: true,
+      content: const Text(
+        'Meninggalkan perkuliahan secara sepihak berarti merelakan gelar akademikmu dan menutup peluang kerja profesional berstandar ijazah sarjana. '
+        'Apakah kamu yakin ingin drop out kuliah sekarang?',
       ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+          onPressed: () {
+            Navigator.pop(context);
+            _executeKeluarUniv(context);
+          },
+          child: const Text('Drop Out Sekarang', style: TextStyle(color: Colors.white)),
+        ),
+      ],
     );
   }
 
@@ -1880,31 +1855,17 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
   }
 
   void _showOutcomeDialog(BuildContext context, String title, String content) {
-    final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (c) => AlertDialog(
-        title: Text(
-          title,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            color: isDark ? Colors.white : Colors.black87,
-          ),
+      title: title,
+      isNotification: true,
+      content: Text(content),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('OK'),
         ),
-        content: Text(
-          content,
-          style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(c),
-            child: Text(
-              'OK',
-              style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
-            ),
-          ),
-        ],
-      ),
+      ],
     );
   }
 
@@ -1952,6 +1913,7 @@ class _UnivMenuPageState extends State<UnivMenuPage> {
         title: Text(
           title,
           style: TextStyle(
+            fontSize: 14,
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : Colors.black87,
           ),

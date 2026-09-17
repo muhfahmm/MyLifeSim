@@ -25,39 +25,52 @@ class StorePage extends StatefulWidget {
     this.onPurchaseCompleted,
   });
 
-  static bool get isGodModeUnlocked => _StorePageState._godModeUnlocked;
-  static set isGodModeUnlocked(bool value) => _StorePageState._godModeUnlocked = value;
+  static bool get isGodModeUnlocked => GlobalSettings.isGodModeUnlocked.value;
+  static set isGodModeUnlocked(bool value) => GlobalSettings.isGodModeUnlocked.value = value;
 
-  static bool get isImmunityUnlocked => _StorePageState._immunityUnlocked;
-  static set isImmunityUnlocked(bool value) => _StorePageState._immunityUnlocked = value;
+  static bool get isRemoveAdsUnlocked => GlobalSettings.isRemoveAdsUnlocked.value;
+  static set isRemoveAdsUnlocked(bool value) => GlobalSettings.isRemoveAdsUnlocked.value = value;
 
-  static bool get isSpecialCareerUnlocked => _StorePageState._specialCareerUnlocked;
-  static set isSpecialCareerUnlocked(bool value) => _StorePageState._specialCareerUnlocked = value;
+  static bool get isPremiumUnlocked => GlobalSettings.isPremium.value;
+  static set isPremiumUnlocked(bool value) => GlobalSettings.isPremium.value = value;
 
-  static bool get isSkipUsiaUnlocked => _StorePageState._skipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value;
-  static set isSkipUsiaUnlocked(bool value) {
-    _StorePageState._skipUsiaUnlocked = value;
-    GlobalSettings.isSkipUsiaUnlocked.value = value;
-  }
+  static bool get isImmunityUnlocked => GlobalSettings.isImmunityUnlocked.value;
+  static set isImmunityUnlocked(bool value) => GlobalSettings.isImmunityUnlocked.value = value;
 
-  static bool get isMataSehatUnlocked => _StorePageState._mataSehatUnlocked || GlobalSettings.isMataSehatUnlocked.value;
-  static set isMataSehatUnlocked(bool value) {
-    _StorePageState._mataSehatUnlocked = value;
-    GlobalSettings.isMataSehatUnlocked.value = value;
-  }
+  static bool get isSpecialCareerUnlocked => GlobalSettings.isSpecialCareerUnlocked.value;
+  static set isSpecialCareerUnlocked(bool value) => GlobalSettings.isSpecialCareerUnlocked.value = value;
+
+  static bool get isSkipUsiaUnlocked => GlobalSettings.isSkipUsiaUnlocked.value;
+  static set isSkipUsiaUnlocked(bool value) => GlobalSettings.isSkipUsiaUnlocked.value = value;
+
+  static bool get isMataSehatUnlocked => GlobalSettings.isMataSehatUnlocked.value;
+  static set isMataSehatUnlocked(bool value) => GlobalSettings.isMataSehatUnlocked.value = value;
 
   @override
   State<StorePage> createState() => _StorePageState();
 }
 
 class _StorePageState extends State<StorePage> {
-  static bool _godModeUnlocked = false;
-  static bool _removeAdsUnlocked = false;
-  static bool _premiumUnlocked = false;
-  static bool _immunityUnlocked = false;
-  static bool _specialCareerUnlocked = false;
-  static bool _skipUsiaUnlocked = false;
-  static bool _mataSehatUnlocked = false;
+  static bool get _godModeUnlocked => GlobalSettings.isGodModeUnlocked.value;
+  static set _godModeUnlocked(bool value) => GlobalSettings.isGodModeUnlocked.value = value;
+
+  static bool get _removeAdsUnlocked => GlobalSettings.isRemoveAdsUnlocked.value;
+  static set _removeAdsUnlocked(bool value) => GlobalSettings.isRemoveAdsUnlocked.value = value;
+
+  static bool get _premiumUnlocked => GlobalSettings.isPremium.value;
+  static set _premiumUnlocked(bool value) => GlobalSettings.isPremium.value = value;
+
+  static bool get _immunityUnlocked => GlobalSettings.isImmunityUnlocked.value;
+  static set _immunityUnlocked(bool value) => GlobalSettings.isImmunityUnlocked.value = value;
+
+  static bool get _specialCareerUnlocked => GlobalSettings.isSpecialCareerUnlocked.value;
+  static set _specialCareerUnlocked(bool value) => GlobalSettings.isSpecialCareerUnlocked.value = value;
+
+  static bool get _skipUsiaUnlocked => GlobalSettings.isSkipUsiaUnlocked.value;
+  static set _skipUsiaUnlocked(bool value) => GlobalSettings.isSkipUsiaUnlocked.value = value;
+
+  static bool get _mataSehatUnlocked => GlobalSettings.isMataSehatUnlocked.value;
+  static set _mataSehatUnlocked(bool value) => GlobalSettings.isMataSehatUnlocked.value = value;
 
   void _showNoCharacterMessage() {
     DialogHelper.show(

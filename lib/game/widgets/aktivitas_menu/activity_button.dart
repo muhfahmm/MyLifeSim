@@ -122,7 +122,7 @@ class ActivityButton extends StatelessWidget {
                       'Pendidikan & Karir',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                        fontSize: 18,
                         color: textColor?.withValues(alpha: 0.6),
                       ),
                     );

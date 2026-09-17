@@ -335,7 +335,7 @@ class _PekerjaanProfesionalMenuScreenState extends State<PekerjaanProfesionalMen
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pekerjaan Profesional 🎓'),
+        title: const Text('Pekerjaan Profesional 🎓', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.indigo.shade700,
       ),
       body: Column(

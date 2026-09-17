@@ -57,7 +57,7 @@ class _GuruActionPageState extends State<GuruActionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Guru & Staf Sekolah'),
+        title: const Text('Guru & Staf Sekolah', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.teal,
         foregroundColor: Colors.white,
       ),

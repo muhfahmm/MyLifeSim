@@ -67,7 +67,7 @@ class PindahSekolahActionPage extends StatelessWidget {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pindah Sekolah'),
+        title: const Text('Pindah Sekolah', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueAccent,
         foregroundColor: Colors.white,
       ),
@@ -117,7 +117,7 @@ class PindahSekolahActionPage extends StatelessWidget {
               label: const Flexible(
                 child: Text(
                   'Pindah ke Sekolah Negeri (Gratis)',
-                  style: TextStyle(color: Colors.white, fontSize: 14.5, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

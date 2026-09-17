@@ -39,7 +39,7 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Karir Spesial 🌟', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Pekerjaan Karir Spesial ⭐', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -465,7 +465,7 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
                           child: Text(
                             title,
                             style: TextStyle(
-                              fontSize: 15,
+                              fontSize: 14,
                               fontWeight: FontWeight.bold,
                               color: isUnlocked ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade600,
                             ),

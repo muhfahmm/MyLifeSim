@@ -164,7 +164,7 @@ class _PekerjaanUmumMenuScreenState extends State<PekerjaanUmumMenuScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pekerjaan Umum 💼'),
+        title: const Text('Pekerjaan Umum 💼', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green.shade700,
       ),
       body: Column(

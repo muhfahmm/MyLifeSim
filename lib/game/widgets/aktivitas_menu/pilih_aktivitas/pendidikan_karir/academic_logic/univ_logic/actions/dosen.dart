@@ -43,7 +43,7 @@ class _DosenActionPageState extends State<DosenActionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Dosen Pengajar (Dosen)'),
+        title: const Text('Dosen Pengajar (Dosen)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
       ),

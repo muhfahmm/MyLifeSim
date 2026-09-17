@@ -71,7 +71,7 @@ class DialogHelper {
                         child: Text(
                           title,
                           style: TextStyle(
-                            fontSize: 16, 
+                            fontSize: 18, 
                             fontWeight: FontWeight.bold,
                             color: isDark ? Colors.white : Colors.black87,
                             height: 1.2,

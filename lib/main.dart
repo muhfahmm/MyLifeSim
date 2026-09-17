@@ -4,6 +4,7 @@ import 'package:mylifesim/pilih_gender/gender.dart';
 import 'package:mylifesim/intro_animation.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 
 // Global theme mode notifier
 final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
@@ -22,6 +23,8 @@ final ThemeData _darkTheme = ThemeData(
 );
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  GlobalSettings.initSessionStorage();
   runApp(const MyApp());
 }
 

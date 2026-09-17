@@ -645,7 +645,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Pekerjaan & Karir 💼'),
+          title: const Text('Pekerjaan & Karir 💼', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.green.shade700,
         ),
         body: ListView(
@@ -771,7 +771,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pekerjaan & Karir 💼'),
+        title: const Text('Pekerjaan & Karir 💼', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.green.shade700,
       ),
       body: ListView(
@@ -782,7 +782,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           Text(
             'Lowongan Pekerjaan Tersedia',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: 18,
               fontWeight: FontWeight.bold,
               color: isDark ? Colors.white70 : Colors.blueGrey,
             ),
@@ -878,7 +878,7 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
           title,
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: isMobile ? 13 : 15,
+            fontSize: isMobile ? 14 : 15,
             color: isUnlocked ? (isDark ? Colors.white : Colors.black87) : Colors.grey.shade600,
           ),
         ),

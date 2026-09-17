@@ -65,7 +65,7 @@ class _KelasActionPageState extends State<KelasActionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Teman Sekelas (Kelas)'),
+        title: const Text('Teman Sekelas (Kelas)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueAccent,
         foregroundColor: Colors.white,
       ),

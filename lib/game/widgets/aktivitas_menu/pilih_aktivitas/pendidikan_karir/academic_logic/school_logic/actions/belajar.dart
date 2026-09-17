@@ -59,7 +59,7 @@ class _BelajarActionPageState extends State<BelajarActionPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Belajar Lebih Giat'),
+        title: const Text('Belajar Lebih Giat', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.indigo,
         foregroundColor: Colors.white,
       ),
