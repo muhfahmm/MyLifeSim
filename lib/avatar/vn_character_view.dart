@@ -16,6 +16,7 @@ class VNCharacterView extends StatelessWidget {
   final VNEmotionType emotion;
   final VNOutfitType outfit;
   final String? customAvatarUrl;
+  final bool showNameTag;
 
   const VNCharacterView({
     super.key,
@@ -27,6 +28,7 @@ class VNCharacterView extends StatelessWidget {
     this.emotion = VNEmotionType.neutral,
     this.outfit = VNOutfitType.casual,
     this.customAvatarUrl,
+    this.showNameTag = true,
   });
 
   @override
@@ -72,6 +74,10 @@ class VNCharacterView extends StatelessWidget {
     final isMale = character.gender.toLowerCase() == 'laki-laki' ||
         character.gender.toLowerCase() == 'male';
 
+    final String displayName = (customName != null && customName!.isNotEmpty)
+        ? customName!
+        : character.name;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
       curve: Curves.easeOutBack,
@@ -88,43 +94,81 @@ class VNCharacterView extends StatelessWidget {
         child: AnimatedOpacity(
           duration: const Duration(milliseconds: 300),
           opacity: isActiveSpeaker ? 1.0 : 0.88,
-          child: Stack(
-            alignment: Alignment.center,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Avatar Utama (DiceBear murni tanpa background box / badge)
-              SizedBox(
-                width: width,
-                height: height,
-                child: Image(
-                  image: AvatarImageCache.getImageProvider(avatarUrl),
-                  fit: BoxFit.contain,
-                  loadingBuilder: (context, child, loadingProgress) {
-                    if (loadingProgress == null) return child;
-                    return const Center(
-                      child: SizedBox(
-                        width: 24,
-                        height: 24,
-                        child: CircularProgressIndicator(strokeWidth: 2),
+              if (showNameTag && displayName.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  margin: const EdgeInsets.only(bottom: 4),
+                  constraints: BoxConstraints(maxWidth: width),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: isActiveSpeaker ? Colors.amber : Colors.white24,
+                      width: isActiveSpeaker ? 1.4 : 0.8,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black45,
+                        blurRadius: 4,
+                        offset: Offset(0, 2),
                       ),
-                    );
-                  },
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(
-                      isMale ? Icons.face : Icons.face_3,
-                      size: width * 0.5,
-                      color: isMale ? Colors.blue : Colors.pink,
-                    );
-                  },
+                    ],
+                  ),
+                  child: Text(
+                    displayName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: isActiveSpeaker ? Colors.amber : Colors.white,
+                      fontSize: width < 140 ? 10 : 11.5,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    // Avatar Utama (DiceBear murni tanpa background box / badge)
+                    SizedBox(
+                      width: width,
+                      child: Image(
+                        image: AvatarImageCache.getImageProvider(avatarUrl),
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(
+                            isMale ? Icons.face : Icons.face_3,
+                            size: width * 0.5,
+                            color: isMale ? Colors.blue : Colors.pink,
+                          );
+                        },
+                      ),
+                    ),
+
+                    // Emotion Reaction Icon Bubble (Jika Emosi Spesial)
+                    if (emotion != VNEmotionType.neutral)
+                      Positioned(
+                        top: 4,
+                        right: 8,
+                        child: _buildEmotionBubble(),
+                      ),
+                  ],
                 ),
               ),
-
-              // Emotion Reaction Icon Bubble (Jika Emosi Spesial)
-              if (emotion != VNEmotionType.neutral)
-                Positioned(
-                  top: 10,
-                  right: 15,
-                  child: _buildEmotionBubble(),
-                ),
             ],
           ),
         ),

@@ -277,9 +277,38 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
     if (success) {
       int caughtChance = 0;
       final String trLower = widget.targetRole.toLowerCase();
-      final bool isSpouse = trLower == 'istri' || trLower == 'suami' || trLower == 'pasangan';
+      final String tnLower = widget.targetName.toLowerCase();
 
-      if (!isSpouse) {
+      final bool isBloodFamily = trLower.contains('ayah') ||
+          trLower.contains('ibu') ||
+          trLower.contains('kakak') ||
+          trLower.contains('adik') ||
+          trLower.contains('paman') ||
+          trLower.contains('bibi') ||
+          trLower.contains('kakek') ||
+          trLower.contains('nenek') ||
+          trLower.contains('sepupu') ||
+          trLower.contains('anak') ||
+          trLower.contains('keponakan') ||
+          trLower.contains('keluarga') ||
+          trLower.contains('tiri') ||
+          trLower.contains('saudara') ||
+          trLower.contains('saudari') ||
+          tnLower.contains('ayah') ||
+          tnLower.contains('ibu') ||
+          tnLower.contains('kakak') ||
+          tnLower.contains('adik') ||
+          tnLower.contains('paman') ||
+          tnLower.contains('bibi') ||
+          tnLower.contains('kakek') ||
+          tnLower.contains('nenek') ||
+          tnLower.contains('sepupu') ||
+          tnLower.contains('anak') ||
+          tnLower.contains('keponakan');
+
+      // Risiko ketahuan HANYA berlaku jika berhubungan intim/masturbasi bersama dengan keluarga sedarah.
+      // Jika dengan pacar / pasangan (bukan keluarga sedarah), persentase ketahuan adalah 0!
+      if (isBloodFamily) {
         final String locLower = _chosenLocation.toLowerCase();
         final String tLower = _chosenTime.toLowerCase();
         final bool isOwnHouse = locLower.contains('rumah sendiri') ||

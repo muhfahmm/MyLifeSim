@@ -14,6 +14,8 @@ class VNDialogueOverlay extends StatefulWidget {
   final VoidCallback? onFinished;
   final String? playerAvatarUrl;
   final String? npcAvatarUrl;
+  final Map<String, dynamic>? secondNpc;
+  final String? secondNpcAvatarUrl;
   final String? customLocation;
   final String? finishButtonText;
 
@@ -25,6 +27,8 @@ class VNDialogueOverlay extends StatefulWidget {
     this.onFinished,
     this.playerAvatarUrl,
     this.npcAvatarUrl,
+    this.secondNpc,
+    this.secondNpcAvatarUrl,
     this.customLocation,
     this.finishButtonText,
   });
@@ -37,6 +41,8 @@ class VNDialogueOverlay extends StatefulWidget {
     VoidCallback? onFinished,
     String? playerAvatarUrl,
     String? npcAvatarUrl,
+    Map<String, dynamic>? secondNpc,
+    String? secondNpcAvatarUrl,
     String? customLocation,
     String? finishButtonText,
   }) {
@@ -54,6 +60,8 @@ class VNDialogueOverlay extends StatefulWidget {
           onFinished: onFinished,
           playerAvatarUrl: playerAvatarUrl,
           npcAvatarUrl: npcAvatarUrl ?? npc['avatarUrl']?.toString(),
+          secondNpc: secondNpc,
+          secondNpcAvatarUrl: secondNpcAvatarUrl ?? secondNpc?['avatarUrl']?.toString(),
           customLocation: customLocation,
           finishButtonText: finishButtonText,
         );
@@ -69,6 +77,8 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
   int _currentIndex = 0;
   bool _isAuto = false;
   bool _showActionMenu = false;
+  bool _isChoicePanelHidden = false;
+  bool _isNarrationHidden = false;
   Timer? _autoTimer;
   final List<VNLogItem> _historyLog = [];
 
@@ -110,6 +120,8 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       _currentIndex = index;
       _displayedText = '';
       _isTyping = true;
+      _isChoicePanelHidden = false;
+      _isNarrationHidden = false;
     });
 
     _startTypewriter(currentText);
@@ -123,7 +135,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
       if (charIndex < fullText.length) {
         if (mounted) {
           setState(() {
-            _displayedText += fullText[charIndex];
+            _displayedText = fullText.substring(0, charIndex + 1);
           });
         }
         charIndex++;
@@ -133,9 +145,6 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           setState(() {
             _isTyping = false;
           });
-          if (_isAuto) {
-            _scheduleAutoNext();
-          }
         }
       }
     });
@@ -225,7 +234,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
               ),
             ),
 
-          // 3. Character Standees (User & NPC Side by Side)
+          // 3. Character Standees (User & NPCs Side by Side)
           Positioned.fill(
             child: IgnorePointer(
               child: SafeArea(
@@ -243,21 +252,34 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                         emotion: (currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.playerAvatarUrl ?? AvatarAgeRules.getAgeBasedAvatarUrl(widget.player, happiness: widget.player.happiness),
-                        width: 170,
-                        height: 310,
+                        width: widget.secondNpc != null ? 115 : 170,
+                        height: widget.secondNpc != null ? 250 : 310,
                       ),
 
-                      // NPC Standee (Right)
+                      // NPC 1 Standee
                       VNCharacterView(
                         character: _createDummyNPCCharacter(widget.npc),
                         isActiveSpeaker: isNarratorNode ? false : !currentNode.isPlayerSpeaking,
-                        customName: widget.npc['name'] ?? 'NPC',
+                        customName: widget.npc['name'] ?? 'NPC 1',
                         emotion: (!currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.npcAvatarUrl ?? widget.npc['avatarUrl']?.toString(),
-                        width: 170,
-                        height: 310,
+                        width: widget.secondNpc != null ? 115 : 170,
+                        height: widget.secondNpc != null ? 250 : 310,
                       ),
+
+                      // NPC 2 Standee (Right - if secondNpc exists)
+                      if (widget.secondNpc != null)
+                        VNCharacterView(
+                          character: _createDummyNPCCharacter(widget.secondNpc!),
+                          isActiveSpeaker: isNarratorNode ? false : !currentNode.isPlayerSpeaking,
+                          customName: widget.secondNpc!['name'] ?? 'NPC 2',
+                          emotion: (!currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
+                          outfit: currentNode.outfit,
+                          customAvatarUrl: widget.secondNpcAvatarUrl ?? widget.secondNpc!['avatarUrl']?.toString(),
+                          width: 115,
+                          height: 250,
+                        ),
                     ],
                   ),
                 ),
@@ -265,25 +287,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
             ),
           ),
 
-          // 5. Panel Dropdown Aksi Persisten (Ciuman & Penetrasi) - TIDAK memblokir Selanjutnya
-          if (hasPersistentActions)
-            Positioned(
-              top: _showActionMenu ? 160 : 70,
-              left: 20,
-              right: 20,
-              child: _buildPersistentActionPanel(currentNode),
-            ),
-
-          // 5b. Choice Decision Card biasa (jika ada choices yang memblokir)
-          if (hasChoices)
-            Positioned(
-              top: _showActionMenu ? 160 : 70,
-              left: 20,
-              right: 20,
-              child: _buildChoiceCard(currentNode),
-            ),
-
-          // 6. Dialogue Box Bottom Component (Clickable to advance/finish dialogue)
+          // 5. Dialogue Box Bottom Component (Clickable to advance/finish dialogue)
           Positioned(
             bottom: 0,
             left: 0,
@@ -299,6 +303,70 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
               ),
             ),
           ),
+
+          // 6. Panel Dropdown Aksi Persisten (Ciuman & Penetrasi) - TIDAK memblokir Selanjutnya
+          if (hasPersistentActions)
+            Positioned(
+              top: _showActionMenu ? 160 : 70,
+              left: 20,
+              right: 20,
+              bottom: 220,
+              child: _buildPersistentActionPanel(currentNode),
+            ),
+
+          // 7. Choice Decision Card biasa (jika ada choices)
+          if (hasChoices)
+            Positioned(
+              top: _showActionMenu ? 160 : 70,
+              left: 16,
+              right: 16,
+              child: _isChoicePanelHidden
+                  ? Center(
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              _isChoicePanelHidden = false;
+                            });
+                          },
+                          borderRadius: BorderRadius.circular(20),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF1E1E2E).withValues(alpha: 0.96),
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(color: Colors.amber, width: 1.8),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black87,
+                                  blurRadius: 10,
+                                  spreadRadius: 1,
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.touch_app, color: Colors.amber, size: 16),
+                                const SizedBox(width: 6),
+                                Text(
+                                  '⚡ Tampilkan Menu Aksi Intim (${currentNode.choices?.length ?? 0}) 🔻',
+                                  style: const TextStyle(
+                                    color: Colors.amber,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 12,
+                                    letterSpacing: 0.5,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    )
+                  : _buildChoiceCard(currentNode),
+            ),
 
           // 4. Top Control Bar (Location & Close X on Top Row, Toggleable Action Buttons Below)
           Positioned(
@@ -634,24 +702,28 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Speaker Name Tag Banner & Tombol Selanjutnya
+          // Header Row: Sembunyikan/Tampilkan Narasi (Kiri) & Selanjutnya (Kanan)
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Flexible(
+              // Tombol Sembunyikan / Tampilkan Narasi
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isNarrationHidden = !_isNarrationHidden;
+                  });
+                },
+                borderRadius: BorderRadius.circular(10),
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                   decoration: BoxDecoration(
-                    color: style.badgeBgColor,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(
-                      color: style.badgeBorderColor,
-                      width: 1.2,
-                    ),
-                    boxShadow: [
+                    color: const Color(0xFF312E81),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.amber, width: 1.2),
+                    boxShadow: const [
                       BoxShadow(
-                        color: style.badgeBorderColor.withValues(alpha: 0.4),
-                        blurRadius: 6,
+                        color: Colors.black45,
+                        blurRadius: 4,
                       ),
                     ],
                   ),
@@ -659,30 +731,31 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        style.icon,
-                        size: 14,
-                        color: style.textColor,
+                        _isNarrationHidden ? Icons.visibility : Icons.visibility_off,
+                        size: 13,
+                        color: Colors.amber,
                       ),
-                      const SizedBox(width: 6),
-                      Flexible(
-                        child: Text(
-                          node.speakerName,
-                          style: TextStyle(
-                            color: style.textColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 13,
-                            letterSpacing: 0.4,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          maxLines: 1,
+                      const SizedBox(width: 4),
+                      Text(
+                        _isNarrationHidden ? 'Tampilkan Narasi' : 'Sembunyikan Narasi',
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
                         ),
+                      ),
+                      const SizedBox(width: 2),
+                      Icon(
+                        _isNarrationHidden ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                        size: 14,
+                        color: Colors.amber,
                       ),
                     ],
                   ),
                 ),
               ),
               const SizedBox(width: 8),
-              // Tombol Selanjutnya di samping Badge Narasi
+              // Tombol Selanjutnya
               InkWell(
                 onTap: _nextDialogue,
                 borderRadius: BorderRadius.circular(10),
@@ -718,66 +791,116 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
               ),
             ],
           ),
-          const SizedBox(height: 10),
-          // Typewriter Dialogue Text
-          Text(
-            _displayedText,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 15,
-              height: 1.4,
-              letterSpacing: 0.3,
-            ),
-          ),
-          const SizedBox(height: 8),
-          // Tombol Selesaikan (Selesaikan Seks / Selesaikan Masturbasi) di kanan bawah dialog box
-          Align(
-            alignment: Alignment.bottomRight,
-            child: InkWell(
-              onTap: _finishDialogue,
-              borderRadius: BorderRadius.circular(10),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      Colors.red.shade900,
-                      Colors.deepOrange.shade800,
-                    ],
-                  ),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: Colors.amber.withValues(alpha: 0.8), width: 1.2),
-                  boxShadow: const [
-                    BoxShadow(
-                      color: Colors.black54,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      Icons.stop_circle,
-                      size: 13,
-                      color: Colors.white,
-                    ),
-                    const SizedBox(width: 5),
-                    Text(
-                      _getFinishButtonText(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 11.5,
-                        letterSpacing: 0.2,
-                      ),
-                    ),
-                  ],
-                ),
+          if (!_isNarrationHidden) ...[
+            const SizedBox(height: 10),
+            // Typewriter Dialogue Text
+            Text(
+              _displayedText,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 15,
+                height: 1.4,
+                letterSpacing: 0.3,
               ),
             ),
-          ),
+            const SizedBox(height: 10),
+            // Bottom Row: Badge Nama Pembicara (Kiri) & Tombol Selesaikan (Kanan) Sejajar
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Speaker Name Tag Banner (Pindah ke bawah sejajar dengan tombol Selesaikan)
+                Flexible(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      color: style.badgeBgColor,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: style.badgeBorderColor,
+                        width: 1.2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: style.badgeBorderColor.withValues(alpha: 0.4),
+                          blurRadius: 6,
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          style.icon,
+                          size: 14,
+                          color: style.textColor,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible(
+                          child: Text(
+                            node.speakerName,
+                            style: TextStyle(
+                              color: style.textColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 13,
+                              letterSpacing: 0.4,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                // Tombol Selesaikan (Selesaikan Seks / Selesaikan Masturbasi) di kanan bawah dialog box
+                InkWell(
+                  onTap: _finishDialogue,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          Colors.red.shade900,
+                          Colors.deepOrange.shade800,
+                        ],
+                      ),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: Colors.amber.withValues(alpha: 0.8), width: 1.2),
+                      boxShadow: const [
+                        BoxShadow(
+                          color: Colors.black45,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.stop_circle,
+                          size: 13,
+                          color: Colors.white,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          _getFinishButtonText(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 11.5,
+                            letterSpacing: 0.2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );
@@ -1141,9 +1264,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
 
     return Container(
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.55,
+        maxHeight: MediaQuery.of(context).size.height * 0.42,
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: const Color(0xFF1E1E2E).withValues(alpha: 0.96),
         borderRadius: BorderRadius.circular(20),
@@ -1161,18 +1284,59 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Icon(Icons.touch_app, color: Colors.amber, size: 20),
-              const SizedBox(width: 8),
-              Text(
-                cardTitle,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.amber,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.1,
+              Expanded(
+                child: Row(
+                  children: [
+                    const Icon(Icons.touch_app, color: Colors.amber, size: 18),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        cardTitle,
+                        style: const TextStyle(
+                          color: Colors.amber,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 0.5,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 6),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    _isChoicePanelHidden = true;
+                  });
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  decoration: BoxDecoration(
+                    color: Colors.amber.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.amber.withValues(alpha: 0.5), width: 1),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'Sembunyikan',
+                        style: TextStyle(
+                          color: Colors.amber,
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(width: 2),
+                      Icon(Icons.keyboard_arrow_up, color: Colors.amber, size: 16),
+                    ],
+                  ),
                 ),
               ),
             ],
@@ -1180,7 +1344,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
           const SizedBox(height: 14),
           Flexible(
             child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
+              physics: const AlwaysScrollableScrollPhysics(
+                parent: BouncingScrollPhysics(),
+              ),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
