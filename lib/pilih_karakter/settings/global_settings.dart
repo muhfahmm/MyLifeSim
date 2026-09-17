@@ -35,6 +35,12 @@ class GlobalSettings {
   static final ValueNotifier<bool> isModelUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isIdolUnlocked = ValueNotifier<bool>(false);
 
+  // Status Pembelian Sub-Fitur 18+
+  static final ValueNotifier<bool> isMasturbationUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isMakeLoveUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isIncestUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isTeacherStudentUnlocked = ValueNotifier<bool>(false);
+
   static final ValueNotifier<bool> musicEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> soundEffectsEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> animationsEnabled = ValueNotifier<bool>(true);
@@ -73,6 +79,10 @@ class GlobalSettings {
     'isAstronotUnlocked': isAstronotUnlocked,
     'isModelUnlocked': isModelUnlocked,
     'isIdolUnlocked': isIdolUnlocked,
+    'isMasturbationUnlocked': isMasturbationUnlocked,
+    'isMakeLoveUnlocked': isMakeLoveUnlocked,
+    'isIncestUnlocked': isIncestUnlocked,
+    'isTeacherStudentUnlocked': isTeacherStudentUnlocked,
   };
 
   static File get _sessionFile {

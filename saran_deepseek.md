@@ -1,82 +1,89 @@
-Menambahkan jalur karier Politik akan memberikan dimensi baru yang jauh lebih kompleks, penuh intrik, dan sangat memanjakan pemain yang suka membangun "Kekuasaan" daripada sekadar mencari uang.
+Pertanyaan yang sangat penting! Karena ini adalah fitur 18+ yang bersifat sensitif, kamu perlu sistem verifikasi berlapis agar tidak mudah dibeli oleh anak di bawah umur, sekaligus melindungi game kamu dari masalah hukum dan kebijakan toko aplikasi.
 
-Berikut adalah rancangan lengkap bagaimana kamu bisa mengintegrasikan politik ke dalam menu "Pekerjaan & Karir", lengkap dengan logika gating (syarat), atribut, dan event spesialnya.
+Berikut adalah **5 lapis verifikasi** yang bisa kamu terapkan, dari yang paling sederhana hingga paling ketat:
 
-1. UI/UX Penempatan Menu (Sesuai Screenshot)
-Kamu bisa menambahkan Kartu baru di bawah "Lowongan Pekerjaan Tersedia" dengan gaya yang sama, tetapi menggunakan ikon yang lebih "mewah" (misalnya 🏛️ atau 🎖️):
+---
 
-dart
-Card(
-  child: ListTile(
-    leading: Icon(Icons.account_balance, color: Colors.amber), // Ikon gedung pemerintahan
-    title: Text('Karier Politik 🏛️', style: TextStyle(fontWeight: FontWeight.bold)),
-    subtitle: Text('Jalur kekuasaan: Dewan, Walikota, hingga Presiden (Butuh Gelar & Popularitas)'),
-    trailing: Icon(Icons.arrow_forward_ios),
-    onTap: () {
-        // Cek syarat: Umur, Gelar, dan Kekayaan (untuk biaya kampanye)
-        if (character.age < 25 || !character.hasDegree) {
-           showDialog(...); // Tampilkan pesan "Belum memenuhi syarat"
-        } else {
-           Navigator.push(...); // Masuk ke menu politik
-        }
-    },
-  ),
-)
-2. Logika Syarat (Prasyarat / Gating) yang Ketat
-Politik harus terasa eksklusif dan sulit dimasuki:
+### 🔐 Lapis 1: Verifikasi Usia Dasar (Age Gate)
+Sebelum user bisa melihat atau membeli fitur 18+, munculkan dialog:
+> *"Fitur ini hanya untuk pengguna berusia 18 tahun ke atas. Apakah kamu sudah berusia 18+?"*
+> [Ya, saya 18+] [Tidak]
 
-Umur Minimal: 25 tahun (atau 30 tahun jika mengikuti konstitusi beberapa negara).
+**Kelemahan:** Anak-anak bisa berbohong dengan menekan "Ya".
+**Solusi:** Ini hanya lapis pertama. Jangan hanya mengandalkan ini.
 
-Pendidikan: Wajib memiliki gelar Sarjana (seperti "Pekerjaan Profesional").
+---
 
-Uang (Modal Awal): Butuh dana kampanye (misalnya $100.000) agar diakui partai. Ini juga berfungsi sebagai sink uang di game.
+### 🔐 Lapis 2: Verifikasi Tanggal Lahir (Date of Birth)
+User diminta memasukkan tanggal lahir mereka. Sistem akan menghitung umur secara otomatis.
 
-Karma/Reputasi: Karma minimal harus di atas 50% agar tidak dianggap sebagai "politisi korup" sejak awal.
+```dart
+bool isUserAdult(DateTime birthDate) {
+  final today = DateTime.now();
+  final age = today.year - birthDate.year;
+  final hasHadBirthday = today.month > birthDate.month || 
+      (today.month == birthDate.month && today.day >= birthDate.day);
+  return hasHadBirthday ? age >= 18 : (age - 1) >= 18;
+}
+```
 
-3. Sistem Tangga Karier (Career Ladder)
-Di dalam menu politik, buatlah hierarki yang harus dilalui pemain secara bertahap:
+**Kelemahan:** Tetap bisa dimanipulasi jika user memasukkan tanggal lahir palsu.
+**Solusi:** Cocokkan dengan data karakter di game. Jika karakter berusia 15 tahun, fitur 18+ **tidak boleh muncul sama sekali** (bahkan tidak terlihat di menu).
 
-Relawan / Staf Kampanye (Gaji rendah, tapi Karma naik, belajar politik)
+---
 
-Anggota Dewan Kota / DPRD (Gaji sedang, butuh popularitas lokal)
+### 🔐 Lapis 3: Verifikasi Pembayaran (Payment Gate)
+Ini adalah lapisan paling efektif secara praktis. Karena fitur 18+ kamu **berbayar (Rp 89.000, Rp 69.000)**, anak di bawah umur akan kesulitan membeli karena:
 
-Walikota / Bupati (Gaji tinggi, mulai sering disuap atau dimintai bantuan)
+1. **Mereka tidak punya kartu kredit/debit sendiri.**
+2. **Mereka harus meminta izin orang tua untuk transfer.**
+3. **Metode pembayaran seperti GoPay, OVO, Dana biasanya terhubung ke rekening orang tua.**
 
-Gubernur / Senator / Menteri (Gaji sangat tinggi, kebijakan memengaruhi seluruh negara bagian)
+**Saran Implementasi:**
+- **Wajibkan verifikasi akun** (login dengan Google/Apple/Email) sebelum pembelian.
+- **Jangan izinkan pembelian via pulsa** (karena anak-anak mudah membeli pulsa).
+- **Gunakan payment gateway** yang memerlukan verifikasi identitas (seperti Midtrans, Xendit, atau Stripe).
 
-Presiden / Perdana Menteri (Gaji tertinggi, tapi stres dan risiko skandal sangat tinggi)
+---
 
-4. Atribut yang Berpengaruh (Sinergi)
-Karena kamu baru saja menghapus "Penampilan" di sistem kencan, kamu perlu memutuskan: apakah akan menambahkan atribut baru "Karisma/Popularitas", atau memanfaatkan atribut yang ada?
+### 🔐 Lapis 4: Verifikasi Identitas (KTP/ID Upload)
+Ini adalah lapisan paling kuat, tetapi paling merepotkan. Cocok jika kamu ingin benar-benar serius mencegah anak di bawah umur.
 
-Kecerdasan & Disiplin: Sangat penting untuk memahami undang-undang dan menyusun kebijakan yang baik.
+**Alur:**
+1. User menekan "Beli Fitur 18+".
+2. Muncul dialog: *"Untuk membeli fitur ini, kamu perlu memverifikasi identitasmu. Unggah foto KTP/SIM/Paspor."*
+3. User mengunggah foto.
+4. Sistem (atau admin manual) memverifikasi umur dari foto tersebut.
+5. Jika lolos, pembelian baru diizinkan.
 
-Kebahagiaan: Mewakili karisma alami dan kemampuan menarik simpati rakyat.
+**Kelemahan:** Prosesnya lambat, butuh biaya server untuk penyimpanan, dan bisa membuat user malas.
+**Saran:** Gunakan ini **hanya jika game kamu sudah besar** dan memiliki banyak pengguna.
 
-Karma: Penentu nasib. Karma tinggi = rakyat percaya. Karma rendah = sering kena skandal atau dituntut.
+---
 
-Tekad: Dibutuhkan untuk bertahan dari tekanan politik dan fitnah.
+### 🔐 Lapis 5: Verifikasi PIN / Password Orang Tua (Parental Control)
+Ini adalah fitur yang sangat dihargai oleh orang tua. Kamu bisa menambahkan **PIN 4-6 digit** yang hanya diketahui orang tua.
 
-Kekayaan (Uang): Sangat penting untuk membeli iklan kampanye, menyogok, atau justru menolak suap (yang menaikkan Karma).
+**Alur:**
+1. Saat pertama kali game dibuka, minta user membuat PIN (atau orang tua yang membuat).
+2. Setiap kali akan membeli fitur 18+, munculkan dialog: *"Masukkan PIN Orang Tua untuk melanjutkan."*
+3. Jika PIN salah 3x, fitur terkunci selama 24 jam.
 
-5. Event Spesial & Konsekuensi (Anti-Membosankan)
-Politik tidak boleh hanya menekan tombol "Naik Pangkat". Tambahkan Event acak:
+**Keuntungan:** Orang tua merasa aman, dan kamu mematuhi regulasi perlindungan anak (seperti COPPA di Amerika atau UU PDP di Indonesia).
 
-Skandal Korupsi: Pilihan untuk menerima suap (Uang +, Karma -) atau menolaknya (Uang -, Karma +).
+---
 
-Debat Publik: Mengadu Kecerdasan dengan lawan politik. Jika kalah, popularitas turun.
+### 🎯 Rekomendasi Kombinasi Terbaik untuk Game Kamu:
 
-Musim Pemilu: Setiap 4 tahun, ada pemilu. Keberhasilan ditentukan oleh kombinasi Kecerdasan + Karma + Uang Kampanye.
+| Lapis | Metode | Wajib? |
+| :--- | :--- | :---: |
+| 1 | Age Gate (Ya/Tidak) | ✅ |
+| 2 | Verifikasi Tanggal Lahir (cocokkan dengan umur karakter) | ✅ |
+| 3 | Wajib Login Akun (Google/Apple) sebelum beli | ✅ |
+| 4 | Payment Gateway (Midtrans/Xendit) dengan verifikasi | ✅ |
+| 5 | PIN Orang Tua (opsional, untuk nilai tambah) | ⚠️ |
 
-Krisis Nasional: (Misalnya: Pandemi, Bencana Alam). Keputusanmu akan menentukan Karma dan Kebahagiaan rakyat.
+**Kesimpulan:**
+Kunci utamanya adalah **Lapis 3 (Pembayaran)**. Anak di bawah umur tidak akan bisa membeli fitur Rp 89.000 tanpa akses ke kartu kredit atau rekening bank. Pastikan **pembelian tidak bisa dilakukan dengan pulsa** dan **wajib login akun** terlebih dahulu. 
 
-6. Koneksi ke Fitur Online (Server-Side)
-Karena kamu ingin menambahkan sistem online nanti:
-
-Sangat Penting untuk Anti-Cheat: Status politik (misalnya "Presiden") harus disimpan di server. Jangan sampai pemain memodifikasi game lokal mereka untuk langsung menjadi Presiden.
-
-Server harus memvalidasi "Apakah pemain ini benar-benar melewati syarat umur, gelar, dan modal kampanye?" sebelum mengubah status politik mereka di database global.
-
-Ini juga membuka peluang fitur "Pemilu Global Online" yang sangat seru: semua pemain di server ikut memilih satu Presiden virtual!
-
-💡 Contoh Implementasi Logika Dasar di Dart (Struktur Folder) didalam folder dan file baru.
+Dengan kombinasi ini, kamu tidak hanya melindungi anak di bawah umur, tetapi juga membangun reputasi game yang bertanggung jawab di mata orang tua dan platform seperti Google Play/App Store.

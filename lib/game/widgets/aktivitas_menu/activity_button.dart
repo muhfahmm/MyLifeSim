@@ -1,6 +1,7 @@
 // lib/game/widgets/aktivitas_menu/activity_button.dart
 
 import 'package:flutter/material.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
@@ -605,7 +606,7 @@ class ActivityButton extends StatelessWidget {
                   // Masturbasi (hanya jika usia >= 9 & Premium Akses Penuh 18+)
                   if (age >= 9)
                     Builder(builder: (ctx) {
-                      final bool isPremium = GlobalSettings.isPremium.value;
+                      final bool isMasturbationUnlocked = AdultFeatures.isMasturbationUnlocked;
                       return _buildActivityTile(
                         context: context,
                         label: 'Masturbasi (Fantasi)',
@@ -613,12 +614,12 @@ class ActivityButton extends StatelessWidget {
                         icon: Icons.favorite_border,
                         color: Colors.pinkAccent,
                         minAge: 9,
-                        currentAge: isPremium ? age : 0,
-                        customLockMessage: isPremium
+                        currentAge: isMasturbationUnlocked ? age : 0,
+                        customLockMessage: isMasturbationUnlocked
                             ? null
-                            : 'Fitur Masturbasi ini merupakan bagian dari Premium Akses Penuh (18+). Beli akses premium 18+ di Toko untuk membuka fitur ini.',
-                        lockActionLabel: isPremium ? null : 'Buka Toko 🛒',
-                        onLockAction: isPremium
+                            : 'Fitur Masturbasi ini merupakan bagian dari Fitur Dewasa (18+). Beli fitur ini di Toko untuk membukanya.',
+                        lockActionLabel: isMasturbationUnlocked ? null : 'Buka Toko 🛒',
+                        onLockAction: isMasturbationUnlocked
                             ? null
                             : () {
                                 Navigator.push(

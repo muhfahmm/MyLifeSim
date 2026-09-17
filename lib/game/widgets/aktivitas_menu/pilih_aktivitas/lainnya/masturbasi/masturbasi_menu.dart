@@ -6,7 +6,7 @@ import 'risiko_masturbasi.dart'; // Import file risiko
 import 'persentase_ajakan.dart'; // Import persentase ajakan
 import 'ajakan_masturbasi_dialog.dart'; // Import ajakan masturbasi dialog
 import 'efek_samping.dart'; // Import efek samping masturbasi
-import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'masturbate_enjoyment.dart';
@@ -26,6 +26,12 @@ class MasturbasiHelper {
   }
 
   static String getAddictionLabel(int level) {
+    if (level < 34) return 'Rendah';
+    if (level < 67) return 'Sedang';
+    return 'Tinggi';
+  }
+
+  static String getAddictionStatus(int level) {
     if (level < 34) return 'Rendah';
     if (level < 67) return 'Sedang';
     return 'Tinggi';
@@ -53,7 +59,7 @@ class MasturbasiHelper {
   // FUNGSI PUBLIK: BUKA MENU MASTURBASI (HALAMAN)
   // ============================================================
   static void showMasturbationMenu(BuildContext context, Character character, VoidCallback onComplete) {
-    if (!GlobalSettings.isPremium.value) {
+    if (!AdultFeatures.isMasturbationUnlocked) {
       DialogHelper.show(
         context: context,
         title: 'Fitur Premium 18+',

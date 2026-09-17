@@ -6,7 +6,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 // IMPOR FILE BARU
-import 'package:mylifesim/store_page/fitur_premium/adult_features/akses_18plus_page.dart'; 
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features_store_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
@@ -411,21 +411,20 @@ class _StorePageState extends State<StorePage> {
             _buildStoreItem(
               icon: Icons.verified_user,
               iconBgColor: Colors.purple.shade600,
-              title: 'Premium Akses Penuh (18+)',
-              description: 'Membuka semua fitur 18+, inses, masturbasi, dan hubungan guru-murid.',
-              price: 'Rp 199.000',
+              title: 'Fitur Dewasa (18+) 🔞',
+              description: 'Buka menu pilihan fitur 18+, inses, masturbasi, dan hubungan guru-murid.',
+              price: 'Pilih Fitur ➔',
               isUnlocked: _premiumUnlocked,
               onTap: () {
-                _simulatePurchase('Premium Akses Penuh (18+)', () {
-                  _premiumUnlocked = true;
-                  GlobalSettings.isPremium.value = true;
-                });
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AdultFeaturesStorePage()),
+                );
               },
-              // TAMBAHKAN NAVIGASI INI
               onActiveTap: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
+                  MaterialPageRoute(builder: (context) => const AdultFeaturesStorePage()),
                 );
               },
             ),

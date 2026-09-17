@@ -1202,8 +1202,8 @@ class AjakanHandler {
         }
         
         // Filter Premium: Ajakan pacaran dari Keluarga (seperti Adik, Kakak, Sepupu, dll.) 
-        // hanya diperbolehkan jika user sudah premium.
-        if (character.activeProposal != null && isFamily && !AdultFeatures.isPremiumUnlocked) {
+        // hanya diperbolehkan jika user sudah membuka akses Inses (Keluarga).
+        if (character.activeProposal != null && isFamily && !AdultFeatures.isIncestUnlocked) {
           character.activeProposal = null;
         }
       }

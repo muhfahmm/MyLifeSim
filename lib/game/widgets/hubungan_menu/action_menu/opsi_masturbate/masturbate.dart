@@ -9,7 +9,7 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/k
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/masturbate_enjoyment.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/age_activity_logic/usia_10tahun/ajak_masturbate/ajak_masturbate_dialogue.dart';
-import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
@@ -170,7 +170,7 @@ class _MasturbateScreenState extends State<MasturbateScreen> {
   }
 
   Future<void> _startMasturbateFlow() async {
-    if (!GlobalSettings.isPremium.value) {
+    if (!AdultFeatures.isMasturbationUnlocked) {
       DialogHelper.show(
         context: context,
         title: 'Fitur Premium 18+',

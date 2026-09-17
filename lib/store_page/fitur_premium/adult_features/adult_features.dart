@@ -1,72 +1,80 @@
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 
 class AdultFeatures {
-  /// Memeriksa apakah fitur Premium Akses Penuh (18+) aktif.
+  /// Memeriksa apakah fitur Premium Akses Penuh (18+) aktif secara global.
   static bool get isPremiumUnlocked => GlobalSettings.isPremium.value;
 
+  /// Memeriksa akses per-kategori (bebas jika bundle premium aktif)
+  static bool get isMasturbationUnlocked => isPremiumUnlocked || GlobalSettings.isMasturbationUnlocked.value;
+  static bool get isMakeLoveUnlocked => isPremiumUnlocked || GlobalSettings.isMakeLoveUnlocked.value;
+  static bool get isIncestUnlocked => isPremiumUnlocked || GlobalSettings.isIncestUnlocked.value;
+  static bool get isTeacherStudentUnlocked => isPremiumUnlocked || GlobalSettings.isTeacherStudentUnlocked.value;
+
   /// Memeriksa apakah user diizinkan pacaran dengan relasi tertentu.
-  ///
-  /// Aturan:
-  /// - Usia minimum 9 tahun (untuk NPC maupun player).
-  /// - Pacaran dengan Guru, Dosen, dan peran sejenis HANYA untuk premium (karena sensitif).
-  /// - Selain itu, pacaran bebas (open untuk non-premium).
   static bool canProposeDating(String role, String relation, {int userAge = 18}) {
-    // Cek usia minimum absolut (9 tahun)
     if (userAge < 9) return false;
+    if (isPremiumUnlocked) return true;
 
     final rLower = '$role $relation'.toLowerCase();
 
-    // Peran sensitif (termasuk Keluarga, Guru, Dosen, Bos, Idol, dll) yang HANYA boleh untuk premium
-    const sensitiveRoles = [
-      'guru', 'teacher', 'dosen', 'professor',
-      'kepala sekolah', 'supervisor', 'ceo', 'bos',
-      'staf idol', 'manajer idol',
+    const familyRoles = [
       'ayah', 'ibu', 'ortu', 'orang tua', 'kakak', 'adik', 'saudara',
       'anak', 'sepupu', 'paman', 'bibi', 'kakek', 'nenek', 'keluarga', 'kandung',
       'father', 'mother', 'parent', 'brother', 'sister', 'uncle', 'aunt', 'cousin',
     ];
-    final isSensitiveRole = sensitiveRoles.any((r) => rLower.contains(r));
 
-    if (isSensitiveRole) {
-      return isPremiumUnlocked; // Hanya premium
-    }
+    const teacherBossRoles = [
+      'guru', 'teacher', 'dosen', 'professor',
+      'kepala sekolah', 'supervisor', 'ceo', 'bos',
+      'staf idol', 'manajer idol',
+    ];
 
-    // Semua role lain bebas, tidak perlu premium
+    final isFamily = familyRoles.any((r) => rLower.contains(r));
+    if (isFamily) return isIncestUnlocked;
+
+    final isTeacherBoss = teacherBossRoles.any((r) => rLower.contains(r));
+    if (isTeacherBoss) return isTeacherStudentUnlocked;
+
     return true;
   }
 
   /// Memeriksa apakah user diizinkan berhubungan intim / Make Love (ML) dengan target tertentu.
-  ///
-  /// Aturan:
-  /// - Non-Premium: Usia >= 18 tahun, hanya dengan Teman Sekolah/Kuliah/Partner.
-  /// - Premium: Semua role diizinkan (selama usia >= 10).
   static bool canMakeLove({
     required int userAge,
     required String role,
     required String relation,
   }) {
     if (userAge < 10) return false;
-
     if (isPremiumUnlocked) return true;
 
-    if (userAge < 18) return false;
+    final rLower = '$role $relation'.toLowerCase();
 
-    final rLower = role.toLowerCase();
-    final relLower = relation.toLowerCase();
+    const familyRoles = [
+      'ayah', 'ibu', 'ortu', 'orang tua', 'kakak', 'adik', 'saudara',
+      'anak', 'sepupu', 'paman', 'bibi', 'kakek', 'nenek', 'keluarga', 'kandung',
+      'father', 'mother', 'parent', 'brother', 'sister', 'uncle', 'aunt', 'cousin',
+    ];
 
-    // Boleh dengan teman sekelas / teman kuliah / rekan kerja / partner biasa
-    if (rLower.contains('teman') || relLower.contains('teman') ||
-        rLower.contains('rekan') || relLower.contains('rekan') ||
-        rLower.contains('coworker') || relLower.contains('coworker') ||
-        rLower == 'partner') {
-      return true;
-    }
+    const teacherBossRoles = [
+      'guru', 'teacher', 'dosen', 'professor',
+      'kepala sekolah', 'supervisor', 'ceo', 'bos',
+      'staf idol', 'manajer idol',
+    ];
 
-    return true;
+    final isFamily = familyRoles.any((r) => rLower.contains(r));
+    if (isFamily) return isIncestUnlocked;
+
+    final isTeacherBoss = teacherBossRoles.any((r) => rLower.contains(r));
+    if (isTeacherBoss) return isTeacherStudentUnlocked;
+
+    // Bebas untuk usia >= 18 tahun (hubungan intim standar tanpa role sensitif)
+    if (userAge >= 18) return true;
+
+    return isMakeLoveUnlocked;
   }
 
   /// Memeriksa apakah user diizinkan melakukan Masturbasi Bersama.
   static bool canMasturbateTogether() {
-    return true;
+    return isMasturbationUnlocked;
   }
 }
