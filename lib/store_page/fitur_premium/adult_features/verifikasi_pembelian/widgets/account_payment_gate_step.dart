@@ -68,7 +68,7 @@ class AccountPaymentGateStep extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           DropdownButtonFormField<String>(
-            value: selectedAccount,
+            initialValue: selectedAccount,
             isExpanded: true,
             decoration: InputDecoration(
               labelText: 'Pilih Akun Terhubung',

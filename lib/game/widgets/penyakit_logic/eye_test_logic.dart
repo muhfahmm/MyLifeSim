@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
+import 'pilih_kacamata_page.dart';
 import 'dart:math';
 import 'dart:async';
 
@@ -214,9 +215,20 @@ class EyeTestLogic {
                               onPressed: () {
                                 Navigator.pop(timeoutContext);
                                 Navigator.pop(dialogContext);
-                                onFinish.call();
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => PilihKacamataPage(
+                                      character: character,
+                                      onSaved: () {
+                                        onUpdateAvatar();
+                                        onFinish.call();
+                                      },
+                                    ),
+                                  ),
+                                );
                               },
-                              child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                              child: const Text('PILIH KACAMATA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                             ),
                           ],
                         ),
@@ -325,9 +337,20 @@ class EyeTestLogic {
                                                         onPressed: () {
                                                           Navigator.pop(failContext);
                                                           Navigator.pop(dialogContext);
-                                                          onFinish.call();
+                                                          Navigator.push(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                              builder: (context) => PilihKacamataPage(
+                                                                character: character,
+                                                                onSaved: () {
+                                                                  onUpdateAvatar();
+                                                                  onFinish.call();
+                                                                },
+                                                              ),
+                                                            ),
+                                                          );
                                                         },
-                                                        child: const Text('OK', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
+                                                        child: const Text('PILIH KACAMATA', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold)),
                                                       ),
                                                     ],
                                                   ),

@@ -41,6 +41,16 @@ class GlobalSettings {
   static final ValueNotifier<bool> isIncestUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isTeacherStudentUnlocked = ValueNotifier<bool>(false);
 
+  // Status Pembelian Finansial Premium
+  static final ValueNotifier<bool> isFinansialUangTunaiUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isFinansialInvestasiUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isFinansialKemewahanUnlocked = ValueNotifier<bool>(false);
+
+  // Status Pembelian Assets Premium
+  static final ValueNotifier<bool> isAssetsCasinoUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isAssetsGarasiMobilUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isAssetsGarasiMotorUnlocked = ValueNotifier<bool>(false);
+
   static final ValueNotifier<bool> musicEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> soundEffectsEnabled = ValueNotifier<bool>(true);
   static final ValueNotifier<bool> animationsEnabled = ValueNotifier<bool>(true);
@@ -83,6 +93,12 @@ class GlobalSettings {
     'isMakeLoveUnlocked': isMakeLoveUnlocked,
     'isIncestUnlocked': isIncestUnlocked,
     'isTeacherStudentUnlocked': isTeacherStudentUnlocked,
+    'isFinansialUangTunaiUnlocked': isFinansialUangTunaiUnlocked,
+    'isFinansialInvestasiUnlocked': isFinansialInvestasiUnlocked,
+    'isFinansialKemewahanUnlocked': isFinansialKemewahanUnlocked,
+    'isAssetsCasinoUnlocked': isAssetsCasinoUnlocked,
+    'isAssetsGarasiMobilUnlocked': isAssetsGarasiMobilUnlocked,
+    'isAssetsGarasiMotorUnlocked': isAssetsGarasiMotorUnlocked,
   };
 
   static File get _sessionFile {
@@ -121,11 +137,11 @@ class GlobalSettings {
 
     // Tambahkan listener untuk otomatis menyimpan jika ada perubahan status pembelian
     for (final entry in _purchaseMap.entries) {
-      entry.value.addListener(_saveSessionStorage);
+      entry.value.addListener(saveSessionStorage);
     }
   }
 
-  static void _saveSessionStorage() {
+  static void saveSessionStorage() {
     try {
       final file = _sessionFile;
       final purchasesMap = <String, bool>{};

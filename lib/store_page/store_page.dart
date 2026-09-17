@@ -7,6 +7,8 @@ import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 // IMPOR FILE BARU
 import 'package:mylifesim/store_page/fitur_premium/adult_features/adult_features_store_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/finansial_premium/finansial_premium_page.dart';
+import 'package:mylifesim/store_page/fitur_premium/assets_premium/assets_premium_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
@@ -406,6 +408,50 @@ class _StorePageState extends State<StorePage> {
                   GlobalSettings.isMataSehatUnlocked.value = true;
                 });
                 if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.account_balance_wallet_rounded,
+              iconBgColor: Colors.green.shade700,
+              title: 'Finansial Premium 💵',
+              description: 'Akses menu pilihan modal tunai, portofolio investasi, dan koleksi kemewahan.',
+              price: 'Pilih Fitur ➔',
+              isUnlocked: GlobalSettings.isFinansialUangTunaiUnlocked.value ||
+                  GlobalSettings.isFinansialInvestasiUnlocked.value ||
+                  GlobalSettings.isFinansialKemewahanUnlocked.value,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FinansialPremiumPage(character: character)),
+                ).then((_) => setState(() {}));
+              },
+              onActiveTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => FinansialPremiumPage(character: character)),
+                ).then((_) => setState(() {}));
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.account_balance_rounded,
+              iconBgColor: Colors.amber.shade800,
+              title: 'Aset Premium 🏛️',
+              description: 'Akses menu hiburan Casino, Garasi Mobil impian, dan Garasi Motor superbike.',
+              price: 'Pilih Fitur ➔',
+              isUnlocked: GlobalSettings.isAssetsCasinoUnlocked.value ||
+                  GlobalSettings.isAssetsGarasiMobilUnlocked.value ||
+                  GlobalSettings.isAssetsGarasiMotorUnlocked.value,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AssetsPremiumPage(character: character)),
+                ).then((_) => setState(() {}));
+              },
+              onActiveTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AssetsPremiumPage(character: character)),
+                ).then((_) => setState(() {}));
               },
             ),
             _buildStoreItem(

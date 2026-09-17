@@ -159,11 +159,16 @@ class _PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final double screenWidth = MediaQuery.of(context).size.width;
+    final double dialogWidth = (screenWidth - 32).clamp(280.0, 400.0);
 
     return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+      backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(24.0),
+      child: Container(
+        width: dialogWidth,
+        padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 20.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

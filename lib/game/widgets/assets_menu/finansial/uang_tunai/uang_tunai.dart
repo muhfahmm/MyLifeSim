@@ -127,35 +127,28 @@ class UangTunaiItem extends StatelessWidget {
   }
 
   void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.lock_outline, color: Colors.grey, size: 28),
-            SizedBox(width: 8),
-            Text('Fitur Terkunci', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
-              style: const TextStyle(fontSize: 14, color: Colors.black87),
+      title: 'Fitur Terkunci 🔒',
+      isNotification: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
             ),
-            const SizedBox(height: 8),
-            Text(
-              'Usia saat ini: ${character.age} tahun',
-              style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Usia saat ini: ${character.age} tahun',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Mengerti'),
           ),
         ],
       ),

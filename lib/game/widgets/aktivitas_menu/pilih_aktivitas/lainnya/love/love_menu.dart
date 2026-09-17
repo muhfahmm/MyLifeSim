@@ -72,7 +72,7 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Temukan belahan jiwamu melalui aplikasi kencan atau cari jodoh secara acak.',
+                      'Temukan belahan jiwamu melalui aplikasi kencan.',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: isDark ? Colors.redAccent : Colors.redAccent,
@@ -111,59 +111,6 @@ class _LoveMenuPageState extends State<LoveMenuPage> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (context) => DatingAppConfigPage(character: character, onComplete: widget.onComplete)),
-                  );
-                },
-              ),
-            ),
-
-            Card(
-              elevation: 0,
-              margin: const EdgeInsets.only(bottom: 8),
-              color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-              ),
-              child: ListTile(
-                leading: const Icon(Icons.favorite_border, color: Colors.redAccent),
-                title: Text(
-                  'Cari Pacar Acak 💘',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 13,
-                    color: isDark ? Colors.white : Colors.black87,
-                  ),
-                ),
-                subtitle: Text(
-                  'Coba keberuntunganmu dengan mengajak kencan orang asing secara acak (Gratis)',
-                  style: TextStyle(color: isDark ? Colors.white70 : Colors.black54),
-                ),
-                trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
-                onTap: () {
-                  final r = Random();
-                  final List<String> boys = ['Reza', 'Gani', 'Dimas', 'Kevin', 'Iqbal', 'Arie', 'Wisnu', 'Diki', 'Indra'];
-                  final List<String> girls = ['Siska', 'Rina', 'Clara', 'Mila', 'Alya', 'Nabila', 'Vania', 'Riska', 'Laras'];
-                  
-                  final gender = character.gender.toLowerCase() == 'laki-laki' ? 'Perempuan' : 'Laki-laki';
-                  final name = gender == 'Laki-laki' ? boys[r.nextInt(boys.length)] : girls[r.nextInt(girls.length)];
-                  
-                  final age = (character.age - 2) + r.nextInt(5);
-                  final looks = 30 + r.nextInt(70);
-                  final smart = 30 + r.nextInt(70);
-                  final moneyValue = 10 + r.nextInt(500);
-
-                  _showCandidateDialog(
-                    context,
-                    character,
-                    {
-                      'name': name,
-                      'gender': gender,
-                      'age': age.toString(),
-                      'looks': looks.toString(),
-                      'smart': smart.toString(),
-                      'money': moneyValue.toString(),
-                    },
-                    widget.onComplete,
                   );
                 },
               ),
@@ -413,9 +360,13 @@ class _DatingAppConfigPageState extends State<DatingAppConfigPage> {
     final String candidateName = nameData['full']!;
 
     int age = 18;
-    if (selectedAgeRange == '18-25') age = 18 + r.nextInt(8);
-    else if (selectedAgeRange == '26-35') age = 26 + r.nextInt(10);
-    else age = 36 + r.nextInt(15);
+    if (selectedAgeRange == '18-25') {
+      age = 18 + r.nextInt(8);
+    } else if (selectedAgeRange == '26-35') {
+      age = 26 + r.nextInt(10);
+    } else {
+      age = 36 + r.nextInt(15);
+    }
 
     // Generate Atribut Kepribadian & Seksual
     final int health = 40 + r.nextInt(61); // 40 - 100
@@ -546,174 +497,175 @@ void _showCandidateDialog(
     );
   }
 
-  showDialog(
+  DialogHelper.show(
     context: context,
+    title: 'Kandidat Ditemukan! 💖',
+    isNotification: true,
+    showCloseButton: false,
     barrierDismissible: false,
-    builder: (ctx) => AlertDialog(
-      backgroundColor: isDark ? Colors.grey.shade900 : null,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      title: Row(
-        children: [
-          const Icon(Icons.favorite, color: Colors.pinkAccent),
-          const SizedBox(width: 8),
-          Text('Kandidat Ditemukan!', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Center(
-            child: Container(
-              width: 72,
-              height: 72,
-              margin: const EdgeInsets.only(bottom: 12),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.pink.shade50,
-                border: Border.all(color: Colors.pinkAccent.withValues(alpha: 0.5), width: 2),
-              ),
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Container(
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.pinkAccent.shade400, width: 2.5),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.pinkAccent.withValues(alpha: 0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: CircleAvatar(
+              radius: 40,
+              backgroundColor: gender == 'Perempuan' ? Colors.pink.shade50 : Colors.blue.shade50,
               child: ClipOval(
                 child: Image.network(
                   avatarUrl,
+                  width: 76,
+                  height: 76,
                   fit: BoxFit.cover,
-                  errorBuilder: (ctx, err, stack) => Icon(
-                    gender == 'Perempuan' ? Icons.female : Icons.male,
-                    size: 36,
-                    color: gender == 'Perempuan' ? Colors.pink : Colors.blue,
+                  errorBuilder: (context, error, stackTrace) => Icon(
+                    gender == 'Perempuan' ? Icons.face_3 : Icons.face,
+                    color: gender == 'Perempuan' ? Colors.pink.shade400 : Colors.blue.shade400,
+                    size: 40,
                   ),
                 ),
               ),
             ),
           ),
-          Center(
-            child: Text(
-              name,
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17, color: isDark ? Colors.white : Colors.black87),
-            ),
+        ),
+        Center(
+          child: Text(
+            name,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: isDark ? Colors.white : Colors.black87),
           ),
-          const SizedBox(height: 4),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Gender: $gender', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
-              const Text(' • ', style: TextStyle(color: Colors.grey)),
-              Text('Usia: $age thn', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
-            ],
-          ),
-          Center(
-            child: Text('Seksualitas: $sexuality', style: TextStyle(color: isDark ? Colors.pinkAccent : Colors.pink, fontWeight: FontWeight.bold, fontSize: 12)),
-          ),
-          const SizedBox(height: 12),
-          
-          buildStatRow('Kesehatan:', health, Colors.green),
-          buildStatRow('Kebahagiaan:', happiness, Colors.amber),
-          buildStatRow('Kecerdasan:', smart, Colors.blue),
-          buildStatRow('Disiplin:', discipline, Colors.purple),
-
-          const SizedBox(height: 8),
-          Text(
-            salary > 0 ? 'Pekerjaan: $job (Gaji: ${CurrencySettings.format(salary)}/bln)' : 'Pekerjaan: $job',
-            style: TextStyle(color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold, fontSize: 12),
-          ),
-          Text(
-            'Kekayaan Tabungan: ${CurrencySettings.format(moneyValue)}',
-            style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
-          ),
-        ],
-      ),
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      actions: [
+        ),
+        const SizedBox(height: 4),
         Row(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Expanded(
-              child: OutlinedButton(
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx); // Tutup dialog kandidat
-                  onComplete();
-                  Navigator.pop(context); // Pop halaman config
-                },
-                child: Text('Abaikan', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.bold)),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pinkAccent.shade400,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                ),
-                onPressed: () {
-                  Navigator.pop(ctx); // Tutup dialog kandidat
-                  final chance = (smart + happiness + 20) ~/ 3;
-                  final success = r.nextInt(100) < chance;
-
-            String msg;
-            if (success) {
-              final Map<String, String> partnerMap = {
-                'name': name,
-                'gender': gender,
-                'relationship': '70',
-                'relation': 'Pacar',
-                'age': age.toString(),
-                'health': health.toString(),
-                'happiness': happiness.toString(),
-                'smart': smart.toString(),
-                'discipline': discipline.toString(),
-                'sexuality': sexuality,
-                'money': moneyValue.toString(),
-                'job': job,
-                'salary': salary.toString(),
-                'avatarUrl': avatarUrl,
-                'location': c['location'] ?? character.location,
-                'currentCity': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
-                'city': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
-              };
-              character.addPartnerToFreeSlot(partnerMap);
-              msg = '🎉 Berhasil! $name menerima ajakan kencanmu. Sekarang kalian resmi berpacaran!';
-            } else {
-              msg = '😔 Sayang sekali. $name menolak ajakan kencanmu dengan halus.';
-            }
-
-            character.inbox.add(msg);
-            onComplete();
-
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                backgroundColor: isDark ? Colors.grey.shade900 : null,
-                title: Row(children: [
-                  Icon(success ? Icons.check_circle : Icons.cancel, color: success ? Colors.green : Colors.red),
-                  const SizedBox(width: 8),
-                  Text(success ? 'Sukses!' : 'Ditolak', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                ]),
-                content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
-                actions: [
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      Navigator.pop(context);
-                    },
-                    child: const Text('OK'),
-                  )
-                ],
-              ),
-            );
-          },
-                child: const Text('Ajak Pacaran 💖', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
-            ),
+            Text('Gender: $gender', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
+            const Text(' • ', style: TextStyle(color: Colors.grey)),
+            Text('Usia: $age thn', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12)),
           ],
+        ),
+        Center(
+          child: Text('Seksualitas: $sexuality', style: TextStyle(color: isDark ? Colors.pinkAccent : Colors.pink, fontWeight: FontWeight.bold, fontSize: 12)),
+        ),
+        const SizedBox(height: 14),
+        
+        buildStatRow('Kesehatan:', health, Colors.green),
+        buildStatRow('Kebahagiaan:', happiness, Colors.amber),
+        buildStatRow('Kecerdasan:', smart, Colors.blue),
+        buildStatRow('Disiplin:', discipline, Colors.purple),
+
+        const SizedBox(height: 8),
+        Text(
+          salary > 0 ? 'Pekerjaan: $job (Gaji: ${CurrencySettings.format(salary)}/bln)' : 'Pekerjaan: $job',
+          style: TextStyle(color: isDark ? Colors.tealAccent : Colors.teal.shade700, fontWeight: FontWeight.bold, fontSize: 12),
+        ),
+        Text(
+          'Kekayaan Tabungan: ${CurrencySettings.format(moneyValue)}',
+          style: TextStyle(color: isDark ? Colors.white70 : Colors.black54, fontSize: 12),
         ),
       ],
     ),
+    actions: [
+      Row(
+        children: [
+          Expanded(
+            child: OutlinedButton(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                side: BorderSide(color: isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Tutup dialog kandidat
+                onComplete();
+                Navigator.pop(context); // Pop halaman config
+              },
+              child: Text('Abaikan', style: TextStyle(color: isDark ? Colors.white70 : Colors.black87, fontWeight: FontWeight.bold)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pinkAccent.shade400,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                elevation: 2,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Tutup dialog kandidat
+                final chance = (smart + happiness + 20) ~/ 3;
+                final success = r.nextInt(100) < chance;
+
+                String msg;
+                if (success) {
+                  final Map<String, String> partnerMap = {
+                    'name': name,
+                    'gender': gender,
+                    'relationship': '70',
+                    'relation': 'Pacar',
+                    'age': age.toString(),
+                    'health': health.toString(),
+                    'happiness': happiness.toString(),
+                    'smart': smart.toString(),
+                    'discipline': discipline.toString(),
+                    'sexuality': sexuality,
+                    'money': moneyValue.toString(),
+                    'job': job,
+                    'salary': salary.toString(),
+                    'avatarUrl': avatarUrl,
+                    'location': c['location'] ?? character.location,
+                    'currentCity': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
+                    'city': c['currentCity'] ?? character.currentCity ?? 'Kota Utama',
+                  };
+                  character.addPartnerToFreeSlot(partnerMap);
+                  msg = '🎉 Berhasil! $name menerima ajakan kencanmu. Sekarang kalian resmi berpacaran!';
+                } else {
+                  msg = '😔 Sayang sekali. $name menolak ajakan kencanmu dengan halus.';
+                }
+
+                character.inbox.add(msg);
+                onComplete();
+
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    backgroundColor: isDark ? Colors.grey.shade900 : null,
+                    title: Row(children: [
+                      Icon(success ? Icons.check_circle : Icons.cancel, color: success ? Colors.green : Colors.red),
+                      const SizedBox(width: 8),
+                      Text(success ? 'Sukses!' : 'Ditolak', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+                    ]),
+                    content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          Navigator.pop(context);
+                        },
+                        child: const Text('OK'),
+                      )
+                    ],
+                  ),
+                );
+              },
+              child: const Text('Ajak Pacaran 💖', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+          ),
+        ],
+      ),
+    ],
   );
 }

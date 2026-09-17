@@ -55,7 +55,7 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
     // 3. Setup Shimmer Teks (Gradient bergerak)
     _shimmerController = AnimationController(vsync: this, duration: const Duration(seconds: 2))..repeat();
 
-    // 4. Setup Urutan Scene (Total 7.5 detik agar sedikit lebih lama 2-3 detik)
+    // 4. Setup Urutan Scene (Kembali 7.5 detik sesuai permintaan)
     _introController = AnimationController(vsync: this, duration: const Duration(milliseconds: 7500));
     
     // Mulai animasi lebih awal (Interval dipercepat mulainya agar tidak lama putih di awal)
@@ -77,7 +77,6 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
             pageBuilder: (_, __, ___) => widget.nextScreen,
             transitionDuration: const Duration(milliseconds: 600),
             transitionsBuilder: (_, animation, __, child) {
-              // Transisi modern: Fade + Zoom Out halus
               return FadeTransition(
                 opacity: animation,
                 child: ScaleTransition(
@@ -122,6 +121,12 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
       child: Scaffold(
         body: Stack(
           children: [
+            // 0. Pre-rendering nextScreen di background (warm up widget tree & GPU)
+            Offstage(
+              offstage: true,
+              child: widget.nextScreen,
+            ),
+
             // 1. Background Gradien yang Bergerak Real-time
             AnimatedBuilder(
               animation: _bgController,
@@ -239,17 +244,23 @@ class _IntroAnimationScreenState extends State<IntroAnimationScreen>
 
                   const SizedBox(height: 40),
 
-                  // Progress Bar Modern
+                  // Progress Bar Modern (Sinkron dengan _introController 0% -> 100%)
                   FadeTransition(
                     opacity: _progressOpacity,
-                    child: const SizedBox(
-                      width: 80,
+                    child: SizedBox(
+                      width: 140,
                       child: ClipRRect(
-                        borderRadius: BorderRadius.all(Radius.circular(10)),
-                        child: LinearProgressIndicator(
-                          color: Colors.blueAccent,
-                          backgroundColor: Colors.black12,
-                          minHeight: 4,
+                        borderRadius: const BorderRadius.all(Radius.circular(10)),
+                        child: AnimatedBuilder(
+                          animation: _introController,
+                          builder: (context, child) {
+                            return LinearProgressIndicator(
+                              value: _introController.value,
+                              color: Colors.blueAccent,
+                              backgroundColor: Colors.blueAccent.withValues(alpha: 0.15),
+                              minHeight: 6,
+                            );
+                          },
                         ),
                       ),
                     ),

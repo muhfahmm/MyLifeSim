@@ -61,20 +61,30 @@ class KasinoItem extends StatelessWidget {
   }
 
   void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(children: [Icon(Icons.lock_outline, color: Colors.grey), SizedBox(width: 8), Text('Fitur Terkunci')]),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Fitur $feature terbuka saat karakter berusia $requiredAge tahun.'),
-            const SizedBox(height: 8),
-            Text('Usia saat ini: ${character.age} tahun', style: const TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Mengerti'))],
+      title: 'Fitur Terkunci 🔒',
+      isNotification: true,
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Fitur $feature terbuka saat karakter berusia $requiredAge tahun.',
+            style: TextStyle(
+              fontSize: 14,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Usia saat ini: ${character.age} tahun',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87,
+            ),
+          ),
+        ],
       ),
     );
   }

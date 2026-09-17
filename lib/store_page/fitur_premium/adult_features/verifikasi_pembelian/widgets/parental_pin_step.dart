@@ -80,7 +80,7 @@ class _ParentalPinStepState extends State<ParentalPinStep> {
             title: const Text('Aktifkan Proteksi PIN Orang Tua', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
             subtitle: const Text('Minta masukan PIN 4 digit sebelum transaksi disetujui.', style: TextStyle(fontSize: 11)),
             value: widget.isPinEnabled,
-            activeColor: Colors.amber.shade800,
+            activeThumbColor: Colors.amber.shade800,
             onChanged: (val) {
               widget.onTogglePin(val);
               if (!val) {

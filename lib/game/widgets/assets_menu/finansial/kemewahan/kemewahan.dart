@@ -92,54 +92,27 @@ class KemewahanItem extends StatelessWidget {
 void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
   final bool isDark = Theme.of(context).brightness == Brightness.dark;
   
-  showDialog(
+  DialogHelper.show(
     context: context,
-    builder: (dialogContext) => AlertDialog(
-      backgroundColor: isDark ? Colors.grey.shade900 : null,
-      title: Row(
-        children: [
-          Icon(Icons.lock_outline, color: isDark ? Colors.white70 : Colors.grey, size: 28),
-          const SizedBox(width: 8),
-          Text(
-            'Fitur Terkunci',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white : Colors.black87,
-            ),
+    title: 'Fitur Terkunci 🔒',
+    isNotification: true,
+    content: Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
+          style: TextStyle(
+            fontSize: 14,
+            color: isDark ? Colors.white70 : Colors.black87,
           ),
-        ],
-      ),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Fitur $feature akan terbuka saat karakter berusia $requiredAge tahun.',
-            style: TextStyle(
-              fontSize: 14,
-              color: isDark ? Colors.white70 : Colors.black87,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Usia saat ini: ${character.age} tahun',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              color: isDark ? Colors.white54 : Colors.grey,
-            ),
-          ),
-        ],
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(dialogContext).pop(),
-          child: Text(
-            'Mengerti',
-            style: TextStyle(
-              color: isDark ? Colors.blueAccent : Colors.blue,
-              fontWeight: FontWeight.bold,
-            ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Usia saat ini: ${character.age} tahun',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            color: isDark ? Colors.white : Colors.black87,
           ),
         ),
       ],

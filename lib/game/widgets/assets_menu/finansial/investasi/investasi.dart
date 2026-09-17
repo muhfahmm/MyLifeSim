@@ -132,12 +132,16 @@ class InvestasiItem extends StatelessWidget {
     return InkWell(
       onTap: () {
         if (!isUnlocked) {
-          showDialog(
+          DialogHelper.show(
             context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Fitur Terkunci'),
-              content: Text('Investasi akan terbuka saat karakter berusia 12 tahun. Usia saat ini: $age tahun.'),
-              actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Mengerti'))],
+            title: 'Fitur Terkunci 🔒',
+            isNotification: true,
+            content: Text(
+              'Investasi akan terbuka saat karakter berusia 12 tahun.\nUsia saat ini: $age tahun.',
+              style: TextStyle(
+                fontSize: 14,
+                color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Colors.black87,
+              ),
             ),
           );
           return;
