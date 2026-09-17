@@ -85,7 +85,7 @@ class MakeLoveStoreCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        isUnlocked ? 'Terbeli ✔' : 'Rp 89.000',
+                        isUnlocked ? 'Terbeli ✔' : 'Rp 249.000',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                     ),

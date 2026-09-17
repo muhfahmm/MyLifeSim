@@ -6,22 +6,33 @@ import 'make_love/make_love_store_card.dart';
 import 'inses/inses_store_card.dart';
 import 'guru_murid/guru_murid_store_card.dart';
 import 'akses_18plus_page.dart';
+import 'verifikasi_pembelian/adult_purchase_verification_page.dart';
 
 class AdultFeaturesStorePage extends StatelessWidget {
   const AdultFeaturesStorePage({super.key});
 
   void _simulatePurchase(BuildContext context, String itemName, VoidCallback onPurchased) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return _PurchaseSimulationDialog(itemName: itemName);
-      },
-    ).then((success) {
-      if (success == true) {
-        onPurchased();
-      }
-    });
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AdultPurchaseVerificationPage(
+          itemName: itemName,
+          onVerificationSuccess: () {
+            showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: (BuildContext context) {
+                return _PurchaseSimulationDialog(itemName: itemName);
+              },
+            ).then((success) {
+              if (success == true) {
+                onPurchased();
+              }
+            });
+          },
+        ),
+      ),
+    );
   }
 
   @override

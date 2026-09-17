@@ -85,7 +85,7 @@ class MasturbasiStoreCard extends StatelessWidget {
                         ),
                       ),
                       child: Text(
-                        isUnlocked ? 'Terbeli ✔' : 'Rp 49.000',
+                        isUnlocked ? 'Terbeli ✔' : 'Rp 219.000',
                         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                       ),
                     ),

@@ -1,9 +1,7 @@
-import 'package:flutter/foundation.dart';
-
 class AdultVerificationModel {
   bool isAgeGateConfirmed;
   DateTime? birthDate;
-  String? selectedAccountType; // e.g., 'Google Account', 'Apple ID', 'Verified Email'
+  String? selectedAccountType; // 'Google Account', 'Apple ID', 'Email'
   bool isAccountVerified;
   String? parentalPin;
   bool isParentalPinEnabled;
@@ -29,14 +27,4 @@ class AdultVerificationModel {
   }
 
   bool get isAdult => calculatedAge >= 18;
-
-  bool get isVerificationComplete {
-    if (!isAgeGateConfirmed) return false;
-    if (!isAdult) return false;
-    if (!isAccountVerified) return false;
-    if (isParentalPinEnabled && (parentalPin == null || parentalPin!.length < 4)) {
-      return false;
-    }
-    return true;
-  }
 }

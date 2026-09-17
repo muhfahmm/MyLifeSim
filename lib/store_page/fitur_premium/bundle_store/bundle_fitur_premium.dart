@@ -3,12 +3,12 @@ import 'dart:async';
 import 'promo_twin_date_logic.dart';
 
 class BundleFiturPremiumLogic {
-  static const int item1Price = 199000;
-  static const int item2Price = 249000;
-  static const int item3Price = 49000;
-  static const int item4Price = 129000;
-  static const int item5Price = 149000;
-  static const int item6Price = 99000;
+  static const int item1Price = 599000; // Paket Bundle Fitur Dewasa (18+)
+  static const int item2Price = 249000; // God Mode
+  static const int item3Price = 49000;  // Bebas Iklan
+  static const int item4Price = 129000; // Kekebalan Abadi
+  static const int item5Price = 149000; // Fast Forward Usia
+  static const int item6Price = 99000;  // Mata Sehat Abadi
 
   static const double baseDiscountRate = 0.15; // 15% base
 
