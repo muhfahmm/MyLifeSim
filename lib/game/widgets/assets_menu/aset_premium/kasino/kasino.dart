@@ -130,6 +130,7 @@ class _KasinoPageState extends State<KasinoPage> {
 
   // --- Efek judi (tambahan penalti jika kalah besar) ---
   void _applyGamblingEffect(bool isWin, int bet, {int happinessBonus = 10, int happinessPenalty = 5, int healthPenalty = 3}) {
+    character.gamblingAddictionLevel = (character.gamblingAddictionLevel + 3).clamp(0, 100);
     if (isWin) {
       character.happiness = (character.happiness + happinessBonus).clamp(0, 100);
     } else {

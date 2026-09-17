@@ -25,63 +25,75 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
     return CurrencySettings.format(amount);
   }
 
-  // Bangun daftar program rehabilitasi, termasuk menu khusus kecanduan masturbasi jika pengguna memiliki akses Premium
+  String _getMasturbationNarrative(int level) {
+    if (level == 0) return '0% • Rendah (Aman) - Pikiran jernih dan bebas kecanduan.';
+    if (level < 34) return '$level% • Ringan (Terkendali) - Dorongan masih dalam batas wajar.';
+    if (level < 67) return '$level% • Sedang (Waspada) - Dorongan sering mengganggu fokus aktivitas harian.';
+    return '$level% • Tinggi (Bahaya Kecanduan!) - Sangat kecanduan, berisiko mengganggu fisik & mental.';
+  }
+
+  String _getDrugNarrative(int level) {
+    if (level == 0) return '0% • Rendah (Aman) - Tubuh bersih dari zat penenang & obat terlarang.';
+    if (level < 34) return '$level% • Ringan (Gejala Awal) - Mulai ketagihan namun masih dapat dikontrol.';
+    if (level < 67) return '$level% • Sedang (Ketergantungan) - Butuh dosis rutin untuk merasa tenang & nyaman.';
+    return '$level% • Tinggi (Bahaya Overdosis!) - Ketergantungan berat dan berisiko fatal bagi kesehatan.';
+  }
+
+  String _getGamblingNarrative(int level) {
+    if (level == 0) return '0% • Rendah (Aman) - Bebas dari dorongan taruhan judi.';
+    if (level < 34) return '$level% • Ringan (Iseng) - Hanya mencoba taruhan judi sesekali untuk hiburan.';
+    if (level < 67) return '$level% • Sedang (Ketergantungan) - Sering bayang-bayang dorongan memasang taruhan lagi.';
+    return '$level% • Tinggi (Kompulsif / Bahaya!) - Kecanduan berat taruhan, berisiko menguras aset keuangan.';
+  }
+
+  // Bangun daftar program rehabilitasi
   List<Map<String, dynamic>> _getProgramList() {
     final List<Map<String, dynamic>> list = [
       {
         'name': 'Terapi Perilaku 🧠',
         'cost': 250,
-        'duration': 7,
         'happiness': 18,
         'health': 5,
         'reduceAddiction': 0,
+        'targetType': 'none',
         'desc': 'Terapi kognitif untuk mengubah pola pikir negatif',
       },
       {
         'name': 'Rehabilitasi Judi 🎲',
         'cost': 500,
-        'duration': 14,
         'happiness': 15,
         'health': 10,
-        'reduceAddiction': 0,
-        'desc': 'Terapi mengatasi kecanduan berjudi',
+        'reduceAddiction': 100, // Menurunkan kecanduan judi 100%
+        'targetType': 'judi',
+        'desc': 'Terapi pemulihan mengatasi kecanduan berjudi',
       },
     ];
 
-    // FITUR PREMIUM: Menu untuk menurunkan kecanduan masturbasi HANYA MUNCUL jika pengguna membeli Premium Akses Penuh (18+)
-    if (GlobalSettings.isPremium.value) {
+    // HANYA MUNCUL jika pengguna telah membeli Premium Akses Penuh (18+) atau memiliki kecanduan > 0
+    if (GlobalSettings.isPremium.value || widget.character.addictionLevel > 0) {
       list.add({
         'name': 'Terapi Kecanduan Masturbasi 💦',
         'cost': 350,
-        'duration': 14,
         'happiness': 20,
         'health': 15,
-        'reduceAddiction': 50, // Menurunkan kecanduan sebesar 50%
-        'desc': 'Terapi khusus premium untuk menurunkan kecanduan masturbasi',
-        'isPremiumOnly': true,
+        'reduceAddiction': 50, // Menurunkan kecanduan masturbasi sebesar 50%
+        'targetType': 'masturbasi',
+        'desc': 'Terapi pemulihan untuk menurunkan kecanduan masturbasi',
       });
     }
 
-    list.addAll([
-      {
-        'name': 'Rehabilitasi Alkohol 🍺',
-        'cost': 1200,
-        'duration': 30,
-        'happiness': 20,
-        'health': 25,
-        'reduceAddiction': 0,
-        'desc': 'Program detoks dari ketergantungan alkohol',
-      },
-      {
+    // HANYA MUNCUL jika pengguna telah membeli Akses Obat-obatan (18+) atau memiliki kecanduan > 0
+    if (GlobalSettings.isObatObatanUnlocked.value || widget.character.drugAddictionLevel > 0) {
+      list.add({
         'name': 'Rehabilitasi Narkoba & Obat-obatan 💊',
         'cost': 2500,
-        'duration': 90,
         'happiness': 25,
         'health': 30,
-        'reduceAddiction': 100,
+        'reduceAddiction': 100, // Menurunkan kecanduan obat/narkoba 100%
+        'targetType': 'narkoba',
         'desc': 'Program pemulihan intensif dari ketergantungan obat-obatan & narkoba',
-      },
-    ]);
+      });
+    }
 
     return list;
   }
@@ -92,6 +104,7 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
     final int health = item['health'] as int;
     final int happiness = item['happiness'] as int;
     final int reduceAddiction = item['reduceAddiction'] as int;
+    final String targetType = (item['targetType'] as String?) ?? 'none';
 
     DialogHelper.show(
       context: context,
@@ -112,9 +125,17 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
           _buildStatRow('Kesehatan ❤️', health > 0 ? '+$health' : '-', isDark, health > 0 ? Colors.redAccent : null),
           const SizedBox(height: 8),
           _buildStatRow('Kebahagiaan 🥳', happiness > 0 ? '+$happiness' : '-', isDark, happiness > 0 ? Colors.amber.shade700 : null),
-          if (reduceAddiction > 0) ...[
+          if (reduceAddiction > 0 && targetType == 'masturbasi') ...[
             const SizedBox(height: 8),
             _buildStatRow('Kecanduan Masturbasi 💦', '-$reduceAddiction%', isDark, Colors.green),
+          ],
+          if (reduceAddiction > 0 && targetType == 'narkoba') ...[
+            const SizedBox(height: 8),
+            _buildStatRow('Kecanduan Obat/Narkoba 💊', '-$reduceAddiction%', isDark, Colors.purpleAccent),
+          ],
+          if (reduceAddiction > 0 && targetType == 'judi') ...[
+            const SizedBox(height: 8),
+            _buildStatRow('Kecanduan Judi 🎲', '-$reduceAddiction%', isDark, Colors.amber.shade800),
           ],
           const SizedBox(height: 8),
           _buildStatRow('Kecerdasan 🧠', '-', isDark, null),
@@ -168,6 +189,7 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
     final int healthGain = item['health'] as int;
     final int happinessGain = item['happiness'] as int;
     final int reduceAddiction = item['reduceAddiction'] as int;
+    final String targetType = (item['targetType'] as String?) ?? 'none';
 
     if (widget.character.money < cost) {
       DialogHelper.show(
@@ -187,14 +209,28 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
         widget.character.happiness = (widget.character.happiness + happinessGain).clamp(0, 100);
       }
       if (reduceAddiction > 0) {
-        widget.character.addictionLevel = (widget.character.addictionLevel - reduceAddiction).clamp(0, 100);
+        if (targetType == 'masturbasi') {
+          widget.character.addictionLevel = (widget.character.addictionLevel - reduceAddiction).clamp(0, 100);
+        } else if (targetType == 'narkoba') {
+          widget.character.drugAddictionLevel = (widget.character.drugAddictionLevel - reduceAddiction).clamp(0, 100);
+        } else if (targetType == 'judi') {
+          widget.character.gamblingAddictionLevel = (widget.character.gamblingAddictionLevel - reduceAddiction).clamp(0, 100);
+        }
       }
     });
 
     List<String> effectDetails = [];
     if (healthGain > 0) effectDetails.add('+$healthGain% Kesehatan');
     if (happinessGain > 0) effectDetails.add('+$happinessGain% Kebahagiaan');
-    if (reduceAddiction > 0) effectDetails.add('-$reduceAddiction% Kecanduan Masturbasi (Level saat ini: ${widget.character.addictionLevel}%)');
+    if (reduceAddiction > 0) {
+      if (targetType == 'masturbasi') {
+        effectDetails.add('-$reduceAddiction% Kecanduan Masturbasi (Level saat ini: ${widget.character.addictionLevel}%)');
+      } else if (targetType == 'narkoba') {
+        effectDetails.add('-$reduceAddiction% Kecanduan Narkoba & Obat (Level saat ini: ${widget.character.drugAddictionLevel}%)');
+      } else if (targetType == 'judi') {
+        effectDetails.add('-$reduceAddiction% Kecanduan Judi (Level saat ini: ${widget.character.gamblingAddictionLevel}%)');
+      }
+    }
 
     final String effectStr = effectDetails.isNotEmpty ? ' (${effectDetails.join(', ')})' : '';
     final String msg = '💚 ${item['name']} selesai! Kamu pulih dan siap menjalani hidup lebih sehat.$effectStr';
@@ -287,10 +323,10 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
         ),
         const SizedBox(height: 12),
 
-        // Indikator Tingkat Kecanduan Karakter (jika ada kecanduan atau premium)
-        if (GlobalSettings.isPremium.value)
+        // Indikator Tingkat Kecanduan Masturbasi (Tampil jika Premium aktif atau level kecanduan > 0)
+        if (GlobalSettings.isPremium.value || widget.character.addictionLevel > 0)
           Container(
-            margin: const EdgeInsets.only(bottom: 12),
+            margin: const EdgeInsets.only(bottom: 8),
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
             decoration: BoxDecoration(
               color: Colors.pink.withValues(alpha: 0.08),
@@ -309,9 +345,10 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
                         'Level Kecanduan Masturbasi',
                         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.pinkAccent),
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        'Tingkat kecanduan saat ini: ${widget.character.addictionLevel}%',
-                        style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
+                        _getMasturbationNarrative(widget.character.addictionLevel),
+                        style: TextStyle(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
                       ),
                     ],
                   ),
@@ -319,6 +356,73 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
               ],
             ),
           ),
+
+        // Indikator Tingkat Kecanduan Narkoba & Obat-obatan (Tampil jika Akses Obat Dibuka atau level kecanduan > 0)
+        if (GlobalSettings.isObatObatanUnlocked.value || widget.character.drugAddictionLevel > 0)
+          Container(
+            margin: const EdgeInsets.only(bottom: 8),
+            padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            decoration: BoxDecoration(
+              color: Colors.purple.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.purpleAccent.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.medication_rounded, color: Colors.purple, size: 20),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Level Kecanduan Narkoba & Obat-obatan',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.purple),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        _getDrugNarrative(widget.character.drugAddictionLevel),
+                        style: TextStyle(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+        // Indikator Tingkat Kecanduan Judi
+        Container(
+          margin: const EdgeInsets.only(bottom: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.amber.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.amber.shade700.withValues(alpha: 0.4)),
+          ),
+          child: Row(
+            children: [
+              Icon(Icons.casino, color: Colors.amber.shade800, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Level Kecanduan Judi',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.amber.shade900),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _getGamblingNarrative(widget.character.gamblingAddictionLevel),
+                      style: TextStyle(fontSize: 11.5, color: isDark ? Colors.white70 : Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
 
         // Daftar Program Rehabilitasi
         ListView.builder(
@@ -418,7 +522,7 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'Biaya: ${_fmt(cost)} | Durasi: ${item['duration']} hari',
+                              'Biaya: ${_fmt(cost)}',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,

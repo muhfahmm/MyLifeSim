@@ -11,6 +11,7 @@ import 'package:mylifesim/store_page/fitur_premium/god_mode/god_mode_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/top_up_page/top_up_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/karir_spesial/karir_spesial_page.dart';
 import 'package:mylifesim/store_page/fitur_premium/skip_usia/skip_usia_page.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/obat_obatan/obat_obatan_menu.dart';
 import 'fitur_premium/bundle_store/bundle_fitur_premium.dart';
 import 'fitur_premium/bundle_store/bundle_peningkat_atribut.dart';
 import 'fitur_premium/bundle_store/promo_twin_date_logic.dart';
@@ -540,6 +541,19 @@ class _StorePageState extends State<StorePage> {
                   _obatObatanUnlocked = true;
                   GlobalSettings.isObatObatanUnlocked.value = true;
                 });
+              },
+              onActiveTap: () {
+                if (character != null && character.age >= 18) {
+                  ObatObatanMenuHelper.showObatObatanMenu(context, character, () {});
+                } else if (character != null && character.age < 18) {
+                  DialogHelper.show(
+                    context: context,
+                    title: 'Akses Dibatasi 🔒',
+                    content: const Text('Kamu harus berusia minimal 18 tahun untuk mengakses menu ini.'),
+                  );
+                } else {
+                  _showNoCharacterMessage();
+                }
               },
             ),
 

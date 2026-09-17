@@ -496,33 +496,37 @@ class ActivityButton extends StatelessWidget {
 
                   // Obat-obatan (hanya jika usia >= 18 & Akses Obat-obatan 18+ dibuka dari Toko)
                   if (age >= 18)
-                    Builder(builder: (ctx) {
-                      final bool isObatUnlocked = GlobalSettings.isObatObatanUnlocked.value;
-                      return _buildActivityTile(
-                        context: context,
-                        label: 'Obat-obatan',
-                        subtitle: 'Konsumsi obat-obatan atau zat penenang',
-                        icon: Icons.medication,
-                        color: Colors.purple,
-                        minAge: 18,
-                        currentAge: isObatUnlocked ? age : 0,
-                        customLockMessage: isObatUnlocked
-                            ? null
-                            : 'Fitur Obat-obatan memerlukan item "Akses Obat-obatan (18+)". Beli item akses di Toko MyLifeSim untuk membuka fitur ini.',
-                        lockActionLabel: isObatUnlocked ? null : 'Buka Toko 🛒',
-                        onLockAction: isObatUnlocked
-                            ? null
-                            : () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => StorePage(character: character)),
-                                );
-                              },
-                        onTap: () => _executeAction(context, () {
-                          ObatObatanMenuHelper.showObatObatanMenu(context, character, localRefresh);
-                        }),
-                      );
-                    }),
+                    ValueListenableBuilder<bool>(
+                      valueListenable: GlobalSettings.isObatObatanUnlocked,
+                      builder: (ctx, isObatUnlocked, _) {
+                        return _buildActivityTile(
+                          context: context,
+                          label: 'Obat-obatan',
+                          subtitle: 'Konsumsi obat-obatan atau zat penenang',
+                          icon: Icons.medication,
+                          color: Colors.purple,
+                          minAge: 18,
+                          currentAge: isObatUnlocked ? age : 0,
+                          customLockMessage: isObatUnlocked
+                              ? null
+                              : 'Fitur Obat-obatan memerlukan item "Akses Obat-obatan (18+)". Beli item akses di Toko MyLifeSim untuk membuka fitur ini.',
+                          lockActionLabel: isObatUnlocked ? null : 'Buka Toko 🛒',
+                          onLockAction: isObatUnlocked
+                              ? null
+                              : () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => StorePage(character: character)),
+                                  ).then((_) {
+                                    localRefresh();
+                                  });
+                                },
+                          onTap: () => _executeAction(context, () {
+                            ObatObatanMenuHelper.showObatObatanMenu(context, character, localRefresh);
+                          }),
+                        );
+                      },
+                    ),
 
                   // Rehabilitasi
                   _buildActivityTile(

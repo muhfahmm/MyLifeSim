@@ -153,7 +153,7 @@ class _ObatObatanPageState extends State<ObatObatanPage> {
 
     setState(() {
       widget.character.money -= cost;
-      widget.character.addictionLevel = (widget.character.addictionLevel + addictionIncrease).clamp(0, 100);
+      widget.character.drugAddictionLevel = (widget.character.drugAddictionLevel + addictionIncrease).clamp(0, 100);
 
       if (overdose) {
         widget.character.health = (widget.character.health - 40).clamp(0, 100);
@@ -353,7 +353,7 @@ class _ObatObatanPageState extends State<ObatObatanPage> {
     final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
     final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
 
-    final int addictionLevel = widget.character.addictionLevel;
+    final int addictionLevel = widget.character.drugAddictionLevel;
     final Color addictionColor = _getAddictionColor(addictionLevel);
     final String addictionLabel = _getAddictionLabel(addictionLevel);
 

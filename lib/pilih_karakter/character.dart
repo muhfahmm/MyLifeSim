@@ -937,9 +937,11 @@ class Character {
   bool hasSifilis = false;
   bool hasHPV = false;
 
-  // --- LOGIKA MASTURBASI ---
+  // --- LOGIKA MASTURBASI, NARKOBA & JUDI ---
   int lastMasturbationAge = -5;
-  int addictionLevel = 0;
+  int addictionLevel = 0; // Level kecanduan masturbasi
+  int drugAddictionLevel = 0; // Level kecanduan narkoba & obat-obatan
+  int gamblingAddictionLevel = 0; // Level kecanduan judi
 
   // --- DATABASE NAMA DARI JSON (GLOBAL CACHE) ---
   static List<String> globalMaleFirstNames = [];
