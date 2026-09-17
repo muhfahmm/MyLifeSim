@@ -2790,8 +2790,10 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
               context: context,
               character: widget.character,
               updateState: _updateState,
+              targetName: widget.targetName,
             );
           },
+
         ));
       }
     }

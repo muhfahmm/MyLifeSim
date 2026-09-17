@@ -4,16 +4,29 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_tempat/pilih_tempat.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/pilih_waktu/pilih_waktu.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/ffm/ffm_menu.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/fmm/fmm_menu.dart';
 
 class ThreesomeHelper {
-  /// Memulai logika ajak 3some/4some/5some/6some jika user memiliki minimal 2 pacar.
+  /// Memulai logika ajak 3some/4some/5some/6some dengan menu pilihan Mode FFM atau FMM.
   static void processThreesome({
     required BuildContext context,
     required Character character,
     required VoidCallback updateState,
+    String? targetName,
   }) {
     final int count = character.activePartnersCount;
-    if (count < 2) {
+    // Hitung total kandidat (Pacar + Anggota Keluarga Dewasa)
+    int familyCount = 0;
+    if (character.fatherName != null && !character.isFatherDeceased) familyCount++;
+    if (character.motherName != null && !character.isMotherDeceased) familyCount++;
+    if (character.stepFatherName != null && !character.isStepFatherDeceased) familyCount++;
+    if (character.stepMotherName != null && !character.isStepMotherDeceased) familyCount++;
+    for (var s in character.siblings) {
+      if (s['isDeceased'] != 'true' && (int.tryParse(s['age'] ?? '18') ?? 18) >= 18) familyCount++;
+    }
+
+    if (count + familyCount < 2) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -35,7 +48,7 @@ class ThreesomeHelper {
             ],
           ),
           content: const Text(
-            'Untuk mengajak hubungan ini, kamu harus memiliki minimal 2 pacar aktif!',
+            'Untuk mengajak Threesome, kamu membutuhkan minimal 2 partisipan (kombinasi Pacar atau Anggota Keluarga)!',
             style: TextStyle(fontSize: 12),
           ),
           actions: [
@@ -49,6 +62,138 @@ class ThreesomeHelper {
       return;
     }
 
+    final bool isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Modal Pilihan Mode Threesome (FFM vs FMM vs Standard)
+    showDialog(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        title: Row(
+          children: [
+            const Icon(Icons.group, color: Colors.purple, size: 22),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                'Pilih Mode Threesome 🔥',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black87),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              'Silakan pilih konfigurasi Threesome yang kamu inginkan:',
+              style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87),
+            ),
+            const SizedBox(height: 12),
+
+            // Tombol FFM
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.pinkAccent.shade700,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: const Icon(Icons.favorite, size: 18),
+              label: const Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Mode FFM (2 Wanita & 1 Pria)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    Text('Kombinasi 2 wanita cantik & 1 pria', style: TextStyle(fontSize: 10, color: Colors.white70)),
+                  ],
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                FfmThreesomeHelper.processFfm(
+                  context: context,
+                  character: character,
+                  updateState: updateState,
+                  preselectedTargetName: targetName,
+                );
+              },
+            ),
+
+            const SizedBox(height: 8),
+
+            // Tombol FMM
+            ElevatedButton.icon(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepPurple,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              icon: const Icon(Icons.bolt, size: 18),
+              label: const Align(
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Mode FMM (1 Wanita & 2 Pria)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    Text('Sensasi dominasi 1 wanita & 2 pria tangguh', style: TextStyle(fontSize: 10, color: Colors.white70)),
+                  ],
+                ),
+              ),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                FmmThreesomeHelper.processFmm(
+                  context: context,
+                  character: character,
+                  updateState: updateState,
+                  preselectedTargetName: targetName,
+                );
+              },
+            ),
+
+
+            const SizedBox(height: 8),
+
+            // Tombol Otomatis / Semua Pasangan
+            OutlinedButton.icon(
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade400),
+              ),
+              icon: Icon(Icons.people_outline, size: 18, color: isDark ? Colors.white70 : Colors.black87),
+              label: Text('Semua Pasangan Aktif (Default)', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                _processStandardThreesome(context, character, updateState);
+              },
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Logika Threesome default (semua pasangan aktif)
+  static void _processStandardThreesome(
+    BuildContext context,
+    Character character,
+    VoidCallback updateState,
+  ) {
+    final int count = character.activePartnersCount;
     final List<String> names = [];
     if (character.partner != null && character.partner!['isDeceased'] != 'true') names.add(character.partner!['name']!);
     if (character.secondPartner != null && character.secondPartner!['isDeceased'] != 'true') names.add(character.secondPartner!['name']!);
@@ -95,9 +240,9 @@ class ThreesomeHelper {
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: Colors.blue.withValues(alpha: 0.3)),
               ),
-              child: Text(
+              child: const Text(
                 'ℹ️ Info: Ada 60% peluang pacar-pacarmu akan menerima ajakan ini. Jika ditolak, hubungan kalian tidak akan putus.',
-                style: const TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 12, color: Colors.blue, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -106,8 +251,7 @@ class ThreesomeHelper {
           TextButton(
             onPressed: () async {
               Navigator.pop(dialogContext);
-              
-              // Tampilkan dialog tempat dan waktu
+
               final String? loc = await TempatBercintaHelper.showLocationChooser(
                 context: context,
                 character: character,
@@ -115,11 +259,10 @@ class ThreesomeHelper {
                 userAge: character.age,
                 targetAge: 20,
               );
-              if (loc == null) return;
+              if (loc == null || !context.mounted) return;
 
-              if (!context.mounted) return;
               final String? time = await PilihWaktuHelper.showTimeChooser(context, loc);
-              if (time == null) return;
+              if (time == null || !context.mounted) return;
 
               final List<Map<String, dynamic>> femalePartners = [];
               if (character.partner != null && character.partner!['isDeceased'] != 'true' && (character.partner!['gender'] ?? 'Perempuan') == 'Perempuan') {
@@ -269,7 +412,6 @@ class ThreesomeHelper {
 
       character.happiness = (character.happiness + 30).clamp(0, 100);
 
-      // Logika Kehamilan Threesome (Masing-masing wanita 50% peluang hamil mandiri jika tidak pakai kondom)
       List<String> newlyPregnantNames = [];
       if (!useCondom && femalePartners.length >= 2) {
         final bool female1Pregnant = random.nextInt(100) < 50;
