@@ -19,6 +19,7 @@ class RehabilitasiMenuHelper {
     DialogHelper.show(
       context: context,
       title: 'Program Rehabilitasi 💚',
+      headerColor: Colors.purple.shade700,
       isNotification: false,
       content: RehabilitasiContent(
         character: character,

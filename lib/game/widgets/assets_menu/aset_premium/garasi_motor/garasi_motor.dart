@@ -43,9 +43,9 @@ class GarasiMotorItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUnlocked ? Colors.orange.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          color: isUnlocked ? Colors.orange.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isUnlocked ? Colors.orange.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.orange.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -55,8 +55,8 @@ class GarasiMotorItem extends StatelessWidget {
               child: Text(
                 'Garasi Motor',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                   color: isUnlocked ? Colors.orange : Colors.grey,
                 ),
               ),
@@ -291,7 +291,7 @@ class GarasiMotorPageState extends State<GarasiMotorPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Garasi Motor'),
+        title: const Text('Garasi Motor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
         actions: [

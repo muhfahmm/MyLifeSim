@@ -11,6 +11,7 @@ class DialogHelper {
     bool showCloseButton = true, // Set to false when user must choose an action
     bool barrierDismissible = true,
     VoidCallback? onClose,
+    Color? headerColor,
   }) {
     final double screenWidth = MediaQuery.of(context).size.width;
     final double screenHeight = MediaQuery.of(context).size.height;
@@ -48,7 +49,7 @@ class DialogHelper {
             color: Colors.transparent,
             child: Container(
               width: dialogWidth,
-              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+              clipBehavior: Clip.antiAlias,
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey.shade900 : Colors.white,
                 borderRadius: BorderRadius.circular(20),
@@ -64,67 +65,121 @@ class DialogHelper {
                 mainAxisSize: MainAxisSize.min, // Wrap height automatically
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          title,
-                          style: TextStyle(
-                            fontSize: 18, 
-                            fontWeight: FontWeight.bold,
-                            color: isDark ? Colors.white : Colors.black87,
-                            height: 1.2,
+                  if (headerColor != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
+                      color: headerColor,
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                                height: 1.2,
+                              ),
+                            ),
                           ),
-                        ),
+                          if (showCloseButton) ...[
+                            const SizedBox(width: 8),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(dialogContext).pop();
+                              },
+                              borderRadius: BorderRadius.circular(16),
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: const Icon(
+                                  Icons.close,
+                                  size: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
-                      if (showCloseButton) ...[
-                        const SizedBox(width: 8),
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(dialogContext).pop();
-                          },
-                          borderRadius: BorderRadius.circular(16),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.close,
-                              size: 18,
-                              color: isDark ? Colors.white70 : Colors.grey.shade600,
+                    ),
+                  Padding(
+                    padding: headerColor != null
+                        ? const EdgeInsets.fromLTRB(20.0, 16.0, 20.0, 16.0)
+                        : const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        if (headerColor == null)
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  title,
+                                  style: TextStyle(
+                                    fontSize: 18, 
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.black87,
+                                    height: 1.2,
+                                  ),
+                                ),
+                              ),
+                              if (showCloseButton) ...[
+                                const SizedBox(width: 8),
+                                InkWell(
+                                  onTap: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                  borderRadius: BorderRadius.circular(16),
+                                  child: Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 18,
+                                      color: isDark ? Colors.white70 : Colors.grey.shade600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ],
+                          ),
+                        if (headerColor == null) const SizedBox(height: 12),
+                        Flexible(
+                          child: SingleChildScrollView(
+                            physics: const BouncingScrollPhysics(),
+                            child: DefaultTextStyle(
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: isDark ? Colors.white70 : Colors.black87,
+                                height: 1.4,
+                              ),
+                              child: content,
                             ),
                           ),
                         ),
+                        if (actions != null && actions.isNotEmpty) ...[
+                          const SizedBox(height: 18),
+                          Wrap(
+                            alignment: WrapAlignment.end,
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8.0,
+                            runSpacing: 8.0,
+                            children: actions,
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  Flexible(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: DefaultTextStyle(
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: isDark ? Colors.white70 : Colors.black87,
-                          height: 1.4,
-                        ),
-                        child: content,
-                      ),
                     ),
                   ),
-                  if (actions != null && actions.isNotEmpty) ...[
-                    const SizedBox(height: 18),
-                    Wrap(
-                      alignment: WrapAlignment.end,
-                      crossAxisAlignment: WrapCrossAlignment.center,
-                      spacing: 8.0,
-                      runSpacing: 8.0,
-                      children: actions,
-                    ),
-                  ],
                 ],
               ),
             ),
@@ -136,6 +191,9 @@ class DialogHelper {
       // Fullscreen/Stretching card style for main dashboard pages (Anak-anak, Hubungan, Assets, dll.)
       final double dialogWidth = isMobile ? screenWidth : 500;
       final double dialogHeight = isMobile ? screenHeight : (screenHeight * 0.85).clamp(300, 700);
+
+      final Color effectiveHeaderColor = headerColor ?? (isDark ? Colors.grey.shade900 : Colors.white);
+      final bool hasHeaderColor = headerColor != null;
 
       return showGeneralDialog(
         context: context,
@@ -152,7 +210,8 @@ class DialogHelper {
             child: Container(
               width: dialogWidth,
               height: dialogHeight,
-              padding: isMobile ? const EdgeInsets.fromLTRB(16, 8, 16, 8) : const EdgeInsets.all(24.0),
+              clipBehavior: Clip.antiAlias,
+              padding: EdgeInsets.zero,
               decoration: BoxDecoration(
                 color: isDark ? Colors.grey.shade900 : Colors.white,
                 borderRadius: isMobile ? BorderRadius.zero : BorderRadius.circular(16),
@@ -163,41 +222,61 @@ class DialogHelper {
                   mainAxisSize: MainAxisSize.max,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: 18, 
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.white : Colors.black87,
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                      color: effectiveHeaderColor,
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              title,
+                              style: TextStyle(
+                                fontSize: 18, 
+                                fontWeight: FontWeight.bold,
+                                color: hasHeaderColor
+                                    ? Colors.white
+                                    : (isDark ? Colors.white : Colors.black87),
+                              ),
                             ),
                           ),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.close, color: isDark ? Colors.white70 : Colors.black54),
-                          onPressed: () => Navigator.pop(context),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        physics: const ClampingScrollPhysics(),
-                        child: DefaultTextStyle(
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: isDark ? Colors.white70 : Colors.black87,
+                          IconButton(
+                            icon: Icon(
+                              Icons.close,
+                              color: hasHeaderColor
+                                  ? Colors.white
+                                  : (isDark ? Colors.white70 : Colors.black54),
+                            ),
+                            onPressed: () => Navigator.pop(context),
                           ),
-                          child: content,
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Padding(
+                        padding: isMobile ? const EdgeInsets.fromLTRB(16, 12, 16, 8) : const EdgeInsets.all(20.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Expanded(
+                              child: SingleChildScrollView(
+                                physics: const ClampingScrollPhysics(),
+                                child: DefaultTextStyle(
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: isDark ? Colors.white70 : Colors.black87,
+                                  ),
+                                  child: content,
+                                ),
+                              ),
+                            ),
+                            if (actions != null) ...[
+                              const SizedBox(height: 12),
+                              ...actions,
+                            ],
+                          ],
                         ),
                       ),
                     ),
-                    if (actions != null) ...[
-                      const SizedBox(height: 12),
-                      ...actions,
-                    ],
                   ],
                 ),
               ),

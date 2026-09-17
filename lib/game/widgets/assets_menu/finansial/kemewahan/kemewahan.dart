@@ -39,7 +39,6 @@ class KemewahanItem extends StatelessWidget {
           _showLockedDialog(context, 'Kemewahan', 15);
           return;
         }
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -52,9 +51,9 @@ class KemewahanItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUnlocked ? Colors.purple.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
+          color: isUnlocked ? Colors.purple.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isUnlocked ? Colors.purple.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.purple.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -64,8 +63,8 @@ class KemewahanItem extends StatelessWidget {
               child: Text(
                 'Kemewahan',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                   color: isUnlocked ? Colors.purple : Colors.grey,
                 ),
               ),
@@ -407,8 +406,9 @@ class _KemewahanPageState extends State<KemewahanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kemewahan'),
+        title: const Text('Kemewahan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.purple,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

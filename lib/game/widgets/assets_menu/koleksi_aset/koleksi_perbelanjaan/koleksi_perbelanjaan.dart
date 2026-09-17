@@ -37,7 +37,7 @@ class _KoleksiPerbelanjaanPageState extends State<KoleksiPerbelanjaanPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Koleksi Hasil Belanja 🛒', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          title: const Text('Koleksi Hasil Belanja 🛒', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           backgroundColor: Colors.teal.shade700,
           foregroundColor: Colors.white,
           elevation: 1,

@@ -52,9 +52,9 @@ class GarasiMobilItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUnlocked ? Colors.red.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          color: isUnlocked ? Colors.red.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isUnlocked ? Colors.red.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.red.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -64,8 +64,8 @@ class GarasiMobilItem extends StatelessWidget {
               child: Text(
                 'Garasi Mobil',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                   color: isUnlocked ? Colors.red : Colors.grey,
                 ),
               ),
@@ -310,7 +310,7 @@ class GarasiMobilPageState extends State<GarasiMobilPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Garasi Mobil'),
+        title: const Text('Garasi Mobil', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.red,
         foregroundColor: Colors.white,
         actions: [

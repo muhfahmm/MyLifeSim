@@ -18,8 +18,9 @@ class _SahamPageState extends State<SahamPage> {
     final state = widget.state;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Saham'),
+        title: const Text('Saham', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

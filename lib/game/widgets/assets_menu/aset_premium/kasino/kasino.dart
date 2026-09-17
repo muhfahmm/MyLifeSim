@@ -43,15 +43,15 @@ class KasinoItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUnlocked ? Colors.amber.withOpacity(0.1) : Colors.grey.withOpacity(0.1),
+          color: isUnlocked ? Colors.amber.withValues(alpha: 0.1) : Colors.grey.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isUnlocked ? Colors.amber.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.amber.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
             Icon(Icons.casino, color: isUnlocked ? Colors.amber : Colors.grey, size: 28),
             const SizedBox(width: 16),
-            Expanded(child: Text('Casino', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isUnlocked ? Colors.amber : Colors.grey))),
+            Expanded(child: Text('Casino', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isUnlocked ? Colors.amber : Colors.grey))),
             const SizedBox(width: 8),
             Icon(isUnlocked ? Icons.check_circle : Icons.lock, color: isUnlocked ? Colors.green : Colors.grey, size: 18),
           ],
@@ -139,6 +139,13 @@ class _KasinoPageState extends State<KasinoPage> {
     }
   }
 
+  String _getGamblingNarrative(int level) {
+    if (level == 0) return '0% • Rendah (Aman) - Bebas dari dorongan taruhan judi.';
+    if (level < 34) return '$level% • Ringan (Iseng) - Hanya mencoba taruhan judi sesekali.';
+    if (level < 67) return '$level% • Sedang (Ketergantungan) - Sering terbayang dorongan taruhan.';
+    return '$level% • Tinggi (Kompulsif / Bahaya!) - Kecanduan berat taruhan judi.';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -152,49 +159,180 @@ class _KasinoPageState extends State<KasinoPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
+    final int addictionLevel = character.gamblingAddictionLevel;
+
+    // Color code untuk kecanduan judi
+    Color statusColor;
+    if (addictionLevel < 34) {
+      statusColor = Colors.green;
+    } else if (addictionLevel < 67) {
+      statusColor = Colors.amber.shade800;
+    } else {
+      statusColor = Colors.redAccent;
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Casino'),
-        backgroundColor: Colors.amber,
-        foregroundColor: Colors.black,
-        actions: [IconButton(icon: const Icon(Icons.refresh), onPressed: () => setState(() {}))],
+        title: const Text('Casino', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
+        backgroundColor: Colors.amber.shade900,
+        foregroundColor: Colors.white,
+        elevation: 1,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: () => setState(() {}),
+            tooltip: 'Refresh Saldo & Status',
+          ),
+        ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // --- Card Saldo & Statistik ---
             Card(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+                side: BorderSide(color: isDark ? Colors.amber.shade800.withValues(alpha: 0.4) : Colors.amber.shade200),
+              ),
               color: isDark ? Colors.grey.shade800 : Colors.amber.shade50,
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Saldo Anda', style: TextStyle(fontSize: 14, color: isDark ? Colors.white70 : Colors.grey)),
-                    Text('USD ${formatRupiah(character.money)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.amber)),
-                    const SizedBox(height: 8),
-                    Row(
+                    Text(
+                      'Saldo Anda',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Colors.white70 : Colors.grey.shade700,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'USD ${formatRupiah(character.money)}',
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    // Wrap mencegah horizontal overflow pada layar HP
+                    Wrap(
+                      spacing: 12,
+                      runSpacing: 6,
+                      crossAxisAlignment: WrapCrossAlignment.center,
                       children: [
-                        const Icon(Icons.trending_up, color: Colors.green, size: 16),
-                        const SizedBox(width: 4),
-                        Text('Total Menang: USD ${formatRupiah(totalWin)}', style: const TextStyle(color: Colors.green)),
-                        const SizedBox(width: 16),
-                        const Icon(Icons.trending_down, color: Colors.red, size: 16),
-                        const SizedBox(width: 4),
-                        Text('Total Kalah: USD ${formatRupiah(totalLoss)}', style: const TextStyle(color: Colors.red)),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.trending_up, color: Colors.green, size: 15),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Menang: USD ${formatRupiah(totalWin)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.green,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.trending_down, color: Colors.red, size: 15),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Kalah: USD ${formatRupiah(totalLoss)}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                    if (slotJackpot > 0)
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8),
-                        child: Text('Jackpot Slot: USD ${formatRupiah(slotJackpot)}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                    if (slotJackpot > 0) ...[
+                      const SizedBox(height: 8),
+                      Text(
+                        '🎰 Jackpot Slot: USD ${formatRupiah(slotJackpot)}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.redAccent,
+                        ),
                       ),
+                    ],
                   ],
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 12),
+
+            // --- Card Bar Level Kecanduan Judi ---
+            Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: statusColor.withValues(alpha: 0.3)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.casino, color: statusColor, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'Level Kecanduan Judi',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 13.5,
+                            color: isDark ? Colors.amber.shade300 : Colors.amber.shade900,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '$addictionLevel%',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 13.5,
+                          color: statusColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(6),
+                    child: LinearProgressIndicator(
+                      value: (addictionLevel / 100).clamp(0.0, 1.0),
+                      minHeight: 7,
+                      backgroundColor: statusColor.withValues(alpha: 0.15),
+                      valueColor: AlwaysStoppedAnimation<Color>(statusColor),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    _getGamblingNarrative(addictionLevel),
+                    style: TextStyle(
+                      fontSize: 11.5,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
             _buildMenuTile(Icons.casino, 'Slot Machine', '3 gulungan dengan jackpot progresif', Colors.deepPurple, () => Navigator.push(context, MaterialPageRoute(builder: (_) => SlotMachinePage(state: this)))),
             const SizedBox(height: 8),
             _buildMenuTile(Icons.style, 'Blackjack', 'Kartu 21 melawan dealer', Colors.red, () => Navigator.push(context, MaterialPageRoute(builder: (_) => BlackjackPage(state: this)))),
@@ -216,27 +354,54 @@ class _KasinoPageState extends State<KasinoPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12), side: BorderSide(color: color.withOpacity(0.3))),
+      margin: EdgeInsets.zero,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: color.withValues(alpha: 0.3)),
+      ),
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 32),
-              const SizedBox(width: 16),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 26),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(label, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: color)),
+                    Text(
+                      label,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14.5,
+                        color: isDark ? Colors.white : Colors.black87,
+                      ),
+                    ),
                     const SizedBox(height: 2),
-                    Text(subtitle, style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text(
+                      subtitle,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
+              Icon(Icons.chevron_right, size: 20, color: isDark ? Colors.white54 : Colors.grey.shade400),
             ],
           ),
         ),

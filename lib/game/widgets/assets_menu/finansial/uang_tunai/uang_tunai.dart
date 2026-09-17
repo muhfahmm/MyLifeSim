@@ -100,8 +100,8 @@ class UangTunaiItem extends StatelessWidget {
               child: Text(
                 'Uang Tunai',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                   color: isUnlocked ? Colors.green : Colors.grey,
                 ),
               ),
@@ -148,13 +148,13 @@ class UangTunaiItem extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Usia saat ini: ${character.age} tahun',
-              style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.grey),
+              style: const TextStyle(fontWeight: FontWeight.bold),
             ),
           ],
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(),
+            onPressed: () => Navigator.pop(context),
             child: const Text('Mengerti'),
           ),
         ],
@@ -164,10 +164,11 @@ class UangTunaiItem extends StatelessWidget {
 }
 
 // ============================================================
-// HALAMAN UANG TUNAI (Root State)
+// HALAMAN KELOLA UANG TUNAI
 // ============================================================
 class UangTunaiPage extends StatefulWidget {
   final Character character;
+
   const UangTunaiPage({super.key, required this.character});
 
   @override
@@ -175,8 +176,8 @@ class UangTunaiPage extends StatefulWidget {
 }
 
 class _UangTunaiPageState extends State<UangTunaiPage> {
-  // Data transaksi dinamis dari objek karakter
   List<Map<String, dynamic>> get transactions => widget.character.cashTransactions;
+
   // Data pinjaman dinamis dari objek karakter
   List<Map<String, dynamic>> get loans => widget.character.cashLoans;
 
@@ -208,14 +209,6 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
     showTransferDialogInternal(context, this);
   }
 
-  void showAjukanPinjamanDialog() {
-    showAjukanPinjamanDialogInternal(context, this);
-  }
-
-  void bayarCicilan(int index) {
-    bayarCicilanInternal(context, this, index);
-  }
-
   void showLoanManagementDialog() {
     showLoanManagementDialogInternal(context, this);
   }
@@ -225,8 +218,9 @@ class _UangTunaiPageState extends State<UangTunaiPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Uang Tunai'),
+        title: const Text('Uang Tunai', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.green,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

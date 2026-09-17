@@ -39,7 +39,7 @@ class AssetsButton extends StatelessWidget {
               ),
             )
           : ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber.withOpacity(0.2),
+              backgroundColor: Colors.amber.withValues(alpha: 0.2),
               foregroundColor: Colors.amber,
               elevation: 0,
               padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 6),
@@ -69,7 +69,7 @@ class AssetsButton extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const Text('Finansial', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const Text('Finansial', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   UangTunaiItem(
                     character: character,
@@ -84,13 +84,13 @@ class AssetsButton extends StatelessWidget {
                     onPop: () => setStateDialog(() {}),
                   ),
                   const Divider(height: 32),
-                  const Text('Koleksi Aset & Belanja', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const Text('Koleksi Aset & Belanja', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   KoleksiAksorisItem(character: character, onPop: () => setStateDialog(() {})),
                   KoleksiPerbelanjaanItem(character: character, onPop: () => setStateDialog(() {})),
                   PropertiItem(character: character, onPop: () => setStateDialog(() {})),
                   const Divider(height: 32),
-                  const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const Text('Aset Premium', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
                   KasinoItem(character: character, onPop: () => setStateDialog(() {})),
                   // MuseumItem telah dihapus

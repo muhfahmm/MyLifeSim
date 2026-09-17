@@ -40,8 +40,9 @@ class PortofolioPage extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Portofolio'),
+        title: const Text('Portofolio', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
       ),
       body: Column(
         children: [

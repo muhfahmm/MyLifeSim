@@ -13,6 +13,7 @@ class TempatTinggalMenuHelper {
     DialogHelper.show(
       context: context,
       title: 'Pilih Tempat Tinggal',
+      headerColor: Colors.blue.shade700,
       isNotification: false,
       content: StatefulBuilder(
         builder: (context, setStateDialog) {

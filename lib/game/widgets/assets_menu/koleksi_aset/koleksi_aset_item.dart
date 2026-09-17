@@ -14,7 +14,6 @@ class KoleksiAksorisItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -41,11 +40,11 @@ class KoleksiAksorisItem extends StatelessWidget {
                 children: [
                   const Text(
                     'Koleksi Aksesoris',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   Text(
                     '${character.ownedAccessories.length} barang koleksi aksesoris',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Colors.grey),
                   ),
                 ],
               ),
@@ -68,7 +67,6 @@ class KoleksiPerbelanjaanItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -95,11 +93,11 @@ class KoleksiPerbelanjaanItem extends StatelessWidget {
                 children: [
                   const Text(
                     'Koleksi Hasil Belanja',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   Text(
                     '${character.ownedShopping.length} barang koleksi belanjaan',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Colors.grey),
                   ),
                 ],
               ),

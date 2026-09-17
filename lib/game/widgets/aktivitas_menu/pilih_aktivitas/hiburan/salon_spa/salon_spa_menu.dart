@@ -19,6 +19,7 @@ class SalonSpaMenuHelper {
     DialogHelper.show(
       context: context,
       title: 'Salon & Spa 💅',
+      headerColor: Colors.pink.shade700,
       isNotification: false,
       content: SalonSpaContent(
         character: character,

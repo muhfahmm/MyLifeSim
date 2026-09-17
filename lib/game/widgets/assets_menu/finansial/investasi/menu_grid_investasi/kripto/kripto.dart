@@ -18,8 +18,9 @@ class _KriptoPageState extends State<KriptoPage> {
     final state = widget.state;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kripto'),
+        title: const Text('Kripto', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),

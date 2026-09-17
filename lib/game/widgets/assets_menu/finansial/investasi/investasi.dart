@@ -156,9 +156,9 @@ class InvestasiItem extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 6),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
-          color: isUnlocked ? Colors.blue.withOpacity(0.05) : Colors.grey.withOpacity(0.05),
+          color: isUnlocked ? Colors.blue.withValues(alpha: 0.05) : Colors.grey.withValues(alpha: 0.05),
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: isUnlocked ? Colors.blue.withOpacity(0.3) : Colors.grey.withOpacity(0.3)),
+          border: Border.all(color: isUnlocked ? Colors.blue.withValues(alpha: 0.3) : Colors.grey.withValues(alpha: 0.3)),
         ),
         child: Row(
           children: [
@@ -168,8 +168,8 @@ class InvestasiItem extends StatelessWidget {
               child: Text(
                 'Investasi',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
                   color: isUnlocked ? Colors.blue : Colors.grey,
                 ),
               ),
@@ -183,7 +183,7 @@ class InvestasiItem extends StatelessWidget {
 }
 
 // ============================================================
-// HALAMAN INVESTASI UTAMA (State)
+// HALAMAN INVESTASI UTAMA (ROOT)
 // ============================================================
 class InvestasiPage extends StatefulWidget {
   final Character character;
@@ -196,7 +196,6 @@ class InvestasiPage extends StatefulWidget {
 class _InvestasiPageState extends State<InvestasiPage> {
   late Character character;
 
-  // ---- DATA INVESTASI DINAMIS & PERSISTEN DARI OBJEK KARAKTER ----
   Map<String, int> get saham => character.saham;
   set saham(Map<String, int> val) => character.saham = val;
 
@@ -478,8 +477,9 @@ class _InvestasiPageState extends State<InvestasiPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Investasi'),
+        title: const Text('Investasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -563,19 +563,28 @@ class _InvestasiPageState extends State<InvestasiPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Card(
       elevation: 0,
+      margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: color.withOpacity(0.3)),
+        borderRadius: BorderRadius.circular(14),
+        side: BorderSide(color: color.withValues(alpha: 0.3)),
       ),
+      color: isDark ? Colors.grey.shade800 : Colors.white,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
           child: Row(
             children: [
-              Icon(icon, color: color, size: 32),
-              const SizedBox(width: 16),
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(icon, color: color, size: 26),
+              ),
+              const SizedBox(width: 14),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -585,20 +594,24 @@ class _InvestasiPageState extends State<InvestasiPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 15,
-                        color: color,
+                        color: isDark ? Colors.white : Colors.black87,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       subtitle,
-                      style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.grey),
+                      style: TextStyle(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w500,
+                        color: isDark ? Colors.white70 : Colors.grey.shade600,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
               ),
-              Icon(Icons.arrow_forward_ios, size: 16, color: isDark ? Colors.white54 : Colors.grey),
+              Icon(Icons.chevron_right, size: 20, color: isDark ? Colors.white54 : Colors.grey.shade400),
             ],
           ),
         ),

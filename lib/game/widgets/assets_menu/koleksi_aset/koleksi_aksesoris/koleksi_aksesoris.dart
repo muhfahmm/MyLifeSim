@@ -35,7 +35,7 @@ class _KoleksiAksorisPageState extends State<KoleksiAksorisPage> {
       length: categories.length,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Koleksi Aksesoris 💍', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          title: const Text('Koleksi Aksesoris 💍', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
           backgroundColor: Colors.purple.shade700,
           foregroundColor: Colors.white,
           elevation: 1,

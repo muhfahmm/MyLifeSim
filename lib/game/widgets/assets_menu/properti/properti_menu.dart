@@ -28,7 +28,6 @@ class PropertiItem extends StatelessWidget {
           );
           return;
         }
-        Navigator.pop(context);
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -55,11 +54,11 @@ class PropertiItem extends StatelessWidget {
                 children: [
                   const Text(
                     'Properti & Rumah',
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                   ),
                   Text(
                     '${character.ownedHouses.length} rumah dimiliki',
-                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w500, color: Colors.grey),
                   ),
                 ],
               ),
@@ -106,7 +105,7 @@ class _PropertiMenuPageState extends State<PropertiMenuPage> with SingleTickerPr
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Properti & Rumah'),
+        title: const Text('Properti & Rumah', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white)),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
         bottom: TabBar(

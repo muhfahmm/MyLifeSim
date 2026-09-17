@@ -19,6 +19,7 @@ class OperasiPlastikMenuHelper {
     DialogHelper.show(
       context: context,
       title: 'Operasi Plastik 🏥',
+      headerColor: Colors.cyan.shade800,
       isNotification: false,
       content: OperasiPlastikContent(
         character: character,

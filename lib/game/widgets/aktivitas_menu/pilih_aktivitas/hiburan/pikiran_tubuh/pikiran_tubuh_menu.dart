@@ -19,6 +19,7 @@ class PikiranTubuhMenuHelper {
     DialogHelper.show(
       context: context,
       title: 'Pikiran & Tubuh 🧘',
+      headerColor: Colors.indigo.shade700,
       isNotification: false,
       content: PikiranTubuhContent(
         character: character,
