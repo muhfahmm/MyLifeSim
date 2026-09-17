@@ -21,51 +21,43 @@ class _TopUpPageState extends State<TopUpPage> {
     if (widget.character == null) {
       DialogHelper.show(
         context: context,
-        title: 'Perhatian',
+        title: 'Perhatian ⚠️',
         content: const Text('Anda belum memiliki karakter aktif!'),
       );
       return;
     }
 
-    showDialog(
+    DialogHelper.show(
       context: context,
-      barrierDismissible: false,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Row(
-          children: [
-            Icon(Icons.shopping_bag_rounded, color: Colors.amber),
-            SizedBox(width: 8),
-            Text('Konfirmasi Pembelian'),
-          ],
+      title: 'Konfirmasi Pembelian 🛍️',
+      content: Text('Simulasi transaksi untuk "$itemName". Lanjutkan pembayaran?'),
+      showCloseButton: false,
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
         ),
-        content: Text('Simulasi transaksi untuk "$itemName". Lanjutkan pembayaran?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Batal'),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.amber.shade800,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.amber.shade800,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                widget.character!.money += amount;
-              });
+          onPressed: () {
+            Navigator.pop(context);
+            setState(() {
+              widget.character!.money += amount;
+            });
 
-              DialogHelper.show(
-                context: context,
-                title: 'Top Up Berhasil',
-                content: Text('🎉 Berhasil Top Up $itemName!\n+\$${_fmt(amount)} telah ditambahkan ke dompet.'),
-              );
-            },
-            child: const Text('Bayar Sekarang', style: TextStyle(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+            DialogHelper.show(
+              context: context,
+              title: 'Top Up Berhasil 🎉',
+              content: Text('Berhasil Top Up $itemName!\n+\$${_fmt(amount)} telah ditambahkan ke dompet.'),
+            );
+          },
+          child: const Text('Bayar Sekarang', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
+      ],
     );
   }
 
