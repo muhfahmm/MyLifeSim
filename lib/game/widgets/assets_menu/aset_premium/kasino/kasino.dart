@@ -1,5 +1,6 @@
 // lib/game/widgets/assets_menu/aset_premium/kasino/kasino.dart
 import 'dart:math';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
