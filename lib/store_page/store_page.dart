@@ -414,10 +414,9 @@ class _StorePageState extends State<StorePage> {
               icon: Icons.account_balance_wallet_rounded,
               iconBgColor: Colors.green.shade700,
               title: 'Finansial Premium 💵',
-              description: 'Akses menu pilihan modal tunai, portofolio investasi, dan koleksi kemewahan.',
+              description: 'Akses menu portofolio investasi dan koleksi kemewahan.',
               price: 'Pilih Fitur ➔',
-              isUnlocked: GlobalSettings.isFinansialUangTunaiUnlocked.value &&
-                  GlobalSettings.isFinansialInvestasiUnlocked.value &&
+              isUnlocked: GlobalSettings.isFinansialInvestasiUnlocked.value &&
                   GlobalSettings.isFinansialKemewahanUnlocked.value,
               onTap: () {
                 Navigator.push(

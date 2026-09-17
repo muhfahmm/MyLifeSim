@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'bundle_finansial_card.dart';
-import 'uang_tunai/uang_tunai_page.dart';
 import 'investasi/investasi_page.dart';
 import 'kemewahan/kemewahan_page.dart';
 
@@ -164,109 +163,80 @@ class _FinansialPremiumPageState extends State<FinansialPremiumPage> {
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: ValueListenableBuilder<bool>(
-          valueListenable: GlobalSettings.isFinansialUangTunaiUnlocked,
-          builder: (context, isUangTunaiUnlocked, _) {
+          valueListenable: GlobalSettings.isFinansialInvestasiUnlocked,
+          builder: (context, isInvestasiUnlocked, _) {
             return ValueListenableBuilder<bool>(
-              valueListenable: GlobalSettings.isFinansialInvestasiUnlocked,
-              builder: (context, isInvestasiUnlocked, _) {
-                return ValueListenableBuilder<bool>(
-                  valueListenable: GlobalSettings.isFinansialKemewahanUnlocked,
-                  builder: (context, isKemewahanUnlocked, _) {
-                    return ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        // Card Bundle Finansial Premium
-                        BundleFinansialCard(
-                          onPurchase: (itemName, onPurchased) => _simulatePurchase(itemName, onPurchased),
-                        ),
+              valueListenable: GlobalSettings.isFinansialKemewahanUnlocked,
+              builder: (context, isKemewahanUnlocked, _) {
+                return ListView(
+                  padding: const EdgeInsets.all(16),
+                  children: [
+                    // Card Bundle Finansial Premium
+                    BundleFinansialCard(
+                      onPurchase: (itemName, onPurchased) => _simulatePurchase(itemName, onPurchased),
+                    ),
 
-                        Padding(
-                          padding: const EdgeInsets.only(left: 4, bottom: 10),
-                          child: Text(
-                            'PILIH KATEGORI FINANSIAL INDIVIDUAL:',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.bold,
-                              color: isDark ? Colors.green.shade200 : Colors.green.shade900,
-                              letterSpacing: 1.1,
-                            ),
-                          ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4, bottom: 10),
+                      child: Text(
+                        'PILIH KATEGORI FINANSIAL INDIVIDUAL:',
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.green.shade200 : Colors.green.shade900,
+                          letterSpacing: 1.1,
                         ),
+                      ),
+                    ),
 
-                        // Card 1: Uang Tunai
-                        _buildItemCard(
-                          context: context,
-                          title: 'Uang Tunai 💵',
-                          description: 'Dapatkan saldo dana modal usaha tunai tak terbatas untuk karaktermu.',
-                          icon: Icons.attach_money_rounded,
-                          color: Colors.green.shade600,
-                          price: 'Rp 149.000',
-                          isUnlocked: isUangTunaiUnlocked,
-                          onTap: () {
-                            _simulatePurchase('Uang Tunai (Finansial Premium)', () {
-                              GlobalSettings.isFinansialUangTunaiUnlocked.value = true;
-                              GlobalSettings.saveSessionStorage();
-                            });
-                          },
-                          onOpen: () {
-                            if (widget.character == null) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => UangTunaiPage(character: widget.character!)),
-                            );
-                          },
-                        ),
+                    // Card 1: Investasi
+                    _buildItemCard(
+                      context: context,
+                      title: 'Investasi 📈',
+                      description: 'Akses portofolio pasar saham, properti komersial, dan obligasi internasional.',
+                      icon: Icons.show_chart_rounded,
+                      color: Colors.blue.shade600,
+                      price: 'Rp 199.000',
+                      isUnlocked: isInvestasiUnlocked,
+                      onTap: () {
+                        _simulatePurchase('Investasi (Finansial Premium)', () {
+                          GlobalSettings.isFinansialInvestasiUnlocked.value = true;
+                          GlobalSettings.saveSessionStorage();
+                        });
+                      },
+                      onOpen: () {
+                        if (widget.character == null) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => InvestasiPage(character: widget.character!)),
+                        );
+                      },
+                    ),
 
-                        // Card 2: Investasi
-                        _buildItemCard(
-                          context: context,
-                          title: 'Investasi 📈',
-                          description: 'Akses portofolio pasar saham, properti komersial, dan obligasi internasional.',
-                          icon: Icons.show_chart_rounded,
-                          color: Colors.blue.shade600,
-                          price: 'Rp 199.000',
-                          isUnlocked: isInvestasiUnlocked,
-                          onTap: () {
-                            _simulatePurchase('Investasi (Finansial Premium)', () {
-                              GlobalSettings.isFinansialInvestasiUnlocked.value = true;
-                              GlobalSettings.saveSessionStorage();
-                            });
-                          },
-                          onOpen: () {
-                            if (widget.character == null) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => InvestasiPage(character: widget.character!)),
-                            );
-                          },
-                        ),
-
-                        // Card 3: Kemewahan
-                        _buildItemCard(
-                          context: context,
-                          title: 'Kemewahan 💎',
-                          description: 'Koleksi perhiasan langka, jet pribadi, vila super mewah, dan karya seni dunia.',
-                          icon: Icons.diamond_rounded,
-                          color: Colors.purple.shade600,
-                          price: 'Rp 249.000',
-                          isUnlocked: isKemewahanUnlocked,
-                          onTap: () {
-                            _simulatePurchase('Kemewahan (Finansial Premium)', () {
-                              GlobalSettings.isFinansialKemewahanUnlocked.value = true;
-                              GlobalSettings.saveSessionStorage();
-                            });
-                          },
-                          onOpen: () {
-                            if (widget.character == null) return;
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => KemewahanPage(character: widget.character!)),
-                            );
-                          },
-                        ),
-                      ],
-                    );
-                  },
+                    // Card 2: Kemewahan
+                    _buildItemCard(
+                      context: context,
+                      title: 'Kemewahan 💎',
+                      description: 'Koleksi perhiasan langka, jet pribadi, vila super mewah, dan karya seni dunia.',
+                      icon: Icons.diamond_rounded,
+                      color: Colors.purple.shade600,
+                      price: 'Rp 249.000',
+                      isUnlocked: isKemewahanUnlocked,
+                      onTap: () {
+                        _simulatePurchase('Kemewahan (Finansial Premium)', () {
+                          GlobalSettings.isFinansialKemewahanUnlocked.value = true;
+                          GlobalSettings.saveSessionStorage();
+                        });
+                      },
+                      onOpen: () {
+                        if (widget.character == null) return;
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => KemewahanPage(character: widget.character!)),
+                        );
+                      },
+                    ),
+                  ],
                 );
               },
             );

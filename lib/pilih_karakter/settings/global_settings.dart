@@ -42,7 +42,6 @@ class GlobalSettings {
   static final ValueNotifier<bool> isTeacherStudentUnlocked = ValueNotifier<bool>(false);
 
   // Status Pembelian Finansial Premium
-  static final ValueNotifier<bool> isFinansialUangTunaiUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isFinansialInvestasiUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isFinansialKemewahanUnlocked = ValueNotifier<bool>(false);
 
@@ -93,7 +92,6 @@ class GlobalSettings {
     'isMakeLoveUnlocked': isMakeLoveUnlocked,
     'isIncestUnlocked': isIncestUnlocked,
     'isTeacherStudentUnlocked': isTeacherStudentUnlocked,
-    'isFinansialUangTunaiUnlocked': isFinansialUangTunaiUnlocked,
     'isFinansialInvestasiUnlocked': isFinansialInvestasiUnlocked,
     'isFinansialKemewahanUnlocked': isFinansialKemewahanUnlocked,
     'isAssetsCasinoUnlocked': isAssetsCasinoUnlocked,
