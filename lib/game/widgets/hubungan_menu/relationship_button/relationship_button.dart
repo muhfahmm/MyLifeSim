@@ -31,10 +31,11 @@ class _RelationshipButtonState extends State<RelationshipButton> {
   // ==========================================================
   // LOGIKA INTERAKSI PENGAHUSAN (PARENTING)
   // ==========================================================
-    // --- LOGIKA INTERAKSI PENGAHUSAN (PARENTING) ---
+  // --- LOGIKA INTERAKSI PENGAHUSAN (PARENTING) ---
   void _handleParentingAction(String childName, String action) {
     // Cari index anak berdasarkan nama
-    final int index = widget.character.children.indexWhere((c) => c['name'] == childName);
+    final int index =
+        widget.character.children.indexWhere((c) => c['name'] == childName);
     if (index == -1) return;
 
     // Ambil data anak
@@ -142,19 +143,29 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               _dialogSetState = setDialogState;
 
               // Bersihkan partner yang secara tidak sengaja bentrok dengan nama anak
-              if (character.partner != null && character.children.any((c) => c['name'] == character.partner!['name'])) {
+              if (character.partner != null &&
+                  character.children
+                      .any((c) => c['name'] == character.partner!['name'])) {
                 character.partner = null;
               }
-              if (character.secondPartner != null && character.children.any((c) => c['name'] == character.secondPartner!['name'])) {
+              if (character.secondPartner != null &&
+                  character.children.any(
+                      (c) => c['name'] == character.secondPartner!['name'])) {
                 character.secondPartner = null;
               }
-              if (character.thirdPartner != null && character.children.any((c) => c['name'] == character.thirdPartner!['name'])) {
+              if (character.thirdPartner != null &&
+                  character.children.any(
+                      (c) => c['name'] == character.thirdPartner!['name'])) {
                 character.thirdPartner = null;
               }
-              if (character.fourthPartner != null && character.children.any((c) => c['name'] == character.fourthPartner!['name'])) {
+              if (character.fourthPartner != null &&
+                  character.children.any(
+                      (c) => c['name'] == character.fourthPartner!['name'])) {
                 character.fourthPartner = null;
               }
-              if (character.fifthPartner != null && character.children.any((c) => c['name'] == character.fifthPartner!['name'])) {
+              if (character.fifthPartner != null &&
+                  character.children.any(
+                      (c) => c['name'] == character.fifthPartner!['name'])) {
                 character.fifthPartner = null;
               }
 
@@ -178,7 +189,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     'name': sib['name'] ?? 'Saudara',
                     'gender': sib['gender'] ?? 'Laki-laki',
                     'relation': sib['relation'] ?? 'Saudara',
-                    'relationship': int.tryParse(sib['relationship'] ?? '50') ?? 50,
+                    'relationship':
+                        int.tryParse(sib['relationship'] ?? '50') ?? 50,
                     'age': sibAge,
                     'isDeceased': isDeceased,
                     'skinColor': sib['skinColor'],
@@ -209,9 +221,14 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   // ============================================
                   // 1. BAGIAN ORANGTUA
                   // ============================================
-                  if (character.isFatherDivorced || character.isMotherDivorced) ...[
+                  if (character.isFatherDivorced ||
+                      character.isMotherDivorced) ...[
                     if (character.fatherName != null) ...[
-                      const Text('👨 Ayah (Terpisah)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                      const Text('👨 Ayah (Terpisah)',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -221,17 +238,29 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             : character.isFatherImprisoned
                                 ? '${character.fatherName} (Dipenjara)'
                                 : character.fatherName!,
-                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Ayah Kandung',
-                        color: character.isFatherDeceased ? Colors.grey : Colors.blue,
-                        relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
-                        ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
+                        status: character.isFatherImprisoned
+                            ? 'Dipenjara'
+                            : 'Ayah Kandung',
+                        color: character.isFatherDeceased
+                            ? Colors.grey
+                            : Colors.blue,
+                        relationshipValue: character.isFatherDeceased
+                            ? 0
+                            : (character.fatherRelationship ?? 50),
+                        ageText: character.fatherAge != null
+                            ? '${character.fatherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isFatherDeceased,
-                        isLivingTogether: character.livesWithParents && character.custodyParent == 'Ayah' && !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            character.custodyParent == 'Ayah' &&
+                            !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fatherName!,
                           gender: 'Laki-laki',
                           age: character.fatherAge ?? 40,
-                          happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                          happiness: character.isFatherDeceased
+                              ? 0
+                              : (character.fatherRelationship ?? 50),
                           forcedSkinColor: character.fatherSkinColor,
                         ),
                       ),
@@ -239,25 +268,40 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         _buildFamilyItem(
                           context,
                           icon: Icons.person_add,
-                          label: character.isStepMotherDeceased ? '${character.stepMotherName} (Wafat)' : character.stepMotherName!,
+                          label: character.isStepMotherDeceased
+                              ? '${character.stepMotherName} (Wafat)'
+                              : character.stepMotherName!,
                           status: 'Ibu Tiri',
-                          color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
-                          relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
-                          ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
+                          color: character.isStepMotherDeceased
+                              ? Colors.grey
+                              : Colors.pinkAccent,
+                          relationshipValue: character.isStepMotherDeceased
+                              ? 0
+                              : (character.stepMotherRelationship ?? 50),
+                          ageText: character.stepMotherAge != null
+                              ? '${character.stepMotherAge} tahun'
+                              : 'Tidak diketahui',
                           isDeceased: character.isStepMotherDeceased,
-                          isLivingTogether: character.livesWithParents && character.custodyParent == 'Ayah',
+                          isLivingTogether: character.livesWithParents &&
+                              character.custodyParent == 'Ayah',
                           avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                             name: character.stepMotherName!,
                             gender: 'Perempuan',
                             age: character.stepMotherAge ?? 40,
-                            happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                            happiness: character.isStepMotherDeceased
+                                ? 0
+                                : (character.stepMotherRelationship ?? 50),
                             forcedSkinColor: character.stepMotherSkinColor,
                           ),
                         ),
                       const SizedBox(height: 16),
                     ],
                     if (character.motherName != null) ...[
-                      const Text('👩 Ibu (Terpisah)', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                      const Text('👩 Ibu (Terpisah)',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -267,17 +311,29 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             : character.isMotherImprisoned
                                 ? '${character.motherName} (Dipenjara)'
                                 : character.motherName!,
-                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Ibu Kandung',
-                        color: character.isMotherDeceased ? Colors.grey : Colors.pink,
-                        relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
-                        ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
+                        status: character.isMotherImprisoned
+                            ? 'Dipenjara'
+                            : 'Ibu Kandung',
+                        color: character.isMotherDeceased
+                            ? Colors.grey
+                            : Colors.pink,
+                        relationshipValue: character.isMotherDeceased
+                            ? 0
+                            : (character.motherRelationship ?? 50),
+                        ageText: character.motherAge != null
+                            ? '${character.motherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isMotherDeceased,
-                        isLivingTogether: character.livesWithParents && character.custodyParent == 'Ibu' && !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            character.custodyParent == 'Ibu' &&
+                            !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.motherName!,
                           gender: 'Perempuan',
                           age: character.motherAge ?? 40,
-                          happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                          happiness: character.isMotherDeceased
+                              ? 0
+                              : (character.motherRelationship ?? 50),
                           forcedSkinColor: character.motherSkinColor,
                         ),
                       ),
@@ -285,25 +341,40 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         _buildFamilyItem(
                           context,
                           icon: Icons.person_add,
-                          label: character.isStepFatherDeceased ? '${character.stepFatherName} (Wafat)' : character.stepFatherName!,
+                          label: character.isStepFatherDeceased
+                              ? '${character.stepFatherName} (Wafat)'
+                              : character.stepFatherName!,
                           status: 'Ayah Tiri',
-                          color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
-                          relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
-                          ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
+                          color: character.isStepFatherDeceased
+                              ? Colors.grey
+                              : Colors.blueGrey,
+                          relationshipValue: character.isStepFatherDeceased
+                              ? 0
+                              : (character.stepFatherRelationship ?? 50),
+                          ageText: character.stepFatherAge != null
+                              ? '${character.stepFatherAge} tahun'
+                              : 'Tidak diketahui',
                           isDeceased: character.isStepFatherDeceased,
-                          isLivingTogether: character.livesWithParents && character.custodyParent == 'Ibu',
+                          isLivingTogether: character.livesWithParents &&
+                              character.custodyParent == 'Ibu',
                           avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                             name: character.stepFatherName!,
                             gender: 'Laki-laki',
                             age: character.stepFatherAge ?? 40,
-                            happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                            happiness: character.isStepFatherDeceased
+                                ? 0
+                                : (character.stepFatherRelationship ?? 50),
                             forcedSkinColor: character.stepFatherSkinColor,
                           ),
                         ),
                       const SizedBox(height: 16),
                     ],
                   ] else ...[
-                    const Text('👨‍👩‍👧 Orangtua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                    const Text('👨‍👩‍👧 Orangtua',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blueGrey)),
                     const SizedBox(height: 8),
                     if (character.fatherName != null)
                       _buildFamilyItem(
@@ -314,36 +385,60 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             : character.isFatherImprisoned
                                 ? '${character.fatherName} (Dipenjara)'
                                 : character.fatherName!,
-                        status: character.isFatherImprisoned ? 'Dipenjara' : 'Ayah Kandung',
-                        color: character.isFatherDeceased ? Colors.grey : Colors.blue,
-                        relationshipValue: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
-                        ageText: character.fatherAge != null ? '${character.fatherAge} tahun' : 'Tidak diketahui',
+                        status: character.isFatherImprisoned
+                            ? 'Dipenjara'
+                            : 'Ayah Kandung',
+                        color: character.isFatherDeceased
+                            ? Colors.grey
+                            : Colors.blue,
+                        relationshipValue: character.isFatherDeceased
+                            ? 0
+                            : (character.fatherRelationship ?? 50),
+                        ageText: character.fatherAge != null
+                            ? '${character.fatherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isFatherDeceased,
-                        isLivingTogether: character.livesWithParents && !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fatherName!,
                           gender: 'Laki-laki',
                           age: character.fatherAge ?? 40,
-                          happiness: character.isFatherDeceased ? 0 : (character.fatherRelationship ?? 50),
+                          happiness: character.isFatherDeceased
+                              ? 0
+                              : (character.fatherRelationship ?? 50),
                           forcedSkinColor: character.fatherSkinColor,
                         ),
                       ),
-                    if (character.stepMotherName != null && !(character.isFatherDivorced || character.isMotherDivorced))
+                    if (character.stepMotherName != null &&
+                        !(character.isFatherDivorced ||
+                            character.isMotherDivorced))
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_add,
-                        label: character.isStepMotherDeceased ? '${character.stepMotherName} (Wafat)' : character.stepMotherName!,
+                        label: character.isStepMotherDeceased
+                            ? '${character.stepMotherName} (Wafat)'
+                            : character.stepMotherName!,
                         status: 'Ibu Tiri',
-                        color: character.isStepMotherDeceased ? Colors.grey : Colors.pinkAccent,
-                        relationshipValue: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
-                        ageText: character.stepMotherAge != null ? '${character.stepMotherAge} tahun' : 'Tidak diketahui',
+                        color: character.isStepMotherDeceased
+                            ? Colors.grey
+                            : Colors.pinkAccent,
+                        relationshipValue: character.isStepMotherDeceased
+                            ? 0
+                            : (character.stepMotherRelationship ?? 50),
+                        ageText: character.stepMotherAge != null
+                            ? '${character.stepMotherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isStepMotherDeceased,
-                        isLivingTogether: character.livesWithParents && !character.isFatherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            !character.isFatherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.stepMotherName!,
                           gender: 'Perempuan',
                           age: character.stepMotherAge ?? 40,
-                          happiness: character.isStepMotherDeceased ? 0 : (character.stepMotherRelationship ?? 50),
+                          happiness: character.isStepMotherDeceased
+                              ? 0
+                              : (character.stepMotherRelationship ?? 50),
                           forcedSkinColor: character.stepMotherSkinColor,
                         ),
                       ),
@@ -356,36 +451,60 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             : character.isMotherImprisoned
                                 ? '${character.motherName} (Dipenjara)'
                                 : character.motherName!,
-                        status: character.isMotherImprisoned ? 'Dipenjara' : 'Ibu Kandung',
-                        color: character.isMotherDeceased ? Colors.grey : Colors.pink,
-                        relationshipValue: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
-                        ageText: character.motherAge != null ? '${character.motherAge} tahun' : 'Tidak diketahui',
+                        status: character.isMotherImprisoned
+                            ? 'Dipenjara'
+                            : 'Ibu Kandung',
+                        color: character.isMotherDeceased
+                            ? Colors.grey
+                            : Colors.pink,
+                        relationshipValue: character.isMotherDeceased
+                            ? 0
+                            : (character.motherRelationship ?? 50),
+                        ageText: character.motherAge != null
+                            ? '${character.motherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isMotherDeceased,
-                        isLivingTogether: character.livesWithParents && !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.motherName!,
                           gender: 'Perempuan',
                           age: character.motherAge ?? 40,
-                          happiness: character.isMotherDeceased ? 0 : (character.motherRelationship ?? 50),
+                          happiness: character.isMotherDeceased
+                              ? 0
+                              : (character.motherRelationship ?? 50),
                           forcedSkinColor: character.motherSkinColor,
                         ),
                       ),
-                    if (character.stepFatherName != null && !(character.isFatherDivorced || character.isMotherDivorced))
+                    if (character.stepFatherName != null &&
+                        !(character.isFatherDivorced ||
+                            character.isMotherDivorced))
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_add,
-                        label: character.isStepFatherDeceased ? '${character.stepFatherName} (Wafat)' : character.stepFatherName!,
+                        label: character.isStepFatherDeceased
+                            ? '${character.stepFatherName} (Wafat)'
+                            : character.stepFatherName!,
                         status: 'Ayah Tiri',
-                        color: character.isStepFatherDeceased ? Colors.grey : Colors.blueGrey,
-                        relationshipValue: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
-                        ageText: character.stepFatherAge != null ? '${character.stepFatherAge} tahun' : 'Tidak diketahui',
+                        color: character.isStepFatherDeceased
+                            ? Colors.grey
+                            : Colors.blueGrey,
+                        relationshipValue: character.isStepFatherDeceased
+                            ? 0
+                            : (character.stepFatherRelationship ?? 50),
+                        ageText: character.stepFatherAge != null
+                            ? '${character.stepFatherAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isStepFatherDeceased,
-                        isLivingTogether: character.livesWithParents && !character.isMotherImprisoned,
+                        isLivingTogether: character.livesWithParents &&
+                            !character.isMotherImprisoned,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.stepFatherName!,
                           gender: 'Laki-laki',
                           age: character.stepFatherAge ?? 40,
-                          happiness: character.isStepFatherDeceased ? 0 : (character.stepFatherRelationship ?? 50),
+                          happiness: character.isStepFatherDeceased
+                              ? 0
+                              : (character.stepFatherRelationship ?? 50),
                           forcedSkinColor: character.stepFatherSkinColor,
                         ),
                       ),
@@ -401,20 +520,30 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         Text(
                           (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
                               ? '💖 Pacar'
-                              : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
+                              : (character.partner!['relation'] ?? 'Pacar') ==
+                                      'Tunangan'
                                   ? '💍 Tunangan'
                                   : '👩‍❤️‍👨 Pasangan Hidup',
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey),
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: Colors.blueGrey),
                         ),
-                        if ((character.partner!['relation'] ?? 'Pacar') == 'Pacar') ...[
+                        if ((character.partner!['relation'] ?? 'Pacar') ==
+                            'Pacar') ...[
                           const SizedBox(width: 8),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: Colors.redAccent,
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Text('Pacar Resmi', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                            child: const Text('Pacar Resmi',
+                                style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold)),
                           ),
                         ],
                       ],
@@ -422,29 +551,45 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     const SizedBox(height: 8),
                     _buildFamilyItem(
                       context,
-                      icon: (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
-                          ? Icons.favorite
-                          : (character.partner!['relation'] ?? 'Pacar') == 'Tunangan'
-                              ? Icons.diamond
-                              : Icons.wc,
+                      icon:
+                          (character.partner!['relation'] ?? 'Pacar') == 'Pacar'
+                              ? Icons.favorite
+                              : (character.partner!['relation'] ?? 'Pacar') ==
+                                      'Tunangan'
+                                  ? Icons.diamond
+                                  : Icons.wc,
                       label: character.partner!['isDeceased'] == 'true'
                           ? '${character.partner!['name'] ?? 'Pasangan'} (Wafat)'
                           : (character.partner!['name'] ?? 'Pasangan'),
                       status: character.partner!['relation'] ?? 'Pacar',
-                      color: character.partner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
-                      relationshipValue: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
+                      color: character.partner!['isDeceased'] == 'true'
+                          ? Colors.grey
+                          : Colors.redAccent,
+                      relationshipValue: int.tryParse(
+                              character.partner!['relationship'] ?? '80') ??
+                          80,
                       ageText: '${character.partner!['age'] ?? '20'} tahun',
                       avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                         name: character.partner!['name'] ?? 'Pasangan',
                         gender: character.partner!['gender'] ?? 'Perempuan',
-                        age: int.tryParse(character.partner!['age'] ?? '20') ?? 20,
-                        happiness: int.tryParse(character.partner!['relationship'] ?? '80') ?? 80,
-                        forcedSkinColor: character.getFamilyMemberSkinColor(character.partner!['name'] ?? '') ?? character.partner!['skinColor'],
+                        age: int.tryParse(character.partner!['age'] ?? '20') ??
+                            20,
+                        happiness: int.tryParse(
+                                character.partner!['relationship'] ?? '80') ??
+                            80,
+                        forcedSkinColor: character.getFamilyMemberSkinColor(
+                                character.partner!['name'] ?? '') ??
+                            character.partner!['skinColor'],
                       ),
                     ),
-                    if (character.secondPartner != null && !character.isHavingAffair) ...[
+                    if (character.secondPartner != null &&
+                        !character.isHavingAffair) ...[
                       const SizedBox(height: 12),
-                      const Text('❤️ Pacar Kedua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const Text('❤️ Pacar Kedua',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -453,21 +598,39 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ? '${character.secondPartner!['name'] ?? 'Pacar'} (Wafat)'
                             : (character.secondPartner!['name'] ?? 'Pacar'),
                         status: 'Pacar Kedua',
-                        color: character.secondPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
-                        relationshipValue: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
-                        ageText: '${character.secondPartner!['age'] ?? '20'} tahun',
+                        color: character.secondPartner!['isDeceased'] == 'true'
+                            ? Colors.grey
+                            : Colors.redAccent,
+                        relationshipValue: int.tryParse(
+                                character.secondPartner!['relationship'] ??
+                                    '70') ??
+                            70,
+                        ageText:
+                            '${character.secondPartner!['age'] ?? '20'} tahun',
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.secondPartner!['name'] ?? 'Pacar',
-                          gender: character.secondPartner!['gender'] ?? 'Perempuan',
-                          age: int.tryParse(character.secondPartner!['age'] ?? '20') ?? 20,
-                          happiness: int.tryParse(character.secondPartner!['relationship'] ?? '70') ?? 70,
-                          forcedSkinColor: character.getFamilyMemberSkinColor(character.secondPartner!['name'] ?? '') ?? character.secondPartner!['skinColor'],
+                          gender:
+                              character.secondPartner!['gender'] ?? 'Perempuan',
+                          age: int.tryParse(
+                                  character.secondPartner!['age'] ?? '20') ??
+                              20,
+                          happiness: int.tryParse(
+                                  character.secondPartner!['relationship'] ??
+                                      '70') ??
+                              70,
+                          forcedSkinColor: character.getFamilyMemberSkinColor(
+                                  character.secondPartner!['name'] ?? '') ??
+                              character.secondPartner!['skinColor'],
                         ),
                       ),
                     ],
                     if (character.thirdPartner != null) ...[
                       const SizedBox(height: 12),
-                      const Text('❤️ Pacar Ketiga', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const Text('❤️ Pacar Ketiga',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -476,21 +639,39 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ? '${character.thirdPartner!['name'] ?? 'Pacar'} (Wafat)'
                             : (character.thirdPartner!['name'] ?? 'Pacar'),
                         status: 'Pacar Ketiga',
-                        color: character.thirdPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
-                        relationshipValue: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
-                        ageText: '${character.thirdPartner!['age'] ?? '20'} tahun',
+                        color: character.thirdPartner!['isDeceased'] == 'true'
+                            ? Colors.grey
+                            : Colors.redAccent,
+                        relationshipValue: int.tryParse(
+                                character.thirdPartner!['relationship'] ??
+                                    '70') ??
+                            70,
+                        ageText:
+                            '${character.thirdPartner!['age'] ?? '20'} tahun',
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.thirdPartner!['name'] ?? 'Pacar',
-                          gender: character.thirdPartner!['gender'] ?? 'Perempuan',
-                          age: int.tryParse(character.thirdPartner!['age'] ?? '20') ?? 20,
-                          happiness: int.tryParse(character.thirdPartner!['relationship'] ?? '70') ?? 70,
-                          forcedSkinColor: character.getFamilyMemberSkinColor(character.thirdPartner!['name'] ?? '') ?? character.thirdPartner!['skinColor'],
+                          gender:
+                              character.thirdPartner!['gender'] ?? 'Perempuan',
+                          age: int.tryParse(
+                                  character.thirdPartner!['age'] ?? '20') ??
+                              20,
+                          happiness: int.tryParse(
+                                  character.thirdPartner!['relationship'] ??
+                                      '70') ??
+                              70,
+                          forcedSkinColor: character.getFamilyMemberSkinColor(
+                                  character.thirdPartner!['name'] ?? '') ??
+                              character.thirdPartner!['skinColor'],
                         ),
                       ),
                     ],
                     if (character.fourthPartner != null) ...[
                       const SizedBox(height: 12),
-                      const Text('❤️ Pacar Keempat', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const Text('❤️ Pacar Keempat',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -499,21 +680,39 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ? '${character.fourthPartner!['name'] ?? 'Pacar'} (Wafat)'
                             : (character.fourthPartner!['name'] ?? 'Pacar'),
                         status: 'Pacar Keempat',
-                        color: character.fourthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
-                        relationshipValue: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
-                        ageText: '${character.fourthPartner!['age'] ?? '20'} tahun',
+                        color: character.fourthPartner!['isDeceased'] == 'true'
+                            ? Colors.grey
+                            : Colors.redAccent,
+                        relationshipValue: int.tryParse(
+                                character.fourthPartner!['relationship'] ??
+                                    '70') ??
+                            70,
+                        ageText:
+                            '${character.fourthPartner!['age'] ?? '20'} tahun',
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fourthPartner!['name'] ?? 'Pacar',
-                          gender: character.fourthPartner!['gender'] ?? 'Perempuan',
-                          age: int.tryParse(character.fourthPartner!['age'] ?? '20') ?? 20,
-                          happiness: int.tryParse(character.fourthPartner!['relationship'] ?? '70') ?? 70,
-                          forcedSkinColor: character.getFamilyMemberSkinColor(character.fourthPartner!['name'] ?? '') ?? character.fourthPartner!['skinColor'],
+                          gender:
+                              character.fourthPartner!['gender'] ?? 'Perempuan',
+                          age: int.tryParse(
+                                  character.fourthPartner!['age'] ?? '20') ??
+                              20,
+                          happiness: int.tryParse(
+                                  character.fourthPartner!['relationship'] ??
+                                      '70') ??
+                              70,
+                          forcedSkinColor: character.getFamilyMemberSkinColor(
+                                  character.fourthPartner!['name'] ?? '') ??
+                              character.fourthPartner!['skinColor'],
                         ),
                       ),
                     ],
                     if (character.fifthPartner != null) ...[
                       const SizedBox(height: 12),
-                      const Text('❤️ Pacar Kelima', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.blueGrey)),
+                      const Text('❤️ Pacar Kelima',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: Colors.blueGrey)),
                       const SizedBox(height: 8),
                       _buildFamilyItem(
                         context,
@@ -522,15 +721,29 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ? '${character.fifthPartner!['name'] ?? 'Pacar'} (Wafat)'
                             : (character.fifthPartner!['name'] ?? 'Pacar'),
                         status: 'Pacar Kelima',
-                        color: character.fifthPartner!['isDeceased'] == 'true' ? Colors.grey : Colors.redAccent,
-                        relationshipValue: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,
-                        ageText: '${character.fifthPartner!['age'] ?? '20'} tahun',
+                        color: character.fifthPartner!['isDeceased'] == 'true'
+                            ? Colors.grey
+                            : Colors.redAccent,
+                        relationshipValue: int.tryParse(
+                                character.fifthPartner!['relationship'] ??
+                                    '70') ??
+                            70,
+                        ageText:
+                            '${character.fifthPartner!['age'] ?? '20'} tahun',
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fifthPartner!['name'] ?? 'Pacar',
-                          gender: character.fifthPartner!['gender'] ?? 'Perempuan',
-                          age: int.tryParse(character.fifthPartner!['age'] ?? '20') ?? 20,
-                          happiness: int.tryParse(character.fifthPartner!['relationship'] ?? '70') ?? 70,
-                          forcedSkinColor: character.getFamilyMemberSkinColor(character.fifthPartner!['name'] ?? '') ?? character.fifthPartner!['skinColor'],
+                          gender:
+                              character.fifthPartner!['gender'] ?? 'Perempuan',
+                          age: int.tryParse(
+                                  character.fifthPartner!['age'] ?? '20') ??
+                              20,
+                          happiness: int.tryParse(
+                                  character.fifthPartner!['relationship'] ??
+                                      '70') ??
+                              70,
+                          forcedSkinColor: character.getFamilyMemberSkinColor(
+                                  character.fifthPartner!['name'] ?? '') ??
+                              character.fifthPartner!['skinColor'],
                         ),
                       ),
                     ],
@@ -555,15 +768,24 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           const Divider(height: 32),
                           Row(
                             children: [
-                              const Text('💔 Hubungan Rahasia', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.deepOrange)),
+                              const Text('💔 Hubungan Rahasia',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16,
+                                      color: Colors.deepOrange)),
                               const SizedBox(width: 8),
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 6, vertical: 2),
                                 decoration: BoxDecoration(
                                   color: Colors.deepOrange,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                child: const Text('Selingkuhan', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                                child: const Text('Selingkuhan',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
@@ -571,7 +793,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           ...secretList.map((sec) {
                             final bool isDeceased = sec['isDeceased'] == 'true';
                             final String sName = sec['name'] ?? '';
-                            final String relationRole = sec['relation'] ?? 'Pacar (Rahasia)';
+                            final String relationRole =
+                                sec['relation'] ?? 'Pacar (Rahasia)';
                             return Padding(
                               padding: const EdgeInsets.only(bottom: 8.0),
                               child: _buildFamilyItem(
@@ -579,16 +802,27 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                 icon: Icons.heart_broken,
                                 label: isDeceased ? '$sName (Wafat)' : sName,
                                 status: relationRole,
-                                color: isDeceased ? Colors.grey : Colors.deepOrange,
-                                relationshipValue: int.tryParse(sec['relationship'] ?? '70') ?? 70,
-                                ageText: sec['age'] != null ? '${sec['age']} tahun' : 'Tidak diketahui',
+                                color: isDeceased
+                                    ? Colors.grey
+                                    : Colors.deepOrange,
+                                relationshipValue:
+                                    int.tryParse(sec['relationship'] ?? '70') ??
+                                        70,
+                                ageText: sec['age'] != null
+                                    ? '${sec['age']} tahun'
+                                    : 'Tidak diketahui',
                                 isDeceased: isDeceased,
-                                avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                                avatarUrl:
+                                    AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                                   name: sName,
                                   gender: sec['gender'] ?? 'Perempuan',
                                   age: int.tryParse(sec['age'] ?? '20') ?? 20,
-                                  happiness: int.tryParse(sec['relationship'] ?? '70') ?? 70,
-                                  forcedSkinColor: character.getFamilyMemberSkinColor(sName) ?? sec['skinColor'],
+                                  happiness: int.tryParse(
+                                          sec['relationship'] ?? '70') ??
+                                      70,
+                                  forcedSkinColor: character
+                                          .getFamilyMemberSkinColor(sName) ??
+                                      sec['skinColor'],
                                 ),
                               ),
                             );
@@ -601,41 +835,66 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   // ============================================
                   // 2b. BAGIAN MERTUA (AYAH & IBU MERTUA)
                   // ============================================
-                  if (character.fatherInLawName != null || character.motherInLawName != null) ...[
+                  if (character.fatherInLawName != null ||
+                      character.motherInLawName != null) ...[
                     const Divider(height: 32),
-                    const Text('👵👴 Mertua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                    const Text('👵👴 Mertua',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blueGrey)),
                     const SizedBox(height: 8),
                     if (character.fatherInLawName != null)
                       _buildFamilyItem(
                         context,
                         icon: Icons.person,
-                        label: character.isFatherInLawDeceased ? '${character.fatherInLawName} (Wafat)' : character.fatherInLawName!,
+                        label: character.isFatherInLawDeceased
+                            ? '${character.fatherInLawName} (Wafat)'
+                            : character.fatherInLawName!,
                         status: 'Ayah Mertua',
-                        color: character.isFatherInLawDeceased ? Colors.grey : Colors.blueGrey,
-                        relationshipValue: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
-                        ageText: character.fatherInLawAge != null ? '${character.fatherInLawAge} tahun' : 'Tidak diketahui',
+                        color: character.isFatherInLawDeceased
+                            ? Colors.grey
+                            : Colors.blueGrey,
+                        relationshipValue: character.isFatherInLawDeceased
+                            ? 0
+                            : (character.fatherInLawRelationship ?? 50),
+                        ageText: character.fatherInLawAge != null
+                            ? '${character.fatherInLawAge} tahun'
+                            : 'Tidak diketahui',
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.fatherInLawName!,
                           gender: 'Laki-laki',
                           age: character.fatherInLawAge ?? 50,
-                          happiness: character.isFatherInLawDeceased ? 0 : (character.fatherInLawRelationship ?? 50),
+                          happiness: character.isFatherInLawDeceased
+                              ? 0
+                              : (character.fatherInLawRelationship ?? 50),
                         ),
                       ),
                     if (character.motherInLawName != null)
                       _buildFamilyItem(
                         context,
                         icon: Icons.person_outline,
-                        label: character.isMotherInLawDeceased ? '${character.motherInLawName} (Wafat)' : character.motherInLawName!,
+                        label: character.isMotherInLawDeceased
+                            ? '${character.motherInLawName} (Wafat)'
+                            : character.motherInLawName!,
                         status: 'Ibu Mertua',
-                        color: character.isMotherInLawDeceased ? Colors.grey : Colors.brown,
-                        relationshipValue: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
-                        ageText: character.motherInLawAge != null ? '${character.motherInLawAge} tahun' : 'Tidak diketahui',
+                        color: character.isMotherInLawDeceased
+                            ? Colors.grey
+                            : Colors.brown,
+                        relationshipValue: character.isMotherInLawDeceased
+                            ? 0
+                            : (character.motherInLawRelationship ?? 50),
+                        ageText: character.motherInLawAge != null
+                            ? '${character.motherInLawAge} tahun'
+                            : 'Tidak diketahui',
                         isDeceased: character.isMotherInLawDeceased,
                         avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                           name: character.motherInLawName!,
                           gender: 'Perempuan',
                           age: character.motherInLawAge ?? 50,
-                          happiness: character.isMotherInLawDeceased ? 0 : (character.motherInLawRelationship ?? 50),
+                          happiness: character.isMotherInLawDeceased
+                              ? 0
+                              : (character.motherInLawRelationship ?? 50),
                         ),
                       ),
                   ],
@@ -645,9 +904,15 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   // ============================================
                   // 3. BAGIAN SAUDARA & DIRI SENDIRI
                   // ============================================
-                  const Text('👫 Saudara & Diri Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                  const Text('👫 Saudara & Diri Anda',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.blueGrey)),
                   const SizedBox(height: 8),
-                  ...childrenList.where((child) => (child['age'] as int) >= 0).map((child) {
+                  ...childrenList
+                      .where((child) => (child['age'] as int) >= 0)
+                      .map((child) {
                     final bool isPlayer = child['isPlayer'] as bool;
                     final String name = child['name'] as String;
                     final String gender = child['gender'] as String;
@@ -663,7 +928,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         decoration: BoxDecoration(
                           color: Colors.teal.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: Colors.teal.withOpacity(0.4), width: 1.5),
+                          border: Border.all(
+                              color: Colors.teal.withOpacity(0.4), width: 1.5),
                         ),
                         child: Row(
                           children: [
@@ -677,12 +943,14 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                     happiness: character.happiness,
                                   ),
                                 ),
-                                loadingBuilder: (context, child, loadingProgress) {
+                                loadingBuilder:
+                                    (context, child, loadingProgress) {
                                   if (loadingProgress == null) return child;
                                   return const SizedBox(
                                     width: 14,
                                     height: 14,
-                                    child: CircularProgressIndicator(strokeWidth: 1.5),
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 1.5),
                                   );
                                 },
                                 width: 28,
@@ -697,55 +965,89 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                   Row(
                                     children: [
                                       Icon(
-                                        character.gender.toLowerCase().contains('perempuan') ? Icons.female : Icons.male,
-                                        color: character.gender.toLowerCase().contains('perempuan') ? Colors.pink : Colors.blue,
+                                        character.gender
+                                                .toLowerCase()
+                                                .contains('perempuan')
+                                            ? Icons.female
+                                            : Icons.male,
+                                        color: character.gender
+                                                .toLowerCase()
+                                                .contains('perempuan')
+                                            ? Colors.pink
+                                            : Colors.blue,
                                         size: 16,
                                       ),
                                       const SizedBox(width: 4),
                                       Expanded(
                                         child: Text(
                                           name,
-                                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.teal),
+                                          style: const TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.teal),
                                           overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ],
                                   ),
                                   const SizedBox(height: 2),
-                                  Text('Umur: $age tahun', style: TextStyle(fontSize: 11, color: Theme.of(context).brightness == Brightness.dark ? Colors.white54 : Colors.black54)),
+                                  Text('Umur: $age tahun',
+                                      style: TextStyle(
+                                          fontSize: 11,
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white54
+                                              : Colors.black54)),
                                 ],
                               ),
                             ),
-                            if (character.gender.trim().toLowerCase() == 'perempuan' && character.isPregnant) ...[
+                            if (character.gender.trim().toLowerCase() ==
+                                    'perempuan' &&
+                                character.isPregnant) ...[
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
                                 margin: const EdgeInsets.only(right: 8),
                                 decoration: BoxDecoration(
                                   color: Colors.pink.withOpacity(0.15),
                                   borderRadius: BorderRadius.circular(8),
-                                  border: Border.all(color: Colors.pink.withOpacity(0.3)),
+                                  border: Border.all(
+                                      color: Colors.pink.withOpacity(0.3)),
                                 ),
-                                child: const Text('Hamil 🍼', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.pink)),
+                                child: const Text('Hamil 🍼',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.pink)),
                               ),
                             ],
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
                               decoration: BoxDecoration(
                                 color: Colors.teal.withOpacity(0.15),
                                 borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.teal.withOpacity(0.3)),
+                                border: Border.all(
+                                    color: Colors.teal.withOpacity(0.3)),
                               ),
-                              child: const Text('Anda', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.teal)),
+                              child: const Text('Anda',
+                                  style: TextStyle(
+                                      fontSize: 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.teal)),
                             ),
                           ],
                         ),
                       );
                     } else {
-                      final bool isParentsDivorced = character.isFatherDivorced || character.isMotherDivorced;
+                      final bool isParentsDivorced =
+                          character.isFatherDivorced ||
+                              character.isMotherDivorced;
                       String? custodyBadgeText;
                       Color? custodyBadgeColor;
                       if (isParentsDivorced && !isDeceased) {
-                        final int hash = name.codeUnits.fold(0, (prev, element) => prev + element);
+                        final int hash = name.codeUnits
+                            .fold(0, (prev, element) => prev + element);
                         final String custody = (hash % 2 == 0) ? 'Ayah' : 'Ibu';
                         if (custody == 'Ayah') {
                           custodyBadgeText = 'Ikut Ayah';
@@ -761,7 +1063,9 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         icon: isMale ? Icons.male : Icons.female,
                         label: isDeceased ? '$name (Wafat)' : name,
                         status: relation,
-                        color: isDeceased ? Colors.grey : (isMale ? Colors.indigo : Colors.purple),
+                        color: isDeceased
+                            ? Colors.grey
+                            : (isMale ? Colors.indigo : Colors.purple),
                         relationshipValue: child['relationship'] as int,
                         ageText: age < 0 ? 'Belum lahir' : '$age tahun',
                         isDeceased: isDeceased,
@@ -783,12 +1087,17 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   // ============================================
                   if (character.exPartners.isNotEmpty) ...[
                     const Divider(height: 32),
-                    const Text('💔 Mantan Pacar', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                    const Text('💔 Mantan Pacar',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Colors.blueGrey)),
                     const SizedBox(height: 8),
                     ...character.exPartners.map((ex) {
                       final String name = ex['name'] ?? 'Mantan Pacar';
                       final String gender = ex['gender'] ?? 'Perempuan';
-                      final int relVal = int.tryParse(ex['relationship'] ?? '30') ?? 30;
+                      final int relVal =
+                          int.tryParse(ex['relationship'] ?? '30') ?? 30;
                       final int exAge = int.tryParse(ex['age'] ?? '12') ?? 12;
                       final bool isDeceased = ex['isDeceased'] == 'true';
                       final bool isMale = gender == 'Laki-laki';
@@ -796,7 +1105,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       return _buildFamilyItem(
                         context,
                         icon: isMale ? Icons.male : Icons.female,
-                        label: isDeceased ? '$name (Mantan Pacar) (Wafat)' : name,
+                        label:
+                            isDeceased ? '$name (Mantan Pacar) (Wafat)' : name,
                         status: 'Mantan Pacar',
                         color: isDeceased ? Colors.grey : Colors.pinkAccent,
                         relationshipValue: relVal,
@@ -807,7 +1117,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           gender: gender,
                           age: exAge,
                           happiness: relVal,
-                          forcedSkinColor: ex['skinColor'] ?? character.getFamilyMemberSkinColor(name),
+                          forcedSkinColor: ex['skinColor'] ??
+                              character.getFamilyMemberSkinColor(name),
                         ),
                       );
                     }).toList(),
@@ -819,21 +1130,34 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   if (character.children.isNotEmpty) ...[
                     const Divider(height: 32),
                     (() {
-                      final normalChildren = character.children.where((child) => !character.donorRecipients.any((r) => r['childName'] == child['name'])).toList();
-                      final donorChildren = character.children.where((child) => character.donorRecipients.any((r) => r['childName'] == child['name'])).toList();
+                      final normalChildren = character.children
+                          .where((child) => !character.donorRecipients
+                              .any((r) => r['childName'] == child['name']))
+                          .toList();
+                      final donorChildren = character.children
+                          .where((child) => character.donorRecipients
+                              .any((r) => r['childName'] == child['name']))
+                          .toList();
 
                       final List<Widget> widgets = [];
                       if (normalChildren.isNotEmpty) {
-                        widgets.add(const Text('👶 Anak Anda', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)));
+                        widgets.add(const Text('👶 Anak Anda',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.blueGrey)));
                         widgets.add(const SizedBox(height: 8));
                         widgets.addAll(normalChildren.map((child) {
                           final String name = child['name'] ?? 'Anak';
                           final String gender = child['gender'] ?? 'Laki-laki';
-                          final int relVal = int.tryParse(child['relationship'] ?? '80') ?? 80;
-                          final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+                          final int relVal =
+                              int.tryParse(child['relationship'] ?? '80') ?? 80;
+                          final int childAge =
+                              int.tryParse(child['age'] ?? '0') ?? 0;
                           final bool isDeceased = child['isDeceased'] == 'true';
                           final bool isMale = gender == 'Laki-laki';
-                          final String parentingStyle = character.parentingStyles[name] ?? 'Balanced';
+                          final String parentingStyle =
+                              character.parentingStyles[name] ?? 'Balanced';
 
                           return _buildChildItem(
                             context,
@@ -845,7 +1169,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ageText: '$childAge tahun',
                             isDeceased: isDeceased,
                             parentingStyle: parentingStyle,
-                            avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                            avatarUrl:
+                                AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                               name: name,
                               gender: gender,
                               age: childAge,
@@ -857,18 +1182,27 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       }
 
                       if (donorChildren.isNotEmpty) {
-                        if (widgets.isNotEmpty) widgets.add(const SizedBox(height: 16));
-                        widgets.add(const Text('🧬 Anak Hasil Donor', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)));
+                        if (widgets.isNotEmpty)
+                          widgets.add(const SizedBox(height: 16));
+                        widgets.add(const Text('🧬 Anak Hasil Donor',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.blueGrey)));
                         widgets.add(const SizedBox(height: 8));
                         widgets.addAll(donorChildren.map((child) {
                           final String name = child['name'] ?? 'Anak';
                           final String gender = child['gender'] ?? 'Laki-laki';
-                          final int relVal = int.tryParse(child['relationship'] ?? '80') ?? 80;
-                          final int childAge = int.tryParse(child['age'] ?? '0') ?? 0;
+                          final int relVal =
+                              int.tryParse(child['relationship'] ?? '80') ?? 80;
+                          final int childAge =
+                              int.tryParse(child['age'] ?? '0') ?? 0;
                           final bool isDeceased = child['isDeceased'] == 'true';
                           final bool isMale = gender == 'Laki-laki';
-                          final bool livesWithUser = child['livesWithUser'] == 'true';
-                          final String parentingStyle = character.parentingStyles[name] ?? 'Balanced';
+                          final bool livesWithUser =
+                              child['livesWithUser'] == 'true';
+                          final String parentingStyle =
+                              character.parentingStyles[name] ?? 'Balanced';
 
                           return _buildChildItem(
                             context,
@@ -881,7 +1215,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             isDeceased: isDeceased,
                             parentingStyle: parentingStyle,
                             showParentingStyle: livesWithUser,
-                            avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                            avatarUrl:
+                                AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                               name: name,
                               gender: gender,
                               age: childAge,
@@ -922,8 +1257,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     ];
                     for (var list in allNpcLists) {
                       for (var item in list) {
-                        if (item['isFriend'] == 'true' && item['isDeceased'] != 'true') {
-                          if (!activeFriends.any((e) => e['name'] == item['name'])) {
+                        if (item['isFriend'] == 'true' &&
+                            item['isDeceased'] != 'true') {
+                          if (!activeFriends
+                              .any((e) => e['name'] == item['name'])) {
                             activeFriends.add(item);
                           }
                         }
@@ -936,15 +1273,25 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Divider(height: 32),
-                        const Text('👥 Teman', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                        const Text('👥 Teman',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.blueGrey)),
                         const SizedBox(height: 8),
                         ...activeFriends.map((friend) {
                           final String fName = friend['name'] ?? 'Teman';
-                          final String fGender = friend['gender'] ?? 'Perempuan';
-                          final int fRel = int.tryParse(friend['relationship'] ?? '70') ?? 70;
-                          final int fAge = int.tryParse(friend['age'] ?? '12') ?? 12;
-                          final bool isDeceased = friend['isDeceased'] == 'true';
-                          final bool isMale = fGender.toLowerCase().contains('laki');
+                          final String fGender =
+                              friend['gender'] ?? 'Perempuan';
+                          final int fRel =
+                              int.tryParse(friend['relationship'] ?? '70') ??
+                                  70;
+                          final int fAge =
+                              int.tryParse(friend['age'] ?? '12') ?? 12;
+                          final bool isDeceased =
+                              friend['isDeceased'] == 'true';
+                          final bool isMale =
+                              fGender.toLowerCase().contains('laki');
 
                           return _buildFamilyItem(
                             context,
@@ -956,7 +1303,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ageText: '$fAge tahun',
                             isDeceased: isDeceased,
                             gender: fGender,
-                            avatarUrl: AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+                            avatarUrl:
+                                AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
                               name: fName,
                               gender: fGender,
                               age: fAge,
@@ -975,17 +1323,25 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     const Divider(height: 32),
                     Row(
                       children: [
-                        const Text('🐾 Hewan Peliharaan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.blueGrey)),
+                        const Text('🐾 Hewan Peliharaan',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.blueGrey)),
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 6, vertical: 2),
                           decoration: BoxDecoration(
                             color: Colors.orange.shade700,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             '${character.pets.length} Ekor',
-                            style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold),
                           ),
                         ),
                       ],
@@ -1008,7 +1364,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                 pet: pet,
                                 onRefresh: () {
                                   widget.onRefresh();
-                                  if (_dialogSetState != null) _dialogSetState!(() {});
+                                  if (_dialogSetState != null)
+                                    _dialogSetState!(() {});
                                 },
                               ),
                             ),
@@ -1021,7 +1378,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           decoration: BoxDecoration(
                             color: Colors.orange.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                            border: Border.all(
+                                color: Colors.orange.withValues(alpha: 0.3)),
                           ),
                           child: Column(
                             children: [
@@ -1029,13 +1387,16 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                 children: [
                                   CircleAvatar(
                                     radius: 16,
-                                    backgroundColor: Colors.orange.withValues(alpha: 0.15),
-                                    child: Text(emoji, style: const TextStyle(fontSize: 18)),
+                                    backgroundColor:
+                                        Colors.orange.withValues(alpha: 0.15),
+                                    child: Text(emoji,
+                                        style: const TextStyle(fontSize: 18)),
                                   ),
                                   const SizedBox(width: 12),
                                   Expanded(
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '$petName ($breed)',
@@ -1050,41 +1411,54 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                           'Umur: ${pet['age'] ?? 1} tahun (${pet['gender'] ?? 'Jantan'})',
                                           style: TextStyle(
                                             fontSize: 11,
-                                            color: Theme.of(context).brightness == Brightness.dark
-                                                ? Colors.white54
-                                                : Colors.black54,
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.dark
+                                                    ? Colors.white54
+                                                    : Colors.black54,
                                           ),
                                         ),
                                       ],
                                     ),
                                   ),
                                   Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: Colors.orange.withValues(alpha: 0.12),
+                                      color:
+                                          Colors.orange.withValues(alpha: 0.12),
                                       borderRadius: BorderRadius.circular(8),
-                                      border: Border.all(color: Colors.orange.withValues(alpha: 0.3)),
+                                      border: Border.all(
+                                          color: Colors.orange
+                                              .withValues(alpha: 0.3)),
                                     ),
                                     child: Text(
                                       '${pet['age'] ?? 1} Tahun',
-                                      style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.orange),
+                                      style: const TextStyle(
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.orange),
                                     ),
                                   ),
                                   const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                                  const Icon(Icons.arrow_forward_ios,
+                                      size: 14, color: Colors.grey),
                                 ],
                               ),
                               const SizedBox(height: 8),
                               Row(
                                 children: [
-                                  const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                                  const Text('Hubungan: ',
+                                      style: TextStyle(
+                                          fontSize: 10, color: Colors.grey)),
                                   Expanded(
                                     child: ClipRRect(
                                       borderRadius: BorderRadius.circular(4),
                                       child: LinearProgressIndicator(
                                         value: relVal / 100,
                                         backgroundColor: Colors.grey.shade200,
-                                        valueColor: AlwaysStoppedAnimation<Color>(
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
                                           relVal > 65
                                               ? Colors.green
                                               : relVal > 35
@@ -1138,7 +1512,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
             Icon(Icons.favorite, size: 20, color: Colors.pink),
             Text(
               'Hubungan',
-              style: TextStyle(fontSize: 10, fontWeight: FontWeight.w600, color: Colors.pink),
+              style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.pink),
             ),
           ],
         ),
@@ -1146,7 +1523,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     );
   }
 
-  void _showPetInteractionModal(BuildContext context, Map<String, dynamic> pet, Character character) {
+  void _showPetInteractionModal(
+      BuildContext context, Map<String, dynamic> pet, Character character) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -1176,8 +1554,14 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('$name ($breed)', style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                            Text('Hewan Peliharaan • $type', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                            Text('$name ($breed)',
+                                style: const TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.bold)),
+                            Text('Hewan Peliharaan • $type',
+                                style: TextStyle(
+                                    color: isDark
+                                        ? Colors.white70
+                                        : Colors.black54)),
                           ],
                         ),
                       ),
@@ -1186,12 +1570,18 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Text('Tingkat Hubungan: ', style: TextStyle(fontWeight: FontWeight.bold)),
-                      Text('$rel%', style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                      const Text('Tingkat Hubungan: ',
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      Text('$rel%',
+                          style: const TextStyle(
+                              color: Colors.green,
+                              fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  const Text('Interaksi:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                  const Text('Interaksi:',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   const SizedBox(height: 10),
                   ListTile(
                     leading: const Text('🧶', style: TextStyle(fontSize: 22)),
@@ -1201,7 +1591,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       Navigator.pop(ctx2);
                       rel = (rel + 5).clamp(0, 100);
                       pet['relationship'] = rel;
-                      character.happiness = (character.happiness + 5).clamp(0, 100);
+                      character.happiness =
+                          (character.happiness + 5).clamp(0, 100);
                       DialogHelper.show(
                         context: context,
                         title: 'Interaksi Peliharaan',
@@ -1219,7 +1610,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       Navigator.pop(ctx2);
                       rel = (rel + 8).clamp(0, 100);
                       pet['relationship'] = rel;
-                      character.happiness = (character.happiness + 3).clamp(0, 100);
+                      character.happiness =
+                          (character.happiness + 3).clamp(0, 100);
                       DialogHelper.show(
                         context: context,
                         title: 'Interaksi Peliharaan',
@@ -1231,17 +1623,20 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                   ),
                   ListTile(
                     leading: const Text('🚪', style: TextStyle(fontSize: 22)),
-                    title: const Text('Lepaskan / Jual Peliharaan', style: TextStyle(color: Colors.red)),
+                    title: const Text('Lepaskan / Jual Peliharaan',
+                        style: TextStyle(color: Colors.red)),
                     subtitle: const Text('Menghapus peliharaan dari daftar'),
                     onTap: () {
                       Navigator.pop(ctx2);
                       character.pets.remove(pet);
-                      character.happiness = (character.happiness - 10).clamp(0, 100);
+                      character.happiness =
+                          (character.happiness - 10).clamp(0, 100);
                       character.inbox.add('$emoji Kamu melepaskan $name.');
                       DialogHelper.show(
                         context: context,
                         title: 'Interaksi Peliharaan',
-                        content: Text('$name telah dilepaskan/dijual. (-10% Kebahagiaan)'),
+                        content: Text(
+                            '$name telah dilepaskan/dijual. (-10% Kebahagiaan)'),
                       );
                       widget.onRefresh();
                       if (_dialogSetState != null) _dialogSetState!(() {});
@@ -1273,23 +1668,25 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     String? gender,
   }) {
     return InkWell(
-      onTap: isDeceased ? null : () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ActionMenuScreen(
-              character: widget.character,
-              targetName: label,
-              targetRole: status,
-            ),
-          ),
-        ).then((_) {
-          widget.onRefresh();
-          if (_dialogSetState != null) {
-            _dialogSetState!(() {});
-          }
-        });
-      },
+      onTap: isDeceased
+          ? null
+          : () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ActionMenuScreen(
+                    character: widget.character,
+                    targetName: label,
+                    targetRole: status,
+                  ),
+                ),
+              ).then((_) {
+                widget.onRefresh();
+                if (_dialogSetState != null) {
+                  _dialogSetState!(() {});
+                }
+              });
+            },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
@@ -1332,13 +1729,14 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         final String lowerGender = (gender ?? '').toLowerCase();
                         final String lowerLabel = label.toLowerCase();
                         final String lowerStatus = status.toLowerCase();
-                        final bool isFemale = lowerGender.contains('perempuan') ||
-                            icon == Icons.female ||
-                            lowerLabel.contains('ibu') ||
-                            lowerLabel.contains('nenek') ||
-                            lowerLabel.contains('bibi') ||
-                            lowerLabel.contains('istri') ||
-                            lowerStatus.contains('perempuan');
+                        final bool isFemale =
+                            lowerGender.contains('perempuan') ||
+                                icon == Icons.female ||
+                                lowerLabel.contains('ibu') ||
+                                lowerLabel.contains('nenek') ||
+                                lowerLabel.contains('bibi') ||
+                                lowerLabel.contains('istri') ||
+                                lowerStatus.contains('perempuan');
                         final bool isMale = lowerGender.contains('laki') ||
                             icon == Icons.male ||
                             lowerLabel.contains('ayah') ||
@@ -1366,11 +1764,16 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             Expanded(
                               child: Text(
                                 label,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
-                                  color: isDeceased ? Colors.grey.shade600 : null,
-                                ),
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: isDeceased
+                                          ? Colors.grey.shade600
+                                          : null,
+                                    ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -1393,7 +1796,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         runSpacing: 4,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: color.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(6),
@@ -1401,28 +1805,37 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                             ),
                             child: Text(
                               isDeceased ? 'Wafat' : status,
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: color),
                             ),
                           ),
-                          if (!isDeceased && widget.character.partnerIsPregnant) ...[
+                          if (!isDeceased &&
+                              widget.character.partnerIsPregnant) ...[
                             (() {
-                              final String pregList = widget.character.pregnantByPartnerName ?? '';
+                              final String pregList =
+                                  widget.character.pregnantByPartnerName ?? '';
                               final List<String> pregnantNames = pregList
                                   .split(', ')
                                   .map((e) => AvatarAgeRules.getCleanNPCName(e))
                                   .toList();
-                              final String cleanLabel = AvatarAgeRules.getCleanNPCName(label);
+                              final String cleanLabel =
+                                  AvatarAgeRules.getCleanNPCName(label);
                               final bool isHamil = pregList.contains(label) ||
                                   pregnantNames.contains(cleanLabel) ||
-                                  (cleanLabel.isNotEmpty && pregList.contains(cleanLabel));
+                                  (cleanLabel.isNotEmpty &&
+                                      pregList.contains(cleanLabel));
 
                               if (isHamil) {
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: Colors.pink.withOpacity(0.15),
                                     borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: Colors.pink.withOpacity(0.3)),
+                                    border: Border.all(
+                                        color: Colors.pink.withOpacity(0.3)),
                                   ),
                                   child: const Text(
                                     'Hamil 🍼',
@@ -1439,28 +1852,40 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                           ],
                           if (extraBadgeText != null && !isDeceased)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
-                                color: (extraBadgeColor ?? Colors.green).withOpacity(0.1),
+                                color: (extraBadgeColor ?? Colors.green)
+                                    .withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: (extraBadgeColor ?? Colors.green).withOpacity(0.2)),
+                                border: Border.all(
+                                    color: (extraBadgeColor ?? Colors.green)
+                                        .withOpacity(0.2)),
                               ),
                               child: Text(
                                 extraBadgeText,
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: extraBadgeColor ?? Colors.green),
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: extraBadgeColor ?? Colors.green),
                               ),
                             ),
                           if (isLivingTogether && !isDeceased)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 6, vertical: 2),
                               decoration: BoxDecoration(
                                 color: Colors.green.withOpacity(0.1),
                                 borderRadius: BorderRadius.circular(6),
-                                border: Border.all(color: Colors.green.withOpacity(0.2)),
+                                border: Border.all(
+                                    color: Colors.green.withOpacity(0.2)),
                               ),
                               child: const Text(
                                 'Tinggal Bersama 🏡',
-                                style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.green),
+                                style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.green),
                               ),
                             ),
                         ],
@@ -1470,7 +1895,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ),
                 if (!isDeceased) ...[
                   const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  const Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Colors.grey),
                 ],
               ],
             ),
@@ -1478,7 +1904,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                  const Text('Hubungan: ',
+                      style: TextStyle(fontSize: 10, color: Colors.grey)),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
@@ -1533,24 +1960,26 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     bool showParentingStyle = true,
   }) {
     return InkWell(
-      onTap: isDeceased ? null : () {
-        final String cleanRole = status.replaceAll('(Donor)', '').trim();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ActionMenuScreen(
-              character: widget.character,
-              targetName: label,
-              targetRole: cleanRole,
-            ),
-          ),
-        ).then((_) {
-          widget.onRefresh();
-          if (_dialogSetState != null) {
-            _dialogSetState!(() {});
-          }
-        });
-      },
+      onTap: isDeceased
+          ? null
+          : () {
+              final String cleanRole = status.replaceAll('(Donor)', '').trim();
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ActionMenuScreen(
+                    character: widget.character,
+                    targetName: label,
+                    targetRole: cleanRole,
+                  ),
+                ),
+              ).then((_) {
+                widget.onRefresh();
+                if (_dialogSetState != null) {
+                  _dialogSetState!(() {});
+                }
+              });
+            },
       borderRadius: BorderRadius.circular(12),
       child: Container(
         margin: const EdgeInsets.only(bottom: 6),
@@ -1591,8 +2020,10 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                     children: [
                       (() {
                         final String lowerStatus = status.toLowerCase();
-                        final bool isFemale = icon == Icons.girl || lowerStatus.contains('perempuan');
-                        final bool isMale = icon == Icons.boy || lowerStatus.contains('laki');
+                        final bool isFemale = icon == Icons.girl ||
+                            lowerStatus.contains('perempuan');
+                        final bool isMale =
+                            icon == Icons.boy || lowerStatus.contains('laki');
 
                         IconData? genderIcon;
                         Color? genderColor;
@@ -1618,8 +2049,13 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                                   fontWeight: FontWeight.bold,
                                   color: isDeceased
                                       ? Colors.grey.shade600
-                                      : (Theme.of(context).brightness == Brightness.dark ? Colors.white : Colors.black87),
-                                  decoration: isDeceased ? TextDecoration.lineThrough : null,
+                                      : (Theme.of(context).brightness ==
+                                              Brightness.dark
+                                          ? Colors.white
+                                          : Colors.black87),
+                                  decoration: isDeceased
+                                      ? TextDecoration.lineThrough
+                                      : null,
                                 ),
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -1644,15 +2080,20 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 6, vertical: 2),
                             decoration: BoxDecoration(
                               color: color.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(6),
-                              border: Border.all(color: color.withValues(alpha: 0.2)),
+                              border: Border.all(
+                                  color: color.withValues(alpha: 0.2)),
                             ),
                             child: Text(
                               isDeceased ? 'Wafat' : status,
-                              style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: color),
+                              style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.bold,
+                                  color: color),
                             ),
                           ),
                           if (!isDeceased && showParentingStyle)
@@ -1660,66 +2101,116 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                               tooltip: 'Interaksi Pengasuhan',
                               padding: EdgeInsets.zero,
                               constraints: const BoxConstraints(),
-                              onSelected: (value) => _handleParentingAction(label, value),
+                              onSelected: (value) =>
+                                  _handleParentingAction(label, value),
                               itemBuilder: (context) => [
                                 const PopupMenuItem(
                                   enabled: false,
-                                  child: Text('Gaya Pengasuhan', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Gaya Pengasuhan',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
                                 ),
                                 PopupMenuItem(
                                   value: 'Strict',
-                                  child: Row(children: const [Text('🗡️'), SizedBox(width: 8), Text('Strict')]),
+                                  child: Row(children: const [
+                                    Text('🗡️'),
+                                    SizedBox(width: 8),
+                                    Text('Strict')
+                                  ]),
                                 ),
                                 PopupMenuItem(
                                   value: 'Balanced',
-                                  child: Row(children: const [Text('⚖️'), SizedBox(width: 8), Text('Balanced')]),
+                                  child: Row(children: const [
+                                    Text('⚖️'),
+                                    SizedBox(width: 8),
+                                    Text('Balanced')
+                                  ]),
                                 ),
                                 PopupMenuItem(
                                   value: 'Loose',
-                                  child: Row(children: const [Text('🕊️'), SizedBox(width: 8), Text('Loose')]),
+                                  child: Row(children: const [
+                                    Text('🕊️'),
+                                    SizedBox(width: 8),
+                                    Text('Loose')
+                                  ]),
                                 ),
                                 const PopupMenuDivider(),
                                 const PopupMenuItem(
                                   enabled: false,
-                                  child: Text('Aksi Cepat', style: TextStyle(fontWeight: FontWeight.bold)),
+                                  child: Text('Aksi Cepat',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
                                 ),
                                 PopupMenuItem(
                                   value: 'Marahi Anak',
-                                  child: Row(children: const [Text('📢'), SizedBox(width: 8), Text('Marahi Anak (Strict)')]),
+                                  child: Row(children: const [
+                                    Text('📢'),
+                                    SizedBox(width: 8),
+                                    Text('Marahi Anak (Strict)')
+                                  ]),
                                 ),
                                 PopupMenuItem(
                                   value: 'Beri Hadiah',
-                                  child: Row(children: const [Text('🎁'), SizedBox(width: 8), Text('Beri Hadiah (Loose)')]),
+                                  child: Row(children: const [
+                                    Text('🎁'),
+                                    SizedBox(width: 8),
+                                    Text('Beri Hadiah (Loose)')
+                                  ]),
                                 ),
                                 PopupMenuItem(
                                   value: 'Ajak Diskusi',
-                                  child: Row(children: const [Text('💬'), SizedBox(width: 8), Text('Ajak Diskusi (Balanced)')]),
+                                  child: Row(children: const [
+                                    Text('💬'),
+                                    SizedBox(width: 8),
+                                    Text('Ajak Diskusi (Balanced)')
+                                  ]),
                                 ),
                               ],
                               child: Builder(builder: (context) {
                                 final Map<String, dynamic> styleInfo = {
-                                  'Strict':     {'emoji': '🗡️', 'color': Colors.red.shade700},
-                                  'Balanced':   {'emoji': '⚖️', 'color': Colors.blue.shade600},
-                                  'Loose':      {'emoji': '🕊️', 'color': Colors.green.shade600},
-                                  'Neglectful': {'emoji': '👻', 'color': Colors.grey.shade600},
+                                  'Strict': {
+                                    'emoji': '🗡️',
+                                    'color': Colors.red.shade700
+                                  },
+                                  'Balanced': {
+                                    'emoji': '⚖️',
+                                    'color': Colors.blue.shade600
+                                  },
+                                  'Loose': {
+                                    'emoji': '🕊️',
+                                    'color': Colors.green.shade600
+                                  },
+                                  'Neglectful': {
+                                    'emoji': '👻',
+                                    'color': Colors.grey.shade600
+                                  },
                                 };
-                                final info = styleInfo[parentingStyle] ?? styleInfo['Balanced']!;
+                                final info = styleInfo[parentingStyle] ??
+                                    styleInfo['Balanced']!;
                                 final Color badgeColor = info['color'] as Color;
                                 final String emoji = info['emoji'] as String;
 
                                 return Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 6, vertical: 2),
                                   decoration: BoxDecoration(
                                     color: badgeColor.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(6),
-                                    border: Border.all(color: badgeColor.withValues(alpha: 0.4)),
+                                    border: Border.all(
+                                        color:
+                                            badgeColor.withValues(alpha: 0.4)),
                                   ),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      Text('$emoji $parentingStyle', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: badgeColor)),
+                                      Text('$emoji $parentingStyle',
+                                          style: TextStyle(
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: badgeColor)),
                                       const SizedBox(width: 2),
-                                      const Icon(Icons.arrow_drop_down, size: 14, color: Colors.grey),
+                                      const Icon(Icons.arrow_drop_down,
+                                          size: 14, color: Colors.grey),
                                     ],
                                   ),
                                 );
@@ -1732,7 +2223,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                 ),
                 if (!isDeceased) ...[
                   const SizedBox(width: 8),
-                  const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+                  const Icon(Icons.arrow_forward_ios,
+                      size: 14, color: Colors.grey),
                 ],
               ],
             ),
@@ -1740,7 +2232,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               const SizedBox(height: 8),
               Row(
                 children: [
-                  const Text('Hubungan: ', style: TextStyle(fontSize: 10, color: Colors.grey)),
+                  const Text('Hubungan: ',
+                      style: TextStyle(fontSize: 10, color: Colors.grey)),
                   Expanded(
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(4),
@@ -1818,13 +2311,15 @@ class _RelationshipButtonState extends State<RelationshipButton> {
 
     int stepFatherSalary = 0;
     if (character.stepFatherName != null && !character.isStepFatherDeceased) {
-      final sfJob = character.getNPCJobInfo(character.stepFatherName!, 'Ayah Tiri');
+      final sfJob =
+          character.getNPCJobInfo(character.stepFatherName!, 'Ayah Tiri');
       stepFatherSalary = sfJob['salary'] as int? ?? 0;
     }
 
     int stepMotherSalary = 0;
     if (character.stepMotherName != null && !character.isStepMotherDeceased) {
-      final smJob = character.getNPCJobInfo(character.stepMotherName!, 'Ibu Tiri');
+      final smJob =
+          character.getNPCJobInfo(character.stepMotherName!, 'Ibu Tiri');
       stepMotherSalary = smJob['salary'] as int? ?? 0;
     }
 
@@ -1833,13 +2328,19 @@ class _RelationshipButtonState extends State<RelationshipButton> {
     for (var sib in character.siblings) {
       final bool isDeceased = sib['isDeceased'] == 'true';
       if (!isDeceased && sib['name'] != null) {
-        final sJob = character.getNPCJobInfo(sib['name']!, sib['relation'] ?? 'Saudara');
+        final sJob =
+            character.getNPCJobInfo(sib['name']!, sib['relation'] ?? 'Saudara');
         siblingsTotalSalary += (sJob['salary'] as int? ?? 0);
         livingSiblingsCount++;
       }
     }
 
-    final int totalFamilySalary = userSalary + fatherSalary + motherSalary + stepFatherSalary + stepMotherSalary + siblingsTotalSalary;
+    final int totalFamilySalary = userSalary +
+        fatherSalary +
+        motherSalary +
+        stepFatherSalary +
+        stepMotherSalary +
+        siblingsTotalSalary;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -1873,10 +2374,13 @@ class _RelationshipButtonState extends State<RelationshipButton> {
               Container(
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: isDark ? const Color(0xFF065F46) : const Color(0xFFA7F3D0),
+                  color: isDark
+                      ? const Color(0xFF065F46)
+                      : const Color(0xFFA7F3D0),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.account_balance_wallet, color: Color(0xFF059669), size: 22),
+                child: const Icon(Icons.account_balance_wallet,
+                    color: Color(0xFF059669), size: 22),
               ),
               const SizedBox(width: 10),
               Expanded(
@@ -1896,7 +2400,8 @@ class _RelationshipButtonState extends State<RelationshipButton> {
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: isDark ? Colors.tealAccent : Colors.green.shade700,
+                        color:
+                            isDark ? Colors.tealAccent : Colors.green.shade700,
                       ),
                     ),
                   ],
@@ -1905,18 +2410,27 @@ class _RelationshipButtonState extends State<RelationshipButton> {
             ],
           ),
           const SizedBox(height: 10),
-          Divider(height: 1, thickness: 0.8, color: isDark ? Colors.white24 : Colors.black12),
+          Divider(
+              height: 1,
+              thickness: 0.8,
+              color: isDark ? Colors.white24 : Colors.black12),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 6,
             children: [
               _buildSalaryChip('Anda', userSalary, isDark),
-              if (fatherSalary > 0) _buildSalaryChip('Ayah', fatherSalary, isDark),
-              if (motherSalary > 0) _buildSalaryChip('Ibu', motherSalary, isDark),
-              if (stepFatherSalary > 0) _buildSalaryChip('Ayah Tiri', stepFatherSalary, isDark),
-              if (stepMotherSalary > 0) _buildSalaryChip('Ibu Tiri', stepMotherSalary, isDark),
-              if (siblingsTotalSalary > 0) _buildSalaryChip('Saudara ($livingSiblingsCount org)', siblingsTotalSalary, isDark),
+              if (fatherSalary > 0)
+                _buildSalaryChip('Ayah', fatherSalary, isDark),
+              if (motherSalary > 0)
+                _buildSalaryChip('Ibu', motherSalary, isDark),
+              if (stepFatherSalary > 0)
+                _buildSalaryChip('Ayah Tiri', stepFatherSalary, isDark),
+              if (stepMotherSalary > 0)
+                _buildSalaryChip('Ibu Tiri', stepMotherSalary, isDark),
+              if (siblingsTotalSalary > 0)
+                _buildSalaryChip('Saudara ($livingSiblingsCount org)',
+                    siblingsTotalSalary, isDark),
             ],
           ),
         ],

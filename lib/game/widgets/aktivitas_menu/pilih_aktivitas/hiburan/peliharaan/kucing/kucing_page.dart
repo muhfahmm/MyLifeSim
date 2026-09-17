@@ -27,16 +27,106 @@ class _KucingPageState extends State<KucingPage> {
   }
 
   static const _names = [
-    'Mochi', 'Luna', 'Milo', 'Oreo', 'Oliver', 'Simba', 'Cleo', 'Felix', 'Bella', 'Charlie',
-    'Lucy', 'Leo', 'Nala', 'Lily', 'Jack', 'Loki', 'Max', 'Jasper', 'Chloe', 'Smokey',
-    'Shadow', 'Tiger', 'Angel', 'Princess', 'Peanut', 'Zoe', 'Coco', 'Socks', 'Garfield', 'Mittens',
-    'Ziggy', 'Bandit', 'Chester', 'Frankie', 'Ginger', 'Harley', 'Marley', 'Gizmo', 'Toby', 'Salem',
-    'Binx', 'Buster', 'Teddy', 'Penny', 'Ruby', 'Rosie', 'Zelda', 'Willow', 'Hazel', 'Poppy',
-    'Daisy', 'Olive', 'Stella', 'Lulu', 'Maya', 'Sophie', 'Piper', 'Gatsby', 'Romeo', 'Juliet',
-    'Winston', 'Barnaby', 'Otis', 'Dexter', 'Boots', 'Snowball', 'Fluffy', 'Whiskers', 'Paws', 'Noodle',
-    'Tofu', 'Boba', 'Muffin', 'Cookie', 'Cupcake', 'Browser', 'Pixel', 'Sonic', 'Cash', 'Kiwi',
-    'Mango', 'Peach', 'Pumpkin', 'Pepper', 'Cinnamon', 'Honey', 'Sugar', 'Butter', 'Cheeto', 'Salami',
-    'Biscuit', 'Brownie', 'Pudding', 'Caramel', 'Marshmallow', 'Waffles', 'Pancake', 'Sushi', 'Mimi', 'Kiki'
+    'Mochi',
+    'Luna',
+    'Milo',
+    'Oreo',
+    'Oliver',
+    'Simba',
+    'Cleo',
+    'Felix',
+    'Bella',
+    'Charlie',
+    'Lucy',
+    'Leo',
+    'Nala',
+    'Lily',
+    'Jack',
+    'Loki',
+    'Max',
+    'Jasper',
+    'Chloe',
+    'Smokey',
+    'Shadow',
+    'Tiger',
+    'Angel',
+    'Princess',
+    'Peanut',
+    'Zoe',
+    'Coco',
+    'Socks',
+    'Garfield',
+    'Mittens',
+    'Ziggy',
+    'Bandit',
+    'Chester',
+    'Frankie',
+    'Ginger',
+    'Harley',
+    'Marley',
+    'Gizmo',
+    'Toby',
+    'Salem',
+    'Binx',
+    'Buster',
+    'Teddy',
+    'Penny',
+    'Ruby',
+    'Rosie',
+    'Zelda',
+    'Willow',
+    'Hazel',
+    'Poppy',
+    'Daisy',
+    'Olive',
+    'Stella',
+    'Lulu',
+    'Maya',
+    'Sophie',
+    'Piper',
+    'Gatsby',
+    'Romeo',
+    'Juliet',
+    'Winston',
+    'Barnaby',
+    'Otis',
+    'Dexter',
+    'Boots',
+    'Snowball',
+    'Fluffy',
+    'Whiskers',
+    'Paws',
+    'Noodle',
+    'Tofu',
+    'Boba',
+    'Muffin',
+    'Cookie',
+    'Cupcake',
+    'Browser',
+    'Pixel',
+    'Sonic',
+    'Cash',
+    'Kiwi',
+    'Mango',
+    'Peach',
+    'Pumpkin',
+    'Pepper',
+    'Cinnamon',
+    'Honey',
+    'Sugar',
+    'Butter',
+    'Cheeto',
+    'Salami',
+    'Biscuit',
+    'Brownie',
+    'Pudding',
+    'Caramel',
+    'Marshmallow',
+    'Waffles',
+    'Pancake',
+    'Sushi',
+    'Mimi',
+    'Kiki'
   ];
 
   void _executeAdopsi(BuildContext context, Map<String, dynamic> h) {
@@ -46,7 +136,8 @@ class _KucingPageState extends State<KucingPage> {
 
     setState(() {
       widget.character.money -= cost;
-      widget.character.happiness = (widget.character.happiness + happinessBoost).clamp(0, 100);
+      widget.character.happiness =
+          (widget.character.happiness + happinessBoost).clamp(0, 100);
       widget.character.pets.add({
         'name': petName,
         'breed': h['name'] as String,
@@ -61,7 +152,8 @@ class _KucingPageState extends State<KucingPage> {
       });
     });
 
-    final msg = '🐱 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(cost)})';
+    final msg =
+        '🐱 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(cost)})';
     widget.character.inbox.add(msg);
 
     showDialog(
@@ -70,7 +162,8 @@ class _KucingPageState extends State<KucingPage> {
         title: const Row(children: [
           Icon(Icons.check_circle, color: Colors.green),
           SizedBox(width: 8),
-          Text('Selamat Datang!', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Selamat Datang!',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ]),
         content: Text(msg),
         actions: [
@@ -96,7 +189,8 @@ class _KucingPageState extends State<KucingPage> {
     if (success) {
       final petName = _names[Random().nextInt(_names.length)];
       setState(() {
-        widget.character.happiness = (widget.character.happiness + happinessBoost).clamp(0, 100);
+        widget.character.happiness =
+            (widget.character.happiness + happinessBoost).clamp(0, 100);
         widget.character.pets.add({
           'name': petName,
           'breed': itemName,
@@ -111,7 +205,8 @@ class _KucingPageState extends State<KucingPage> {
         });
       });
 
-      final msg = '🐱 Orang tua kamu menyetujui permintaanmu dan membelikan $itemName bernama $petName! (+$happinessBoost% Kebahagiaan)';
+      final msg =
+          '🐱 Orang tua kamu menyetujui permintaanmu dan membelikan $itemName bernama $petName! (+$happinessBoost% Kebahagiaan)';
       widget.character.inbox.add(msg);
 
       showDialog(
@@ -120,7 +215,8 @@ class _KucingPageState extends State<KucingPage> {
           title: const Row(children: [
             Icon(Icons.sentiment_very_satisfied, color: Colors.green),
             SizedBox(width: 8),
-            Text('Disetujui! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Disetujui! 🎉',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ]),
           content: Text(msg),
           actions: [
@@ -187,13 +283,16 @@ class _KucingPageState extends State<KucingPage> {
                       children: [
                         Text(
                           itemName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Harga: ${_fmt(cost)}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark ? Colors.greenAccent : Colors.green.shade700,
+                            color: isDark
+                                ? Colors.greenAccent
+                                : Colors.green.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -205,7 +304,8 @@ class _KucingPageState extends State<KucingPage> {
               const SizedBox(height: 12),
               Text(
                 h['desc'] ?? '',
-                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                style:
+                    TextStyle(color: isDark ? Colors.white70 : Colors.black87),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -216,10 +316,14 @@ class _KucingPageState extends State<KucingPage> {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  side: BorderSide(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                 ),
-                leading: const Icon(Icons.account_balance_wallet, color: Colors.green),
-                title: const Text('Beli Sendiri', style: TextStyle(fontWeight: FontWeight.bold)),
+                leading: const Icon(Icons.account_balance_wallet,
+                    color: Colors.green),
+                title: const Text('Beli Sendiri',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(
                   canAfford
                       ? 'Saldo Anda: ${_fmt(widget.character.money)}'
@@ -235,7 +339,8 @@ class _KucingPageState extends State<KucingPage> {
                     DialogHelper.show(
                       context: context,
                       title: 'Uang Tidak Cukup',
-                      content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
+                      content: Text(
+                          'Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
                     );
                   }
                 },
@@ -244,11 +349,15 @@ class _KucingPageState extends State<KucingPage> {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  side: BorderSide(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                 ),
                 leading: const Icon(Icons.family_restroom, color: Colors.blue),
-                title: const Text('Minta Orang Tua Membelikan', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Peluang disetujui: 80%', style: TextStyle(color: Colors.blueAccent)),
+                title: const Text('Minta Orang Tua Membelikan',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Peluang disetujui: 80%',
+                    style: TextStyle(color: Colors.blueAccent)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -266,18 +375,21 @@ class _KucingPageState extends State<KucingPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color bgColor =
+        isDark ? const Color(0xFF121212) : Colors.grey.shade100;
     final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
     final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black87;
-    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color borderColor =
+        isDark ? Colors.grey.shade700 : Colors.grey.shade200;
     final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
 
     const list = DatabaseKucing.listKucing;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adopsi Kucing 🐱', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Adopsi Kucing 🐱',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: containerBg,
         foregroundColor: textColor,
         elevation: 0.5,
@@ -307,7 +419,8 @@ class _KucingPageState extends State<KucingPage> {
             const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   final h = list[i];
@@ -320,7 +433,8 @@ class _KucingPageState extends State<KucingPage> {
                       side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       title: Text(
                         h['name'],
                         style: TextStyle(

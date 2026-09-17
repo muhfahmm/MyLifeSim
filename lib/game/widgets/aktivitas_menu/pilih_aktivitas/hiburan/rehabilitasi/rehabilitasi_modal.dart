@@ -73,13 +73,13 @@ class _RehabilitasiContentState extends State<RehabilitasiContent> {
         'desc': 'Program detoks dari ketergantungan alkohol',
       },
       {
-        'name': 'Rehabilitasi Narkoba 💊',
+        'name': 'Rehabilitasi Narkoba & Obat-obatan 💊',
         'cost': 2500,
         'duration': 90,
         'happiness': 25,
         'health': 30,
-        'reduceAddiction': 0,
-        'desc': 'Program pemulihan dari ketergantungan narkoba',
+        'reduceAddiction': 100,
+        'desc': 'Program pemulihan intensif dari ketergantungan obat-obatan & narkoba',
       },
     ]);
 

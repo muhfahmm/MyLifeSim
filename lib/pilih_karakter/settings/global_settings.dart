@@ -14,6 +14,7 @@ class GlobalSettings {
   static final ValueNotifier<bool> isSpecialCareerUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isSkipUsiaUnlocked = ValueNotifier<bool>(false);
   static final ValueNotifier<bool> isMataSehatUnlocked = ValueNotifier<bool>(false);
+  static final ValueNotifier<bool> isObatObatanUnlocked = ValueNotifier<bool>(false);
 
   // Status Pembelian Karir Militer per Cabang
   static final ValueNotifier<bool> isMiliterADUnlocked = ValueNotifier<bool>(false);
@@ -58,6 +59,7 @@ class GlobalSettings {
     'isSpecialCareerUnlocked': isSpecialCareerUnlocked,
     'isSkipUsiaUnlocked': isSkipUsiaUnlocked,
     'isMataSehatUnlocked': isMataSehatUnlocked,
+    'isObatObatanUnlocked': isObatObatanUnlocked,
     'isMiliterADUnlocked': isMiliterADUnlocked,
     'isMiliterALUnlocked': isMiliterALUnlocked,
     'isMiliterAUUnlocked': isMiliterAUUnlocked,

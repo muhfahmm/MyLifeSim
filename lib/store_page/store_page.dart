@@ -46,6 +46,9 @@ class StorePage extends StatefulWidget {
   static bool get isMataSehatUnlocked => GlobalSettings.isMataSehatUnlocked.value;
   static set isMataSehatUnlocked(bool value) => GlobalSettings.isMataSehatUnlocked.value = value;
 
+  static bool get isObatObatanUnlocked => GlobalSettings.isObatObatanUnlocked.value;
+  static set isObatObatanUnlocked(bool value) => GlobalSettings.isObatObatanUnlocked.value = value;
+
   @override
   State<StorePage> createState() => _StorePageState();
 }
@@ -64,13 +67,15 @@ class _StorePageState extends State<StorePage> {
   static set _immunityUnlocked(bool value) => GlobalSettings.isImmunityUnlocked.value = value;
 
   static bool get _specialCareerUnlocked => GlobalSettings.isSpecialCareerUnlocked.value;
-  static set _specialCareerUnlocked(bool value) => GlobalSettings.isSpecialCareerUnlocked.value = value;
 
   static bool get _skipUsiaUnlocked => GlobalSettings.isSkipUsiaUnlocked.value;
   static set _skipUsiaUnlocked(bool value) => GlobalSettings.isSkipUsiaUnlocked.value = value;
 
   static bool get _mataSehatUnlocked => GlobalSettings.isMataSehatUnlocked.value;
   static set _mataSehatUnlocked(bool value) => GlobalSettings.isMataSehatUnlocked.value = value;
+
+  static bool get _obatObatanUnlocked => GlobalSettings.isObatObatanUnlocked.value;
+  static set _obatObatanUnlocked(bool value) => GlobalSettings.isObatObatanUnlocked.value = value;
 
   void _showNoCharacterMessage() {
     DialogHelper.show(
@@ -520,6 +525,20 @@ class _StorePageState extends State<StorePage> {
                 _simulatePurchase('Mata Sehat Abadi (Bebas Tes Mata)', () {
                   _mataSehatUnlocked = true;
                   GlobalSettings.isMataSehatUnlocked.value = true;
+                });
+              },
+            ),
+            _buildStoreItem(
+              icon: Icons.medication_rounded,
+              iconBgColor: Colors.purple.shade700,
+              title: 'Akses Obat-obatan (18+)',
+              description: 'Membuka menu khusus konsumsi obat-obatan & zat penenang untuk karakter berusia minimal 18 tahun.',
+              price: 'Rp 79.000',
+              isUnlocked: _obatObatanUnlocked || GlobalSettings.isObatObatanUnlocked.value,
+              onTap: () {
+                _simulatePurchase('Akses Obat-obatan (18+)', () {
+                  _obatObatanUnlocked = true;
+                  GlobalSettings.isObatObatanUnlocked.value = true;
                 });
               },
             ),

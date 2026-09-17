@@ -1,0 +1,71 @@
+// lib/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/obat_obatan/database_obat.dart
+
+class DatabaseObat {
+  static const List<Map<String, dynamic>> listObat = [
+    {
+      'id': 'sedatif',
+      'name': 'Obat Penenang / Sedatif 💊',
+      'type': 'Resep / Farmasi',
+      'cost': 40,
+      'happiness': 8,
+      'healthPenalty': 2,
+      'addictionIncrease': 5,
+      'overdoseChance': 2, // 2%
+      'policeChance': 0, // Obat resep
+      'desc': 'Obat penenang dosis ringan untuk mengendalikan kecemasan dan stres.',
+      'rarity': 'Biasa',
+    },
+    {
+      'id': 'ganja',
+      'name': 'Ganja / Marijuana 🌿',
+      'type': 'Herbal / Psikotropika',
+      'cost': 80,
+      'happiness': 15,
+      'healthPenalty': 4,
+      'addictionIncrease': 10,
+      'overdoseChance': 3,
+      'policeChance': 5,
+      'desc': 'Daun ganja kering untuk merelaksasi pikiran dan memberikan sensasi tenang.',
+      'rarity': 'Biasa',
+    },
+    {
+      'id': 'ekstasi',
+      'name': 'Pil Ekstasi / MDMA 💊✨',
+      'type': 'Stimulan Sintetis',
+      'cost': 250,
+      'happiness': 25,
+      'healthPenalty': 8,
+      'addictionIncrease': 15,
+      'overdoseChance': 8,
+      'policeChance': 12,
+      'desc': 'Pil pesta yang memicu rasa gembira berlebihan dan energi tak terbatas.',
+      'rarity': 'Populer',
+    },
+    {
+      'id': 'kokain',
+      'name': 'Kokain Murni ❄️',
+      'type': 'Narkotika Serbuk',
+      'cost': 600,
+      'happiness': 35,
+      'healthPenalty': 14,
+      'addictionIncrease': 22,
+      'overdoseChance': 15,
+      'policeChance': 20,
+      'desc': 'Serbuk putih kelas atas dengan efek percaya diri dan euforia instan.',
+      'rarity': 'Langka',
+    },
+    {
+      'id': 'meth',
+      'name': 'Metamfetamin / Sabu-sabu 💎',
+      'type': 'Narkotika Berat',
+      'cost': 1200,
+      'happiness': 50,
+      'healthPenalty': 22,
+      'addictionIncrease': 30,
+      'overdoseChance': 25,
+      'policeChance': 30,
+      'desc': 'Zat sintetis berdaya kecanduan ekstrem yang memberikan dorongan energi masif.',
+      'rarity': 'Sangat Langka',
+    },
+  ];
+}

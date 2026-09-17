@@ -26,16 +26,106 @@ class _ReptilPageState extends State<ReptilPage> {
   }
 
   static const _names = [
-    'Spike', 'Draco', 'Yoshi', 'Ziggy', 'Rex', 'Pascal', 'Sly', 'Godzilla', 'Gex', 'Rango',
-    'Kaa', 'Nag', 'Nagini', 'Basilisk', 'Viper', 'Fang', 'Scales', 'Blaze', 'Inferno', 'Shadow',
-    'Phantom', 'Ghost', 'Titan', 'Atlas', 'Thor', 'Loki', 'Zeus', 'Apollo', 'Ares', 'Hades',
-    'Odin', 'Ragnar', 'Kratos', 'Dino', 'Reptar', 'Charmander', 'Gecko', 'Iguana', 'Chameleon', 'Cobra',
-    'Python', 'Anaconda', 'Boa', 'Mamba', 'Hydra', 'Jaffar', 'Sauron', 'Smaug', 'Alduin', 'Bahamut',
-    'Tiamat', 'Charizard', 'Rayquaza', 'Gyarados', 'Onix', 'Ekans', 'Arbok', 'Koffing', 'Weezing', 'Snorlax',
-    'Machop', 'Gengar', 'Alakazam', 'Dragonite', 'Mewtwo', 'Lucario', 'Tyranitar', 'Salamence', 'Garchomp', 'Haxorus',
-    'Hydreigon', 'Goodra', 'Kommo-o', 'Dragapult', 'Baxcalibur', 'Bandit', 'Chester', 'Otis', 'Dexter', 'Winston',
-    'Gatsby', 'Romeo', 'Juliet', 'Penny', 'Ruby', 'Rosie', 'Poppy', 'Daisy', 'Olive', 'Stella',
-    'Lulu', 'Maya', 'Sophie', 'Piper', 'Hazel', 'Willow', 'Zelda', 'Cleo', 'Venom', 'Vipera'
+    'Spike',
+    'Draco',
+    'Yoshi',
+    'Ziggy',
+    'Rex',
+    'Pascal',
+    'Sly',
+    'Godzilla',
+    'Gex',
+    'Rango',
+    'Kaa',
+    'Nag',
+    'Nagini',
+    'Basilisk',
+    'Viper',
+    'Fang',
+    'Scales',
+    'Blaze',
+    'Inferno',
+    'Shadow',
+    'Phantom',
+    'Ghost',
+    'Titan',
+    'Atlas',
+    'Thor',
+    'Loki',
+    'Zeus',
+    'Apollo',
+    'Ares',
+    'Hades',
+    'Odin',
+    'Ragnar',
+    'Kratos',
+    'Dino',
+    'Reptar',
+    'Charmander',
+    'Gecko',
+    'Iguana',
+    'Chameleon',
+    'Cobra',
+    'Python',
+    'Anaconda',
+    'Boa',
+    'Mamba',
+    'Hydra',
+    'Jaffar',
+    'Sauron',
+    'Smaug',
+    'Alduin',
+    'Bahamut',
+    'Tiamat',
+    'Charizard',
+    'Rayquaza',
+    'Gyarados',
+    'Onix',
+    'Ekans',
+    'Arbok',
+    'Koffing',
+    'Weezing',
+    'Snorlax',
+    'Machop',
+    'Gengar',
+    'Alakazam',
+    'Dragonite',
+    'Mewtwo',
+    'Lucario',
+    'Tyranitar',
+    'Salamence',
+    'Garchomp',
+    'Haxorus',
+    'Hydreigon',
+    'Goodra',
+    'Kommo-o',
+    'Dragapult',
+    'Baxcalibur',
+    'Bandit',
+    'Chester',
+    'Otis',
+    'Dexter',
+    'Winston',
+    'Gatsby',
+    'Romeo',
+    'Juliet',
+    'Penny',
+    'Ruby',
+    'Rosie',
+    'Poppy',
+    'Daisy',
+    'Olive',
+    'Stella',
+    'Lulu',
+    'Maya',
+    'Sophie',
+    'Piper',
+    'Hazel',
+    'Willow',
+    'Zelda',
+    'Cleo',
+    'Venom',
+    'Vipera'
   ];
 
   void _executeAdopsi(BuildContext context, Map<String, dynamic> h) {
@@ -45,7 +135,8 @@ class _ReptilPageState extends State<ReptilPage> {
 
     setState(() {
       widget.character.money -= cost;
-      widget.character.happiness = (widget.character.happiness + happinessBoost).clamp(0, 100);
+      widget.character.happiness =
+          (widget.character.happiness + happinessBoost).clamp(0, 100);
       widget.character.pets.add({
         'name': petName,
         'breed': h['name'] as String,
@@ -60,7 +151,8 @@ class _ReptilPageState extends State<ReptilPage> {
       });
     });
 
-    final msg = '🦎 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(cost)})';
+    final msg =
+        '🦎 Kamu mengadopsi ${h['name']} bernama $petName! (+${h['happiness']}% Kebahagiaan, -${_fmt(cost)})';
     widget.character.inbox.add(msg);
 
     showDialog(
@@ -69,7 +161,8 @@ class _ReptilPageState extends State<ReptilPage> {
         title: const Row(children: [
           Icon(Icons.check_circle, color: Colors.green),
           SizedBox(width: 8),
-          Text('Selamat Datang!', style: TextStyle(fontWeight: FontWeight.bold)),
+          Text('Selamat Datang!',
+              style: TextStyle(fontWeight: FontWeight.bold)),
         ]),
         content: Text(msg),
         actions: [
@@ -95,7 +188,8 @@ class _ReptilPageState extends State<ReptilPage> {
     if (success) {
       final petName = _names[Random().nextInt(_names.length)];
       setState(() {
-        widget.character.happiness = (widget.character.happiness + happinessBoost).clamp(0, 100);
+        widget.character.happiness =
+            (widget.character.happiness + happinessBoost).clamp(0, 100);
         widget.character.pets.add({
           'name': petName,
           'breed': itemName,
@@ -110,7 +204,8 @@ class _ReptilPageState extends State<ReptilPage> {
         });
       });
 
-      final msg = '🦎 Orang tua kamu menyetujui permintaanmu dan membelikan $itemName bernama $petName! (+$happinessBoost% Kebahagiaan)';
+      final msg =
+          '🦎 Orang tua kamu menyetujui permintaanmu dan membelikan $itemName bernama $petName! (+$happinessBoost% Kebahagiaan)';
       widget.character.inbox.add(msg);
 
       showDialog(
@@ -119,7 +214,8 @@ class _ReptilPageState extends State<ReptilPage> {
           title: const Row(children: [
             Icon(Icons.sentiment_very_satisfied, color: Colors.green),
             SizedBox(width: 8),
-            Text('Disetujui! 🎉', style: TextStyle(fontWeight: FontWeight.bold)),
+            Text('Disetujui! 🎉',
+                style: TextStyle(fontWeight: FontWeight.bold)),
           ]),
           content: Text(msg),
           actions: [
@@ -186,13 +282,16 @@ class _ReptilPageState extends State<ReptilPage> {
                       children: [
                         Text(
                           itemName,
-                          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          style: const TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         Text(
                           'Harga: ${_fmt(cost)}',
                           style: TextStyle(
                             fontSize: 14,
-                            color: isDark ? Colors.greenAccent : Colors.green.shade700,
+                            color: isDark
+                                ? Colors.greenAccent
+                                : Colors.green.shade700,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -204,7 +303,8 @@ class _ReptilPageState extends State<ReptilPage> {
               const SizedBox(height: 12),
               Text(
                 h['desc'] ?? '',
-                style: TextStyle(color: isDark ? Colors.white70 : Colors.black87),
+                style:
+                    TextStyle(color: isDark ? Colors.white70 : Colors.black87),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -215,10 +315,14 @@ class _ReptilPageState extends State<ReptilPage> {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  side: BorderSide(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                 ),
-                leading: const Icon(Icons.account_balance_wallet, color: Colors.green),
-                title: const Text('Beli Sendiri', style: TextStyle(fontWeight: FontWeight.bold)),
+                leading: const Icon(Icons.account_balance_wallet,
+                    color: Colors.green),
+                title: const Text('Beli Sendiri',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(
                   canAfford
                       ? 'Saldo Anda: ${_fmt(widget.character.money)}'
@@ -234,9 +338,11 @@ class _ReptilPageState extends State<ReptilPage> {
                     showDialog(
                       context: context,
                       builder: (c) => AlertDialog(
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                         title: const Text('Uang Tidak Cukup'),
-                        content: Text('Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
+                        content: Text(
+                            'Uang Anda tidak cukup untuk membeli $itemName secara mandiri.'),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(c),
@@ -252,11 +358,15 @@ class _ReptilPageState extends State<ReptilPage> {
               ListTile(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
-                  side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                  side: BorderSide(
+                      color:
+                          isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                 ),
                 leading: const Icon(Icons.family_restroom, color: Colors.blue),
-                title: const Text('Minta Orang Tua Membelikan', style: TextStyle(fontWeight: FontWeight.bold)),
-                subtitle: const Text('Peluang disetujui: 80%', style: TextStyle(color: Colors.blueAccent)),
+                title: const Text('Minta Orang Tua Membelikan',
+                    style: TextStyle(fontWeight: FontWeight.bold)),
+                subtitle: const Text('Peluang disetujui: 80%',
+                    style: TextStyle(color: Colors.blueAccent)),
                 trailing: const Icon(Icons.chevron_right),
                 onTap: () {
                   Navigator.pop(ctx);
@@ -274,18 +384,21 @@ class _ReptilPageState extends State<ReptilPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color bgColor =
+        isDark ? const Color(0xFF121212) : Colors.grey.shade100;
     final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
     final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black87;
-    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color borderColor =
+        isDark ? Colors.grey.shade700 : Colors.grey.shade200;
     final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
 
     const list = DatabaseReptil.listReptil;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adopsi Reptil 🦎', style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text('Adopsi Reptil 🦎',
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: containerBg,
         foregroundColor: textColor,
         elevation: 0.5,
@@ -315,7 +428,8 @@ class _ReptilPageState extends State<ReptilPage> {
             const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: list.length,
                 itemBuilder: (_, i) {
                   final h = list[i];
@@ -328,7 +442,8 @@ class _ReptilPageState extends State<ReptilPage> {
                       side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       title: Text(
                         h['name'],
                         style: TextStyle(

@@ -18,6 +18,7 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/li
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/pikiran_tubuh/pikiran_tubuh_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/peliharaan/peliharaan_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/operasi_plastik/operasi_plastik_menu.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/obat_obatan/obat_obatan_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/rehabilitasi/rehabilitasi_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/salon_spa/salon_spa_menu.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/berbelanja/berbelanja_menu.dart';
@@ -492,6 +493,36 @@ class ActivityButton extends StatelessWidget {
                       OperasiPlastikMenuHelper.showOperasiPlastikMenu(context, character, localRefresh);
                     }),
                   ),
+
+                  // Obat-obatan (hanya jika usia >= 18 & Akses Obat-obatan 18+ dibuka dari Toko)
+                  if (age >= 18)
+                    Builder(builder: (ctx) {
+                      final bool isObatUnlocked = GlobalSettings.isObatObatanUnlocked.value;
+                      return _buildActivityTile(
+                        context: context,
+                        label: 'Obat-obatan',
+                        subtitle: 'Konsumsi obat-obatan atau zat penenang',
+                        icon: Icons.medication,
+                        color: Colors.purple,
+                        minAge: 18,
+                        currentAge: isObatUnlocked ? age : 0,
+                        customLockMessage: isObatUnlocked
+                            ? null
+                            : 'Fitur Obat-obatan memerlukan item "Akses Obat-obatan (18+)". Beli item akses di Toko MyLifeSim untuk membuka fitur ini.',
+                        lockActionLabel: isObatUnlocked ? null : 'Buka Toko 🛒',
+                        onLockAction: isObatUnlocked
+                            ? null
+                            : () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => StorePage(character: character)),
+                                );
+                              },
+                        onTap: () => _executeAction(context, () {
+                          ObatObatanMenuHelper.showObatObatanMenu(context, character, localRefresh);
+                        }),
+                      );
+                    }),
 
                   // Rehabilitasi
                   _buildActivityTile(

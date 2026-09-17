@@ -10,14 +10,19 @@ import 'kelinci/kelinci_page.dart';
 import 'reptil/reptil_page.dart';
 
 class PeliharaanMenuHelper {
-  static void showPeliharaanMenu(BuildContext context, Character character, VoidCallback onComplete) {
+  static void showPeliharaanMenu(
+      BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 8) {
       showDialog(
         context: context,
         builder: (ctx) => AlertDialog(
           title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 8 tahun untuk mengadopsi peliharaan.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
+          content: const Text(
+              'Kamu harus berusia minimal 8 tahun untuk mengadopsi peliharaan.'),
+          actions: [
+            TextButton(
+                onPressed: () => Navigator.pop(ctx), child: const Text('OK'))
+          ],
         ),
       );
       return;
@@ -51,9 +56,17 @@ class PeliharaanPage extends StatefulWidget {
 
 class _PeliharaanPageState extends State<PeliharaanPage> {
   final List<Map<String, dynamic>> hewan = [
-    {'id': 'kucing', 'name': 'Kucing 🐱', 'desc': 'Teman berbulu yang menggemaskan'},
+    {
+      'id': 'kucing',
+      'name': 'Kucing 🐱',
+      'desc': 'Teman berbulu yang menggemaskan'
+    },
     {'id': 'anjing', 'name': 'Anjing 🐶', 'desc': 'Teman setia yang aktif'},
-    {'id': 'burung', 'name': 'Burung 🦜', 'desc': 'Hewan cantik yang bisa bernyanyi'},
+    {
+      'id': 'burung',
+      'name': 'Burung 🦜',
+      'desc': 'Hewan cantik yang bisa bernyanyi'
+    },
     {'id': 'ikan', 'name': 'Ikan 🐠', 'desc': 'Hewan tenang dan menenangkan'},
     {'id': 'kelinci', 'name': 'Kelinci 🐇', 'desc': 'Hewan lucu dan jinak'},
     {'id': 'reptil', 'name': 'Reptil 🦎', 'desc': 'Hewan unik untuk kolektor'},
@@ -67,22 +80,28 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
     Widget targetPage;
     switch (categoryId) {
       case 'kucing':
-        targetPage = KucingPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = KucingPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       case 'anjing':
-        targetPage = AnjingPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = AnjingPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       case 'burung':
-        targetPage = BurungPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = BurungPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       case 'ikan':
-        targetPage = IkanPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = IkanPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       case 'kelinci':
-        targetPage = KelinciPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = KelinciPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       case 'reptil':
-        targetPage = ReptilPage(character: widget.character, onComplete: widget.onComplete);
+        targetPage = ReptilPage(
+            character: widget.character, onComplete: widget.onComplete);
         break;
       default:
         return;
@@ -99,16 +118,19 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
   @override
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
-    final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
+    final Color bgColor =
+        isDark ? const Color(0xFF121212) : Colors.grey.shade100;
     final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
     final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black87;
-    final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
+    final Color borderColor =
+        isDark ? Colors.grey.shade700 : Colors.grey.shade200;
     final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Adopsi Peliharaan 🐾', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        title: const Text('Adopsi Peliharaan 🐾',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
         backgroundColor: Colors.brown.shade700,
         foregroundColor: Colors.white,
         elevation: 1,
@@ -138,7 +160,8 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
             const SizedBox(height: 8),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 itemCount: hewan.length,
                 itemBuilder: (_, i) {
                   final h = hewan[i];
@@ -151,7 +174,8 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                       side: BorderSide(color: borderColor),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
                       title: Text(
                         h['name'],
                         style: TextStyle(
@@ -174,7 +198,8 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
                         size: 16,
                         color: isDark ? Colors.white70 : Colors.grey.shade600,
                       ),
-                      onTap: () => _openCategoryPage(context, h['id'] as String),
+                      onTap: () =>
+                          _openCategoryPage(context, h['id'] as String),
                     ),
                   );
                 },
@@ -186,4 +211,3 @@ class _PeliharaanPageState extends State<PeliharaanPage> {
     );
   }
 }
-
