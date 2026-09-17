@@ -82,7 +82,7 @@ class _GodModePageState extends State<GodModePage> {
       appBar: AppBar(
         title: Text(
           'Atribut Kepribadian (God Mode)',
-          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
         ),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,

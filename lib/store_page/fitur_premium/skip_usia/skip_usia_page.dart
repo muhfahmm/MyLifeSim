@@ -39,7 +39,7 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
     if (character == null) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Fast Forward Usia'),
+          title: const Text('Fast Forward Usia', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
           backgroundColor: Colors.purple.shade800,
           foregroundColor: Colors.white,
         ),
@@ -64,7 +64,7 @@ class _SkipUsiaPageState extends State<SkipUsiaPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Fast Forward Usia ⏩', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Fast Forward Usia ⏩', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(

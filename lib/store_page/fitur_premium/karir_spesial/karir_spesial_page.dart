@@ -32,7 +32,7 @@ class KarirSpesialPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Karir Spesial 🌟',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

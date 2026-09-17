@@ -32,7 +32,7 @@ class EsportsStorePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'E-Sports 🎮',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(

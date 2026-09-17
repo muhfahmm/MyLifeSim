@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'package:mylifesim/game/widgets/assets_menu/properti/properti_menu.dart';
 import 'tempat_tinggal_logic.dart';
 
 class TempatTinggalMenuHelper {
@@ -64,6 +65,33 @@ class TempatTinggalMenuHelper {
                       ),
                     ),
                   ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              // Button Redirect ke Toko Rumah / Properti
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PropertiMenuPage(character: character),
+                      ),
+                    ).then((_) => onRefresh());
+                  },
+                  icon: const Icon(Icons.storefront_rounded, size: 18),
+                  label: const Text(
+                    'Buka Toko Rumah & Properti 🏡',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal.shade700,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 10),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
                 ),
               ),
               const SizedBox(height: 16),

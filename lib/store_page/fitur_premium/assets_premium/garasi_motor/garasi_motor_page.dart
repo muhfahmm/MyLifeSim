@@ -12,7 +12,7 @@ class GarasiMotorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Garasi Motor 🏍️'),
+        title: const Text('Garasi Motor 🏍️', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.orange.shade700,
         foregroundColor: Colors.white,
       ),

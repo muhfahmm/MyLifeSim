@@ -5,6 +5,7 @@ import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class PilihAnakPage extends StatefulWidget {
   final Character character;
@@ -103,53 +104,40 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
   }
 
   void _showAdoptionDialog(Map<String, dynamic> child) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Konfirmasi Adopsi', style: TextStyle(fontWeight: FontWeight.bold)),
-        content: Text('Apakah Anda yakin ingin mengadopsi ${child['name']} (${child['gender']}, ${child['age']} tahun) dengan biaya ${_fmt(child['cost'] as int)}?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Batal'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: Colors.orange),
-            onPressed: () {
-              Navigator.pop(ctx); // Close confirmation dialog
-              final int cost = child['cost'] as int;
-              if (widget.character.money >= cost) {
-                _adoptChild(child);
-              } else {
-                _showNotEnoughMoneyDialog();
-              }
-            },
-            child: const Text('Adopsi'),
-          ),
-        ],
-      ),
+      title: 'Konfirmasi Adopsi',
+      showCloseButton: false,
+      content: Text('Apakah Anda yakin ingin mengadopsi ${child['name']} (${child['gender']}, ${child['age']} tahun) dengan biaya ${_fmt(child['cost'] as int)}?'),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade300, foregroundColor: Colors.black87),
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Batal'),
+        ),
+        const SizedBox(width: 8),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.orange, foregroundColor: Colors.white),
+          onPressed: () {
+            Navigator.pop(context);
+            final int cost = child['cost'] as int;
+            if (widget.character.money >= cost) {
+              _adoptChild(child);
+            } else {
+              _showNotEnoughMoneyDialog();
+            }
+          },
+          child: const Text('Adopsi'),
+        ),
+      ],
     );
   }
 
   void _showNotEnoughMoneyDialog() {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.error_outline, color: Colors.red),
-            SizedBox(width: 8),
-            Text('Dana Kurang', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: const Text('Maaf, uang Anda tidak cukup untuk mengadopsi anak ini.'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      title: 'Dana Kurang 💸',
+      content: const Text('Maaf, uang Anda tidak cukup untuk mengadopsi anak ini.'),
     );
   }
 
@@ -176,30 +164,15 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
     widget.character.inbox.add(msg);
 
     // Tampilkan dialog sukses
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx2) => AlertDialog(
-        title: const Row(
-          children: [
-            Icon(Icons.check_circle, color: Colors.green),
-            SizedBox(width: 8),
-            Text('Adopsi Berhasil!', style: TextStyle(fontWeight: FontWeight.bold)),
-          ],
-        ),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx2); // tutup dialog
-              // Kembali ke halaman utama setelah adopsi selesai
-              Navigator.of(context).pop(); // tutup PilihAnakPage
-              Navigator.of(context).pop(); // tutup AdopsiAnakPage
-              widget.onComplete();
-            },
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+      title: 'Adopsi Berhasil! 🎉',
+      content: Text(msg),
+      onClose: () {
+        Navigator.of(context).pop(); // tutup PilihAnakPage
+        Navigator.of(context).pop(); // tutup AdopsiAnakPage
+        widget.onComplete();
+      },
     );
   }
 
@@ -207,10 +180,10 @@ class _PilihAnakPageState extends State<PilihAnakPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Pilih Anak (${widget.category['name']})', style: const TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
-        foregroundColor: Colors.black87,
-        elevation: 0.5,
+        title: Text('Pilih Anak (${widget.category['name']})', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.amber.shade800,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: Colors.grey.shade100,

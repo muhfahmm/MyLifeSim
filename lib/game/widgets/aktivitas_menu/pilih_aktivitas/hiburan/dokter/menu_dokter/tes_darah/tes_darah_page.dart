@@ -12,9 +12,35 @@ class TesDarahPage extends StatefulWidget {
 }
 
 class _TesDarahPageState extends State<TesDarahPage> {
+  void _doRoutineTest() async {
+    const int cost = 150;
+    bool paidByParent = false;
+    if (widget.character.money < cost) {
+      paidByParent = await DokterUtils.handleInsufficientMoney(context, widget.character, cost, 'Tes Darah Rutin');
+      if (!paidByParent) {
+        return;
+      }
+    }
+
+    if (!paidByParent) {
+      widget.character.money -= cost;
+    }
+    widget.character.health = (widget.character.health + 10).clamp(0, 100);
+    widget.character.happiness = (widget.character.happiness + 5).clamp(0, 100);
+    widget.character.inbox.add('💉 Tes Darah Rutin: Hasil tes darah sampel menunjukkan kondisi sel dan kadar gula dalam batas normal! (-${DokterUtils.fmt(cost)}, +10% Kesehatan, +5% Kebahagiaan)');
+    widget.onComplete?.call();
+    setState(() {});
+
+    DokterUtils.showResultDialog(
+      context,
+      'Hasil Tes Darah 💉',
+      'Dokter mengambil sampel darahmu.\n\nHasil Uji Lab: Sampel darah dalam keadaan prima dan sehat!\n\n(+10% Kesehatan, +5% Kebahagiaan, -${DokterUtils.fmt(cost)} biaya lab)',
+      () {},
+    );
+  }
+
   void _treat(String disease) async {
-    // Gunakan helper pengobatan dari DokterUtils
-    await DokterUtils.handleDiseaseTreatment(context, widget.character, 'Tes Darah');
+    await DokterUtils.handleDiseaseTreatment(context, widget.character, 'Tes Darah', specificDisease: disease);
     widget.onComplete?.call();
     setState(() {});
   }
@@ -29,10 +55,10 @@ class _TesDarahPageState extends State<TesDarahPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tes Darah 💉', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Tes Darah 💉', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue.shade800,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -58,62 +84,90 @@ class _TesDarahPageState extends State<TesDarahPage> {
             ),
             const SizedBox(height: 8),
             Expanded(
-              child: activeDiseases.isEmpty
-                  ? Center(
-                      child: Text(
-                        'kamu sehat',
-                        textAlign: TextAlign.center,
+              child: ListView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                children: [
+                  // Menu Tes Rutin
+                  Card(
+                    elevation: 0,
+                    margin: const EdgeInsets.only(bottom: 8),
+                    color: isDark ? Colors.grey.shade800 : Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                    ),
+                    child: ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.bloodtype, color: Colors.red, size: 24),
+                      title: Text(
+                        'Tes Darah Rutin & Skrining 🩸',
                         style: TextStyle(
-                          color: isDark ? Colors.white70 : Colors.black54,
-                          fontSize: 18,
                           fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                          color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      itemCount: activeDiseases.length,
-                      itemBuilder: (context, index) {
-                        final disease = activeDiseases[index];
-                        final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
-                        final int cost = costData['cost'] ?? 250;
-                        return Card(
-                          elevation: 0,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          color: isDark ? Colors.grey.shade800 : Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
-                          ),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                            title: Text(
-                              disease,
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14,
-                                color: isDark ? Colors.white : Colors.black87,
-                              ),
-                            ),
-                            subtitle: Text(
-                              'Membutuhkan tindakan tes darah.',
-                              style: TextStyle(
-                                color: isDark ? Colors.white70 : Colors.black54,
-                              ),
-                            ),
-                            trailing: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue.shade600,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              onPressed: () => _treat(disease),
-                              child: Text('Obati (${DokterUtils.fmt(cost)})'),
-                            ),
-                          ),
-                        );
-                      },
+                      subtitle: Text(
+                        'Cek hemoglobin & gula darah • ${DokterUtils.fmt(150)}',
+                        style: TextStyle(
+                          color: isDark ? Colors.white70 : Colors.black54,
+                          fontSize: 12,
+                        ),
+                      ),
+                      trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
+                      onTap: _doRoutineTest,
                     ),
+                  ),
+
+                  if (activeDiseases.isNotEmpty) ...[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Text(
+                        'Penyakit Terdeteksi:',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: isDark ? Colors.white70 : Colors.black54,
+                        ),
+                      ),
+                    ),
+                    ...activeDiseases.map((disease) {
+                      final costData = DokterUtils.getDiseaseCostAndSuccessRate(disease);
+                      final int cost = costData['cost'] ?? 250;
+                      return Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        color: isDark ? Colors.grey.shade800 : Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        ),
+                        child: ListTile(
+                          dense: true,
+                          leading: const Icon(Icons.medical_services, color: Colors.blue, size: 24),
+                          title: Text(
+                            disease,
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                          ),
+                          subtitle: Text(
+                            'Terapi darah spesifik • ${DokterUtils.fmt(cost)}',
+                            style: TextStyle(
+                              color: isDark ? Colors.white70 : Colors.black54,
+                              fontSize: 12,
+                            ),
+                          ),
+                          trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
+                          onTap: () => _treat(disease),
+                        ),
+                      );
+                    }),
+                  ],
+                ],
+              ),
             ),
           ],
         ),

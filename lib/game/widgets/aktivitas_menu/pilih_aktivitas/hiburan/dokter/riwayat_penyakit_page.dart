@@ -3,9 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'menu_dokter/dokter_utils.dart';
-import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
-import 'menu_dokter/tes_darah/tes_darah_page.dart';
-import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
 
 class RiwayatPenyakitPage extends StatefulWidget {
   final Character character;
@@ -471,10 +468,10 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Daftar Penyakit Anda', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Daftar Penyakit Anda 🏥', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue.shade800,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -519,11 +516,11 @@ class _RiwayatPenyakitPageState extends State<RiwayatPenyakitPage> {
               child: activeDiseases.isEmpty
                   ? Center(
                       child: Text(
-                        'kamu sehat',
+                        '🎉 Kamu Sehat Walafiat!\nTidak ada penyakit aktif saat ini.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: isDark ? Colors.white70 : Colors.black54, 
-                          fontSize: 18, 
+                          fontSize: 15, 
                           fontWeight: FontWeight.bold,
                         ),
                       ),

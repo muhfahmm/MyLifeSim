@@ -232,7 +232,7 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'Imigrasi & Kebangsaan ✈️🛂',
+          'Imigrasi & Kebangsaan',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         backgroundColor: Colors.blueAccent.shade700,
@@ -240,12 +240,13 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
         elevation: 1,
         bottom: TabBar(
           controller: _tabController,
-          labelColor: isDark ? Colors.lightBlueAccent : Colors.blue,
-          unselectedLabelColor: isDark ? Colors.white70 : Colors.grey,
-          indicatorColor: isDark ? Colors.lightBlueAccent : Colors.blue,
+          labelColor: Colors.white,
+          unselectedLabelColor: Colors.white70,
+          indicatorColor: Colors.white,
+          indicatorWeight: 3,
           tabs: const [
-            Tab(text: 'Pindah Negara ✈️'),
-            Tab(text: 'Ganti Kebangsaan 🛂'),
+            Tab(text: 'Pindah Negara'),
+            Tab(text: 'Ganti Kebangsaan'),
           ],
         ),
       ),
@@ -347,7 +348,12 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                           children: [
                             Icon(Icons.flight_takeoff, color: Colors.blue),
                             SizedBox(width: 8),
-                            Text('Konfirmasi Imigrasi', style: TextStyle(fontWeight: FontWeight.bold)),
+                            Expanded(
+                              child: Text(
+                                'Konfirmasi Imigrasi',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                            ),
                           ],
                         ),
                         content: Text(
@@ -380,16 +386,19 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                               final msg = '✈️ Kamu pindah ke $capitalizedName! Karena berpindah negara, kamu otomatis mengundurkan diri dari pekerjaan lamamu. Kehidupan baru menanti! (+${n['happiness']}% Kebahagiaan)';
                               widget.character.inbox.add(msg);
                               
-                              final navigator = Navigator.of(context);
                               final List<String> cities = await _fetchCities(capitalizedName);
 
                               if (!mounted) return;
 
-                              navigator.pop();
+                              // ignore: use_build_context_synchronously
+                              Navigator.of(context).pop();
                               widget.onComplete();
 
+                              if (!mounted) return;
+
                               showDialog(
-                                context: navigator.context,
+                                // ignore: use_build_context_synchronously
+                                context: context,
                                 barrierDismissible: false,
                                 builder: (ctx) => AlertDialog(
                                   title: const Row(
@@ -404,8 +413,8 @@ class _PindahNegaraMenuPageState extends State<PindahNegaraMenuPage> with Single
                                     TextButton(
                                       onPressed: () {
                                         Navigator.pop(ctx);
-                                        if (cities.isNotEmpty) {
-                                          _showSelectCityModal(navigator.context, capitalizedName, cities);
+                                        if (cities.isNotEmpty && mounted) {
+                                          _showSelectCityModal(context, capitalizedName, cities);
                                         }
                                       },
                                       child: const Text('OK'),

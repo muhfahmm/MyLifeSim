@@ -12,7 +12,7 @@ class GarasiMobilPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Garasi Mobil 🚗'),
+        title: const Text('Garasi Mobil 🚗', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.red.shade700,
         foregroundColor: Colors.white,
       ),

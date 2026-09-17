@@ -12,7 +12,7 @@ class CasinoPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Casino 🎲'),
+        title: const Text('Casino 🎲', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.amber.shade700,
         foregroundColor: Colors.white,
       ),

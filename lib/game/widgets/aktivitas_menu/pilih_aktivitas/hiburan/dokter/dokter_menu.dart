@@ -5,8 +5,6 @@ import 'menu_dokter/pemeriksaan_umum/pemeriksaan_umum_page.dart';
 import 'menu_dokter/tes_darah/tes_darah_page.dart';
 import 'menu_dokter/operasi_kecil/operasi_kecil_page.dart';
 import 'menu_dokter/medical_checkup/medical_checkup_page.dart';
-// TAMBAHKAN BARIS INI DI BAWAHNYA:
-import 'menu_dokter/dokter_utils.dart'; 
 import 'riwayat_penyakit_page.dart';
 
 class DokterMenuHelper {
@@ -46,24 +44,16 @@ class _DokterPageState extends State<DokterPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
+        titleSpacing: 12,
         title: const Text('Pergi ke Dokter 🏥', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor: Colors.blue.shade800,
         foregroundColor: Colors.white,
         elevation: 1,
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: TextButton.icon(
-              icon: Icon(Icons.sick_outlined, size: 18, color: isDark ? Colors.redAccent : Colors.red),
-              label: Text(
-                'Penyakit (${widget.character.riwayatPenyakit.length})', 
-                style: TextStyle(
-                  fontWeight: FontWeight.bold, 
-                  color: isDark ? Colors.redAccent : Colors.red, 
-                  fontSize: 13,
-                ),
-              ),
-              onPressed: () {
+            padding: const EdgeInsets.only(right: 12.0),
+            child: InkWell(
+              onTap: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -77,6 +67,30 @@ class _DokterPageState extends State<DokterPage> {
                   widget.onComplete();
                 });
               },
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade700,
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 4)],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.sick, size: 14, color: Colors.white),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Penyakit: ${widget.character.riwayatPenyakit.length}', 
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold, 
+                        color: Colors.white, 
+                        fontSize: 11,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           )
         ],
@@ -131,13 +145,13 @@ class _DokterPageState extends State<DokterPage> {
                       subtitle: Padding(
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
-                          '${l['desc']}\nBiaya: Gratis', 
+                          l['desc'], 
                           style: TextStyle(
                             color: isDark ? Colors.white70 : Colors.black54,
                           ),
                         ),
                       ),
-                      isThreeLine: true,
+                      isThreeLine: false,
                       trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.lightBlueAccent : Colors.blue),
                       onTap: () {
                         Widget page;

@@ -147,7 +147,7 @@ class _FinansialPremiumPageState extends State<FinansialPremiumPage> {
       appBar: AppBar(
         title: const Text(
           'Finansial Premium 💵',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

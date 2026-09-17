@@ -30,7 +30,7 @@ class MiliterStorePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Militer 🪖',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(

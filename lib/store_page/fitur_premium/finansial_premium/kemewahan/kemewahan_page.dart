@@ -12,7 +12,7 @@ class KemewahanPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Kemewahan 💎'),
+        title: const Text('Kemewahan 💎', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.purple.shade700,
         foregroundColor: Colors.white,
       ),

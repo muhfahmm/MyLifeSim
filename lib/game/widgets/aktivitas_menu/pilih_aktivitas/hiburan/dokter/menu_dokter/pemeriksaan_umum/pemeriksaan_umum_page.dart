@@ -29,10 +29,10 @@ class _PemeriksaanUmumPageState extends State<PemeriksaanUmumPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pemeriksaan Umum 🩺', style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        foregroundColor: isDark ? Colors.white : Colors.black87,
-        elevation: 0.5,
+        title: const Text('Pemeriksaan Umum 🩺', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.blue.shade800,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
@@ -86,7 +86,8 @@ class _PemeriksaanUmumPageState extends State<PemeriksaanUmumPage> {
                             side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                           ),
                           child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            dense: true,
+                            leading: const Icon(Icons.medical_services, color: Colors.blue, size: 24),
                             title: Text(
                               disease,
                               style: TextStyle(
@@ -96,20 +97,14 @@ class _PemeriksaanUmumPageState extends State<PemeriksaanUmumPage> {
                               ),
                             ),
                             subtitle: Text(
-                              'Membutuhkan tindakan pemeriksaan umum.',
+                              'Pemeriksaan umum • ${DokterUtils.fmt(cost)}',
                               style: TextStyle(
                                 color: isDark ? Colors.white70 : Colors.black54,
+                                fontSize: 12,
                               ),
                             ),
-                            trailing: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue.shade600,
-                                foregroundColor: Colors.white,
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                              ),
-                              onPressed: () => _treat(disease),
-                              child: Text('Obati (${DokterUtils.fmt(cost)})'),
-                            ),
+                            trailing: Icon(Icons.arrow_forward_ios, size: 14, color: isDark ? Colors.white54 : Colors.grey),
+                            onTap: () => _treat(disease),
                           ),
                         );
                       },

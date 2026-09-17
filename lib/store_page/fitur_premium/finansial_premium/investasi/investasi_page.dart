@@ -12,7 +12,7 @@ class InvestasiPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Investasi 📈'),
+        title: const Text('Investasi 📈', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
       ),

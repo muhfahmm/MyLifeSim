@@ -63,10 +63,10 @@ class _JamTanganProductsPageState extends State<JamTanganProductsPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Produk ${widget.brand}'),
-        backgroundColor: containerBg,
-        foregroundColor: textColor,
-        elevation: 0.5,
+        title: Text('Produk ${widget.brand}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+        backgroundColor: Colors.purple.shade700,
+        foregroundColor: Colors.white,
+        elevation: 1,
       ),
       body: Container(
         color: bgColor,

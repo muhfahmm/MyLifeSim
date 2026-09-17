@@ -43,7 +43,7 @@ class AdultFeaturesStorePage extends StatelessWidget {
       appBar: AppBar(
         title: const Text(
           'Fitur Dewasa (18+) 🔞',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 18),
+          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
         ),
         flexibleSpace: Container(
           decoration: const BoxDecoration(

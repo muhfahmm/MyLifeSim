@@ -270,7 +270,7 @@ class _StorePageState extends State<StorePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Toko MyLifeSim', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Toko MyLifeSim', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

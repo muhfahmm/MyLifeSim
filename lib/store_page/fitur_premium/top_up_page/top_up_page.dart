@@ -202,7 +202,7 @@ class _TopUpPageState extends State<TopUpPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Top Up Dana / Koin', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text('Top Up Dana / Koin', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white)),
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(

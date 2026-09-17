@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'ujian_lisensi_page.dart';
+import 'lisensi_option_modal.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
 
@@ -365,26 +366,24 @@ class _LisensiPageState extends State<LisensiPage> {
                           return;
                         }
 
-                        // Proceed to Ujian Teori
-                        Navigator.push<bool>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => UjianLisensiPage(
-                              character: widget.character,
-                              license: l,
-                              onComplete: () {
-                                if (mounted) {
-                                  setState(() {});
-                                  widget.onComplete();
-                                }
-                              },
-                            ),
-                          ),
-                        ).then((passed) {
-                          if (passed == true && mounted && context.mounted) {
-                            _checkParentGiftOffer(context, l);
-                          }
-                        });
+                        // Open Option Modal (Test vs Bayar Instan)
+                        LisensiOptionModal.showOptionModal(
+                          context: context,
+                          character: widget.character,
+                          lisensiData: l,
+                          onComplete: () {
+                            if (mounted) {
+                              setState(() {});
+                              widget.onComplete();
+                              _checkParentGiftOffer(context, l);
+                            }
+                          },
+                          onRefreshParent: () {
+                            if (mounted) {
+                              setState(() {});
+                            }
+                          },
+                        );
                       },
                     ),
                   );

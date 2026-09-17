@@ -129,22 +129,22 @@ class _KriminalPageState extends State<KriminalPage> {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(12),
-              margin: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              margin: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: isDark ? Colors.red.shade900 : Colors.red.shade50,
+                color: isDark ? Colors.red.shade900.withValues(alpha: 0.4) : Colors.red.shade50,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(color: isDark ? Colors.red.shade700 : Colors.red.shade200),
               ),
               child: Row(
                 children: [
-                  const Icon(Icons.warning_amber_rounded, color: Colors.red),
+                  const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 18),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'Tindakan kriminal berisiko dipenjara! Pilih dengan bijak.',
                       style: TextStyle(
-                        fontSize: 12, 
+                        fontSize: 11, 
                         color: isDark ? Colors.redAccent : Colors.red, 
                         fontWeight: FontWeight.bold,
                       ),
@@ -155,44 +155,42 @@ class _KriminalPageState extends State<KriminalPage> {
             ),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 itemCount: crimes.length,
                 itemBuilder: (_, i) {
                   final crime = crimes[i];
                   return Card(
                     elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 8),
+                    margin: const EdgeInsets.only(bottom: 6),
                     color: isDark ? Colors.grey.shade800 : Colors.white,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       title: Text(
                         crime['name'], 
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
-                          fontSize: 14,
+                          fontSize: 13,
                           color: isDark ? Colors.white : Colors.black87,
                         ),
                       ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '${crime['desc']}\nRisiko: ${crime['risk']}% | Penjara: ${crime['jail']} thn',
-                          style: TextStyle(
-                            color: isDark ? Colors.white70 : Colors.black54,
-                          ),
+                      subtitle: Text(
+                        '${crime['desc']} • Risiko: ${crime['risk']}% (${crime['jail']} thn)',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isDark ? Colors.white70 : Colors.black54,
                         ),
                       ),
-                      isThreeLine: true,
                       trailing: Text(
                         '+${_fmt(crime['gain'] as int)}',
                         style: TextStyle(
-                          color: isDark ? Colors.greenAccent : Colors.green, 
+                          color: isDark ? Colors.greenAccent : Colors.green.shade800, 
                           fontWeight: FontWeight.bold, 
-                          fontSize: 14,
+                          fontSize: 12,
                         ),
                       ),
                       onTap: () => _executeCrime(context, crime),

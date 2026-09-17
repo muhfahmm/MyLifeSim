@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class DokterUtils {
   static String fmt(int amount) {
@@ -15,26 +16,99 @@ class DokterUtils {
   }
 
   static void showResultDialog(BuildContext context, String title, String msg, VoidCallback onComplete) {
-    showDialog(
+    DialogHelper.show(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Row(children: [
-          const Icon(Icons.check_circle, color: Colors.green),
-          const SizedBox(width: 8),
-          Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-        ]),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              onComplete();
-            },
-            child: const Text('OK'),
-          )
-        ],
-      ),
+      title: title,
+      content: Text(msg),
+      onClose: onComplete,
     );
+  }
+
+  static Future<bool> handleInsufficientMoney(BuildContext context, Character character, int cost, String actionName) async {
+    final bool hasFather = character.fatherName != null && !character.isFatherDeceased;
+    final bool hasMother = character.motherName != null && !character.isMotherDeceased;
+    final bool hasParents = hasFather || hasMother;
+
+    bool? askParents = false;
+    await DialogHelper.show(
+      context: context,
+      title: 'Saldo Kurang 💸',
+      showCloseButton: false,
+      content: Text('Kamu tidak memiliki cukup uang untuk membayar $actionName sebesar ${fmt(cost)}.\n' +
+          (hasParents 
+              ? 'Apakah kamu ingin meminta bantuan orang tuamu untuk membiayainya?' 
+              : 'Kamu tidak memiliki orang tua untuk dimintai bantuan.')),
+      actions: [
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade300, foregroundColor: Colors.black87),
+          onPressed: () {
+            askParents = false;
+            Navigator.pop(context);
+          },
+          child: const Text('Mengerti'),
+        ),
+        if (hasParents) ...[
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+            onPressed: () {
+              askParents = true;
+              Navigator.pop(context);
+            },
+            child: const Text('Minta Orang Tua 👨‍👩‍👧'),
+          ),
+        ],
+      ],
+    );
+
+    if (askParents == true) {
+      int parentRelation = 0;
+      int parentCount = 0;
+      if (hasMother) {
+        parentRelation += character.motherRelationship ?? 50;
+        parentCount++;
+      }
+      if (hasFather) {
+        parentRelation += character.fatherRelationship ?? 50;
+        parentCount++;
+      }
+      final int avgRelation = parentCount > 0 ? (parentRelation / parentCount).round() : 50;
+      
+      final r = Random();
+      final bool agree = r.nextInt(100) < avgRelation;
+
+      if (agree) {
+        if (hasMother) {
+          character.motherRelationship = ((character.motherRelationship ?? 50) + 10).clamp(0, 100);
+        }
+        if (hasFather) {
+          character.fatherRelationship = ((character.fatherRelationship ?? 50) + 10).clamp(0, 100);
+        }
+
+        await DialogHelper.show(
+          context: context,
+          title: 'Orang Tua Setuju 🎉',
+          content: Text('Orang tuamu bersedia membayarkan $actionName sebesar ${fmt(cost)}! Hubunganmu dengan mereka meningkat.'),
+        );
+        return true; // Dibayar oleh orang tua
+      } else {
+        if (hasMother) {
+          character.motherRelationship = ((character.motherRelationship ?? 50) - 8).clamp(0, 100);
+        }
+        if (hasFather) {
+          character.fatherRelationship = ((character.fatherRelationship ?? 50) - 8).clamp(0, 100);
+        }
+
+        await DialogHelper.show(
+          context: context,
+          title: 'Bantuan Ditolak 😔',
+          content: const Text('Orang tuamu menolak membiayai pengobatanmu. Mereka meminta kamu agar lebih mandiri dan berhemat.'),
+        );
+        return false;
+      }
+    }
+
+    return false;
   }
 
   static String getRequiredMenu(String diseaseName) {
@@ -99,12 +173,11 @@ class DokterUtils {
 
     final random = Random();
     if (ringanList.any((key) => nameLower.contains(key))) {
-      return 25 + random.nextInt(11); // 25-35%
+      return 5 + random.nextInt(6);
     } else if (beratList.any((key) => nameLower.contains(key))) {
-      return 25 + random.nextInt(11); // 25-35%
+      return 25 + random.nextInt(16);
     } else {
-      // Sedang
-      return 25 + random.nextInt(11); // 25-35%
+      return 10 + random.nextInt(11);
     }
   }
 
@@ -135,26 +208,36 @@ class DokterUtils {
       final bool hasMother = character.motherName != null && !character.isMotherDeceased;
       final bool hasParents = hasFather || hasMother;
 
-      bool? askParents = await showDialog<bool>(
+      bool? askParents = false;
+      await DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Saldo Kurang 💸'),
-          content: Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar ${fmt(cost)}.\n' +
-              (hasParents 
-                  ? 'Apakah kamu ingin meminta bantuan orang tuamu untuk membiayai pengobatan?' 
-                  : 'Kamu tidak memiliki orang tua untuk dimintai bantuan.')),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Mengerti', style: TextStyle(color: Colors.grey)),
+        title: 'Saldo Kurang 💸',
+        showCloseButton: false,
+        content: Text('Kamu tidak memiliki cukup uang untuk membayar biaya pengobatan sebesar ${fmt(cost)}.\n' +
+            (hasParents 
+                ? 'Apakah kamu ingin meminta bantuan orang tuamu untuk membiayai pengobatan?' 
+                : 'Kamu tidak memiliki orang tua untuk dimintai bantuan.')),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade300, foregroundColor: Colors.black87),
+            onPressed: () {
+              askParents = false;
+              Navigator.pop(context);
+            },
+            child: const Text('Mengerti'),
+          ),
+          if (hasParents) ...[
+            const SizedBox(width: 8),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+              onPressed: () {
+                askParents = true;
+                Navigator.pop(context);
+              },
+              child: const Text('Minta Orang Tua 👨‍👩‍👧'),
             ),
-            if (hasParents)
-              TextButton(
-                onPressed: () => Navigator.pop(ctx, true),
-                child: const Text('Minta Orang Tua 👨‍👩‍👧', style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
           ],
-        ),
+        ],
       );
 
       if (askParents == true) {
@@ -182,18 +265,10 @@ class DokterUtils {
             character.fatherRelationship = ((character.fatherRelationship ?? 50) + 10).clamp(0, 100);
           }
 
-          await showDialog(
+          await DialogHelper.show(
             context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Orang Tua Setuju 🎉'),
-              content: Text('Orang tuamu bersedia membayar pengobatan sebesar ${fmt(cost)}! Hubunganmu dengan mereka meningkat.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Lanjutkan'),
-                ),
-              ],
-            ),
+            title: 'Orang Tua Setuju 🎉',
+            content: Text('Orang tuamu bersedia membayar pengobatan sebesar ${fmt(cost)}! Hubunganmu dengan mereka meningkat.'),
           );
         } else {
           if (hasMother) {
@@ -203,18 +278,10 @@ class DokterUtils {
             character.fatherRelationship = ((character.fatherRelationship ?? 50) - 8).clamp(0, 100);
           }
 
-          await showDialog(
+          await DialogHelper.show(
             context: context,
-            builder: (ctx) => AlertDialog(
-              title: const Text('Bantuan Ditolak 😔'),
-              content: const Text('Orang tuamu menolak membiayai pengobatanmu. Mereka meminta kamu agar lebih mandiri dan berhemat.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(ctx),
-                  child: const Text('Mengerti'),
-                ),
-              ],
-            ),
+            title: 'Bantuan Ditolak 😔',
+            content: const Text('Orang tuamu menolak membiayai pengobatanmu. Mereka meminta kamu agar lebih mandiri dan berhemat.'),
           );
           return false;
         }
@@ -224,22 +291,31 @@ class DokterUtils {
     }
 
     if (!parentPaid) {
-      bool? proceed = await showDialog<bool>(
+      bool? proceed = false;
+      await DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Penyakit Terdeteksi 🤒'),
-          content: Text('Dokter mendeteksi kamu mengidap $targetDisease.\nApakah kamu ingin sekalian mengobatinya dengan biaya ${fmt(cost)} melalui $menuType?'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, false),
-              child: const Text('Tidak, Biarkan saja', style: const TextStyle(color: Colors.grey)),
-            ),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('Ya, Obati', style: const TextStyle(fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
+        title: 'Penyakit Terdeteksi 🤒',
+        showCloseButton: false,
+        content: Text('Dokter mendeteksi kamu mengidap $targetDisease.\nApakah kamu ingin sekalian mengobatinya dengan biaya ${fmt(cost)} melalui $menuType?'),
+        actions: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.grey.shade300, foregroundColor: Colors.black87),
+            onPressed: () {
+              proceed = false;
+              Navigator.pop(context);
+            },
+            child: const Text('Tidak, Biarkan saja'),
+          ),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.blue, foregroundColor: Colors.white),
+            onPressed: () {
+              proceed = true;
+              Navigator.pop(context);
+            },
+            child: const Text('Ya, Obati'),
+          ),
+        ],
       );
 
       if (proceed != true) {
@@ -265,18 +341,10 @@ class DokterUtils {
       character.happiness = (character.happiness + hapGain).clamp(0, 100);
       character.inbox.add('🏥 Pengobatan: Kamu telah sembuh dari $targetDisease via $menuType (-${fmt(cost)} uang, +25% Kesehatan, +$hapGain% Kebahagiaan)');
 
-      await showDialog(
+      await DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Pengobatan Berhasil 🎉'),
-          content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% dan Kebahagiaanmu meningkat +$hapGain% (${fmt(cost)} uang berkurang).'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Bagus'),
-            ),
-          ],
-        ),
+        title: 'Pengobatan Berhasil 🎉',
+        content: Text('Dokter berhasil mengobati $targetDisease.\nKesehatanmu meningkat +25% dan Kebahagiaanmu meningkat +$hapGain% (${fmt(cost)} uang berkurang).'),
       );
     } else {
       // Gagal sembuh: kesehatan naik sedikit 5-15%
@@ -292,18 +360,10 @@ class DokterUtils {
       
       character.inbox.add('🏥 Pengobatan Gagal: Upaya mengobati $targetDisease via $menuType belum berhasil (-${fmt(cost)} uang, +$partialHeal% Kesehatan)');
 
-      await showDialog(
+      await DialogHelper.show(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Pengobatan Belum Berhasil 😔'),
-          content: Text('$failMsg\nPenyakit tetap ada di tubuhmu, tetapi kesehatanmu membaik sedikit +$partialHeal% karena terapi medis.\nBiaya sebesar ${fmt(cost)} tetap ditagihkan.'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('Mengerti'),
-            ),
-          ],
-        ),
+        title: 'Pengobatan Belum Berhasil 😔',
+        content: Text('$failMsg\nPenyakit tetap ada di tubuhmu, tetapi kesehatanmu membaik sedikit +$partialHeal% karena terapi medis.\nBiaya sebesar ${fmt(cost)} tetap ditagihkan.'),
       );
     }
 

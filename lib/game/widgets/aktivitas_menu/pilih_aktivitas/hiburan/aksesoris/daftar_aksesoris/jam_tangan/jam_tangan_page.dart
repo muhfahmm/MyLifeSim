@@ -27,7 +27,6 @@ class _JamTanganBrandPageState extends State<JamTanganBrandPage> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color bgColor = isDark ? const Color(0xFF121212) : Colors.grey.shade100;
-    final Color containerBg = isDark ? Colors.grey.shade900 : Colors.white;
     final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
     final Color textColor = isDark ? Colors.white : Colors.black87;
     final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
@@ -40,14 +39,15 @@ class _JamTanganBrandPageState extends State<JamTanganBrandPage> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Toko Jam Tangan', style: TextStyle(fontWeight: FontWeight.bold)),
-          backgroundColor: containerBg,
-          foregroundColor: textColor,
-          elevation: 0.5,
+          title: const Text('Toko Jam Tangan ⌚', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+          backgroundColor: Colors.purple.shade700,
+          foregroundColor: Colors.white,
+          elevation: 1,
           bottom: TabBar(
-            labelColor: isDark ? Colors.pinkAccent : Colors.pink,
-            unselectedLabelColor: isDark ? Colors.white70 : Colors.black54,
-            indicatorColor: isDark ? Colors.pinkAccent : Colors.pink,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
+            indicatorColor: Colors.white,
+            indicatorWeight: 3,
             tabs: const [
               Tab(text: 'Brand'),
               Tab(text: 'Koleksi'),

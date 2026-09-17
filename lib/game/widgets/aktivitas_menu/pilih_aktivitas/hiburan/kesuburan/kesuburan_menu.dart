@@ -170,7 +170,7 @@ class _KesuburanPageState extends State<KesuburanPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Kesuburan 🌱', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-        backgroundColor: Colors.teal.shade700,
+        backgroundColor: Colors.teal.shade800,
         foregroundColor: Colors.white,
         elevation: 1,
       ),
@@ -178,90 +178,119 @@ class _KesuburanPageState extends State<KesuburanPage> {
         color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
         child: Column(
           children: [
+            // Status Header Card
             Container(
-              padding: const EdgeInsets.all(16),
-              color: isDark ? Colors.grey.shade800 : Colors.white,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              margin: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isDark 
+                      ? [const Color(0xFF134E4A), const Color(0xFF0F766E)] 
+                      : [Colors.teal.shade700, Colors.teal.shade900],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 6)],
+              ),
+              child: Column(
                 children: [
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('💰', style: TextStyle(fontSize: 18)),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Saldo Anda: ${CurrencySettings.format(widget.character.money)}',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          fontSize: 14, 
-                          color: isDark ? Colors.greenAccent : Colors.green,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'SALDO DOMPET',
+                            style: TextStyle(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 1),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
+                            CurrencySettings.format(widget.character.money),
+                            style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.teal.shade900.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: Colors.tealAccent, width: 1),
+                        ),
+                        child: Text(
+                          kesuburan > 70 ? 'Sangat Subur 💖' : (kesuburan > 40 ? 'Cukup Subur 🌸' : 'Kesuburan Rendah ⚠️'),
+                          style: const TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
                         ),
                       ),
                     ],
                   ),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: isDark ? Colors.purple.shade900 : Colors.purple.shade50,
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: isDark ? Colors.purple.shade700 : Colors.purple.shade200),
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      const Text('Tingkat Kesuburan: ', style: TextStyle(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w500)),
+                      Text('$kesuburan%', style: const TextStyle(color: Colors.tealAccent, fontSize: 14, fontWeight: FontWeight.bold)),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: LinearProgressIndicator(
+                      value: (kesuburan / 100).clamp(0.0, 1.0),
+                      minHeight: 8,
+                      backgroundColor: Colors.white24,
+                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.tealAccent),
                     ),
-                    child: Text('Kesuburan: $kesuburan%',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold, 
-                          fontSize: 13, 
-                          color: isDark ? Colors.purpleAccent : Colors.purple,
-                        )),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 4),
             Expanded(
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 itemCount: layanan.length,
                 itemBuilder: (_, i) {
                   final l = layanan[i];
                   final bool canAfford = widget.character.money >= (l['cost'] as int);
                   return Card(
                     elevation: 0,
-                    margin: const EdgeInsets.only(bottom: 8),
+                    margin: const EdgeInsets.only(bottom: 6),
                     color: canAfford 
                         ? (isDark ? Colors.grey.shade800 : Colors.white)
                         : (isDark ? Colors.grey.shade700 : Colors.grey.shade50),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(10),
                       side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                     ),
                     child: ListTile(
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      dense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                       title: Text(
                         l['name'], 
                         style: TextStyle(
                           fontWeight: FontWeight.bold, 
-                          fontSize: 14,
+                          fontSize: 13,
                           color: canAfford 
                               ? (isDark ? Colors.white : Colors.black87)
                               : (isDark ? Colors.white54 : Colors.grey),
                         ),
                       ),
-                      subtitle: Padding(
-                        padding: const EdgeInsets.only(top: 4),
-                        child: Text(
-                          '${l['desc']}\nBiaya: ${CurrencySettings.format(l['cost'] as int)}',
-                          style: TextStyle(
-                            color: canAfford 
-                                ? (isDark ? Colors.white70 : Colors.black54)
-                                : (isDark ? Colors.white38 : Colors.grey),
-                          ),
+                      subtitle: Text(
+                        '${l['desc']} • Biaya: ${CurrencySettings.format(l['cost'] as int)}',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: canAfford 
+                              ? (isDark ? Colors.white70 : Colors.black54)
+                              : (isDark ? Colors.white38 : Colors.grey),
                         ),
                       ),
-                      isThreeLine: true,
                       trailing: Icon(
                         canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                        size: 14, 
+                        size: 13, 
                         color: canAfford 
-                            ? (isDark ? Colors.purpleAccent : Colors.purple)
+                            ? (isDark ? Colors.tealAccent : Colors.teal.shade700)
                             : (isDark ? Colors.white54 : Colors.grey),
                       ),
                       onTap: canAfford ? () {

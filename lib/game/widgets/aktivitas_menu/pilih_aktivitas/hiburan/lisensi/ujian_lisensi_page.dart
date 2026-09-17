@@ -217,7 +217,7 @@ class _UjianLisensiPageState extends State<UjianLisensiPage> {
       appBar: AppBar(
         title: Text(
           'Ujian: ${widget.license['name']}',
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
         ),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.blue.shade800,
         foregroundColor: Colors.white,
