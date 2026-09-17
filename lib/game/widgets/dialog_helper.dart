@@ -22,7 +22,7 @@ class DialogHelper {
 
     if (isNotification) {
       // Centered scale-animated modal card popup
-      final double dialogWidth = isMobile ? (screenWidth - 24) : (screenWidth * 0.90).clamp(320.0, 500.0);
+      final double dialogWidth = isMobile ? (screenWidth - 48).clamp(280.0, 360.0) : (screenWidth * 0.70).clamp(300.0, 380.0);
       return showGeneralDialog(
         context: context,
         barrierDismissible: barrierDismissible,

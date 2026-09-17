@@ -55,13 +55,17 @@ class AvatarAgeRules {
       mouthType = 'smile';
     } else if (age <= 12) {
       // --- Usia 7-12 (Anak-anak sekolah dasar) ---
-      top = isMale ? 'theCaesar' : 'straight01';
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty)
+          ? character.avatarTopType!
+          : (isMale ? 'theCaesar' : 'straight01');
       accessories = (baseAcc != 'blank') ? 'prescription01' : 'blank';
       clothing = 'shirtCrewNeck';
       clothingColor = 'e6e6e6'; // Warna kaos biasa
     } else if (age <= 18) {
       // --- Usia 13-18 (Remaja / Teenager) ---
-      top = isMale ? 'shaggy' : 'straight02';
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty)
+          ? character.avatarTopType!
+          : (isMale ? 'shaggy' : 'straight02');
       clothing = 'hoodie'; // Hoodie keren untuk remaja
       clothingColor = '262e33';
     } else if (age <= 39) {

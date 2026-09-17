@@ -642,20 +642,49 @@ void _showCandidateDialog(
                 showDialog(
                   context: context,
                   builder: (ctx) => AlertDialog(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                    titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
+                    contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
                     backgroundColor: isDark ? Colors.grey.shade900 : null,
-                    title: Row(children: [
-                      Icon(success ? Icons.check_circle : Icons.cancel, color: success ? Colors.green : Colors.red),
-                      const SizedBox(width: 8),
-                      Text(success ? 'Sukses!' : 'Ditolak', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
-                    ]),
-                    content: Text(msg, style: TextStyle(color: isDark ? Colors.white70 : Colors.black87)),
+                    title: Row(
+                      children: [
+                        Icon(
+                          success ? Icons.favorite : Icons.heart_broken,
+                          color: success ? Colors.pink : Colors.red,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            success ? 'Cinta Diterima! 💖' : 'Ajakan Ditolak 💔',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                              color: isDark ? Colors.white : Colors.black87,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                    content: Text(
+                      msg,
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: isDark ? Colors.white70 : Colors.black87,
+                      ),
+                    ),
                     actions: [
                       TextButton(
                         onPressed: () {
                           Navigator.pop(ctx);
                           Navigator.pop(context);
                         },
-                        child: const Text('OK'),
+                        child: const Text(
+                          'OK',
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                        ),
                       )
                     ],
                   ),

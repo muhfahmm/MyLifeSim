@@ -4531,7 +4531,12 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                     radius: 34,
                                     backgroundColor: Colors.blue.shade50,
                                     child: Image(
-                                      image: AvatarImageCache.getImageProvider(_avatarUrl), // Gunakan cache URL
+                                      image: AvatarImageCache.getImageProvider(
+                                        AvatarAgeRules.getAgeBasedAvatarUrl(
+                                          _character,
+                                          happiness: _character.happiness,
+                                        ),
+                                      ),
                                       loadingBuilder: (context, child, loadingProgress) {
                                         if (loadingProgress == null) return child;
                                         return const SizedBox(

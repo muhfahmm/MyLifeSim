@@ -9,7 +9,6 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/b
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_masturbate/masturbate.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_lamar.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/notifikasi_ortu/beri_tahu_pacar.dart';
-import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/interograsi/interograsi_pacar.dart';
 import 'age_base.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/ajakan_pacaran_makelove/ajakan_resolver.dart';
@@ -450,26 +449,6 @@ List<ActionItem> getAge12PlusActions(
               },
             ),
           ),
-        );
-      },
-    ));
-  }
-
-  // --- AJAK 3SOME (jika memiliki dua pasangan) ---
-  final bool targetIsEitherPartner = (character.partner != null && character.partner!['name'] == targetName) ||
-                                     (character.secondPartner != null && character.secondPartner!['name'] == targetName);
-  final bool hasTwoPartners = character.partner != null && character.secondPartner != null;
-
-  if (targetIsEitherPartner && hasTwoPartners) {
-    actions.add(ActionItem(
-      label: 'Ajak 3some? 🔥',
-      icon: Icons.people,
-      color: Colors.purple,
-      onTap: () {
-        ThreesomeHelper.processThreesome(
-          context: context,
-          character: character,
-          updateState: updateState,
         );
       },
     ));

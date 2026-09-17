@@ -32,18 +32,31 @@ class _OperasiKecilPageState extends State<OperasiKecilPage> {
     int happyPenalty = 5; // Efek samping pusing
     String detail = 'Operasi berjalan lancar. Kesehatanmu meningkat signifikan.';
 
+    // Jika melakukan Operasi LASIK dan karakter sedang memakai kacamata resep/dokter
+    bool removeGlasses = false;
+    if (o['nama'].toString().contains('LASIK')) {
+      final acc = widget.character.avatarAccessoriesType;
+      if (acc != null && acc != 'blank') {
+        widget.character.avatarAccessoriesType = 'blank';
+        removeGlasses = true;
+        detail = 'Operasi LASIK sukses besar! Penglihatan matamu kini kembali normal (100%) dan kamu tidak perlu lagi memakai kacamata.';
+      } else {
+        detail = 'Operasi LASIK berjalan lancar. Penglihatan matamu tetap tajam dan prima.';
+      }
+    }
+
     // Update real stats
     if (!paidByParent) {
       widget.character.money -= cost;
     }
     DokterUtils.updateStats(widget.character, healthGain, -happyPenalty, 0);
     widget.character.inbox.add('🏥 Operasi Kecil: ${o['nama']} - $detail (-${DokterUtils.fmt(cost)}, +$healthGain% Kesehatan, -$happyPenalty% Kebahagiaan)');
-    widget.onComplete?.call();
+    if (!mounted) return;
 
     DokterUtils.showResultDialog(
       context, 
       'Operasi Sukses', 
-      '🏥 ${o['nama']}: $detail\n\n(+$healthGain% Kesehatan, -$happyPenalty% Kebahagiaan sementara, -${DokterUtils.fmt(cost)} biaya operasi)', 
+      '🏥 ${o['nama']}: $detail\n\n(+$healthGain% Kesehatan, -$happyPenalty% Kebahagiaan sementara, -${DokterUtils.fmt(cost)} biaya operasi${removeGlasses ? '\n👓 Kacamata telah dilepas dari wajahmu!' : ''})', 
       () {
         if (mounted) {
           setState(() {});

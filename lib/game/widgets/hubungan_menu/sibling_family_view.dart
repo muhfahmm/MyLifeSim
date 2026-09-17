@@ -52,7 +52,7 @@ class _SiblingFamilyViewScreenState extends State<SiblingFamilyViewScreen> {
     final bool isMale = gender.toLowerCase() == 'laki-laki';
     String avatarUrl;
     if (isUser) {
-      avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(widget.character);
+      avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrl(widget.character, happiness: widget.character.happiness);
     } else {
       avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
         name: name,

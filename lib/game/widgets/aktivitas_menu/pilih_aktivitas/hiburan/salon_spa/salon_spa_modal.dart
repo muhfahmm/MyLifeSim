@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
+import 'pilih_potong_rambut_page.dart';
+import 'pilih_warna_rambut_page.dart';
 
 class SalonSpaContent extends StatefulWidget {
   final Character character;
@@ -152,6 +154,40 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
 
   // Langsung terapkan efek setelah user menekan menu
   void _executeLayanan(BuildContext context, Map<String, dynamic> item) {
+    final String name = item['name'] as String;
+
+    if (name.contains('Potong Rambut')) {
+      Navigator.pop(context); // Tutup dialog salon spa
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PilihPotongRambutPage(
+            character: widget.character,
+            onSaved: () {
+              widget.onComplete();
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (name.contains('Mewarnai Rambut')) {
+      Navigator.pop(context); // Tutup dialog salon spa
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => PilihWarnaRambutPage(
+            character: widget.character,
+            onSaved: () {
+              widget.onComplete();
+            },
+          ),
+        ),
+      );
+      return;
+    }
+
     final int cost = item['cost'] as int;
     final int healthGain = item['health'] as int;
     final int happinessGain = item['happiness'] as int;
@@ -159,8 +195,8 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
     if (widget.character.money < cost) {
       DialogHelper.show(
         context: context,
-        title: 'Uang Tidak Cukup',
-        content: Text('Kamu membutuhkan ${_fmt(cost)} untuk melakukan ${item['name']}.'),
+        title: 'Uang Tidak Cukup 💸',
+        content: Text('Kamu membutuhkan ${_fmt(cost)} untuk melakukan ${item['name']}. Saldomu saat ini: ${_fmt(widget.character.money)}.'),
       );
       return;
     }
@@ -228,9 +264,7 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     final Color cardBg = isDark ? Colors.grey.shade800 : Colors.white;
-    final Color disabledCardBg = isDark ? Colors.grey.shade800.withValues(alpha: 0.5) : Colors.grey.shade100;
     final Color textColor = isDark ? Colors.white : Colors.black87;
-    final Color disabledTextColor = isDark ? Colors.white38 : Colors.grey;
     final Color borderColor = isDark ? Colors.grey.shade700 : Colors.grey.shade200;
     final Color subtextColor = isDark ? Colors.white70 : Colors.black54;
 
@@ -270,23 +304,22 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
           itemCount: layananList.length,
           itemBuilder: (_, i) {
             final item = layananList[i];
-            final bool canAfford = widget.character.money >= (item['cost'] as int);
 
             return Card(
               elevation: 0,
               margin: const EdgeInsets.only(bottom: 8),
-              color: canAfford ? cardBg : disabledCardBg,
+              color: cardBg,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
                 side: BorderSide(color: borderColor),
               ),
               child: InkWell(
-                onTap: canAfford ? () => _executeLayanan(context, item) : null,
+                onTap: () => _executeLayanan(context, item),
                 borderRadius: BorderRadius.circular(12),
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center, // Panah & i sejajar di tengah
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Tombol i (Info) di samping kiri nama
                       InkWell(
@@ -318,7 +351,7 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 14,
-                                color: canAfford ? textColor : disabledTextColor,
+                                color: textColor,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -326,7 +359,7 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
                               item['desc'] as String,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: canAfford ? subtextColor : disabledTextColor,
+                                color: subtextColor,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -335,9 +368,7 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w600,
-                                color: canAfford
-                                    ? (isDark ? Colors.purple.shade200 : Colors.purple.shade700)
-                                    : disabledTextColor,
+                                color: isDark ? Colors.purple.shade200 : Colors.purple.shade700,
                               ),
                             ),
                           ],
@@ -347,9 +378,9 @@ class _SalonSpaContentState extends State<SalonSpaContent> {
 
                       // Panah > berada di tengah secara vertikal
                       Icon(
-                        canAfford ? Icons.arrow_forward_ios : Icons.lock_outline,
-                        size: canAfford ? 14 : 16,
-                        color: canAfford ? Colors.pinkAccent : (isDark ? Colors.white38 : Colors.grey),
+                        Icons.arrow_forward_ios,
+                        size: 14,
+                        color: isDark ? Colors.white54 : Colors.grey,
                       ),
                     ],
                   ),
