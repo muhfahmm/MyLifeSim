@@ -1,7 +1,7 @@
-// lib/store_page/fitur_premium/skip_usia/skip_usia_logic.dart
-
+import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/pilih_karakter/settings/currency_settings.dart';
+import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/pendidikan_karir/academic_logic/school_logic/actions/school_generator.dart';
 
 class SkipUsiaLogic {
   /// Melakukan lompat usia secara instan ke [targetAge] dan memperbarui usia seluruh NPC serta akumulasi gaji
@@ -104,21 +104,42 @@ class SkipUsiaLogic {
     // 3. Sync umur NPC jika ada selisih yang belum ter-update
     _updateAllNpcAges(character, 0);
 
-    // 4. Sync riwayat pendidikan secara otomatis berdasarkan usia baru
+    // 4. Sync riwayat pendidikan & status pendaftaran sekolah secara otomatis (60% Swasta / 40% Negeri)
     final history = character.educationHistory;
-    if (targetAge >= 6) {
-      history['SD'] ??= (targetAge >= 12 ? 'Lulus' : 'Belum Lulus');
-    }
-    if (targetAge >= 12) {
-      history['SD'] = 'Lulus';
-      history['SMP'] ??= (targetAge >= 15 ? 'Lulus' : 'Belum Lulus');
-    }
-    if (targetAge >= 15) {
-      history['SMP'] = 'Lulus';
-      history['SMA'] ??= (targetAge >= 18 ? 'Lulus' : 'Belum Lulus');
-    }
-    if (targetAge >= 18) {
-      history['SMA'] = 'Lulus';
+    String schoolLog = '';
+    if (finalAge >= 6) {
+      final bool isSwasta = Random().nextInt(100) < 60; // 60% Swasta, 40% Negeri
+      character.schoolType = isSwasta ? 'Swasta' : 'Negeri';
+
+      if (finalAge < 12) {
+        history['SD'] = 'Belum Lulus';
+        schoolLog = ' 🏫 Kamu otomatis terdaftar di SD (${character.schoolType}).';
+      } else if (finalAge < 15) {
+        history['SD'] = 'Lulus';
+        history['SMP'] = 'Belum Lulus';
+        schoolLog = ' 🏫 Kamu telah lulus SD dan otomatis terdaftar di SMP (${character.schoolType}).';
+      } else if (finalAge < 18) {
+        history['SD'] = 'Lulus';
+        history['SMP'] = 'Lulus';
+        history['SMA'] = 'Belum Lulus';
+        schoolLog = ' 🏫 Kamu telah lulus SD & SMP, dan otomatis terdaftar di SMA (${character.schoolType}).';
+      } else {
+        history['SD'] = 'Lulus';
+        history['SMP'] = 'Lulus';
+        history['SMA'] = 'Lulus';
+        schoolLog = ' 🎓 Kamu telah menyelesaikan jenjang pendidikan sekolah dasar & menengah (SD, SMP, SMA).';
+      }
+
+      if (finalAge < 18) {
+        character.classmates.clear();
+        character.sdTeachers.clear();
+        character.smpTeachers.clear();
+        character.smaTeachers.clear();
+        character.headmaster = null;
+        character.bkTeacher = null;
+        SchoolGenerator.generateClassmatesIfEmpty(character);
+        SchoolGenerator.generateTeachersIfEmpty(character);
+      }
     }
 
     // Catat log inbox
@@ -128,7 +149,7 @@ class SkipUsiaLogic {
 
     character.inbox.insert(
       0,
-      '⏩ Fast Forward Usia: Karakter kamu telah melompat dari usia $oldAge tahun ke $finalAge tahun!$incomeLog Seluruh anggota keluarga & kerabat ikut bertambah usia.',
+      '⏩ Fast Forward Usia: Karakter kamu telah melompat dari usia $oldAge tahun ke $finalAge tahun!$schoolLog$incomeLog Seluruh anggota keluarga & kerabat ikut bertambah usia.',
     );
 
     final String resultMsg = character.isAlive

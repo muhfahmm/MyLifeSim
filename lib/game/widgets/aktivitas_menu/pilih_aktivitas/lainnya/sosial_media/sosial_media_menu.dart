@@ -11,8 +11,10 @@ class SocialMediaMenuHelper {
   static const List<Map<String, dynamic>> platforms = [
     {'name': 'YouTube', 'icon': Icons.play_circle_filled, 'color': Colors.red},
     {'name': 'Instagram', 'icon': Icons.camera_alt, 'color': Colors.purple},
+    {'name': 'TikTok', 'icon': Icons.music_note, 'color': Colors.pinkAccent},
     {'name': 'X (Twitter)', 'icon': Icons.chat, 'color': Colors.black},
     {'name': 'Telegram', 'icon': Icons.telegram, 'color': Colors.blue},
+    {'name': 'Twitch', 'icon': Icons.live_tv, 'color': Colors.deepPurple},
   ];
 
   // Fungsi ini memeriksa batasan negara & usia sebelum membuka menu sosial media

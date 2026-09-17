@@ -1175,7 +1175,10 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Pilih Jurusan Universitas 🎓'),
+        title: const Text(
+          'Pilih Jurusan Universitas 🎓',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        ),
         backgroundColor: Colors.indigo,
         foregroundColor: Colors.white,
         centerTitle: true,
@@ -1195,7 +1198,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                   child: Text(
                     'Pilih salah satu program studi yang ingin kamu tekuni:',
                     style: TextStyle(
-                      fontSize: 15,
+                      fontSize: 14,
                       fontWeight: FontWeight.w500,
                       color: isDark ? Colors.white70 : Colors.black87,
                     ),
@@ -1232,7 +1235,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                           Text(
                             'Jurusan tidak ditemukan',
                             style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: isDark ? Colors.white70 : Colors.black87,
                             ),
@@ -1241,7 +1244,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                           Text(
                             'Coba kata kunci lain atau pilih kategori lain.',
                             style: TextStyle(
-                              fontSize: 13,
+                              fontSize: 14,
                               color: isDark ? Colors.white38 : Colors.grey.shade600,
                             ),
                             textAlign: TextAlign.center,
@@ -1280,6 +1283,7 @@ class _UnivMajorSelectionPageState extends State<UnivMajorSelectionPage> {
                             Text(
                               major,
                               style: TextStyle(
+                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                                 color: isDark ? Colors.white : Colors.black87,
                               ),

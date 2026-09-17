@@ -10,6 +10,8 @@ import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 import 'package:mylifesim/store_page/store_page.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'masturbate_enjoyment.dart';
+import 'package:mylifesim/avatar/avatar_age_rules.dart';
+import 'package:mylifesim/avatar/avatar_generator.dart';
 
 class MasturbasiHelper {
   // ============================================================
@@ -233,33 +235,134 @@ class MasturbasiHelper {
   // MEMBANGUN OPSI FANTASI
   // ============================================================
   static List<Map<String, String>> _buildOptions(Character character) {
-    final List<Map<String, String>> options = [
-      {'name': 'Tanpa Bayangan (Biasa)', 'relation': 'Biasa'},
-    ];
+    final List<Map<String, String>> options = [];
 
+    // 1. Tanpa Bayangan (Biasa) - Gunakan avatar karakter utama
+    final String selfAvatar = AvatarAgeRules.getAgeBasedAvatarUrl(character, happiness: character.happiness);
+    options.add({
+      'name': 'Tanpa Bayangan (Biasa)',
+      'relation': 'Biasa',
+      'avatarUrl': selfAvatar,
+    });
+
+    // 2. Pasangan
     if (character.partner != null) {
+      final p = character.partner!;
+      String partnerAvatar = p['avatarUrl'] ?? '';
+      if (partnerAvatar.isEmpty) {
+        partnerAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+          name: p['name'] ?? 'Pasangan',
+          gender: p['gender'] ?? 'Perempuan',
+          age: int.tryParse(p['age']?.toString() ?? '') ?? character.age,
+          happiness: int.tryParse(p['relationship']?.toString() ?? '') ?? 50,
+          forcedSkinColor: p['skinColor'],
+        );
+      }
       options.add({
-        'name': character.partner!['name']!,
+        'name': p['name'] ?? 'Pasangan',
         'relation': 'Pasangan',
+        'avatarUrl': partnerAvatar,
       });
     }
 
+    // 3. Ayah Kandung
     if (character.fatherName != null && !character.isFatherDeceased) {
-      options.add({'name': 'Ayah (${character.fatherName})', 'relation': 'Ayah'});
+      final String fatherAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+        name: character.fatherName!,
+        gender: 'Laki-laki',
+        age: character.fatherAge ?? 45,
+        happiness: character.fatherRelationship ?? 50,
+        forcedSkinColor: character.fatherSkinColor,
+      );
+      options.add({
+        'name': 'Ayah (${character.fatherName})',
+        'relation': 'Ayah',
+        'avatarUrl': fatherAvatar,
+      });
     }
+
+    // 4. Ayah Tiri
+    if (character.stepFatherName != null && !character.isStepFatherDeceased) {
+      final String stepFatherAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+        name: character.stepFatherName!,
+        gender: 'Laki-laki',
+        age: character.stepFatherAge ?? 45,
+        happiness: character.stepFatherRelationship ?? 50,
+        forcedSkinColor: character.stepFatherSkinColor,
+      );
+      options.add({
+        'name': 'Ayah Tiri (${character.stepFatherName})',
+        'relation': 'Ayah Tiri',
+        'avatarUrl': stepFatherAvatar,
+      });
+    }
+
+    // 5. Ibu Kandung
     if (character.motherName != null && !character.isMotherDeceased) {
-      options.add({'name': 'Ibu (${character.motherName})', 'relation': 'Ibu'});
+      final String motherAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+        name: character.motherName!,
+        gender: 'Perempuan',
+        age: character.motherAge ?? 43,
+        happiness: character.motherRelationship ?? 50,
+        forcedSkinColor: character.motherSkinColor,
+      );
+      options.add({
+        'name': 'Ibu (${character.motherName})',
+        'relation': 'Ibu',
+        'avatarUrl': motherAvatar,
+      });
     }
+
+    // 6. Ibu Tiri
+    if (character.stepMotherName != null && !character.isStepMotherDeceased) {
+      final String stepMotherAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+        name: character.stepMotherName!,
+        gender: 'Perempuan',
+        age: character.stepMotherAge ?? 43,
+        happiness: character.stepMotherRelationship ?? 50,
+        forcedSkinColor: character.stepMotherSkinColor,
+      );
+      options.add({
+        'name': 'Ibu Tiri (${character.stepMotherName})',
+        'relation': 'Ibu Tiri',
+        'avatarUrl': stepMotherAvatar,
+      });
+    }
+
+    // 7. Saudara
     for (var sib in character.siblings) {
       if (sib['isDeceased'] != 'true') {
+        String sibAvatar = sib['avatarUrl'] ?? '';
+        if (sibAvatar.isEmpty) {
+          sibAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+            name: sib['name'] ?? 'Saudara',
+            gender: sib['gender'] ?? 'Perempuan',
+            age: int.tryParse(sib['age']?.toString() ?? '') ?? character.age,
+            happiness: int.tryParse(sib['relationship']?.toString() ?? '') ?? 50,
+            forcedSkinColor: sib['skinColor'],
+          );
+        }
         options.add({
           'name': '${sib['name']} (${sib['relation']})',
           'relation': sib['relation'] ?? 'Saudara',
+          'avatarUrl': sibAvatar,
         });
       }
     }
 
-    options.add({'name': 'Teman Dekat / Selebriti', 'relation': 'Teman'});
+    // 8. Teman Dekat / Selebriti
+    final String friendAvatar = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
+      name: 'Teman Dekat',
+      gender: character.gender == 'Laki-laki' ? 'Perempuan' : 'Laki-laki',
+      age: character.age,
+      happiness: 70,
+    );
+    options.add({
+      'name': 'Teman Dekat / Selebriti',
+      'relation': 'Teman',
+      'avatarUrl': friendAvatar,
+    });
+
     return options;
   }
 }
@@ -290,7 +393,10 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Pilih Fantasi Masturbasi'),
+          title: const Text(
+            'Pilih Fantasi Masturbasi',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
           leading: IconButton(
             icon: const Icon(Icons.close),
             onPressed: () {
@@ -314,6 +420,7 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                   itemCount: options.length,
                   itemBuilder: (context, index) {
                     final opt = options[index];
+                    final String? avatarUrl = opt['avatarUrl'];
                     return Card(
                       elevation: 2,
                       color: isDark ? Colors.grey.shade800 : Colors.grey.shade50,
@@ -323,12 +430,21 @@ class _MasturbasiMenuPageState extends State<MasturbasiMenuPage> {
                         side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
                       ),
                       child: ListTile(
-                        leading: const Icon(Icons.psychology, color: Colors.pinkAccent),
+                        leading: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.pink.shade100,
+                          backgroundImage: (avatarUrl != null && avatarUrl.isNotEmpty)
+                              ? AvatarImageCache.getImageProvider(avatarUrl)
+                              : null,
+                          child: (avatarUrl == null || avatarUrl.isEmpty)
+                              ? const Icon(Icons.psychology, color: Colors.pinkAccent)
+                              : null,
+                        ),
                         title: Text(
                           opt['name']!,
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 13,
+                            fontSize: 14,
                             color: isDark ? Colors.white : Colors.black87,
                           ),
                         ),
