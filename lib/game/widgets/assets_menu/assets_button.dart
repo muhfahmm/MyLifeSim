@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:mylifesim/game/widgets/dialog_helper.dart';
 import 'package:mylifesim/pilih_karakter/character.dart';
-import 'package:mylifesim/game/widgets/assets_menu/finansial/uang_tunai/uang_tunai.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/investasi/investasi.dart';
 import 'package:mylifesim/game/widgets/assets_menu/finansial/kemewahan/kemewahan.dart';
 import 'package:mylifesim/game/widgets/assets_menu/koleksi_aset/koleksi_aset_item.dart';
@@ -71,10 +70,6 @@ class AssetsButton extends StatelessWidget {
                 children: [
                   const Text('Finansial', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 17, color: Colors.blueGrey)),
                   const SizedBox(height: 8),
-                  UangTunaiItem(
-                    character: character,
-                    onPop: () => setStateDialog(() {}),
-                  ),
                   InvestasiItem(
                     character: character,
                     onPop: () => setStateDialog(() {}),

@@ -416,8 +416,8 @@ class _StorePageState extends State<StorePage> {
               title: 'Finansial Premium 💵',
               description: 'Akses menu pilihan modal tunai, portofolio investasi, dan koleksi kemewahan.',
               price: 'Pilih Fitur ➔',
-              isUnlocked: GlobalSettings.isFinansialUangTunaiUnlocked.value ||
-                  GlobalSettings.isFinansialInvestasiUnlocked.value ||
+              isUnlocked: GlobalSettings.isFinansialUangTunaiUnlocked.value &&
+                  GlobalSettings.isFinansialInvestasiUnlocked.value &&
                   GlobalSettings.isFinansialKemewahanUnlocked.value,
               onTap: () {
                 Navigator.push(
@@ -438,8 +438,8 @@ class _StorePageState extends State<StorePage> {
               title: 'Aset Premium 🏛️',
               description: 'Akses menu hiburan Casino, Garasi Mobil impian, dan Garasi Motor superbike.',
               price: 'Pilih Fitur ➔',
-              isUnlocked: GlobalSettings.isAssetsCasinoUnlocked.value ||
-                  GlobalSettings.isAssetsGarasiMobilUnlocked.value ||
+              isUnlocked: GlobalSettings.isAssetsCasinoUnlocked.value &&
+                  GlobalSettings.isAssetsGarasiMobilUnlocked.value &&
                   GlobalSettings.isAssetsGarasiMotorUnlocked.value,
               onTap: () {
                 Navigator.push(
