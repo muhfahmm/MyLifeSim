@@ -249,6 +249,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                         character: widget.player,
                         isActiveSpeaker: isNarratorNode ? false : currentNode.isPlayerSpeaking,
                         customName: widget.player.name,
+                        roleTag: 'User',
                         emotion: (currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.playerAvatarUrl ?? AvatarAgeRules.getAgeBasedAvatarUrl(widget.player, happiness: widget.player.happiness),
@@ -261,6 +262,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                         character: _createDummyNPCCharacter(widget.npc),
                         isActiveSpeaker: isNarratorNode ? false : !currentNode.isPlayerSpeaking,
                         customName: widget.npc['name'] ?? 'NPC 1',
+                        roleTag: widget.npc['role'] ?? widget.npc['relation'] ?? widget.npc['hubungan'] ?? 'NPC',
                         emotion: (!currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                         outfit: currentNode.outfit,
                         customAvatarUrl: widget.npcAvatarUrl ?? widget.npc['avatarUrl']?.toString(),
@@ -274,6 +276,7 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                           character: _createDummyNPCCharacter(widget.secondNpc!),
                           isActiveSpeaker: isNarratorNode ? false : !currentNode.isPlayerSpeaking,
                           customName: widget.secondNpc!['name'] ?? 'NPC 2',
+                          roleTag: widget.secondNpc!['role'] ?? widget.secondNpc!['relation'] ?? widget.secondNpc!['hubungan'] ?? 'NPC',
                           emotion: (!currentNode.isPlayerSpeaking && !isNarratorNode) ? currentNode.emotion : VNEmotionType.neutral,
                           outfit: currentNode.outfit,
                           customAvatarUrl: widget.secondNpcAvatarUrl ?? widget.secondNpc!['avatarUrl']?.toString(),
@@ -836,16 +839,42 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                         ),
                         const SizedBox(width: 6),
                         Flexible(
-                          child: Text(
-                            node.speakerName,
-                            style: TextStyle(
-                              color: style.textColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 13,
-                              letterSpacing: 0.4,
-                            ),
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 1,
+                          child: Builder(
+                            builder: (context) {
+                              String displayedSpeakerName = node.speakerName;
+                              final String plainSpeaker = AvatarAgeRules.getCleanNPCName(node.speakerName.trim());
+                              final String npc1Name = AvatarAgeRules.getCleanNPCName((widget.npc['name'] ?? '').toString().trim());
+                              final String npc2Name = widget.secondNpc != null ? AvatarAgeRules.getCleanNPCName((widget.secondNpc!['name'] ?? '').toString().trim()) : '';
+
+                              if (node.speakerName.trim().toLowerCase() == 'keduanya' ||
+                                  node.speakerName.toLowerCase().contains('keduanya')) {
+                                displayedSpeakerName = 'Keduanya';
+                              } else if (plainSpeaker.isNotEmpty) {
+                                if (npc1Name.isNotEmpty && (plainSpeaker == npc1Name || node.speakerName.contains(npc1Name))) {
+                                  final String rTag = (widget.npc['role'] ?? widget.npc['relation'] ?? widget.npc['hubungan'] ?? '').toString().trim();
+                                  if (rTag.isNotEmpty && !displayedSpeakerName.contains('(')) {
+                                    displayedSpeakerName = '$displayedSpeakerName ($rTag)';
+                                  }
+                                } else if (npc2Name.isNotEmpty && (plainSpeaker == npc2Name || node.speakerName.contains(npc2Name))) {
+                                  final String rTag = (widget.secondNpc!['role'] ?? widget.secondNpc!['relation'] ?? widget.secondNpc!['hubungan'] ?? '').toString().trim();
+                                  if (rTag.isNotEmpty && !displayedSpeakerName.contains('(')) {
+                                    displayedSpeakerName = '$displayedSpeakerName ($rTag)';
+                                  }
+                                }
+                              }
+
+                              return Text(
+                                displayedSpeakerName,
+                                style: TextStyle(
+                                  color: style.textColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 13,
+                                  letterSpacing: 0.4,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                maxLines: 1,
+                              );
+                            },
                           ),
                         ),
                       ],
@@ -1370,8 +1399,23 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
               final bool isDoStimulasi = c.text.contains('6.');
               final bool isPayudara = c.text.contains('7.') && c.text.contains('payudara');
 
+              // 0. Double Penetration (DP) / Threesome DP / Spitroast / Sandwich
+              if (activePos.contains('double penetration') || activePos.contains('dp') || activePos.contains('spitroast') || activePos.contains('sandwich')) {
+                if (activePos.contains('dp') || activePos.contains('double penetration') || activePos.contains('spitroast')) {
+                  if (isCiuman) {
+                    isDisabledByPosisi = true;
+                    disabledReason = ' 🚫 (Tidak dapat diakses: Posisi DP/Spitroast mengunci gerakan kepala & penetrasi ganda)';
+                  } else if (isOral) {
+                    isDisabledByPosisi = true;
+                    disabledReason = ' 🚫 (Tidak dapat diakses: Mulut/Mulut Pasangan sibuk saat DP)';
+                  } else if (isDoStimulasi) {
+                    isDisabledByPosisi = true;
+                    disabledReason = ' 🚫 (Tidak dapat diakses: Seluruh tubuh dalam penetrasi ganda)';
+                  }
+                }
+              }
               // 1. Doggy Style (Dari Belakang)
-              if (activePos.contains('doggy') || activePos.contains('belakang')) {
+              else if (activePos.contains('doggy') || activePos.contains('belakang')) {
                 if (isCiuman) {
                   isDisabledByPosisi = true;
                   disabledReason = ' 🚫 (Tidak dapat diakses: Posisi membelakangi)';

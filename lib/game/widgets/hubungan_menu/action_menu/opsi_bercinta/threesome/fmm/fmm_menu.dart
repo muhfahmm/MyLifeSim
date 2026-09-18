@@ -11,6 +11,14 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/t
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_npc_perempuan/desahan_npc_perempuan_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_npc_laki/desahan_npc_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_pacar.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_laki/desahan_user_laki_makelove.dart';
+
+
+
 
 
 class FmmThreesomeHelper {
@@ -53,31 +61,35 @@ class FmmThreesomeHelper {
 
     for (var sib in character.siblings) {
       if (sib['isDeceased'] != 'true' && sib['name'] != null) {
-        final int age = int.tryParse(sib['age'] ?? '18') ?? 18;
-        if (age >= 18) {
+        final int age = int.tryParse(sib['age']?.toString() ?? '18') ?? 18;
+        if (age >= 10) {
           family.add({
             'name': sib['name']!,
             'gender': sib['gender'] ?? 'Perempuan',
-            'relation': sib['relation'] ?? 'Saudara',
+            'relation': sib['relation'] ?? (age < character.age ? 'Adik' : 'Kakak'),
             'relationship': sib['relationship'] ?? '50',
+            'age': age,
           });
         }
       }
     }
 
+
     for (var child in character.children) {
       if (child['isDeceased'] != 'true' && child['name'] != null) {
-        final int age = int.tryParse(child['age'] ?? '0') ?? 0;
-        if (age >= 18) {
+        final int age = int.tryParse(child['age']?.toString() ?? '0') ?? 0;
+        if (age >= 10) {
           family.add({
             'name': child['name']!,
             'gender': child['gender'] ?? 'Perempuan',
             'relation': child['relation'] ?? 'Anak',
             'relationship': child['relationship'] ?? '50',
+            'age': age,
           });
         }
       }
     }
+
 
     return family;
   }
@@ -202,108 +214,182 @@ class FmmThreesomeHelper {
 
     if (isPlayerMale) {
       // --- SKENARIO USER LAKI-LAKI ---
-      // LANGKAH 1: Pilih 1 Pria Tambahan terlebih dahulu
-      if (availableMales.length == 1) {
-        selectedMales = [availableMales.first];
-      } else {
-        final Map<String, dynamic>? pickedMale = await showDialog<Map<String, dynamic>>(
-          context: context,
-          builder: (context) => AlertDialog(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-            insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-            titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-            contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            title: Row(
-              children: [
-                const Icon(Icons.person, color: Colors.blue, size: 22),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    'Langkah 1: Pilih 1 Pria Tambahan ⚡',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
-                  ),
-                ),
-              ],
-            ),
-            content: SizedBox(
-              width: double.maxFinite,
-              child: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: availableMales.map((m) {
-                    final String avatarUrl = _getAvatarUrl(m);
-                    final String source = m['source'].toString();
+      // Cek apakah preselectedTargetName sudah menentukan siapa yang diajak (Wanita atau Pria)
+      final String cleanTarget = AvatarAgeRules.getCleanNPCName(preselectedTargetName ?? '');
+      
+      Map<String, dynamic>? preselectedFemale;
+      Map<String, dynamic>? preselectedMale;
 
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: isDark ? Colors.grey.shade800 : Colors.grey.shade100,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                      ),
-                      child: ListTile(
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
-                        onTap: () => Navigator.pop(context, m),
-                        leading: CircleAvatar(
-                          radius: 20,
-                          backgroundColor: isDark ? Colors.grey.shade700 : Colors.blue.shade100,
-                          child: ClipOval(
-                            child: Image(
-                              image: AvatarImageCache.getImageProvider(avatarUrl),
-                              width: 38,
-                              height: 38,
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) => const Icon(Icons.face, color: Colors.blue, size: 22),
-                            ),
-                          ),
-                        ),
-                        title: Text(
-                          m['name'].toString(),
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: isDark ? Colors.white : Colors.black87),
-                        ),
-                        subtitle: Align(
-                          alignment: Alignment.centerLeft,
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 3),
-                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                            decoration: BoxDecoration(
-                              color: source.contains('Keluarga')
-                                  ? Colors.orange.withValues(alpha: 0.15)
-                                  : Colors.blue.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: Text(
-                              source,
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: source.contains('Keluarga') ? Colors.orange : Colors.blue,
-                              ),
-                            ),
-                          ),
-                        ),
-                        trailing: const Icon(Icons.chevron_right, color: Colors.grey),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, null),
-                child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey)),
-              ),
-            ],
-          ),
-        );
-        if (pickedMale == null || !context.mounted) return;
-        selectedMales = [pickedMale];
+      if (cleanTarget.isNotEmpty) {
+        for (var f in femaleCandidates) {
+          final String cleanF = AvatarAgeRules.getCleanNPCName(f['name']?.toString() ?? '');
+          if (cleanF == cleanTarget || preselectedTargetName!.contains(cleanF)) {
+            preselectedFemale = f;
+            break;
+          }
+        }
+        for (var m in availableMales) {
+          final String cleanM = AvatarAgeRules.getCleanNPCName(m['name']?.toString() ?? '');
+          if (cleanM == cleanTarget || preselectedTargetName!.contains(cleanM)) {
+            preselectedMale = m;
+            break;
+          }
+        }
       }
 
-      // LANGKAH 2: Pilih 1 Wanita (Pacar Wanita / Keluarga Wanita)
-      if (femaleCandidates.length == 1) {
+      // 1. Tentukan Pria Tambahan dengan Modal Pemilihan Checkbox (seperti FFM)
+      final List<Map<String, dynamic>>? pickedMales = await showDialog<List<Map<String, dynamic>>>(
+        context: context,
+        builder: (context) {
+          final String cleanTarget = AvatarAgeRules.getCleanNPCName(preselectedTargetName ?? '');
+          List<Map<String, dynamic>> selection = availableMales.where((cand) {
+            final String cleanCand = AvatarAgeRules.getCleanNPCName(cand['name']?.toString() ?? '');
+            return cleanTarget.isNotEmpty && (cleanCand == cleanTarget || preselectedTargetName!.contains(cleanCand));
+          }).toList();
+
+          return StatefulBuilder(
+            builder: (context, setModalState) {
+              return AlertDialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+                insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                titlePadding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+                contentPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+                title: Row(
+                  children: [
+                    const Icon(Icons.bolt, color: Colors.deepPurpleAccent, size: 22),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Pilih 1 Pria Tambahan untuk FMM ⚡',
+                        style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: isDark ? Colors.white : Colors.black87),
+                      ),
+                    ),
+                  ],
+                ),
+                content: SizedBox(
+                  width: double.maxFinite,
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: availableMales.map((m) {
+                        final bool isSelected = selection.any((c) => c['name'] == m['name']);
+                        final String avatarUrl = _getAvatarUrl(m);
+                        final String source = m['source'].toString();
+
+                        return Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? (isDark ? Colors.deepPurple.shade900.withValues(alpha: 0.4) : Colors.deepPurple.shade50)
+                                : (isDark ? Colors.grey.shade800 : Colors.grey.shade100),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.deepPurpleAccent
+                                  : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
+                              width: isSelected ? 1.8 : 1.0,
+                            ),
+                          ),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                            onTap: () {
+                              setModalState(() {
+                                if (isSelected) {
+                                  selection.removeWhere((c) => c['name'] == m['name']);
+                                } else {
+                                  selection = [m];
+                                }
+                              });
+                            },
+                            leading: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: isDark ? Colors.grey.shade700 : Colors.blue.shade100,
+                              child: ClipOval(
+                                child: Image(
+                                  image: AvatarImageCache.getImageProvider(avatarUrl),
+                                  width: 38,
+                                  height: 38,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (_, __, ___) => const Icon(Icons.face, color: Colors.blue, size: 22),
+                                ),
+                              ),
+                            ),
+                            title: Text(
+                              m['name'].toString(),
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13.5, color: isDark ? Colors.white : Colors.black87),
+                            ),
+                            subtitle: Align(
+                              alignment: Alignment.centerLeft,
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 3),
+                                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                decoration: BoxDecoration(
+                                  color: source.contains('Keluarga')
+                                      ? Colors.orange.withValues(alpha: 0.15)
+                                      : Colors.blue.withValues(alpha: 0.15),
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                                child: Text(
+                                  source,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                    color: source.contains('Keluarga') ? Colors.orange : Colors.blue,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            trailing: Checkbox(
+                              value: isSelected,
+                              activeColor: Colors.deepPurpleAccent,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                              onChanged: (val) {
+                                setModalState(() {
+                                  if (val == true) {
+                                    selection = [m];
+                                  } else {
+                                    selection.removeWhere((c) => c['name'] == m['name']);
+                                  }
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: selection.length == 1 ? () => Navigator.pop(context, selection) : null,
+                    child: Text(
+                      'Konfirmasi (${selection.length}/1)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                        color: selection.length == 1 ? Colors.deepPurpleAccent : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(context, null),
+                    child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey)),
+                  ),
+                ],
+              );
+            },
+          );
+        },
+      );
+      if (pickedMales == null || pickedMales.isEmpty || !context.mounted) return;
+      selectedMales = pickedMales;
+
+
+      // 2. Tentukan Wanita (jika preselectedTargetName adalah wanita, gunakan wanita tersebut tanpa perlu bertanya lagi!)
+      if (preselectedFemale != null) {
+        selectedFemale = preselectedFemale;
+      } else if (femaleCandidates.length == 1) {
         selectedFemale = femaleCandidates.first;
       } else {
         selectedFemale = await showDialog<Map<String, dynamic>>(
@@ -575,54 +661,6 @@ class FmmThreesomeHelper {
       ...selectedMales.map((m) => '${m['name']}'),
     ];
     final String namesText = participantNames.join(' dan ');
-
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        title: Row(
-          children: [
-            const Icon(Icons.bolt, color: Colors.deepPurpleAccent, size: 22),
-            const SizedBox(width: 8),
-            Expanded(child: Text('Konfirmasi Threesome FMM ⚡', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87))),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Kamu akan melakukan Threesome FMM bersama: $namesText.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.deepPurple.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.deepPurple.withValues(alpha: 0.3)),
-              ),
-              child: const Text(
-                'ℹ️ Sesi FMM pilihanmu siap dimulai.',
-                style: TextStyle(fontSize: 11, color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Lanjutkan', style: TextStyle(fontSize: 12, color: Colors.deepPurpleAccent, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm != true || !context.mounted) return;
 
     // Pilih Tempat & Waktu
     final String? loc = await TempatBercintaHelper.showLocationChooser(
@@ -956,6 +994,9 @@ class FmmThreesomeHelper {
         ));
       }
 
+      final bool p1IsFemale = !isPlayerFemale;
+      final bool p2IsFemale = false; // Di FMM, P2 selalu Laki-laki
+
       // NODE 31: Sub-Menu Penetrasi P1
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
@@ -963,7 +1004,7 @@ class FmmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina $p1', nextNodeIndex: 34),
+          if (p1IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina $p1', nextNodeIndex: 34),
           VNChoiceOption(text: '🍑 Penetrasi Anal $p1', nextNodeIndex: 35),
         ],
       ));
@@ -975,7 +1016,7 @@ class FmmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina $p2', nextNodeIndex: 36),
+          if (p2IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina $p2', nextNodeIndex: 36),
           VNChoiceOption(text: '🍑 Penetrasi Anal $p2', nextNodeIndex: 37),
         ],
       ));
@@ -987,16 +1028,58 @@ class FmmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina Bergantian', nextNodeIndex: 38),
+          if (p1IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina $p1 & Anal $p2', nextNodeIndex: 38),
           VNChoiceOption(text: '🍑 Penetrasi Anal Bergantian', nextNodeIndex: 39),
-          VNChoiceOption(text: '🔥 Double Penetration Simultan', nextNodeIndex: 40),
+          if (p1IsFemale) VNChoiceOption(text: '🔥 Double Penetration Simultan ($p1)', nextNodeIndex: 40),
         ],
       ));
 
+      final String femaleName = isPlayerFemale ? character.name : (selectedFemale != null ? (selectedFemale['name'] ?? p1) : p1);
+      final Map<String, dynamic> femaleMap = isPlayerFemale ? {'name': character.name} : (selectedFemale ?? {'name': p1});
+
+      String getCallNameForTarget(String targetName) {
+        if (targetName == character.name) {
+          // NPC memanggil User
+          final Map<String, dynamic>? npcMapObj = (selectedFemale != null && selectedFemale['name'] != character.name)
+              ? selectedFemale
+              : (selectedMales.isNotEmpty ? selectedMales[0] : null);
+          final String role = npcMapObj?['role'] ?? npcMapObj?['relation'] ?? 'Pasangan';
+
+          return PanggilanManager.getPanggilan(
+            targetName: character.name,
+            targetRole: role,
+            targetGender: character.gender,
+            isSpeakerPlayer: false,
+            userName: character.name,
+            userGender: character.gender,
+            isIntimate: true,
+            character: character,
+          );
+        } else {
+          // User memanggil NPC / NPC memanggil sesama NPC
+          final Map<String, dynamic>? npcMapObj = (selectedFemale != null && selectedFemale['name'] == targetName)
+              ? selectedFemale
+              : (selectedMales.where((m) => m['name'] == targetName).isNotEmpty ? selectedMales.firstWhere((m) => m['name'] == targetName) : null);
+          final String role = npcMapObj?['role'] ?? npcMapObj?['relation'] ?? 'Pasangan';
+          final String gndr = npcMapObj?['gender'] ?? 'Perempuan';
+
+          return PanggilanManager.getPanggilan(
+            targetName: targetName,
+            targetRole: role,
+            targetGender: gndr,
+            isSpeakerPlayer: true,
+            userName: character.name,
+            userGender: character.gender,
+            isIntimate: true,
+            character: character,
+          );
+        }
+      }
+
       // NODE 34: Outcome Vagina P1
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina penuh gairah kepada $p1...) 🌸',
+        speakerName: femaleName,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)} ${getCallNameForTarget(isPlayerFemale ? p1 : character.name)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1004,8 +1087,10 @@ class FmmThreesomeHelper {
 
       // NODE 35: Outcome Anal P1
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal yang nikmat dan membara kepada $p1...) 🍑',
+        speakerName: p1IsFemale ? femaleName : p1,
+        dynamicDialogueText: () => p1IsFemale
+            ? '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)} ${getCallNameForTarget(isPlayerFemale ? p1 : character.name)}..."'
+            : '"${DesahanNpcLakiMakeLove.getRandomMoan({'name': p1})} ${getCallNameForTarget(character.name)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1013,26 +1098,27 @@ class FmmThreesomeHelper {
 
       // NODE 36: Outcome Vagina P2
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina penuh gairah kepada $p2...) 🌸',
+        speakerName: femaleName,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
-      // NODE 37: Outcome Anal P2
+      // NODE 37: Outcome Anal P2 (P2 selalu Laki-laki di FMM)
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal yang nikmat dan membara kepada $p2...) 🍑',
+        speakerName: p2,
+        dynamicDialogueText: () => '"${DesahanNpcLakiMakeLove.getRandomMoan({'name': p2})} ${getCallNameForTarget(character.name)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
+
 
       // NODE 38: Outcome Vagina Keduanya
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina bergantian kepada $p1 dan $p2...) 🌸',
+        speakerName: femaleName,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)}... Ahh...!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1040,8 +1126,8 @@ class FmmThreesomeHelper {
 
       // NODE 39: Outcome Anal Keduanya
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal bergantian kepada $p1 dan $p2...) 🍑',
+        speakerName: femaleName,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)}... Ahh...!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1049,18 +1135,33 @@ class FmmThreesomeHelper {
 
       // NODE 40: Outcome Double Penetration
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu dan partisipan melakukan penetrasi double (vagina dan anal) secara bersamaan...) 🔥',
+        speakerName: femaleName,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan(femaleMap)}... Ahhh... Nikmat sekali...!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
+
+      final Map<String, dynamic> p1Map = {'name': p1, 'gender': p1IsFemale ? 'Perempuan' : 'Laki-laki'};
+      final Map<String, dynamic> p2Map = {'name': p2, 'gender': p2IsFemale ? 'Perempuan' : 'Laki-laki'};
+      final bool isP1Male = !p1IsFemale;
+      final bool isP2Male = !p2IsFemale;
+
       // NODE 51: Outcome Minta P1
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($p1 melakukan onani di depanmu dengan begitu penuh gairah...) 🖐️',
+        dialogueText: '($p1 memberikan manipulasi dan stimulasi intim kepada ${character.name} dengan begitu penuh gairah...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? p1 : character.name,
+        dynamicDialogueText: () => isPlayerFemale
+            ? '"${isP1Male ? DesahanNpcLakiMakeLove.getRandomMoan(p1Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p1Map)}... Mmh..."'
+            : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... $p1... Ahh!"',
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1068,8 +1169,17 @@ class FmmThreesomeHelper {
       // NODE 52: Outcome Minta P2
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($p2 melakukan onani dengan nikmat memamerkan keindahannya...) 🖐️',
+        dialogueText: '($p2 memberikan stimulasi intim kepada ${character.name} dengan nikmat...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? p2 : character.name,
+        dynamicDialogueText: () => isPlayerFemale
+            ? '"${isP2Male ? DesahanNpcLakiMakeLove.getRandomMoan(p2Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p2Map)}... Aah..."'
+            : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... $p2... Ngh!"',
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1077,8 +1187,17 @@ class FmmThreesomeHelper {
       // NODE 53: Outcome Minta Keduanya
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($p1 dan $p2 melakukan onani bersama-sama memberikan pemandangan yang amat panas...) 🖐️',
+        dialogueText: '($p1 dan $p2 memberikan stimulasi intim bersama-sama kepada ${character.name}...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? p1 : character.name,
+        dynamicDialogueText: () => isPlayerFemale
+            ? '"${isP1Male ? DesahanNpcLakiMakeLove.getRandomMoan(p1Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p1Map)}..."'
+            : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... Ahh!"',
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1099,6 +1218,12 @@ class FmmThreesomeHelper {
         dialogueText: '(Kamu memberikan rabaan dan stimulasi mendalam kepada $p1...) 👆',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: p1,
+        dynamicDialogueText: () => '"${isP1Male ? DesahanNpcLakiMakeLove.getRandomMoan(p1Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p1Map)}... Ahh!"',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
@@ -1108,6 +1233,12 @@ class FmmThreesomeHelper {
         dialogueText: '(Kamu memberikan stimulasi intens yang membuat $p2 mendesah nikmat...) 👆',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: p2,
+        dynamicDialogueText: () => '"${isP2Male ? DesahanNpcLakiMakeLove.getRandomMoan(p2Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p2Map)}... Ngh!"',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
@@ -1115,6 +1246,12 @@ class FmmThreesomeHelper {
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
         dialogueText: '(Kamu menggunakan kedua tanganmu untuk memberikan stimulasi kepada $p1 dan $p2 sekaligus...) 👆',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: 'Keduanya',
+        dynamicDialogueText: () => '"${isP1Male ? DesahanNpcLakiMakeLove.getRandomMoan(p1Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p1Map)}... ${isP2Male ? DesahanNpcLakiMakeLove.getRandomMoan(p2Map) : DesahanNpcPerempuanMakeLove.getRandomMoan(p2Map)}...!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1139,18 +1276,18 @@ class FmmThreesomeHelper {
         choices: unlockedMainActionButtons,
       ));
 
-      Map<String, dynamic>? p1Map;
-      Map<String, dynamic>? p2Map;
+      Map<String, dynamic>? overlayP1Map;
+      Map<String, dynamic>? overlayP2Map;
 
       if (isPlayerFemale) {
-        if (selectedMales.isNotEmpty) p1Map = selectedMales[0];
-        if (selectedMales.length > 1) p2Map = selectedMales[1];
+        if (selectedMales.isNotEmpty) overlayP1Map = selectedMales[0];
+        if (selectedMales.length > 1) overlayP2Map = selectedMales[1];
       } else {
-        if (selectedFemale != null) p1Map = selectedFemale;
-        if (selectedMales.isNotEmpty) p2Map = selectedMales[0];
+        if (selectedFemale != null) overlayP1Map = selectedFemale;
+        if (selectedMales.isNotEmpty) overlayP2Map = selectedMales[0];
       }
 
-      final Map<String, dynamic> npcMap1 = p1Map ?? {
+      final Map<String, dynamic> npcMap1 = overlayP1Map ?? {
         'name': namesText,
         'gender': 'Laki-laki',
         'role': 'Threesome FMM',
@@ -1160,9 +1297,9 @@ class FmmThreesomeHelper {
         context: context,
         player: character,
         npc: npcMap1,
-        npcAvatarUrl: p1Map != null ? _getAvatarUrl(p1Map) : null,
-        secondNpc: p2Map,
-        secondNpcAvatarUrl: p2Map != null ? _getAvatarUrl(p2Map) : null,
+        npcAvatarUrl: overlayP1Map != null ? _getAvatarUrl(overlayP1Map) : null,
+        secondNpc: overlayP2Map,
+        secondNpcAvatarUrl: overlayP2Map != null ? _getAvatarUrl(overlayP2Map) : null,
         nodes: nodes,
         customLocation: '$loc ($time)',
         finishButtonText: 'Selesai Sesi FMM',

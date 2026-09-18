@@ -23,8 +23,13 @@ class ThreesomeHelper {
     if (character.stepFatherName != null && !character.isStepFatherDeceased) familyCount++;
     if (character.stepMotherName != null && !character.isStepMotherDeceased) familyCount++;
     for (var s in character.siblings) {
-      if (s['isDeceased'] != 'true' && (int.tryParse(s['age'] ?? '18') ?? 18) >= 18) familyCount++;
+      if (s['isDeceased'] != 'true' && (int.tryParse(s['age']?.toString() ?? '18') ?? 18) >= 10) familyCount++;
     }
+    for (var c in character.children) {
+      if (c['isDeceased'] != 'true' && (int.tryParse(c['age']?.toString() ?? '0') ?? 0) >= 10) familyCount++;
+    }
+
+
 
     if (count + familyCount < 2) {
       showDialog(

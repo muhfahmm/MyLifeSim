@@ -11,6 +11,11 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/t
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_overlay.dart';
 import 'package:mylifesim/game/widgets/vn_dialogue/vn_dialogue_models.dart';
 import 'package:mylifesim/avatar/vn_character_view.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_npc_perempuan/desahan_npc_perempuan_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_pacar.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_laki/desahan_user_laki_makelove.dart';
+
 
 
 class FfmThreesomeHelper {
@@ -53,31 +58,35 @@ class FfmThreesomeHelper {
 
     for (var sib in character.siblings) {
       if (sib['isDeceased'] != 'true' && sib['name'] != null) {
-        final int age = int.tryParse(sib['age'] ?? '18') ?? 18;
-        if (age >= 18) {
+        final int age = int.tryParse(sib['age']?.toString() ?? '18') ?? 18;
+        if (age >= 10) {
           family.add({
             'name': sib['name']!,
             'gender': sib['gender'] ?? 'Perempuan',
-            'relation': sib['relation'] ?? 'Saudara',
+            'relation': sib['relation'] ?? (age < character.age ? 'Adik' : 'Kakak'),
             'relationship': sib['relationship'] ?? '50',
+            'age': age,
           });
         }
       }
     }
 
+
     for (var child in character.children) {
       if (child['isDeceased'] != 'true' && child['name'] != null) {
-        final int age = int.tryParse(child['age'] ?? '0') ?? 0;
-        if (age >= 18) {
+        final int age = int.tryParse(child['age']?.toString() ?? '0') ?? 0;
+        if (age >= 10) {
           family.add({
             'name': child['name']!,
             'gender': child['gender'] ?? 'Perempuan',
             'relation': child['relation'] ?? 'Anak',
             'relationship': child['relationship'] ?? '50',
+            'age': age,
           });
         }
       }
     }
+
 
     return family;
   }
@@ -565,57 +574,6 @@ class FfmThreesomeHelper {
     ];
     final String namesText = participantNames.join(' dan ');
 
-
-    final bool? confirm = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
-        insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        title: Row(
-          children: [
-            const Icon(Icons.favorite, color: Colors.pinkAccent, size: 22),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text('Konfirmasi Threesome FFM 🔥', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87)),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Kamu akan melakukan Threesome FFM bersama: $namesText.', style: TextStyle(fontSize: 12, color: isDark ? Colors.white70 : Colors.black87)),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                color: Colors.pink.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.pink.withValues(alpha: 0.3)),
-              ),
-              child: const Text(
-                'ℹ️ Sesi FFM pilihanmu siap dimulai.',
-                style: TextStyle(fontSize: 11, color: Colors.pink, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Lanjutkan', style: TextStyle(fontSize: 12, color: Colors.pinkAccent, fontWeight: FontWeight.bold)),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(dialogContext, false),
-            child: const Text('Batal', style: TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
-    );
-
-    if (confirm != true || !context.mounted) return;
-
     // Pilih Tempat & Waktu
     final String? loc = await TempatBercintaHelper.showLocationChooser(
       context: context,
@@ -667,7 +625,7 @@ class FfmThreesomeHelper {
     useCondom = chooseCondom;
 
     if (!context.mounted) return;
-    _executeFfm(context, character, namesText, targetNamesText, loc, time, useCondom, selectedFemales, updateState);
+    _executeFfm(context, character, namesText, targetNamesText, loc, time, useCondom, selectedFemales, selectedMale, updateState);
   }
 
   static void _executeFfm(
@@ -679,11 +637,14 @@ class FfmThreesomeHelper {
     String time,
     bool useCondom,
     List<Map<String, dynamic>> selectedFemales,
+    Map<String, dynamic> selectedMale,
     VoidCallback updateState,
   ) {
 
     character.currentPosisiSeks = null;
+    final bool isPlayerFemale = character.gender.toLowerCase().contains('perempuan');
     final Random random = Random();
+
 
     // Ambil daftar posisi FFM berdasarkan lokasi yang dipilih
     final List<Map<String, dynamic>> posisiOptions = PosisiFfmHelper.getPosisiOptions(location: loc);
@@ -841,18 +802,16 @@ class FfmThreesomeHelper {
         ],
       ));
 
-      // NODE 7: Sub-Menu Ejakulasi
+      // NODE 7: Sub-Menu Pilih Pasangan Ejakulasi
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '(Pilih lokasi pengeluaran cairan klimaks untuk FFM...) 💦',
+        dialogueText: '(Pilih siapa pasangan wanita yang ingin kamu berikan ejakulasi/klimaks...) 💦',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '💦 Keluar di Dalam Vagina', nextNodeIndex: null),
-          VNChoiceOption(text: '🧴 Keluar di Perut / Luar', nextNodeIndex: null),
-          VNChoiceOption(text: '👑 Keluar di Wajah', nextNodeIndex: null),
-          VNChoiceOption(text: '👄 Keluar di Mulut', nextNodeIndex: null),
-          VNChoiceOption(text: '🏁 Selesai Bercinta', nextNodeIndex: null),
+          VNChoiceOption(text: '💦 Ejakulasi kepada $p1', nextNodeIndex: 71),
+          VNChoiceOption(text: '💦 Ejakulasi kepada $p2', nextNodeIndex: 72),
+          VNChoiceOption(text: '💦 Ejakulasi kepada Keduanya ($p1 & $p2)', nextNodeIndex: 73),
         ],
       ));
 
@@ -943,6 +902,9 @@ class FfmThreesomeHelper {
         ));
       }
 
+      final bool p1IsFemale = true;
+      final bool p2IsFemale = !isPlayerFemale;
+
       // NODE 31: Sub-Menu Penetrasi P1
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
@@ -950,7 +912,7 @@ class FfmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina $p1', nextNodeIndex: 34),
+          if (p1IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina $p1', nextNodeIndex: 34),
           VNChoiceOption(text: '🍑 Penetrasi Anal $p1', nextNodeIndex: 35),
         ],
       ));
@@ -962,7 +924,7 @@ class FfmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina $p2', nextNodeIndex: 36),
+          if (p2IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina $p2', nextNodeIndex: 36),
           VNChoiceOption(text: '🍑 Penetrasi Anal $p2', nextNodeIndex: 37),
         ],
       ));
@@ -974,16 +936,37 @@ class FfmThreesomeHelper {
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         choices: [
-          VNChoiceOption(text: '🌸 Penetrasi Vagina Bergantian', nextNodeIndex: 38),
+          if (p1IsFemale && p2IsFemale) VNChoiceOption(text: '🌸 Penetrasi Vagina Bergantian', nextNodeIndex: 38),
           VNChoiceOption(text: '🍑 Penetrasi Anal Bergantian', nextNodeIndex: 39),
           VNChoiceOption(text: '🔥 Double Penetration Simultan', nextNodeIndex: 40),
         ],
       ));
 
+
+      String getPlayerCall(String npcName) {
+        final Map<String, dynamic>? npcMapObj = (selectedFemales.where((f) => f['name'] == npcName).isNotEmpty)
+            ? selectedFemales.firstWhere((f) => f['name'] == npcName)
+            : (selectedMale != null && selectedMale['name'] == npcName ? selectedMale : null);
+
+        final String role = npcMapObj?['role'] ?? npcMapObj?['relation'] ?? 'Pasangan';
+
+        return PanggilanManager.getPanggilan(
+          targetName: character.name,
+          targetRole: role,
+          targetGender: character.gender,
+          isSpeakerPlayer: false,
+          userName: character.name,
+          userGender: character.gender,
+          isIntimate: true,
+          character: character,
+        );
+      }
+
+
       // NODE 34: Outcome Vagina P1
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina penuh gairah kepada $p1...) 🌸',
+        speakerName: p1,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})} ${getPlayerCall(p1)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -991,8 +974,8 @@ class FfmThreesomeHelper {
 
       // NODE 35: Outcome Anal P1
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal yang nikmat dan membara kepada $p1...) 🍑',
+        speakerName: p1,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})} ${getPlayerCall(p1)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1000,8 +983,8 @@ class FfmThreesomeHelper {
 
       // NODE 36: Outcome Vagina P2
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina penuh gairah kepada $p2...) 🌸',
+        speakerName: p2,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})} ${getPlayerCall(p2)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1009,17 +992,19 @@ class FfmThreesomeHelper {
 
       // NODE 37: Outcome Anal P2
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal yang nikmat dan membara kepada $p2...) 🍑',
+        speakerName: p2,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})} ${getPlayerCall(p2)}..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
+
+
       // NODE 38: Outcome Vagina Keduanya
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi vagina bergantian kepada $p1 dan $p2...) 🌸',
+        speakerName: 'Keduanya',
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... Ahh... $p2..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1027,8 +1012,8 @@ class FfmThreesomeHelper {
 
       // NODE 39: Outcome Anal Keduanya
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu melakukan penetrasi anal bergantian kepada $p1 dan $p2...) 🍑',
+        speakerName: 'Keduanya',
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}... Ahh... $p1..."',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1036,8 +1021,8 @@ class FfmThreesomeHelper {
 
       // NODE 40: Outcome Double Penetration
       nodes.add(VNDialogueNode(
-        speakerName: 'Narasi',
-        dialogueText: '(Kamu dan partisipan melakukan penetrasi double (vagina dan anal) secara bersamaan...) 🔥',
+        speakerName: 'Keduanya',
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... ${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}...!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1056,8 +1041,30 @@ class FfmThreesomeHelper {
       // NODE 51: Hasil Minta p1
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($p1 melakukan sentuhan intim dan onani yang lembut...) 🖐️',
+        dialogueText: '($p1 melakukan sentuhan intim dan mengocok penis ${character.name} dengan lembut...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? p1 : character.name,
+        dynamicDialogueText: () {
+          final String callToP1 = PanggilanManager.getPanggilan(
+            targetName: p1,
+            targetRole: (selectedFemales.where((f) => f['name'] == p1).isNotEmpty)
+                ? (selectedFemales.firstWhere((f) => f['name'] == p1)['role'] ?? 'Pasangan')
+                : 'Pasangan',
+            isSpeakerPlayer: true,
+            userName: character.name,
+            userGender: character.gender,
+            isIntimate: true,
+            character: character,
+          );
+          return isPlayerFemale
+              ? '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... Mmh..."'
+              : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... $callToP1... Ahh!"';
+        },
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1065,8 +1072,30 @@ class FfmThreesomeHelper {
       // NODE 52: Hasil Minta p2
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($p2 melakukan sentuhan intim dan onani yang lembut...) 🖐️',
+        dialogueText: '($p2 melakukan sentuhan intim dan mengocok penis ${character.name} dengan nikmat...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? p2 : character.name,
+        dynamicDialogueText: () {
+          final String callToP2 = PanggilanManager.getPanggilan(
+            targetName: p2,
+            targetRole: (selectedFemales.where((f) => f['name'] == p2).isNotEmpty)
+                ? (selectedFemales.firstWhere((f) => f['name'] == p2)['role'] ?? 'Pasangan')
+                : 'Pasangan',
+            isSpeakerPlayer: true,
+            userName: character.name,
+            userGender: character.gender,
+            isIntimate: true,
+            character: character,
+          );
+          return isPlayerFemale
+              ? '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}... Aah..."'
+              : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... $callToP2... Ngh!"';
+        },
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1074,8 +1103,17 @@ class FfmThreesomeHelper {
       // NODE 53: Hasil Minta Keduanya
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
-        dialogueText: '($targetNamesText melakukan sentuhan intim dan onani bersama...) 🖐️',
+        dialogueText: '($targetNamesText melakukan sentuhan intim dan mengocok penis ${character.name} bersama-sama...) 🖐️',
         emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: isPlayerFemale ? 'Keduanya' : character.name,
+        dynamicDialogueText: () => isPlayerFemale
+            ? '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... ${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}..."'
+            : '"${DesahanUserLakiMakeLove.getRandomMoan(character)}... Ahh!"',
+        emotion: VNEmotionType.blush,
+        isPlayerSpeaking: !isPlayerFemale,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
@@ -1096,6 +1134,12 @@ class FfmThreesomeHelper {
         dialogueText: '(Kamu memberikan rabaan dan sentuhan sensual kepada $p1...) 👆',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: p1,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... Ahh!"',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
         nextIndex: 86,
       ));
 
@@ -1103,6 +1147,12 @@ class FfmThreesomeHelper {
       nodes.add(VNDialogueNode(
         speakerName: 'Narasi',
         dialogueText: '(Kamu memberikan rabaan dan sentuhan sensual kepada $p2...) 👆',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: p2,
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}... Ngh!"',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
         nextIndex: 86,
@@ -1114,7 +1164,81 @@ class FfmThreesomeHelper {
         dialogueText: '(Kamu memberikan rabaan dan sentuhan sensual kepada $targetNamesText...) 👆',
         emotion: VNEmotionType.blush,
         background: VNBackgroundType.bedroom,
+      ));
+      nodes.add(VNDialogueNode(
+        speakerName: 'Keduanya',
+        dynamicDialogueText: () => '"${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p1})}... ${DesahanNpcPerempuanMakeLove.getRandomMoan({'name': p2})}...!"',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
         nextIndex: 86,
+      ));
+
+      // Node Outcome Ejakulasi (71, 72, 73)
+      while (nodes.length < 71) {
+        nodes.add(VNDialogueNode(
+          speakerName: 'Narasi',
+          dialogueText: '(Aksi berjalan memuaskan...) ✨',
+          emotion: VNEmotionType.blush,
+          background: VNBackgroundType.bedroom,
+          nextIndex: 86,
+        ));
+      }
+
+      // NODE 71: Sub-Menu Lokasi Ejakulasi P1
+      nodes.add(VNDialogueNode(
+        speakerName: 'Narasi',
+        dialogueText: '(Pilih lokasi ejakulasi untuk $p1...) 💦',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+        choices: [
+          VNChoiceOption(
+            text: '💦 Keluar di Dalam Vagina $p1',
+            nextNodeIndex: null,
+            onSelect: (p, n) => character.didCreampieThisSession = true,
+          ),
+          VNChoiceOption(text: '🧴 Keluar di Perut / Luar $p1', nextNodeIndex: null),
+          VNChoiceOption(text: '👑 Keluar di Wajah $p1', nextNodeIndex: null),
+          VNChoiceOption(text: '👄 Keluar di Mulut $p1', nextNodeIndex: null),
+          VNChoiceOption(text: '🏁 Selesai Bercinta', nextNodeIndex: null),
+        ],
+      ));
+
+      // NODE 72: Sub-Menu Lokasi Ejakulasi P2
+      nodes.add(VNDialogueNode(
+        speakerName: 'Narasi',
+        dialogueText: '(Pilih lokasi ejakulasi untuk $p2...) 💦',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+        choices: [
+          VNChoiceOption(
+            text: '💦 Keluar di Dalam Vagina $p2',
+            nextNodeIndex: null,
+            onSelect: (p, n) => character.didCreampieThisSession = true,
+          ),
+          VNChoiceOption(text: '🧴 Keluar di Perut / Luar $p2', nextNodeIndex: null),
+          VNChoiceOption(text: '👑 Keluar di Wajah $p2', nextNodeIndex: null),
+          VNChoiceOption(text: '👄 Keluar di Mulut $p2', nextNodeIndex: null),
+          VNChoiceOption(text: '🏁 Selesai Bercinta', nextNodeIndex: null),
+        ],
+      ));
+
+      // NODE 73: Sub-Menu Lokasi Ejakulasi Keduanya
+      nodes.add(VNDialogueNode(
+        speakerName: 'Narasi',
+        dialogueText: '(Pilih lokasi ejakulasi untuk $p1 dan $p2...) 💦',
+        emotion: VNEmotionType.blush,
+        background: VNBackgroundType.bedroom,
+        choices: [
+          VNChoiceOption(
+            text: '💦 Keluar di Dalam Vagina Keduanya ($p1 & $p2)',
+            nextNodeIndex: null,
+            onSelect: (p, n) => character.didCreampieThisSession = true,
+          ),
+          VNChoiceOption(text: '🧴 Keluar di Perut / Luar Keduanya', nextNodeIndex: null),
+          VNChoiceOption(text: '👑 Keluar di Wajah Keduanya', nextNodeIndex: null),
+          VNChoiceOption(text: '👄 Keluar di Mulut Keduanya', nextNodeIndex: null),
+          VNChoiceOption(text: '🏁 Selesai Bercinta', nextNodeIndex: null),
+        ],
       ));
 
       // NODE 86: Loop Re-choice Card Utama (Menu Utama setelah melakukan aksi)

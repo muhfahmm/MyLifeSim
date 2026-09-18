@@ -26,8 +26,8 @@ class PanggilanPacar {
 
     if (!isSpeakerPlayer && isUserMale && isTargetFemale && isUserStaff) {
       if (isDating) {
-        // Sudah PACAR RESMI: Idol perempuan memanggil staf laki-laki dengan "Om Sayang", "Om", "Sayang", atau "Mas"
-        final List<String> omPool = ['Om Sayang', 'Om', 'Sayang', 'Mas'];
+        // Sudah PACAR RESMI: Idol perempuan memanggil staf laki-laki dengan panggilan manja
+        final List<String> omPool = ['Om Sayang', 'Sayang', 'Baby', 'Beb', 'Mas Sayang', 'Om'];
         return omPool[_random.nextInt(omPool.length)];
       } else {
         // BELUM BERPACARAN (Formal/Biasa): Idol perempuan memanggil staf laki-laki dengan "Om" atau "Pak"
@@ -36,49 +36,75 @@ class PanggilanPacar {
       }
     }
 
-    // Jika NPC (perempuan) memanggil User (laki-laki) yang merupakan pacar
-    if (!isSpeakerPlayer && isUserMale && isTargetFemale) {
-      return 'Sayang';
-    }
-
-    final String g = isSpeakerPlayer
+    final String listenerGender = isSpeakerPlayer
         ? (targetGender ?? '').toLowerCase()
         : (userGender ?? '').toLowerCase();
 
     final String listenerName = isSpeakerPlayer ? targetName : (userName ?? '');
-    final bool isMale = g == 'laki-laki' || g == 'male' || (isSpeakerPlayer && targetRole == 'Suami');
+    final bool isListenerMale = listenerGender.contains('laki') || listenerGender.contains('male') || (isSpeakerPlayer && targetRole == 'Suami');
 
     final List<String> listPanggilan = [
       'Sayang',
       'Sayangku',
       'Beb',
+      'Baby',
       'Honey',
       'Cinta',
       'Cintaku',
       'Manisku',
       'Love',
+      'Dear',
     ];
 
-    if (isMale) {
+    if (isListenerMale) {
       listPanggilan.addAll([
+        'Mas Sayang',
+        'Abang Sayang',
         'Mas',
         'Abang',
         'Hubby',
+        if (includeName && listenerName.isNotEmpty) 'Sayang $listenerName',
         if (includeName && listenerName.isNotEmpty) 'Mas $listenerName',
-        if (includeName && listenerName.isNotEmpty) 'Abang $listenerName',
       ]);
     } else {
       listPanggilan.addAll([
+        'Dek Sayang',
+        'Cantikku',
         'Adek',
         'Dek',
         'Wife',
         'Cantik',
-        'Manis',
-        if (includeName && listenerName.isNotEmpty) 'Dek $listenerName',
         if (includeName && listenerName.isNotEmpty) 'Sayang $listenerName',
+        if (includeName && listenerName.isNotEmpty) 'Dek $listenerName',
       ]);
     }
 
     return listPanggilan[_random.nextInt(listPanggilan.length)];
   }
+
+  /// Mendapatkan sebutan panggilan manja khusus untuk pacar/pasangan (selalu manja seperti Sayang, Baby, Beb, etc.)
+  static String getPanggilanManja({
+    String? targetGender,
+    bool isTargetMale = false,
+  }) {
+    final bool isMale = isTargetMale || (targetGender != null && (targetGender.toLowerCase().contains('laki') || targetGender.toLowerCase().contains('male')));
+    final List<String> manjaPool = [
+      'Sayang',
+      'Sayangku',
+      'Beb',
+      'Baby',
+      'Honey',
+      'Cinta',
+      'Cintaku',
+      'Manisku',
+      'Love',
+      'Dear',
+      if (isMale) 'Mas Sayang',
+      if (isMale) 'Abang Sayang',
+      if (!isMale) 'Dek Sayang',
+      if (!isMale) 'Cantikku',
+    ];
+    return manjaPool[_random.nextInt(manjaPool.length)];
+  }
 }
+

@@ -16,6 +16,8 @@ import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/ma
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/lainnya/masturbasi/persentase_ajakan.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/dialog_makelove/percakapan_dispatcher.dart';
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/hubungan_progress_modal.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/threesome/threesome.dart';
+
 
 // ──────────────────────────────────────────────
 // HELPER: Tampilkan pilihan sebelum VN dialogue
@@ -1247,7 +1249,31 @@ List<ActionItem> getAge12PlusActions(
     } else {
       actions.add(ajakMasturbasiAction);
     }
+
+    final ActionItem ajakThreesomeAction = ActionItem(
+      label: 'Ajak Threesome',
+      icon: Icons.group,
+      color: Colors.purple,
+      onTap: () {
+        ThreesomeHelper.processThreesome(
+          context: context,
+          character: character,
+          updateState: updateState,
+          targetName: targetName,
+        );
+      },
+    );
+
+    final int masturbasiIndex = actions.indexWhere((act) => act.label == 'Ajak Masturbasi Bersama');
+    if (masturbasiIndex != -1) {
+      actions.insert(masturbasiIndex + 1, ajakThreesomeAction);
+    } else if (bercintaIndex != -1) {
+      actions.insert(bercintaIndex + 2, ajakThreesomeAction);
+    } else {
+      actions.add(ajakThreesomeAction);
+    }
   }
+
 
   return actions;
 }

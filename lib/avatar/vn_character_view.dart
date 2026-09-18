@@ -13,6 +13,7 @@ class VNCharacterView extends StatelessWidget {
   final double width;
   final double height;
   final String? customName;
+  final String? roleTag;
   final VNEmotionType emotion;
   final VNOutfitType outfit;
   final String? customAvatarUrl;
@@ -25,11 +26,13 @@ class VNCharacterView extends StatelessWidget {
     this.width = 240,
     this.height = 360,
     this.customName,
+    this.roleTag,
     this.emotion = VNEmotionType.neutral,
     this.outfit = VNOutfitType.casual,
     this.customAvatarUrl,
     this.showNameTag = true,
   });
+
 
   @override
   Widget build(BuildContext context) {
@@ -169,6 +172,42 @@ class VNCharacterView extends StatelessWidget {
                   ],
                 ),
               ),
+
+              // Role Badge Below Avatar
+              if (roleTag != null && roleTag!.isNotEmpty)
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  margin: const EdgeInsets.only(top: 4),
+                  constraints: BoxConstraints(maxWidth: width),
+                  decoration: BoxDecoration(
+                    color: (roleTag!.toLowerCase() == 'user')
+                        ? Colors.blue.withValues(alpha: 0.85)
+                        : Colors.purple.withValues(alpha: 0.85),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: Colors.white30,
+                      width: 0.8,
+                    ),
+                    boxShadow: const [
+                      BoxShadow(
+                        color: Colors.black38,
+                        blurRadius: 3,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    roleTag!,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: width < 140 ? 9.5 : 10.5,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
             ],
           ),
         ),

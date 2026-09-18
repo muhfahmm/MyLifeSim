@@ -1450,7 +1450,17 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         if (!hasMasturbasiAlready) {
           actions.insert(1, _buildAjakMasturbasiAction());
         }
+
+        // 3. Ajak Threesome
+        final bool hasThreesomeAlready = actions.any((a) =>
+            a.label.toLowerCase().contains('threesome'));
+        if (!hasThreesomeAlready) {
+          final int masturbasiIdx = actions.indexWhere((a) => a.label.toLowerCase().contains('masturbasi'));
+          final int insertIdx = masturbasiIdx != -1 ? masturbasiIdx + 1 : (actions.length > 1 ? 2 : actions.length);
+          actions.insert(insertIdx, _buildAjakThreesomeAction());
+        }
       }
+
 
       final bool isAlreadyChildPartner = widget.character.isAnyPartnerNameMatching(widget.targetName);
 
@@ -2779,23 +2789,12 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
         ));
       }
 
-      // 4. Threesome (jika pacar >= 2)
-      if (widget.character.activePartnersCount >= 2) {
-        topActions.add(ActionItem(
-          label: 'Threesome',
-          icon: Icons.group,
-          color: Colors.purple,
-          onTap: () {
-            ThreesomeHelper.processThreesome(
-              context: context,
-              character: widget.character,
-              updateState: _updateState,
-              targetName: widget.targetName,
-            );
-          },
-
-        ));
+      // 4. Threesome
+      final bool hasThreesomeInTop = topActions.any((a) => a.label.toLowerCase().contains('threesome'));
+      if (!hasThreesomeInTop && (AdultFeatures.isPremiumUnlocked || widget.character.activePartnersCount >= 2)) {
+        topActions.add(_buildAjakThreesomeAction());
       }
+
     }
 
     // --- TAMBAHAN: LAPORKAN PERSELINGKUHAN KEPADA PASANGAN SAH ---
@@ -4672,4 +4671,21 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
       },
     );
   }
+
+  ActionItem _buildAjakThreesomeAction() {
+    return ActionItem(
+      label: 'Ajak Threesome',
+      icon: Icons.group,
+      color: Colors.purple,
+      onTap: () {
+        ThreesomeHelper.processThreesome(
+          context: context,
+          character: widget.character,
+          updateState: _updateState,
+          targetName: widget.targetName,
+        );
+      },
+    );
+  }
 }
+

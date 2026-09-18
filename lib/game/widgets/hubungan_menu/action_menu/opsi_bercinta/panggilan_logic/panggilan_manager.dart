@@ -23,10 +23,12 @@ class PanggilanManager {
     final String cleanTargetName = AvatarAgeRules.getCleanNPCName(targetName);
 
     if (character != null) {
+      // Jika isSpeakerPlayer == false, targetName yang di-pass bisa saja userName (player).
+      // Dalam hal itu, kita perlu tahu NPC siapa yang sedang berbicara (bisa diidentifikasi dari targetRole atau pencarian relasi).
       // 1. Cek anak di character.children
       for (var child in character.children) {
         final String cName = AvatarAgeRules.getCleanNPCName((child['name'] ?? '').toString());
-        if (cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName))) {
+        if (cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName) || targetRole.contains(cName))) {
           effectiveRole = 'Anak Kandung';
           break;
         }
@@ -37,8 +39,8 @@ class PanggilanManager {
         for (var recipient in character.donorRecipients) {
           final String cName = AvatarAgeRules.getCleanNPCName((recipient['childName'] ?? '').toString());
           final String rName = AvatarAgeRules.getCleanNPCName((recipient['name'] ?? '').toString());
-          if ((cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName))) ||
-              (rName.isNotEmpty && (rName == cleanTargetName || targetName.contains(rName)))) {
+          if ((cName.isNotEmpty && (cName == cleanTargetName || targetName.contains(cName) || targetRole.contains(cName))) ||
+              (rName.isNotEmpty && (rName == cleanTargetName || targetName.contains(rName) || targetRole.contains(rName)))) {
             effectiveRole = 'Anak Anda (Donor)';
             break;
           }
@@ -49,7 +51,7 @@ class PanggilanManager {
       if (effectiveRole == targetRole) {
         for (var sib in character.siblings) {
           final String sName = AvatarAgeRules.getCleanNPCName((sib['name'] ?? '').toString());
-          if (sName.isNotEmpty && (sName == cleanTargetName || targetName.contains(sName))) {
+          if (sName.isNotEmpty && (sName == cleanTargetName || targetName.contains(sName) || targetRole.contains(sName))) {
             effectiveRole = (sib['role'] ?? sib['relation'] ?? 'Saudara Kandung').toString();
             break;
           }
@@ -60,7 +62,7 @@ class PanggilanManager {
       if (effectiveRole == targetRole) {
         for (var fam in character.extendedFamily) {
           final String fName = AvatarAgeRules.getCleanNPCName((fam['name'] ?? '').toString());
-          if (fName.isNotEmpty && (fName == cleanTargetName || targetName.contains(fName))) {
+          if (fName.isNotEmpty && (fName == cleanTargetName || targetName.contains(fName) || targetRole.contains(fName))) {
             effectiveRole = (fam['role'] ?? fam['relation'] ?? 'Keluarga').toString();
             break;
           }

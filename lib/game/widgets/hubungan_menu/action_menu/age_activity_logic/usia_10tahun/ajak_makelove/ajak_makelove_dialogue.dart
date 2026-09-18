@@ -15,6 +15,8 @@ import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/a
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/aksi_intim/stimulasi_payudara.dart';
 
 import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/panggilan_logic/panggilan_manager.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_laki/desahan_user_laki_makelove.dart';
+import 'package:mylifesim/game/widgets/hubungan_menu/action_menu/opsi_bercinta/desahan_makelove/desahan_user_perempuan/desahan_user_perempuan_makelove.dart';
 
 class AjakMakeLoveDialogue {
   static VNBackgroundType _getBackgroundTypeFromLocation(String location) {
@@ -1031,7 +1033,10 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: player.name,
-      dialogueText: lubePlayerText,
+      dynamicDialogueText: () {
+        final String rawMoan = DesahanUserLakiMakeLove.getRandomMoan(player);
+        return '"$rawMoan... $partnerName... Hah...!"';
+      },
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: true,
       outfit: VNOutfitType.casual,
@@ -1079,7 +1084,14 @@ class AjakMakeLoveDialogue {
     ));
     allNodes.add(VNDialogueNode(
       speakerName: player.name,
-      dialogueText: handjobPlayerText,
+      dynamicDialogueText: () {
+        final String rawMoan = isMalePlayerWithFemaleNPC
+            ? DesahanUserLakiMakeLove.getRandomMoan(player)
+            : (isMalePlayer
+                ? DesahanUserLakiMakeLove.getRandomMoan(player)
+                : DesahanUserPerempuanMakeLove.getRandomMoan(player));
+        return '"$rawMoan... $partnerName...!"';
+      },
       emotion: VNEmotionType.blush,
       isPlayerSpeaking: true,
       outfit: VNOutfitType.casual,
