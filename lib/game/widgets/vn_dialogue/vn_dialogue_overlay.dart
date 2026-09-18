@@ -631,7 +631,16 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
     }
 
     String speakerGender = '';
-    if (node.isPlayerSpeaking) {
+    if (nameLower.contains('keduanya') || nameLower == 'keduanya') {
+      // Jika Keduanya dan dialog dilakukan oleh NPC 1 atau NPC 2
+      final String n1Gender = (widget.npc['gender'] ?? '').toString().toLowerCase();
+      final String n2Gender = (widget.secondNpc?['gender'] ?? '').toString().toLowerCase();
+      if (n1Gender.contains('perempuan') || n1Gender.contains('wanita') || n1Gender == 'female' ||
+          n2Gender.contains('perempuan') || n2Gender.contains('wanita') || n2Gender == 'female') {
+        return SpeakerType.female;
+      }
+      return SpeakerType.male;
+    } else if (node.isPlayerSpeaking) {
       speakerGender = widget.player.gender;
     } else {
       speakerGender = widget.npc['gender']?.toString() ?? '';
@@ -833,7 +842,9 @@ class _VNDialogueOverlayState extends State<VNDialogueOverlay> with SingleTicker
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(
-                          style.icon,
+                          (node.speakerName.trim().toLowerCase() == 'keduanya' || node.speakerName.toLowerCase().contains('keduanya'))
+                              ? Icons.people
+                              : style.icon,
                           size: 14,
                           color: style.textColor,
                         ),
