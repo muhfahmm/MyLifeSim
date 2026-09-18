@@ -20,6 +20,7 @@ class PropertiLogic {
       'name': house.name,
       'type': house.type,
       'price': house.price.toString(),
+      'value': house.price.toString(),
       'yearlyMaintenance': house.yearlyMaintenance.toString(),
       'iconEmoji': house.iconEmoji,
       'boughtAge': character.age.toString(),
@@ -32,9 +33,9 @@ class PropertiLogic {
     };
   }
 
-  /// Menjual rumah yang dimiliki (mendapatkan 85% dari harga beli)
+  /// Menjual rumah yang dimiliki (mendapatkan 85% dari harga beli/nilai aset)
   static Map<String, dynamic> sellHouse(Character character, Map<String, String> houseMap) {
-    final int price = int.tryParse(houseMap['price'] ?? '0') ?? 0;
+    final int price = int.tryParse(houseMap['price'] ?? houseMap['value'] ?? '0') ?? 0;
     final int sellPrice = (price * 0.85).round();
 
     final String houseName = houseMap['name'] ?? 'Rumah';
@@ -55,3 +56,4 @@ class PropertiLogic {
     };
   }
 }
+
