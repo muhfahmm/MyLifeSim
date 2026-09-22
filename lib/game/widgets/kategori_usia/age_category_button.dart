@@ -183,7 +183,7 @@ class AgeCategoryButton extends StatelessWidget {
       onTap: () {
         DialogHelper.show(
           context: context,
-          title: '📊 Kategori & Status',
+          title: 'Kategori & Status',
           isNotification: false,
           content: (() {
             int activeTab = 0; // 0: Pendidikan, 1: Pekerjaan
@@ -236,7 +236,13 @@ class AgeCategoryButton extends StatelessWidget {
                     const SizedBox(height: 16),
 
                     // --- STATISTIK KARAKTER ---
-                    const Text('📈 Statistik Karakter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                    const Row(
+                      children: [
+                        Icon(Icons.show_chart, size: 18, color: Colors.blue),
+                        SizedBox(width: 6),
+                        Text('Statistik Karakter', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                      ],
+                    ),
                     const SizedBox(height: 8),
                     Wrap(
                       spacing: 8.0,
@@ -267,15 +273,20 @@ class AgeCategoryButton extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  '🎓 Pendidikan',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: activeTab == 0 ? color : Colors.grey,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.school, size: 16, color: activeTab == 0 ? color : Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Pendidikan',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: activeTab == 0 ? color : Colors.grey,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ),
@@ -293,15 +304,20 @@ class AgeCategoryButton extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              child: Center(
-                                child: Text(
-                                  '💼 Pekerjaan',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 13,
-                                    color: activeTab == 1 ? color : Colors.grey,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.work, size: 16, color: activeTab == 1 ? color : Colors.grey),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    'Pekerjaan',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 13,
+                                      color: activeTab == 1 ? color : Colors.grey,
+                                    ),
                                   ),
-                                ),
+                                ],
                               ),
                             ),
                           ),
