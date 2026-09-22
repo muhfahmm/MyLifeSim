@@ -205,7 +205,7 @@ class _PetActionMenuScreenState extends State<PetActionMenuScreen> {
       appBar: AppBar(
         title: Text(
           '$petName 🐾',
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
         backgroundColor: cardBg,
         foregroundColor: textColor,

@@ -95,7 +95,7 @@ class _StaffInteractionPageState extends State<StaffInteractionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,

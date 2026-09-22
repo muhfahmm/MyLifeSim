@@ -247,7 +247,7 @@ class _ClassmateInteractionPageState extends State<ClassmateInteractionPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(name),
+        title: Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         backgroundColor: isDark ? const Color(0xFF1E1E1E) : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,

@@ -3903,7 +3903,14 @@ class _ActionMenuScreenState extends State<ActionMenuScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.targetName),
+        title: Text(
+          widget.targetName,
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+        ),
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
