@@ -390,12 +390,46 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     }
 
     // === 3. DIRI NPC & SAUDARA KANDUNG ===
+    String selfBadgeLabel = 'Subjek';
+    if (targetRelTag == 'FATHER') {
+      selfBadgeLabel = 'Ayah Kandung Anda';
+    } else if (targetRelTag == 'MOTHER') {
+      selfBadgeLabel = 'Ibu Kandung Anda';
+    } else if (targetRelTag == 'STEP_FATHER') {
+      selfBadgeLabel = 'Ayah Tiri Anda';
+    } else if (targetRelTag == 'STEP_MOTHER') {
+      selfBadgeLabel = 'Ibu Tiri Anda';
+    } else if (targetRelTag == 'GRANDFATHER') {
+      selfBadgeLabel = 'Kakek Anda';
+    } else if (targetRelTag == 'GRANDMOTHER') {
+      selfBadgeLabel = 'Nenek Anda';
+    } else if (targetRelTag == 'GREAT_GRANDFATHER') {
+      selfBadgeLabel = 'Kakek Buyut Anda';
+    } else if (targetRelTag == 'GREAT_GRANDMOTHER') {
+      selfBadgeLabel = 'Nenek Buyut Anda';
+    } else if (targetRelTag == 'UNCLE_AUNT') {
+      selfBadgeLabel = isMale ? 'Paman Anda' : 'Tante Anda';
+    } else if (targetRelTag == 'COUSIN') {
+      selfBadgeLabel = 'Sepupu Anda';
+    } else if (targetRelTag == 'SIBLING') {
+      selfBadgeLabel = 'Saudara Anda';
+    } else if (targetRelTag == 'CHILD') {
+      selfBadgeLabel = 'Anak Anda';
+    } else if (targetRelTag == 'SPOUSE') {
+      selfBadgeLabel = isMale ? 'Suami (Pasangan Anda)' : 'Istri (Pasangan Anda)';
+    } else if (targetRelTag == 'SELF') {
+      selfBadgeLabel = 'Diri Anda';
+    } else if (widget.npcRole.isNotEmpty) {
+      selfBadgeLabel = widget.npcRole;
+    }
+
     family.add({
       'section': 'saudara',
       'name': widget.npcName,
       'cleanName': widget.npcName,
-      'relation': 'Diri',
-      'relLabel': 'Diri',
+      'relation': selfBadgeLabel,
+      'relLabel': selfBadgeLabel,
+      'relationToPlayer': targetRelTag,
       'gender': widget.npcGender,
       'age': widget.npcAge,
       'isDeceased': false,
@@ -411,6 +445,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'cleanName': char.name,
         'relation': 'Saudara',
         'relLabel': 'Saudara Anda',
+        'relationToPlayer': 'SELF',
         'gender': char.gender,
         'age': char.age,
         'isDeceased': false,
@@ -429,7 +464,8 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
             'name': sName,
             'cleanName': sName,
             'relation': s['relation'] ?? 'Saudara',
-            'relLabel': 'Saudara',
+            'relLabel': 'Saudara Anda',
+            'relationToPlayer': 'SIBLING',
             'gender': s['gender'] ?? 'Laki-laki',
             'age': sAge,
             'isDeceased': s['isDeceased'] == 'true',
@@ -439,35 +475,69 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
           });
         }
       }
-    } else if (!isPlayerFather && !isPlayerMother && !isPlayerStepFather && !isPlayerStepMother) {
-      final int siblingSeed = seed;
+    } else {
+      final int siblingSeed = seed + 100;
       final siblingRng = Random(siblingSeed);
-      final int siblingCount = siblingRng.nextInt(3);
 
-      for (int i = 0; i < siblingCount; i++) {
-        final bool brotherOrSister = siblingRng.nextBool();
-        final String sGender = brotherOrSister ? 'Laki-laki' : 'Perempuan';
-        final int ageDiff = -4 + siblingRng.nextInt(9);
-        final int sAge = (age + ageDiff).clamp(5, 90);
+      // 50-50 chance if parent of player, or 60% chance for other NPCs
+      final bool hasSiblings = (isPlayerFather || isPlayerMother || isPlayerStepFather || isPlayerStepMother)
+          ? siblingRng.nextBool()
+          : siblingRng.nextDouble() < 0.6;
 
-        final bool isOlder = sAge > age;
-        final String relLabel = brotherOrSister 
-            ? (isOlder ? 'Kakak Laki-laki' : 'Adik Laki-laki') 
-            : (isOlder ? 'Kakak Perempuan' : 'Adik Perempuan');
-        final String sName = _randomName(sGender, siblingSeed + 10 + i);
+      if (hasSiblings) {
+        final int siblingCount = 1 + siblingRng.nextInt(3);
 
-        family.add({
-          'section': 'saudara',
-          'name': sName,
-          'cleanName': sName,
-          'relation': relLabel,
-          'relLabel': 'Kandung',
-          'gender': sGender,
-          'age': sAge,
-          'isDeceased': false,
-          'rel': 30 + siblingRng.nextInt(60),
-          'color': brotherOrSister ? Colors.indigo : Colors.purple,
-        });
+        for (int i = 0; i < siblingCount; i++) {
+          final bool brotherOrSister = siblingRng.nextBool();
+          final String sGender = brotherOrSister ? 'Laki-laki' : 'Perempuan';
+          final int ageDiff = -4 + siblingRng.nextInt(9);
+          final int sAge = (age + ageDiff).clamp(5, 90);
+
+          final bool isOlder = sAge > age;
+          String relLabel = brotherOrSister 
+              ? (isOlder ? 'Kakak Laki-laki' : 'Adik Laki-laki') 
+              : (isOlder ? 'Kakak Perempuan' : 'Adik Perempuan');
+          String badgeText = brotherOrSister ? 'Saudara Laki-laki' : 'Saudara Perempuan';
+          String? sRelTag;
+
+          if (isPlayerFather || isPlayerMother || isPlayerStepFather || isPlayerStepMother) {
+            relLabel = brotherOrSister ? 'Paman' : 'Tante';
+            badgeText = brotherOrSister ? 'Paman Anda' : 'Tante Anda';
+            sRelTag = 'UNCLE_AUNT';
+          } else if (targetRelTag == 'GRANDFATHER' || targetRelTag == 'GRANDMOTHER') {
+            relLabel = brotherOrSister ? 'Paman Buyut' : 'Tante Buyut';
+            badgeText = brotherOrSister ? 'Paman Buyut Anda' : 'Tante Buyut Anda';
+            sRelTag = 'GREAT_UNCLE_AUNT';
+          } else if (targetRelTag == 'UNCLE_AUNT') {
+            relLabel = brotherOrSister ? 'Paman' : 'Tante';
+            badgeText = brotherOrSister ? 'Paman Anda' : 'Tante Anda';
+            sRelTag = 'UNCLE_AUNT';
+          } else if (targetRelTag == 'COUSIN') {
+            relLabel = 'Sepupu';
+            badgeText = 'Sepupu Anda';
+            sRelTag = 'COUSIN';
+          } else if (targetRelTag == 'SIBLING') {
+            relLabel = 'Saudara';
+            badgeText = 'Saudara Anda';
+            sRelTag = 'SIBLING';
+          }
+
+          final String sName = _randomName(sGender, siblingSeed + 10 + i);
+
+          family.add({
+            'section': 'saudara',
+            'name': sName,
+            'cleanName': sName,
+            'relation': relLabel,
+            'relLabel': badgeText,
+            'relationToPlayer': sRelTag,
+            'gender': sGender,
+            'age': sAge,
+            'isDeceased': false,
+            'rel': 30 + siblingRng.nextInt(60),
+            'color': brotherOrSister ? Colors.indigo : Colors.purple,
+          });
+        }
       }
     }
 
@@ -656,9 +726,9 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
   Widget _buildFamilyCard(Map<String, dynamic> member, bool isDark) {
     final String rawName = (member['cleanName'] as String?) ?? (member['name'] as String);
     final bool isSelf = member['isSelf'] == true;
-    final String displayName = isSelf ? '$rawName (Profil Ini)' : (member['name'] as String);
+    final String displayName = member['name'] as String;
     final String relation = member['relation'] as String;
-    final String relLabel = isSelf ? 'Profil Ini' : (member['relLabel'] as String);
+    final String relLabel = member['relLabel'] as String;
     final int age = member['age'] as int;
     final int rel = member['rel'] as int;
     final bool isDeceased = member['isDeceased'] as bool;
