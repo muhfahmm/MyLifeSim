@@ -412,7 +412,11 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     } else if (targetRelTag == 'COUSIN') {
       selfBadgeLabel = 'Sepupu Anda';
     } else if (targetRelTag == 'SIBLING') {
-      selfBadgeLabel = 'Saudara Anda';
+      final int playerAge = char?.age ?? 0;
+      final bool isOlder = widget.npcAge > playerAge;
+      selfBadgeLabel = isMale
+          ? (isOlder ? 'Kakak Laki-laki Anda' : 'Adik Laki-laki Anda')
+          : (isOlder ? 'Kakak Perempuan Anda' : 'Adik Perempuan Anda');
     } else if (targetRelTag == 'CHILD') {
       selfBadgeLabel = 'Anak Anda';
     } else if (targetRelTag == 'SPOUSE') {
@@ -443,13 +447,13 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'section': 'saudara',
         'name': '${char.name} (Anda)',
         'cleanName': char.name,
-        'relation': 'Saudara',
-        'relLabel': 'Saudara Anda',
+        'relation': 'Diri',
+        'relLabel': 'Diri Anda',
         'relationToPlayer': 'SELF',
         'gender': char.gender,
         'age': char.age,
         'isDeceased': false,
-        'rel': 80,
+        'rel': 100,
         'color': Colors.teal,
         if (char.avatarSkinColor != null) 'skinColor': char.avatarSkinColor,
       });
@@ -459,12 +463,17 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         if (sName.isNotEmpty && !_isSameName(sName, widget.npcName)) {
           final int sAge = int.tryParse(s['age'] ?? '') ?? age;
           final int sRel = int.tryParse(s['relationship'] ?? '80') ?? 80;
+          final bool sMale = (s['gender'] ?? 'Laki-laki') == 'Laki-laki';
+          final bool sOlder = sAge > char.age;
+          final String sBadge = sMale
+              ? (sOlder ? 'Kakak Laki-laki Anda' : 'Adik Laki-laki Anda')
+              : (sOlder ? 'Kakak Perempuan Anda' : 'Adik Perempuan Anda');
           family.add({
             'section': 'saudara',
             'name': sName,
             'cleanName': sName,
             'relation': s['relation'] ?? 'Saudara',
-            'relLabel': 'Saudara Anda',
+            'relLabel': sBadge,
             'relationToPlayer': 'SIBLING',
             'gender': s['gender'] ?? 'Laki-laki',
             'age': sAge,
@@ -474,6 +483,39 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
             if (s['skinColor'] != null) 'skinColor': s['skinColor'],
           });
         }
+      }
+    } else if (targetRelTag == 'UNCLE_AUNT' && char != null) {
+      if (char.fatherName != null) {
+        family.add({
+          'section': 'saudara',
+          'name': char.fatherName!,
+          'cleanName': char.fatherName!,
+          'relation': 'Saudara',
+          'relLabel': 'Ayah Kandung Anda',
+          'relationToPlayer': 'FATHER',
+          'gender': 'Laki-laki',
+          'age': char.fatherAge ?? (age + 2),
+          'isDeceased': char.isFatherDeceased,
+          'rel': char.fatherRelationship ?? 80,
+          'color': Colors.blue,
+          if (char.fatherSkinColor != null) 'skinColor': char.fatherSkinColor,
+        });
+      }
+      if (char.motherName != null) {
+        family.add({
+          'section': 'saudara',
+          'name': char.motherName!,
+          'cleanName': char.motherName!,
+          'relation': 'Saudara',
+          'relLabel': 'Ibu Kandung Anda',
+          'relationToPlayer': 'MOTHER',
+          'gender': 'Perempuan',
+          'age': char.motherAge ?? (age + 2),
+          'isDeceased': char.isMotherDeceased,
+          'rel': char.motherRelationship ?? 80,
+          'color': Colors.pink,
+          if (char.motherSkinColor != null) 'skinColor': char.motherSkinColor,
+        });
       }
     } else {
       final int siblingSeed = seed + 100;
@@ -574,6 +616,112 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
             'rel': sRel,
             'color': Colors.teal,
             if (s['skinColor'] != null) 'skinColor': s['skinColor'],
+          });
+        }
+      }
+    } else if ((targetRelTag == 'GRANDFATHER' || targetRelTag == 'GRANDMOTHER') && char != null) {
+      if (char.fatherName != null) {
+        family.add({
+          'section': 'anak',
+          'name': char.fatherName!,
+          'cleanName': char.fatherName!,
+          'relation': 'Anak',
+          'relLabel': 'Ayah Kandung Anda',
+          'relationToPlayer': 'FATHER',
+          'gender': 'Laki-laki',
+          'age': char.fatherAge ?? (age - 25),
+          'isDeceased': char.isFatherDeceased,
+          'rel': char.fatherRelationship ?? 80,
+          'color': Colors.blue,
+          if (char.fatherSkinColor != null) 'skinColor': char.fatherSkinColor,
+        });
+      }
+      if (char.motherName != null) {
+        family.add({
+          'section': 'anak',
+          'name': char.motherName!,
+          'cleanName': char.motherName!,
+          'relation': 'Anak',
+          'relLabel': 'Ibu Kandung Anda',
+          'relationToPlayer': 'MOTHER',
+          'gender': 'Perempuan',
+          'age': char.motherAge ?? (age - 27),
+          'isDeceased': char.isMotherDeceased,
+          'rel': char.motherRelationship ?? 80,
+          'color': Colors.pink,
+          if (char.motherSkinColor != null) 'skinColor': char.motherSkinColor,
+        });
+      }
+
+      final int uncleSeed = seed + 200;
+      final uncleRng = Random(uncleSeed);
+      final int uncleCount = uncleRng.nextInt(3);
+      for (int i = 0; i < uncleCount; i++) {
+        final bool isMaleUncle = uncleRng.nextBool();
+        final String uGender = isMaleUncle ? 'Laki-laki' : 'Perempuan';
+        final String uName = _randomName(uGender, uncleSeed + 10 + i);
+        final int uAge = (age - 25 + uncleRng.nextInt(8) - 4).clamp(18, 75);
+        family.add({
+          'section': 'anak',
+          'name': uName,
+          'cleanName': uName,
+          'relation': isMaleUncle ? 'Anak Laki-laki' : 'Anak Perempuan',
+          'relLabel': isMaleUncle ? 'Paman Anda' : 'Tante Anda',
+          'relationToPlayer': 'UNCLE_AUNT',
+          'gender': uGender,
+          'age': uAge,
+          'isDeceased': false,
+          'rel': 40 + uncleRng.nextInt(50),
+          'color': isMaleUncle ? Colors.indigo : Colors.purple,
+        });
+      }
+    } else if (targetRelTag == 'UNCLE_AUNT') {
+      final int childSeed = seed + 300;
+      final childRng = Random(childSeed);
+      if (age >= 20) {
+        final int childCount = 1 + childRng.nextInt(3);
+        for (int i = 0; i < childCount; i++) {
+          final bool childMale = childRng.nextBool();
+          final String cGender = childMale ? 'Laki-laki' : 'Perempuan';
+          final int cAge = max(1, age - 22 - childRng.nextInt(6));
+          final String cName = _randomName(cGender, childSeed + 10 + i);
+          family.add({
+            'section': 'anak',
+            'name': cName,
+            'cleanName': cName,
+            'relation': childMale ? 'Anak Laki-laki' : 'Anak Perempuan',
+            'relLabel': 'Sepupu Anda',
+            'relationToPlayer': 'COUSIN',
+            'gender': cGender,
+            'age': cAge,
+            'isDeceased': false,
+            'rel': 50 + childRng.nextInt(40),
+            'color': Colors.purple,
+          });
+        }
+      }
+    } else if (targetRelTag == 'SIBLING' || targetRelTag == 'COUSIN') {
+      final int childSeed = seed + 300;
+      final childRng = Random(childSeed);
+      if (age >= 20) {
+        final int childCount = 1 + childRng.nextInt(3);
+        for (int i = 0; i < childCount; i++) {
+          final bool childMale = childRng.nextBool();
+          final String cGender = childMale ? 'Laki-laki' : 'Perempuan';
+          final int cAge = max(1, age - 22 - childRng.nextInt(6));
+          final String cName = _randomName(cGender, childSeed + 10 + i);
+          family.add({
+            'section': 'anak',
+            'name': cName,
+            'cleanName': cName,
+            'relation': childMale ? 'Anak Laki-laki' : 'Anak Perempuan',
+            'relLabel': 'Keponakan Anda',
+            'relationToPlayer': 'NEPHEW_NIECE',
+            'gender': cGender,
+            'age': cAge,
+            'isDeceased': false,
+            'rel': 50 + childRng.nextInt(40),
+            'color': Colors.teal,
           });
         }
       }
