@@ -187,21 +187,26 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
           includeFather = false;
         }
       }
-    } else if (targetRelTag == 'FATHER' || targetRelTag == 'MOTHER') {
+    } else if (targetRelTag == 'FATHER') {
       fatherRelLabel = 'Kakek Anda';
-      fatherRelTag = 'GRANDFATHER';
+      fatherRelTag = 'GRANDFATHER_PATERNAL';
       motherRelLabel = 'Nenek Anda';
-      motherRelTag = 'GRANDMOTHER';
-    } else if (targetRelTag == 'GRANDFATHER' || targetRelTag == 'GRANDMOTHER') {
+      motherRelTag = 'GRANDMOTHER_PATERNAL';
+    } else if (targetRelTag == 'MOTHER') {
+      fatherRelLabel = 'Kakek Anda';
+      fatherRelTag = 'GRANDFATHER_MATERNAL';
+      motherRelLabel = 'Nenek Anda';
+      motherRelTag = 'GRANDMOTHER_MATERNAL';
+    } else if (targetRelTag.startsWith('GRANDFATHER') || targetRelTag.startsWith('GRANDMOTHER')) {
       fatherRelLabel = 'Kakek Buyut Anda';
       fatherRelTag = 'GREAT_GRANDFATHER';
       motherRelLabel = 'Nenek Buyut Anda';
       motherRelTag = 'GREAT_GRANDMOTHER';
     } else if (targetRelTag == 'UNCLE_AUNT') {
       fatherRelLabel = 'Kakek Anda';
-      fatherRelTag = 'GRANDFATHER';
+      fatherRelTag = 'GRANDFATHER_PATERNAL';
       motherRelLabel = 'Nenek Anda';
-      motherRelTag = 'GRANDMOTHER';
+      motherRelTag = 'GRANDMOTHER_PATERNAL';
     } else if (targetRelTag == 'COUSIN') {
       fatherRelLabel = 'Paman Anda';
       fatherRelTag = 'UNCLE_AUNT';
@@ -340,6 +345,70 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
         'color': Colors.redAccent,
         if (char.fatherSkinColor != null) 'skinColor': char.fatherSkinColor,
       });
+    } else if (targetRelTag == 'GRANDFATHER_PATERNAL' && char != null && char.fatherName != null) {
+      final int parentSeed = char.fatherName!.codeUnits.fold(0, (a, b) => a + b);
+      final String grandmotherName = _randomName('Perempuan', parentSeed + 2);
+      family.add({
+        'section': 'pasangan',
+        'name': grandmotherName,
+        'cleanName': grandmotherName,
+        'relation': 'Istri',
+        'relLabel': 'Istri (Nenek Anda)',
+        'relationToPlayer': 'GRANDMOTHER_PATERNAL',
+        'gender': 'Perempuan',
+        'age': (age - 2).clamp(18, 95),
+        'isDeceased': age >= 78,
+        'rel': 85,
+        'color': Colors.redAccent,
+      });
+    } else if (targetRelTag == 'GRANDMOTHER_PATERNAL' && char != null && char.fatherName != null) {
+      final int parentSeed = char.fatherName!.codeUnits.fold(0, (a, b) => a + b);
+      final String grandfatherName = _randomName('Laki-laki', parentSeed + 1);
+      family.add({
+        'section': 'pasangan',
+        'name': grandfatherName,
+        'cleanName': grandfatherName,
+        'relation': 'Suami',
+        'relLabel': 'Suami (Kakek Anda)',
+        'relationToPlayer': 'GRANDFATHER_PATERNAL',
+        'gender': 'Laki-laki',
+        'age': (age + 2).clamp(18, 95),
+        'isDeceased': age >= 80,
+        'rel': 85,
+        'color': Colors.redAccent,
+      });
+    } else if (targetRelTag == 'GRANDFATHER_MATERNAL' && char != null && char.motherName != null) {
+      final int parentSeed = char.motherName!.codeUnits.fold(0, (a, b) => a + b);
+      final String grandmotherName = _randomName('Perempuan', parentSeed + 2);
+      family.add({
+        'section': 'pasangan',
+        'name': grandmotherName,
+        'cleanName': grandmotherName,
+        'relation': 'Istri',
+        'relLabel': 'Istri (Nenek Anda)',
+        'relationToPlayer': 'GRANDMOTHER_MATERNAL',
+        'gender': 'Perempuan',
+        'age': (age - 2).clamp(18, 95),
+        'isDeceased': age >= 78,
+        'rel': 85,
+        'color': Colors.redAccent,
+      });
+    } else if (targetRelTag == 'GRANDMOTHER_MATERNAL' && char != null && char.motherName != null) {
+      final int parentSeed = char.motherName!.codeUnits.fold(0, (a, b) => a + b);
+      final String grandfatherName = _randomName('Laki-laki', parentSeed + 1);
+      family.add({
+        'section': 'pasangan',
+        'name': grandfatherName,
+        'cleanName': grandfatherName,
+        'relation': 'Suami',
+        'relLabel': 'Suami (Kakek Anda)',
+        'relationToPlayer': 'GRANDFATHER_MATERNAL',
+        'gender': 'Laki-laki',
+        'age': (age + 2).clamp(18, 95),
+        'isDeceased': age >= 80,
+        'rel': 85,
+        'color': Colors.redAccent,
+      });
     } else if (targetRelTag == 'SPOUSE' && char != null) {
       family.add({
         'section': 'pasangan',
@@ -399,9 +468,9 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
       selfBadgeLabel = 'Ayah Tiri Anda';
     } else if (targetRelTag == 'STEP_MOTHER') {
       selfBadgeLabel = 'Ibu Tiri Anda';
-    } else if (targetRelTag == 'GRANDFATHER') {
+    } else if (targetRelTag.startsWith('GRANDFATHER')) {
       selfBadgeLabel = 'Kakek Anda';
-    } else if (targetRelTag == 'GRANDMOTHER') {
+    } else if (targetRelTag.startsWith('GRANDMOTHER')) {
       selfBadgeLabel = 'Nenek Anda';
     } else if (targetRelTag == 'GREAT_GRANDFATHER') {
       selfBadgeLabel = 'Kakek Buyut Anda';
@@ -546,7 +615,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
             relLabel = brotherOrSister ? 'Paman' : 'Tante';
             badgeText = brotherOrSister ? 'Paman Anda' : 'Tante Anda';
             sRelTag = 'UNCLE_AUNT';
-          } else if (targetRelTag == 'GRANDFATHER' || targetRelTag == 'GRANDMOTHER') {
+          } else if (targetRelTag.startsWith('GRANDFATHER') || targetRelTag.startsWith('GRANDMOTHER')) {
             relLabel = brotherOrSister ? 'Paman Buyut' : 'Tante Buyut';
             badgeText = brotherOrSister ? 'Paman Buyut Anda' : 'Tante Buyut Anda';
             sRelTag = 'GREAT_UNCLE_AUNT';
@@ -785,11 +854,28 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     final anak = _family.where((m) => m['section'] == 'anak').toList();
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
+    String orangTuaHeaderTitle = 'Orang Tua';
+    final String targetRelTag = widget.relationToPlayer ?? 'OTHER';
+    if (targetRelTag == 'FATHER' || targetRelTag == 'MOTHER' || targetRelTag == 'UNCLE_AUNT' || targetRelTag == 'SIBLING' || targetRelTag == 'SELF') {
+      orangTuaHeaderTitle = 'Kakek & Nenek Anda';
+    } else if (targetRelTag.startsWith('GRANDFATHER') || targetRelTag.startsWith('GRANDMOTHER')) {
+      orangTuaHeaderTitle = 'Kakek & Nenek Buyut Anda';
+    }
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Keluarga ${widget.npcName}'),
-        backgroundColor: isDark ? Colors.grey.shade900 : Colors.blueGrey,
-        foregroundColor: Colors.white,
+        title: Text(
+          'Keluarga ${widget.npcName}',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+        backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0,
       ),
       backgroundColor: isDark ? Colors.grey.shade900 : Colors.grey.shade50,
@@ -805,7 +891,7 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
               children: [
                 // === ORANGTUA ===
                 if (orangTua.isNotEmpty) ...[
-                  _buildSectionHeader('Orang Tua', Icons.family_restroom, isDark),
+                  _buildSectionHeader(orangTuaHeaderTitle, Icons.family_restroom, isDark),
                   const SizedBox(height: 8),
                   ...orangTua.map((m) => _buildFamilyCard(m, isDark)),
                 ],
