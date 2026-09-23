@@ -645,7 +645,7 @@ class _DaftarTimPageState extends State<DaftarTimPage> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
-                                  isQualified ? 'Kualifikasi Sesuai ✅' : 'Terkunci 🔒',
+                                  isQualified ? 'Kualifikasi Sesuai ✅' : 'Terkunci',
                                   style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white),
                                 ),
                               ),

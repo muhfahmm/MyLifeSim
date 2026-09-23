@@ -905,17 +905,9 @@ class _KerjaMenuScreenState extends State<KerjaMenuScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Text('🔒', style: TextStyle(fontSize: 20)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Kamu harus berusia minimal $minAge tahun untuk membuka lowongan pekerjaan ini.',
-                          style: TextStyle(fontSize: isMobile ? 13 : 14),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Kamu harus berusia minimal $minAge tahun untuk membuka lowongan pekerjaan ini.',
+                    style: TextStyle(fontSize: isMobile ? 13 : 14),
                   ),
                   const SizedBox(height: 12),
                   Container(

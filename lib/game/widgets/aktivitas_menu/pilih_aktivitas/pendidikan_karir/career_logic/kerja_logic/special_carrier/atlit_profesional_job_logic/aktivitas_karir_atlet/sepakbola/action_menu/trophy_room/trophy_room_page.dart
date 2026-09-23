@@ -149,7 +149,7 @@ class TrophyRoomPage extends StatelessWidget {
             borderRadius: BorderRadius.circular(6),
           ),
           child: Text(
-            isUnlocked ? 'Tercapai 🏆' : 'Terkunci 🔒',
+            isUnlocked ? 'Tercapai' : 'Terkunci',
             style: TextStyle(fontSize: 11, fontWeight: FontWeight.bold, color: isUnlocked ? Colors.green.shade900 : Colors.grey.shade700),
           ),
         ),

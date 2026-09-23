@@ -135,14 +135,14 @@ class _AktivitasManajemenPageState extends State<AktivitasManajemenPage> {
               return _buildActionCard(
                 title: 'Perekrutan Generasi Trainee Baru 📋',
                 desc: alreadyRecruitedThisYear
-                    ? '🔒 Perekrutan generasi trainee baru telah dilaksanakan tahun ini (1 kali / tahun).'
+                    ? 'Perekrutan generasi trainee baru telah dilaksanakan tahun ini (1 kali / tahun).'
                     : 'Mengorganisir audisi dan seleksi kandidat member idol generasi baru (Disiplin +6%, Kebahagiaan -4%)',
                 isDisabled: alreadyRecruitedThisYear,
                 onTap: () {
                   if (alreadyRecruitedThisYear) {
                     DialogHelper.show(
                       context: context,
-                      title: 'Audisi Sudah Dilaksanakan 🔒',
+                      title: 'Audisi Sudah Dilaksanakan',
                       content: const Text(
                         'Perekrutan generasi trainee baru hanya dapat dilaksanakan 1 kali dalam 1 tahun.\n\n'
                         'Tunggu hingga usia Anda bertambah (tahun berikutnya) untuk membuka audisi generasi baru kembali.',

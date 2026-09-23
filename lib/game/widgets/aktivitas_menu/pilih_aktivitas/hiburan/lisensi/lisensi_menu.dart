@@ -6,17 +6,15 @@ import 'ujian_lisensi_page.dart';
 import 'lisensi_option_modal.dart';
 import 'package:mylifesim/game/widgets/assets_menu/aset_premium/garasi_mobil/database_mobil.dart';
 import 'package:mylifesim/game/widgets/aktivitas_menu/pilih_aktivitas/hiburan/imigrasi/imigrasi_menu.dart';
+import 'package:mylifesim/game/widgets/dialog_helper.dart';
 
 class LisensiMenuHelper {
   static void showLisensiMenu(BuildContext context, Character character, VoidCallback onComplete) {
     if (character.age < 17) {
-      showDialog(
+      DialogHelper.showFeatureLocked(
         context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Akses Dibatasi'),
-          content: const Text('Kamu harus berusia minimal 17 tahun untuk mengurus lisensi.'),
-          actions: [TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('OK'))],
-        ),
+        title: 'Akses Dibatasi',
+        message: 'Kamu harus berusia minimal 17 tahun untuk mengurus lisensi.',
       );
       return;
     }
@@ -157,7 +155,7 @@ class _LisensiPageState extends State<LisensiPage> {
                         padding: const EdgeInsets.only(top: 4),
                         child: Text(
                           isPilotLocked 
-                              ? '${l['desc']}\nLisensi Terkunci 🔒 Butuh [Kecerdasan 80+] & Umur 21 thn.'
+                              ? '${l['desc']}\nLisensi Terkunci Butuh [Kecerdasan 80+] & Umur 21 thn.'
                               : '${l['desc']}\nBiaya: ${CurrencySettings.format(cost)} | Min. usia: $minAge thn',
                           style: TextStyle(color: subtitleColor),
                         ),
@@ -214,34 +212,10 @@ class _LisensiPageState extends State<LisensiPage> {
 
                         // 2. Check Pilot Lock
                         if (isPilotLocked) {
-                          showDialog(
+                          DialogHelper.showFeatureLocked(
                             context: context,
-                            builder: (ctx) => AlertDialog(
-                              insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                              titlePadding: const EdgeInsets.fromLTRB(16, 14, 16, 6),
-                              contentPadding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                              actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                              title: Row(
-                                children: [
-                                  const Icon(Icons.lock, color: Colors.amber, size: 20),
-                                  const SizedBox(width: 8),
-                                  Expanded(
-                                    child: Text(
-                                      'Lisensi Terkunci 🔒',
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              content: Text('Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.', style: TextStyle(fontSize: 12, height: 1.35, color: isDark ? Colors.white70 : Colors.black54)),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(ctx),
-                                  child: Text('Tutup', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: isDark ? Colors.white70 : Colors.black87)),
-                                ),
-                              ],
-                            ),
+                            title: 'Lisensi Terkunci',
+                            message: 'Lisensi ini terkunci. Kamu membutuhkan [Kecerdasan 80+] dan Umur 21 tahun untuk membukanya.',
                           );
                           return;
                         }

@@ -134,7 +134,7 @@ class InvestasiItem extends StatelessWidget {
         if (!isUnlocked) {
           DialogHelper.show(
             context: context,
-            title: 'Fitur Terkunci 🔒',
+            title: 'Fitur Terkunci',
             isNotification: true,
             content: Text(
               'Investasi akan terbuka saat karakter berusia 12 tahun.\nUsia saat ini: $age tahun.',

@@ -340,17 +340,9 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      const Text('🔒', style: TextStyle(fontSize: 20)),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Kamu harus berusia minimal $minAge tahun untuk membuka jalur karir ini.',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Kamu harus berusia minimal $minAge tahun untuk membuka jalur karir ini.',
+                    style: const TextStyle(fontSize: 14),
                   ),
                   const SizedBox(height: 12),
                   Container(
@@ -386,7 +378,7 @@ class _PekerjaanSpesialMenuScreenState extends State<PekerjaanSpesialMenuScreen>
           if (!isPurchased) {
             DialogHelper.show(
               context: context,
-              title: 'Fitur Terkunci 🔒',
+              title: 'Fitur Terkunci',
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,

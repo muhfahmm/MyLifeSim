@@ -34,7 +34,7 @@ class _AstronotMenuPageState extends State<AstronotMenuPage> {
   void _showLockedDialog(BuildContext context, String featureName) {
     DialogHelper.show(
       context: context,
-      title: 'Status Astronot Belum Aktif 🔒',
+      title: 'Status Astronot Belum Aktif',
       content: Text(
         'Kamu belum terdaftar di lembaga antariksa mana pun! Ikuti menu "Rekrutmen & Seleksi Astronot Baru" terlebih dahulu untuk membuka $featureName.',
         style: const TextStyle(fontSize: 12),
@@ -384,7 +384,7 @@ class _AstronotMenuPageState extends State<AstronotMenuPage> {
                   color: Colors.grey.shade700,
                   borderRadius: BorderRadius.circular(4),
                 ),
-                child: const Text('🔒 LOCKED', style: TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold)),
+                child: const Text('TERKUNCI', style: TextStyle(fontSize: 9, color: Colors.white, fontWeight: FontWeight.bold)),
               ),
           ],
         ),

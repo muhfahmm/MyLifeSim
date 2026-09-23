@@ -235,7 +235,7 @@ class _AtlitProfesionalMenuPageState extends State<AtlitProfesionalMenuPage> {
                                   SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Cabor Terkunci 🔒',
+                                      'Cabor Terkunci',
                                       style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                                     ),
                                   ),

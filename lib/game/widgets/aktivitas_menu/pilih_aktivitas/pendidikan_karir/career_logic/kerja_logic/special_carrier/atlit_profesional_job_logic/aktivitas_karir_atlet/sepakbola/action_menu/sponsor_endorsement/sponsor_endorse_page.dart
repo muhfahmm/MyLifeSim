@@ -40,7 +40,7 @@ class _SponsorEndorsePageState extends State<SponsorEndorsePage> {
   void _tandaTanganSponsor(String brand, int basePay, int minFollowers) {
     if (widget.character.followers < minFollowers) {
       _showAlert(
-        'Syarat Belum Terpenuhi 🔒',
+        'Syarat Belum Terpenuhi',
         'Sponsor $brand membutuhkan minimal $minFollowers followers!\n'
         'Jumlah followersmu saat ini: ${widget.character.followers}.',
       );

@@ -384,4 +384,20 @@ class DialogHelper {
       headerColor: headerColor,
     );
   }
+
+  /// Single standardized modal for feature lock notifications (no lock emojis)
+  static Future<void> showFeatureLocked({
+    required BuildContext context,
+    String title = 'Fitur Terkunci',
+    required String message,
+  }) {
+    final cleanTitle = title.replaceAll('🔒', '').replaceAll('🔐', '').replaceAll('🔑', '').trim();
+    final cleanMessage = message.replaceAll('🔒', '').replaceAll('🔐', '').replaceAll('🔑', '').trim();
+    return show(
+      context: context,
+      title: cleanTitle.isEmpty ? 'Fitur Terkunci' : cleanTitle,
+      content: Text(cleanMessage),
+      isNotification: true,
+    );
+  }
 }

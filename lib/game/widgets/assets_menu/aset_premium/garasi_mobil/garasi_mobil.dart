@@ -81,7 +81,7 @@ class GarasiMobilItem extends StatelessWidget {
   void _showLockedDialog(BuildContext context, String feature, int requiredAge) {
     DialogHelper.show(
       context: context,
-      title: 'Fitur Terkunci 🔒',
+      title: 'Fitur Terkunci',
       isNotification: true,
       content: Column(
         mainAxisSize: MainAxisSize.min,

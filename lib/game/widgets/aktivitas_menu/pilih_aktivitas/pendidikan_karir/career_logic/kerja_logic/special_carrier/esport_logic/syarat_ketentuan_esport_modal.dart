@@ -203,7 +203,7 @@ class _SyaratKetentuanEsportModalState extends State<SyaratKetentuanEsportModal>
                         if (!isRoleUnlocked) {
                           DialogHelper.show(
                             context: context,
-                            title: 'Fitur Terkunci 🔒',
+                            title: 'Fitur Terkunci',
                             content: Column(
                               mainAxisSize: MainAxisSize.min,
                               crossAxisAlignment: CrossAxisAlignment.start,

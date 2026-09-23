@@ -350,7 +350,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       ),
                       const SizedBox(height: 14),
                       Text(
-                        '🔒 Fitur Dewasa Terkunci',
+                        'Fitur Dewasa Terkunci',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,

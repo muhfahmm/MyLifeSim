@@ -34,7 +34,7 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
   void _showLockedDialog(BuildContext context, String featureName) {
     DialogHelper.show(
       context: context,
-      title: 'Peran Film Belum Diterima 🔒',
+      title: 'Peran Film Belum Diterima',
       content: Text(
         'Kamu belum memiliki project peran film aktif! Ikuti menu "Audisi & Casting Film Terbuka" terlebih dahulu untuk mengakses $featureName.',
         style: const TextStyle(fontSize: 13),
@@ -167,7 +167,7 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
             title: 'Lokasi Syuting & Produksi Film 🎥',
             desc: hasActorRole
                 ? 'Pendalaman karakter method acting & aksi stunt berbahaya'
-                : '🔒 Harus lolos audisi film terlebih dahulu',
+                : 'Harus lolos audisi film terlebih dahulu',
             icon: Icons.video_camera_back,
             color: Colors.deepPurple,
             isLocked: !hasActorRole,
@@ -190,7 +190,7 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
             title: 'Manajemen Agen & Kontrak Fee 💼',
             desc: hasActorRole
                 ? 'Gabung agensi bakat ternama & naikkan nilai fee per film'
-                : '🔒 Harus memiliki peran film aktif terlebih dahulu',
+                : 'Harus memiliki peran film aktif terlebih dahulu',
             icon: Icons.business_center,
             color: Colors.indigo,
             isLocked: !hasActorRole,
@@ -213,7 +213,7 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
             title: 'Red Carpet & Festival Film 🏆',
             desc: hasActorRole
                 ? 'Hadiri Gala Academy Awards Oscar, Cannes, & Piala Citra'
-                : '🔒 Harus memiliki peran film aktif terlebih dahulu',
+                : 'Harus memiliki peran film aktif terlebih dahulu',
             icon: Icons.emoji_events,
             color: Colors.amber.shade900,
             isLocked: !hasActorRole,
@@ -236,7 +236,7 @@ class _AktorFilmMenuPageState extends State<AktorFilmMenuPage> {
             title: 'Co-Star, Sutradara & Kru Produksi 👥',
             desc: hasActorRole
                 ? 'Interaksi & ngopi bersama rekan artis di lokasi syuting'
-                : '🔒 Harus memiliki peran film aktif terlebih dahulu',
+                : 'Harus memiliki peran film aktif terlebih dahulu',
             icon: Icons.groups,
             color: Colors.teal,
             isLocked: !hasActorRole,

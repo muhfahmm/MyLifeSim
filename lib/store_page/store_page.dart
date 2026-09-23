@@ -592,7 +592,7 @@ class _StorePageState extends State<StorePage> {
                 } else if (character != null && character.age < 18) {
                   DialogHelper.show(
                     context: context,
-                    title: 'Akses Dibatasi 🔒',
+                    title: 'Akses Dibatasi',
                     content: const Text('Kamu harus berusia minimal 18 tahun untuk mengakses menu ini.'),
                   );
                 } else {

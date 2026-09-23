@@ -50,7 +50,7 @@ class PembisnisMenuPage extends StatelessWidget {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Usaha Belum Didirikan 🔒'),
+        title: const Text('Usaha Belum Didirikan'),
         content: Text(
           'Kamu belum memiliki usaha! Buat usaha terlebih dahulu di menu "Buat Usaha & Ide Bisnis" untuk mengakses $featureName.',
         ),
@@ -154,7 +154,7 @@ class PembisnisMenuPage extends StatelessWidget {
             title: 'Manajemen Operasional',
             subtitle: hasBusiness
                 ? 'Kelola karyawan, inventaris, dan pemasaran'
-                : '🔒 Membutuhkan usaha aktif terlebih dahulu',
+                : 'Membutuhkan usaha aktif terlebih dahulu',
             isLocked: !hasBusiness,
             onTap: () {
               if (!hasBusiness) {
@@ -178,7 +178,7 @@ class PembisnisMenuPage extends StatelessWidget {
             title: 'Manajemen Keuangan',
             subtitle: hasBusiness
                 ? 'Laporan laba rugi, pinjaman bank, dan investasi'
-                : '🔒 Membutuhkan usaha aktif terlebih dahulu',
+                : 'Membutuhkan usaha aktif terlebih dahulu',
             isLocked: !hasBusiness,
             onTap: () {
               if (!hasBusiness) {
@@ -202,7 +202,7 @@ class PembisnisMenuPage extends StatelessWidget {
             title: 'Ekspansi & Strategi',
             subtitle: hasBusiness
                 ? 'Ambil alih pesaing, buka cabang baru, dan IPO'
-                : '🔒 Membutuhkan usaha aktif terlebih dahulu',
+                : 'Membutuhkan usaha aktif terlebih dahulu',
             isLocked: !hasBusiness,
             onTap: () {
               if (!hasBusiness) {

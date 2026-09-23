@@ -15,7 +15,7 @@ class ObatObatanMenuHelper {
     if (!GlobalSettings.isObatObatanUnlocked.value) {
       DialogHelper.show(
         context: context,
-        title: 'Fitur Terkunci 🔒',
+        title: 'Fitur Terkunci',
         content: const Text('Fitur Obat-obatan ini memerlukan item "Akses Obat-obatan (18+)". Silakan beli akses di Toko MyLifeSim untuk membuka fitur ini.'),
         actions: [
           TextButton(
@@ -42,7 +42,7 @@ class ObatObatanMenuHelper {
     if (character.age < 18) {
       DialogHelper.show(
         context: context,
-        title: 'Akses Dibatasi 🔒',
+        title: 'Akses Dibatasi',
         content: const Text('Kamu harus berusia minimal 18 tahun untuk mengakses menu ini.'),
       );
       return;

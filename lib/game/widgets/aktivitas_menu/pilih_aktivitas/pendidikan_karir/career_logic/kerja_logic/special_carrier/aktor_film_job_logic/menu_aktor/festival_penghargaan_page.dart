@@ -32,7 +32,7 @@ class _FestivalPenghargaanPageState extends State<FestivalPenghargaanPage> {
   void _hadiriRedCarpet(String festivalName, int minPop) {
     if (widget.character.popularity < minPop) {
       _showAlert(
-        'Undangan Terbatas 🔒',
+        'Undangan Terbatas',
         'Festival $festivalName hanya mengundang aktor papan atas dengan minimal Popularitas $minPop%.\n'
         'Popularitasmu saat ini: ${widget.character.popularity}%.',
       );

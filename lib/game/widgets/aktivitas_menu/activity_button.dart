@@ -717,17 +717,9 @@ class ActivityButton extends StatelessWidget {
                     mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        children: [
-                          const Text('🔒', style: TextStyle(fontSize: 20)),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
-                              style: TextStyle(fontSize: isMobile ? 13 : 14),
-                            ),
-                          ),
-                        ],
+                      Text(
+                        customLockMessage ?? 'Kamu harus berusia minimal $minAge tahun untuk membuka aktivitas ini.',
+                        style: TextStyle(fontSize: isMobile ? 13 : 14),
                       ),
                       if (customLockMessage == null) ...[
                         const SizedBox(height: 12),
