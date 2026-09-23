@@ -478,6 +478,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final bool isMobile = MediaQuery.of(context).size.width < 600;
 
     final backgroundColor = isDark ? const Color(0xFF0F172A) : const Color(0xFFF8FAFC);
     final textColor = isDark ? Colors.white : const Color(0xFF0F172A);
@@ -727,10 +728,10 @@ class _KarakterScreenState extends State<KarakterScreen> {
                             const SizedBox(height: 18),
 
                             // Location Selectors (Country & City)
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _buildLocationTile(
+                            if (isMobile)
+                              Column(
+                                children: [
+                                  _buildLocationTile(
                                     label: 'Negara Asal',
                                     value: _currentCountry,
                                     prefixWidget: Text(
@@ -744,10 +745,8 @@ class _KarakterScreenState extends State<KarakterScreen> {
                                     textColor: textColor,
                                     subtextColor: subtextColor,
                                   ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: _buildLocationTile(
+                                  const SizedBox(height: 12),
+                                  _buildLocationTile(
                                     label: 'Kota Asal',
                                     value: _selectedCity ?? 'Pilih Kota',
                                     prefixWidget: const Icon(Icons.location_city_rounded, size: 18, color: Colors.blue),
@@ -758,9 +757,43 @@ class _KarakterScreenState extends State<KarakterScreen> {
                                     textColor: textColor,
                                     subtextColor: subtextColor,
                                   ),
-                                ),
-                              ],
-                            ),
+                                ],
+                              )
+                            else
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildLocationTile(
+                                      label: 'Negara Asal',
+                                      value: _currentCountry,
+                                      prefixWidget: Text(
+                                        _countryCodeToEmoji(_currentCountryIso ?? ''),
+                                        style: const TextStyle(fontSize: 18),
+                                      ),
+                                      onTap: _showCountryPicker,
+                                      isDark: isDark,
+                                      cardBgColor: cardBgColor,
+                                      borderColor: borderColor,
+                                      textColor: textColor,
+                                      subtextColor: subtextColor,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Expanded(
+                                    child: _buildLocationTile(
+                                      label: 'Kota Asal',
+                                      value: _selectedCity ?? 'Pilih Kota',
+                                      prefixWidget: const Icon(Icons.location_city_rounded, size: 18, color: Colors.blue),
+                                      onTap: _citiesList.isNotEmpty ? _showCityPicker : null,
+                                      isDark: isDark,
+                                      cardBgColor: cardBgColor,
+                                      borderColor: borderColor,
+                                      textColor: textColor,
+                                      subtextColor: subtextColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             const SizedBox(height: 16),
 
                             // Name Inputs & Randomize Row
@@ -782,37 +815,6 @@ class _KarakterScreenState extends State<KarakterScreen> {
                                 ),
                               )
                             else ...[
-                              // JSON Ready Badge Pill
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Container(
-                                  margin: const EdgeInsets.only(bottom: 12),
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                                  decoration: BoxDecoration(
-                                    color: _hasJsonData ? const Color(0xFF10B981).withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
-                                      color: _hasJsonData ? Colors.green.withValues(alpha: 0.3) : Colors.red.withValues(alpha: 0.3),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Icon(_hasJsonData ? Icons.check_circle_rounded : Icons.warning_rounded,
-                                          size: 14, color: _hasJsonData ? Colors.green : Colors.red),
-                                      const SizedBox(width: 6),
-                                      Text(
-                                        _hasJsonData ? 'Database Nama $_currentCountry Siap' : 'Database Nama Belum Tersedia',
-                                        style: TextStyle(
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.bold,
-                                          color: _hasJsonData ? Colors.green.shade600 : Colors.red.shade600,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
 
                               Row(
                                 children: [

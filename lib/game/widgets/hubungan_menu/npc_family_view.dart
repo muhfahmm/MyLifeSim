@@ -664,7 +664,10 @@ class _NpcFamilyViewScreenState extends State<NpcFamilyViewScreen> {
     final bool isDeceased = member['isDeceased'] as bool;
     final bool isMale = member['gender'] == 'Laki-laki';
     final Color color = isDeceased ? Colors.grey : (member['color'] as Color);
-    final bool canClick = !isDeceased && !isSelf;
+    final bool isPlayer = member['isPlayer'] == true ||
+        member['relationToPlayer'] == 'SELF' ||
+        (widget.character != null && _isSameName(rawName, widget.character!.name));
+    final bool canClick = !isDeceased && !isSelf && !isPlayer;
 
     final String avatarUrl = AvatarAgeRules.getAgeBasedAvatarUrlForNPC(
       name: rawName,

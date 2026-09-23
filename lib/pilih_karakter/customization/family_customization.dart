@@ -264,14 +264,14 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                 child: Text(
                   currentLabel,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
                     color: isDark ? Colors.white : Colors.black87,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blueAccent),
+              const Icon(Icons.keyboard_arrow_down_rounded, color: Colors.blueAccent),
             ],
           ),
         ),
@@ -288,20 +288,26 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          'Latar Belakang Keluarga 👨‍👩‍👧‍👦',
-          style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87),
+          'Latar Belakang Keluarga',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 17,
+            color: isDark ? Colors.white : Colors.black87,
+          ),
         ),
+        titleSpacing: 0,
         backgroundColor: isDark ? Colors.grey.shade900 : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black87,
         elevation: 0.5,
       ),
       body: Container(
-        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+        color: isDark ? const Color(0xFF121212) : Colors.grey.shade100,
         child: Column(
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -309,23 +315,23 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(color: isDark ? Colors.blue.shade900.withValues(alpha: 0.5) : Colors.blue.shade100),
                       ),
-                      color: isDark ? Colors.blue.shade900.withValues(alpha: 0.3) : Colors.blue.shade50,
+                      color: isDark ? Colors.blue.shade900.withValues(alpha: 0.2) : Colors.blue.shade50.withValues(alpha: 0.6),
                       child: Padding(
-                        padding: const EdgeInsets.all(16),
+                        padding: const EdgeInsets.all(14),
                         child: Row(
                           children: [
-                            Icon(Icons.info_outline, color: isDark ? Colors.blue.shade300 : Colors.blue.shade700, size: 24),
-                            const SizedBox(width: 12),
+                            Icon(Icons.info_outline_rounded, color: isDark ? Colors.blue.shade300 : Colors.blue.shade700, size: 22),
+                            const SizedBox(width: 10),
                             Expanded(
                               child: Text(
-                                'Kustomisasi asal usul silsilah keluargamu. Aturan logika kelahiran akan divalidasi otomatis secara presisi.',
+                                'Kustomisasi silsilah & latar belakang keluargamu dengan presisi.',
                                 style: TextStyle(
                                   color: isDark ? Colors.blue.shade200 : Colors.blue.shade900,
-                                  fontSize: 13,
-                                  height: 1.4,
+                                  fontSize: 12.5,
+                                  height: 1.35,
                                 ),
                               ),
                             ),
@@ -333,28 +339,31 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // CARD 1: Rentang Usia Orang Tua
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                       ),
-                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      color: isDark ? Colors.grey.shade900 : Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('1. Rentang Usia Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-                            const SizedBox(height: 16),
+                            Text(
+                              '1. Rentang Usia Orang Tua',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                            ),
+                            const SizedBox(height: 14),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Usia Ayah:', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black87)),
-                                Text('${_fatherAgeRange.start.round()} - ${_fatherAgeRange.end.round()} Tahun', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                                Text('Usia Ayah:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                Text('${_fatherAgeRange.start.round()} - ${_fatherAgeRange.end.round()} Tahun', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
                               ],
                             ),
                             RangeSlider(
@@ -362,12 +371,12 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                               labels: RangeLabels('${_fatherAgeRange.start.round()}', '${_fatherAgeRange.end.round()}'),
                               onChanged: (values) => setState(() => _fatherAgeRange = values),
                             ),
-                            const SizedBox(height: 12),
+                            const SizedBox(height: 8),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Usia Ibu:', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black87)),
-                                Text('${_motherAgeRange.start.round()} - ${_motherAgeRange.end.round()} Tahun', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.blue)),
+                                Text('Usia Ibu:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                Text('${_motherAgeRange.start.round()} - ${_motherAgeRange.end.round()} Tahun', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.blue)),
                               ],
                             ),
                             RangeSlider(
@@ -379,23 +388,26 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // CARD 2: Urutan Kelahiran & Pilihan Saudara
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                       ),
-                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      color: isDark ? Colors.grey.shade900 : Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('2. Urutan Kelahiran', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-                            const SizedBox(height: 16),
+                            Text(
+                              '2. Urutan Kelahiran',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                            ),
+                            const SizedBox(height: 14),
                             _buildModernDropdown<int>(
                               label: 'Saya adalah anak ke-',
                               value: _birthOrder,
@@ -423,27 +435,30 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // CARD 3: Detail Saudara Kandung
                     if (_siblingOption != 'tidak_punya')
                       Card(
                         elevation: 0,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                          borderRadius: BorderRadius.circular(14),
+                          side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                         ),
-                        color: isDark ? Colors.grey.shade800 : Colors.white,
+                        color: isDark ? Colors.grey.shade900 : Colors.white,
                         child: Padding(
                           padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('3. Detail Saudara Kandung', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-                              const SizedBox(height: 16),
+                              Text(
+                                '3. Detail Saudara Kandung',
+                                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                              ),
+                              const SizedBox(height: 14),
                               if (hasKakak) ...[
-                                Text('Jumlah Kakak (Harus ${_birthOrder - 1} Orang):', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54)),
-                                const SizedBox(height: 8),
+                                Text('Jumlah Kakak (Harus ${_birthOrder - 1} Orang):', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54)),
+                                const SizedBox(height: 6),
                                 _buildCounterRow(context: context, label: 'Kakak Laki-laki', value: _kakakLakiCount, onChanged: (val) {
                                   setState(() {
                                     _kakakLakiCount = val;
@@ -458,11 +473,11 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                                     if (_kakakLakiCount + _kakakPerempuanCount > maxK) { _kakakLakiCount = maxK - _kakakPerempuanCount; }
                                   });
                                 }),
-                                const Divider(height: 24, color: Colors.grey),
+                                const Divider(height: 20, color: Colors.grey),
                               ],
                               if (hasAdik) ...[
-                                Text('Jumlah Adik:', style: TextStyle(fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54)),
-                                const SizedBox(height: 8),
+                                Text('Jumlah Adik:', style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.bold, color: isDark ? Colors.white70 : Colors.black54)),
+                                const SizedBox(height: 6),
                                 _buildCounterRow(context: context, label: 'Adik Laki-laki', value: _adikLakiCount, onChanged: (val) => setState(() => _adikLakiCount = val)),
                                 _buildCounterRow(context: context, label: 'Adik Perempuan', value: _adikPerempuanCount, onChanged: (val) => setState(() => _adikPerempuanCount = val)),
                               ],
@@ -470,23 +485,26 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                           ),
                         ),
                       ),
-                    const SizedBox(height: 16),
+                    if (_siblingOption != 'tidak_punya') const SizedBox(height: 14),
 
                     // CARD 4: Status Ekonomi & Pekerjaan Orang Tua
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                       ),
-                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      color: isDark ? Colors.grey.shade900 : Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('4. Status Ekonomi & Pekerjaan Orang Tua', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-                            const SizedBox(height: 16),
+                            Text(
+                              '4. Status Ekonomi & Pekerjaan Orang Tua',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                            ),
+                            const SizedBox(height: 14),
                             _buildModernDropdown<String>(
                               label: 'Status Ekonomi',
                               value: _economicStatus,
@@ -509,48 +527,51 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
 
                     // CARD 5: Hubungan Awal & Kesehatan Genetik
                     Card(
                       elevation: 0,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade200),
+                        borderRadius: BorderRadius.circular(14),
+                        side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200),
                       ),
-                      color: isDark ? Colors.grey.shade800 : Colors.white,
+                      color: isDark ? Colors.grey.shade900 : Colors.white,
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('5. Hubungan Awal & Kesehatan Genetik', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: isDark ? Colors.white : Colors.black87)),
-                            const SizedBox(height: 16),
-                            Text('Hubungan Awal dengan Orang Tua:', style: TextStyle(color: isDark ? Colors.white70 : Colors.black54)),
+                            Text(
+                              '5. Hubungan Awal & Kesehatan Genetik',
+                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: isDark ? Colors.white : Colors.black87),
+                            ),
+                            const SizedBox(height: 14),
+                            Text('Hubungan Awal dengan Orang Tua:', style: TextStyle(fontSize: 13, color: isDark ? Colors.white70 : Colors.black54)),
                             Slider(
                               value: _initialRelationshipValue, min: 0, max: 100, divisions: 20,
                               label: '${_initialRelationshipValue.round()}%', activeColor: Colors.green,
                               onChanged: (val) => setState(() => _initialRelationshipValue = val),
                             ),
                             Text('${_initialRelationshipValue.round()}% (Semakin tinggi, semakin akrab)', style: TextStyle(fontSize: 12, color: isDark ? Colors.white54 : Colors.grey)),
-                            const Divider(height: 24, color: Colors.grey),
+                            const Divider(height: 20, color: Colors.grey),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Genetik Kesehatan Ayah:', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black87)),
-                                Text('${_fatherHealthRange.start.round()} - ${_fatherHealthRange.end.round()}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                                Text('Genetik Kesehatan Ayah:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                Text('${_fatherHealthRange.start.round()} - ${_fatherHealthRange.end.round()}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.red)),
                               ],
                             ),
                             RangeSlider(
                               values: _fatherHealthRange, min: 10, max: 100, divisions: 18,
                               onChanged: (values) => setState(() => _fatherHealthRange = values),
                             ),
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 6),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Genetik Kesehatan Ibu:', style: TextStyle(fontWeight: FontWeight.w600, color: isDark ? Colors.white : Colors.black87)),
-                                Text('${_motherHealthRange.start.round()} - ${_motherHealthRange.end.round()}', style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.red)),
+                                Text('Genetik Kesehatan Ibu:', style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: isDark ? Colors.white70 : Colors.black87)),
+                                Text('${_motherHealthRange.start.round()} - ${_motherHealthRange.end.round()}', style: const TextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.red)),
                               ],
                             ),
                             RangeSlider(
@@ -561,26 +582,39 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
-              child: SizedBox(
-                width: double.infinity,
-                height: 52,
-                child: ElevatedButton(
-                  onPressed: _submit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
+            Container(
+              padding: const EdgeInsets.all(16.0),
+              decoration: BoxDecoration(
+                color: isDark ? Colors.grey.shade900 : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -3),
                   ),
-                  child: const Text('SELESAI & LAHIRKAN! 👶', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              child: SafeArea(
+                top: false,
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 50,
+                  child: ElevatedButton.icon(
+                    onPressed: _submit,
+                    icon: const Icon(Icons.check_circle_rounded, size: 20),
+                    label: const Text('Simpan', style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.white,
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -588,6 +622,7 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
         ),
       ),
     );
+
   }
 
   Widget _buildCounterRow({
@@ -606,7 +641,7 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
           Row(
             children: [
               IconButton(
-                icon: Icon(Icons.remove_circle_outline, color: Colors.blue),
+                icon: const Icon(Icons.remove_circle_outline, color: Colors.blue),
                 onPressed: value > 0 ? () => onChanged(value - 1) : null,
               ),
               Container(
@@ -614,7 +649,7 @@ class _FamilyCustomizationScreenState extends State<FamilyCustomizationScreen> {
                 child: Text('$value', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: isDark ? Colors.white : Colors.black87)),
               ),
               IconButton(
-                icon: Icon(Icons.add_circle_outline, color: Colors.blue),
+                icon: const Icon(Icons.add_circle_outline, color: Colors.blue),
                 onPressed: () => onChanged(value + 1),
               ),
             ],
