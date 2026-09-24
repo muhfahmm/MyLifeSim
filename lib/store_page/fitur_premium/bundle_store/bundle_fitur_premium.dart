@@ -9,12 +9,16 @@ class BundleFiturPremiumLogic {
   static const int item4Price = 129000; // Kekebalan Abadi
   static const int item5Price = 149000; // Fast Forward Usia
   static const int item6Price = 99000;  // Mata Sehat Abadi
+  static const int item7Price = 79000;  // Akses Obat-obatan (18+)
+  static const int item8Price = 299000; // Finansial Premium (Investasi & Kemewahan)
+  static const int item9Price = 298000; // Aset Premium (Casino, Garasi Mobil, & Motor)
 
   static const double baseDiscountRate = 0.15; // 15% base
 
   static double get effectiveDiscountRate => baseDiscountRate + PromoTwinDateLogic.getBonusDiscountRate();
 
-  static int get originalTotalPrice => item1Price + item2Price + item3Price + item4Price + item5Price + item6Price;
+  static int get originalTotalPrice =>
+      item1Price + item2Price + item3Price + item4Price + item5Price + item6Price + item7Price + item8Price + item9Price;
   static int get bundlePrice => (originalTotalPrice * (1.0 - effectiveDiscountRate)).round();
   static int get savingsAmount => originalTotalPrice - bundlePrice;
 
@@ -44,8 +48,19 @@ class BundleFiturPremiumLogic {
     required bool immunityUnlocked,
     required bool skipUsiaUnlocked,
     required bool mataSehatUnlocked,
+    required bool obatObatanUnlocked,
+    required bool finansialUnlocked,
+    required bool assetsUnlocked,
   }) {
-    return premiumUnlocked && godModeUnlocked && removeAdsUnlocked && immunityUnlocked && skipUsiaUnlocked && mataSehatUnlocked;
+    return premiumUnlocked &&
+        godModeUnlocked &&
+        removeAdsUnlocked &&
+        immunityUnlocked &&
+        skipUsiaUnlocked &&
+        mataSehatUnlocked &&
+        obatObatanUnlocked &&
+        finansialUnlocked &&
+        assetsUnlocked;
   }
 }
 
@@ -197,7 +212,7 @@ class _BundleFiturPremiumCardState extends State<BundleFiturPremiumCard> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'Akses 6 Fitur Sekaligus: Akses 18+, God Mode, Bebas Iklan, Kekebalan Abadi, Fast Forward Usia, & Mata Sehat Abadi!',
+                        'Akses Seluruh Fitur Premium (Fitur 18+, Finansial Premium, Aset Premium, God Mode, Bebas Iklan, Kekebalan, Fast Forward, Mata Sehat, & Obat-obatan)!',
                         style: TextStyle(
                           fontSize: isMobile ? 11 : 12,
                           color: isDark ? Colors.white70 : Colors.grey.shade800,
@@ -386,7 +401,7 @@ class __PurchaseSimulationDialogState extends State<_PurchaseSimulationDialog> {
               ),
               const SizedBox(height: 10),
               Text(
-                'Selamat! Seluruh 6 Fitur Premium (Akses 18+, God Mode, Bebas Iklan, Kekebalan Abadi, Fast Forward Usia, & Mata Sehat Abadi) telah resmi aktif!',
+                'Selamat! Seluruh Fitur Premium (Fitur 18+, Finansial Premium, Aset Premium, God Mode, Bebas Iklan, Kekebalan Abadi, Fast Forward Usia, Mata Sehat Abadi, & Obat-obatan) telah resmi aktif!',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 13.5,

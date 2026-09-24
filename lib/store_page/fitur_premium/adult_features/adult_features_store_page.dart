@@ -7,6 +7,7 @@ import 'inses/inses_store_card.dart';
 import 'guru_murid/guru_murid_store_card.dart';
 import 'akses_18plus_page.dart';
 import 'verifikasi_pembelian/adult_purchase_verification_page.dart';
+import 'package:mylifesim/pilih_karakter/settings/global_settings.dart';
 
 class AdultFeaturesStorePage extends StatelessWidget {
   const AdultFeaturesStorePage({super.key});
@@ -39,96 +40,116 @@ class AdultFeaturesStorePage extends StatelessWidget {
   Widget build(BuildContext context) {
     final bool isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text(
-          'Fitur Dewasa (18+) 🔞',
-          style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
-        ),
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFF4A148C), Color(0xFF8E24AA)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
-        ),
-        iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
-            tooltip: 'Pengaturan Preferensi 18+',
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Container(
-        color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            // Kartu Paket Bundle All
-            BundleAdultCard(
-              onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
-            ),
+    return ListenableBuilder(
+      listenable: Listenable.merge([
+        GlobalSettings.isPremium,
+        GlobalSettings.isMasturbationUnlocked,
+        GlobalSettings.isMakeLoveUnlocked,
+        GlobalSettings.isIncestUnlocked,
+        GlobalSettings.isTeacherStudentUnlocked,
+      ]),
+      builder: (context, _) {
+        final bool isAnyAdultFeatureUnlocked = GlobalSettings.isPremium.value ||
+            GlobalSettings.isMasturbationUnlocked.value ||
+            GlobalSettings.isMakeLoveUnlocked.value ||
+            GlobalSettings.isIncestUnlocked.value ||
+            GlobalSettings.isTeacherStudentUnlocked.value;
 
-            Padding(
-              padding: const EdgeInsets.only(left: 4, bottom: 10, top: 4),
-              child: Text(
-                'PILIH KATEGORI FITUR 18+ INDIVIDUAL:',
-                style: TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.bold,
-                  color: isDark ? Colors.purple.shade200 : Colors.purple.shade800,
-                  letterSpacing: 1.1,
+        return Scaffold(
+          appBar: AppBar(
+            title: const Text(
+              'Fitur Dewasa (18+) 🔞',
+              style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+            ),
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [Color(0xFF4A148C), Color(0xFF8E24AA)],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
               ),
             ),
+            iconTheme: const IconThemeData(color: Colors.white),
+            actions: [
+              if (isAnyAdultFeatureUnlocked)
+                IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.white),
+                  tooltip: 'Pengaturan Preferensi 18+',
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
+                    );
+                  },
+                ),
+            ],
+          ),
+          body: Container(
+            color: isDark ? Colors.grey.shade900 : Colors.grey.shade100,
+            child: ListView(
+              padding: const EdgeInsets.all(16),
+              children: [
+                // Kartu Paket Bundle All
+                BundleAdultCard(
+                  onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
+                ),
 
-            // Kartu Fitur Terpisah
-            MasturbasiStoreCard(
-              onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
-            ),
-            MakeLoveStoreCard(
-              onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
-            ),
-            InsesStoreCard(
-              onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
-            ),
-            GuruMuridStoreCard(
-              onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
-            ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 4, bottom: 10, top: 4),
+                  child: Text(
+                    'PILIH KATEGORI FITUR 18+ INDIVIDUAL:',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.bold,
+                      color: isDark ? Colors.purple.shade200 : Colors.purple.shade800,
+                      letterSpacing: 1.1,
+                    ),
+                  ),
+                ),
 
-            const SizedBox(height: 16),
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
-              ),
-              color: isDark ? const Color(0xFF262626) : Colors.white,
-              child: ListTile(
-                leading: const Icon(Icons.tune, color: Colors.purpleAccent),
-                title: const Text('Buka Pengaturan Preferensi 18+'),
-                subtitle: const Text('Atur persentase ajakan NPC & sakelar privasi.'),
-                trailing: const Icon(Icons.chevron_right),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
-                  );
-                },
-              ),
+                // Kartu Fitur Terpisah
+                MasturbasiStoreCard(
+                  onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
+                ),
+                MakeLoveStoreCard(
+                  onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
+                ),
+                InsesStoreCard(
+                  onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
+                ),
+                GuruMuridStoreCard(
+                  onPurchase: (itemName, onPurchased) => _simulatePurchase(context, itemName, onPurchased),
+                ),
+
+                if (isAnyAdultFeatureUnlocked) ...[
+                  const SizedBox(height: 16),
+                  Card(
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      side: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
+                    ),
+                    color: isDark ? const Color(0xFF262626) : Colors.white,
+                    child: ListTile(
+                      leading: const Icon(Icons.tune, color: Colors.purpleAccent),
+                      title: const Text('Buka Pengaturan Preferensi 18+'),
+                      subtitle: const Text('Atur persentase ajakan NPC & sakelar privasi.'),
+                      trailing: const Icon(Icons.chevron_right),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => const Akses18PlusPage()),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }

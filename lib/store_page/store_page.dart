@@ -386,28 +386,63 @@ class _StorePageState extends State<StorePage> {
 
             // --- SEKSI FITUR PREMIUM ---
             _buildSectionHeader('Fitur Premium', isDark),
-            BundleFiturPremiumCard(
-              isUnlocked: BundleFiturPremiumLogic.isAllUnlocked(
-                premiumUnlocked: _premiumUnlocked,
-                godModeUnlocked: _godModeUnlocked,
-                removeAdsUnlocked: _removeAdsUnlocked,
-                immunityUnlocked: _immunityUnlocked,
-                skipUsiaUnlocked: _skipUsiaUnlocked || GlobalSettings.isSkipUsiaUnlocked.value,
-                mataSehatUnlocked: _mataSehatUnlocked || GlobalSettings.isMataSehatUnlocked.value,
-              ),
-              onPurchaseSuccess: () {
-                setState(() {
-                  _premiumUnlocked = true;
-                  _godModeUnlocked = true;
-                  _removeAdsUnlocked = true;
-                  _immunityUnlocked = true;
-                  _skipUsiaUnlocked = true;
-                  _mataSehatUnlocked = true;
-                  GlobalSettings.isPremium.value = true;
-                  GlobalSettings.isSkipUsiaUnlocked.value = true;
-                  GlobalSettings.isMataSehatUnlocked.value = true;
-                });
-                if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
+            ListenableBuilder(
+              listenable: Listenable.merge([
+                GlobalSettings.isPremium,
+                GlobalSettings.isGodModeUnlocked,
+                GlobalSettings.isRemoveAdsUnlocked,
+                GlobalSettings.isImmunityUnlocked,
+                GlobalSettings.isSkipUsiaUnlocked,
+                GlobalSettings.isMataSehatUnlocked,
+                GlobalSettings.isObatObatanUnlocked,
+                GlobalSettings.isFinansialInvestasiUnlocked,
+                GlobalSettings.isFinansialKemewahanUnlocked,
+                GlobalSettings.isAssetsCasinoUnlocked,
+                GlobalSettings.isAssetsGarasiMobilUnlocked,
+                GlobalSettings.isAssetsGarasiMotorUnlocked,
+              ]),
+              builder: (context, _) {
+                return BundleFiturPremiumCard(
+                  isUnlocked: BundleFiturPremiumLogic.isAllUnlocked(
+                    premiumUnlocked: GlobalSettings.isPremium.value,
+                    godModeUnlocked: GlobalSettings.isGodModeUnlocked.value,
+                    removeAdsUnlocked: GlobalSettings.isRemoveAdsUnlocked.value,
+                    immunityUnlocked: GlobalSettings.isImmunityUnlocked.value,
+                    skipUsiaUnlocked: GlobalSettings.isSkipUsiaUnlocked.value,
+                    mataSehatUnlocked: GlobalSettings.isMataSehatUnlocked.value,
+                    obatObatanUnlocked: GlobalSettings.isObatObatanUnlocked.value,
+                    finansialUnlocked: GlobalSettings.isFinansialInvestasiUnlocked.value &&
+                        GlobalSettings.isFinansialKemewahanUnlocked.value,
+                    assetsUnlocked: GlobalSettings.isAssetsCasinoUnlocked.value &&
+                        GlobalSettings.isAssetsGarasiMobilUnlocked.value &&
+                        GlobalSettings.isAssetsGarasiMotorUnlocked.value,
+                  ),
+                  onPurchaseSuccess: () {
+                    setState(() {
+                      _premiumUnlocked = true;
+                      _godModeUnlocked = true;
+                      _removeAdsUnlocked = true;
+                      _immunityUnlocked = true;
+                      _skipUsiaUnlocked = true;
+                      _mataSehatUnlocked = true;
+                      _obatObatanUnlocked = true;
+                      GlobalSettings.isPremium.value = true;
+                      GlobalSettings.isGodModeUnlocked.value = true;
+                      GlobalSettings.isRemoveAdsUnlocked.value = true;
+                      GlobalSettings.isImmunityUnlocked.value = true;
+                      GlobalSettings.isSkipUsiaUnlocked.value = true;
+                      GlobalSettings.isMataSehatUnlocked.value = true;
+                      GlobalSettings.isObatObatanUnlocked.value = true;
+                      GlobalSettings.isFinansialInvestasiUnlocked.value = true;
+                      GlobalSettings.isFinansialKemewahanUnlocked.value = true;
+                      GlobalSettings.isAssetsCasinoUnlocked.value = true;
+                      GlobalSettings.isAssetsGarasiMobilUnlocked.value = true;
+                      GlobalSettings.isAssetsGarasiMotorUnlocked.value = true;
+                      GlobalSettings.saveSessionStorage();
+                    });
+                    if (widget.onPurchaseCompleted != null) widget.onPurchaseCompleted!();
+                  },
+                );
               },
             ),
             _buildStoreItem(
