@@ -100,117 +100,110 @@ class Akses18PlusPage extends StatelessWidget {
             ),
             
             // CARD BERISI TOGGLE NONAKTIFKAN
-            Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-                side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-              ),
-              child: Column(
-                children: [
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disableMasturbationFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.block, color: Colors.redAccent),
-                      title: Text(
-                        'Nonaktifkan Ajakan Masturbasi (Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
-                      ),
-                      subtitle: const Text('Mencegah ajakan dari ayah, ibu, kakak, adik, paman, bibi, dll.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disableMasturbationFamily.value = newVal,
-                    ),
+            // CARD BERISI TOGGLE NONAKTIFKAN
+            ListenableBuilder(
+              listenable: Listenable.merge([
+                GlobalSettings.isPremium,
+                GlobalSettings.isMasturbationUnlocked,
+                GlobalSettings.isMakeLoveUnlocked,
+                GlobalSettings.isIncestUnlocked,
+                GlobalSettings.isTeacherStudentUnlocked,
+              ]),
+              builder: (context, _) {
+                final bool isFullPremium = GlobalSettings.isPremium.value;
+                final bool isMasturbasiUnlocked = isFullPremium || GlobalSettings.isMasturbationUnlocked.value;
+                final bool isMakeLoveUnlocked = isFullPremium || GlobalSettings.isMakeLoveUnlocked.value;
+                final bool isIncestUnlocked = isFullPremium || GlobalSettings.isIncestUnlocked.value;
+
+                return Card(
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    side: BorderSide(color: isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                   ),
-                  const Divider(height: 1),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disableMasturbationNonFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.group, color: Colors.orange),
-                      title: Text(
-                        'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                  child: Column(
+                    children: [
+                      // Toggle Masturbasi (Keluarga) -> Butuh Masturbasi & Inses
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.block,
+                        iconColor: Colors.redAccent,
+                        title: 'Nonaktifkan Ajakan Masturbasi (Keluarga)',
+                        subtitle: 'Mencegah ajakan dari ayah, ibu, kakak, adik, paman, bibi, dll.',
+                        valueNotifier: GlobalSettings.disableMasturbationFamily,
+                        isUnlocked: isMasturbasiUnlocked && isIncestUnlocked,
+                        lockReason: 'Membutuhkan Fitur Masturbasi & Hubungan Inses',
                       ),
-                      subtitle: const Text('Mencegah ajakan dari teman, guru, rekan kerja, atau orang lain.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disableMasturbationNonFamily.value = newVal,
-                    ),
-                  ),
-                  const Divider(height: 1),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disableMakeLoveFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.favorite, color: Colors.pinkAccent),
-                      title: Text(
-                        'Nonaktifkan Ajakan Make Love (Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                      const Divider(height: 1),
+                      // Toggle Masturbasi (Non-Keluarga) -> Butuh Masturbasi
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.group,
+                        iconColor: Colors.orange,
+                        title: 'Nonaktifkan Ajakan Masturbasi (Non-Keluarga)',
+                        subtitle: 'Mencegah ajakan dari teman, guru, rekan kerja, atau orang lain.',
+                        valueNotifier: GlobalSettings.disableMasturbationNonFamily,
+                        isUnlocked: isMasturbasiUnlocked,
+                        lockReason: 'Membutuhkan Fitur Masturbasi',
                       ),
-                      subtitle: const Text('Mencegah ajakan hubungan intim dari anggota keluarga.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disableMakeLoveFamily.value = newVal,
-                    ),
-                  ),
-                  const Divider(height: 1),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disableMakeLoveNonFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.people, color: Colors.blueAccent),
-                      title: Text(
-                        'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                      const Divider(height: 1),
+                      // Toggle Make Love (Keluarga) -> Butuh ML & Inses
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.favorite,
+                        iconColor: Colors.pinkAccent,
+                        title: 'Nonaktifkan Ajakan Make Love (Keluarga)',
+                        subtitle: 'Mencegah ajakan hubungan intim dari anggota keluarga.',
+                        valueNotifier: GlobalSettings.disableMakeLoveFamily,
+                        isUnlocked: isMakeLoveUnlocked && isIncestUnlocked,
+                        lockReason: 'Membutuhkan Hubungan Dewasa (ML) & Hubungan Inses',
                       ),
-                      subtitle: const Text('Mencegah ajakan hubungan intim dari teman, guru, rekan kerja, atau orang lain.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disableMakeLoveNonFamily.value = newVal,
-                    ),
-                  ),
-                  const Divider(height: 1),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disablePacaranFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.heart_broken, color: Colors.red),
-                      title: Text(
-                        'Nonaktifkan Ajakan Pacaran (Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                      const Divider(height: 1),
+                      // Toggle Make Love (Non-Keluarga) -> Butuh ML
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.people,
+                        iconColor: Colors.blueAccent,
+                        title: 'Nonaktifkan Ajakan Make Love (Non-Keluarga)',
+                        subtitle: 'Mencegah ajakan hubungan intim dari teman, guru, rekan kerja, atau orang lain.',
+                        valueNotifier: GlobalSettings.disableMakeLoveNonFamily,
+                        isUnlocked: isMakeLoveUnlocked,
+                        lockReason: 'Membutuhkan Hubungan Dewasa (ML)',
                       ),
-                      subtitle: const Text('Mencegah ajakan pacaran dari anggota keluarga.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disablePacaranFamily.value = newVal,
-                    ),
-                  ),
-                  const Divider(height: 1),
-                  ValueListenableBuilder<bool>(
-                    valueListenable: GlobalSettings.disablePacaranNonFamily,
-                    builder: (context, val, _) => SwitchListTile(
-                      secondary: const Icon(Icons.person_add_disabled, color: Colors.deepOrange),
-                      title: Text(
-                        'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          color: isDark ? Colors.white : Colors.black87,
-                        ),
+                      const Divider(height: 1),
+                      // Toggle Pacaran (Keluarga) -> Butuh Inses
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.heart_broken,
+                        iconColor: Colors.red,
+                        title: 'Nonaktifkan Ajakan Pacaran (Keluarga)',
+                        subtitle: 'Mencegah ajakan pacaran dari anggota keluarga.',
+                        valueNotifier: GlobalSettings.disablePacaranFamily,
+                        isUnlocked: isIncestUnlocked,
+                        lockReason: 'Membutuhkan Hubungan Inses (Keluarga)',
                       ),
-                      subtitle: const Text('Mencegah ajakan pacaran dari teman, guru, rekan kerja, atau orang lain.', style: TextStyle(fontSize: 12)),
-                      value: val,
-                      onChanged: (newVal) => GlobalSettings.disablePacaranNonFamily.value = newVal,
-                    ),
+                      const Divider(height: 1),
+                      // Toggle Pacaran (Non-Keluarga) -> Selalu Terbuka jika masuk 18+
+                      _buildDisableSwitchTile(
+                        context: context,
+                        isDark: isDark,
+                        icon: Icons.person_add_disabled,
+                        iconColor: Colors.deepOrange,
+                        title: 'Nonaktifkan Ajakan Pacaran (Non-Keluarga)',
+                        subtitle: 'Mencegah ajakan pacaran dari teman, guru, rekan kerja, atau orang lain.',
+                        valueNotifier: GlobalSettings.disablePacaranNonFamily,
+                        isUnlocked: true,
+                        lockReason: '',
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
 
             const SizedBox(height: 16),
@@ -342,6 +335,82 @@ class Akses18PlusPage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDisableSwitchTile({
+    required BuildContext context,
+    required bool isDark,
+    required IconData icon,
+    required Color iconColor,
+    required String title,
+    required String subtitle,
+    required ValueNotifier<bool> valueNotifier,
+    required bool isUnlocked,
+    required String lockReason,
+  }) {
+    return ValueListenableBuilder<bool>(
+      valueListenable: valueNotifier,
+      builder: (context, val, _) {
+        return AbsorbPointer(
+          absorbing: !isUnlocked,
+          child: Opacity(
+            opacity: isUnlocked ? 1.0 : 0.45,
+            child: SwitchListTile(
+              secondary: Icon(
+                isUnlocked ? icon : Icons.lock,
+                color: isUnlocked ? iconColor : Colors.grey,
+              ),
+              title: Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: isUnlocked ? (isDark ? Colors.white : Colors.black87) : Colors.grey,
+                      ),
+                    ),
+                  ),
+                  if (!isUnlocked) ...[
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(4),
+                        border: Border.all(color: Colors.red.shade300, width: 0.8),
+                      ),
+                      child: const Text(
+                        'Tertutup 🔒',
+                        style: TextStyle(fontSize: 10, color: Colors.redAccent, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    subtitle,
+                    style: TextStyle(fontSize: 12, color: isUnlocked ? null : Colors.grey),
+                  ),
+                  if (!isUnlocked && lockReason.isNotEmpty) ...[
+                    const SizedBox(height: 2),
+                    Text(
+                      '🔒 $lockReason',
+                      style: const TextStyle(fontSize: 11, color: Colors.redAccent, fontWeight: FontWeight.w600),
+                    ),
+                  ],
+                ],
+              ),
+              value: isUnlocked ? val : false,
+              onChanged: isUnlocked ? (newVal) => valueNotifier.value = newVal : null,
+            ),
+          ),
+        );
+      },
     );
   }
 }

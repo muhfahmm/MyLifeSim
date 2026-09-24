@@ -668,7 +668,31 @@ class RelationPercentageGroupCard extends StatelessWidget {
 
   bool _isKeluarga(String key) {
     final r = key.toLowerCase();
-    if (r.contains('guru') || r.contains('dosen') || r.contains('teman') || r.contains('rekan') || r.contains('idol')) {
+    if (r.contains('guru') ||
+        r.contains('dosen') ||
+        r.contains('wali') ||
+        r.contains('kepala') ||
+        r.contains('sekolah') ||
+        r.contains('bos') ||
+        r.contains('atasan') ||
+        r.contains('supervisor') ||
+        r.contains('teman') ||
+        r.contains('rekan') ||
+        r.contains('idol') ||
+        r.contains('brand') ||
+        r.contains('ambassador') ||
+        r.contains('talent') ||
+        r.contains('player') ||
+        r.contains('esports') ||
+        r.contains('leader') ||
+        r.contains('center') ||
+        r.contains('trainee') ||
+        r.contains('produser') ||
+        r.contains('manager') ||
+        r.contains('staf') ||
+        r.contains('operasional') ||
+        r.contains('magang') ||
+        r.contains('internship')) {
       return false;
     }
     return true;
@@ -707,85 +731,111 @@ class RelationPercentageGroupCard extends StatelessWidget {
                         final ValueNotifier<double> masturbationNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Masturbasi', gender: genderVal, sexuality: sexualityVal);
                         final ValueNotifier<double> makeLoveNotifier = ProposalPercentageSettings.getNotifier(relationKey, 'Bercinta', gender: genderVal, sexuality: sexualityVal);
 
-                        return Container(
-                          margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                          decoration: BoxDecoration(
-                            color: allDisabled
-                                ? (isDark ? Colors.grey.shade900.withValues(alpha: 0.3) : Colors.grey.shade200)
-                                : (isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.white),
-                            borderRadius: BorderRadius.circular(10),
-                            border: Border.all(
-                              color: allDisabled
-                                  ? (isDark ? Colors.grey.shade800 : Colors.grey.shade400)
-                                  : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
-                            ),
-                          ),
-                          child: ExpansionTile(
-                            leading: Icon(icon, color: allDisabled ? Colors.grey : iconColor, size: 22),
-                            title: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    title,
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: allDisabled ? Colors.grey : (isDark ? Colors.white : Colors.black87),
-                                    ),
-                                  ),
+                        return ValueListenableBuilder<bool>(
+                          valueListenable: GlobalSettings.isPremium,
+                          builder: (context, isFullPremium, _) {
+                            final bool isMasturbationUnlocked = isFullPremium || GlobalSettings.isMasturbationUnlocked.value;
+                            final bool isMakeLoveUnlocked = isFullPremium || GlobalSettings.isMakeLoveUnlocked.value;
+                            final bool isIncestUnlocked = isFullPremium || GlobalSettings.isIncestUnlocked.value;
+                            final bool isTeacherStudentUnlocked = isFullPremium || GlobalSettings.isTeacherStudentUnlocked.value;
+
+                            final bool requiresIncest = isFam;
+                            final bool isCategoryUnlocked = !requiresIncest || isIncestUnlocked;
+
+                            return Container(
+                              margin: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                              decoration: BoxDecoration(
+                                color: allDisabled
+                                    ? (isDark ? Colors.grey.shade900.withValues(alpha: 0.3) : Colors.grey.shade200)
+                                    : (isDark ? Colors.grey.shade900.withValues(alpha: 0.5) : Colors.white),
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                  color: allDisabled
+                                      ? (isDark ? Colors.grey.shade800 : Colors.grey.shade400)
+                                      : (isDark ? Colors.grey.shade700 : Colors.grey.shade300),
                                 ),
-                                if (!relationEnabled) ...[
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: ExpansionTile(
+                                leading: Icon(icon, color: allDisabled ? Colors.grey : iconColor, size: 22),
+                                title: Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        title,
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          fontWeight: FontWeight.bold,
+                                          color: allDisabled ? Colors.grey : (isDark ? Colors.white : Colors.black87),
+                                        ),
+                                      ),
                                     ),
-                                    child: const Text(
-                                      'Nonaktif',
-                                      style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
+                                    if (!isCategoryUnlocked) ...[
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.red.withValues(alpha: 0.15),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Text(
+                                          'Butuh Inses 🔒',
+                                          style: TextStyle(fontSize: 10, color: Colors.redAccent, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                    ] else if (!relationEnabled) ...[
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey.withValues(alpha: 0.2),
+                                          borderRadius: BorderRadius.circular(4),
+                                        ),
+                                        child: const Text(
+                                          'Nonaktif',
+                                          style: TextStyle(fontSize: 10, color: Colors.grey, fontWeight: FontWeight.bold),
+                                        ),
+                                      ),
+                                      const SizedBox(width: 6),
+                                    ],
+                                  ],
+                                ),
+                                trailing: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Transform.scale(
+                                      scale: 0.8,
+                                      child: Switch(
+                                        value: relationEnabled,
+                                        activeThumbColor: iconColor,
+                                        onChanged: (val) {
+                                          relationEnabledNotifier.value = val;
+                                        },
+                                      ),
                                     ),
+                                  ],
+                                ),
+                                children: [
+                                  PercentageSliderTile(
+                                    title: 'Peluang Diajak Pacaran',
+                                    notifier: pacaranNotifier,
+                                    activeColor: Colors.red,
+                                    isDisabled: !relationEnabled || disablePacaran || !isCategoryUnlocked,
                                   ),
-                                  const SizedBox(width: 6),
+                                  PercentageSliderTile(
+                                    title: 'Peluang Diajak Masturbasi Bersama',
+                                    notifier: masturbationNotifier,
+                                    activeColor: Colors.orange,
+                                    isDisabled: !relationEnabled || disableMasturbation || !isMasturbationUnlocked || !isCategoryUnlocked,
+                                  ),
+                                  PercentageSliderTile(
+                                    title: 'Peluang DiajakBercinta / Make Love',
+                                    notifier: makeLoveNotifier,
+                                    activeColor: Colors.pinkAccent,
+                                    isDisabled: !relationEnabled || disableMakeLove || !isMakeLoveUnlocked || !isCategoryUnlocked,
+                                  ),
                                 ],
-                              ],
-                            ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Transform.scale(
-                                  scale: 0.8,
-                                  child: Switch(
-                                    value: relationEnabled,
-                                    activeThumbColor: iconColor,
-                                    onChanged: (val) {
-                                      relationEnabledNotifier.value = val;
-                                    },
-                                  ),
-                                ),
-                              ],
-                            ),
-                            children: [
-                              PercentageSliderTile(
-                                title: 'Peluang Diajak Pacaran',
-                                notifier: pacaranNotifier,
-                                activeColor: Colors.red,
-                                isDisabled: !relationEnabled || disablePacaran,
                               ),
-                              PercentageSliderTile(
-                                title: 'Peluang Diajak Masturbasi Bersama',
-                                notifier: masturbationNotifier,
-                                activeColor: Colors.orange,
-                                isDisabled: !relationEnabled || disableMasturbation,
-                              ),
-                              PercentageSliderTile(
-                                title: 'Peluang DiajakBercinta / Make Love',
-                                notifier: makeLoveNotifier,
-                                activeColor: Colors.pinkAccent,
-                                isDisabled: !relationEnabled || disableMakeLove,
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         );
                       },
                     );

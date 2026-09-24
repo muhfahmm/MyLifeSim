@@ -111,7 +111,11 @@ class _GameScreenState extends State<GameScreen> {
           width: 40,
           height: 40,
           fit: BoxFit.cover,
-          errorBuilder: (ctx, err, stack) => Text(isDeceased ? '🪦' : (isFemale ? '👩' : '👨'), style: const TextStyle(fontSize: 18)),
+          errorBuilder: (ctx, err, stack) => Icon(
+            isDeceased ? Icons.brightness_3 : (isFemale ? Icons.female : Icons.male),
+            size: 20,
+            color: isDeceased ? Colors.grey.shade700 : (isFemale ? Colors.pink.shade700 : Colors.blue.shade700),
+          ),
         ),
       ),
     );
@@ -145,13 +149,13 @@ class _GameScreenState extends State<GameScreen> {
 
     String familyStatusText = '';
     if (isDivorced) {
-      familyStatusText = '💔 Status Orang Tua: Bercerai. Kedua orang tuamu telah berpisah saat kamu lahir.\n\n🏡 Hak Asuh: Kamu tinggal & diasuh oleh $custodyLabel.';
+      familyStatusText = 'Status Orang Tua: Bercerai. Kedua orang tuamu telah berpisah saat kamu lahir.\n\nHak Asuh: Kamu tinggal & diasuh oleh $custodyLabel.';
     } else if (fatherDeceased && motherDeceased) {
-      familyStatusText = '🪦 Status Keluarga: Kedua orang tuamu telah meninggal dunia saat kamu lahir.';
+      familyStatusText = 'Status Keluarga: Kedua orang tuamu telah meninggal dunia saat kamu lahir.';
     } else if (fatherDeceased) {
-      familyStatusText = '👴 Status Keluarga: Ayahmu ($fatherName) telah meninggal dunia. Kamu dibesarkan oleh Ibumu ($motherName) sebagai orang tua tunggal.';
+      familyStatusText = 'Status Keluarga: Ayahmu ($fatherName) telah meninggal dunia. Kamu dibesarkan oleh Ibumu ($motherName) sebagai orang tua tunggal.';
     } else if (motherDeceased) {
-      familyStatusText = '👵 Status Keluarga: Ibumu ($motherName) telah meninggal dunia. Kamu dibesarkan oleh Ayahmu ($fatherName) sebagai orang tua tunggal.';
+      familyStatusText = 'Status Keluarga: Ibumu ($motherName) telah meninggal dunia. Kamu dibesarkan oleh Ayahmu ($fatherName) sebagai orang tua tunggal.';
     }
 
     // Generate Avatar URL untuk masing-masing anggota keluarga
@@ -205,7 +209,7 @@ class _GameScreenState extends State<GameScreen> {
             children: [
               Icon(Icons.family_restroom, color: Colors.blue, size: 22),
               SizedBox(width: 8),
-              Text('Silsilah Keluarga 👪', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+              Text('Silsilah Keluarga', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
             ],
           ),
           content: SingleChildScrollView(
@@ -213,23 +217,85 @@ class _GameScreenState extends State<GameScreen> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Text(
-                    familyStatusText,
-                    style: TextStyle(
-                      fontSize: 11.5,
-                      fontWeight: FontWeight.bold,
-                      color: isDark ? Colors.white : Colors.blue.shade900,
+                if (familyStatusText.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isDark ? Colors.grey.shade800 : Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: isDark ? Colors.grey.shade700 : Colors.blue.shade100,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(
+                              isDivorced
+                                  ? Icons.heart_broken
+                                  : (fatherDeceased || motherDeceased ? Icons.sentiment_very_dissatisfied : Icons.info_outline),
+                              color: isDivorced ? Colors.redAccent : Colors.blueAccent,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                isDivorced
+                                    ? 'Status Orang Tua: Bercerai. Kedua orang tuamu telah berpisah saat kamu lahir.'
+                                    : (fatherDeceased && motherDeceased
+                                        ? 'Status Keluarga: Kedua orang tuamu telah meninggal dunia saat kamu lahir.'
+                                        : (fatherDeceased
+                                            ? 'Status Keluarga: Ayahmu ($fatherName) telah meninggal dunia. Kamu dibesarkan oleh Ibumu ($motherName) sebagai orang tua tunggal.'
+                                            : 'Status Keluarga: Ibumu ($motherName) telah meninggal dunia. Kamu dibesarkan oleh Ayahmu ($fatherName) sebagai orang tua tunggal.')),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: isDark ? Colors.white : Colors.blue.shade900,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        if (isDivorced) ...[
+                          const SizedBox(height: 10),
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Icon(
+                                Icons.home_work_rounded,
+                                color: Colors.amber,
+                                size: 18,
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  'Hak Asuh: Kamu tinggal & diasuh oleh $custodyLabel.',
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: isDark ? Colors.white : Colors.blue.shade900,
+                                    height: 1.3,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                ),
                 const SizedBox(height: 12),
-                const Text('📊 Data Anggota Keluarga:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                const Row(
+                  children: [
+                    Icon(Icons.bar_chart, color: Colors.blueAccent, size: 16),
+                    SizedBox(width: 6),
+                    Text('Data Anggota Keluarga:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                  ],
+                ),
                 const SizedBox(height: 8),
 
                 // Data Ayah
@@ -300,7 +366,13 @@ class _GameScreenState extends State<GameScreen> {
 
                 if (_character.siblings.isNotEmpty) ...[
                   const Divider(),
-                  const Text('👧👦 Saudara:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                  const Row(
+                    children: [
+                      Icon(Icons.people, color: Colors.blueAccent, size: 16),
+                      SizedBox(width: 6),
+                      Text('Saudara:', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                    ],
+                  ),
                   const SizedBox(height: 8),
                   ..._character.siblings.where((sib) {
                     final String sAge = sib['age'] ?? '0';
@@ -2490,7 +2562,7 @@ class _GameScreenState extends State<GameScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Kelulusan Kuliah 🎓',
+                      'Kelulusan Kuliah',
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -2506,7 +2578,7 @@ class _GameScreenState extends State<GameScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Text(
-                    '🎓 Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang S1 dengan jurusan $major! 🎉\n\nPilih langkah selanjutnya untuk masa depanmu:',
+                    'Kelulusan Kuliah: Selamat! Kamu telah resmi lulus dari jenjang S1 dengan jurusan $major!\n\nPilih langkah selanjutnya untuk masa depanmu:',
                     style: TextStyle(
                       fontSize: 13,
                       color: isDark ? Colors.white70 : Colors.black87,
@@ -2534,7 +2606,7 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                       );
                     },
-                    child: const Text('Lanjut S2 🎓', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    child: const Text('Lanjut S2', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   ),
                   const SizedBox(height: 6),
                   ElevatedButton(
@@ -2559,7 +2631,7 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                       );
                     },
-                    child: const Text('Pilih Bekerja 💼', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
+                    child: const Text('Pilih Bekerja', style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold)),
                   ),
                 ],
               ),
@@ -4074,7 +4146,6 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
   }
 
   void _showIncomingCondomDialog(Map<String, dynamic> proposal, [VoidCallback? onDone]) {
-    final String partnerName = proposal['name'];
     final String relation = proposal['relation'];
     final String myGender = _character.gender.trim().toLowerCase();
     final String partnerGender = (proposal['gender'] ?? 'Laki-laki').trim().toLowerCase();
@@ -4976,7 +5047,7 @@ Widget _buildIntimBadge(IconData icon, String label, Color color) {
                                       } else {
                                         DialogHelper.show(
                                           context: context,
-                                          title: 'Fitur Premium ⏩',
+                                          title: 'Fitur Premium',
                                           content: const Text(
                                             'Fitur Fast Forward Usia (Lompat Usia Instan) adalah Fitur Premium.\n\nIngin membelinya di Toko?',
                                           ),
