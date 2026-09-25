@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:mylifesim/pilih_karakter/character.dart';
 import 'package:mylifesim/avatar/avatar_generator.dart';
 
@@ -40,49 +41,63 @@ class AvatarAgeRules {
 
     if (age <= 3) {
       // --- Usia 0-3 (Bayi) ---
-      top = 'noHair'; // Botak / rambut tipis sekali
+      top = 'noHair'; // Botak / rambut tipis sekali khas bayi
       accessories = 'blank';
       clothing = 'shirtCrewNeck';
       clothingColor = '65c9ff'; // Biru muda cerah khas bayi
       mouthType = 'eating'; // Renders pacifier/dot di DiceBear
-      eyeType = 'happy';
+      eyeType = 'default';
     } else if (age <= 6) {
       // --- Usia 4-6 (Balita / Anak Kecil) ---
-      top = isMale ? 'shortRound' : 'bob';
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty && character.avatarTopType! != 'noHair')
+          ? character.avatarTopType!
+          : (baseTop != 'noHair' ? baseTop : (isMale ? 'shortRound' : 'bob'));
       accessories = 'blank';
       clothing = 'graphicShirt';
       clothingColor = 'ffafb9'; // Warna cerah anak-anak
       mouthType = 'smile';
     } else if (age <= 12) {
       // --- Usia 7-12 (Anak-anak sekolah dasar) ---
-      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty)
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty && character.avatarTopType! != 'noHair')
           ? character.avatarTopType!
-          : (isMale ? 'theCaesar' : 'straight01');
+          : (baseTop != 'noHair' ? baseTop : (isMale ? 'theCaesar' : 'straight01'));
       accessories = (baseAcc != 'blank') ? 'prescription01' : 'blank';
       clothing = 'shirtCrewNeck';
       clothingColor = 'e6e6e6'; // Warna kaos biasa
     } else if (age <= 18) {
       // --- Usia 13-18 (Remaja / Teenager) ---
-      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty)
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty && character.avatarTopType! != 'noHair')
           ? character.avatarTopType!
-          : (isMale ? 'shaggy' : 'straight02');
+          : (baseTop != 'noHair' ? baseTop : (isMale ? 'shaggy' : 'straight02'));
       clothing = 'hoodie'; // Hoodie keren untuk remaja
       clothingColor = '262e33';
-    } else if (age <= 39) {
-      // --- Usia 19-39 (Dewasa Muda / Dewasa) ---
+    } else if (age <= 45) {
+      // --- Usia 19-45 (Dewasa Muda) ---
+      top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty && character.avatarTopType! != 'noHair')
+          ? character.avatarTopType!
+          : (baseTop != 'noHair' ? baseTop : (isMale ? 'shortRound' : 'straight01'));
       // Gunakan pilihan kustom penuh
-    } else if (age <= 59) {
-      // --- Usia 40-59 (Paruh Baya / Middle Aged) ---
-      // (Automatic override removed per request - glasses now determined by eye test)
-    } else if (age <= 70) {
-      // --- Usia 60-70 (Terlihat Tua / Lansia) ---
-      hairColor = 'e8e1e1'; // Mulai beruban (warna silver/abu-abu)
-      mouthType = 'concerned'; // Ekspresi berkerut
     } else {
-      // --- Usia 71-80+ (Terlihat Sangat Tua) ---
-      hairColor = 'e8e1e1'; // Rambut beruban total
-      top = isMale ? 'sides' : 'bun'; // Botak atas (sides) atau sanggul nenek
-      mouthType = 'sad';
+      // --- Usia > 45 (Dewasa Tua & Lansia) ---
+      // Botak terjadi hanya untuk pria di atas 45 tahun dengan peluang 40% secara acak
+      final int seed = (character.name + (character.avatarSkinColor ?? '')).hashCode;
+      final bool isBald40Percent = isMale && (Random(seed).nextInt(100) < 40);
+
+      if (isBald40Percent) {
+        top = 'noHair'; // Botak khas usia lanjut
+      } else {
+        top = (character.avatarTopType != null && character.avatarTopType!.isNotEmpty)
+            ? character.avatarTopType!
+            : baseTop;
+      }
+
+      if (age >= 60) {
+        hairColor = 'e8e1e1'; // Mulai beruban (warna silver/abu-abu)
+        mouthType = 'concerned'; // Ekspresi berkerut
+      }
+      if (age >= 71) {
+        mouthType = 'sad';
+      }
     }
 
     return AvatarGenerator.buildCustomAvatarUrl(

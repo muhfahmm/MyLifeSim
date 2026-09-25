@@ -94,9 +94,8 @@ class AvatarGenerator {
 
   // --- Ekspresi wajah berdasarkan happiness ---
   static String getEyeType(int happiness) {
-    if (happiness > 75) return 'happy';
     if (happiness < 30) return 'cry';
-    return 'default';
+    return 'default'; // Tetap terbuka normal meskipun sedang senang (happiness full)
   }
 
   static String getMouthType(int happiness) {
@@ -200,12 +199,14 @@ class AvatarGenerator {
   static Map<String, String> generateRandomAvatar(String gender, {String? seedName}) {
     final g = gender.toLowerCase().trim();
     final isMale = g == 'laki-laki' || g == 'male' || g == 'pria' || g == 'l' || g.startsWith('laki');
-    final topMap = isMale ? topsMale : topsFemale;
-    final seed = seedName != null ? seedName.hashCode : null;
+    final Map<String, String> topMap = isMale ? topsMale : topsFemale;
+    // Exclude 'noHair' (botak) from random options so characters have hair by default
+    final hairValues = topMap.values.where((v) => v != 'noHair').toList();
+    final seed = seedName?.hashCode;
     final random = seed != null ? Random(seed) : Random();
 
     return {
-      'topType': topMap.values.elementAt(random.nextInt(topMap.length)),
+      'topType': hairValues.isNotEmpty ? hairValues[random.nextInt(hairValues.length)] : 'shortFlat',
       'accessoriesType': 'blank',
       'hairColor': hairColors.values.elementAt(random.nextInt(hairColors.length)),
       'clotheType': clothes.values.elementAt(random.nextInt(clothes.length)),

@@ -200,7 +200,7 @@ class _KarakterScreenState extends State<KarakterScreen> {
 
     final bool isMale = widget.gender == 'male' || widget.gender == 'laki-laki';
     _selectedTopType = isMale
-        ? AvatarGenerator.topsMale.values.first
+        ? 'shortRound'
         : AvatarGenerator.topsFemale.values.first;
     _selectedAccessoriesType = AvatarGenerator.accessories.values.first;
     _selectedHairColor = AvatarGenerator.hairColors.values.first;
